@@ -2,16 +2,36 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "GM State",
   "type": "object",
-  "required": ["version", "season_id", "scenario_seed", "hidden_world_state", "hidden_character_state", "future_events"],
+  "required": ["version", "season_id", "design_status", "scenario_seed", "hidden_world_state", "hidden_character_state", "future_events", "parallel_tracks", "pending_consequences", "intel_truth_map", "resource_dynamics", "route_states"],
   "properties": {
-    "version": {"type": "integer", "minimum": 1},
+    "version": {"type": "integer", "minimum": 2},
     "season_id": {"type": ["string", "null"]},
+    "design_status": {"type": "string"},
     "scenario_seed": {"type": ["integer", "null"]},
     "hidden_world_state": {"type": "object"},
     "hidden_character_state": {"type": "object"},
     "hidden_npcs": {"type": "object"},
     "future_events": {"type": "array"},
+    "parallel_tracks": {"type": "array"},
+    "pending_consequences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "origin_choice": {"type": ["string", "null"]},
+          "trigger": {"type": ["string", "null"]},
+          "effect": {"type": ["string", "null"]},
+          "status": {"type": ["string", "null"]}
+        },
+        "additionalProperties": true
+      }
+    },
+    "intel_truth_map": {"type": "object"},
+    "resource_dynamics": {"type": "object"},
+    "route_states": {"type": "object"},
     "unrevealed_locations": {"type": "array"},
     "notes": {"type": "array"}
-  }
+  },
+  "additionalProperties": true
 }
