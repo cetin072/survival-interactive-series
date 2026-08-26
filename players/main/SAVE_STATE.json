@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "season_id": null,
+  "episode_id": null,
+  "day": 0,
+  "time": null,
+  "location": null,
+  "current_objective": null,
+  "party_location": {
+    "player": null,
+    "wife": null,
+    "son": null,
+    "father": null
+  },
+  "public_party_condition": {
+    "player": "정상",
+    "wife": "정상",
+    "son": "정상",
+    "father": "정상"
+  },
+  "resources": {},
+  "known_information": [],
+  "open_questions": [],
+  "recent_major_events": [],
+  "last_choice": null,
+  "checkpoint_note": "새 Season 1 시작 전 초기 상태"
+}
