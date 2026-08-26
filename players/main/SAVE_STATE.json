@@ -1,7 +1,10 @@
 {
-  "version": 1,
+  "version": 2,
+  "run_type": null,
   "season_id": null,
   "episode_id": null,
+  "scene_id": null,
+  "difficulty": null,
   "day": 0,
   "time": null,
   "location": null,
@@ -18,10 +21,20 @@
     "son": "정상",
     "father": "정상"
   },
+  "party_tasks": {
+    "player": null,
+    "wife": null,
+    "son": null,
+    "father": null
+  },
   "resources": {},
+  "resource_stashes": [],
   "known_information": [],
+  "intel_log": [],
   "open_questions": [],
+  "active_constraints": [],
   "recent_major_events": [],
   "last_choice": null,
-  "checkpoint_note": "새 Season 1 시작 전 초기 상태"
+  "last_action_sequence": [],
+  "checkpoint_note": "공식 S01 설계 전 초기 상태"
 }
