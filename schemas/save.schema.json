@@ -2,22 +2,57 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Player Save State",
   "type": "object",
-  "required": ["version", "season_id", "episode_id", "day", "time", "location", "party_location", "public_party_condition", "resources", "known_information", "recent_major_events"],
+  "required": ["version", "run_type", "season_id", "episode_id", "scene_id", "difficulty", "day", "time", "location", "party_location", "public_party_condition", "party_tasks", "resources", "resource_stashes", "known_information", "intel_log", "open_questions", "active_constraints", "recent_major_events", "last_action_sequence"],
   "properties": {
-    "version": {"type": "integer", "minimum": 1},
+    "version": {"type": "integer", "minimum": 2},
+    "run_type": {"type": ["string", "null"], "enum": ["season", "tutorial", "prototype", null]},
     "season_id": {"type": ["string", "null"]},
     "episode_id": {"type": ["string", "null"]},
+    "scene_id": {"type": ["string", "null"]},
+    "difficulty": {"type": ["string", "null"], "enum": ["Tutorial", "Standard", "Hard", "Standard-Hard", null]},
     "day": {"type": "integer", "minimum": 0},
     "time": {"type": ["string", "null"]},
     "location": {"type": ["string", "null"]},
     "current_objective": {"type": ["string", "null"]},
     "party_location": {"type": "object"},
     "public_party_condition": {"type": "object"},
+    "party_tasks": {"type": "object"},
     "resources": {"type": "object"},
+    "resource_stashes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "location": {"type": ["string", "null"]},
+          "access": {"type": ["string", "null"]},
+          "summary": {"type": ["string", "null"]}
+        },
+        "additionalProperties": true
+      }
+    },
     "known_information": {"type": "array"},
+    "intel_log": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "claim": {"type": "string"},
+          "source": {"type": ["string", "null"]},
+          "observed_at": {"type": ["string", "null"]},
+          "status": {"type": ["string", "null"]}
+        },
+        "required": ["claim"],
+        "additionalProperties": true
+      }
+    },
     "open_questions": {"type": "array"},
+    "active_constraints": {"type": "array"},
     "recent_major_events": {"type": "array"},
     "last_choice": {},
+    "last_action_sequence": {"type": "array"},
     "checkpoint_note": {"type": ["string", "null"]}
-  }
+  },
+  "additionalProperties": true
 }
