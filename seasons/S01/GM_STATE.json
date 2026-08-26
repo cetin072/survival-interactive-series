@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "season_id": "S01",
+  "scenario_seed": null,
+  "hidden_world_state": {},
+  "hidden_character_state": {
+    "player": {},
+    "wife": {},
+    "son": {},
+    "father": {}
+  },
+  "hidden_npcs": {},
+  "future_events": [],
+  "unrevealed_locations": [],
+  "notes": [
+    "새 모바일 플레이 시작 시 GM이 시즌 시드와 숨은 사건 구조를 설정한다.",
+    "이 파일의 내용은 플레이 도중 직접 노출하지 않는다."
+  ]
+}
