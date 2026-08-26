@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Character Party",
+  "type": "object",
+  "required": ["party_version", "members"],
+  "properties": {
+    "party_version": {"type": "integer", "minimum": 1},
+    "members": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "relation", "sex", "age", "role"],
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "relation": {"type": "string"},
+          "sex": {"type": "string"},
+          "age": {"type": "integer", "minimum": 0},
+          "role": {"type": "string"}
+        }
+      }
+    }
+  }
+}
