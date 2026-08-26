@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GM State",
+  "type": "object",
+  "required": ["version", "season_id", "scenario_seed", "hidden_world_state", "hidden_character_state", "future_events"],
+  "properties": {
+    "version": {"type": "integer", "minimum": 1},
+    "season_id": {"type": ["string", "null"]},
+    "scenario_seed": {"type": ["integer", "null"]},
+    "hidden_world_state": {"type": "object"},
+    "hidden_character_state": {"type": "object"},
+    "hidden_npcs": {"type": "object"},
+    "future_events": {"type": "array"},
+    "unrevealed_locations": {"type": "array"},
+    "notes": {"type": "array"}
+  }
+}
