@@ -1,6 +1,7 @@
 {
-  "version": 1,
+  "version": 2,
   "season_id": "S01",
+  "design_status": "NOT DESIGNED",
   "scenario_seed": null,
   "hidden_world_state": {},
   "hidden_character_state": {
@@ -11,9 +12,16 @@
   },
   "hidden_npcs": {},
   "future_events": [],
+  "parallel_tracks": [],
+  "pending_consequences": [],
+  "intel_truth_map": {},
+  "resource_dynamics": {},
+  "route_states": {},
   "unrevealed_locations": [],
   "notes": [
-    "새 모바일 플레이 시작 시 GM이 시즌 시드와 숨은 사건 구조를 설정한다.",
+    "정식 S01은 기획방 설계 승인 전에는 플레이방에서 생성하거나 시작하지 않는다.",
+    "APPROVED FOR PLAYTEST 이후 DESIGN/SCENARIO를 기준으로 숨은 상태를 초기화한다.",
+    "플레이어 선택 뒤에 결과를 맞추기 위해 숨은 세계 상태를 소급 변경하지 않는다.",
     "이 파일의 내용은 플레이 도중 직접 노출하지 않는다."
   ]
 }
