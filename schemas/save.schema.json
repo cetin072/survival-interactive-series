@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Player Save State",
+  "type": "object",
+  "required": ["version", "season_id", "episode_id", "day", "time", "location", "party_location", "public_party_condition", "resources", "known_information", "recent_major_events"],
+  "properties": {
+    "version": {"type": "integer", "minimum": 1},
+    "season_id": {"type": ["string", "null"]},
+    "episode_id": {"type": ["string", "null"]},
+    "day": {"type": "integer", "minimum": 0},
+    "time": {"type": ["string", "null"]},
+    "location": {"type": ["string", "null"]},
+    "current_objective": {"type": ["string", "null"]},
+    "party_location": {"type": "object"},
+    "public_party_condition": {"type": "object"},
+    "resources": {"type": "object"},
+    "known_information": {"type": "array"},
+    "open_questions": {"type": "array"},
+    "recent_major_events": {"type": "array"},
+    "last_choice": {},
+    "checkpoint_note": {"type": ["string", "null"]}
+  }
+}
