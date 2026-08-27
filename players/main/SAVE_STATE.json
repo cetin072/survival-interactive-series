@@ -1,40 +1,85 @@
 {
   "version": 2,
-  "run_type": null,
-  "season_id": null,
-  "episode_id": null,
-  "scene_id": null,
+  "run_type": "season",
+  "season_id": "S01",
+  "episode_id": "E02",
+  "scene_id": "return_to_city_apartment",
   "difficulty": null,
   "day": 0,
-  "time": null,
-  "location": null,
-  "current_objective": null,
+  "time": "14:02",
+  "location": "도심 아파트",
+  "current_objective": "가족 안전을 유지하면서 생활 복구와 정상생활 재개 조건을 정리한다.",
   "party_location": {
-    "player": null,
-    "wife": null,
-    "son": null,
-    "father": null
+    "player": "도심 아파트",
+    "wife": "도심 아파트",
+    "son": "도심 아파트",
+    "father": "도심 아파트"
   },
   "public_party_condition": {
-    "player": "정상",
-    "wife": "정상",
-    "son": "정상",
-    "father": "정상"
+    "player": "안전",
+    "wife": "안전",
+    "son": "안전",
+    "father": "안전"
   },
   "party_tasks": {
-    "player": null,
+    "player": "생활 복구 및 후속 연락 정리",
     "wife": null,
     "son": null,
-    "father": null
+    "father": "아버지 자택 통제 해제 전까지 도심 아파트 체류"
   },
   "resources": {},
-  "resource_stashes": [],
-  "known_information": [],
-  "intel_log": [],
-  "open_questions": [],
-  "active_constraints": [],
-  "recent_major_events": [],
-  "last_choice": null,
-  "last_action_sequence": [],
-  "checkpoint_note": "공식 S01 설계 전 초기 상태"
+  "resource_stashes": [
+    {
+      "id": "city_home",
+      "location": "도심 아파트",
+      "access": "정상",
+      "summary": "집 내부 이상 없음. 사용한 비축품은 추후 재보충 필요."
+    },
+    {
+      "id": "wife_vehicle",
+      "location": "도심 아파트 지하주차장",
+      "access": "정상",
+      "summary": "아내 차량 정상."
+    }
+  ],
+  "known_information": [
+    "공식 대피 권고가 해제되었다.",
+    "도심 아파트 건물에 직접 피해가 없다.",
+    "도심 아파트 전기와 수도가 정상이다.",
+    "집 내부에 이상이 없고 약한 연기 냄새만 남아 있다.",
+    "아버지 자택 지역은 아직 통제 중이다.",
+    "가족 4명 모두 안전하다."
+  ],
+  "intel_log": [
+    {
+      "id": "s01_e02_evacuate_return",
+      "claim": "대피 권고 해제",
+      "source": "공식 안내",
+      "observed_at": "13:10 전후",
+      "status": "확인됨"
+    }
+  ],
+  "open_questions": [
+    "아버지 자택 지역 통제는 언제 해제되는가?",
+    "회사 출근·휴가·재택·결근 처리는 어떻게 되는가?",
+    "아이의 학교·학원 일정에 어떤 영향이 있는가?",
+    "사용한 비축품 중 무엇을 얼마나 재보충해야 하는가?"
+  ],
+  "active_constraints": [
+    "아버지 자택 지역 통제 지속",
+    "집에 약한 연기 냄새 잔존",
+    "재난 후 정상생활 복구 의무가 남아 있음"
+  ],
+  "recent_major_events": [
+    "산불 관련 대피",
+    "공식 대피 권고 해제 확인",
+    "가족 전원 도심 아파트 복귀",
+    "아버지는 자택 통제로 인해 도심 아파트에 임시 체류"
+  ],
+  "last_choice": 1,
+  "last_action_sequence": [
+    "대피 권고 해제 공식 확인",
+    "가족 전원 도심 아파트로 복귀"
+  ],
+  "checkpoint_note": "S01 불길 E02 14:02. 급성 대피는 성공. 시즌은 생활 복구/정상사회 지속 단계로 이어질 수 있음."
 }
