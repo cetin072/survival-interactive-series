@@ -1,5 +1,87 @@
 {
   "version": 1,
   "season_id": "S01",
-  "events": []
+  "scenario_version": "1.0",
+  "events": [
+    {
+      "id": "wildfire_spread_shift",
+      "type": "time_or_condition",
+      "visibility": "gm",
+      "trigger": "wind_or_suppression_state_changes",
+      "effect": "산불 위협권과 거점 가치가 변할 수 있다.",
+      "notes": "플레이어 선택 뒤에 맞춰 소급 생성하지 말고 월드 시드에서 조건을 고정한다."
+    },
+    {
+      "id": "evacuation_status_change",
+      "type": "condition",
+      "visibility": "player_when_announced",
+      "trigger": "official_threshold_reached",
+      "effect": "대피 준비/권고/명령/해제 상태가 바뀐다.",
+      "notes": "공식 정보는 강한 근거지만 실시간 완전정보로 취급하지 않는다."
+    },
+    {
+      "id": "road_congestion_shift",
+      "type": "time",
+      "visibility": "observable_or_intel",
+      "trigger": "departure_wave_or_incident",
+      "effect": "주요 도로 이동시간과 경로 선택 가치가 변한다."
+    },
+    {
+      "id": "power_or_comms_degradation",
+      "type": "condition",
+      "visibility": "observable",
+      "trigger": "infrastructure_stress",
+      "effect": "전력 또는 통신 품질이 저하되어 정보·생활·이동 계획에 영향을 준다."
+    },
+    {
+      "id": "fuel_and_lodging_pressure",
+      "type": "time",
+      "visibility": "observable_or_intel",
+      "trigger": "regional_displacement_increases",
+      "effect": "주유 대기와 숙박 가용성/비용 압박이 커질 수 있다."
+    },
+    {
+      "id": "family_fatigue_conflict",
+      "type": "condition",
+      "visibility": "player",
+      "trigger": "travel_or_waiting_fatigue_threshold",
+      "effect": "가족 구성원의 휴식·숙박·이동 선호가 갈릴 수 있다."
+    },
+    {
+      "id": "night_route_exposure",
+      "type": "condition",
+      "visibility": "gm_then_observable",
+      "trigger": "night_travel_on_uncertain_route",
+      "effect": "위험 노출도가 상승한다. 사고는 확정하지 않는다.",
+      "notes": "Risk Exposure Rule 적용. 실제 결과는 도로·기상·차량·피로·이전 선택과 결합한다."
+    },
+    {
+      "id": "wildfire_suppression_improves",
+      "type": "time_or_condition",
+      "visibility": "intel",
+      "trigger": "suppression_progress",
+      "effect": "일부 대피·복귀 조건이 완화될 수 있다."
+    },
+    {
+      "id": "post_fire_rainfall",
+      "type": "time_or_condition",
+      "visibility": "forecast_then_observable",
+      "trigger": "rain_after_burned_slope_exists",
+      "effect": "불탄 산지의 토사유출·산사태 위험 평가가 활성화된다."
+    },
+    {
+      "id": "return_restriction_reassessment",
+      "type": "condition",
+      "visibility": "official_intel",
+      "trigger": "secondary_hazard_or_site_inspection",
+      "effect": "주민 복귀 권고가 유지·철회·재개될 수 있다."
+    },
+    {
+      "id": "normal_society_resume",
+      "type": "time",
+      "visibility": "player",
+      "trigger": "acute_hazard_decreases",
+      "effect": "직장·학교·주거·경제·생활복구 의무가 다시 강하게 활성화된다."
+    }
+  ]
 }
