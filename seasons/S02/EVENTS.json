@@ -1,12 +1,12 @@
 {
-  "version": 2,
+  "version": 3,
   "season_id": "S02",
   "events": [
     {
       "id": "E02-001",
       "type": "time",
       "trigger_local": "2026-09-04T19:18:00+09:00",
-      "status": "active",
+      "status": "occurred",
       "hidden": true,
       "summary": "도심 여러 구역에서 순간정전·통신 지연·위성항법 오차가 거의 동시에 시작된다.",
       "player_visibility": "아파트 조명 깜빡임, 휴대폰 데이터 지연, 일부 전자기기 재부팅 등 관찰 가능한 현상만 공개"
@@ -15,7 +15,7 @@
       "id": "E02-002",
       "type": "time",
       "trigger_local": "2026-09-04T19:24:00+09:00",
-      "status": "pending",
+      "status": "occurred",
       "hidden": true,
       "summary": "아파트 승강기 한 대가 안전정지하고 관리소가 비상전원·급수 설비 점검을 시작한다.",
       "conditions": ["플레이어 행동과 무관하게 건물 전원 품질 불안정 지속"],
@@ -25,7 +25,7 @@
       "id": "E02-003",
       "type": "time",
       "trigger_local": "2026-09-04T19:31:00+09:00",
-      "status": "pending",
+      "status": "occurred",
       "hidden": true,
       "summary": "정부·지자체가 광역 전력·통신 이상과 교통신호 장애를 확인하고 원인 조사 중이라는 1차 안내를 배포한다.",
       "player_visibility": "재난문자·방송 수신 상태에 따라 지연 가능"
