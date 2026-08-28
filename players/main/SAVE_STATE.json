@@ -1,15 +1,17 @@
 {
-  "version": 2,
+  "version": 3,
   "run_type": "season",
-  "season_id": "S01",
-  "episode_id": "FINAL",
-  "scene_id": "season_complete",
-  "difficulty": "Standard",
-  "season_status": "first_playthrough_complete",
+  "season_id": "S02",
+  "episode_id": "E01",
+  "scene_id": "day0_initial_anomaly",
+  "difficulty": "Standard-Hard",
+  "season_status": "active_first_playthrough",
   "day": 0,
-  "time": null,
-  "location": "도심 아파트",
-  "current_objective": null,
+  "date": "2026-09-04",
+  "weekday": "금요일",
+  "time": "19:18",
+  "location": "서림시 도심 아파트",
+  "current_objective": "이상 징후의 범위를 파악하고 가족의 초기 대응을 결정한다.",
   "party_location": {
     "player": "도심 아파트",
     "wife": "도심 아파트",
@@ -17,71 +19,71 @@
     "father": "도심 아파트"
   },
   "public_party_condition": {
-    "player": "생존·안전",
-    "wife": "생존·안전",
-    "son": "생존·안전",
-    "father": "생존·안전"
+    "player": "정상",
+    "wife": "정상",
+    "son": "정상",
+    "father": "정상"
   },
   "party_tasks": {
     "player": null,
     "wife": null,
     "son": null,
-    "father": "외곽 자택 안전 복귀 가능 시점까지 도심 아파트 임시 체류"
+    "father": "S01 이후 외곽 자택 복귀 제한으로 도심 아파트 임시 체류 중"
   },
-  "resources": {},
+  "resources": {
+    "bottled_water": "약 24L",
+    "food": "가족 4인 기준 약 3일분 구성 가능",
+    "emergency_kit": "공용 비상가방 1개",
+    "vehicle": "서윤 차량 1대, 정상, 연료 약 65%"
+  },
   "resource_stashes": [
     {
       "id": "city_home",
       "location": "도심 아파트",
       "access": "정상",
-      "summary": "직접 화재 피해 없음. 전기·수도 정상. 주거 가능."
+      "summary": "전기·수도 사용 가능하지만 방금 전력 이상 징후가 시작됨. 평소 생활물자와 공용 비상가방 보유."
     },
     {
       "id": "father_outskirts_home",
       "location": "외곽주택",
-      "access": "즉시 복귀 불가",
-      "summary": "본채 생존, 창고 일부 피해, 주변 산림 광범위 소실, 태양광 등 일부 설비 상태 불명. 호우·산사태 후속 위험 존재."
+      "access": "즉시 복귀 제한",
+      "summary": "S01 이후 본채 생존, 창고 일부 피해. 주변 산림 피해와 사면 위험이 남아 있고 태양광 등 일부 설비 상태 미확인."
     },
     {
       "id": "wife_vehicle",
       "location": "도심 아파트 지하주차장",
-      "access": "정상",
-      "summary": "아내 차량 정상."
+      "access": "현재 접근 가능",
+      "summary": "차량 정상, 연료 약 65%."
     }
   ],
   "known_information": [
-    "가족 4명 전원 생존했다.",
-    "도심 아파트는 직접 화재 피해가 없고 거주 가능하다.",
-    "아버지 외곽주택 본채는 생존했으나 창고 일부가 피해를 입었다.",
-    "외곽 거점 주변 산림이 광범위하게 소실되었다.",
-    "태양광 등 외곽 거점 일부 설비 상태는 불명이다.",
-    "산불 이후 호우·산사태 위험 때문에 아버지 집 즉시 복귀가 어렵다.",
-    "직장과 학교는 재난 상황에 따라 일시 중단 후 정상화되었다."
+    "한준호(본인·41세), 서윤(아내·39세), 민석(아들·13세), 정호(아버지·68세) 네 명 모두 도심 아파트에 함께 있다.",
+    "정호는 S01 산불 이후 외곽 자택의 즉시 복귀가 제한되어 임시로 도심 아파트에 머물고 있다.",
+    "도심 아파트는 평소 생활물자와 가족 장비가 집중된 거점이며 장기 정전·단수·승강기 중단에는 취약할 수 있다.",
+    "외곽주택은 평시 차량 20~30분 거리이며 작은 마당·창고·제한적 독립전력 설비가 있으나 S01 이후 일부 설비 상태가 아직 확인되지 않았다.",
+    "사용 가능한 가족 차량은 서윤 차량이며 지하주차장에 있고 연료는 약 65%다.",
+    "집에는 생수 약 24L, 평소 식재료를 합쳐 4인 기준 약 3일분 식사가 가능하며 공용 비상가방 1개가 있다.",
+    "현재 수도는 정상이고 전기는 방금 이상 징후가 발생하기 전까지 정상 사용 중이었다.",
+    "오늘은 2026년 9월 4일 금요일 저녁이다. 주말이 시작되지만 다음 주 직장·학교 일정은 정상적으로 예정돼 있다."
   ],
   "intel_log": [],
   "open_questions": [
+    "현재 전력·통신 이상이 건물 내부 문제인지 광역 문제인지",
+    "장애 원인과 지속 예상시간",
     "외곽주택 태양광 등 일부 설비의 최종 상태"
   ],
   "active_constraints": [
-    "아버지 외곽주택 즉시 복귀 불가",
-    "산불 피해 산지의 호우·산사태 후속 위험"
+    "아버지 외곽주택 즉시 복귀 제한",
+    "외곽 산지의 S01 후속 사면 위험",
+    "방금 시작된 전력·통신 이상 징후"
   ],
   "recent_major_events": [
-    "산불 발생과 가족 분산",
-    "가족 합류",
-    "1차 대피",
-    "산불 재확산과 재대피",
-    "공식 대피소와 가족 의견 충돌",
-    "야간 이동 및 [STRESS_TEST] 지방도로 위험도 검증",
-    "산불 이후 호우·산사태 2차 위험",
-    "도심 아파트 복귀 및 생활 정상화",
-    "S01 첫 플레이 완료"
+    "S01 불길 첫 플레이 완료",
+    "도심 아파트 생활 정상화",
+    "S02 Day 0 금요일 저녁 시작",
+    "도심 아파트에서 순간적인 전력·통신 이상 징후 발생"
   ],
   "last_choice": null,
-  "last_action_sequence": [
-    "대피 종료 후 생활 복구",
-    "직장·학교 정상화",
-    "S01 종료 복기"
-  ],
-  "checkpoint_note": "SEASON 01 불길 첫 플레이 완료. 첫 본편형 유효 프로토타입. 다음 단계는 Scenario v1.0 추출이며 다음 시즌은 선택 비용과 장기 결과를 강화한다."
+  "last_action_sequence": [],
+  "checkpoint_note": "S02 첫 플레이 시작. Hidden World Seed는 선택 전에 고정되었고 첫 의미 있는 선택 전 Player Known Information을 공개하는 상태."
 }
