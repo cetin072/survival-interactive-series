@@ -2,15 +2,16 @@
   "version": 2,
   "season_id": "S01",
   "design_status": "SCENARIO_V1_0_FROZEN",
-  "scenario_seed": {
-    "title": "불길",
-    "version": "1.0",
-    "base_difficulty": "Standard+",
-    "core_hazard": "wildfire",
-    "secondary_hazard": "post-fire rainfall and landslide risk",
-    "design_principle": "world_first_story_emerges_from_play"
-  },
+  "scenario_seed": 1001,
   "hidden_world_state": {
+    "scenario_meta": {
+      "title": "불길",
+      "version": "1.0",
+      "base_difficulty": "Standard+",
+      "core_hazard": "wildfire",
+      "secondary_hazard": "post-fire rainfall and landslide risk",
+      "design_principle": "world_first_story_emerges_from_play"
+    },
     "must_seed_before_each_run": [
       "wildfire_origin_and_spread_axes",
       "wind_change_window",
@@ -63,13 +64,55 @@
     "home_and_base_status"
   ],
   "pending_consequences": [
-    "사전 차량 적재 여부",
-    "연료 관리",
-    "가족 휴식 관리",
-    "가족 의견 처리",
-    "거점 선택",
-    "이동 타이밍",
-    "위험 경로 노출"
+    {
+      "id": "preload_vehicle",
+      "origin_choice": "차량 사전 적재 여부",
+      "trigger": "재대피 필요",
+      "effect": "출발 지연과 운반 부담에 영향",
+      "status": "template"
+    },
+    {
+      "id": "fuel_management",
+      "origin_choice": "연료 관리",
+      "trigger": "장거리 또는 반복 이동",
+      "effect": "이동 선택폭과 주유 압박에 영향",
+      "status": "template"
+    },
+    {
+      "id": "rest_management",
+      "origin_choice": "가족 휴식 관리",
+      "trigger": "야간/장시간 이동",
+      "effect": "피로·갈등·운전 부담에 영향",
+      "status": "template"
+    },
+    {
+      "id": "family_opinion_handling",
+      "origin_choice": "가족 의견 처리",
+      "trigger": "후속 공동 결정",
+      "effect": "신뢰·협조·갈등 강도에 영향",
+      "status": "template"
+    },
+    {
+      "id": "base_choice",
+      "origin_choice": "거점 선택",
+      "trigger": "재난 확산 또는 복귀 단계",
+      "effect": "물자·차량·비용·복구속도에 영향",
+      "status": "template"
+    },
+    {
+      "id": "departure_timing",
+      "origin_choice": "이동 타이밍",
+      "trigger": "도로 혼잡/야간화",
+      "effect": "이동시간·숙박 가용성·피로에 영향",
+      "status": "template"
+    },
+    {
+      "id": "route_risk_exposure",
+      "origin_choice": "위험 경로 선택",
+      "trigger": "불확실한 야간 경로 이용",
+      "effect": "위험 노출 증가. 사고를 자동 확정하지 않음",
+      "status": "template"
+    }
   ],
   "intel_truth_map": {
     "sources": [
@@ -107,6 +150,7 @@
   "notes": [
     "Scenario v1.0은 seasons/S01/SCENARIO_V1.md를 기준으로 한다.",
     "큰 갈림길은 BRANCH_MAP.md를 따른다.",
+    "scenario_seed 숫자는 템플릿 식별용 기본값이며 실제 런에서는 필요에 따라 새 중립 시드를 정할 수 있다.",
     "플레이어 상식 정보는 첫 의미 있는 선택 전에 공개한다.",
     "Risk Exposure Rule을 적용하여 위험 선택을 서사적으로 처벌하지 않는다.",
     "국가기능 붕괴 수준이 아니면 Normal Society Continuity Rule을 적용한다.",
