@@ -1,81 +1,14 @@
 {
-  "version": 5,
+  "version": 6,
   "season_id": "S02",
   "events": [
-    {
-      "id": "E02-001",
-      "type": "time",
-      "trigger_local": "2026-09-04T19:18:00+09:00",
-      "status": "occurred",
-      "hidden": true,
-      "summary": "도심 여러 구역에서 순간정전·통신 지연·위성항법 오차가 거의 동시에 시작된다.",
-      "player_visibility": "아파트 조명 깜빡임, 휴대폰 데이터 지연, 일부 전자기기 재부팅 등 관찰 가능한 현상만 공개"
-    },
-    {
-      "id": "E02-002",
-      "type": "time",
-      "trigger_local": "2026-09-04T19:24:00+09:00",
-      "status": "occurred",
-      "hidden": true,
-      "summary": "아파트 승강기 한 대가 안전정지하고 관리소가 비상전원·급수 설비 점검을 시작한다.",
-      "conditions": ["플레이어 행동과 무관하게 건물 전원 품질 불안정 지속"],
-      "player_visibility": "관리방송 또는 직접 확인 시 공개"
-    },
-    {
-      "id": "E02-003",
-      "type": "time",
-      "trigger_local": "2026-09-04T19:31:00+09:00",
-      "status": "occurred",
-      "hidden": true,
-      "summary": "정부·지자체가 광역 전력·통신 이상과 교통신호 장애를 확인하고 원인 조사 중이라는 1차 안내를 배포한다.",
-      "player_visibility": "재난문자·방송 수신 상태에 따라 지연 가능"
-    },
-    {
-      "id": "E02-004",
-      "type": "time",
-      "trigger_local": "2026-09-04T20:05:00+09:00",
-      "status": "occurred",
-      "hidden": true,
-      "summary": "지역별 전력 복구와 재정전이 엇갈리고 일부 카드·모바일결제 승인 지연, 신호등 장애가 확대된다.",
-      "player_visibility": "한준호가 주유소 결제 지연과 신호등 소등을 직접 관찰. 서윤·정호는 편의점 결제 지연 및 첫 ATM 통신오류를 경험. 민석은 뉴스로 지역별 재정전 확대를 확인."
-    },
-    {
-      "id": "E02-005",
-      "type": "conditional",
-      "status": "pending",
-      "hidden": true,
-      "summary": "통신 기지국 배터리와 비상전원 상태에 따라 늦은 밤부터 지역별 통신 품질 격차가 커진다.",
-      "conditions": ["해당 구역 정전이 수시간 지속", "기지국 비상전원 소진 또는 연료 보급 지연"],
-      "earliest_local": "2026-09-04T23:00:00+09:00",
-      "player_visibility": "통화 실패·데이터 지연·주변 사람 반응으로 체감"
-    },
-    {
-      "id": "E02-006",
-      "type": "time",
-      "trigger_local": "2026-09-05T07:30:00+09:00",
-      "status": "pending",
-      "hidden": true,
-      "summary": "장애가 밤을 넘긴 지역에서 주유·생필품·충전·현금 수요가 급증하고 영업 가능한 점포에 수요가 몰린다.",
-      "player_visibility": "직접 이동, 주변 연락, 방송을 통해 점진적으로 공개"
-    },
-    {
-      "id": "E02-007",
-      "type": "conditional_time_window",
-      "window_local": "2026-09-05T19:00:00+09:00/2026-09-06T07:00:00+09:00",
-      "status": "pending",
-      "hidden": true,
-      "summary": "추가 우주기상 충격이 도달할 수 있다. 실제 강도와 국내 영향은 고정된 범위 안에서 판정하며 플레이어 선택에 맞춰 소급 변경하지 않는다.",
-      "conditions": ["관계기관 예보는 사전에 존재", "영향 정도는 기존 계통 상태와 복구 수준에 따라 결정"],
-      "player_visibility": "공식 경보 수준이 올라갈 경우 공개"
-    },
-    {
-      "id": "E02-008",
-      "type": "time",
-      "trigger_local": "2026-09-04T22:48:00+09:00",
-      "status": "pending",
-      "hidden": true,
-      "summary": "서림시 남쪽 평지 일부 배전구역이 다시 정전된다. 친척 단독주택도 같은 구역에 포함된다.",
-      "player_visibility": "친척집 전원 소실과 인근 주택가 소등으로 직접 확인"
-    }
+    {"id":"E02-001","type":"time","trigger_local":"2026-09-04T19:18:00+09:00","status":"occurred","hidden":true,"summary":"도심 여러 구역에서 순간정전·통신 지연·위성항법 오차가 거의 동시에 시작된다.","player_visibility":"아파트 조명 깜빡임, 휴대폰 데이터 지연, 일부 전자기기 재부팅 등 관찰 가능한 현상만 공개"},
+    {"id":"E02-002","type":"time","trigger_local":"2026-09-04T19:24:00+09:00","status":"occurred","hidden":true,"summary":"아파트 승강기 한 대가 안전정지하고 관리소가 비상전원·급수 설비 점검을 시작한다.","conditions":["플레이어 행동과 무관하게 건물 전원 품질 불안정 지속"],"player_visibility":"관리방송 또는 직접 확인 시 공개"},
+    {"id":"E02-003","type":"time","trigger_local":"2026-09-04T19:31:00+09:00","status":"occurred","hidden":true,"summary":"정부·지자체가 광역 전력·통신 이상과 교통신호 장애를 확인하고 원인 조사 중이라는 1차 안내를 배포한다.","player_visibility":"재난문자·방송 수신 상태에 따라 지연 가능"},
+    {"id":"E02-004","type":"time","trigger_local":"2026-09-04T20:05:00+09:00","status":"occurred","hidden":true,"summary":"지역별 전력 복구와 재정전이 엇갈리고 일부 카드·모바일결제 승인 지연, 신호등 장애가 확대된다.","player_visibility":"한준호가 주유소 결제 지연과 신호등 소등을 직접 관찰. 서윤·정호는 편의점 결제 지연 및 첫 ATM 통신오류를 경험. 민석은 뉴스로 지역별 재정전 확대를 확인."},
+    {"id":"E02-005","type":"conditional","status":"pending","hidden":true,"summary":"통신 기지국 배터리와 비상전원 상태에 따라 늦은 밤부터 지역별 통신 품질 격차가 커진다.","conditions":["해당 구역 정전이 수시간 지속","기지국 비상전원 소진 또는 연료 보급 지연"],"earliest_local":"2026-09-04T23:00:00+09:00","player_visibility":"통화 실패·데이터 지연·주변 사람 반응으로 체감"},
+    {"id":"E02-006","type":"time","trigger_local":"2026-09-05T07:30:00+09:00","status":"pending","hidden":true,"summary":"장애가 밤을 넘긴 지역에서 주유·생필품·충전·현금 수요가 급증하고 영업 가능한 점포에 수요가 몰린다.","player_visibility":"직접 이동, 주변 연락, 방송을 통해 점진적으로 공개"},
+    {"id":"E02-007","type":"conditional_time_window","window_local":"2026-09-05T19:00:00+09:00/2026-09-06T07:00:00+09:00","status":"pending","hidden":true,"summary":"추가 우주기상 충격이 도달할 수 있다. 실제 강도와 국내 영향은 고정된 범위 안에서 판정하며 플레이어 선택에 맞춰 소급 변경하지 않는다.","conditions":["관계기관 예보는 사전에 존재","영향 정도는 기존 계통 상태와 복구 수준에 따라 결정"],"player_visibility":"공식 경보 수준이 올라갈 경우 공개"},
+    {"id":"E02-008","type":"time","trigger_local":"2026-09-04T22:48:00+09:00","status":"occurred","hidden":true,"summary":"서림시 남쪽 평지 일부 배전구역이 다시 정전된다. 친척 단독주택도 같은 구역에 포함된다.","player_visibility":"친척집 전원 소실과 인근 주택가 소등으로 직접 확인"}
   ]
 }
