@@ -1,38 +1,52 @@
-# Season 01 — 불길
+# SEASON 01 — 불길
+
+STATUS: SCENARIO V1.0 FROZEN
 
 ## 현재 지위
-정식 첫 플레이 진행 중.
-아직 Scenario v1.0으로 동결하지 않는다.
+첫 플레이와 최종 회고를 바탕으로 재사용 가능한 Scenario v1.0 추출을 완료했다.
 
-## 제작 방식
-이 시즌은 완성 대본을 먼저 작성한 뒤 따라가는 구조가 아니다.
-Hidden World Seed를 기반으로 실제 플레이를 통해 이야기를 발견한다.
+공식 재사용 문서:
+- `SCENARIO_V1.md` — 시즌 세계·압력·전환점·이벤트·종료상태
+- `BRANCH_MAP.md` — 큰 갈림길과 장기 인과관계
+- `EVENTS.json` — 시간/조건부 사건 풀
+- `GM_STATE.json` — 재플레이용 비공개 시드 골격
+- `MEDIA_CANDIDATES.md` — Visual Bible 이전 미디어 후보
 
-## 현재까지 공개된 큰 흐름
-- 산불/연기 위험으로 가족 대피가 발생함.
-- 아버지 자택 지역은 통제 대상이 되었고 가족 4명이 함께 움직이는 상태가 됨.
-- 대피 권고 해제 확인 후 E02에서 가족 전원이 도심 아파트로 복귀함.
-- 도심 아파트는 직접 피해가 없고 전기·수도·차량이 정상임.
-- 아버지 집은 아직 통제 중이라 아버지는 당분간 도심 아파트에 머묾.
-- 급성 대피는 성공했지만 직장·학교·행정·주거·비축품 재보충 등 생활 복구 문제는 남아 있음.
+첫 플레이 기록:
+- `PLAYTHROUGH_CANON.md`
+- `RETROSPECTIVE.md`
 
-## 공통 규칙 반영
-이 시즌부터 `docs/NORMAL_SOCIETY_CONTINUITY_RULE.md`를 적용한다.
-재난이 국가기능 붕괴 단계가 아닌 경우 정상 사회의 의무와 일정이 계속 플레이에 영향을 준다.
+## 의미
+Scenario v1.0은 완성 대본이 아니다.
 
-## 아직 확정하지 않는 것
-- 시즌 전체 길이
-- 다음 에피소드 수
-- 확정 클라이맥스
-- 확정 엔딩
-- 미사용 갈림길의 최종 Canon
+다른 플레이어가 같은 `불길`을 플레이할 때:
+- 세계와 핵심 압력은 같은 뼈대를 사용하고
+- 시작 위치·숨은 상태·도로·풍향·정보 지연 등은 런 시작 전 다시 시드할 수 있으며
+- 세부 장면·대화·자유행동 결과는 AI GM이 기존 상태와 충돌하지 않는 범위에서 즉흥 생성한다.
 
-## 시즌 종료 후
-실제 플레이와 미사용 세계 요소를 분석해:
-- PLAYTHROUGH_CANON
-- Branch Map
-- Scenario v1.0
-- AAR
-- 삽화/영상 후보
+첫 플레이에서 사용자가 걸었던 경로는 정답 루트로 고정하지 않는다.
 
-를 정리한다.
+## 핵심 공통 규칙
+- Player Known Information Rule
+- Multi-Base Rule
+- Normal Society Continuity Rule
+- Risk Exposure Rule
+- Player Intentional Stress-Test Tag
+- Post-Disaster Secondary Hazard Rule
+- Season Dual Review Rule
+- Decision Cost over Event Count
+
+상세: `docs/PLAYTEST_DERIVED_RULES_V1.md`
+
+## 현실성 기준
+현실 지식 검증 기록은 `knowledge/SOURCES.md`를 따른다.
+S01은 특정 실제 산불을 재현하지 않는 가상 시나리오다.
+
+## 다음 단계
+S01은 여기서 시나리오 자산화 완료로 본다.
+
+향후 순서:
+1. S02 플레이테스트
+2. S01을 실제 외부/추가 플레이어가 테스트할 시 v1.1 개선 후보 수집
+3. 시각 제작 단계에 들어갈 때 Visual Bible 작성
+4. 이후 S01 미디어 후보 선별·제작
