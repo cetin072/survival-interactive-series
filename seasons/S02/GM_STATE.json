@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "season_id": "S02",
   "design_status": "ACTIVE_FIRST_PLAYTHROUGH",
   "scenario_seed": {
@@ -15,12 +15,12 @@
     "anti_retcon_locked": true
   },
   "hidden_world_state": {
-    "phase": "PHASE_0_TO_1",
+    "phase": "PHASE_1",
     "region": "현대 대한민국과 유사한 가상 한국의 서림시 생활권",
-    "city_status": "평상시 기능이 유지되던 금요일 저녁. 이상 징후가 막 시작됐으며 대다수 시민은 원인을 모른다.",
+    "city_status": "광역 전력·통신 이상이 반복되며 일부 교통·결제 장애가 확대되는 금요일 저녁",
     "power": {
       "city_grid": "불안정",
-      "apartment_feed": "간헐적 순간정전 발생 단계",
+      "apartment_feed": "20시 이후 재정전",
       "expected_next_hours": "복구와 재정전이 반복될 가능성이 높음",
       "critical_damage": "도시 외곽 일부 변전설비에 실제 손상 존재"
     },
@@ -36,13 +36,13 @@
     },
     "transport": {
       "roads": "대부분 통행 가능",
-      "traffic_signals": "일부 교차로 순간 장애 시작",
+      "traffic_signals": "일부 교차로 장애 확대",
       "rail": "안전 확인으로 지연 가능성 증가",
-      "fuel_stations": "현재 정상 영업 중이나 전력 의존"
+      "fuel_stations": "일부 영업 중이나 전력 의존"
     },
     "payments": {
       "cash": "정상",
-      "cards": "대부분 정상이나 일부 승인 지연",
+      "cards": "일부 승인 지연",
       "mobile_payments": "통신 장애 지역에서 실패 가능"
     },
     "public_order": "정상사회 유지. 경찰·소방·행정이 작동 중이며 무법 상태 아님.",
@@ -50,130 +50,43 @@
     "father_home_access": "S01 산불 이후 산지 복구와 사면 위험 때문에 즉시 복귀는 아직 제한적이며 일부 설비 상태 미확인"
   },
   "hidden_character_state": {
-    "player": {
-      "location": "도심 아파트",
-      "condition": "정상",
-      "priority": "가족 안전과 상황 파악",
-      "stress": "낮음"
-    },
-    "wife": {
-      "location": "도심 아파트",
-      "condition": "정상",
-      "priority": "가족 생활 기반과 물·식량·통신 안정",
-      "stress": "낮음",
-      "likely_behavior": "정보가 불확실하면 성급한 이동을 견제"
-    },
-    "son": {
-      "location": "도심 아파트",
-      "condition": "정상",
-      "priority": "상황 이해와 휴대폰·통신 유지",
-      "stress": "낮음",
-      "likely_behavior": "온라인 정보 확인을 먼저 시도할 가능성"
-    },
-    "father": {
-      "location": "도심 아파트",
-      "condition": "정상",
-      "priority": "외곽 자택 상태 확인과 가족 부담 최소화",
-      "stress": "낮음",
-      "likely_behavior": "초기에는 침착하나 외곽집 장기 방치가 길어지면 복귀 의지가 강해질 수 있음"
-    }
+    "player": {"location":"도심 아파트","condition":"정상","priority":"가족 안전과 상황 파악","stress":"낮음"},
+    "wife": {"location":"도심 아파트","condition":"정상","priority":"가족 생활 기반과 물·식량·통신 안정","stress":"낮음","likely_behavior":"정보가 불확실하면 성급한 이동을 견제"},
+    "son": {"location":"도심 아파트","condition":"정상","priority":"상황 이해와 휴대폰·통신 유지","stress":"낮음","likely_behavior":"온라인 정보 확인을 먼저 시도할 가능성"},
+    "father": {"location":"도심 아파트","condition":"정상","priority":"외곽 자택 상태 확인과 가족 부담 최소화","stress":"낮음","likely_behavior":"외곽집을 장기 거점 후보로 보지만 야간 무리한 이동은 주장하지 않음"}
   },
   "hidden_npcs": {
-    "apt_manager": {
-      "name": "박기철",
-      "role": "아파트 관리소 당직 책임자",
-      "goal": "승강기·비상전원·급수 상태 확인과 주민 혼란 억제",
-      "knowledge": "건물 내부 설비 상태는 비교적 정확하지만 광역 원인은 모름"
-    },
-    "local_grid_engineer": {
-      "name": "윤서진",
-      "role": "지역 전력설비 협력업체 기술자",
-      "goal": "도시 외곽 변전설비 점검 지원",
-      "knowledge": "광역 장애가 단순 정전이 아니라는 단서를 일찍 접함",
-      "availability": "플레이어와 직접 연결되어 있지 않음"
-    },
-    "neighbor": {
-      "name": "최미경",
-      "role": "같은 층 이웃 주민",
-      "goal": "혼자 사는 노모와 연락 유지",
-      "knowledge": "SNS와 가족 연락에 의존해 정보 정확도가 들쭉날쭉"
-    }
+    "apt_manager": {"name":"박기철","role":"아파트 관리소 당직 책임자","goal":"승강기·비상전원·급수 상태 확인과 주민 혼란 억제","knowledge":"건물 내부 설비 상태는 비교적 정확하지만 광역 원인은 모름"},
+    "local_grid_engineer": {"name":"윤서진","role":"지역 전력설비 협력업체 기술자","goal":"도시 외곽 변전설비 점검 지원","knowledge":"광역 장애가 단순 정전이 아니라는 단서를 일찍 접함","availability":"플레이어와 직접 연결되어 있지 않음"},
+    "neighbor": {"name":"최미경","role":"같은 층 이웃 주민","goal":"혼자 사는 노모와 연락 유지","knowledge":"SNS와 가족 연락에 의존해 정보 정확도가 들쭉날쭉"}
   },
-  "future_events": [
-    "E02-001",
-    "E02-002",
-    "E02-003",
-    "E02-004",
-    "E02-005",
-    "E02-006",
-    "E02-007"
-  ],
-  "parallel_tracks": [
-    "전력계통 복구·재악화",
-    "통신망 혼잡과 기지국 배터리 소진",
-    "교통·전자결제 장애",
-    "직장·학교 주말 이후 일정 변화",
-    "외곽주택 접근 제한과 설비 상태",
-    "가족 피로·역할·거점 선호 변화"
-  ],
+  "future_events": ["E02-001","E02-002","E02-003","E02-004","E02-005","E02-006","E02-007"],
+  "parallel_tracks": ["전력계통 복구·재악화","통신망 혼잡과 기지국 배터리 소진","교통·전자결제 장애","직장·학교 주말 이후 일정 변화","외곽주택 접근 제한과 설비 상태","가족 피로·역할·거점 선호 변화"],
   "pending_consequences": [
     "초기 전력·통신 안정화 행동이 첫 24시간 자원 여유에 영향을 줌",
-    "차량을 언제·어떻게 유지하는지가 이후 이동 선택 폭에 영향을 줌",
+    "차량을 지상에 두어 출차 접근성은 높아졌지만 외부 노출은 증가함",
     "외곽주택 확인을 서두르거나 미루는 선택이 장기 거점 옵션에 영향을 줄 수 있음",
     "이웃·관리소와의 초기 협력이 이후 정보와 상호지원에 영향을 줄 수 있음"
   ],
   "intel_truth_map": {
-    "official_initial": "광역 전력·통신 이상 발생 사실은 맞으나 원인과 지속시간은 초기 발표에서 불확실",
-    "cyberattack_rumor": "초기 SNS의 대규모 사이버공격 확정설은 확인되지 않은 오정보",
-    "war_rumor": "전쟁·공격 연계설은 초기 시점에서 근거 없음",
-    "space_weather_internal": "관계기관은 강한 우주기상 영향을 유력 원인 중 하나로 보고 있으나 대중 발표는 아직 제한적",
-    "second_impact_forecast": "추가 충격 가능성은 실제 존재하지만 강도와 도달 영향은 불확실"
+    "official_initial":"광역 전력·통신 이상 발생 사실은 맞으나 원인과 지속시간은 초기 발표에서 불확실",
+    "cyberattack_rumor":"초기 SNS의 대규모 사이버공격 확정설은 확인되지 않은 오정보",
+    "war_rumor":"전쟁·공격 연계설은 초기 시점에서 근거 없음",
+    "space_weather_internal":"관계기관은 강한 우주기상 영향을 유력 원인 중 하나로 보고 있으나 대중 발표는 아직 제한적",
+    "second_impact_forecast":"추가 충격 가능성은 실제 존재하지만 강도와 도달 영향은 불확실"
   },
   "resource_dynamics": {
-    "city_home": {
-      "tap_water": "현재 사용 가능",
-      "bottled_water_known": "약 24L",
-      "food_known": "평소 식재료 포함 가족 4인 기준 약 3일분을 무리 없이 구성 가능",
-      "emergency_kit": "공용 비상가방 1개, 기본 구급품·손전등·예비건전지·보조배터리 포함",
-      "charging": "가정용 전원과 보조배터리 사용 가능하나 정전 지속 시 제한"
-    },
-    "wife_vehicle": {
-      "location": "도심 아파트 지하주차장",
-      "condition": "정상",
-      "fuel": "약 65%",
-      "role": "현재 확인된 가족의 사용 가능 차량"
-    },
-    "father_home": {
-      "location": "외곽 단독주택",
-      "access": "현재 즉시 복귀 제한",
-      "solar_battery": "S01 이후 최종 상태 미확인",
-      "lpg": "평소 사용하지만 현재 잔량 미확인",
-      "stored_goods": "일정 수준의 생활물자 존재 가능하나 S01 피해 후 정확한 잔량 미확인"
-    }
+    "city_home": {"tap_water":"현재 사용 가능","bottled_water_known":"약 36L + 수돗물 추가 확보","food_known":"가족 4인 기준 기존 약 3일 + 간편식 1~2일분","emergency_kit":"공용 비상가방 1개","charging":"초기 충전 완료분 사용 가능"},
+    "wife_vehicle": {"location":"도심 아파트 지상 주차구역","condition":"정상","fuel":"약 95%","role":"현재 확인된 가족의 사용 가능 차량"},
+    "father_home": {"location":"외곽 단독주택","access":"현재 즉시 복귀 제한","solar_battery":"S01 이후 최종 상태 미확인","lpg":"평소 사용하지만 현재 잔량 미확인","stored_goods":"일정 수준의 생활물자 존재 가능하나 S01 피해 후 정확한 잔량 미확인","base_potential":"중장기 가족 거점 후보이나 접근·설비 안전 확인이 선행돼야 함"}
   },
   "route_states": {
-    "apartment_to_city_center": "현재 대부분 통행 가능, 신호 장애가 늘면 지연 가능",
-    "apartment_to_father_home": "평시 20~30분 거리이나 S01 산불 피해 산지 복구구간 때문에 일부 접근 제한 지속",
-    "underground_parking": "현재 접근 가능. 정전 시 조명·출입·승강기 운용이 불안정해질 수 있음"
+    "apartment_to_city_center":"현재 통행 가능하나 일부 신호 장애로 지연 증가",
+    "apartment_to_father_home":"평시 20~30분 거리이나 S01 산불 피해 산지 복구구간 때문에 일부 접근 제한 지속",
+    "underground_parking":"정전 시 조명·출입·승강기 운용 불안정",
+    "surface_parking":"즉시 출차에는 유리하나 차량 외부 노출이 증가"
   },
-  "unrevealed_locations": [
-    "지역 임시 전력지원 거점",
-    "일부 정상 운영 주유소",
-    "통신이 상대적으로 안정적인 행정시설",
-    "외곽 변전설비 피해구역"
-  ],
-  "possible_season_end_states": [
-    "가족이 Phase 1~2를 넘기며 지속 가능한 단기 생활체계를 만들었지만 장기 아크가 계속되는 상태",
-    "거점·직장·학교·차량 중 일부가 크게 변해 다음 시즌으로 새로운 생활구조가 승계되는 상태",
-    "광역 기능이 상당 부분 복구되었으나 가족의 경제·주거·관계에 장기 결과가 남은 상태"
-  ],
-  "notes": [
-    "플레이 직전 최신 START_HERE, WORLD_SEED_PROTOCOL, PLAYTEST_DERIVED_RULES_V1을 적용함.",
-    "재난 종류와 숨은 월드 골격은 플레이어에게 공개하지 않는다.",
-    "완성 대본, 정답 루트, 확정 엔딩은 만들지 않는다.",
-    "S01 결과를 승계하며 가족 4명은 시작 시 도심 아파트에 함께 있다.",
-    "선택 후 결과를 맞추기 위해 숨은 세계 상태를 소급 변경하지 않는다.",
-    "첫 의미 있는 선택 전 Player Known Information을 공개한다.",
-    "시즌 첫 등장 시 가족 이름·관계·나이를 최소 1회 함께 표시한다."
-  ]
+  "unrevealed_locations": ["지역 임시 전력지원 거점","일부 정상 운영 주유소","통신이 상대적으로 안정적인 행정시설","외곽 변전설비 피해구역"],
+  "possible_season_end_states": ["가족이 Phase 1~2를 넘기며 지속 가능한 단기 생활체계를 만들었지만 장기 아크가 계속되는 상태","거점·직장·학교·차량 중 일부가 크게 변해 다음 시즌으로 새로운 생활구조가 승계되는 상태","광역 기능이 상당 부분 복구되었으나 가족의 경제·주거·관계에 장기 결과가 남은 상태"],
+  "notes": ["재난 종류와 숨은 월드 골격은 플레이어에게 공개하지 않는다.","완성 대본, 정답 루트, 확정 엔딩은 만들지 않는다.","S01 결과를 승계한다.","선택 후 결과를 맞추기 위해 숨은 세계 상태를 소급 변경하지 않는다.","현재 Canon에 존재하지 않는 제3의 가족 소유 거점을 임의 생성하지 않는다."]
 }
