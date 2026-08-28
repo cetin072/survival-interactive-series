@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "season_id": "S02",
   "events": [
     {
@@ -34,10 +34,10 @@
       "id": "E02-004",
       "type": "time",
       "trigger_local": "2026-09-04T20:05:00+09:00",
-      "status": "pending",
+      "status": "occurred",
       "hidden": true,
       "summary": "지역별 전력 복구와 재정전이 엇갈리고 일부 카드·모바일결제 승인 지연, 신호등 장애가 확대된다.",
-      "player_visibility": "외부 이동·결제·뉴스 확인 시 부분 공개"
+      "player_visibility": "한준호가 주유소 결제 지연과 신호등 소등을 직접 관찰. 서윤·정호는 편의점 결제 지연 및 첫 ATM 통신오류를 경험. 민석은 뉴스로 지역별 재정전 확대를 확인."
     },
     {
       "id": "E02-005",
