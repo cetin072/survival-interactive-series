@@ -5,17 +5,21 @@
 ## 0. 장기 결정 확인
 먼저 아래를 읽는다.
 1. `core/PROJECT_DECISIONS.md`
-2. `core/GAME_BIBLE.md`
-3. `docs/CORE_GAME_SYSTEMS_V1.md`
-4. `docs/PLAYTEST_DERIVED_RULES_V1.md`
-5. `docs/WORLD_SEED_PROTOCOL.md`
-6. `docs/NORMAL_SOCIETY_CONTINUITY_RULE.md`
-7. `docs/MEGADISASTER_LONG_ARC_RULE.md`
-8. `core/FAMILY_RESIDENCE_AND_START_INFO.md`
-9. `docs/AUTOSAVE_POLICY.md`
-10. `core/GM_RULES.md`
-11. `core/WORLD_BIBLE.md`
-12. `core/CHARACTERS.json`
+2. `core/PERSISTENT_CANON.md`
+3. `core/GAME_BIBLE.md`
+4. `docs/CORE_GAME_SYSTEMS_V1.md`
+5. `docs/PLAYTEST_DERIVED_RULES_V1.md`
+6. `docs/WORLD_SEED_PROTOCOL.md`
+7. `docs/NORMAL_SOCIETY_CONTINUITY_RULE.md`
+8. `docs/MEGADISASTER_LONG_ARC_RULE.md`
+9. `core/FAMILY_RESIDENCE_AND_START_INFO.md`
+10. `docs/AUTOSAVE_POLICY.md`
+11. `core/GM_RULES.md`
+12. `core/WORLD_BIBLE.md`
+13. `core/CHARACTERS.json`
+
+`core/PERSISTENT_CANON.md`는 시즌 간 누적 세계 상태의 최우선 장기 기준이다.
+새 시즌 첫 장면은 이 문서와 직전 시즌 승계 상태를 읽기 전 생성하지 않는다.
 
 ## 1. 새 정식 시즌 시작 규칙
 정식 시즌은 완성 대본을 미리 설계하지 않는다.
@@ -46,21 +50,30 @@
 핵심 원칙:
 `세계는 먼저 존재하고, 이야기는 플레이로 생긴다.`
 
-## 2. 현재 신규 시즌 시작 기준
-S02 `단절` 첫 플레이는 종료되었다.
+## 2. 신규 시즌 Canon 로드 순서
+S03 또는 이후 신규 시즌 시작 전 아래 순서를 따른다.
 
-다음 신규 본편은 S03이다.
-단, S03의 재난 종류나 줄거리를 지금 미리 작성하지 않는다.
+1. `core/PERSISTENT_CANON.md`
+2. 직전 시즌 `PERSISTENT_WORLD_STATE.md`
+3. 직전 시즌 `RETROSPECTIVE.md`
+4. `players/main/SAVE_STATE.json`
+5. `players/main/CHECKPOINT.md`
+6. 최신 `docs/PLAYTEST_DERIVED_RULES_V1.md`
+7. 최신 `core/GM_RULES.md`
+8. 필요한 경우 과거 시즌의 관련 Canon 문서
 
-S03 또는 이후 신규 시즌 시작 전 반드시 읽는다.
-- `seasons/S02/PERSISTENT_WORLD_STATE.md`
-- `seasons/S02/RETROSPECTIVE.md`
-- 최신 `docs/PLAYTEST_DERIVED_RULES_V1.md`
-- 최신 `core/GM_RULES.md`
+직전 시즌 요약만으로 세계 상태를 재구성하지 않는다.
+누적 Canon과 직전 시즌 승계 상태를 함께 사용한다.
 
-S02에서 지속되는 세계 상태를 시작 기반으로 사용한다.
+설정 충돌 시 우선순위:
+1. 사용자가 명시적으로 바로잡은 최신 Canon Correction
+2. `core/PERSISTENT_CANON.md`
+3. 직전 시즌 `PERSISTENT_WORLD_STATE.md`
+4. 실제 플레이 Canon / SAVE / CHECKPOINT
+5. 과거 요약·회고
+6. GM 즉흥 생성
 
-핵심 지속 상태:
+S02에서 지속되는 핵심 상태 예:
 - 도심 아파트 = 일상·직장·학교·의료 중심 거점
 - 정호 외곽주택 = 장기 비상거점
 - 외곽 창고 보수/비축체계
@@ -68,7 +81,9 @@ S02에서 지속되는 세계 상태를 시작 기반으로 사용한다.
 - 물 저장체계
 - 소규모 텃밭
 - 공구·보수재
-- 최씨 가구와 우물 중심의 2가구 제한적 협업
+- 최씨 가구와 두 가구 우선의 제한적 협업
+- 최씨 우물은 S02에서 공동 비용 부담으로 정비·개선했으며 플레이어 가족 태양광과 직접 연결된 설비가 아님
+- 두 집은 각각 독립 거점을 보강했고 필요할 때 서로 다른 자산·시설·노동력을 상호보완함
 - 정상화 이후에도 외곽거점을 정기 관리하는 가족 운영방식
 
 ## 3. High-Intensity Season Commitment
@@ -106,8 +121,8 @@ Scenario v1.0이 동결된 시즌은 신규 시즌과 다르게 처리한다.
 S02 `단절`은 아직 Scenario v1.0으로 동결하지 않았으므로 현재 상태 그대로 외부 재플레이용 정식 시나리오로 취급하지 않는다.
 
 ## 5. 플레이어 상식 정보
-첫 의미 있는 선택 전에 `core/FAMILY_RESIDENCE_AND_START_INFO.md`를 기준으로 플레이어가 현실적으로 이미 알고 있을 정보를 공개한다.
-가족 위치, 평소 거주 구조, 차량 위치와 대략적 연료, 주요 비축품·약·비상가방, 거점 기본 특성 등을 선택 후 뒤늦게 공개해 이전 선택의 의미를 바꾸지 않는다.
+첫 의미 있는 선택 전에 `core/FAMILY_RESIDENCE_AND_START_INFO.md`와 누적 Canon을 기준으로 플레이어가 현실적으로 이미 알고 있을 정보를 공개한다.
+가족 위치, 평소 거주 구조, 차량 위치와 대략적 연료, 주요 비축품·약·비상가방, 거점 기본 특성, 지속 협업관계 등을 선택 후 뒤늦게 공개해 이전 선택의 의미를 바꾸지 않는다.
 
 ## 6. 선택지/행동 입력
 - 선택지는 `1, 2, 3...` 숫자를 기본으로 한다.
@@ -164,6 +179,13 @@ S02 `단절`은 아직 Scenario v1.0으로 동결하지 않았으므로 현재 �
 협업은 이해관계 기반으로 처리한다.
 플레이어가 제한적 범위를 선택하면 GM이 자동으로 마을 전체 공동체로 확대하지 않는다.
 
+지속 협업의 경우 물자만 기록하지 말고 다음도 Canon에 남긴다.
+- 누가 어떤 자산을 소유하는가
+- 실제 물리적 연결 여부
+- 비용을 누가 부담했는가
+- 어떤 사건을 계기로 관계가 형성되었는가
+- 각 거점이 독립적으로 유지되는지 여부
+
 ## 11. 반복 작업 자동 압축
 사용자가 `특이사항 발생 전까지 반복`, `계속 정비`, `매일 관리` 등 반복 운영을 선언하면 동일 장면을 반복하지 않는다.
 
@@ -183,7 +205,7 @@ S02 `단절`은 아직 Scenario v1.0으로 동결하지 않았으므로 현재 �
 
 급박한 장면은 임의 사고가 아니라 Hidden World Seed와 현재 세계 상태에서 발생해야 한다.
 
-## 13. 저장
+## 13. 저장 및 Canon Correction
 사용자가 `저장`이라고 말하지 않아도 다음 시점에는 SAVE_STATE / CHECKPOINT / SESSION_LOG 및 필요한 GM 상태를 가능한 한 자동 갱신한다.
 - 의미 있는 선택 결과 확정
 - 장면/에피소드 전환
@@ -196,6 +218,10 @@ S02 `단절`은 아직 Scenario v1.0으로 동결하지 않았으므로 현재 �
 - 시즌 간 지속상태 변경
 - 세션 종료 또는 다른 채팅 이동
 - 시즌 종료
+
+사용자가 과거 설정의 오류·누락을 바로잡으면 `docs/AUTOSAVE_POLICY.md`의 Canon Correction 규칙을 적용한다.
+장기 지속 사실이면 `core/PERSISTENT_CANON.md`와 필요한 과거 시즌 승계 문서를 즉시 보강한다.
+사용자가 별도로 기획방에 복사하거나 `설정확정:`이라고 말해야만 저장되는 구조로 만들지 않는다.
 
 사소한 매 턴은 저장하지 않는다.
 
@@ -227,6 +253,7 @@ A. 플레이어 생존 복기
 B. 게임 시스템 복기
 
 장기 아크에서는 추가로 다음 시즌으로 넘길 `Persistent State`를 반드시 정리한다.
+그중 여러 시즌 뒤에도 판단에 영향을 줄 사실은 `core/PERSISTENT_CANON.md`에 승격한다.
 
 ## 18. 시즌 종료 후 자산화
 `docs/SEASON_COMPLETION_PIPELINE.md`에 따라 실제 플레이와 시스템 피드백을 분리해 정리한다.
@@ -234,4 +261,5 @@ B. 게임 시스템 복기
 ## 절대 원칙
 - GM 전용 비밀을 플레이어에게 노출하지 않는다.
 - 여러 시즌 줄거리를 미리 고정하지 않는다.
-- 한 시즌씩 `월드 시드 → 플레이 → 분석 → 시스템 개선/시나리오 자산화 → 지속상태 승계`한다.
+- 한 시즌씩 `월드 시드 → 플레이 → 분석 → 시스템 개선/시나리오 자산화 → 지속상태 승계 → 누적 Canon 갱신`한다.
+- 채팅방이 바뀌어도 GitHub 누적 Canon을 통해 세계 설정을 복구한다.
