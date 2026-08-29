@@ -1,80 +1,86 @@
 # S02 Design Status
 
-STATUS: READY FOR HIDDEN WORLD SEED
-TITLE: 미정
-ARC_MODE: MEGA-DISASTER LONG ARC — ENTRY SEASON
+STATUS: FIRST PLAYTHROUGH COMPLETE / FEEDBACK INTEGRATED
+TITLE: 단절
+ARC_MODE: MEGA-DISASTER LONG ARC — FIRST PLAYTEST
 
 ## 현재 지위
-S02는 아직 플레이되지 않았다.
-재난 종류, 시작 사건, 주요 위험, 엔딩을 미리 공개하거나 완성 대본으로 작성하지 않는다.
+`SEASON 02 — 단절` 첫 플레이가 종료되었다.
 
-S02부터는 `docs/MEGADISASTER_LONG_ARC_RULE.md`를 적용한다.
-이번 시즌은 단일 재난을 넘기고 완전 리셋되는 독립 에피소드가 아니라, 여러 시즌으로 이어질 수 있는 초재난 장기 아크의 첫 진입 시즌이다.
+주요 재난 축:
+- 광역 전력·통신 장애
+- 복구 불확실성
+- 장기 생활운영과 2거점 체계 구축
 
-중요:
-- 장기 아크 자체의 결말은 미리 정하지 않는다.
-- S03 이후 줄거리도 미리 쓰지 않는다.
-- S02에서 실제로 발생한 변화가 다음 시즌의 세계 상태가 된다.
-- 초재난이 반드시 사회 완전붕괴나 아포칼립스로 진행되는 것은 아니다.
+플레이는 DAY 96 부근까지 진행되었고 사회 기능이 상당 부분 정상화되며 가족의 도심/외곽 2거점 운영체계가 정착된 시점에 종료되었다.
 
-## 시작 규칙
-플레이 직전 GM은 `docs/WORLD_SEED_PROTOCOL.md`, `docs/MEGADISASTER_LONG_ARC_RULE.md`와 최신 공통 규칙을 읽고 비공개로 최소 월드 골격만 생성한다.
+## 최종 평가
+플레이어 대응은 전반적으로 성공적이었다.
+그러나 게임 체감은 `많이 루즈함`으로 평가되었다.
 
-반드시 반영:
-- S01에서 검증된 가족 4인 파티와 현실 한국형 세계
-- Player Known Information Rule
-- Multi-Base Rule
-- Normal Society Continuity Rule
-- Risk Exposure Rule
-- Post-Disaster Secondary Hazard Rule
-- Decision Cost over Event Count
-- Mega-Disaster Long Arc Rule
+핵심 원인:
+- 플레이어와 독립적인 외생 재난 압력 부족
+- 장기재난의 단계 상승 부족
+- 좋은 준비가 너무 많은 문제를 완전히 제거
+- 정비·구매·텃밭·비축 최적화가 반복 장면으로 남음
 
-## S02 체감 목표
-S01보다 사건 수를 억지로 늘리지 않는다.
+반대로 강하게 검증된 장점:
+- 거점 건설·성장
+- 창고·물·전력·텃밭·공구·보수 체계
+- 가족 역할분담
+- 최씨 가구와의 제한적·상호보완적 협업
+- 도심/외곽 2거점 운영
 
-이번에는 다음을 한 단계 강화한다.
-- 단기 안전과 장기 생존 기반 사이의 충돌
-- 자원 부족과 기회비용
-- 정보 불확실성
-- 시간 압박
-- 가족 이해 충돌
-- 되돌리기 어려운 선택
-- 며칠/몇 주 뒤 돌아오는 결과
-- 직장·학교·경제·주거의 장기 변화
-- 거점의 유지·포기·이동 문제
-- 이동/대피 외의 다양한 문제 해결
+## 시스템 승격
+Issue #1의 회고를 기준으로 다음 문서에 공통 규칙을 승격했다.
+- `core/GAME_BIBLE.md`
+- `core/GM_RULES.md`
+- `docs/PLAYTEST_DERIVED_RULES_V1.md`
+- `docs/MEGADISASTER_LONG_ARC_RULE.md`
 
-## 초재난 진행 원칙
-세계는 처음부터 무법상태가 아니다.
+핵심 승격 규칙:
+- Exogenous World Pressure Rule
+- Preparedness Mitigates, Never Cancels Rule
+- Long-Disaster Phase Escalation Rule
+- Repeated Operations Compression Rule
+- Build–Pressure Rhythm Rule
+- Base Capability Growth Rule
+- Interest-Based Cooperation Rule
+- Prepared Base Shifts Pressure Rule
+- High-Intensity Season Commitment Rule
 
-가능한 흐름:
-`평범한 생활 → 급성 충격 → 부분 마비 → 장기 압박 → 생활체계 재편`
+## 지속 세계 상태
+다음 시즌에 이어질 공식 상태는 `seasons/S02/PERSISTENT_WORLD_STATE.md`를 따른다.
 
-어디까지 진행되는지는 실제 플레이와 세계 상태에 따라 결정된다.
-S02가 Phase 1~2에서 끝날 수도 있고, 더 장기 상태까지 진입할 수도 있다.
+핵심:
+- 도심 아파트 = 일상·직장·학교·의료 거점
+- 정호 외곽주택 = 장기 비상거점
+- 창고 보수/비축체계
+- 제한적 태양광·배터리/LPG
+- 물 저장체계
+- 소규모 텃밭
+- 기본 공구·보수재
+- 최씨 가구와 우물 중심 2가구 협업
+- 정상화 이후에도 외곽거점 정기 유지관리
 
-## 시즌 종료
-S02 종료가 세계 리셋을 의미하지 않는다.
+## S02의 현재 제작 상태
+S02를 아직 `Scenario v1.0 FROZEN`으로 보지 않는다.
 
-시즌 종료 시 다음을 다음 시즌으로 넘길 수 있다.
-- 가족 상태/관계
-- 거점 상태
-- 차량/자원
-- 경제적 손실
-- 직장/학교 변화
-- 인프라 상태
-- NPC 관계
-- 미해결 장기 결과
+이유:
+첫 플레이의 거점·협업 시스템은 유효했지만, 외생압력과 장기 단계구조가 본편 목표에 미달했다.
 
-## 금지
-- S01 구조를 이름만 바꿔 반복
-- 정답 루트 선작성
-- 위험 선택을 자동 사고로 처벌
-- 플레이어가 원래 아는 정보를 선택 후 공개
-- 모든 재난을 즉시 사회붕괴로 과장
-- 장기전이라는 이유로 의미 없는 일상을 매시간 플레이
-- S03 이후 줄거리를 미리 결정
+따라서:
+- 플레이 원본은 플레이방에 보존
+- 장기 회고는 Issue #1 및 `RETROSPECTIVE.md`에 보존
+- 공통 시스템 개선은 완료
+- 필요 시 향후 S02 재구성/Scenario v1.0 자산화 여부를 별도 판단
 
 ## 다음 단계
-새 플레이방에서 `생존기록 시작` 또는 `S02 시작` 명령을 받으면 GM이 초재난 장기 아크의 숨은 월드 시드를 생성하고 스포일러 없이 Day 0 첫 장면을 시작한다.
+S03 줄거리를 지금 미리 설계하지 않는다.
+먼저 이번에 승격된 시스템 규칙이 다음 Hidden World Seed에서 실제로 작동하도록 한다.
+
+다음 정규 시즌 시작 시 GM은 비공개로 다음 중 하나를 명확히 선택한다.
+- `대규모 장기재난`
+- `급박한 대규모 사건`
+
+그리고 플레이어 대응과 무관한 충분한 세계 압력을 시드한다.
