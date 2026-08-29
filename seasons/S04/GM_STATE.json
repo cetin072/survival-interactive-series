@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "season_id": "S04",
+  "title": "해협",
+  "difficulty": "NORMAL",
+  "status": "first_playthrough_active",
+  "spoiler_scope": "GM_ONLY_DURING_PLAY",
+  "seed_locked_at": "2026-08-30T21:47:00+09:00",
+  "start": {
+    "day": 0,
+    "date": "2026-08-30",
+    "weekday": "일요일",
+    "time": "21:47",
+    "location": "도심 아파트",
+    "party": ["한준호", "서윤", "민석", "정호"],
+    "korea_direct_belligerent": false,
+    "company_status": "월요일 정상 운영 예고, 긴급 공급망 점검 병행",
+    "school_status": "월요일 정상 등교 예고",
+    "hospital_status": "정상 운영, 비상연락망·물자 점검 강화"
+  },
+  "incident": {
+    "type": "fictional_large_scale_taiwan_strait_military_conflict",
+    "public_onset_time": "2026-08-30T20:55:00+09:00",
+    "initial_character": "해상·항공 통제와 대규모 군사행동이 동시에 시작된 급격한 지역전",
+    "known_to_player": "충돌 규모가 매우 크지만 한국은 직접 전쟁 상태가 아님",
+    "unknown_to_player": [
+      "충돌 지속기간",
+      "해상 통제의 실제 지속범위",
+      "제3국 개입 수준",
+      "한국 내 공급망 충격의 속도",
+      "금융시장 충격이 실물경제로 번지는 정도"
+    ]
+  },
+  "external_pressure_axes": [
+    {
+      "id": "shipping",
+      "name": "해상물류·보험",
+      "initial": "일부 항로 우회·운항 보류 시작",
+      "player_cannot_remove": true
+    },
+    {
+      "id": "energy",
+      "name": "에너지·원자재 수입가격",
+      "initial": "가격 급등 신호, 국내 물리적 공급은 아직 정상",
+      "player_cannot_remove": true
+    },
+    {
+      "id": "finance",
+      "name": "환율·금융시장·결제 불안",
+      "initial": "야간시장 변동성 급증, 일반 결제망은 정상",
+      "player_cannot_remove": true
+    },
+    {
+      "id": "continuity",
+      "name": "회사·병원·학교 정상사회 의무",
+      "initial": "모두 정상운영을 예고하지만 비상 점검이 동시에 시작됨",
+      "player_cannot_remove": true
+    },
+    {
+      "id": "information",
+      "name": "정보전·통신혼선",
+      "initial": "공식정보와 소문이 빠르게 충돌, 통신망은 정상",
+      "player_cannot_remove": true
+    }
+  ],
+  "world_phase": {
+    "current": "P1_INITIAL_SHOCK",
+    "possible_transitions": [
+      "P2_SUPPLY_CHAIN_SQUEEZE",
+      "P3_DOMESTIC_ADAPTATION_OR_RESTRICTION",
+      "P4_PROLONGED_RESTRUCTURING_OR_DEESCALATION"
+    ],
+    "rule": "phase transitions depend on external events and accumulated domestic stress, not player performance"
+  },
+  "family_private_priorities": {
+    "한준호": "상황이 장기화되기 전에 선택권을 확보하고 싶어 함",
+    "서윤": "병원 정상운영과 가족 생활을 동시에 지키려 하며 성급한 사회이탈을 경계",
+    "민석": "온라인 정보의 진위를 직접 확인하고 싶어 하며 보호대상 취급을 싫어함",
+    "정호": "외곽주택 상태를 걱정하지만 첫날밤부터 무리하게 움직일 필요는 없다고 봄"
+  },
+  "start_assets_known": {
+    "urban_apartment": "평상시 생활재고와 비상가방 보유. 단기 체류에는 여유가 있으나 장기 공급차질용 주거지는 아님",
+    "outer_house": "비축·태양광·배터리·LPG·물 저장·공구·텃밭 기반 유지",
+    "urban_vehicle": "도심 아파트 주차장, 연료 약 60%",
+    "emergency_vehicle": "외곽주택, 마지막 정기점검 기준 연료 약 70%",
+    "core_partner": "최씨 가구와 제한적 핵심협력 관계 유지"
+  },
+  "anti_retcon": {
+    "locked_facts": [
+      "한국은 시작 시 직접 교전국이 아니다",
+      "첫날 밤 국내 전력·통신·상수도·일반 결제는 정상이다",
+      "해상물류 충격은 실제이며 단순 허위소문이 아니다",
+      "S03에서 확보한 외곽거점 능력은 정상 작동 상태다",
+      "사회 기능은 즉시 붕괴하지 않는다"
+    ]
+  }
+}
