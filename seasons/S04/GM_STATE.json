@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "season_id": "S04",
   "title": "해협",
   "difficulty": "NORMAL",
@@ -64,9 +64,10 @@
     }
   ],
   "world_phase": {
-    "current": "P1_INITIAL_SHOCK",
+    "current": "P2_SUPPLY_CHAIN_SQUEEZE",
+    "entered_at": "2026-08-31T20:45:00+09:00",
+    "trigger_summary": "주요 선사 우회 확대, 전쟁위험 보험 제한, 기업 조달조건 악화와 일부 품목 신규가격·주문 불확실성이 동시에 현실화",
     "possible_transitions": [
-      "P2_SUPPLY_CHAIN_SQUEEZE",
       "P3_DOMESTIC_ADAPTATION_OR_RESTRICTION",
       "P4_PROLONGED_RESTRUCTURING_OR_DEESCALATION"
     ],
@@ -76,14 +77,20 @@
     "한준호": "상황이 장기화되기 전에 선택권을 확보하고 싶어 함",
     "서윤": "병원 정상운영과 가족 생활을 동시에 지키려 하며 성급한 사회이탈을 경계",
     "민석": "온라인 정보의 진위를 직접 확인하고 싶어 하며 보호대상 취급을 싫어함",
-    "정호": "외곽주택 상태를 걱정하지만 첫날밤부터 무리하게 움직일 필요는 없다고 봄"
+    "정호": "외곽주택 상태와 장기 운영능력을 실제로 끌어올리는 쪽에 무게를 둠"
   },
   "start_assets_known": {
     "urban_apartment": "평상시 생활재고와 비상가방 보유. 단기 체류에는 여유가 있으나 장기 공급차질용 주거지는 아님",
     "outer_house": "비축·태양광·배터리·LPG·물 저장·공구·텃밭 기반 유지",
-    "urban_vehicle": "도심 아파트 주차장, 연료 약 60%",
+    "urban_vehicle": "도심 아파트 주차장, 시작 시 연료 약 60%였으나 첫날 밤 충분 수준으로 보충",
     "emergency_vehicle": "외곽주택, 마지막 정기점검 기준 연료 약 70%",
     "core_partner": "최씨 가구와 제한적 핵심협력 관계 유지"
+  },
+  "current_player_strategy": {
+    "urban": "도심 생활과 회사·병원·학교 등 정상사회 기능을 유지",
+    "outer_base": "정호 중심으로 현재 거점을 유지하면서 주요설비 확장 준비에 들어감",
+    "expansion_scope": "실제 대규모 공사를 즉시 시작하는 것이 아니라 전력·물·저장·보수 등 기존 핵심설비의 확장 후보, 필요 부품, 비용, 우선순위를 점검하는 준비 단계",
+    "procurement": "초기 선제구매는 거의 종료하고 반복 구매전은 AUTO 압축"
   },
   "anti_retcon": {
     "locked_facts": [
