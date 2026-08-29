@@ -1,62 +1,39 @@
 {
-  "version": 23,
+  "version": 24,
   "run_type": "season",
   "season_id": "S04",
   "season_title": "해협",
-  "episode_id": "EP01",
-  "scene_id": "monday_night_dual_track_strategy",
+  "episode_id": "EP06",
+  "scene_id": "new_stable_order",
   "difficulty": "NORMAL",
-  "season_status": "first_playthrough_active",
-  "day": 1,
-  "date": "2026-08-31",
-  "weekday": "월요일",
-  "time": "21:15",
-  "location": "도심 아파트·정호 외곽주택 분산",
-  "world_phase": "P2_SUPPLY_CHAIN_SQUEEZE",
-  "current_objective": "도심 정상생활을 유지하면서 외곽거점을 단순 비축소가 아니라 장기 공급차질 대응용 확장 가능 거점으로 준비",
+  "season_status": "first_playthrough_completed",
+  "timeframe": "2026년 가을, 시작 약 수주 후",
+  "world_phase": "P4_PROLONGED_RESTRUCTURING_OR_DEESCALATION",
+  "ending": "대만해협 충돌은 장기간 긴장완화 단계로 들어갔고 주요 해상통로 제한이 완화되기 시작했다. 한국 사회는 붕괴하지 않았으나 가격·기업운영·공급망·근무형태가 이전과 다른 새 안정상태에 들어갔다.",
   "public_party_condition": {
     "player": "정상",
-    "wife": "정상",
-    "son": "정상",
-    "father": "정상"
+    "wife": "정상, 병원 비상대기 축소 예정",
+    "son": "정상, 학교 정상화",
+    "father": "정상, 외곽주택 상주"
   },
-  "party_location": {
-    "player": "도심 아파트",
-    "wife": "도심 아파트",
-    "son": "도심 아파트",
-    "father": "외곽주택"
+  "family_operating_model": {
+    "player": "회사 축소근무를 유지하면서 비근무일 일부를 외곽 노동·가족운영에 사용",
+    "wife": "병원 정상근무 복귀 예정, 위기 중 추가근무로 가계소득 일부 보완",
+    "son": "학교 유지, 방과후 축소 경험과 외곽생활·재고기록 등 독립 역할 경험 축적",
+    "father": "외곽 일상운영과 민석 생활관리 역할을 수행하며 독립 운영능력 입증"
   },
-  "family_roles": {
-    "player": "도심 생활·회사 대응 유지, 큰 자원·거점 판단",
-    "wife": "병원 정상근무·비상대기와 가정 생활 지속성 관리",
-    "son": "학교 유지, 공식정보·온라인 정보 취합",
-    "father": "외곽거점 유지와 주요설비 확장 준비 총괄"
+  "final_assets": {
+    "urban_apartment": "주생활 거점 유지, 생활물자 충분",
+    "outer_house": "기존 태양광·배터리·LPG·물 저장·공구·텃밭에 더해 정비 예비부품, 유지보수 체계, 운영 효율과 고장대응력이 강화됨",
+    "core_partner": "최씨 가구와 두 가구 우선 협력 유지, 우물·농업·정비 관련 협업 경험 확대",
+    "household_finance": "지출 구조를 낮추고 현금 방어에 성공. 준호 소득 감소를 서윤 추가근무 수입이 상당 부분 완충"
   },
-  "known_assets": {
-    "urban_apartment": "장기보관 식품·생활소모품·가정용 의료위생품을 충분히 보강, 정상생활 유지 가능",
-    "outer_house": "비축·태양광·배터리·LPG·물 저장·공구·텃밭 정상. 유지보수 소모품과 일부 예비부품 추가 확보",
-    "urban_vehicle": "연료 충분 수준 유지",
-    "emergency_vehicle": "외곽주택, 연료 여유 유지",
-    "core_partner": "최씨 가구와 제한적 핵심협력 관계"
+  "company_state": {
+    "employment": "유지",
+    "work_pattern": "주4일 및 일부 순환휴업 체제 경험, 즉시 원상복귀하지 않음",
+    "supply_chain": "국내 대체부품·공급망 재편 지속",
+    "anchor_npc": "박재현 부장 47세 — 생산·구매·납기 조율형 운영책임자, 위기 때 과장하지 않고 회사 판단을 회사가 하게 하는 반복 NPC"
   },
-  "outer_base_expansion_preparation": {
-    "status": "준비 시작",
-    "principle": "당장 대규모 공사를 벌이지 않고 기존 핵심설비를 기반으로 확장 후보·필요 부품·비용·우선순위를 정리",
-    "candidate_axes": ["제한적 독립전력", "물 확보·저장", "저장능력", "보수·예비부품"],
-    "operator": "정호 중심, 필요 시 최씨와 기존 협력범위 내 정보·작업 협의"
-  },
-  "public_world_state": {
-    "taiwan_strait": "대규모 군사충돌 지속",
-    "korea": "직접 전쟁 상태 아님",
-    "utilities": "전력·통신·상수도 정상",
-    "payments": "정상이나 원화·금융시장 변동성 큼",
-    "shipping": "주요 선사 우회·운항보류 확대, 일부 전쟁위험 보험 인수 제한으로 납기확답 급감",
-    "consumer_supply": "국내 재고는 대체로 존재하나 일부 품목 구매량 증가와 가격 재조정 시작",
-    "company": "비상근무·긴급구매 체제",
-    "hospital": "정상진료 유지, 비상근무조 가동 및 일부 소모품 사용관리",
-    "school": "화요일 정상등교 예정",
-    "agriculture": "수입 비료·사료·일부 부품의 신규가격·주문확정 어려움"
-  },
-  "last_choice": "도심 생활 유지 + 외곽 주요설비 확장 준비",
-  "checkpoint_note": "S04 DAY1 밤. 가족은 도심 3명+외곽 정호 구조를 유지한다. 초기 구매전은 종료하고 반복 구매·점검은 AUTO로 압축한다. 외곽은 정호 중심으로 전력·물·저장·보수 계통의 확장 후보와 필요 부품·비용·우선순위를 검토하는 준비 단계에 들어간다. 실제 대규모 공사는 아직 시작하지 않았다."
+  "last_choice": "시즌 종료 검토 → 현재를 새로운 안정상태로 보고 S04 종료",
+  "checkpoint_note": "S04 첫 플레이 종료. 가족은 조기 외곽이주 대신 도심 정상생활과 외곽 강화의 이중거점을 유지했다. 초기 선제구매, 정비·예비부품 우선 강화, 현금방어, 가족 노동 재배치가 누적되어 장기 공급망·경기충격을 큰 손실 없이 통과했다. 사회는 붕괴하지 않았고 위기는 공급충격에서 경기·소득·근무형태 변화로 이동한 뒤 장기 재편·긴장완화 단계에 들어갔다."
 }
