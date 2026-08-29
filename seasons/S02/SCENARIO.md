@@ -1,23 +1,43 @@
-# SEASON 02 — PRE-PLAY
+# SEASON 02 — 단절
 
-STATUS: READY FOR HIDDEN WORLD SEED
-TITLE: 미정
+STATUS: FIRST PLAYTHROUGH COMPLETE / NOT YET FROZEN AS SCENARIO V1.0
 
-S02는 아직 이야기가 만들어지지 않았다.
+## 시즌 정체성
+광역 전력·통신 장애와 장기 복구 불확실성 속에서 가족이 도심/외곽 2거점 운영, 거점 능력 강화, 제한적 협업을 구축한 장기재난 플레이테스트 시즌.
 
-플레이 직전 GM이 비공개 월드 시드를 생성하고 실제 플레이를 통해 시즌 이야기를 발견한다.
+## 기록 원칙
+전체 플레이 대화는 이 파일에 복제하지 않는다.
 
-미리 작성하지 않는다:
-- 재난 종류 공개
-- 에피소드 대본
-- 정답 루트
-- 확정 클라이맥스
-- 확정 엔딩
+기준 기록:
+- 상세 플레이 원본: S02 플레이방
+- 장기 설계 회고: GitHub Issue #1
+- 회고 요약: `RETROSPECTIVE.md`
+- 다음 시즌 승계 상태: `PERSISTENT_WORLD_STATE.md`
 
-시작 기준:
-- `START_HERE.md`
-- `docs/WORLD_SEED_PROTOCOL.md`
+## 검증된 강점
+- 거점 건설·성장
+- 창고·물·전력·텃밭·공구·보수 능력 강화
+- 가족 역할분담
+- 최씨 가구와의 이해관계 기반 제한적 협업
+- 도심/외곽 2거점 운영
+
+## 검증된 문제
+- 플레이어와 독립적인 외생압력 부족
+- 장기재난 Phase 상승 부족
+- 좋은 준비가 메인 문제까지 제거하는 현상
+- 반복 정비/구매/텃밭 장면 압축 부족
+- 후반부 긴장도 저하
+
+## 현재 판정
+S02는 플레이테스트로서 중요한 시스템 검증을 완료했다.
+그러나 현재 형태를 그대로 다른 플레이어용 `Scenario v1.0`으로 동결하지 않는다.
+
+먼저 Issue #1에서 도출된 공통 시스템 규칙을 다음 시즌에서 검증한다.
+
+승격된 규칙은:
+- `core/GAME_BIBLE.md`
+- `core/GM_RULES.md`
 - `docs/PLAYTEST_DERIVED_RULES_V1.md`
-- `core/FAMILY_RESIDENCE_AND_START_INFO.md`
+- `docs/MEGADISASTER_LONG_ARC_RULE.md`
 
-S01의 구조를 그대로 반복하지 않고 선택 비용·장기 결과·정보 불확실성·가족 이해 충돌·되돌릴 수 없는 결정을 한 단계 강화한다.
+를 따른다.
