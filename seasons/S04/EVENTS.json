@@ -1,76 +1,83 @@
 {
-  "version": 1,
+  "version": 2,
   "season_id": "S04",
   "events": [
     {
       "id": "E001",
       "time": "2026-08-30T22:20:00+09:00",
       "type": "public_information",
-      "state": "scheduled",
+      "state": "occurred",
       "effect": "정부가 한국은 직접 교전상태가 아니며 해운·에너지·금융 비상점검에 들어갔다고 발표"
     },
     {
       "id": "E002",
       "time": "2026-08-30T23:10:00+09:00",
       "type": "shipping",
-      "state": "scheduled",
+      "state": "occurred",
       "effect": "복수의 주요 해운사가 대만해협 통과를 일시 보류하고 일부 항로를 우회"
     },
     {
       "id": "E003",
       "time": "2026-08-30T23:40:00+09:00",
       "type": "information_noise",
-      "state": "scheduled",
+      "state": "occurred",
       "effect": "SNS에서 사재기·결제중단·연료부족 소문이 확산되지만 국내 물리적 공급과 결제망은 이 시점까지 대체로 정상"
     },
     {
       "id": "E004",
       "time": "2026-08-31T06:30:00+09:00",
       "type": "hospital_continuity",
-      "state": "scheduled",
+      "state": "occurred",
       "effect": "서윤의 병원이 정상근무를 유지하되 비상물자·환자 유입·행정대응 점검을 강화"
     },
     {
       "id": "E005",
       "time": "2026-08-31T07:00:00+09:00",
       "type": "company_continuity",
-      "state": "scheduled",
+      "state": "occurred",
       "effect": "한준호의 회사는 정상출근을 유지하면서 공급망·원자재 관련 긴급회의를 소집"
     },
     {
       "id": "E006",
       "time": "2026-08-31T07:20:00+09:00",
       "type": "school_continuity",
-      "state": "scheduled",
+      "state": "occurred",
       "effect": "민석의 학교는 정상등교를 유지하며 해외정세 관련 안전공지와 가정 연락망 확인을 시행"
     },
     {
       "id": "E007",
       "time": "2026-08-31T09:00:00+09:00",
       "type": "finance",
-      "state": "scheduled",
+      "state": "occurred",
       "effect": "국내 금융시장이 큰 변동성 속에서 개장하고 일부 기업이 긴급 구매·환헤지·재고확보에 들어감"
     },
     {
       "id": "C001",
       "type": "conditional",
-      "state": "armed",
+      "state": "not_triggered",
       "condition": "가족이 첫날 밤 즉시 외곽거점으로 전환",
       "effect": "월요일 병원·회사·학교 의무와 거점안정 사이의 갈등이 조기에 전면화"
     },
     {
       "id": "C002",
       "type": "conditional",
-      "state": "armed",
+      "state": "triggered",
       "condition": "가족이 도심에 남아 정상생활을 우선",
       "effect": "초기 생활편의는 유지되지만 공급망 악화 시 외곽거점 전환 타이밍이 후속 핵심선택으로 남음"
     },
     {
       "id": "C003",
       "type": "conditional",
-      "state": "armed",
+      "state": "partially_triggered",
       "condition": "파티가 첫날부터 분할",
-      "effect": "정보와 의무를 병렬 처리할 수 있으나 가족 간 실시간 판단 차이와 이동비용이 발생 가능"
+      "effect": "정호가 외곽거점으로 복귀하고 나머지 3명은 도심 의무를 유지하면서 정보와 준비를 병렬 처리함"
+    },
+    {
+      "id": "C004",
+      "type": "conditional",
+      "state": "triggered",
+      "condition": "플레이어가 월요일 오후 반차를 사용해 물자확보를 선택",
+      "effect": "회사 의무를 완전히 포기하지 않은 채 가족이 역할분담해 생활·의료·거점 유지보수·정보를 병렬 보강함"
     }
   ]
 }
