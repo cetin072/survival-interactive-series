@@ -33,6 +33,8 @@ export type EventArchetype = {
   cooldown: number
   pressureDelta: -1 | 0 | 1
   weight: number
+  choiceHook: Extract<SliceIntent, 'observe' | 'check_resources'>
+  choiceLabel: string
 }
 
 export type FamilyDecisionKind = 'agree' | 'conditional_agree' | 'refuse' | 'delay' | 'independent_action'
