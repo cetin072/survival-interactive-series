@@ -39,6 +39,11 @@ function currentStateIssues(state: LiveState): ValidationIssue[] {
       if (member.location !== state.party[companionId].location) {
         issues.push(issue('PARTY_LOCATION_CONFLICT', `${memberId} and ${companionId} are together but have different locations`))
       }
+      if (companionId === memberId) {
+        issues.push(issue('PARTY_SELF_COMPANION', `${memberId} cannot be their own companion`))
+      } else if (!state.party[companionId].with.includes(memberId)) {
+        issues.push(issue('PARTY_COMPANION_ASYMMETRY', `${memberId} lists ${companionId} as a companion, but the relation is not reciprocal`))
+      }
     }
   }
 

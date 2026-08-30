@@ -88,6 +88,25 @@ describe('M2 Validator', () => {
     })
   })
 
+  it('rejects an asymmetric companion relation even when locations match', () => {
+    const current = state()
+    current.party.wife.location = current.party.player.location
+    current.party.player.with = ['wife']
+
+    expect(validateAction(current, action())).toMatchObject({
+      status: 'NEED_GM_REPLAN', issues: [{ code: 'PARTY_COMPANION_ASYMMETRY' }],
+    })
+  })
+
+  it('rejects a party member listing themselves as a companion', () => {
+    const current = state()
+    current.party.player.with = ['player']
+
+    expect(validateAction(current, action())).toMatchObject({
+      status: 'NEED_GM_REPLAN', issues: [{ code: 'PARTY_SELF_COMPANION' }],
+    })
+  })
+
   it('adds a matching operator move when a valid vehicle proposal omits it', () => {
     const candidate = action()
     candidate.proposal.moves = candidate.proposal.moves.filter((move) => move.entity_type === 'vehicle')

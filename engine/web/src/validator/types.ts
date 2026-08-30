@@ -53,6 +53,8 @@ export type QueuedAction = {
 
 export type ValidationIssueCode =
   | 'PARTY_LOCATION_CONFLICT'
+  | 'PARTY_COMPANION_ASYMMETRY'
+  | 'PARTY_SELF_COMPANION'
   | 'VEHICLE_LOCATION_CONFLICT'
   | 'DUPLICATE_ENTITY_MOVE'
   | 'UNKNOWN_ENTITY'

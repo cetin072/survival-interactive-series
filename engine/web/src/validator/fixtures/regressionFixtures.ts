@@ -15,9 +15,29 @@ export const regressionFixtures = {
   familyLocationGate(): { state: LiveState; action: QueuedAction } {
     const state = freshState()
     state.party.player.with = ['wife']
+    state.party.wife.with = ['player']
     return {
       state,
       action: { id: 'confirm-family', label: '가족 위치 확인', actors: ['player'], proposal: emptyProposal() },
+    }
+  },
+
+  asymmetricCompanionRelation(): { state: LiveState; action: QueuedAction } {
+    const state = freshState()
+    state.party.wife.location = state.party.player.location
+    state.party.player.with = ['wife']
+    return {
+      state,
+      action: { id: 'confirm-companions', label: '동행 확인', actors: ['player'], proposal: emptyProposal() },
+    }
+  },
+
+  selfCompanionRelation(): { state: LiveState; action: QueuedAction } {
+    const state = freshState()
+    state.party.player.with = ['player']
+    return {
+      state,
+      action: { id: 'confirm-self', label: '동행 확인', actors: ['player'], proposal: emptyProposal() },
     }
   },
 
