@@ -63,7 +63,7 @@ export function decideFamilyRequest(
   rng: RngState,
   turn: number,
 ): { decision: FamilyDecision | null; rng: RngState } {
-  if (!request) return { decision: null, rng }
+  if (!request) return decideAmbientFamily(state, pressure, rng, turn)
 
   const roll = nextRandom(rng)
   const memberName = state.party[request.member].name
