@@ -52,6 +52,8 @@ export type ActionState = {
   id: string
   label: string
   status: string
+  actors?: PartyMemberId[]
+  exclusive_resources?: string[]
 }
 
 export type LiveState = {

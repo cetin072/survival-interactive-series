@@ -127,7 +127,17 @@
       "properties": {
         "id": { "type": "string" },
         "label": { "type": "string" },
-        "status": { "type": "string" }
+        "status": { "type": "string" },
+        "actors": {
+          "type": "array",
+          "items": { "enum": ["player", "wife", "son", "father"] },
+          "uniqueItems": true
+        },
+        "exclusive_resources": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
       }
     }
   }
