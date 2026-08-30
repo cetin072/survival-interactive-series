@@ -1,4 +1,4 @@
-# PROJECT DECISIONS — Design Reference v3
+# PROJECT DECISIONS — Design Reference v4
 
 이 문서는 **프로젝트의 장기 제작 방향**만 기록한다.
 실제 플레이 런타임에는 기본 로드하지 않는다.
@@ -7,6 +7,7 @@
 > 캐릭터 최신값: `core/CHARACTERS.json`
 > 지속 세계/거점/관계: `core/PERSISTENT_CANON.md`
 > S01~S05 중간점검: `docs/MIDTERM_REVIEW_S01_S05.md`
+> Thin Engine 설계: `docs/THIN_ENGINE_SPEC_V0_1.md`
 
 ---
 
@@ -164,22 +165,62 @@ S01~S05에서 가장 잘 작동한 요소를 결합한다.
 
 ---
 
+## Thin Engine v0.1 실험 — 승인
+S01~S05에서 반복 확인된 GM의 기억·상태·표현 오류를 줄이기 위해 **얇은 보조엔진 실험을 허용한다.**
+
+목적은 게임 제품화가 아니다.
+목적은 ChatGPT GM에게서 다음 반복 업무를 분리하는 것이다.
+- 현재 시간·위치·가족 동행관계 기억
+- 차량·거점·자원 현재 상태 기억
+- 복수행동 순차 처리
+- 상태/권한 모순 검사
+- MUD 화면의 반복적인 상태 표현
+
+권장 책임 분리:
+- **프로그램**: State Engine + Validator + MUD Renderer
+- **AI GM**: 세계 창조 + 인물 + 사건 + 선택 + 즉흥반응
+- **플레이어**: 판단과 자유행동
+- **GitHub**: 장기 Canon/시즌 기록/회고/체크포인트
+
+핵심 원칙:
+`AI proposes, engine commits.`
+
+AI가 상태를 직접 확정하지 않고 구조화된 변경을 제안하면 엔진이 현재 Live State와 검증한 뒤 반영한다.
+
+Thin Engine v0.1의 구체적 범위와 제외사항은 `docs/THIN_ENGINE_SPEC_V0_1.md`를 따른다.
+
+### 취미 보호선
+- 로그인·멀티유저·결제·운영자 CMS·대형 인벤토리·복잡한 게임서버는 v0.1에 넣지 않는다.
+- AI 삽화 자동생성도 v0.1 핵심 범위가 아니다.
+- 개발의 목적은 **플레이를 더 편하고 안정적으로 만드는 것**이다.
+- 개발 자체가 플레이보다 더 큰 프로젝트가 되면 기능 확대를 중단한다.
+
+---
+
 ## 개발 원칙
 - GitHub `cetin072/survival-interactive-series`가 장기 Source of Truth다.
 - Runtime은 `GM_KERNEL + CHARACTERS + PERSISTENT_CANON + SAVE_STATE` 중심으로 가볍게 운용한다.
 - 새 문제가 생길 때마다 새 규칙 파일을 만들지 않는다.
 - 현재 핵심 병목은 코드보다 게임 디자인 실행이다.
 
+### 구현 순서
+1. Thin Engine v0.1의 Live State/Validator/MUD Renderer 최소 구현.
+2. S01 일부 구간으로 회귀테스트.
+3. AI GM 연결 후 State Proposal → Validator → Commit 흐름 검증.
+4. 신규 시즌에 제한 적용.
+5. 재미와 오류율이 개선될 때만 범위 확대 검토.
+
 ### 제품화 게이트
 대형 게임엔진/복잡한 앱 개발은 아직 서두르지 않는다.
 
-다음 검증을 우선한다.
+우선 검증:
 1. S06에서 Runtime v4와 Decision Collision 검증.
-2. 시즌 다양성 및 가족 자율성 개선 확인.
-3. S06 또는 S07 이후 외부 블라인드 플레이 1회 이상.
+2. Thin Engine v0.1이 실제 기억/정합성 오류를 줄이는지 확인.
+3. 시즌 다양성 및 가족 자율성 개선 확인.
+4. S06 또는 S07 이후 외부 블라인드 플레이 1회 이상.
 
 그 뒤:
-- ChatGPT GM을 유지한 얇은 MUD UI 프로토타입은 적극 검토 가능.
+- 얇은 MUD 웹 UI의 유지/확장은 적극 검토 가능.
 - 복잡한 전용 게임엔진/DB는 외부 플레이에서도 핵심 루프가 재미있다는 증거가 생긴 뒤 결정.
 
 ---
