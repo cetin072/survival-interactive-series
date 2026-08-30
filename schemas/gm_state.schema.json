@@ -1,37 +1,41 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "GM State",
+  "title": "GM State — Runtime Compatible",
   "type": "object",
-  "required": ["version", "season_id", "design_status", "scenario_seed", "hidden_world_state", "hidden_character_state", "future_events", "parallel_tracks", "pending_consequences", "intel_truth_map", "resource_dynamics", "route_states"],
+  "required": ["version", "season_id"],
   "properties": {
     "version": {"type": "integer", "minimum": 2},
     "season_id": {"type": ["string", "null"]},
-    "design_status": {"type": "string"},
-    "scenario_seed": {"type": ["integer", "null"]},
+    "title": {"type": ["string", "null"]},
+    "difficulty": {"type": ["string", "null"]},
+    "status": {"type": ["string", "null"]},
+    "spoiler_scope": {"type": ["string", "null"]},
+    "seed_locked_at": {"type": ["string", "null"]},
+    "world_phase": {
+      "oneOf": [
+        {"type": "string"},
+        {"type": "object"},
+        {"type": "null"}
+      ]
+    },
+    "final_world_phase": {"type": ["string", "null"]},
+    "phase_history": {"type": "array", "items": {"type": "string"}},
+    "incident": {"type": "object"},
+    "external_pressure_axes": {"type": "array"},
     "hidden_world_state": {"type": "object"},
     "hidden_character_state": {"type": "object"},
     "hidden_npcs": {"type": "object"},
+    "anchor_npcs": {"type": "object"},
     "future_events": {"type": "array"},
     "parallel_tracks": {"type": "array"},
-    "pending_consequences": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "id": {"type": "string"},
-          "origin_choice": {"type": ["string", "null"]},
-          "trigger": {"type": ["string", "null"]},
-          "effect": {"type": ["string", "null"]},
-          "status": {"type": ["string", "null"]}
-        },
-        "additionalProperties": true
-      }
-    },
+    "pending_consequences": {"type": "array"},
     "intel_truth_map": {"type": "object"},
     "resource_dynamics": {"type": "object"},
     "route_states": {"type": "object"},
-    "unrevealed_locations": {"type": "array"},
-    "notes": {"type": "array"}
+    "anti_retcon": {"type": "object"},
+    "anti_retcon_result": {"type": ["string", "null"]},
+    "ending_condition": {"type": ["string", "null"]},
+    "final_world_state": {"type": "object"}
   },
   "additionalProperties": true
 }
