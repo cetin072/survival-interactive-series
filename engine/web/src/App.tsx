@@ -3,7 +3,8 @@ import { FreeActionForm } from './components/FreeActionForm'
 import { SceneHeader } from './components/SceneHeader'
 import { StatusPanels } from './components/StatusPanels'
 import { createGameSnapshot } from './state/snapshot'
-import { actionForIntent, choicesForState, createInitialSlice, executeTurn } from './slice/engine'
+import { actionForIntent, createInitialSlice, executeTurn } from './slice/engine'
+import { contextualChoicesForState } from './slice/eventChoices'
 import { eventArchetypes } from './slice/events'
 import { parseFreeAction } from './slice/parser'
 import { clearSlice, loadSlice, saveSlice } from './slice/storage'
@@ -20,7 +21,7 @@ export default function App() {
   const [queueText, setQueueText] = useState('')
   const [inputMessage, setInputMessage] = useState('')
   const snapshot = createGameSnapshot(slice.live)
-  const choices = useMemo(() => choicesForState(slice), [slice])
+  const choices = useMemo(() => contextualChoicesForState(slice), [slice])
   const currentEvent = eventArchetypes.find((event) => event.id === slice.currentEventId)
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function App() {
     }
     let next = slice
     for (const id of ids.slice(0, 5)) {
-      const choice = choicesForState(next).find((candidate) => candidate.id === id)
+      const choice = contextualChoicesForState(next).find((candidate) => candidate.id === id)
       if (!choice) continue
       const result = executeTurn(next, choice)
       next = result.state
