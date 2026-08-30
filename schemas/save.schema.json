@@ -1,57 +1,36 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Player Save State",
+  "title": "Player Save State — Runtime Compatible",
   "type": "object",
-  "required": ["version", "run_type", "season_id", "episode_id", "scene_id", "difficulty", "day", "time", "location", "party_location", "public_party_condition", "party_tasks", "resources", "resource_stashes", "known_information", "intel_log", "open_questions", "active_constraints", "recent_major_events", "last_action_sequence"],
+  "required": ["version", "run_type", "season_id", "difficulty", "season_status"],
   "properties": {
     "version": {"type": "integer", "minimum": 2},
     "run_type": {"type": ["string", "null"], "enum": ["season", "tutorial", "prototype", null]},
     "season_id": {"type": ["string", "null"]},
+    "season_title": {"type": ["string", "null"]},
     "episode_id": {"type": ["string", "null"]},
     "scene_id": {"type": ["string", "null"]},
-    "difficulty": {"type": ["string", "null"], "enum": ["Tutorial", "Standard", "Hard", "Standard-Hard", null]},
-    "day": {"type": "integer", "minimum": 0},
+    "difficulty": {
+      "type": ["string", "null"],
+      "enum": ["NORMAL", "Tutorial", "Standard", "Hard", "Standard-Hard", null]
+    },
+    "season_status": {"type": "string"},
+    "world_phase": {"type": ["string", "null"]},
+    "day": {"type": ["integer", "null"], "minimum": 0},
+    "date": {"type": ["string", "null"]},
+    "weekday": {"type": ["string", "null"]},
     "time": {"type": ["string", "null"]},
+    "timeframe": {"type": ["string", "null"]},
     "location": {"type": ["string", "null"]},
     "current_objective": {"type": ["string", "null"]},
     "party_location": {"type": "object"},
     "public_party_condition": {"type": "object"},
-    "party_tasks": {"type": "object"},
-    "resources": {"type": "object"},
-    "resource_stashes": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "id": {"type": "string"},
-          "location": {"type": ["string", "null"]},
-          "access": {"type": ["string", "null"]},
-          "summary": {"type": ["string", "null"]}
-        },
-        "additionalProperties": true
-      }
-    },
-    "known_information": {"type": "array"},
-    "intel_log": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "id": {"type": "string"},
-          "claim": {"type": "string"},
-          "source": {"type": ["string", "null"]},
-          "observed_at": {"type": ["string", "null"]},
-          "status": {"type": ["string", "null"]}
-        },
-        "required": ["claim"],
-        "additionalProperties": true
-      }
-    },
-    "open_questions": {"type": "array"},
-    "active_constraints": {"type": "array"},
-    "recent_major_events": {"type": "array"},
+    "family_operating_model": {"type": "object"},
+    "known_assets": {"type": "object"},
+    "final_assets": {"type": "object"},
+    "public_world_state": {"type": "object"},
+    "company_state": {"type": "object"},
     "last_choice": {},
-    "last_action_sequence": {"type": "array"},
     "checkpoint_note": {"type": ["string", "null"]}
   },
   "additionalProperties": true
