@@ -7,13 +7,21 @@ import { SceneHeader } from './components/SceneHeader'
 import { StatusPanels } from './components/StatusPanels'
 import { demoScene, initialLog } from './data/demoScene'
 import { choiceForKey, choiceLog, freeActionLog } from './input/action'
+import { applyDemoChoice } from './state/demoTransition'
+import { demoLiveState } from './state/demoLiveState'
+import { createGameSnapshot } from './state/snapshot'
 import type { Choice, LogEntry } from './types'
 
 export default function App() {
   const [showPanels, setShowPanels] = useState(true)
   const [log, setLog] = useState<LogEntry[]>(initialLog)
+  const [liveState, setLiveState] = useState(demoLiveState)
+  const snapshot = createGameSnapshot(liveState)
   const append = (entry: LogEntry) => setLog((entries) => [...entries, entry])
-  const select = (choice: Choice) => append(choiceLog(choice, log.length))
+  const select = (choice: Choice) => {
+    setLiveState((state) => applyDemoChoice(state, choice.id))
+    append(choiceLog(choice, log.length))
+  }
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -27,9 +35,9 @@ export default function App() {
 
   return <main className="app-shell">
     <section className="game-shell">
-      <SceneHeader day={demoScene.day} time={demoScene.time} location={demoScene.location} showPanels={showPanels} onTogglePanels={() => setShowPanels((visible) => !visible)} />
+      <SceneHeader day={snapshot.day} time={snapshot.time} location={snapshot.location} showPanels={showPanels} onTogglePanels={() => setShowPanels((visible) => !visible)} />
       <section className="narrative" aria-label="현재 장면"><p>{demoScene.narrative}</p></section>
-      {showPanels && <StatusPanels family={demoScene.family} resources={demoScene.resources} />}
+      {showPanels && <StatusPanels family={snapshot.family} resources={snapshot.resources} />}
       {showPanels && <PresentationBlocks blocks={demoScene.presentationBlocks} />}
       <ChoiceButtons choices={demoScene.choices} onSelect={select} />
       <FreeActionForm onSubmit={(action) => append(freeActionLog(action, log.length))} />

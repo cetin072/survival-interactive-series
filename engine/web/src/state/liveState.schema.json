@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://survival-interactive-series.local/schemas/live-state-v1.json",
+  "title": "Thin Engine Public Live State v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "season_id",
+    "scene_id",
+    "clock",
+    "party",
+    "vehicles",
+    "bases",
+    "resources",
+    "institutions",
+    "routes_known",
+    "active_actions",
+    "completed_actions",
+    "public_world",
+    "last_change",
+    "renderer_flags"
+  ],
+  "properties": {
+    "version": { "const": 1 },
+    "season_id": { "type": "string" },
+    "scene_id": { "type": "string" },
+    "clock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["day", "date", "time", "phase"],
+      "properties": {
+        "day": { "type": "integer", "minimum": 1 },
+        "date": { "type": ["string", "null"] },
+        "time": { "type": "string", "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$" },
+        "phase": { "type": "string" }
+      }
+    },
+    "party": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["player", "wife", "son", "father"],
+      "properties": {
+        "player": { "$ref": "#/$defs/partyMember" },
+        "wife": { "$ref": "#/$defs/partyMember" },
+        "son": { "$ref": "#/$defs/partyMember" },
+        "father": { "$ref": "#/$defs/partyMember" }
+      }
+    },
+    "vehicles": { "type": "object", "additionalProperties": { "$ref": "#/$defs/vehicle" } },
+    "bases": { "type": "object", "additionalProperties": { "$ref": "#/$defs/base" } },
+    "resources": { "type": "object", "additionalProperties": { "$ref": "#/$defs/resource" } },
+    "institutions": { "type": "object", "additionalProperties": { "$ref": "#/$defs/institution" } },
+    "routes_known": { "type": "object", "additionalProperties": { "$ref": "#/$defs/route" } },
+    "active_actions": { "type": "array", "items": { "$ref": "#/$defs/action" } },
+    "completed_actions": { "type": "array", "items": { "$ref": "#/$defs/action" } },
+    "public_world": { "type": "object" },
+    "last_change": { "type": "object" },
+    "renderer_flags": { "type": "object", "additionalProperties": { "type": "boolean" } }
+  },
+  "$defs": {
+    "partyMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "location", "with", "status"],
+      "properties": {
+        "name": { "type": "string" },
+        "location": { "type": "string" },
+        "with": { "type": "array", "items": { "enum": ["player", "wife", "son", "father"] }, "uniqueItems": true },
+        "status": { "type": "string" }
+      }
+    },
+    "vehicle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "location", "status", "operator"],
+      "properties": {
+        "name": { "type": "string" },
+        "location": { "type": "string" },
+        "status": { "type": "string" },
+        "operator": { "enum": ["player", "wife", "son", "father", null] }
+      }
+    },
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "location", "status"],
+      "properties": {
+        "name": { "type": "string" },
+        "location": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "icon", "band"],
+      "properties": {
+        "name": { "type": "string" },
+        "icon": { "type": "string" },
+        "band": { "type": "string" }
+      }
+    },
+    "institution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "status"],
+      "properties": {
+        "name": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "status"],
+      "properties": {
+        "from": { "type": "string" },
+        "to": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "status"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    }
+  }
+}
