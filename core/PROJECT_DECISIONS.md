@@ -1,4 +1,4 @@
-# PROJECT DECISIONS — Design Reference v4
+# PROJECT DECISIONS — Design Reference v5
 
 이 문서는 **프로젝트의 장기 제작 방향**만 기록한다.
 실제 플레이 런타임에는 기본 로드하지 않는다.
@@ -8,6 +8,7 @@
 > 지속 세계/거점/관계: `core/PERSISTENT_CANON.md`
 > S01~S05 중간점검: `docs/MIDTERM_REVIEW_S01_S05.md`
 > Thin Engine 설계: `docs/THIN_ENGINE_SPEC_V0_1.md`
+> Thin Engine 웹게임 구현설계: `docs/THIN_ENGINE_WEB_GAME_V0_1.md`
 
 ---
 
@@ -26,9 +27,10 @@
 - 핵심 재미 축과 조작방식은 확인됨.
 - Runtime/Canon 구조도 실전 운용 가능 수준에 도달.
 - 현재 핵심 과제는 **선택 비용, 장면 박동, 시즌 다양성, 가족 자율성의 실제 실행 강도**다.
+- 동시에 시즌 누적에 따라 AI GM의 위치·시간·상태·기억 오류 가능성이 커지므로 이를 줄이는 **Thin Engine Web v0.1 구현 단계**로 진입한다.
 
-따라서 S06 이후에는 새 시스템·새 규칙을 쉽게 추가하지 않는다.
-먼저 기존 Runtime으로 해결 가능한지 확인한다.
+새 기능을 대형 시스템으로 확장하지 않는다.
+Thin Engine은 기존 게임을 제품화하기 위한 것이 아니라 **플레이 안정성과 편의를 높이는 보조도구**다.
 
 ---
 
@@ -149,8 +151,9 @@ S01~S05에서 가장 잘 작동한 요소를 결합한다.
 ## 시각 자산
 - 기본은 텍스트 MUD + 선택.
 - 플레이 중 Text Visual Grammar를 우선한다.
+- Thin Engine Web에서는 반복적인 MUD 시각표현을 **Renderer가 자동 처리**한다.
 - 실제 삽화/영상은 시즌이 충분히 굳은 뒤 선별 제작한다.
-- 핵심 순간의 제한적 비주얼 실험은 가능하다.
+- AI 삽화 자동생성은 v0.1 범위가 아니다.
 
 ## 시즌 종료 후 자산화
 필요할 때만:
@@ -165,35 +168,67 @@ S01~S05에서 가장 잘 작동한 요소를 결합한다.
 
 ---
 
-## Thin Engine v0.1 실험 — 승인
-S01~S05에서 반복 확인된 GM의 기억·상태·표현 오류를 줄이기 위해 **얇은 보조엔진 실험을 허용한다.**
+## Thin Engine Web v0.1 — 구현 승인
+S01~S05에서 반복 확인된 GM의 기억·상태·표현 오류를 줄이기 위해 **웹 기반 얇은 보조엔진 구현을 진행한다.**
 
-목적은 게임 제품화가 아니다.
-목적은 ChatGPT GM에게서 다음 반복 업무를 분리하는 것이다.
+### 목적
+ChatGPT GM에게서 다음 반복 업무를 분리한다.
 - 현재 시간·위치·가족 동행관계 기억
 - 차량·거점·자원 현재 상태 기억
 - 복수행동 순차 처리
 - 상태/권한 모순 검사
 - MUD 화면의 반복적인 상태 표현
+- 현재 Live State 저장/재개
 
-권장 책임 분리:
-- **프로그램**: State Engine + Validator + MUD Renderer
-- **AI GM**: 세계 창조 + 인물 + 사건 + 선택 + 즉흥반응
+### 책임 분리
+- **프로그램**: State Engine + Action Queue + Validator + MUD Renderer + Cloud Save
+- **AI GM**: 세계 창조 + 인물 + 사건 + 선택 + 즉흥반응 + 서사화
 - **플레이어**: 판단과 자유행동
-- **GitHub**: 장기 Canon/시즌 기록/회고/체크포인트
+- **GitHub**: 장기 Canon/시즌 기록/회고/설계
 
 핵심 원칙:
 `AI proposes, engine commits.`
 
 AI가 상태를 직접 확정하지 않고 구조화된 변경을 제안하면 엔진이 현재 Live State와 검증한 뒤 반영한다.
 
-Thin Engine v0.1의 구체적 범위와 제외사항은 `docs/THIN_ENGINE_SPEC_V0_1.md`를 따른다.
+### 웹게임 형태
+v0.1은 설치형 프로그램이 아니라 **개인용 웹게임**으로 구현한다.
+
+목표:
+- URL 접속만으로 플레이
+- PC·모바일 브라우저 지원
+- 숫자 버튼 + 키보드 숫자 + 자유입력
+- PC에서 하던 게임을 모바일에서 이어갈 수 있는 Cloud Save
+- 정식 회원가입 없이 개인 접근코드 방식
+
+권장 구현:
+- React + TypeScript + Vite
+- Netlify Hosting
+- Netlify Functions
+- Netlify Blobs
+- OpenAI API는 서버 Function에서만 호출
+
+구체적 구현설계는 `docs/THIN_ENGINE_WEB_GAME_V0_1.md`를 따른다.
+
+### Public / Hidden 분리
+- 플레이어에게 공개된 Live State만 브라우저로 보낸다.
+- 미래 이벤트, 미확인 세계 진실, pending consequence 등 Hidden State는 서버에만 둔다.
+- OpenAI API Key와 접근코드 원문은 Public GitHub 및 브라우저 코드에 넣지 않는다.
 
 ### 취미 보호선
-- 로그인·멀티유저·결제·운영자 CMS·대형 인벤토리·복잡한 게임서버는 v0.1에 넣지 않는다.
-- AI 삽화 자동생성도 v0.1 핵심 범위가 아니다.
-- 개발의 목적은 **플레이를 더 편하고 안정적으로 만드는 것**이다.
-- 개발 자체가 플레이보다 더 큰 프로젝트가 되면 기능 확대를 중단한다.
+v0.1에 넣지 않는다.
+- 정식 회원가입
+- 멀티유저
+- 결제
+- 운영자 CMS
+- 공개 서비스 운영기능
+- 대형 인벤토리
+- 2D/3D 지도
+- 복잡한 게임서버
+- 자동 AI 삽화 생성
+
+개발의 목적은 **플레이를 더 편하고 안정적으로 만드는 것**이다.
+개발 자체가 플레이보다 더 큰 프로젝트가 되면 기능 확대를 중단한다.
 
 ---
 
@@ -201,30 +236,38 @@ Thin Engine v0.1의 구체적 범위와 제외사항은 `docs/THIN_ENGINE_SPEC_V
 - GitHub `cetin072/survival-interactive-series`가 장기 Source of Truth다.
 - Runtime은 `GM_KERNEL + CHARACTERS + PERSISTENT_CANON + SAVE_STATE` 중심으로 가볍게 운용한다.
 - 새 문제가 생길 때마다 새 규칙 파일을 만들지 않는다.
-- 현재 핵심 병목은 코드보다 게임 디자인 실행이다.
+- Thin Engine 코드는 현재 저장소의 `engine/` 아래에 둔다.
+- 별도 저장소를 새로 만들지 않는다.
 
-### 구현 순서
-1. Thin Engine v0.1의 Live State/Validator/MUD Renderer 최소 구현.
-2. S01 일부 구간으로 회귀테스트.
-3. AI GM 연결 후 State Proposal → Validator → Commit 흐름 검증.
-4. 신규 시즌에 제한 적용.
-5. 재미와 오류율이 개선될 때만 범위 확대 검토.
+### 확정 구현 순서
+1. **Web Shell** — MUD 화면만 먼저 구현.
+2. **State Engine** — AI 없이 시간·위치·차량 상태 처리.
+3. **Validator** — S01~S05에서 실제 발생한 오류 우선 차단.
+4. **Cloud Save + 개인 접근코드**.
+5. **MUD Renderer** — FAMILY/RESOURCE/AUTO/EVENT/PHASE 자동 표현.
+6. **AI GM 연결** — Structured State Proposal → Validator → Commit.
+7. **S01 일부 구간 회귀테스트**.
+8. **S06 신규 시즌을 웹엔진에서 첫 실전 테스트**.
 
-### 제품화 게이트
-대형 게임엔진/복잡한 앱 개발은 아직 서두르지 않는다.
+### S06 순서 변경
+S06는 바로 기존 채팅 방식으로 시작하지 않는다.
+Thin Engine Web v0.1의 핵심 루프와 S01 회귀테스트가 작동한 뒤 **첫 신규 웹 플레이 시즌 후보**로 사용한다.
 
-우선 검증:
-1. S06에서 Runtime v4와 Decision Collision 검증.
-2. Thin Engine v0.1이 실제 기억/정합성 오류를 줄이는지 확인.
-3. 시즌 다양성 및 가족 자율성 개선 확인.
-4. S06 또는 S07 이후 외부 블라인드 플레이 1회 이상.
+S06의 Hidden World Seed는 엔진 테스트가 끝나기 전까지 생성하지 않는다.
 
-그 뒤:
-- 얇은 MUD 웹 UI의 유지/확장은 적극 검토 가능.
-- 복잡한 전용 게임엔진/DB는 외부 플레이에서도 핵심 루프가 재미있다는 증거가 생긴 뒤 결정.
+### 다음 확장 게이트
+Thin Engine v0.1에서 먼저 확인한다.
+- 실제 기억/정합성 오류 감소
+- 복수행동 비용 처리 안정
+- MUD 화면 구성 부담 감소
+- PC/모바일 재개 편의
+- AI GM의 장면 재미가 유지 또는 개선
+
+그 뒤 외부 블라인드 플레이를 검토한다.
+공개 서비스나 복잡한 전용 게임엔진은 자동 착수하지 않는다.
 
 ---
 
 ## 공개 저장소 주의
 저장소는 Public이다.
-실제 주소·전화번호·계정정보·비밀번호·토큰·기타 민감정보를 저장하지 않는다.
+실제 주소·전화번호·계정정보·비밀번호·토큰·API 키·개인 접근코드 등 민감정보를 저장하지 않는다.
