@@ -1,0 +1,43 @@
+{
+  "version": 4,
+  "season_id": "S05",
+  "title": "신호가 끊긴 날",
+  "difficulty": "NORMAL",
+  "status": "first_playthrough_completed",
+  "spoiler_scope": "GM_ONLY_DURING_PLAY",
+  "final_world_phase": "P5_RECOVERED_DUAL_LIFE_STABLE",
+  "phase_history": [
+    "P1_CASCADING_UTILITY_DISRUPTION",
+    "P2_FAMILY_REGROUP_AND_OUTER_BASE_MOVE",
+    "P3_LOCAL_EMERGENCY_OPERATIONS",
+    "P4_PARTIAL_SOCIAL_RECOVERY",
+    "P5_RECOVERED_DUAL_LIFE_STABLE"
+  ],
+  "final_world_state": {
+    "utilities": "광역 전력·통신·상수도 장애는 단계적으로 복구되어 시즌 종료 시 정상사회 기능이 회복됨",
+    "company": "제한 운영을 거쳐 정상근무 체제로 복귀",
+    "wife_workplace": "제한 운영을 거쳐 정상근무 체제로 복귀",
+    "school": "임시 휴업 후 등교 재개",
+    "village": "공용 관정·디젤 발전기를 이용한 비상급수 경험을 남기고 평시 운영으로 복귀",
+    "security": "반복 수상 차량은 경찰 확인·경고 후 추가 출현과 피해 없이 종료"
+  },
+  "player_strategy_summary": [
+    "가족 위치와 공식 정보를 먼저 확인한 뒤 순차적으로 재집결",
+    "초기 현금으로 차량 연료와 기본 식수·식품을 선제 확보",
+    "단수 전에 자택에서 저장수를 확보한 뒤 가족 4인이 외곽 거점으로 이동",
+    "위험한 전선·손상 교량을 무리하게 통과하지 않고 정보 확인과 우회를 우선",
+    "마을 일상관리는 이장에게 위임하고 나·최씨·이장 3인 연락망만 유지",
+    "최씨 우물과 플레이어 태양광·배터리를 각 가구 개인자산으로 재확인",
+    "사회 복구 후 평일 도심·주말 외곽의 이중생활과 아버지 외곽 상주관리 체제를 정착",
+    "수상 차량 문제는 CCTV 기록·이장 정보취합·경찰 신고 중심으로 대응하고 직접 대치하지 않음"
+  ],
+  "persistent_changes": {
+    "family_living_model": "준호·서윤·민석은 평일 도심 생활, 정호는 외곽 거점 상주, 주말에는 가족 4인이 외곽 거점에 재결집",
+    "outer_base": "물 저장·식량 순환·보관·전력관리·CCTV/출입 보안이 추가로 강화됨",
+    "choi_cooperation": "두 가족 전체가 노동·정보를 적극 협업하되 재산·재고·소유권은 분리 유지",
+    "village_governance": "평시 마을 관리는 이장에게 위임하고, 장기위기 시 과거 협력 가구 중심 비상운영회를 재가동할 수 있는 경험이 정착",
+    "private_assets": "최씨 우물은 최씨 가구 개인자산, 플레이어 외곽 태양광·배터리는 플레이어 가족 개인자산이며 비상협력이 자동 공동사용을 뜻하지 않음"
+  },
+  "anti_retcon_result": "기존 태양광·우물·거점 능력은 실제 능력으로 작동했고 난이도를 맞추기 위해 임의 고장·상실시키지 않았다. 대신 압력은 전력·통신에서 수도·연료·사회복귀·지역보안으로 이동했다.",
+  "ending_condition": "광역 기반시설 장애와 후속 지역보안 이슈가 모두 안정되고, 가족의 도심+외곽 이중생활과 거점 장기운영 구조가 정착되어 추가 긴급 생존선택의 필요성이 낮아진 시점에서 종료"
+}
