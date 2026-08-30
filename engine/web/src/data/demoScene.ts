@@ -1,4 +1,4 @@
-import type { Choice, LogEntry } from '../types'
+import type { Choice, LogEntry, PresentationBlock } from '../types'
 
 export const demoScene = {
   day: 'DAY 01',
@@ -22,6 +22,11 @@ export const demoScene = {
     ['💧 물', '보통'],
     ['📡 통신', '불안정'],
   ],
+  presentationBlocks: [
+    { type: 'EVENT', message: '도심 진입도로 일부 통제' },
+    { type: 'AUTO', message: '통화와 교통 확인에 20분 경과' },
+    { type: 'PHASE CHANGE', message: '공급 차질 → 지역 이동 제한' },
+  ] satisfies PresentationBlock[],
 }
 
 export const initialLog: LogEntry[] = [

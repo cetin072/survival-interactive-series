@@ -16,6 +16,10 @@ h1 { margin: 7px 0 0; font-size: 1.2rem; font-weight: 600; }
 .status-panels h2 { margin-bottom: 10px; }
 .status-panels p { display: flex; justify-content: space-between; gap: 10px; margin: 7px 0; font-size: .84rem; }
 .status-panels span { color: #b9c5ba; text-align: right; }
+.presentation-blocks { display: grid; gap: 8px; padding: 0 22px 20px; }
+.presentation-block { padding: 12px 15px; border-left: 2px solid #719873; background: #101612; }
+.presentation-block h2 { margin-bottom: 6px; }.presentation-block p { margin: 0; line-height: 1.5; font-family: system-ui, sans-serif; }
+.presentation-block.event { border-color: #d5ad63; }.presentation-block.auto { border-color: #7d9cc4; }.presentation-block.phase-change { border-color: #c77d9e; }
 .choices { display: grid; gap: 8px; padding: 0 22px 20px; }
 .choices button { display: flex; align-items: center; gap: 12px; text-align: left; color: #eef5ed; border: 1px solid #536755; background: #1d2920; padding: 15px; min-height: 54px; }
 .choices button:hover, .choices button:focus-visible { background: #2a3c2d; outline: 2px solid #b7d9b9; outline-offset: 2px; }
@@ -28,4 +32,4 @@ kbd { min-width: 1.8em; padding: 3px 6px; text-align: center; border: 1px solid 
 .game-log { max-height: 240px; overflow-y: auto; padding: 18px 22px 24px; }
 .game-log p { margin: 0; }
 .log-title { margin-bottom: 12px !important; }.log-entry { padding: 10px 0; border-top: 1px solid #2f3a31; line-height: 1.55; font-family: system-ui, sans-serif; }.log-entry.choice { color: #c6e8c8; }.log-entry.free-action { color: #dde5dd; }
-@media (max-width: 520px) { .app-shell { padding: 0; }.game-shell { border: 0; min-height: 100vh; }.scene-header, .narrative, .free-action, .game-log { padding-left: 16px; padding-right: 16px; }.status-panels, .choices { padding-left: 16px; padding-right: 16px; }.status-panels { grid-template-columns: 1fr; }.scene-header { align-items: flex-start; }.panel-toggle { font-size: .75rem; } }
+@media (max-width: 520px) { .app-shell { padding: 0; }.game-shell { border: 0; min-height: 100vh; }.scene-header, .narrative, .free-action, .game-log { padding-left: 16px; padding-right: 16px; }.status-panels, .presentation-blocks, .choices { padding-left: 16px; padding-right: 16px; }.status-panels { grid-template-columns: 1fr; }.scene-header { align-items: flex-start; }.panel-toggle { font-size: .75rem; } }

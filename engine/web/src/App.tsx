@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ChoiceButtons } from './components/ChoiceButtons'
 import { FreeActionForm } from './components/FreeActionForm'
 import { GameLog } from './components/GameLog'
+import { PresentationBlocks } from './components/PresentationBlocks'
 import { SceneHeader } from './components/SceneHeader'
 import { StatusPanels } from './components/StatusPanels'
 import { demoScene, initialLog } from './data/demoScene'
@@ -29,6 +30,7 @@ export default function App() {
       <SceneHeader day={demoScene.day} time={demoScene.time} location={demoScene.location} showPanels={showPanels} onTogglePanels={() => setShowPanels((visible) => !visible)} />
       <section className="narrative" aria-label="현재 장면"><p>{demoScene.narrative}</p></section>
       {showPanels && <StatusPanels family={demoScene.family} resources={demoScene.resources} />}
+      {showPanels && <PresentationBlocks blocks={demoScene.presentationBlocks} />}
       <ChoiceButtons choices={demoScene.choices} onSelect={select} />
       <FreeActionForm onSubmit={(action) => append(freeActionLog(action, log.length))} />
       <GameLog entries={log} />
