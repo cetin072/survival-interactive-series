@@ -22,7 +22,7 @@ function initialSavedUrl(): string {
 export function PlayBridge() {
   const [savedUrl, setSavedUrl] = useState(initialSavedUrl)
   const [draftUrl, setDraftUrl] = useState(savedUrl)
-  const [editing, setEditing] = useState(savedUrl.length === 0)
+  const [editing, setEditing] = useState(false)
   const [error, setError] = useState('')
 
   const save = () => {
@@ -42,7 +42,7 @@ export function PlayBridge() {
     window.localStorage.removeItem(CHAT_URL_STORAGE_KEY)
     setSavedUrl('')
     setDraftUrl('')
-    setEditing(true)
+    setEditing(false)
     setError('')
   }
 
@@ -50,31 +50,34 @@ export function PlayBridge() {
     <div className="play-bridge-copy">
       <p className="play-bridge-kicker">WEB-FIRST PLAY</p>
       <h2>현재 상태를 확인했으면 플레이를 이어가세요.</h2>
-      <p>실제 자유행동·가족 자율성·세계 판정은 ChatGPT의 시즌 채팅에서 진행됩니다.</p>
+      <p>실제 자유행동·가족 자율성·세계 판정은 ChatGPT 앱 또는 시즌 채팅에서 진행됩니다.</p>
     </div>
 
-    {savedUrl && !editing
-      ? <div className="play-bridge-actions">
-          <a className="play-primary" href={savedUrl} target="_blank" rel="noreferrer">PLAY IN CHATGPT</a>
-          <button className="play-secondary" type="button" onClick={() => setEditing(true)}>시즌 링크 변경</button>
-        </div>
-      : <div className="play-link-setup">
-          <label htmlFor="season-chat-url">시즌 ChatGPT 주소 · 처음 1회 저장</label>
-          <div className="play-link-row">
-            <input
-              id="season-chat-url"
-              value={draftUrl}
-              onChange={(event) => setDraftUrl(event.target.value)}
-              placeholder="https://chatgpt.com/c/..."
-              inputMode="url"
-              autoComplete="off"
-            />
-            <button className="play-primary" type="button" onClick={save}>저장</button>
-          </div>
-          {error && <p className="play-link-error" role="alert">{error}</p>}
-          <p className="play-link-help">아직 시즌 채팅이 없다면 먼저 ChatGPT를 열어 S07 채팅을 만든 뒤 그 주소를 여기에 저장하세요.</p>
-          <a className="play-open-chatgpt" href="https://chatgpt.com/" target="_blank" rel="noreferrer">CHATGPT 열기</a>
-          {savedUrl && <button className="play-clear" type="button" onClick={clear}>저장된 링크 삭제</button>}
-        </div>}
+    <div className="play-bridge-actions">
+      <a className="play-primary" href={savedUrl || 'https://chatgpt.com/'}>
+        {savedUrl ? 'PLAY IN CHATGPT' : 'CHATGPT 앱 열기'}
+      </a>
+      <button className="play-secondary" type="button" onClick={() => setEditing((current) => !current)}>
+        {editing ? '링크 설정 닫기' : savedUrl ? '시즌 링크 변경' : '시즌 링크 저장 · 선택'}
+      </button>
+    </div>
+
+    {editing && <div className="play-link-setup">
+      <label htmlFor="season-chat-url">시즌 ChatGPT 주소 · 선택 저장</label>
+      <div className="play-link-row">
+        <input
+          id="season-chat-url"
+          value={draftUrl}
+          onChange={(event) => setDraftUrl(event.target.value)}
+          placeholder="https://chatgpt.com/c/..."
+          inputMode="url"
+          autoComplete="off"
+        />
+        <button className="play-primary" type="button" onClick={save}>저장</button>
+      </div>
+      {error && <p className="play-link-error" role="alert">{error}</p>}
+      <p className="play-link-help">모바일에서는 이 저장 없이 바로 ChatGPT 앱을 열어도 됩니다. 특정 시즌 채팅으로 바로 들어가고 싶을 때만 주소를 저장하세요.</p>
+      {savedUrl && <button className="play-clear" type="button" onClick={clear}>저장된 링크 삭제</button>}
+    </div>}
   </section>
 }
