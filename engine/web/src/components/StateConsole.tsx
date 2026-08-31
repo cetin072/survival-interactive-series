@@ -9,6 +9,7 @@ type Props = {
   refreshing: boolean
   onRefresh: () => void
   playBridge: ReactNode
+  bgmControl: ReactNode
 }
 
 function Section({ title, children, empty }: { title: string; children: ReactNode; empty?: boolean }) {
@@ -22,7 +23,7 @@ function valueOrNone(value: string | null): string {
   return value ?? '미기록'
 }
 
-export function StateConsole({ view, source, sourceWarning, refreshing, onRefresh, playBridge }: Props) {
+export function StateConsole({ view, source, sourceWarning, refreshing, onRefresh, playBridge, bgmControl }: Props) {
   return <main className="console-shell">
     <header className="console-header">
       <div>
@@ -32,9 +33,12 @@ export function StateConsole({ view, source, sourceWarning, refreshing, onRefres
         <p className="headline-meta">{view.header.date} · {view.header.time}</p>
         <p className="headline-location">{view.header.location}</p>
       </div>
-      <button className="refresh-button" type="button" onClick={onRefresh} disabled={refreshing}>
-        {refreshing ? 'SYNC…' : 'REFRESH'}
-      </button>
+      <div className="header-controls">
+        {bgmControl}
+        <button className="refresh-button" type="button" onClick={onRefresh} disabled={refreshing}>
+          {refreshing ? 'SYNC…' : 'REFRESH'}
+        </button>
+      </div>
     </header>
 
     <div className="source-line">
