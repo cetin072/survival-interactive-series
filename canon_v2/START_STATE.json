@@ -1,0 +1,31 @@
+{
+  "timeline_id": "canon_v2",
+  "season_id": "S01",
+  "status": "READY_FOR_HIDDEN_WORLD_SEED",
+  "world_state": "ordinary_modern_korea_before_visible_main_event",
+  "player_known_baseline": {
+    "family_structure": ["player", "wife", "son", "father"],
+    "primary_home": "city_apartment",
+    "father_home": "outer_house",
+    "legacy_upgrades_carried_over": false,
+    "legacy_relationships_carried_over": false
+  },
+  "hidden_seed_required": true,
+  "hidden_seed_generated": false,
+  "disaster_identity_public": false,
+  "presentation_profile": "MUD_TEXT_V1",
+  "post_season_debrief": true,
+  "rules": {
+    "ai_proposes_engine_commits": true,
+    "family_independent_decisions": true,
+    "simultaneous_pressures": true,
+    "irreversible_season_change_required": true,
+    "normal_society_full_return_not_default": true,
+    "in_play_lecture": false
+  },
+  "notes": [
+    "Legacy S01-S07 saves and persistent world state must not be loaded into this timeline.",
+    "Exact family locations, vehicle positions, date/time and the disaster are locked privately at S01 play start.",
+    "Do not prewrite a correct route, climax, ending or guaranteed loss."
+  ]
+}
