@@ -82,7 +82,7 @@ export async function main(argv = process.argv.slice(2), environment = process.e
   for (const model of verifiedModels) {
     for (const benchmarkCase of cases) {
       if (!model.available || !model.structuredOutputSupported) {
-        results.push({ model: model.id, caseId: benchmarkCase.id, schemaValid: false, structuralMatchScore: 0, actionCountCorrect: false, actionOrderCorrect: false, ambiguityCorrect: false, latencyMs: null, inputTokens: null, outputTokens: null, totalTokens: null, retryCount: 0, estimatedCostUsd: null, error: model.limitation, rawResponse: null })
+        results.push({ model: model.id, caseId: benchmarkCase.id, expectedDisposition: benchmarkCase.expectedDisposition ?? 'normal', schemaValid: false, structuralMatchScore: 0, actionCountCorrect: false, actionOrderCorrect: false, ambiguityCorrect: false, latencyMs: null, inputTokens: null, outputTokens: null, totalTokens: null, retryCount: 0, estimatedCostUsd: null, error: model.limitation, rawResponse: null })
         continue
       }
       const response = await requestStructuredAction({ apiKey, model, benchmarkCase, prompt: createPrompt(benchmarkCase), timeoutMs: options.timeoutMs, fetchImpl })
@@ -91,6 +91,7 @@ export async function main(argv = process.argv.slice(2), environment = process.e
       results.push({
         model: model.id,
         caseId: benchmarkCase.id,
+        expectedDisposition: benchmarkCase.expectedDisposition ?? 'normal',
         schemaValid: response.ok,
         ...score,
         latencyMs: response.latencyMs ?? null,

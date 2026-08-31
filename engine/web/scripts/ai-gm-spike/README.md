@@ -20,7 +20,7 @@ npm run ai-gm:compare
 Select exact models or fixtures to control cost:
 
 ```powershell
-npm run ai-gm:compare -- --model=qwen/qwen3.7-flash --case=simple-inspect-water,ambiguous-target --timeout-ms=15000
+npm run ai-gm:compare -- --model=qwen/qwen3.8-flash --case=simple-inspect-water,ambiguous-target --timeout-ms=15000
 ```
 
 `OPENROUTER_API_KEY` is read only from the local environment. If it is absent, the command exits before a network request with a short setup message. Do not put a real key in `.env.example`, test fixtures, generated reports, or Vite/browser code.
@@ -32,6 +32,12 @@ For every configured model and Korean benchmark case, the script records schema 
 The default model configuration intentionally has no durable dollar estimate. `models.json` carries the retrieval date and source note; replace it with a dated, sourced price config only when a current cost estimate is needed.
 
 The command performs at most one retry for a transient HTTP/network or malformed-schema response, and each request has a bounded timeout. It checks OpenRouter's live model catalog before running cases, so a removed model ID or missing structured-output capability is visible in the report.
+
+## Interpreter boundary and the conditional v0 stop bucket
+
+This spike measures language interpretation, not physical-state validation. A linguistically clear action remains an action proposal even when the supplied state makes it impossible (for example, requesting a car that is elsewhere). The existing authoritative engine Validator, not this interpreter, rejects that proposal later.
+
+`ambiguous=true` normally means a material linguistic reference cannot be resolved. The current v0 action schema has no condition/deferred-intent field, so the conditional fixture temporarily uses `ambiguous=true` with an `ambiguityReason` as a **deferred stop bucket**. Its report record is marked `expectedDisposition: "deferred_condition"` so it is not interpreted as a linguistic-ambiguity result or as the final engine contract. A later integration contract may represent conditions separately; this spike does not define it.
 
 ## Outputs and fixture safety
 

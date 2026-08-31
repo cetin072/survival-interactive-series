@@ -112,9 +112,9 @@
     "description": "impossible/contradictory request relative to supplied state",
     "state": { "player_location": "school", "vehicles": { "family_car": "market" } },
     "allowed": { "actors": ["player"], "targets": [], "locations": ["school", "shelter"], "vehicles": ["family_car"], "items": [] },
-    "facts": ["family_car is at market and no one can bring it to school this turn."],
+    "facts": ["family_car is at market and no one can bring it to school this turn. This makes execution invalid later, but does not make the player's stated intent linguistically ambiguous."],
     "input": "여기 있는 가족 차를 타고 대피소로 간다.",
-    "expected": { "actions": [], "ambiguous": true }
+    "expected": { "actions": [{ "verb": "move", "actor": "player", "to": "shelter", "vehicle": "family_car" }], "ambiguous": false }
   },
   {
     "id": "conditional-phrasing",
@@ -123,7 +123,8 @@
     "allowed": { "actors": ["player"], "targets": ["apartment_door"], "locations": ["apartment"], "vehicles": [], "items": [] },
     "facts": ["No weather forecast or trigger status is available."],
     "input": "비가 오면 현관문을 잠근다.",
-    "expected": { "actions": [], "ambiguous": true }
+    "expected": { "actions": [], "ambiguous": true },
+    "expectedDisposition": "deferred_condition"
   },
   {
     "id": "negative-phrasing",
