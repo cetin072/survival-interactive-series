@@ -13,6 +13,11 @@ describe('Canon runtime invariants', () => {
     altered.assets.find((asset) => asset.id === 'MOBILE_WELL_POWER')!.ownership_share!.CHOI_HOUSEHOLD = 100
     expect(codes(validateRuntimeInvariants(altered))).toEqual(expect.arrayContaining(['ASSET_COMMUNAL_CONFLICT', 'ASSET_ACCESS_CONFLICT', 'JOINT_OWNERSHIP_CONFLICT']))
   })
+  it('rejects a merged Choi well and village borehole facility ID', () => {
+    const altered = structuredClone(runtimeInvariants)
+    altered.assets.find((asset) => asset.id === 'VILLAGE_BOREHOLE')!.id = 'CHOI_WELL'
+    expect(codes(validateRuntimeInvariants(altered))).toContain('FACILITY_MERGE_CONFLICT')
+  })
   it('does not turn cooperation or coordination into ownership', () => {
     const altered = structuredClone(runtimeInvariants)
     altered.cooperation.ownership_merged = true
