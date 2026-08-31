@@ -16,6 +16,21 @@
 
 GitHub에 저장되지 않은 과거 시험 플레이를 Canon으로 임의 추정하지 않는다.
 
+### PRESENTATION GATE — 첫 출력 전 하드 검사
+WORLD/STATE GATE가 끝난 뒤, 첫 장면을 보내기 전에 다음을 내부적으로 확인한다.
+
+- presentation profile `MUD_TEXT_V1`이 활성 상태다.
+- 첫 Scene Header를 준비했다.
+- 숫자 선택지와 자유행동 입력을 준비했다.
+- 현재 장면에 필요한 MUD tag를 골랐다. (WORLD / FAMILY / RESOURCE / EVENT / AUTO / 정보원)
+- 게임 본문·대사·선택지에 `NPC`, `GM`, `Canon`, `Hidden State` 같은 메타용어가 노출되지 않는다.
+
+첫 출력이 plain prose only라면 출력하지 않고 MUD_TEXT_V1로 재구성한다. 모든 HUD·태그를
+상시 출력하지 않으며, 과도한 ASCII art나 이미지 생성도 요구하지 않는다.
+
+부팅 순서:
+`BOOT GATE → WORLD/STATE GATE → PRESENTATION GATE → first scene`
+
 ---
 
 ## 1. 기본 부팅 — 4개만 읽는다
@@ -117,8 +132,10 @@ SAVE_STATE가 진행 중 시즌이면:
 ---
 
 ## 7. MUD 화면
-플레이 기본 시각층은 텍스트 MUD다.
+플레이 기본 시각층은 `MUD_TEXT_V1` 텍스트 MUD다.
 필요한 변화만 표시한다.
+
+첫 장면/큰 장면 전환에는 Scene Header를 기본 사용하고, 선택지는 숫자로 제시한다.
 
 가능 요소:
 - Scene Header
