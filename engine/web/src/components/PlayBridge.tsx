@@ -22,9 +22,8 @@ export function buildAndroidChatGptIntent(targetUrl: string): string {
   const normalized = normalizeChatGptUrl(targetUrl) ?? 'https://chatgpt.com/'
   const url = new URL(normalized)
   const path = `${url.pathname}${url.search}`
-  const fallback = encodeURIComponent(normalized)
 
-  return `intent://${url.host}${path}#Intent;scheme=https;package=${CHATGPT_ANDROID_PACKAGE};S.browser_fallback_url=${fallback};end`
+  return `intent://${url.host}${path}#Intent;scheme=https;package=${CHATGPT_ANDROID_PACKAGE};end`
 }
 
 function initialSavedUrl(): string {
@@ -94,7 +93,7 @@ export function PlayBridge() {
         <button className="play-primary" type="button" onClick={save}>저장</button>
       </div>
       {error && <p className="play-link-error" role="alert">{error}</p>}
-      <p className="play-link-help">Android에서는 앱 직접 실행을 우선합니다. 특정 시즌 채팅으로 바로 들어가고 싶을 때만 주소를 저장하세요.</p>
+      <p className="play-link-help">Android에서는 앱 직접 실행만 시도합니다. 특정 시즌 채팅으로 바로 들어가고 싶을 때만 주소를 저장하세요.</p>
       {savedUrl && <button className="play-clear" type="button" onClick={clear}>저장된 링크 삭제</button>}
     </div>}
   </section>
