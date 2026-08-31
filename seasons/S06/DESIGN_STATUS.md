@@ -1,67 +1,37 @@
 # S06 Design Status
 
-STATUS: READY FOR HIDDEN WORLD SEED
-TITLE: 미정
+STATUS: ABORTED / NON-CANON PLAYTEST
+TITLE: 폐기
 RUNTIME: v4
 TEST_MODE: POST-S01-S05 MIDTERM
 
-## 현재 지위
+## 최종 판정
+S06 플레이는 폐기한다.
+
+직접 사유:
+- 새 시즌 BOOT에서 기존 Persistent Canon이 충분히 강제되지 않아 평일 정호 위치가 잘못 시작됨
+- 최씨 개인 우물과 마을 공용 수계가 혼동될 수 있는 표현이 발생함
+- 초기 상태 오류가 이후 가족 집결·수원 판단에 영향을 줌
+
+따라서 S06의 플레이 결과, 사건 진행, 선택 결과는 Persistent Canon / SAVE / RUNTIME_STATE에 승격하지 않는다.
+재난 아이디어 자체도 자동 승격하지 않는다.
+
+S07은 S05 종료 Canon을 기준으로 새로 시작한다.
+S06에서 발견한 구조 문제는 #24, #22, #29에서 보강되었다.
+
+---
+
+## 원래 S06 설계 기록
 S01~S05 플레이와 중간점검이 완료되었다.
-S06는 새 시스템을 추가하는 시즌이 아니라 **현재 시스템의 재미 실행력을 검증하는 시즌**이다.
+S06는 새 시스템을 추가하는 시즌이 아니라 **현재 시스템의 재미 실행력을 검증하는 시즌**으로 계획되었다.
 
-아직 정하지 않은 것:
-- 재난/사건 종류
-- 시작 장면
-- 가족 시작 위치
-- 핵심 외생 압력
-- 클라이맥스
-- 결말
+검증 목표는 다음과 같았다.
+1. Decision Collision
+2. Multi-Action Cost
+3. Family Autonomy
+4. Content Diversity
+5. Phase Verb Change
+6. Fast Ending
+7. No New System Needed
 
-이 항목들은 새 플레이 직전 `docs/WORLD_SEED_PROTOCOL.md`에 따라 비공개로 생성한다.
-
-## 시작 전 읽기
-기본 Runtime:
-1. `runtime/GM_KERNEL.md`
-2. `core/CHARACTERS.json`
-3. `core/PERSISTENT_CANON.md`
-4. `players/main/SAVE_STATE.json`
-
-S06 전용 인계:
-- `seasons/S05/START_HANDOFF.md`
-
-## S06 핵심 검증
-1. **Decision Collision** — 합리적 행동을 모두 공짜로 수행하지 못하고 우선순위 비용이 실제로 작동하는가.
-2. **Multi-Action Cost** — 복수선택 순서가 지연·부분성공·기회상실에 실제 영향을 주는가.
-3. **Family Autonomy** — 가족이 플레이어 지시 전에 문제 발견·독립 처리·역할변경 제안을 자연스럽게 하는가.
-4. **Content Diversity** — 최근 전력·통신·단수·외곽 이동 중심 시즌과 실제 플레이 행동군이 다른가.
-5. **Phase Verb Change** — Phase가 바뀔 때 플레이어가 해야 하는 행동 종류도 바뀌는가.
-6. **Fast Ending** — 메인 압력이 끝나면 결이 다른 후속 문제를 붙이지 않고 시즌 종료를 우선 검토하는가.
-7. **No New System Needed** — Runtime v4와 기존 모듈만으로 재미가 개선되는가.
-
-## S06 월드 시드 제한
-기본 압력 예산:
-- 핵심 외생 압력 2~3개
-- 예비 압력 1개 이하
-
-최근 반복 구조를 기본 시나리오로 사용하지 않는다.
-특히 다음 루프는 우선 피한다.
-
-`통신/정전 → 가족 위치 확인 → 물/연료 확보 → 전원 합류 → 외곽거점 이동 → 전력/물 운영`
-
-기존 거점 능력을 무효화하는 것은 금지한다.
-거점이 실제로 유효할 수 있지만 그것만으로 답할 수 없는 다른 압력축을 검토한다.
-
-## 성공 판정
-S06 종료 후 아래가 S05보다 개선됐으면 성공이다.
-- 선택을 고르는 시간이 실제로 고민될 정도의 가치 충돌 증가
-- 복수선택 순서의 체감 가치 증가
-- 가족 4인 파티의 독립성 증가
-- 최근 시즌과 다른 플레이 감각
-- 같은 장면/보고 패턴 감소
-- 메인 재난 이후 빠른 종료
-
-성공 후 다음 단계 후보:
-- 외부 블라인드 플레이
-- 얇은 MUD UI 프로토타입
-
-대형 게임엔진 개발은 아직 자동 착수하지 않는다.
+이 설계 목표 자체는 향후 시즌 회고 참고자료로 남긴다.
