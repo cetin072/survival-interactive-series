@@ -9,11 +9,16 @@
 
 1. `runtime/GM_KERNEL.md`
 2. `core/CHARACTERS.json`
-3. `core/PERSISTENT_CANON.md`
-4. `players/main/SAVE_STATE.json`
+3. `core/RUNTIME_INVARIANTS.json` — hard Canon / ownership / 기본 생활모델
+4. `core/PERSISTENT_CANON.md`
+5. `players/main/RUNTIME_STATE.json`
+6. `players/main/SAVE_STATE.json`
 
 ### 이어서 플레이인 경우에만
-5. 현재 시즌 `seasons/Sxx/GM_STATE.json`
+7. 현재 시즌 `seasons/Sxx/GM_STATE.json`
+
+새 시즌이면 current season handoff를 추가로 읽는다. `RUNTIME_INVARIANTS`는 현재 상태를
+강제 복구하지 않으며, hard Canon과 근거 없는 첫 배치/소유권 drift만 막는다.
 
 CHECKPOINT는 사람이 읽는 재개 요약이다. SAVE_STATE로 충분하면 필수 로드하지 않는다.
 
@@ -79,7 +84,8 @@ Invariant로 이미 활성화되어 있다. 이 문서는 태그·여백·자원
 ## E. 설정 충돌 우선순위
 1. 사용자가 명시적으로 바로잡은 최신 Canon Correction
 2. `core/CHARACTERS.json`
-3. `core/PERSISTENT_CANON.md`
+3. `core/RUNTIME_INVARIANTS.json` (기계 검증용 hard Canon)
+4. `core/PERSISTENT_CANON.md`
 4. 현재 시즌 `GM_STATE.json`
 5. `players/main/SAVE_STATE.json`
 6. 해당 시즌 PLAYTHROUGH_CANON / CHECKPOINT
@@ -91,7 +97,7 @@ Invariant로 이미 활성화되어 있다. 이 문서는 태그·여백·자원
 ---
 
 ## F. 읽기 예산
-플레이 시작 시 원칙적으로 **4개 파일 이내**에서 장면을 시작한다.
+플레이 시작 시 Canon Gate의 **6개 파일**로 장면을 시작한다.
 진행 중 한 장면을 판단하기 위한 상세문서는 보통 **관련 모듈 1개만 추가**한다.
 
 문서를 많이 읽는 것을 정확성으로 간주하지 않는다.

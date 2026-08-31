@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://survival-interactive-series.local/schemas/runtime-invariants-v1.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "registry_version", "family_operating_model", "assets", "cooperation"],
+  "properties": {
+    "schema_version": { "const": 1 }, "registry_version": { "const": 1 },
+    "family_operating_model": { "type": "object", "additionalProperties": false, "required": ["weekday", "weekend"], "properties": {
+      "weekday": { "type": "object", "additionalProperties": false, "required": ["default_locations"], "properties": { "default_locations": { "type": "object", "additionalProperties": false, "required": ["player", "wife", "son", "father"], "properties": { "player": {"const":"urban"}, "wife": {"const":"urban"}, "son": {"const":"urban"}, "father": {"const":"outer_base"} } } } },
+      "weekend": { "type": "object", "additionalProperties": false, "required": ["default_reunion_location", "member_ids"], "properties": { "default_reunion_location": {"const":"outer_base"}, "member_ids": { "type":"array", "uniqueItems":true, "minItems":4, "items":{"type":"string"} } } }
+    } },
+    "assets": { "type":"array", "minItems":6, "items": { "type":"object", "additionalProperties":false, "required":["id","owner_ids","communal","village_auto_access","purpose"], "properties": { "id":{"type":"string"}, "owner_ids":{"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string"}}, "ownership_share":{"type":"object","additionalProperties":{"type":"number","minimum":0,"maximum":100}}, "communal":{"type":"boolean"}, "village_auto_access":{"type":"boolean"}, "purpose":{"type":"string"} } },
+      "allOf": [
+        {"contains":{"type":"object","properties":{"id":{"const":"CHOI_WELL"},"owner_ids":{"const":["CHOI_HOUSEHOLD"]},"communal":{"const":false},"village_auto_access":{"const":false}},"required":["id","owner_ids","communal","village_auto_access"]}},
+        {"contains":{"type":"object","properties":{"id":{"const":"VILLAGE_BOREHOLE"},"owner_ids":{"const":["VILLAGE_COMMON"]},"communal":{"const":true}},"required":["id","owner_ids","communal"]}},
+        {"contains":{"type":"object","properties":{"id":{"const":"JUNHO_SOLAR"},"owner_ids":{"const":["JUNHO_HOUSEHOLD"]},"communal":{"const":false},"village_auto_access":{"const":false}},"required":["id","owner_ids","communal","village_auto_access"]}}
+      ]
+    },
+    "cooperation": { "type":"object", "additionalProperties":false, "required":["core_participants","ownership_merged","coordination_line","headman_roles"], "properties": { "core_participants":{"type":"array","minItems":2,"uniqueItems":true,"items":{"type":"string"}}, "ownership_merged":{"const":false}, "coordination_line":{"type":"object","additionalProperties":false,"required":["participants","asset_authority"],"properties":{"participants":{"type":"array","minItems":3,"uniqueItems":true,"items":{"type":"string"}},"asset_authority":{"const":false}}}, "headman_roles":{"type":"array","minItems":3,"items":{"type":"string"}} } }
+  }
+}
