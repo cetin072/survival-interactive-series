@@ -20,9 +20,14 @@ describe('Runtime State consistency validator', () => {
   it('blocks vehicle user location and unknown references', () => {
     const state = structuredClone(baselineRuntime)
     state.vehicles![0].location = '외곽거점'
-    state.vehicles![0].current_user = 'missing'
+    state.vehicles![0].current_user = 'player'
     state.active_actions = [{ id: 'move', label: '이동', actors: ['missing'], vehicle_ids: ['missing'], base_ids: ['missing'] }]
-    expect(codes(state)).toEqual(expect.arrayContaining(['UNKNOWN_FAMILY_REFERENCE', 'UNKNOWN_VEHICLE_REFERENCE', 'UNKNOWN_BASE_REFERENCE']))
+    expect(codes(state)).toEqual(expect.arrayContaining([
+      'VEHICLE_LOCATION_CONFLICT',
+      'UNKNOWN_FAMILY_REFERENCE',
+      'UNKNOWN_VEHICLE_REFERENCE',
+      'UNKNOWN_BASE_REFERENCE',
+    ]))
   })
 
   it('detects malformed and reversed time', () => {

@@ -94,27 +94,32 @@ GitHub를 기준 저장소로 유지한다.
 
 Netlify State Console은 공개 가능한 최신 상태 파일을 읽어 렌더링한다.
 권장 원본:
-- `players/main/SAVE_STATE.json`
-- `players/main/CHECKPOINT.md`
-- `players/main/PUBLIC_LIVE_STATE.json` (State Console 전용 정규화 snapshot)
+- `players/main/RUNTIME_STATE.json` (현재 상태의 단일 기계 원본)
+- `core/CHARACTERS.json` (가족의 고정 Canon)
+- `players/main/SAVE_STATE.json` / `players/main/CHECKPOINT.md` (장기 저장·재개 요약)
 
-Netlify 브라우저에 Hidden State를 내려보내지 않는다.
+`RUNTIME_STATE`는 checkpoint의 큰 변화에서만 갱신한다. State Console은 빌드된 정적
+compiler/view logic으로 필요한 표시값을 파생하며, 매 checkpoint마다 별도
+`PUBLIC_LIVE_STATE`를 commit하는 중복 원본은 만들지 않는다.
 
-정적 사이트가 GitHub Raw의 `PUBLIC_LIVE_STATE.json`을 읽는 구조를 우선한다. 그러면 별도 AI API, Netlify Function, Blob 없이도 checkpoint commit 직후 상태판이 갱신된다.
+정적 사이트가 GitHub Raw의 `RUNTIME_STATE.json`과 `CHARACTERS.json`을 읽는 구조를
+우선한다. 그러면 별도 AI API, Netlify Function, Blob, 재배포 없이 checkpoint commit
+직후 상태판이 갱신된다.
 
-Hidden GM State는 공개 State Console과 완전히 분리한다. 현재 공개 저장소에 유지되는 GM 전용 파일은 웹 UI가 절대 fetch/render하지 않는다. 향후 실제 비공개 저장 필요성이 생기면 별도 private storage를 검토한다.
+Hidden GM State는 공개 State Console과 완전히 분리한다. 현재 공개 저장소에 유지되는
+GM 전용 파일은 웹 UI가 절대 fetch/render하지 않는다. 향후 실제 비공개 저장 필요성이
+생기면 별도 private storage를 검토한다.
 
 ## 6. State Compiler / Validator
 
 AI GM이 매번 HUD와 정합성을 직접 계산하지 않도록 작은 결정론적 계층을 둔다.
 
 입력:
-- SAVE_STATE
-- Canon snapshot
-- 최신 checkpoint
+- RUNTIME_STATE
+- CHARACTERS Canon
+- 필요한 공개 Canon snapshot
 
 출력:
-- PUBLIC_LIVE_STATE
 - consistency report
 - UI derived fields
 
@@ -134,10 +139,9 @@ AI GM이 매번 HUD와 정합성을 직접 계산하지 않도록 작은 결정�
 
 ## 7. GitHub Actions의 역할
 
-Checkpoint 또는 Save 변경 시 자동으로:
+Checkpoint, Save 또는 RUNTIME_STATE 변경 시 자동으로:
 - JSON schema validation
-- State Compiler 실행
-- consistency tests
+- State Compiler / consistency tests 실행
 - 기존 engine tests
 - build regression
 
@@ -224,7 +228,7 @@ Codex는 런타임 GM이 아니다.
 
 S06 시작 전 마지막 개발 패키지:
 1. Zero-AI Netlify 화면을 State Console로 전환
-2. `PUBLIC_LIVE_STATE.json` 규격 추가
+2. `RUNTIME_STATE.json` 규격 추가
 3. State Compiler 추가
 4. consistency validation 추가
 5. GitHub Actions에서 자동 검증

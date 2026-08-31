@@ -26,6 +26,16 @@ describe('GitHub Raw runtime loader', () => {
     expect(loaded.warning).toContain('배포 시점 checkpoint')
   })
 
+  it('rejects malformed GitHub Raw state and uses the clear fallback', async () => {
+    const malformed = { schema_version: 1, season_id: 'S05', family: 'not-an-array' }
+    const fetcher = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(JSON.stringify(malformed), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(baselineCharacters), { status: 200 }))
+    const loaded = await loadRuntimeState({ fetcher, fallbackRuntime: baselineRuntime, fallbackCharacters: baselineCharacters })
+    expect(loaded.source).toBe('bundled-fallback')
+    expect(loaded.warning).toContain('GitHub 최신 상태')
+  })
+
   it('does not define any non-public source path', () => {
     expect(PUBLIC_RAW_PATHS).toEqual({
       runtime: 'players/main/RUNTIME_STATE.json',
