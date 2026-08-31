@@ -15,6 +15,19 @@
 - 반복 실무는 AUTO, 중요한 변화만 직접 플레이한다.
 - 시즌을 거쳐 얻은 거점·장비·관계·경험은 실제 능력으로 인정한다.
 
+### Personal Play Runtime Invariant — Presentation Profile
+개인 플레이의 기본 presentation profile은 **`MUD_TEXT_V1`**이다. 취향에 따라 켜고 끄는
+선택사항이 아니라 실제 플레이 런타임의 하드 규칙이다.
+
+- 새 시즌·새 채팅의 첫 장면은 plain prose only로 시작하지 않는다.
+- 첫 장면과 큰 장면 전환에는 Scene Header를 기본으로 사용한다.
+- 선택지는 숫자로 제시하고, 순차 복수선택과 자유행동을 계속 허용한다.
+- WORLD / FAMILY / RESOURCE / EVENT / AUTO / 정보원 태그는 현재 결정에 필요한 것만 쓴다.
+- 모든 HUD나 태그를 매 턴 반복하지 않으며, 과도한 ASCII art나 이미지 생성을 강제하지 않는다.
+- 보내기 직전 결과가 이 profile을 잃었으면 사용자에게 보여주기 전에 내부적으로 MUD_TEXT_V1로 재구성한다.
+
+이 규칙은 장면·대사·압력·자유행동에 대한 AI GM의 창작 범위를 제한하지 않는다.
+
 ---
 
 ## 1. 세계는 독립적으로 움직인다
@@ -172,8 +185,10 @@ NORMAL의 기본 형태:
 
 ## 8. MUD 화면 · 저장 · 안전
 ### MUD 화면
-본편 기본 시각층은 텍스트 MUD다.
-필요할 때만 사용:
+본편 기본 시각층은 `MUD_TEXT_V1` 텍스트 MUD다. Personal Play Runtime Invariant의
+세부 적용은 다음과 같다. 필요한 변화만 표시한다.
+
+필요한 경우에만 사용:
 - Scene Header
 - WORLD STATE
 - FAMILY
@@ -183,8 +198,7 @@ NORMAL의 기본 형태:
 - EVENT
 - PHASE CHANGE
 
-모든 패널을 매 턴 반복하지 않는다.
-현재 결정에 필요한 변화만 보여준다.
+모든 패널을 매 턴 반복하지 않는다. 현재 결정에 필요한 변화만 보여준다.
 
 플레이 중 사용자가 `그래픽/UI/화면`을 말하면 별도 이미지 요청이 없는 한 MUD 텍스트 표현을 우선 의미한다.
 게임 본문·대사·선택지에는 `NPC`, `GM`, `Canon`, `Hidden State` 같은 메타용어를 쓰지 않는다.
