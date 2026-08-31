@@ -38,6 +38,7 @@ def main():
     base_checks = [
         (ROOT / "core/CHARACTERS.json", ROOT / "schemas/character.schema.json"),
         (ROOT / "players/main/SAVE_STATE.json", ROOT / "schemas/save.schema.json"),
+        (ROOT / "players/main/RUNTIME_STATE.json", ROOT / "schemas/runtime_state.schema.json"),
     ]
 
     loaded = {}
@@ -59,6 +60,21 @@ def main():
             print(f"ERROR: {data_path.relative_to(ROOT)}: {exc}")
 
     save = loaded.get("SAVE_STATE.json")
+    runtime = loaded.get("RUNTIME_STATE.json")
+    if save and runtime:
+        checkpoint = runtime.get("latest_checkpoint", {})
+        comparisons = [
+            ("season_id", save.get("season_id"), runtime.get("season_id")),
+            ("world phase", save.get("world_phase"), runtime.get("phase")),
+            ("save version", save.get("version"), checkpoint.get("save_version")),
+        ]
+        for label, expected, actual in comparisons:
+            if expected != actual:
+                failed = True
+                print(f"FAIL: RUNTIME_STATE {label} mismatch: SAVE={expected} RUNTIME={actual}")
+            else:
+                print(f"OK:   RUNTIME_STATE {label} = {actual}")
+
     if save:
         season_id = save.get("season_id")
         if season_id:

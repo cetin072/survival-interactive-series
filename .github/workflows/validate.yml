@@ -21,7 +21,7 @@ jobs:
       - name: Install validator dependency
         run: pip install jsonschema
 
-      - name: Validate state files
+      - name: Validate save and runtime state schemas
         run: python tools/validate_state.py
 
       - name: Validate presentation boot contract
@@ -38,7 +38,7 @@ jobs:
         working-directory: engine/web
         run: npm ci
 
-      - name: Test web engine
+      - name: Test web engine and GM coprocessor
         working-directory: engine/web
         run: npm test
 

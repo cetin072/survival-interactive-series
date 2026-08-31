@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://survival-interactive-series.local/schemas/runtime-state-v1.json",
+  "title": "GM Coprocessor Runtime State v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "runtime_version",
+    "season_id",
+    "phase",
+    "clock",
+    "player_location",
+    "family",
+    "completed_action_ids",
+    "latest_checkpoint"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "runtime_version": { "type": "integer", "minimum": 1 },
+    "season_id": { "type": "string", "minLength": 1 },
+    "phase": { "type": "string", "minLength": 1 },
+    "clock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["date", "time"],
+      "properties": {
+        "date": { "type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "time": { "type": ["string", "null"], "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$" }
+      }
+    },
+    "player_location": { "type": "string", "minLength": 1 },
+    "family": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/family" }
+    },
+    "vehicles": { "type": "array", "items": { "$ref": "#/$defs/vehicle" } },
+    "resources": { "type": "array", "items": { "$ref": "#/$defs/resource" } },
+    "bases": { "type": "array", "items": { "$ref": "#/$defs/base" } },
+    "active_actions": { "type": "array", "items": { "$ref": "#/$defs/action" } },
+    "completed_action_ids": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "institutions": { "type": "array", "items": { "$ref": "#/$defs/institution" } },
+    "recent_changes": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 8,
+      "items": { "$ref": "#/$defs/change" }
+    },
+    "latest_checkpoint": { "$ref": "#/$defs/checkpoint" }
+  },
+  "$defs": {
+    "family": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "location", "status", "together_with"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "location": { "type": "string", "minLength": 1 },
+        "status": { "type": "string", "minLength": 1 },
+        "together_with": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "vehicle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "location", "current_user", "availability", "owner_id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "location": { "type": "string", "minLength": 1 },
+        "current_user": { "type": ["string", "null"] },
+        "availability": { "enum": ["available", "in_use", "unavailable", "unknown"] },
+        "owner_id": { "type": "string", "minLength": 1 }
+      }
+    },
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "band"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "band": { "enum": ["stable", "adequate", "strained", "critical", "depleted", "unknown"] }
+      }
+    },
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "location", "owner_id", "state", "capabilities"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "location": { "type": "string", "minLength": 1 },
+        "owner_id": { "type": "string", "minLength": 1 },
+        "state": { "type": "string", "minLength": 1 },
+        "capabilities": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "actors"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "actors": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "vehicle_ids": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "base_ids": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "exclusive_resources": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      }
+    },
+    "institution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "status"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "status": { "type": "string", "minLength": 1 }
+      }
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "at", "type", "message"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "at": { "type": ["string", "null"], "format": "date-time", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d{3})?)?Z$" },
+        "type": { "enum": ["family", "vehicle", "resource", "base", "action", "phase", "institution"] },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "season_id", "phase", "runtime_schema_version", "save_version", "at"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "season_id": { "type": "string", "minLength": 1 },
+        "phase": { "type": "string", "minLength": 1 },
+        "runtime_schema_version": { "type": "integer", "minimum": 1 },
+        "save_version": { "type": "integer", "minimum": 1 },
+        "at": { "type": ["string", "null"], "format": "date-time", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d{3})?)?Z$" }
+      }
+    }
+  }
+}

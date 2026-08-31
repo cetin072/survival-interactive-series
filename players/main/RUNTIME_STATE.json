@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "runtime_version": 1,
+  "season_id": "S05",
+  "phase": "P5_RECOVERED_DUAL_LIFE_STABLE",
+  "clock": {
+    "date": null,
+    "time": null
+  },
+  "player_location": "도심 아파트",
+  "family": [
+    {
+      "id": "player",
+      "location": "도심 아파트",
+      "status": "normal",
+      "together_with": ["wife", "son"]
+    },
+    {
+      "id": "wife",
+      "location": "도심 아파트",
+      "status": "normal",
+      "together_with": ["player", "son"]
+    },
+    {
+      "id": "son",
+      "location": "도심 아파트",
+      "status": "normal",
+      "together_with": ["player", "wife"]
+    },
+    {
+      "id": "father",
+      "location": "외곽거점",
+      "status": "normal",
+      "together_with": []
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "family_car",
+      "name": "가족 차량",
+      "location": "도심 아파트",
+      "current_user": "player",
+      "availability": "available",
+      "owner_id": "player_family"
+    }
+  ],
+  "resources": [
+    { "id": "water", "name": "물", "band": "stable" },
+    { "id": "food", "name": "식량", "band": "stable" },
+    { "id": "power", "name": "전력", "band": "stable" },
+    { "id": "communications", "name": "통신", "band": "stable" }
+  ],
+  "bases": [
+    {
+      "id": "urban_apartment",
+      "name": "도심 아파트",
+      "location": "도심",
+      "owner_id": "player_family",
+      "state": "active",
+      "capabilities": ["urban_living"]
+    },
+    {
+      "id": "outer_house",
+      "name": "외곽 거점",
+      "location": "외곽",
+      "owner_id": "player_family",
+      "state": "active",
+      "capabilities": [
+        "solar",
+        "battery",
+        "lpg",
+        "water_storage",
+        "food_storage",
+        "tools",
+        "cctv",
+        "access_control"
+      ]
+    }
+  ],
+  "active_actions": [],
+  "completed_action_ids": ["S05_FINAL_RECOVERY"],
+  "institutions": [
+    { "id": "emergency_council", "name": "비상운영회", "status": "standby" }
+  ],
+  "recent_changes": [
+    {
+      "id": "s05-recovery",
+      "at": null,
+      "type": "phase",
+      "message": "광역 기반시설이 복구되고 도심 생활이 정상화됐다."
+    },
+    {
+      "id": "s05-dual-life",
+      "at": null,
+      "type": "family",
+      "message": "평일 도심·주말 외곽의 이중생활 체제가 정착됐다."
+    },
+    {
+      "id": "s05-outer-base",
+      "at": null,
+      "type": "base",
+      "message": "정호가 외곽 거점의 평일 일상관리를 맡는다."
+    }
+  ],
+  "latest_checkpoint": {
+    "id": "S05-FINAL",
+    "season_id": "S05",
+    "phase": "P5_RECOVERED_DUAL_LIFE_STABLE",
+    "runtime_schema_version": 1,
+    "save_version": 25,
+    "at": null
+  }
+}
