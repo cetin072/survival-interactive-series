@@ -97,7 +97,7 @@ export default function App() {
       <section className="queue-panel" aria-label="복수 행동 큐">
         <label htmlFor="queue-input">복수 행동 · 순서가 결과에 영향을 줍니다</label>
         <div>
-          <input id="queue-input" value={queueText} onChange={(event) => setQueueText(event.target.value)} placeholder="예: 3 → 5 → 1" inputMode="numeric" />
+          <input id="queue-input" value={queueText} onChange={(event) => setQueueText(event.target.value)} placeholder="예: 3 → 5 → 1" inputMode="text" autoComplete="off" />
           <button type="button" onClick={playQueue}>실행</button>
         </div>
       </section>
