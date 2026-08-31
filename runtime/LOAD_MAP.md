@@ -41,8 +41,13 @@ CHECKPOINT는 사람이 읽는 재개 요약이다. SAVE_STATE로 충분하면 �
 ### 거점 능력 성장·새 업그레이드 판단
 - `docs/BASE_GROWTH_RULE.md`
 
-### 화면 표현 조정
+### 화면 표현 세부 스타일 참고
 - `docs/TEXT_VISUAL_GRAMMAR.md`
+
+`TEXT_VISUAL_GRAMMAR.md`는 MUD 사용 여부를 결정하는 문서가 아니다. 기본 presentation
+profile `MUD_TEXT_V1`은 항상 읽는 `runtime/GM_KERNEL.md`의 Personal Play Runtime
+Invariant로 이미 활성화되어 있다. 이 문서는 태그·여백·자원표현 등 세부 스타일의 예시나
+조정이 실제로 필요할 때만 추가로 읽는다.
 
 ### 시즌 종료/자산화
 - `docs/SEASON_COMPLETION_PIPELINE.md`
