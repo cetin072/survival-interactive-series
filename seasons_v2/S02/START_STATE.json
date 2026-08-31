@@ -1,0 +1,24 @@
+{
+  "timeline_id": "canon_v2",
+  "season_id": "S02",
+  "status": "READY_FOR_HIDDEN_WORLD_SEED",
+  "previous_season": "S01",
+  "previous_season_status": "COMPLETE",
+  "persistent_canon": "canon_v2/PERSISTENT_CANON.md",
+  "handoff": "seasons_v2/S02/START_HANDOFF.md",
+  "legacy_current_state_allowed": false,
+  "hidden_seed_required": true,
+  "hidden_seed_generated": false,
+  "disaster_identity_public": false,
+  "presentation_profile": "MUD_TEXT_V1",
+  "post_season_debrief": true,
+  "rules": {
+    "family_independent_decisions": true,
+    "simultaneous_pressures": true,
+    "s01_assets_remain_valid": true,
+    "s01_assets_are_not_automatic_solution": true,
+    "repeat_s01_core_action_loop": false,
+    "full_normal_reset": false,
+    "prewritten_correct_route": false
+  }
+}
