@@ -8,6 +8,7 @@ type Props = {
   sourceWarning: string | null
   refreshing: boolean
   onRefresh: () => void
+  playBridge: ReactNode
 }
 
 function Section({ title, children, empty }: { title: string; children: ReactNode; empty?: boolean }) {
@@ -21,12 +22,13 @@ function valueOrNone(value: string | null): string {
   return value ?? '미기록'
 }
 
-export function StateConsole({ view, source, sourceWarning, refreshing, onRefresh }: Props) {
+export function StateConsole({ view, source, sourceWarning, refreshing, onRefresh, playBridge }: Props) {
   return <main className="console-shell">
     <header className="console-header">
       <div>
-        <p className="console-kicker">GM COPROCESSOR · READ ONLY</p>
-        <h1>{view.header.season} · {view.header.phase}</h1>
+        <p className="console-kicker">생존기록 · WEB PLAY SHELL</p>
+        <h1>{view.header.season}</h1>
+        <p className="phase-label">{view.header.phase}</p>
         <p className="headline-meta">{view.header.date} · {view.header.time}</p>
         <p className="headline-location">{view.header.location}</p>
       </div>
@@ -37,9 +39,11 @@ export function StateConsole({ view, source, sourceWarning, refreshing, onRefres
 
     <div className="source-line">
       <span className={source === 'github-raw' ? 'source-dot live' : 'source-dot'} aria-hidden="true" />
-      {source === 'github-raw' ? 'GITHUB CHECKPOINT LIVE' : 'DEPLOY CHECKPOINT FALLBACK'}
+      {source === 'github-raw' ? 'LIVE CHECKPOINT' : 'DEPLOY FALLBACK'}
     </div>
     {sourceWarning && <p className="source-warning" role="status">{sourceWarning}</p>}
+
+    {playBridge}
 
     <Section title="FAMILY" empty={view.family.length === 0}>
       <div className="family-list">
