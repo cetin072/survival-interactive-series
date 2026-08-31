@@ -1,0 +1,18 @@
+{
+  "name": "생존기록",
+  "short_name": "생존기록",
+  "description": "생존기록 Web Play Shell",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b100d",
+  "theme_color": "#111714",
+  "lang": "ko-KR",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
