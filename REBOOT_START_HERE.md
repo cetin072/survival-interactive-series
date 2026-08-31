@@ -25,7 +25,7 @@ Legacy 문서는 설계 참고나 과거 기록으로만 조회할 수 있다.
 
 S01 부팅 자료:
 1. `docs/IP_BIBLE_V2.md`
-2. `canon_v2/CHARACTERS.json`
+2. `seasons_v2/S01/PREPLAY_CHARACTERS.json`
 3. `seasons_v2/S01/PREPLAY_CANON.md`
 4. `canon_v2/START_STATE.json`
 5. `seasons_v2/S01/START_HANDOFF.md`
@@ -50,7 +50,7 @@ S02 부팅 자료:
 정식 시즌 시작 시 우선 읽는다.
 
 1. `docs/IP_BIBLE_V2.md`
-2. `canon_v2/CHARACTERS.json`
+2. 현재 시즌에 맞는 Character source
 3. 현재 시즌에 맞는 Persistent/Pre-Play Canon
 4. 해당 시즌 `START_STATE.json`
 5. 해당 시즌 `START_HANDOFF.md`
