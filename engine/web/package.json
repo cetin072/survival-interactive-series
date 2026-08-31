@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "ai-gm:compare": "node scripts/ai-gm-spike/compare-models.mjs"
   },
   "dependencies": {
     "react": "19.2.8",
