@@ -22,11 +22,11 @@ describe('Android ChatGPT app bridge', () => {
     expect(isAndroidUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64)')).toBe(false)
   })
 
-  it('builds an Android intent targeting the official ChatGPT package with web fallback', () => {
+  it('builds an Android intent targeting the official ChatGPT package without browser fallback', () => {
     const intent = buildAndroidChatGptIntent('https://chatgpt.com/c/example?foo=bar')
 
     expect(intent).toContain('intent://chatgpt.com/c/example?foo=bar#Intent;scheme=https;')
     expect(intent).toContain('package=com.openai.chatgpt;')
-    expect(intent).toContain('S.browser_fallback_url=https%3A%2F%2Fchatgpt.com%2Fc%2Fexample%3Ffoo%3Dbar;')
+    expect(intent).not.toContain('browser_fallback_url')
   })
 })
