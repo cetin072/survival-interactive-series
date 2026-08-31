@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "registry_version": 1,
+  "family_operating_model": {
+    "weekday": { "default_locations": { "player": "urban", "wife": "urban", "son": "urban", "father": "outer_base" } },
+    "weekend": { "default_reunion_location": "outer_base", "member_ids": ["player", "wife", "son", "father"] }
+  },
+  "assets": [
+    { "id": "CHOI_WELL", "owner_ids": ["CHOI_HOUSEHOLD"], "communal": false, "village_auto_access": false, "purpose": "private_water" },
+    { "id": "VILLAGE_BOREHOLE", "owner_ids": ["VILLAGE_COMMON"], "communal": true, "village_auto_access": true, "purpose": "emergency_water" },
+    { "id": "VILLAGE_STORAGE_TANK", "owner_ids": ["VILLAGE_COMMON"], "communal": true, "village_auto_access": true, "purpose": "emergency_water_storage" },
+    { "id": "JUNHO_SOLAR", "owner_ids": ["JUNHO_HOUSEHOLD"], "communal": false, "village_auto_access": false, "purpose": "household_power" },
+    { "id": "MOBILE_WELL_POWER", "owner_ids": ["JUNHO_HOUSEHOLD", "CHOI_HOUSEHOLD"], "ownership_share": { "JUNHO_HOUSEHOLD": 50, "CHOI_HOUSEHOLD": 50 }, "communal": false, "village_auto_access": false, "purpose": "joint_well_power" },
+    { "id": "SPARE_WELL_PUMP", "owner_ids": ["JUNHO_HOUSEHOLD", "CHOI_HOUSEHOLD"], "ownership_share": { "JUNHO_HOUSEHOLD": 50, "CHOI_HOUSEHOLD": 50 }, "communal": false, "village_auto_access": false, "purpose": "joint_well_pump" }
+  ],
+  "cooperation": {
+    "core_participants": ["JUNHO_HOUSEHOLD", "CHOI_HOUSEHOLD"],
+    "ownership_merged": false,
+    "coordination_line": { "participants": ["JUNHO", "CHOI", "HEADMAN"], "asset_authority": false },
+    "headman_roles": ["resident_coordination", "public_facilities", "administrative_contact"]
+  }
+}

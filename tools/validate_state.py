@@ -39,6 +39,7 @@ def main():
         (ROOT / "core/CHARACTERS.json", ROOT / "schemas/character.schema.json"),
         (ROOT / "players/main/SAVE_STATE.json", ROOT / "schemas/save.schema.json"),
         (ROOT / "players/main/RUNTIME_STATE.json", ROOT / "schemas/runtime_state.schema.json"),
+        (ROOT / "core/RUNTIME_INVARIANTS.json", ROOT / "schemas/runtime_invariants.schema.json"),
     ]
 
     loaded = {}

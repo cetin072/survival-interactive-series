@@ -28,6 +28,15 @@
 
 이 규칙은 장면·대사·압력·자유행동에 대한 AI GM의 창작 범위를 제한하지 않는다.
 
+### Canon Runtime Invariant Gate
+새 시즌·새 채팅의 첫 장면 전에는 `CHARACTERS`, `RUNTIME_INVARIANTS`, `PERSISTENT_CANON`,
+최신 `RUNTIME_STATE / SAVE`, current season handoff를 확인한다. 부팅 전 즉흥 장면 생성은
+금지한다. 기본 생활 모델은 현재 위치를 강제하지 않지만, 새 시즌 첫 배치가 다르면 현재
+사건·이동·대피에 따른 명시적 override reason이 필요하다.
+
+구조화된 주요 자산은 owner, communal, village_auto_access와 공용/개인 구분을 유지한다.
+협력관계는 ownership merge가 아니며, 3인 coordination line은 자산 소유권을 얻지 않는다.
+
 ---
 
 ## 1. 세계는 독립적으로 움직인다

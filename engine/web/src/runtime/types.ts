@@ -95,6 +95,37 @@ export type ConsistencyIssue = {
   message: string
 }
 
+export type RuntimeInvariantAsset = {
+  id: string
+  owner_ids: string[]
+  ownership_share?: Record<string, number>
+  communal: boolean
+  village_auto_access: boolean
+  purpose: string
+}
+
+export type RuntimeInvariants = {
+  schema_version: 1
+  registry_version: 1
+  family_operating_model: {
+    weekday: { default_locations: Record<string, string> }
+    weekend: { default_reunion_location: string; member_ids: string[] }
+  }
+  assets: RuntimeInvariantAsset[]
+  cooperation: {
+    core_participants: string[]
+    ownership_merged: boolean
+    coordination_line: { participants: string[]; asset_authority: boolean }
+    headman_roles: string[]
+  }
+}
+
+export type SeasonBootFixture = {
+  day_type: 'weekday' | 'weekend'
+  family_locations: Record<string, string>
+  override_reason?: string
+}
+
 export type StateConsoleView = {
   header: { season: string; phase: string; date: string; time: string; location: string }
   family: Array<RuntimeFamilyMember & Pick<CanonCharacter, 'name' | 'age' | 'sex' | 'relation'>>

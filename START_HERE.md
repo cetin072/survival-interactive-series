@@ -8,10 +8,12 @@
 부팅이 끝나기 전에 장면·선택지·시즌 설정을 즉흥 생성하지 않는다.
 
 사용자가 `S06 시작`, `생존기록 시작`, `이어가기` 등을 입력하면 내부적으로 먼저 확인한다.
-- 최신 가족 Canon
+- `core/CHARACTERS.json`
+- `core/RUNTIME_INVARIANTS.json`의 hard Canon
 - 최신 Persistent Canon
-- 현재 Save 상태
+- 최신 RUNTIME_STATE / Save 상태
 - 새 시즌인지 이어서인지
+- 새 시즌이면 current season handoff
 - 첫 장면의 가족 위치·동행·차량·기본 거점 상태
 
 GitHub에 저장되지 않은 과거 시험 플레이를 Canon으로 임의 추정하지 않는다.
@@ -33,13 +35,17 @@ WORLD/STATE GATE가 끝난 뒤, 첫 장면을 보내기 전에 다음을 내부�
 
 ---
 
-## 1. 기본 부팅 — 4개만 읽는다
+## 1. 기본 부팅 — Canon Gate
 1. `runtime/GM_KERNEL.md`
 2. `core/CHARACTERS.json`
-3. `core/PERSISTENT_CANON.md`
-4. `players/main/SAVE_STATE.json`
+3. `core/RUNTIME_INVARIANTS.json`
+4. `core/PERSISTENT_CANON.md`
+5. `players/main/RUNTIME_STATE.json`
+6. `players/main/SAVE_STATE.json`
 
-여기까지로 판단 가능하면 추가 문서를 읽지 않는다.
+새 시즌이면 current season handoff를 추가로 읽는다. 부팅 완료 전에는 이 기준과 충돌하는
+즉흥 장면을 생성하지 않는다. 기본 생활 위치와 다른 시작 배치는 현재 사건·이동·대피 등
+명시된 override reason이 있을 때만 허용한다.
 상세 모듈은 `runtime/LOAD_MAP.md`를 따른다.
 
 ---
