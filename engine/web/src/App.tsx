@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { PlayBridge } from './components/PlayBridge'
+import { BgmControl } from './components/BgmControl'
 import { StateConsole } from './components/StateConsole'
 import { loadRuntimeState } from './runtime/loadRuntimeState'
 import { runtimeCanon } from './runtime/runtimeCanon'
@@ -34,5 +35,6 @@ export default function App() {
     refreshing={refreshing}
     onRefresh={() => { void refresh() }}
     playBridge={<PlayBridge />}
+    bgmControl={<BgmControl />}
   />
 }
