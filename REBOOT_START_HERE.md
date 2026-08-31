@@ -1,46 +1,74 @@
-# REBOOT START HERE — Canon v2 / 정식 시즌 1
+# REBOOT START HERE — Canon v2 / 정식 시즌
 
-이 문서는 기존 Legacy S01~S07과 분리된 **정식 《생존일기》 Canon v2**를 시작하기 위한 부팅 문서다.
+이 문서는 기존 Legacy S01~S07과 분리된 **정식 《생존일기》 Canon v2**를 시작·이어가기 위한 부팅 문서다.
 
 ## 0. 가장 중요한 경계
 
-사용자가 다음 중 하나를 입력하면 Reboot Canon v2로 시작한다.
+Legacy S01~S07의 누적 현재상태는 Canon v2의 현재 상태가 아니다.
+
+읽지 말아야 할 Legacy 현재상태 자료:
+- Legacy `core/PERSISTENT_CANON.md`
+- Legacy `players/main/SAVE_STATE.json`
+- Legacy `players/main/RUNTIME_STATE.json`
+- Legacy `seasons/S01`~`S07`의 GM_STATE/handoff를 Canon v2 현재 상태로 사용
+
+Legacy 문서는 설계 참고나 과거 기록으로만 조회할 수 있다.
+
+## 0-A. 시즌 라우팅
+
+### 정식 시즌 1
+사용자가 다음 중 하나를 입력하면 Canon v2 S01로 시작한다.
 
 - `정식 시즌 1 시작`
 - `리부트 시즌 1 시작`
 - `Canon v2 시즌 1 시작`
 
-이때 **읽지 말아야 할 현재상태 자료**:
-- Legacy `core/PERSISTENT_CANON.md`
-- Legacy `players/main/SAVE_STATE.json`
-- Legacy `players/main/RUNTIME_STATE.json`
-- Legacy `seasons/S01`~`S07`의 GM_STATE/handoff를 현재 상태로 사용
+S01 부팅 자료:
+1. `docs/IP_BIBLE_V2.md`
+2. `canon_v2/CHARACTERS.json`
+3. `canon_v2/PERSISTENT_CANON.md`의 S01 pre-play baseline 시점
+4. `canon_v2/START_STATE.json`
+5. `seasons_v2/S01/START_HANDOFF.md`
 
-Legacy 문서는 설계 참고나 과거 기록으로만 조회할 수 있다.
+정식 S01은 현재 **완료된 역사**다. 새 플레이에서 S01을 다시 시작한다고 명시하지 않는 한 현재 시즌으로 되돌리지 않는다.
 
-## 1. Reboot 기본 로드
+### 정식 시즌 2 이후
+사용자가 `정식 시즌 2 시작`처럼 후속 시즌을 명시하면 최신 Canon v2 지속상태와 해당 시즌 Handoff를 사용한다.
 
-정식 시즌 1 시작 시 우선 읽는다.
+S02 부팅 자료:
+1. `docs/IP_BIBLE_V2.md`
+2. `canon_v2/CHARACTERS.json`
+3. `canon_v2/PERSISTENT_CANON.md`
+4. `seasons_v2/S01/END_STATE.json`
+5. `seasons_v2/S02/START_STATE.json`
+6. `seasons_v2/S02/START_HANDOFF.md`
+
+후속 시즌에서도 이전 시즌 Playthrough 전체를 기본 부팅자료로 읽지 않는다. 필요한 세부 사실만 Handoff 또는 Persistent Canon에서 가져온다.
+
+## 1. Canon v2 기본 로드 원칙
+
+정식 시즌 시작 시 우선 읽는다.
 
 1. `docs/IP_BIBLE_V2.md`
 2. `canon_v2/CHARACTERS.json`
 3. `canon_v2/PERSISTENT_CANON.md`
-4. `canon_v2/START_STATE.json`
-5. `docs/POST_SEASON_SURVIVAL_DEBRIEF_V1.md`의 존재와 종료 hook만 확인
+4. 해당 시즌 `START_STATE.json`
+5. 해당 시즌 `START_HANDOFF.md`
+6. `docs/POST_SEASON_SURVIVAL_DEBRIEF_V1.md`의 존재와 종료 hook만 확인
 
 상세 현실자료는 실제 사건이 정해진 뒤 필요한 `knowledge/` Source만 읽는다.
 
 ## 2. Hidden World Seed
 
-`START_STATE.status == READY_FOR_HIDDEN_WORLD_SEED`이면 첫 장면 전에 비공개로 World Seed를 만든다.
+해당 시즌 `START_STATE.status == READY_FOR_HIDDEN_WORLD_SEED`이면 첫 장면 전에 비공개로 World Seed를 만든다.
 
 최소 잠금:
 - 날짜/요일/시간대
 - 가족 4인의 평시 일정에 따른 현재 위치 또는 마지막 확인 위치
 - 주요 차량 위치와 평시 연료 수준
-- 도시/외곽의 평시 상태
-- 실제 재난의 정체
-- 재난의 장기 규모와 방향
+- 도시/외곽의 현재 상태
+- 실제 재난/사건의 정체
+- 장기 규모와 방향
 - 핵심 외생 압력 2~4개
 - 연쇄/2차 위험
 - 정보가 플레이어에게 드러나는 방식
@@ -48,9 +76,11 @@ Legacy 문서는 설계 참고나 과거 기록으로만 조회할 수 있다.
 - 시즌이 도달할 수 있는 새로운 안정상태
 
 ### Hard Gate
-정식 S01은 단순 `지역 재난 → 며칠 후 완전 정상복귀`가 기본 구조가 아니다.
+정식 시즌은 단순 `지역 재난 → 며칠 후 완전 정상복귀`를 기본 구조로 하지 않는다.
 
 다만 첫 장면부터 국가붕괴를 설명하지 않는다. 플레이어는 실제 관찰·뉴스·통신·가족 상황을 통해 규모를 알아간다.
+
+이전 시즌에서 획득한 자산과 준비를 인정하되 그것이 새 시즌의 자동 정답이 되도록 만들지 않는다.
 
 ## 3. 대본 금지
 
@@ -77,8 +107,9 @@ World Seed는 세계를 만든다. 대본을 만들지 않는다.
 - stubborn_point
 - conflict_axis_with_player
 - current information
+- 이전 정식 시즌에서 실제로 획득한 성장
 
-을 실제 독립 판단에 사용한다.
+을 독립 판단에 사용한다.
 
 가족의 의견 차이는 억지 싸움이 아니라 서로 다른 가치와 정보에서 나와야 한다.
 
@@ -135,14 +166,16 @@ World Seed는 세계를 만든다. 대본을 만들지 않는다.
 
 게임 본문에 `NPC`, `GM`, `Canon`, `Hidden State`, `World Seed` 같은 제작 메타용어를 노출하지 않는다.
 
-## 9. 정식 시즌 1 첫 출력 전 검사
+## 9. 첫 출력 전 검사
 
 첫 장면을 보내기 전에 내부적으로 확인한다.
 
 - Legacy 현재상태를 로드하지 않았다.
+- 올바른 정식 시즌 Handoff를 로드했다.
+- 이전 시즌 지속 Canon을 반영했다.
 - 가족 4인의 위치가 World Seed에 잠겼다.
 - 재난 규모/외생 압력이 잠겼다.
-- 가족 캐릭터 축이 활성화됐다.
+- 가족 캐릭터 축과 누적 성장이 활성화됐다.
 - MUD_TEXT_V1 첫 장면이 준비됐다.
 - 플레이어가 현실적으로 이미 아는 정보를 첫 선택 전에 공개할 준비가 됐다.
 - 완성 대본이나 정답 루트를 만들지 않았다.
@@ -154,16 +187,21 @@ World Seed는 세계를 만든다. 대본을 만들지 않는다.
 정식 시즌 종료 시:
 1. Canon v2 지속상태 기록
 2. 시즌 Playthrough 기록
-3. 플레이어 생존 복기
-4. 공식 근거 기반 생존교육
-5. 필요 시 게임/GM 제작 복기
+3. 구조화 End State
+4. 플레이어 생존 복기
+5. 공식 근거 기반 생존교육
+6. 제작/GM 복기
+7. IP Package
+8. 다음 시즌 Handoff
 
 를 분리한다.
 
 ---
 
-# 시작 명령
+# 현재 다음 시작 명령
 
-> **정식 시즌 1 시작**
+정식 S01 완료 이후 현재 다음 정식 시즌은 S02다.
 
-이 한 문장으로 Canon v2 Reboot S01을 시작한다.
+> **정식 시즌 2 시작**
+
+이 한 문장으로 최신 Canon v2와 `seasons_v2/S02/START_HANDOFF.md`를 기준으로 부팅한다.
