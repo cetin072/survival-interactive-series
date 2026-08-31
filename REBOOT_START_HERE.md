@@ -17,7 +17,7 @@ Legacy 문서는 설계 참고나 과거 기록으로만 조회할 수 있다.
 ## 0-A. 시즌 라우팅
 
 ### 정식 시즌 1
-사용자가 다음 중 하나를 입력하면 Canon v2 S01로 시작한다.
+사용자가 다음 중 하나를 입력하면 Canon v2 S01 재현/재시작으로 취급한다.
 
 - `정식 시즌 1 시작`
 - `리부트 시즌 1 시작`
@@ -26,7 +26,7 @@ Legacy 문서는 설계 참고나 과거 기록으로만 조회할 수 있다.
 S01 부팅 자료:
 1. `docs/IP_BIBLE_V2.md`
 2. `canon_v2/CHARACTERS.json`
-3. `canon_v2/PERSISTENT_CANON.md`의 S01 pre-play baseline 시점
+3. `seasons_v2/S01/PREPLAY_CANON.md`
 4. `canon_v2/START_STATE.json`
 5. `seasons_v2/S01/START_HANDOFF.md`
 
@@ -51,7 +51,7 @@ S02 부팅 자료:
 
 1. `docs/IP_BIBLE_V2.md`
 2. `canon_v2/CHARACTERS.json`
-3. `canon_v2/PERSISTENT_CANON.md`
+3. 현재 시즌에 맞는 Persistent/Pre-Play Canon
 4. 해당 시즌 `START_STATE.json`
 5. 해당 시즌 `START_HANDOFF.md`
 6. `docs/POST_SEASON_SURVIVAL_DEBRIEF_V1.md`의 존재와 종료 hook만 확인
