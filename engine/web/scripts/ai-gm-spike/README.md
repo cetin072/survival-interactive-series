@@ -27,7 +27,7 @@ npm run ai-gm:compare -- --model=qwen/qwen3.8-flash --case=simple-inspect-water,
 
 ## What is measured
 
-For every configured model and Korean benchmark case, the script records schema validity, expected structural match, action count/order, ambiguity correctness, request latency, available token usage, retry count, and an unavailable-by-default cost field. It sends OpenRouter a strict, case-specific JSON Schema and `provider.require_parameters=true`; models that are missing from the live catalog or do not advertise structured output are recorded as failures without relaxing the schema.
+For every configured model and Korean benchmark case, the script records schema validity, expected structural match, action count/order, ambiguity correctness, final-attempt latency, total request wall-clock time, per-attempt error/latency/response-shape observations, available token usage, retry count, and an unavailable-by-default cost field. It sends OpenRouter a strict, case-specific JSON Schema and `provider.require_parameters=true`; models that are missing from the live catalog or do not advertise structured output are recorded as failures without relaxing the schema.
 
 The default model configuration intentionally has no durable dollar estimate. `models.json` carries the retrieval date and source note; replace it with a dated, sourced price config only when a current cost estimate is needed.
 
@@ -37,7 +37,7 @@ The command performs at most one retry for a transient HTTP/network or malformed
 
 This spike measures language interpretation, not physical-state validation. A linguistically clear action remains an action proposal even when the supplied state makes it impossible (for example, requesting a car that is elsewhere). The existing authoritative engine Validator, not this interpreter, rejects that proposal later.
 
-`ambiguous=true` normally means a material linguistic reference cannot be resolved. The current v0 action schema has no condition/deferred-intent field, so the conditional fixture temporarily uses `ambiguous=true` with an `ambiguityReason` as a **deferred stop bucket**. Its report record is marked `expectedDisposition: "deferred_condition"` so it is not interpreted as a linguistic-ambiguity result or as the final engine contract. A later integration contract may represent conditions separately; this spike does not define it.
+`ambiguous=true` normally means a material linguistic reference cannot be resolved. It is a stop result: `actions` must be an empty array and an `ambiguityReason` is required. The current v0 action schema has no condition/deferred-intent field, so the conditional fixture temporarily uses this stop result as a **deferred stop bucket**. Its report record is marked `expectedDisposition: "deferred_condition"` so it is not interpreted as a linguistic-ambiguity result or as the final engine contract. A later integration contract may represent conditions separately; this spike does not define it.
 
 ## Outputs and fixture safety
 

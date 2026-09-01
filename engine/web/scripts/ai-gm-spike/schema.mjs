@@ -68,6 +68,12 @@ export function buildActionSchema(benchmarkCase) {
         confidence: { type: 'number', minimum: 0, maximum: 1 },
         ambiguityReason: { type: 'string', minLength: 1, maxLength: 240 },
       },
+      allOf: [
+        {
+          if: { properties: { ambiguous: { const: true } }, required: ['ambiguous'] },
+          then: { properties: { actions: { maxItems: 0 } } },
+        },
+      ],
     },
   }
 }
@@ -82,6 +88,7 @@ export function validateActionResponse(value, benchmarkCase) {
   if (typeof value.confidence !== 'number' || value.confidence < 0 || value.confidence > 1) errors.push('confidence must be between 0 and 1')
   if (value.ambiguous && (typeof value.ambiguityReason !== 'string' || !value.ambiguityReason.trim())) errors.push('ambiguous responses need ambiguityReason')
   if (!value.ambiguous && value.ambiguityReason !== undefined) errors.push('ambiguityReason is only allowed when ambiguous is true')
+  if (value.ambiguous && Array.isArray(value.actions) && value.actions.length > 0) errors.push('ambiguous responses must not propose actions')
   if (!Array.isArray(value.actions)) return { valid: false, errors }
 
   const allowed = benchmarkCase.allowed

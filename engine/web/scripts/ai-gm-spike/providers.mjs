@@ -45,10 +45,26 @@ function transientStatus(status) {
   return status === 408 || status === 429 || status >= 500
 }
 
-function extractContent(payload) {
-  const content = payload?.choices?.[0]?.message?.content
-  if (typeof content !== 'string') throw new Error('Provider response did not contain choices[0].message.content text.')
-  return content
+export function extractProviderContent(payload) {
+  const choices = payload?.choices
+  if (!Array.isArray(choices)) {
+    return { valid: false, responseShape: 'choices:not_array', error: 'Unsupported OpenRouter chat completion response shape: choices is not an array.' }
+  }
+  if (!choices[0] || typeof choices[0] !== 'object') {
+    return { valid: false, responseShape: 'choices[0]:missing_or_non_object', error: 'Unsupported OpenRouter chat completion response shape: choices[0] is missing or not an object.' }
+  }
+  const message = choices[0].message
+  if (!message || typeof message !== 'object') {
+    return { valid: false, responseShape: 'choices[0].message:missing_or_non_object', error: 'Unsupported OpenRouter chat completion response shape: choices[0].message is missing or not an object.' }
+  }
+  if (!Object.hasOwn(message, 'content')) {
+    return { valid: false, responseShape: 'choices[0].message.content:missing', error: 'Unsupported OpenRouter chat completion response shape: choices[0].message.content is missing.' }
+  }
+  if (typeof message.content === 'string') {
+    return { valid: true, responseShape: 'choices[0].message.content:string', content: message.content }
+  }
+  const type = Array.isArray(message.content) ? 'array' : message.content === null ? 'null' : typeof message.content
+  return { valid: false, responseShape: `choices[0].message.content:${type}`, error: `Unsupported OpenRouter chat completion response shape: choices[0].message.content is ${type}, but this non-streaming Chat Completions benchmark supports only a string.` }
 }
 
 export function parseProviderContent(content, benchmarkCase) {
@@ -70,11 +86,13 @@ export async function requestStructuredAction({ apiKey, model, benchmarkCase, pr
     response_format: { type: 'json_schema', json_schema: buildActionSchema(benchmarkCase) },
     provider: { require_parameters: true },
   }
+  const startedAt = performance.now()
+  const attempts = []
   let lastFailure
   for (let attempt = 0; attempt < 2; attempt += 1) {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), timeoutMs)
-    const startedAt = performance.now()
+    const attemptStartedAt = performance.now()
     try {
       const response = await fetchImpl(CHAT_ENDPOINT, {
         method: 'POST',
@@ -82,32 +100,41 @@ export async function requestStructuredAction({ apiKey, model, benchmarkCase, pr
         body: JSON.stringify(request),
         signal: controller.signal,
       })
-      const latencyMs = Math.round(performance.now() - startedAt)
+      const latencyMs = Math.round(performance.now() - attemptStartedAt)
       if (!response.ok) {
         const detail = (await response.text()).slice(0, 500)
-        lastFailure = { error: `OpenRouter request failed: HTTP ${response.status}${detail ? ` ${detail}` : ''}`, latencyMs, retryable: transientStatus(response.status), rawContent: null }
+        lastFailure = { error: `OpenRouter request failed: HTTP ${response.status}${detail ? ` ${detail}` : ''}`, latencyMs, retryable: transientStatus(response.status), rawContent: null, responseShape: 'not_available_http_error', failureKind: 'http_error' }
       } else {
         const payload = await response.json()
-        const rawContent = extractContent(payload)
-        const parsed = parseProviderContent(rawContent, benchmarkCase)
-        if (parsed.valid) {
-          return {
-            ok: true,
-            value: parsed.value,
-            rawContent,
-            latencyMs,
-            usage: payload.usage ?? {},
-            retryCount: attempt,
+        const extracted = extractProviderContent(payload)
+        if (!extracted.valid) {
+          lastFailure = { error: extracted.error, latencyMs, retryable: true, rawContent: null, responseShape: extracted.responseShape, failureKind: 'unsupported_response_shape' }
+        } else {
+          const parsed = parseProviderContent(extracted.content, benchmarkCase)
+          if (parsed.valid) {
+            attempts.push({ attempt: attempt + 1, outcome: 'success', latencyMs, responseShape: extracted.responseShape, error: null })
+            return {
+              ok: true,
+              value: parsed.value,
+              rawContent: extracted.content,
+              latencyMs,
+              wallClockMs: Math.round(performance.now() - startedAt),
+              attempts,
+              usage: payload.usage ?? {},
+              retryCount: attempt,
+            }
           }
+          lastFailure = { error: parsed.error, latencyMs, retryable: true, rawContent: extracted.content, usage: payload.usage ?? {}, responseShape: extracted.responseShape, failureKind: 'invalid_provider_content' }
         }
-        lastFailure = { error: parsed.error, latencyMs, retryable: true, rawContent, usage: payload.usage ?? {} }
       }
     } catch (error) {
-      lastFailure = { error: error instanceof Error ? error.message : String(error), latencyMs: Math.round(performance.now() - startedAt), retryable: true, rawContent: null }
+      const aborted = error instanceof Error && error.name === 'AbortError'
+      lastFailure = { error: error instanceof Error ? error.message : String(error), latencyMs: Math.round(performance.now() - attemptStartedAt), retryable: true, rawContent: null, responseShape: 'not_available_transport_error', failureKind: aborted ? 'timeout' : 'transport_or_payload_error' }
     } finally {
       clearTimeout(timeout)
     }
+    attempts.push({ attempt: attempt + 1, outcome: lastFailure.failureKind, latencyMs: lastFailure.latencyMs, responseShape: lastFailure.responseShape, error: lastFailure.error })
     if (!lastFailure.retryable || attempt === 1) break
   }
-  return { ok: false, ...lastFailure, retryCount: 1 }
+  return { ok: false, ...lastFailure, wallClockMs: Math.round(performance.now() - startedAt), attempts, retryCount: attempts.length - 1 }
 }

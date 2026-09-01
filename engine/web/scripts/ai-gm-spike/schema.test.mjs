@@ -11,6 +11,10 @@ describe('AI GM spike schema', () => {
     expect(schema.strict).toBe(true)
     expect(schema.schema.properties.actions.items.additionalProperties).toBe(false)
     expect(schema.schema.properties.actions.items.properties.actor.enum).toEqual(['player'])
+    expect(schema.schema.allOf).toContainEqual({
+      if: { properties: { ambiguous: { const: true } }, required: ['ambiguous'] },
+      then: { properties: { actions: { maxItems: 0 } } },
+    })
   })
 
   it('accepts allowed ordered actions and rejects unknown fields or IDs', () => {
@@ -18,5 +22,16 @@ describe('AI GM spike schema', () => {
     const invalid = validateActionResponse({ actions: [{ verb: 'move', actor: 'stranger', to: 'shelter' }], ambiguous: false, confidence: 0.95, narration: 'ignored' }, benchmarkCase)
     expect(invalid.valid).toBe(false)
     expect(invalid.errors.join(' ')).toContain('unknown field')
+  })
+
+  it('rejects action proposals when ambiguity is a stop result', () => {
+    const invalid = validateActionResponse({
+      actions: [{ verb: 'call', actor: 'player', target: 'wife' }],
+      ambiguous: true,
+      ambiguityReason: 'two possible people match the reference',
+      confidence: 0.3,
+    }, benchmarkCase)
+    expect(invalid.valid).toBe(false)
+    expect(invalid.errors).toContain('ambiguous responses must not propose actions')
   })
 })

@@ -60,9 +60,9 @@ function markdownSummary(metadata, summary) {
     `Configured model metadata: ${metadata.modelConfig.retrieved_at} — ${metadata.modelConfig.source}`,
     `Cost: ${metadata.modelConfig.cost_note}`,
     '',
-    '| Model | Cases | Schema valid | Structural score | Count | Order | Ambiguity | Avg latency | Input tokens | Output tokens | Total tokens |',
-    '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |',
-    ...summary.map((item) => `| ${item.model} | ${item.cases} | ${metric(item.schemaValidRate)}% | ${metric(item.structuralMatchScore)} | ${metric(item.actionCountRate)}% | ${metric(item.actionOrderRate)}% | ${metric(item.ambiguityRate)}% | ${metric(item.averageLatencyMs)} ms | ${metric(item.averageInputTokens)} | ${metric(item.averageOutputTokens)} | ${metric(item.averageTotalTokens)} |`),
+    '| Model | Cases | Schema valid | Structural score | Count | Order | Ambiguity | Avg final attempt | Avg wall clock | Input tokens | Output tokens | Total tokens |',
+    '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |',
+    ...summary.map((item) => `| ${item.model} | ${item.cases} | ${metric(item.schemaValidRate)}% | ${metric(item.structuralMatchScore)} | ${metric(item.actionCountRate)}% | ${metric(item.actionOrderRate)}% | ${metric(item.ambiguityRate)}% | ${metric(item.averageLatencyMs)} ms | ${metric(item.averageWallClockMs)} ms | ${metric(item.averageInputTokens)} | ${metric(item.averageOutputTokens)} | ${metric(item.averageTotalTokens)} |`),
     '',
     'Raw provider content, per-case errors, retries, and request measurements are stored only in the adjacent gitignored JSON report.',
   ]
@@ -82,7 +82,7 @@ export async function main(argv = process.argv.slice(2), environment = process.e
   for (const model of verifiedModels) {
     for (const benchmarkCase of cases) {
       if (!model.available || !model.structuredOutputSupported) {
-        results.push({ model: model.id, caseId: benchmarkCase.id, expectedDisposition: benchmarkCase.expectedDisposition ?? 'normal', schemaValid: false, structuralMatchScore: 0, actionCountCorrect: false, actionOrderCorrect: false, ambiguityCorrect: false, latencyMs: null, inputTokens: null, outputTokens: null, totalTokens: null, retryCount: 0, estimatedCostUsd: null, error: model.limitation, rawResponse: null })
+        results.push({ model: model.id, caseId: benchmarkCase.id, expectedDisposition: benchmarkCase.expectedDisposition ?? 'normal', schemaValid: false, structuralMatchScore: 0, actionCountCorrect: false, actionOrderCorrect: false, ambiguityCorrect: false, latencyMs: null, wallClockMs: null, attempts: [], failureKind: 'model_capability_unavailable', inputTokens: null, outputTokens: null, totalTokens: null, retryCount: 0, estimatedCostUsd: null, error: model.limitation, rawResponse: null })
         continue
       }
       const response = await requestStructuredAction({ apiKey, model, benchmarkCase, prompt: createPrompt(benchmarkCase), timeoutMs: options.timeoutMs, fetchImpl })
@@ -95,6 +95,9 @@ export async function main(argv = process.argv.slice(2), environment = process.e
         schemaValid: response.ok,
         ...score,
         latencyMs: response.latencyMs ?? null,
+        wallClockMs: response.wallClockMs ?? null,
+        attempts: response.attempts ?? [],
+        failureKind: response.ok ? null : response.failureKind ?? 'unknown_failure',
         inputTokens: usage.prompt_tokens ?? usage.input_tokens ?? null,
         outputTokens: usage.completion_tokens ?? usage.output_tokens ?? null,
         totalTokens: usage.total_tokens ?? null,

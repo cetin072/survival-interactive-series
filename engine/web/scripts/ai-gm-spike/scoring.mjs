@@ -50,6 +50,7 @@ export function summarizeResults(results) {
       actionOrderRate: percentage('actionOrderCorrect'),
       ambiguityRate: percentage('ambiguityCorrect'),
       averageLatencyMs: average('latencyMs'),
+      averageWallClockMs: average('wallClockMs'),
       averageInputTokens: average('inputTokens'),
       averageOutputTokens: average('outputTokens'),
       averageTotalTokens: average('totalTokens'),
