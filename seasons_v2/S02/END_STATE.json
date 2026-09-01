@@ -1,0 +1,95 @@
+{
+  "timeline": "canon_v2",
+  "season": "S02",
+  "status": "complete",
+  "end_day": 731,
+  "duration": "approximately 2 years",
+  "season_outcome": {
+    "society": "survived but structurally changed",
+    "national_emergency_phase": "ended",
+    "pre_disaster_full_reset": false,
+    "long_term_system": "regional/distributed time, position-correction, payment, logistics and infrastructure operations became normal",
+    "hidden_seed_publicly_revealed": false
+  },
+  "family": {
+    "all_four_survived": true,
+    "primary_living_area": "outer-house region",
+    "outer_house_role": "family four-person shared long-term living base and official primary living area",
+    "outer_house_legal_ownership": "remains Jeong-ho's",
+    "outer_house_operation": "shared responsibility among Jun-ho, Seo-yoon, Min-seok and Jeong-ho",
+    "city_apartment_role": "retained long-term reserve base and city/work access asset",
+    "jun_ho_work": "limited work arrangement maintained",
+    "seo_yoon_work": "limited work arrangement maintained",
+    "min_seok_school": "settled into local regional school",
+    "jeong_ho_role": "local-base and cultivation judgment remains important but is no longer sole operating burden"
+  },
+  "outer_house_assets": {
+    "power": {
+      "level": 3,
+      "mode": "independent",
+      "regional_microgrid_connected": false,
+      "solar": "existing system plus 4 additional panels installed during S02",
+      "storage": "expanded battery system; one degraded battery set later replaced and tested",
+      "control": "power control equipment reinforced",
+      "spares": "electrical spare-parts set maintained",
+      "effect": "household essentials and limited EV charging can be balanced with improved storage resilience, subject to weather and load"
+    },
+    "water": {
+      "level": 2,
+      "own_well": false,
+      "large_tanks": "2 x approximately 500 L installed",
+      "total_large_storage": "approximately 1000 L",
+      "operation": "often maintained near full using legal/available supply opportunities without claiming B/D private water rights",
+      "B_house": "private electric groundwater source; primary pump active, spare pump tested, parts/support relationship maintained",
+      "D_house": "private no-grid/manual water source; reciprocal trust relationship maintained"
+    },
+    "food_production": {
+      "level": 2,
+      "cultivation_area": "approximately 1.6x former plot",
+      "second_expansion": "not executed",
+      "status": "repeat harvest established",
+      "effect": "meaningful share of seasonal fresh vegetables produced locally; does not replace staple grains, oils, meat or long-term stored food"
+    },
+    "mobility": {
+      "jun_ho_combustion_vehicle": 1,
+      "family_ev": 1,
+      "former_seo_yoon_combustion_vehicle": "traded away for family EV",
+      "EV_C": "another household's private electric cargo vehicle remains a cooperation relationship",
+      "public_use_rule": "family vehicle/driver/time may support public work only when movement energy is supplied or compensated; otherwise transport may be physically unsustainable"
+    }
+  },
+  "social_network": {
+    "core_trust_ties": [
+      "B-house",
+      "D-house",
+      "farming-adviser household",
+      "EV-C household",
+      "some prior cooperation households"
+    ],
+    "principles": [
+      "no shared-property assumption",
+      "no forced disclosure of household stockpiles",
+      "private water remains private property",
+      "minimal reciprocal-help records only",
+      "public aid and private reciprocity remain separate"
+    ]
+  },
+  "city_apartment": {
+    "ownership": "retained",
+    "status": "long-term reserve base",
+    "same_floor_contact_household": true,
+    "role": "future city return option, work/city access, emergency reserve",
+    "not_primary_home": true
+  },
+  "final_player_choice": {
+    "preparedness_post_emergency": "actively maintain current preparedness level",
+    "meaning": "continue maintaining power, water, cultivation, vehicles, stock rotation and trust relationships even after national emergency operations end"
+  },
+  "carry_forward": {
+    "outer_house_is_chosen_home_not_temporary_evacuation": true,
+    "city_apartment_is_secondary_reserve": true,
+    "family_roles_are_distributed": true,
+    "preparedness_assets_require_real_maintenance_costs": true,
+    "society_is_functional_but_not_restored_to_old_normal": true
+  }
+}
