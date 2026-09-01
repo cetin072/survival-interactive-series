@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { choiceForKey } from '../input/action'
 import { createGameSnapshot } from '../state/snapshot'
-import { commitPublicRuntimeChoice, keepPublicRuntimeSafeAfterFreeAction, type PublicRuntimeCheckpoint } from '../runtime/publicRuntimeCheckpoint'
-import { createSyntheticPublicRuntimeFixture, nextSyntheticScene } from '../runtime/syntheticPublicRuntimeFixture'
+import type { PublicRuntimeCheckpoint } from '../runtime/publicRuntimeCheckpoint'
+import { runGMProviderTurn } from '../runtime/gmTurnRuntime'
+import { createSyntheticMockProvider, createSyntheticPublicRuntimeFixture } from '../runtime/syntheticPublicRuntimeFixture'
 import { ChoiceButtons } from './ChoiceButtons'
 import { FreeActionForm } from './FreeActionForm'
 import { GameLog } from './GameLog'
@@ -13,12 +14,22 @@ import { StatusPanels } from './StatusPanels'
 export function PlayableTurnLoop() {
   const [checkpoint, setCheckpoint] = useState<PublicRuntimeCheckpoint>(createSyntheticPublicRuntimeFixture)
   const [showPanels, setShowPanels] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const provider = useMemo(createSyntheticMockProvider, [])
   const snapshot = createGameSnapshot(checkpoint.public_state)
 
+  async function submit(input: { kind: 'numbered-choice'; choice_id: number } | { kind: 'free-action'; text: string }) {
+    if (submitting) return
+    setSubmitting(true)
+    try {
+      setCheckpoint(await runGMProviderTurn(checkpoint, input, provider))
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   function selectChoice(choiceId: number) {
-    const choice = checkpoint.current_scene.choices.find((item) => item.id === choiceId)
-    if (!choice) return
-    setCheckpoint(commitPublicRuntimeChoice(checkpoint, choice, nextSyntheticScene))
+    void submit({ kind: 'numbered-choice', choice_id: choiceId })
   }
 
   useEffect(() => {
@@ -45,7 +56,7 @@ export function PlayableTurnLoop() {
     <section className="scene-copy" aria-label="현재 장면"><p>{checkpoint.current_scene.narrative}</p></section>
     <PresentationBlocks blocks={checkpoint.current_scene.presentation_blocks} />
     <ChoiceButtons choices={checkpoint.current_scene.choices} onSelect={(choice) => selectChoice(choice.id)} />
-    <FreeActionForm onSubmit={(action) => setCheckpoint(keepPublicRuntimeSafeAfterFreeAction(checkpoint, action))} />
+    <FreeActionForm onSubmit={(text) => { void submit({ kind: 'free-action', text }) }} />
     <GameLog entries={checkpoint.committed_turn.log} />
   </section>
 }
