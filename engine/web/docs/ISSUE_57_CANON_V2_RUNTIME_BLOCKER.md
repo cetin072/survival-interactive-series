@@ -24,7 +24,8 @@ created after the Hidden World Seed gate. It must provide only:
 - deterministic current scene, numbered choices, and turn-result source.
 
 It must exclude the Hidden World Seed, unrevealed event truth, and all
-`raw_transcript` content. Once that checkpoint is committed, the Phase 1
-adapter can map it to the existing `RuntimeState`/State Console and Phase 2
-can reuse the existing choice, free-action, validator, action-queue, and log
-components without inventing Canon facts.
+`raw_transcript` content. The Phase 2 loop is now implemented only against a
+synthetic non-Canon fixture: it reuses the existing choice, free-action,
+validator, action-queue, and log components without inventing S02 facts. Once
+a real public checkpoint is committed, the Phase 1 adapter can map it to this
+same public contract.

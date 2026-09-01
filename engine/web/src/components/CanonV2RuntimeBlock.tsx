@@ -1,6 +1,7 @@
+import type { ReactNode } from 'react'
 import type { CanonV2RuntimeBlock } from '../runtime/canonV2Runtime'
 
-export function CanonV2RuntimeBlock({ block }: { block: CanonV2RuntimeBlock }) {
+export function CanonV2RuntimeBlock({ block, children }: { block: CanonV2RuntimeBlock; children?: ReactNode }) {
   return <main className="console-shell runtime-block" aria-live="polite">
     <p className="console-kicker">생존일기 · CANON V2 RUNTIME</p>
     <h1>공개 플레이 checkpoint를 기다리는 중입니다.</h1>
@@ -13,5 +14,6 @@ export function CanonV2RuntimeBlock({ block }: { block: CanonV2RuntimeBlock }) {
       </ul>
     </section>
     <p className="runtime-block-help">Legacy 상태와 Raw Transcript는 대체 자료로 사용하지 않았습니다.</p>
+    {children}
   </main>
 }
