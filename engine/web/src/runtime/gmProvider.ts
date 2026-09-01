@@ -11,8 +11,18 @@ export type GMProviderTurnRequest = {
 
 /** Provider output is deliberately untrusted until the GM runtime validates its proposal shape. */
 export type GMProviderResult =
-  | { status: 'proposal'; proposal: unknown }
-  | { status: 'unavailable'; message: string }
+  | { status: 'proposal'; proposal: unknown; meta?: GMProviderMeta }
+  | { status: 'unavailable'; message: string; meta?: GMProviderMeta }
+
+/** Safe request diagnostics only: never include credentials or raw player/provider content. */
+export type GMProviderMeta = {
+  provider?: string
+  model?: string
+  latency_ms?: number
+  retry_count?: number
+  failure_kind?: string
+  usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number; cost?: number }
+}
 
 export interface GMProvider {
   proposeTurn(request: GMProviderTurnRequest): Promise<GMProviderResult>

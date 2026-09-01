@@ -52,8 +52,9 @@ describe('/api/gm synthetic transport', () => {
     }), malformed)
 
     expect(response.status).toBe(502)
-    const payload = await response.json() as { status: string }
+    const payload = await response.json() as { status: string; meta?: { failure_kind?: string } }
     expect(payload.status).toBe('unavailable')
+    expect(payload.meta?.failure_kind).toBe('schema_error')
   })
 
   it('rejects malformed request and refuses real Canon checkpoint on synthetic backend', async () => {
