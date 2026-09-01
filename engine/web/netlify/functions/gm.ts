@@ -48,11 +48,15 @@ export async function handleGMRequest(request: Request, provider?: GMProvider, e
   const parsedRequest = validateGMTransportRequest(payload)
   if (!parsedRequest.valid) return json(400, { status: 'unavailable', message: parsedRequest.message })
 
+  // Issue #63 is synthetic-only: do not route Canon v2 or its adjacent Hidden boundary
+  // to a live provider, even if the server environment has an API key configured.
+  if (parsedRequest.value.checkpoint.source_kind !== 'synthetic-fixture') {
+    return json(503, { status: 'unavailable', message: 'Canon AI GM activation is not enabled.' })
+  }
+
   const selectedProvider = provider ?? (env.OPENROUTER_API_KEY
     ? new OpenRouterDeepSeekProvider(env.OPENROUTER_API_KEY)
-    : parsedRequest.value.checkpoint.source_kind === 'synthetic-fixture'
-      ? createSyntheticMockProvider()
-      : undefined)
+    : createSyntheticMockProvider())
   if (!selectedProvider) return json(503, { status: 'unavailable', message: 'AI GM provider is not configured.' })
 
   let result

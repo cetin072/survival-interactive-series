@@ -13,6 +13,7 @@ describe('OpenRouter DeepSeek server provider', () => {
       const body = JSON.parse(String(init?.body))
       expect(body.model).toBe(OPENROUTER_DEEPSEEK_MODEL)
       expect(body.response_format.type).toBe('json_schema')
+      expect(body.provider).toEqual({ require_parameters: true })
       return new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify(proposal) } }], usage: { prompt_tokens: 12, completion_tokens: 6, total_tokens: 18, cost: 0.001 } }))
     })
     const result = await new OpenRouterDeepSeekProvider('test-only-key', fetcher).proposeTurn(request)
@@ -29,6 +30,17 @@ describe('OpenRouter DeepSeek server provider', () => {
 
     await expect(timeout.proposeTurn(request)).resolves.toMatchObject({ status: 'unavailable', meta: { failure_kind: 'timeout', retry_count: 0 } })
     await expect(unavailable.proposeTurn(request)).resolves.toMatchObject({ status: 'unavailable', meta: { failure_kind: 'unavailable', retry_count: 0 } })
+  })
+
+  it('keeps the wall-clock deadline active through delayed response body parsing', async () => {
+    const slowBody = new OpenRouterDeepSeekProvider('test-only-key', async () => ({
+      json: () => new Promise((resolve) => setTimeout(() => resolve({ choices: [{ message: { content: JSON.stringify(proposal) } }] }), 100)),
+    }) as Response, 10)
+    const startedAt = Date.now()
+    const result = await slowBody.proposeTurn(request)
+
+    expect(result).toMatchObject({ status: 'unavailable', meta: { failure_kind: 'timeout', retry_count: 0 } })
+    expect(Date.now() - startedAt).toBeLessThan(80)
   })
 
   it('classifies malformed JSON and unsupported provider response shapes safely', async () => {

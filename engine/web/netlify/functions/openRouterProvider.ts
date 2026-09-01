@@ -70,6 +70,7 @@ function requestBody(request: GMProviderTurnRequest): string {
       { role: 'user', content: JSON.stringify(request) },
     ],
     response_format: { type: 'json_schema', json_schema: { name: 'gm_proposal', strict: true, schema: proposalSchema() } },
+    provider: { require_parameters: true },
     temperature: 0.2,
   })
 }
@@ -86,26 +87,39 @@ export class OpenRouterDeepSeekProvider implements GMProvider {
     const startedAt = Date.now()
     const meta = (): GMProviderObservability => ({ provider: 'openrouter', model: OPENROUTER_DEEPSEEK_MODEL, latency_ms: Date.now() - startedAt, retry_count: 0 })
     const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), this.timeoutMs)
+    let timedOut = false
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const deadline = new Promise<never>((_resolve, reject) => {
+      timer = setTimeout(() => {
+        timedOut = true
+        controller.abort()
+        const error = new Error('OpenRouter attempt timed out.')
+        error.name = 'AbortError'
+        reject(error)
+      }, this.timeoutMs)
+    })
     let response: Response
     try {
-      response = await this.fetcher(OPENROUTER_CHAT_COMPLETIONS_URL, {
+      response = await Promise.race([this.fetcher(OPENROUTER_CHAT_COMPLETIONS_URL, {
         method: 'POST', signal: controller.signal,
         headers: { authorization: `Bearer ${this.apiKey}`, 'content-type': 'application/json' },
         body: requestBody(request),
-      })
+      }), deadline])
     } catch (error) {
-      clearTimeout(timer)
-      return failure((error as { name?: string }).name === 'AbortError' ? 'timeout' : 'unavailable', 'OpenRouter provider is unavailable.', meta())
+      if (timer) clearTimeout(timer)
+      return failure(timedOut || (error as { name?: string }).name === 'AbortError' ? 'timeout' : 'unavailable', 'OpenRouter provider is unavailable.', meta())
     }
-    clearTimeout(timer)
 
     let payload: unknown
     try {
-      payload = await response.json()
+      // Do not clear the deadline at headers: body consumption is part of the same attempt.
+      payload = await Promise.race([response.json(), deadline])
     } catch {
+      if (timer) clearTimeout(timer)
+      if (timedOut) return failure('timeout', 'OpenRouter provider timed out.', meta())
       return failure('malformed_json', 'OpenRouter returned invalid JSON.', meta())
     }
+    if (timer) clearTimeout(timer)
     const responseMeta = { ...meta(), usage: usageFrom(asRecord(payload)?.usage) }
     if (!response.ok) return failure('unavailable', 'OpenRouter provider is unavailable.', responseMeta)
 
