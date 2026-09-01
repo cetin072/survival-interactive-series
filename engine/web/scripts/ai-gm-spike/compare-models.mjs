@@ -18,11 +18,12 @@ function positiveInteger(value, option) {
 }
 
 export function parseArguments(argv) {
-  const options = { modelIds: [], caseIds: [], timeoutMs: 20_000, maxModels: undefined, maxCases: undefined, outDir: path.join(scriptDirectory, 'generated') }
+  const options = { modelIds: [], caseIds: [], providerId: undefined, timeoutMs: 20_000, maxModels: undefined, maxCases: undefined, outDir: path.join(scriptDirectory, 'generated') }
   for (const argument of argv) {
     const [flag, value] = argument.split('=', 2)
     if (flag === '--model') options.modelIds.push(...parseList(value))
     else if (flag === '--case') options.caseIds.push(...parseList(value))
+    else if (flag === '--provider' && value) options.providerId = value
     else if (flag === '--max-models') options.maxModels = positiveInteger(value, flag)
     else if (flag === '--max-cases') options.maxCases = positiveInteger(value, flag)
     else if (flag === '--timeout-ms') options.timeoutMs = positiveInteger(value, flag)
@@ -34,7 +35,7 @@ export function parseArguments(argv) {
 }
 
 function usage() {
-  return `Usage: npm run ai-gm:compare -- [--model=id[,id]] [--case=id[,id]] [--max-models=N] [--max-cases=N] [--timeout-ms=N] [--out-dir=path]`
+  return `Usage: npm run ai-gm:compare -- [--model=id[,id]] [--case=id[,id]] [--provider=slug] [--max-models=N] [--max-cases=N] [--timeout-ms=N] [--out-dir=path]`
 }
 
 async function loadJson(name) {
@@ -82,16 +83,21 @@ export async function main(argv = process.argv.slice(2), environment = process.e
   for (const model of verifiedModels) {
     for (const benchmarkCase of cases) {
       if (!model.available || !model.structuredOutputSupported) {
-        results.push({ model: model.id, caseId: benchmarkCase.id, expectedDisposition: benchmarkCase.expectedDisposition ?? 'normal', schemaValid: false, structuralMatchScore: 0, actionCountCorrect: false, actionOrderCorrect: false, ambiguityCorrect: false, latencyMs: null, wallClockMs: null, attempts: [], failureKind: 'model_capability_unavailable', inputTokens: null, outputTokens: null, totalTokens: null, retryCount: 0, estimatedCostUsd: null, error: model.limitation, rawResponse: null })
+        results.push({ model: model.id, caseId: benchmarkCase.id, expectedDisposition: benchmarkCase.expectedDisposition ?? 'normal', requestedProvider: options.providerId ?? null, upstreamProvider: null, upstreamModel: null, routerMetadataStatus: 'not_requested', routerAttempts: [], schemaValid: false, structuralMatchScore: 0, actionCountCorrect: false, actionOrderCorrect: false, ambiguityCorrect: false, latencyMs: null, wallClockMs: null, attempts: [], failureKind: 'model_capability_unavailable', inputTokens: null, outputTokens: null, totalTokens: null, retryCount: 0, estimatedCostUsd: null, error: model.limitation, rawResponse: null })
         continue
       }
-      const response = await requestStructuredAction({ apiKey, model, benchmarkCase, prompt: createPrompt(benchmarkCase), timeoutMs: options.timeoutMs, fetchImpl })
+      const response = await requestStructuredAction({ apiKey, model, benchmarkCase, prompt: createPrompt(benchmarkCase), timeoutMs: options.timeoutMs, providerId: options.providerId, fetchImpl })
       const score = response.ok ? scoreResponse(response.value, benchmarkCase) : scoreResponse(null, benchmarkCase)
       const usage = response.usage ?? {}
       results.push({
         model: model.id,
         caseId: benchmarkCase.id,
         expectedDisposition: benchmarkCase.expectedDisposition ?? 'normal',
+        requestedProvider: options.providerId ?? null,
+        upstreamProvider: response.routing?.upstreamProvider ?? null,
+        upstreamModel: response.routing?.upstreamModel ?? null,
+        routerMetadataStatus: response.routing?.status ?? 'not_available',
+        routerAttempts: response.routing?.attempts ?? [],
         schemaValid: response.ok,
         ...score,
         latencyMs: response.latencyMs ?? null,

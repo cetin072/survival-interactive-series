@@ -67,6 +67,38 @@ export function extractProviderContent(payload) {
   return { valid: false, responseShape: `choices[0].message.content:${type}`, error: `Unsupported OpenRouter chat completion response shape: choices[0].message.content is ${type}, but this non-streaming Chat Completions benchmark supports only a string.` }
 }
 
+function asSafeString(value) {
+  return typeof value === 'string' ? value : null
+}
+
+export function extractRoutingMetadata(payload) {
+  const metadata = payload?.openrouter_metadata
+  if (!metadata || typeof metadata !== 'object') {
+    return { status: 'not_provided', upstreamProvider: null, upstreamModel: null, strategy: null, routerAttempt: null, attempts: [] }
+  }
+  const attempts = Array.isArray(metadata.attempts)
+    ? metadata.attempts.map((attempt) => ({ provider: asSafeString(attempt?.provider), model: asSafeString(attempt?.model), status: typeof attempt?.status === 'number' ? attempt.status : null }))
+    : []
+  const selected = Array.isArray(metadata.endpoints?.available)
+    ? metadata.endpoints.available.find((endpoint) => endpoint?.selected === true)
+    : null
+  const lastAttempt = attempts.at(-1) ?? null
+  return {
+    status: 'provided',
+    upstreamProvider: lastAttempt?.provider ?? asSafeString(selected?.provider),
+    upstreamModel: lastAttempt?.model ?? asSafeString(selected?.model),
+    strategy: asSafeString(metadata.strategy),
+    routerAttempt: typeof metadata.attempt === 'number' ? metadata.attempt : null,
+    attempts,
+  }
+}
+
+async function parseResponsePayload(response) {
+  const text = await response.text()
+  if (!text) return { payload: null, text: '' }
+  try { return { payload: JSON.parse(text), text } } catch { return { payload: null, text } }
+}
+
 export function parseProviderContent(content, benchmarkCase) {
   let parsed
   try { parsed = JSON.parse(content) } catch { return { valid: false, error: 'Provider content was not valid JSON.' } }
@@ -76,7 +108,7 @@ export function parseProviderContent(content, benchmarkCase) {
     : { valid: false, error: validation.errors.join('; ') }
 }
 
-export async function requestStructuredAction({ apiKey, model, benchmarkCase, prompt, timeoutMs, fetchImpl = fetch }) {
+export async function requestStructuredAction({ apiKey, model, benchmarkCase, prompt, timeoutMs, providerId, fetchImpl = fetch }) {
   const request = {
     model: model.id,
     messages: [{ role: 'user', content: prompt }],
@@ -84,7 +116,10 @@ export async function requestStructuredAction({ apiKey, model, benchmarkCase, pr
     max_tokens: 700,
     stream: false,
     response_format: { type: 'json_schema', json_schema: buildActionSchema(benchmarkCase) },
-    provider: { require_parameters: true },
+    provider: {
+      require_parameters: true,
+      ...(providerId ? { only: [providerId], allow_fallbacks: false } : {}),
+    },
   }
   const startedAt = performance.now()
   const attempts = []
@@ -96,23 +131,27 @@ export async function requestStructuredAction({ apiKey, model, benchmarkCase, pr
     try {
       const response = await fetchImpl(CHAT_ENDPOINT, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', 'X-OpenRouter-Metadata': 'enabled' },
         body: JSON.stringify(request),
         signal: controller.signal,
       })
       const latencyMs = Math.round(performance.now() - attemptStartedAt)
+      const { payload, text } = await parseResponsePayload(response)
+      const routing = extractRoutingMetadata(payload)
       if (!response.ok) {
-        const detail = (await response.text()).slice(0, 500)
-        lastFailure = { error: `OpenRouter request failed: HTTP ${response.status}${detail ? ` ${detail}` : ''}`, latencyMs, retryable: transientStatus(response.status), rawContent: null, responseShape: 'not_available_http_error', failureKind: 'http_error' }
+        const detail = text.slice(0, 500)
+        lastFailure = { error: `OpenRouter request failed: HTTP ${response.status}${detail ? ` ${detail}` : ''}`, latencyMs, retryable: transientStatus(response.status), rawContent: null, responseShape: 'not_available_http_error', failureKind: 'http_error', routing }
       } else {
-        const payload = await response.json()
+        if (!payload) {
+          lastFailure = { error: 'OpenRouter response was not valid JSON.', latencyMs, retryable: true, rawContent: null, responseShape: 'not_available_invalid_json', failureKind: 'invalid_response_payload', routing }
+        } else {
         const extracted = extractProviderContent(payload)
         if (!extracted.valid) {
-          lastFailure = { error: extracted.error, latencyMs, retryable: true, rawContent: null, responseShape: extracted.responseShape, failureKind: 'unsupported_response_shape' }
+          lastFailure = { error: extracted.error, latencyMs, retryable: true, rawContent: null, responseShape: extracted.responseShape, failureKind: 'unsupported_response_shape', routing }
         } else {
           const parsed = parseProviderContent(extracted.content, benchmarkCase)
           if (parsed.valid) {
-            attempts.push({ attempt: attempt + 1, outcome: 'success', latencyMs, responseShape: extracted.responseShape, error: null })
+            attempts.push({ attempt: attempt + 1, outcome: 'success', latencyMs, responseShape: extracted.responseShape, error: null, routing })
             return {
               ok: true,
               value: parsed.value,
@@ -120,20 +159,22 @@ export async function requestStructuredAction({ apiKey, model, benchmarkCase, pr
               latencyMs,
               wallClockMs: Math.round(performance.now() - startedAt),
               attempts,
+              routing,
               usage: payload.usage ?? {},
               retryCount: attempt,
             }
           }
-          lastFailure = { error: parsed.error, latencyMs, retryable: true, rawContent: extracted.content, usage: payload.usage ?? {}, responseShape: extracted.responseShape, failureKind: 'invalid_provider_content' }
+          lastFailure = { error: parsed.error, latencyMs, retryable: true, rawContent: extracted.content, usage: payload.usage ?? {}, responseShape: extracted.responseShape, failureKind: 'invalid_provider_content', routing }
+        }
         }
       }
     } catch (error) {
       const aborted = error instanceof Error && error.name === 'AbortError'
-      lastFailure = { error: error instanceof Error ? error.message : String(error), latencyMs: Math.round(performance.now() - attemptStartedAt), retryable: true, rawContent: null, responseShape: 'not_available_transport_error', failureKind: aborted ? 'timeout' : 'transport_or_payload_error' }
+      lastFailure = { error: error instanceof Error ? error.message : String(error), latencyMs: Math.round(performance.now() - attemptStartedAt), retryable: true, rawContent: null, responseShape: 'not_available_transport_error', failureKind: aborted ? 'timeout' : 'transport_or_payload_error', routing: { status: 'not_available', upstreamProvider: null, upstreamModel: null, strategy: null, routerAttempt: null, attempts: [] } }
     } finally {
       clearTimeout(timeout)
     }
-    attempts.push({ attempt: attempt + 1, outcome: lastFailure.failureKind, latencyMs: lastFailure.latencyMs, responseShape: lastFailure.responseShape, error: lastFailure.error })
+    attempts.push({ attempt: attempt + 1, outcome: lastFailure.failureKind, latencyMs: lastFailure.latencyMs, responseShape: lastFailure.responseShape, error: lastFailure.error, routing: lastFailure.routing })
     if (!lastFailure.retryable || attempt === 1) break
   }
   return { ok: false, ...lastFailure, wallClockMs: Math.round(performance.now() - startedAt), attempts, retryCount: attempts.length - 1 }

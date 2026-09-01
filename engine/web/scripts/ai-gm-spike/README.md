@@ -23,11 +23,13 @@ Select exact models or fixtures to control cost:
 npm run ai-gm:compare -- --model=qwen/qwen3.8-flash --case=simple-inspect-water,ambiguous-target --timeout-ms=15000
 ```
 
+To compare one exact OpenRouter provider endpoint, add `--provider=<provider-slug>`. This benchmark-only option sends `provider.only` and disables OpenRouter provider fallbacks for that request; omit it to retain the normal automatic provider fallback policy.
+
 `OPENROUTER_API_KEY` is read only from the local environment. If it is absent, the command exits before a network request with a short setup message. Do not put a real key in `.env.example`, test fixtures, generated reports, or Vite/browser code.
 
 ## What is measured
 
-For every configured model and Korean benchmark case, the script records schema validity, expected structural match, action count/order, ambiguity correctness, final-attempt latency, total request wall-clock time, per-attempt error/latency/response-shape observations, available token usage, retry count, and an unavailable-by-default cost field. It sends OpenRouter a strict, case-specific JSON Schema and `provider.require_parameters=true`; models that are missing from the live catalog or do not advertise structured output are recorded as failures without relaxing the schema.
+For every configured model and Korean benchmark case, the script records schema validity, expected structural match, action count/order, ambiguity correctness, final-attempt latency, total request wall-clock time, per-attempt error/latency/response-shape observations, available token usage, retry count, and an unavailable-by-default cost field. It also opts into OpenRouter router metadata and records the selected upstream provider/model plus router attempt details when OpenRouter supplies them. It sends OpenRouter a strict, case-specific JSON Schema and `provider.require_parameters=true`; models that are missing from the live catalog or do not advertise structured output are recorded as failures without relaxing the schema.
 
 The default model configuration intentionally has no durable dollar estimate. `models.json` carries the retrieval date and source note; replace it with a dated, sourced price config only when a current cost estimate is needed.
 
