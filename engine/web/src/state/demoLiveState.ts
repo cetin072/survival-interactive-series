@@ -15,7 +15,7 @@ export const demoLiveState: LiveState = {
     family_car: { name: '가족 차량', location: '회사 · 도심', status: 'available', operator: 'player' },
   },
   bases: {
-    rural_base: { name: '외곽거점', location: '외곽', status: 'available' },
+    rural_base: { name: '외곽거점', location: '외곽', status: 'available', capabilities: ['물 저장', '비상 전력'] },
   },
   resources: {
     water: { name: '물', icon: '💧', band: '보통' },

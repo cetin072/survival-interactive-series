@@ -29,6 +29,7 @@ export type BaseState = {
   name: string
   location: string
   status: string
+  capabilities: string[]
 }
 
 export type ResourceState = {
