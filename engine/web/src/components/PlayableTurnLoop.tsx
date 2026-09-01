@@ -3,7 +3,8 @@ import { choiceForKey } from '../input/action'
 import { createGameSnapshot } from '../state/snapshot'
 import type { PublicRuntimeCheckpoint } from '../runtime/publicRuntimeCheckpoint'
 import { runGMProviderTurn } from '../runtime/gmTurnRuntime'
-import { createSyntheticMockProvider, createSyntheticPublicRuntimeFixture } from '../runtime/syntheticPublicRuntimeFixture'
+import { HttpGMProvider } from '../runtime/gmTransport'
+import { createSyntheticPublicRuntimeFixture } from '../runtime/syntheticPublicRuntimeFixture'
 import { ChoiceButtons } from './ChoiceButtons'
 import { FreeActionForm } from './FreeActionForm'
 import { GameLog } from './GameLog'
@@ -15,7 +16,7 @@ export function PlayableTurnLoop() {
   const [checkpoint, setCheckpoint] = useState<PublicRuntimeCheckpoint>(createSyntheticPublicRuntimeFixture)
   const [showPanels, setShowPanels] = useState(true)
   const [submitting, setSubmitting] = useState(false)
-  const provider = useMemo(createSyntheticMockProvider, [])
+  const provider = useMemo(() => new HttpGMProvider(), [])
   const snapshot = createGameSnapshot(checkpoint.public_state)
 
   async function submit(input: { kind: 'numbered-choice'; choice_id: number } | { kind: 'free-action'; text: string }) {
@@ -43,7 +44,7 @@ export function PlayableTurnLoop() {
   }, [checkpoint])
 
   return <section className="playable-loop" aria-label="synthetic playable turn loop">
-    <p className="playable-loop-kicker">SYNTHETIC CONTRACT FIXTURE · NOT CANON S02</p>
+    <p className="playable-loop-kicker">SYNTHETIC CONTRACT FIXTURE · /api/gm MOCK TRANSPORT · NOT CANON S02</p>
     <SceneHeader
       day={`${checkpoint.date ?? 'DATE UNKNOWN'} · ${checkpoint.phase}`}
       time={snapshot.time}
