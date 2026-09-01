@@ -1,0 +1,59 @@
+{
+  "timeline_id": "canon_v2",
+  "season_id": "S01",
+  "status": "COMPLETE",
+  "duration": "about_one_year",
+  "world": {
+    "wildfire": "ended",
+    "power_crisis": "stabilizing",
+    "society": "functional_but_changed",
+    "full_pre_disaster_reset": false
+  },
+  "family": {
+    "all_four_survived": true,
+    "operating_model": "distributed_judgment_with_reunion_rules",
+    "player": "less_direct_control_more_delegation",
+    "wife": "independent_co_decision_maker",
+    "son": "active_information_and_record_role",
+    "father": "independent_outer_house_operator"
+  },
+  "bases": {
+    "city_apartment": {
+      "role": "primary_home",
+      "status": "maintained"
+    },
+    "outer_house": {
+      "role": "father_home_and_family_secondary_base",
+      "status": "maintain_not_expand_aggressively",
+      "capabilities": [
+        "some_food_production",
+        "water_buffer",
+        "power_buffer",
+        "storage_and_living_support"
+      ]
+    },
+    "b2_route": {
+      "role": "third_escape_option_information",
+      "status": "information_only_no_fixed_property_or_equipment"
+    }
+  },
+  "preparedness": {
+    "vehicle_emergency_cache": "reduced_but_maintained",
+    "household_stockpile": "medium_rotating_stock",
+    "emergency_cash": "maintained_at_limited_level",
+    "family_reunion_rules": "permanent_core_rules",
+    "situation_board": "inactive_in_normal_times_reactivate_in_emergency"
+  },
+  "livelihood_and_relationships": {
+    "local_life_service": "two_person_small_scale_maintained",
+    "primary_jobs": "priority",
+    "expansion_to_joint_business": false,
+    "local_information_and_trade_network": "exists"
+  },
+  "next_season": {
+    "season_id": "S02",
+    "handoff": "seasons_v2/S02/START_HANDOFF.md",
+    "hidden_world_seed_required": true,
+    "disaster_identity_predefined_publicly": false
+  }
+}

@@ -3,8 +3,16 @@
   command = "npm run build"
   publish = "dist"
 
+[functions]
+  directory = "netlify/functions"
+
 [build.environment]
   NODE_VERSION = "22"
+
+[[redirects]]
+  from = "/api/gm"
+  to = "/.netlify/functions/gm"
+  status = 200
 
 [[headers]]
   for = "/*"

@@ -9,6 +9,44 @@ a { color: inherit; }
 .console-shell { width: min(100%, 760px); min-height: 100vh; margin: 0 auto; padding: 24px 18px 48px; }
 .loading-shell { display: grid; align-content: center; min-height: 100vh; }
 .loading-copy { color: #9caaa0; font: .8rem/1.55 system-ui, sans-serif; }
+.runtime-block { display: grid; align-content: center; }
+.runtime-block-copy { max-width: 58ch; margin: 14px 0 0; color: #c1ccc3; font: .86rem/1.6 system-ui, sans-serif; }
+.runtime-block-panel { margin-top: 20px; padding: 16px; border: 1px solid #806c43; background: #18150e; }
+.runtime-block-code { margin: 0; color: #d7b873; font-size: .67rem; letter-spacing: .07em; }
+.runtime-block-panel h2 { margin: 12px 0 0; color: #f1ead7; font: 700 .95rem/1.35 system-ui, sans-serif; }
+.runtime-block-panel ul { margin: 10px 0 0; padding-left: 20px; color: #d5c9ab; font: .78rem/1.55 system-ui, sans-serif; }
+.runtime-block-help { margin: 14px 0 0; color: #92a096; font: .73rem/1.5 system-ui, sans-serif; }
+.playable-loop { margin-top: 28px; padding-top: 18px; border-top: 1px solid #3d5143; }
+.playable-loop-kicker, .playable-loop-pressure { margin: 0; color: #d6b670; font-size: .65rem; letter-spacing: .09em; }
+.playable-loop-pressure { margin-top: 10px; color: #b4c7b8; }
+.scene-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-top: 10px; padding: 12px 0; border-bottom: 1px solid #34433a; }
+.scene-header h1 { margin-top: 4px; }
+.eyebrow { margin: 0; color: #99a99d; font-size: .72rem; }
+.panel-toggle { min-height: 38px; padding: 8px 10px; border: 1px solid #516b58; background: transparent; color: #c9d6cb; font-size: .7rem; }
+.status-panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+.status-panels article, .scene-copy, .presentation-block, .free-action, .game-log { padding: 12px; border: 1px solid #2f4135; background: #101713; }
+.status-panels h2, .log-title { margin: 0 0 8px; color: #8db998; font-size: .67rem; letter-spacing: .09em; }
+.status-panels p { display: flex; justify-content: space-between; gap: 8px; margin: 7px 0 0; font: .72rem system-ui, sans-serif; }
+.status-panels span { color: #a6b4a9; text-align: right; }
+.scene-copy { margin-top: 12px; }
+.scene-copy p { margin: 0; color: #e0e9e1; font: .88rem/1.65 system-ui, sans-serif; }
+.presentation-blocks { display: grid; gap: 7px; margin-top: 10px; }
+.presentation-block { border-left: 2px solid #bf9e5d; }
+.presentation-block h2, .presentation-block p { margin: 0; }
+.presentation-block h2 { color: #d1b06d; font-size: .64rem; letter-spacing: .08em; }
+.presentation-block p { margin-top: 5px; color: #c9d2cb; font: .74rem/1.4 system-ui, sans-serif; }
+.choices { display: grid; gap: 8px; margin-top: 12px; }
+.choices button { display: grid; grid-template-columns: 26px minmax(0, 1fr); align-items: center; gap: 9px; min-height: 48px; padding: 9px; border: 1px solid #46654e; background: #142019; color: #e7f0e8; text-align: left; }
+.choices kbd { display: grid; place-items: center; min-height: 26px; border: 1px solid #6e9577; color: #bde3c5; font-size: .74rem; }
+.choices span { font: .8rem/1.35 system-ui, sans-serif; }
+.free-action { margin-top: 12px; }
+.free-action label { display: block; margin-bottom: 7px; color: #bdd0c0; font-size: .72rem; }
+.free-action > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px; }
+.free-action input { min-width: 0; min-height: 42px; border: 1px solid #3c5142; border-radius: 0; background: #09100c; color: #eef5ef; padding: 9px; }
+.free-action button { min-height: 42px; border: 1px solid #608269; background: #d8eadb; color: #102016; padding: 9px 12px; font-weight: 700; }
+.game-log { margin-top: 12px; }
+.log-entry { margin: 7px 0 0; color: #bfcac1; font: .74rem/1.5 system-ui, sans-serif; }
+.log-entry.choice { color: #cae2ce; }.log-entry.free-action { color: #d7ca9f; }.log-entry.result { color: #8ecb9a; }.log-entry.system { color: #d9b777; }
 .console-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 10px 0 22px; border-bottom: 1px solid #405047; }
 .console-kicker, .console-section h2, .play-bridge-kicker { margin: 0; color: #87b68f; font-size: .68rem; letter-spacing: .13em; }
 h1 { margin: 8px 0 0; max-width: 32ch; font-size: clamp(1.2rem, 5vw, 1.75rem); line-height: 1.25; overflow-wrap: anywhere; }
@@ -90,5 +128,5 @@ h1 { margin: 8px 0 0; max-width: 32ch; font-size: clamp(1.2rem, 5vw, 1.75rem); l
 .empty-state { margin: 0; color: #758079; font-size: .73rem; }
 footer { padding: 24px 0 0; color: #657168; text-align: center; font-size: .62rem; letter-spacing: .07em; }
 @media (display-mode: standalone) { .console-shell { padding-top: max(18px, env(safe-area-inset-top)); padding-bottom: max(40px, env(safe-area-inset-bottom)); } }
-@media (max-width: 390px) { .console-shell { padding: 14px 12px 36px; }.console-header { padding-top: 5px; }.console-section { padding: 13px 12px; }.console-grid { grid-template-columns: 1fr; gap: 0; }.family-row { gap: 8px; }.family-row .row-values { max-width: 44%; }.header-controls { gap: 4px; }.refresh-button { padding: 8px 7px; }.bgm-toggle { padding: 7px 6px; }.bgm-volume-toggle { padding: 7px 5px; }.tag-list li { font-size: .58rem; }.play-bridge { padding: 15px 12px; }.play-bridge-actions, .play-link-row { grid-template-columns: 1fr; }.play-secondary { width: 100%; } }
+@media (max-width: 390px) { .console-shell { padding: 14px 12px 36px; }.console-header { padding-top: 5px; }.console-section { padding: 13px 12px; }.console-grid, .status-panels { grid-template-columns: 1fr; gap: 0; }.family-row { gap: 8px; }.family-row .row-values { max-width: 44%; }.header-controls { gap: 4px; }.refresh-button { padding: 8px 7px; }.bgm-toggle { padding: 7px 6px; }.bgm-volume-toggle { padding: 7px 5px; }.tag-list li { font-size: .58rem; }.play-bridge { padding: 15px 12px; }.play-bridge-actions, .play-link-row, .free-action > div { grid-template-columns: 1fr; }.play-secondary { width: 100%; } }
 @media (max-width: 340px) { .console-shell { padding-left: 9px; padding-right: 9px; }.console-header { gap: 8px; flex-wrap: wrap; }.header-controls { width: 100%; justify-content: flex-end; }.console-kicker { letter-spacing: .08em; }.family-row strong { font-size: .84rem; }.family-row div > span, .family-row .row-values { font-size: .64rem; } }

@@ -13,7 +13,7 @@ export function createGameSnapshot(state: LiveState): GameSnapshot {
     day: `DAY ${String(state.clock.day).padStart(2, '0')}`,
     time: state.clock.time,
     location: state.party.player.location,
-    family: Object.values(state.party).map((member) => [member.name, member.location]),
+    family: Object.values(state.party).map((member) => [member.name, member.location, member.status]),
     resources: Object.values(state.resources).map((resource) => [`${resource.icon} ${resource.name}`, resource.band]),
   }
 }

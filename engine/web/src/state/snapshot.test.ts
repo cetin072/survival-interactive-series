@@ -9,7 +9,7 @@ describe('state snapshot UI connection', () => {
     const snapshot = createGameSnapshot(state)
 
     expect(snapshot).toMatchObject({ day: 'DAY 01', time: '18:00', location: '학교' })
-    expect(snapshot.family[0]).toEqual(['준호', '학교'])
+    expect(snapshot.family[0]).toEqual(['준호', '학교', 'normal'])
     expect(snapshot.resources).toContainEqual(['📡 통신', '불안정'])
     expect(state.vehicles.family_car.location).toBe('학교')
   })

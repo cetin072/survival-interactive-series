@@ -1,0 +1,52 @@
+import { describe, expect, it } from 'vitest'
+import { createSyntheticPublicRuntimeFixture } from './syntheticPublicRuntimeFixture'
+import { HttpGMProvider, validateGMTransportRequest, validateGMTransportResponse } from './gmTransport'
+
+describe('GM HTTP transport contract', () => {
+  it('accepts public checkpoint v1 and rejects hidden/archive-only fields', () => {
+    const checkpoint = createSyntheticPublicRuntimeFixture()
+    expect(validateGMTransportRequest({ input: { kind: 'numbered-choice', choice_id: 1 }, checkpoint }).valid).toBe(true)
+
+    const contaminated = { ...checkpoint, hidden_seed: { event: 'secret' } }
+    const result = validateGMTransportRequest({ input: { kind: 'numbered-choice', choice_id: 1 }, checkpoint: contaminated })
+    expect(result.valid).toBe(false)
+  })
+
+  it('validates transport response envelopes without trusting proposal shape', () => {
+    expect(validateGMTransportResponse({ status: 'proposal', proposal: { anything: true } }).valid).toBe(true)
+    expect(validateGMTransportResponse({ status: 'unavailable', message: 'offline' }).valid).toBe(true)
+    expect(validateGMTransportResponse({ status: 'proposal' }).valid).toBe(false)
+  })
+
+  it('posts only to /api/gm and returns a structured proposal envelope', async () => {
+    const checkpoint = createSyntheticPublicRuntimeFixture()
+    const calls: Array<{ input: RequestInfo | URL; init?: RequestInit }> = []
+    const provider = new HttpGMProvider(async (input, init) => {
+      calls.push({ input, init })
+      return new Response(JSON.stringify({ status: 'proposal', proposal: { actions: [], narrative: 'ok', next_choices: [], presentation_blocks: [] } }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    })
+
+    const result = await provider.proposeTurn({ input: { kind: 'free-action', text: '통신 상태를 확인한다' }, checkpoint })
+    expect(calls).toHaveLength(1)
+    expect(String(calls[0].input)).toBe('/api/gm')
+    expect(calls[0].init?.method).toBe('POST')
+    expect(result.status).toBe('proposal')
+  })
+
+  it('returns safe unavailable result on network, HTTP proposal rejection, or invalid JSON', async () => {
+    const checkpoint = createSyntheticPublicRuntimeFixture()
+    const request = { input: { kind: 'numbered-choice' as const, choice_id: 1 }, checkpoint }
+
+    const network = new HttpGMProvider(async () => { throw new Error('offline') })
+    expect((await network.proposeTurn(request)).status).toBe('unavailable')
+
+    const rejected = new HttpGMProvider(async () => new Response(JSON.stringify({ status: 'proposal', proposal: {} }), { status: 502 }))
+    expect((await rejected.proposeTurn(request)).status).toBe('unavailable')
+
+    const invalidJson = new HttpGMProvider(async () => new Response('not-json', { status: 500 }))
+    expect((await invalidJson.proposeTurn(request)).status).toBe('unavailable')
+  })
+})
