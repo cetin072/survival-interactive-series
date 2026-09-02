@@ -5,13 +5,19 @@ const MODEL = 'deepseek/deepseek-v4-flash-0731:nitro'
 const ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
 const TIMEOUT_MS = 12_000
 const FORBIDDEN_KEYS = new Set(['hidden_seed', 'hidden_world_seed', 'unrevealed_event_truth', 'raw_transcript'])
+const FAMILY_MEMBERS = new Set(['wife', 'son', 'father'])
+const FAMILY_DISPOSITIONS = new Set(['agree', 'amend', 'defer', 'decline', 'independent_action'])
 
 type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
 function scrub(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(scrub)
-  if (!value || typeof value !== 'object') return value
-  return Object.fromEntries(Object.entries(value as Record<string, unknown>)
+  if (!isRecord(value)) return value
+  return Object.fromEntries(Object.entries(value)
     .filter(([key]) => !FORBIDDEN_KEYS.has(key.toLowerCase()))
     .map(([key, child]) => [key, scrub(child)]))
 }
@@ -95,6 +101,63 @@ function parseJsonObject(content: string): unknown | undefined {
   return undefined
 }
 
+function normalizeBlockType(value: unknown): 'EVENT' | 'AUTO' | 'PHASE CHANGE' | undefined {
+  if (typeof value !== 'string') return undefined
+  const normalized = value.trim().toUpperCase().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ')
+  if (normalized === 'EVENT' || normalized === 'AUTO' || normalized === 'PHASE CHANGE') return normalized
+  return undefined
+}
+
+function normalizeStoryCandidate(value: unknown): Record<string, unknown> | undefined {
+  if (!isRecord(value) || typeof value.narrative !== 'string') return undefined
+
+  const rawChoices = Array.isArray(value.next_choices) ? value.next_choices : []
+  const choices = rawChoices.slice(0, 4).flatMap((item, index) => {
+    if (!isRecord(item) || typeof item.label !== 'string' || item.label.trim().length === 0) return []
+    const rawId = Number(item.id)
+    return [{ id: Number.isInteger(rawId) && rawId > 0 ? rawId : index + 1, label: item.label.trim() }]
+  })
+
+  const rawBlocks = Array.isArray(value.presentation_blocks) ? value.presentation_blocks : []
+  const blocks = rawBlocks.slice(0, 2).flatMap((item) => {
+    if (!isRecord(item) || typeof item.message !== 'string') return []
+    const type = normalizeBlockType(item.type)
+    return type ? [{ type, message: item.message }] : []
+  })
+
+  const rawReactions = Array.isArray(value.family_reactions) ? value.family_reactions : []
+  const familyReactions = rawReactions.slice(0, 3).flatMap((item) => {
+    if (!isRecord(item) || typeof item.message !== 'string' || typeof item.member !== 'string' || typeof item.disposition !== 'string') return []
+    const member = item.member.trim().toLowerCase()
+    const disposition = item.disposition.trim().toLowerCase().replace(/[ -]+/g, '_')
+    if (!FAMILY_MEMBERS.has(member) || !FAMILY_DISPOSITIONS.has(disposition)) return []
+    return [{ member, disposition, message: item.message }]
+  })
+
+  return {
+    actions: Array.isArray(value.actions) ? value.actions.slice(0, 2) : [],
+    narrative: value.narrative.trim(),
+    next_choices: choices,
+    presentation_blocks: blocks,
+    family_reactions: familyReactions,
+  }
+}
+
+function validateStoryCandidate(value: unknown) {
+  const normalized = normalizeStoryCandidate(value)
+  if (!normalized) return { valid: false as const, message: 'AI GM 응답에 서사가 없습니다.' }
+
+  const first = validateGMProposal(normalized)
+  if (first.valid) return { valid: true as const, proposal: first.proposal, droppedActions: false }
+
+  // Narrative continuity must not fail because an optional state proposal was malformed.
+  // Dropping untrusted state actions is safe: the engine remains unchanged while the story can continue.
+  const narrativeOnly = validateGMProposal({ ...normalized, actions: [] })
+  if (narrativeOnly.valid) return { valid: true as const, proposal: narrativeOnly.proposal, droppedActions: true }
+
+  return { valid: false as const, message: narrativeOnly.message }
+}
+
 export class OpenRouterStoryProvider implements GMProvider {
   constructor(
     private readonly apiKey: string | undefined,
@@ -147,9 +210,13 @@ export class OpenRouterStoryProvider implements GMProvider {
         }
       }
 
-      const proposal = validateGMProposal(candidate)
+      const proposal = validateStoryCandidate(candidate)
       if (!proposal.valid) return { status: 'unavailable', message: `AI GM 제안 형식 오류: ${proposal.message}`, diagnostic: { key_present: true, failure_category: 'schema_mismatch' } }
-      return { status: 'proposal', proposal: proposal.proposal, diagnostic: { key_present: true } }
+      return {
+        status: 'proposal',
+        proposal: proposal.proposal,
+        diagnostic: { key_present: true, response_fingerprint: { state_actions_dropped: proposal.droppedActions } },
+      }
     } catch {
       const timedOut = controller.signal.aborted
       return { status: 'unavailable', message: timedOut ? 'AI GM 응답 시간이 초과되었습니다. 다시 시도해 주세요.' : 'AI GM 연결에 실패했습니다. 다시 시도해 주세요.', diagnostic: { key_present: true, failure_category: timedOut ? 'timeout' : 'network' } }
