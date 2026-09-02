@@ -1,9 +1,9 @@
 import type { GMProvider, GMProviderResult, GMProviderTurnRequest } from '../runtime/gmProvider'
 import { validateGMProposal } from '../runtime/gmProposal'
 
-const MODEL = 'deepseek/deepseek-v4-flash-0731:nitro'
+const MODEL = 'deepseek/deepseek-v4-pro'
 const ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
-const TIMEOUT_MS = 18_000
+const TIMEOUT_MS = 30_000
 const FORBIDDEN_KEYS = new Set(['hidden_seed', 'hidden_world_seed', 'unrevealed_event_truth', 'raw_transcript'])
 const FAMILY_MEMBERS = new Set(['wife', 'son', 'father'])
 const FAMILY_DISPOSITIONS = new Set(['agree', 'amend', 'defer', 'decline', 'independent_action'])
@@ -109,24 +109,26 @@ const SYSTEM_PROMPT = `너는 현대 한국 배경 생존 RPG 《생존일기》
 ordered-choices가 들어오면 플레이어가 터치한 순서를 의도로 존중한다. 동시에 성립할 수 없으면 멋대로 둘 다 성공시키지 말고 충돌, 대가, 가능한 부분 또는 대안을 서사에 드러낸다.
 숨겨진 사실, Canon 변경, Hidden Seed, raw transcript를 만들거나 요구하지 마라. 가족을 NPC라고 부르지 마라.
 
-한국어 문체 규칙:
+한국어 문체 및 교정 규칙:
 - 자연스러운 현대 한국어로 쓴다.
 - 한 문장을 지나치게 길게 늘이지 않는다.
 - 같은 뜻을 다른 표현으로 반복하지 않는다.
-- 어색한 번역투, 조사 오류, 이름 오기, 불필요한 쉼표를 피한다.
-- 대사는 사람마다 판단과 성격을 드러내는 기능이 있어야 한다.
-- 출력 직전에 맞춤법, 띄어쓰기, 인물 이름, 문장 종결을 스스로 점검한다.
+- 번역투, 비문, 조사 오류, 이름 오기, 부자연스러운 조어, 의미를 알 수 없는 단어를 금지한다.
+- 대사는 실제 한국 가족이 말하는 것처럼 자연스럽게 쓴다. 대사는 사람마다 판단과 성격을 드러내는 기능이 있어야 한다.
+- narrative와 next_choices를 작성한 뒤 최종 JSON을 만들기 전에 반드시 한 번 다시 읽고 맞춤법, 띄어쓰기, 조사, 어휘, 인물 이름, 문장 종결을 교정한다.
+- 오탈자나 문맥상 이상한 단어가 하나라도 의심되면 그 문장을 다시 써라. 초안의 잘못된 표현을 그대로 내보내지 마라.
+- 특히 두 단어가 잘못 붙은 형태, 음절이 빠진 단어, 뜻을 알 수 없는 합성어를 최종 출력에 남기지 마라.
 
 반드시 JSON 객체 하나만 출력한다. 코드펜스나 설명문은 붙이지 마라.
 형식:
 {
   "actions": [],
-  "narrative": "충분히 진행된 한국어 장면 본문. 문단 사이는 빈 줄로 구분",
+  "narrative": "충분히 진행되고 교정된 한국어 장면 본문. 문단 사이는 빈 줄로 구분",
   "next_choices": [
-    {"id":1,"label":"짧은 행동 제목"},
-    {"id":2,"label":"짧은 행동 제목"},
-    {"id":3,"label":"짧은 행동 제목"},
-    {"id":4,"label":"짧은 행동 제목"}
+    {"id":1,"label":"짧고 자연스러운 행동 제목"},
+    {"id":2,"label":"짧고 자연스러운 행동 제목"},
+    {"id":3,"label":"짧고 자연스러운 행동 제목"},
+    {"id":4,"label":"짧고 자연스러운 행동 제목"}
   ],
   "presentation_blocks": [],
   "family_reactions": []
@@ -238,9 +240,9 @@ export class OpenRouterStoryProvider implements GMProvider {
         signal: controller.signal,
         body: JSON.stringify({
           model: MODEL,
-          temperature: 0.35,
-          max_tokens: 2000,
-          reasoning: { effort: 'none' },
+          temperature: 0.40,
+          max_tokens: 2400,
+          reasoning: { effort: 'low' },
           response_format: { type: 'json_object' },
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
