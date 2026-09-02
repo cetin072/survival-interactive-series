@@ -124,7 +124,7 @@ export function keepPublicRuntimeSafeAfterFreeAction(
     ...checkpoint,
     current_scene: {
       ...checkpoint.current_scene,
-      narrative: 'AI GM 응답을 커밋하지 못했습니다. 상태는 바뀌지 않았습니다. 같은 행동을 다시 시도할 수 있습니다.',
+      narrative: 'AI GM 응답을 커밋하지 못했습니다. 상태를 바꾸지 않았고, 같은 행동을 다시 시도할 수 있습니다.',
     },
     committed_turn: {
       ...checkpoint.committed_turn,
