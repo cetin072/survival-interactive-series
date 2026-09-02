@@ -16,8 +16,12 @@ describe('GM HTTP transport contract', () => {
   it('accepts the exact WEB MVP test-session checkpoint used by the browser', () => {
     const checkpoint = createWebMvpTestSession()
     const numbered = validateGMTransportRequest({ input: { kind: 'numbered-choice', choice_id: 1 }, checkpoint })
+    const ordered = validateGMTransportRequest({ input: { kind: 'ordered-choices', choice_ids: [1, 2] }, checkpoint })
+    const tooManyOrdered = validateGMTransportRequest({ input: { kind: 'ordered-choices', choice_ids: [1, 2, 3] }, checkpoint })
     const free = validateGMTransportRequest({ input: { kind: 'free-action', text: '가족에게 먼저 전화한다' }, checkpoint })
     expect(numbered).toEqual(expect.objectContaining({ valid: true }))
+    expect(ordered).toEqual(expect.objectContaining({ valid: true }))
+    expect(tooManyOrdered).toEqual(expect.objectContaining({ valid: false }))
     expect(free).toEqual(expect.objectContaining({ valid: true }))
   })
 
