@@ -107,17 +107,19 @@ function scrub(value: unknown): unknown {
 
 function publicContext(request: GMProviderTurnRequest) {
   const checkpoint = request.checkpoint
-  const selected = request.input.kind === 'numbered-choice'
-    ? checkpoint.current_scene.choices.find((choice) => choice.id === request.input.choice_id)
+  const input = request.input
+  const choiceId = input.kind === 'numbered-choice' ? input.choice_id : undefined
+  const selected = choiceId !== undefined
+    ? checkpoint.current_scene.choices.find((choice) => choice.id === choiceId)
     : undefined
   const nextTurn = checkpoint.committed_turn.number + 1
 
   return {
     session: 'WEB_MVP_TEST_SESSION / NON-CANONICAL',
     turn_number: nextTurn,
-    player_action: request.input.kind === 'free-action'
-      ? { kind: 'free-action', text: request.input.text }
-      : { kind: 'numbered-choice', choice_id: request.input.choice_id, label: selected?.label ?? null },
+    player_action: input.kind === 'free-action'
+      ? { kind: 'free-action', text: input.text }
+      : { kind: 'numbered-choice', choice_id: choiceId, label: selected?.label ?? null },
     current_scene: {
       id: checkpoint.current_scene.id,
       narrative: checkpoint.current_scene.narrative,
