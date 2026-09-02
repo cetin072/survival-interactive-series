@@ -27,7 +27,7 @@ describe('GM HTTP transport contract', () => {
     expect(validateGMTransportResponse({ status: 'proposal' }).valid).toBe(false)
   })
 
-  it('posts only to /api/gm and returns a structured proposal envelope', async () => {
+  it('posts to /api/gm and returns a structured proposal envelope', async () => {
     const checkpoint = createSyntheticPublicRuntimeFixture()
     const calls: Array<{ input: RequestInfo | URL; init?: RequestInit }> = []
     const provider = new HttpGMProvider(async (input, init) => {
@@ -42,6 +42,23 @@ describe('GM HTTP transport contract', () => {
     expect(calls).toHaveLength(1)
     expect(String(calls[0].input)).toBe('/api/gm')
     expect(calls[0].init?.method).toBe('POST')
+    expect(result.status).toBe('proposal')
+  })
+
+  it('retries the direct Netlify function path after /api/gm network failure', async () => {
+    const checkpoint = createSyntheticPublicRuntimeFixture()
+    const calls: string[] = []
+    const provider = new HttpGMProvider(async (input) => {
+      calls.push(String(input))
+      if (String(input) === '/api/gm') throw new Error('rewrite failed')
+      return new Response(JSON.stringify({ status: 'proposal', proposal: { actions: [], narrative: 'ok', next_choices: [], presentation_blocks: [] } }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    })
+
+    const result = await provider.proposeTurn({ input: { kind: 'numbered-choice', choice_id: 1 }, checkpoint })
+    expect(calls).toEqual(['/api/gm', '/.netlify/functions/gm'])
     expect(result.status).toBe('proposal')
   })
 
