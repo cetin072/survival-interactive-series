@@ -1,9 +1,9 @@
 import type { GMProvider, GMProviderResult, GMProviderTurnRequest } from '../runtime/gmProvider'
 import { validateGMProposal } from '../runtime/gmProposal'
 
-const MODEL = 'deepseek/deepseek-v4-pro'
+const MODEL = 'deepseek/deepseek-v4-flash-0731:nitro'
 const ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
-const TIMEOUT_MS = 30_000
+const TIMEOUT_MS = 25_000
 const FORBIDDEN_KEYS = new Set(['hidden_seed', 'hidden_world_seed', 'unrevealed_event_truth', 'raw_transcript'])
 const FAMILY_MEMBERS = new Set(['wife', 'son', 'father'])
 const FAMILY_DISPOSITIONS = new Set(['agree', 'amend', 'defer', 'decline', 'independent_action'])
@@ -240,9 +240,9 @@ export class OpenRouterStoryProvider implements GMProvider {
         signal: controller.signal,
         body: JSON.stringify({
           model: MODEL,
-          temperature: 0.40,
-          max_tokens: 2400,
-          reasoning: { effort: 'low' },
+          temperature: 0.20,
+          max_tokens: 1800,
+          reasoning: { effort: 'none' },
           response_format: { type: 'json_object' },
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
