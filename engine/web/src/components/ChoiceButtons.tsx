@@ -12,7 +12,7 @@ export function ChoiceButtons({ choices, selectedChoiceIds, onToggle, maxSelecti
   const atLimit = selectedChoiceIds.length >= maxSelections
 
   return <section className="choices choice-grid" aria-label="선택지">
-    {choices.map((choice) => {
+    {choices.slice(0, 4).map((choice) => {
       const selectedIndex = selectedChoiceIds.indexOf(choice.id)
       const selected = selectedIndex >= 0
       const selectionLocked = atLimit && !selected
@@ -27,17 +27,9 @@ export function ChoiceButtons({ choices, selectedChoiceIds, onToggle, maxSelecti
       >
         <span className="choice-card-topline">
           <span className="choice-card-index">{choice.id}</span>
-          {selected && <span className="choice-card-order" aria-label={`${selectedIndex + 1}순위`}>{selectedIndex + 1}순위</span>}
+          {selected && <span className="choice-card-order" aria-label={`${selectedIndex + 1}순위`}>{selectedIndex + 1}</span>}
         </span>
-        <span className="choice-card-copy">
-          <strong>{choice.label}</strong>
-          <span className="choice-card-description">{choice.description ?? '이 행동을 우선해 현재 상황에 대응합니다. 구체적인 결과는 선택 후 드러납니다.'}</span>
-        </span>
-        <small>{selected
-          ? `${selectedIndex + 1}번째 행동으로 선택됨`
-          : selectionLocked
-            ? `한 턴에 최대 ${maxSelections}개 선택`
-            : `최대 ${maxSelections}개 · 터치한 순서대로 실행`}</small>
+        <strong className="choice-card-title">{choice.label}</strong>
       </button>
     })}
   </section>
