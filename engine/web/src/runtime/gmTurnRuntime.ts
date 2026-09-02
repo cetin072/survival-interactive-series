@@ -13,6 +13,13 @@ function resultLog(result: ActionExecutionResult, id: number): LogEntry {
 
 function inputLog(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput, id: number): LogEntry {
   if (input.kind === 'free-action') return freeActionLog(input.text, id)
+  if (input.kind === 'ordered-choices') {
+    const labels = input.choice_ids.map((choiceId) => {
+      const choice = checkpoint.current_scene.choices.find((item) => item.id === choiceId)
+      return choice?.label ?? `알 수 없는 선택 ${choiceId}`
+    })
+    return { id, kind: 'choice', text: `복수 선택: ${labels.map((label, index) => `${index + 1}. ${label}`).join(' → ')}` }
+  }
   const choice = checkpoint.current_scene.choices.find((item) => item.id === input.choice_id)
   return choice ? choiceLog(choice, id) : { id, kind: 'system', text: `알 수 없는 선택: ${input.choice_id}` }
 }
