@@ -85,20 +85,24 @@ function sceneFor(state: LiveState, sceneId: string): PublicRuntimeScene {
         ],
         presentation_blocks: [{ type: 'PHASE CHANGE', message: 'TEST SESSION · 거점 점검 단계' }],
       }
-    case 'test-communications':
+    case 'test-communications': {
+      // This scene is intentionally repeatable for the 10–20 turn human MVP playtest.
+      // Validator correctly rejects completed action IDs, so each synthetic loop action gets a unique ID/key.
+      const loopStep = state.completed_actions.length + 1
       return {
         ...common,
         narrative: '민석의 독립적인 통신 목록이 합쳐졌습니다. 그는 다음 점검은 본인이 계속하겠다고 알립니다.',
         choices: [
-          choice(1, '짧은 상태 점검을 마친다', action('test-finish-check', '상태 점검 마무리', {
-            time_delta_min: 10, moves: [], resource_changes: [], world_changes: [{ key: 'review', from: undefined, to: 'complete' }],
+          choice(1, '짧은 상태 점검을 이어간다', action(`test-finish-check-${loopStep}`, '상태 점검 계속', {
+            time_delta_min: 10, moves: [], resource_changes: [], world_changes: [{ key: `review_${loopStep}`, from: undefined, to: 'complete' }],
           })),
-          choice(2, '물 저장을 다시 확인한다', action('test-recheck-water', '물 저장 재확인', {
-            time_delta_min: 5, moves: [], resource_changes: [], world_changes: [{ key: 'water_recheck', from: undefined, to: 'complete' }],
+          choice(2, '물 저장을 다시 확인한다', action(`test-recheck-water-${loopStep}`, '물 저장 재확인', {
+            time_delta_min: 5, moves: [], resource_changes: [], world_changes: [{ key: `water_recheck_${loopStep}`, from: undefined, to: 'complete' }],
           })),
         ],
         presentation_blocks: [{ type: 'EVENT', message: '가족의 독립 반응: 민석이 통신 점검을 자율적으로 이어갑니다.' }],
       }
+    }
     default:
       return {
         ...common,
