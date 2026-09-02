@@ -11,6 +11,7 @@ type Props = {
   showRefresh?: boolean
   playBridge: ReactNode
   bgmControl: ReactNode
+  embedded?: boolean
 }
 
 function Section({ title, children, empty }: { title: string; children: ReactNode; empty?: boolean }) {
@@ -24,9 +25,10 @@ function valueOrNone(value: string | null): string {
   return value ?? '미기록'
 }
 
-export function StateConsole({ view, source, sourceWarning, refreshing, onRefresh, showRefresh = true, playBridge, bgmControl }: Props) {
-  return <main className="console-shell">
-    <header className="console-header">
+export function StateConsole({ view, source, sourceWarning, refreshing, onRefresh, showRefresh = true, playBridge, bgmControl, embedded = false }: Props) {
+  const Root = embedded ? 'section' : 'main'
+  return <Root className={`console-shell${embedded ? ' console-shell-embedded' : ''}`}>
+    {!embedded && <header className="console-header">
       <div>
         <p className="console-kicker">생존기록 · WEB PLAY SHELL</p>
         <h1>{view.header.season}</h1>
@@ -40,12 +42,12 @@ export function StateConsole({ view, source, sourceWarning, refreshing, onRefres
           {refreshing ? 'SYNC…' : 'REFRESH'}
         </button>}
       </div>
-    </header>
+    </header>}
 
-    <div className="source-line">
+    {!embedded && <div className="source-line">
       <span className={source === 'github-raw' || source === 'canon-v2-bundled' ? 'source-dot live' : 'source-dot'} aria-hidden="true" />
       {source === 'github-raw' ? 'LIVE CHECKPOINT' : source === 'canon-v2-bundled' ? 'CANON V2 START STATE' : 'DEPLOY FALLBACK'}
-    </div>
+    </div>}
     {sourceWarning && <p className="source-warning" role="status">{sourceWarning}</p>}
 
     {playBridge}
@@ -108,6 +110,6 @@ export function StateConsole({ view, source, sourceWarning, refreshing, onRefres
         : <ul className="warning-list">{view.warnings.map((warning, index) => <li key={`${warning.code}-${index}`}><strong>{warning.code}</strong><span>{warning.message}</span></li>)}</ul>}
     </Section>
 
-    <footer>PUBLIC STATE ONLY · RUNTIME AI/API CALLS 0</footer>
-  </main>
+    {!embedded && <footer>PUBLIC STATE ONLY · RUNTIME AI/API CALLS 0</footer>}
+  </Root>
 }
