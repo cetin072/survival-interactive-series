@@ -8,6 +8,8 @@ jobs:
   smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    env:
+      PREVIEW_GM_URL: https://6a98076aa5770081cf4d4a59--survival-zero-ai-test.netlify.app/api/gm
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,8 +27,6 @@ jobs:
 
       - name: Create one-call live smoke test
         working-directory: engine/web
-        env:
-          PREVIEW_GM_URL: https://6a98076aa5770081cf4d4a59--survival-zero-ai-test.netlify.app/api/gm
         run: |
           cat > src/runtime/livePreviewSmoke.temp.test.ts <<'EOF'
           import { expect, it } from 'vitest'
