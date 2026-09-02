@@ -49,7 +49,7 @@ function publicContext(request: GMProviderTurnRequest) {
     turn: nextTurn,
     player_action: playerAction,
     scene: checkpoint.current_scene.narrative,
-    choices: checkpoint.current_scene.choices.map((choice) => ({ id: choice.id, label: choice.label })),
+    choices: checkpoint.current_scene.choices.map((choice) => ({ id: choice.id, label: choice.label, description: choice.description })),
     recent_history: checkpoint.committed_turn.log.slice(-8).map((entry) => ({ kind: entry.kind, text: entry.text })),
     state: {
       date: checkpoint.date,
@@ -97,7 +97,12 @@ ordered-choices가 들어오면 플레이어가 터치한 순서를 의도로 �
 {
   "actions": [],
   "narrative": "2~4개의 읽기 쉬운 장면 묶음. 총 5~8문장 정도. 문단 사이는 빈 줄로 구분한다.",
-  "next_choices": [{"id":1,"label":"..."},{"id":2,"label":"..."},{"id":3,"label":"..."},{"id":4,"label":"..."}],
+  "next_choices": [
+    {"id":1,"label":"짧은 행동 제목","description":"이 행동이 무엇을 하려는 선택인지 1~2문장으로 설명"},
+    {"id":2,"label":"짧은 행동 제목","description":"설명"},
+    {"id":3,"label":"짧은 행동 제목","description":"설명"},
+    {"id":4,"label":"짧은 행동 제목","description":"설명"}
+  ],
   "presentation_blocks": [],
   "family_reactions": []
 }
@@ -105,7 +110,8 @@ ordered-choices가 들어오면 플레이어가 터치한 순서를 의도로 �
 규칙:
 - narrative는 결과 -> 반응 -> 의미 있는 변화/새 압력의 흐름을 갖는다. 길이를 늘리기 위해 배경 묘사를 반복하지 않는다.
 - next_choices는 원칙적으로 정확히 4개를 만든다. 서로 의미가 겹치는 변형 선택지를 만들지 말고, 실제로 다른 전략이나 행동을 제시한다.
-- next_choices의 label은 짧고 명확한 행동문으로 쓴다. 결과나 성공 여부를 미리 알려주지 않는다. action을 넣지 않는다.
+- next_choices의 label은 짧고 명확한 행동문으로 쓴다.
+- next_choices의 description은 1~2문장으로, 플레이어가 행동의 의도와 범위를 이해할 정도로 충분히 설명한다. 결과, 성공률, 위험 감소, 보상, 정답 힌트는 쓰지 않는다.
 - 플레이어는 다음 턴에 최대 2개의 선택지를 순서대로 묶을 수 있으므로, 서로 조합할 가치가 있는 선택지와 서로 충돌할 수 있는 선택지가 자연스럽게 섞여도 된다.
 - actions는 이번 턴에 즉시 필요한 상태 변경만 0~2개 제안한다. 서사만 진행되어도 되면 빈 배열이 낫다.
 - action이 필요할 때만 정확히 다음 형식을 쓴다:
@@ -148,7 +154,8 @@ function normalizeStoryCandidate(value: unknown): Record<string, unknown> | unde
   const choices = rawChoices.slice(0, 4).flatMap((item, index) => {
     if (!isRecord(item) || typeof item.label !== 'string' || item.label.trim().length === 0) return []
     const rawId = Number(item.id)
-    return [{ id: Number.isInteger(rawId) && rawId > 0 ? rawId : index + 1, label: item.label.trim() }]
+    const description = typeof item.description === 'string' && item.description.trim().length > 0 ? item.description.trim() : undefined
+    return [{ id: Number.isInteger(rawId) && rawId > 0 ? rawId : index + 1, label: item.label.trim(), ...(description ? { description } : {}) }]
   })
 
   const rawBlocks = Array.isArray(value.presentation_blocks) ? value.presentation_blocks : []
@@ -183,8 +190,6 @@ function validateStoryCandidate(value: unknown) {
   const first = validateGMProposal(normalized)
   if (first.valid) return { valid: true as const, proposal: first.proposal, droppedActions: false }
 
-  // Narrative continuity must not fail because an optional state proposal was malformed.
-  // Dropping untrusted state actions is safe: the engine remains unchanged while the story can continue.
   const narrativeOnly = validateGMProposal({ ...normalized, actions: [] })
   if (narrativeOnly.valid) return { valid: true as const, proposal: narrativeOnly.proposal, droppedActions: true }
 
@@ -211,7 +216,7 @@ export class OpenRouterStoryProvider implements GMProvider {
         body: JSON.stringify({
           model: MODEL,
           temperature: 0.25,
-          max_tokens: 950,
+          max_tokens: 1050,
           reasoning: { effort: 'none' },
           response_format: { type: 'json_object' },
           messages: [
