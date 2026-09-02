@@ -45,6 +45,29 @@ describe('GM HTTP transport contract', () => {
     expect(result.status).toBe('proposal')
   })
 
+  it('uses the browser/global fetch receiver for the default transport', async () => {
+    const checkpoint = createSyntheticPublicRuntimeFixture()
+    const originalFetch = globalThis.fetch
+    let receiver: unknown
+
+    globalThis.fetch = async function (this: unknown) {
+      receiver = this
+      return new Response(JSON.stringify({ status: 'proposal', proposal: { actions: [], narrative: 'ok', next_choices: [], presentation_blocks: [] } }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    } as typeof fetch
+
+    try {
+      const provider = new HttpGMProvider()
+      const result = await provider.proposeTurn({ input: { kind: 'numbered-choice', choice_id: 1 }, checkpoint })
+      expect(receiver).toBe(globalThis)
+      expect(result.status).toBe('proposal')
+    } finally {
+      globalThis.fetch = originalFetch
+    }
+  })
+
   it('retries the direct Netlify function path after /api/gm network failure', async () => {
     const checkpoint = createSyntheticPublicRuntimeFixture()
     const calls: string[] = []
