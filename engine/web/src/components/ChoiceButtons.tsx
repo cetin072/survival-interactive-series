@@ -22,6 +22,7 @@ export function ChoiceButtons({ choices, selectedChoiceIds, onToggle, maxSelecti
         key={choice.id}
         className={selected ? 'choice-card selected' : 'choice-card'}
         aria-pressed={selected}
+        aria-label={`${choice.id}번 선택지: ${choice.label}`}
         onClick={() => onToggle(choice)}
       >
         <span className="choice-card-topline">
