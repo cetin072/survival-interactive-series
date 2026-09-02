@@ -1,0 +1,225 @@
+.playable-loop {
+  --story-font-size: 1.08rem;
+  --choice-font-size: .96rem;
+  --support-font-size: .84rem;
+}
+
+.playable-loop.text-size-small {
+  --story-font-size: .98rem;
+  --choice-font-size: .88rem;
+  --support-font-size: .78rem;
+}
+
+.playable-loop.text-size-large {
+  --story-font-size: 1.22rem;
+  --choice-font-size: 1.06rem;
+  --support-font-size: .92rem;
+}
+
+.text-size-control {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.text-size-control button {
+  min-height: 34px;
+  padding: 7px 8px;
+  border: 1px solid #48614f;
+  background: #0e1511;
+  color: #aebcb1;
+  font: .68rem system-ui, sans-serif;
+}
+
+.text-size-control button[aria-pressed="true"] {
+  border-color: #87b68f;
+  color: #eef5ef;
+  background: #18251c;
+}
+
+.scene-copy {
+  padding: 16px;
+}
+
+.scene-narrative {
+  display: grid;
+  gap: 13px;
+}
+
+.scene-narrative p {
+  margin: 0;
+  color: #e5ede6;
+  font: var(--story-font-size)/1.78 system-ui, sans-serif;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.choices {
+  gap: 10px;
+}
+
+.choices .choice-card {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  padding: 12px 13px;
+  border: 1px solid #46654e;
+  background: #142019;
+  color: #e7f0e8;
+  text-align: left;
+}
+
+.choices .choice-card.selected {
+  border-color: #91bd9a;
+  background: #1b2b20;
+  box-shadow: inset 3px 0 0 #91bd9a;
+}
+
+.choice-card-index {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #6e9577;
+  color: #c9e7cf;
+  font: 700 .88rem system-ui, sans-serif;
+}
+
+.choice-card-copy {
+  min-width: 0;
+}
+
+.choice-card-copy strong {
+  display: block;
+  color: #edf4ee;
+  font: 650 var(--choice-font-size)/1.4 system-ui, sans-serif;
+  word-break: keep-all;
+}
+
+.choice-card-copy small {
+  display: block;
+  margin-top: 5px;
+  color: #91a095;
+  font: .72rem/1.4 system-ui, sans-serif;
+}
+
+.choice-card-order {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #d8eadb;
+  color: #102016;
+  font: 800 .74rem system-ui, sans-serif;
+}
+
+.choice-queue {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid #344b3a;
+  background: #0f1712;
+}
+
+.choice-queue > div:first-child {
+  display: grid;
+  gap: 6px;
+}
+
+.choice-queue strong {
+  color: #8db998;
+  font: 700 .72rem system-ui, sans-serif;
+  letter-spacing: .05em;
+}
+
+.choice-queue span {
+  color: #c8d3ca;
+  font: var(--support-font-size)/1.55 system-ui, sans-serif;
+  word-break: keep-all;
+}
+
+.choice-queue-actions {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  margin-top: 11px;
+}
+
+.choice-queue-actions button {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #52685a;
+  background: transparent;
+  color: #b8c6bb;
+  font: 700 .78rem system-ui, sans-serif;
+}
+
+.choice-queue-actions .choice-confirm {
+  background: #d8eadb;
+  color: #102016;
+  border-color: #d8eadb;
+}
+
+.choice-queue-actions button:disabled {
+  opacity: .42;
+  cursor: default;
+}
+
+.turn-changes {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border: 1px solid #4e5f40;
+  border-left: 3px solid #a7b978;
+  background: #141a10;
+}
+
+.turn-changes h2 {
+  margin: 0;
+  color: #c8d69a;
+  font: 750 .72rem system-ui, sans-serif;
+  letter-spacing: .06em;
+}
+
+.turn-changes ul {
+  margin: 8px 0 0;
+  padding-left: 19px;
+  color: #d5ddcf;
+  font: var(--support-font-size)/1.55 system-ui, sans-serif;
+}
+
+.turn-changes li + li {
+  margin-top: 4px;
+}
+
+.playable-loop .free-action label,
+.playable-loop .free-action-help,
+.playable-loop .log-entry,
+.playable-loop .test-base-status,
+.playable-loop .turn-status {
+  font-size: var(--support-font-size);
+}
+
+.playable-loop .free-action input {
+  font: var(--choice-font-size)/1.45 system-ui, sans-serif;
+}
+
+@media (max-width: 560px) {
+  .test-session-header {
+    display: grid;
+  }
+
+  .test-session-controls {
+    flex-wrap: wrap;
+  }
+
+  .choices .choice-card {
+    grid-template-columns: 34px minmax(0, 1fr) 28px;
+    min-height: 76px;
+  }
+
+  .choice-queue-actions {
+    grid-template-columns: 1fr;
+  }
+}
