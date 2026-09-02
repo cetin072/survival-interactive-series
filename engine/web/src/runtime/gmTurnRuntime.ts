@@ -1,7 +1,7 @@
 import { runActionQueue } from '../controller/actionQueue'
 import { choiceLog, freeActionLog } from '../input/action'
 import type { LogEntry } from '../types'
-import type { ActionExecutionResult } from '../validator/types'
+import type { ActionExecutionResult, QueuedAction } from '../validator/types'
 import { type GMProposal, validateGMProposal } from './gmProposal'
 import type { GMPlayerInput, GMProvider } from './gmProvider'
 import { createPublicRuntimeCheckpoint, type PublicRuntimeCheckpoint } from './publicRuntimeCheckpoint'
@@ -32,6 +32,16 @@ function fallback(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput, mes
   })
 }
 
+function placeholderChoiceAction(turnNumber: number, choiceId: number, label: string): QueuedAction {
+  return {
+    id: `story-choice-t${turnNumber}-${choiceId}`,
+    label,
+    actors: ['player'],
+    exclusive_resources: [],
+    proposal: { time_delta_min: 0, moves: [], resource_changes: [], base_capability_changes: [], world_changes: [] },
+  }
+}
+
 function sceneFromProposal(proposal: GMProposal, turnNumber: number) {
   const familyBlocks = proposal.family_reactions?.map((reaction) => ({
     type: 'EVENT' as const,
@@ -40,7 +50,10 @@ function sceneFromProposal(proposal: GMProposal, turnNumber: number) {
   return {
     id: `gm_turn_${turnNumber}`,
     narrative: proposal.narrative,
-    choices: proposal.next_choices,
+    choices: proposal.next_choices.map((choice) => ({
+      ...choice,
+      action: choice.action ?? placeholderChoiceAction(turnNumber, choice.id, choice.label),
+    })),
     presentation_blocks: [
       ...proposal.presentation_blocks,
       ...(proposal.visible_reaction ? [{ type: 'EVENT' as const, message: proposal.visible_reaction }] : []),
