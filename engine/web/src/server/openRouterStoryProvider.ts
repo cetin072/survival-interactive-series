@@ -85,19 +85,28 @@ const SYSTEM_PROMPT = `너는 현대 한국 배경 생존 RPG 《생존일기》
 ordered-choices가 들어오면 플레이어가 터치한 순서를 의도로 존중한다. 동시에 성립할 수 없으면 멋대로 순서를 바꾸지 말고, 가능한 부분만 진행하거나 충돌/대안을 서사에 드러낸다.
 숨겨진 사실, Canon 변경, Hidden Seed, raw transcript를 만들거나 요구하지 마라. 가족을 NPC라고 부르지 마라.
 
+한국어 문체 규칙:
+- 한 문장을 지나치게 길게 늘이지 않는다. 한 문장에는 핵심 의미 하나를 우선한다.
+- 같은 뜻을 다른 표현으로 반복하지 않는다.
+- 어색한 번역투, 조사 오류, 이름 오기, 불필요한 쉼표를 피한다.
+- 출력 직전에 맞춤법, 띄어쓰기, 인물 이름, 문장 종결을 스스로 한 번 점검한 뒤 최종 문장을 낸다.
+- 장면 묘사보다 행동 결과와 사람의 반응을 우선한다.
+
 반드시 JSON 객체 하나만 출력한다. 코드펜스나 설명문은 붙이지 마라.
 형식:
 {
   "actions": [],
-  "narrative": "3~5개의 짧은 문단으로 구성된 다음 장면. 총 6~10문장 정도. 문단 사이는 빈 줄로 구분한다.",
-  "next_choices": [{"id":1,"label":"..."},{"id":2,"label":"..."}],
+  "narrative": "2~4개의 읽기 쉬운 장면 묶음. 총 5~8문장 정도. 문단 사이는 빈 줄로 구분한다.",
+  "next_choices": [{"id":1,"label":"..."},{"id":2,"label":"..."},{"id":3,"label":"..."},{"id":4,"label":"..."}],
   "presentation_blocks": [],
   "family_reactions": []
 }
 
 규칙:
 - narrative는 결과 -> 반응 -> 의미 있는 변화/새 압력의 흐름을 갖는다. 길이를 늘리기 위해 배경 묘사를 반복하지 않는다.
-- next_choices는 2~4개이며 미래 선택지 텍스트만 쓴다. action을 넣지 않는다.
+- next_choices는 원칙적으로 정확히 4개를 만든다. 서로 의미가 겹치는 변형 선택지를 만들지 말고, 실제로 다른 전략이나 행동을 제시한다.
+- next_choices의 label은 짧고 명확한 행동문으로 쓴다. 결과나 성공 여부를 미리 알려주지 않는다. action을 넣지 않는다.
+- 플레이어는 다음 턴에 최대 2개의 선택지를 순서대로 묶을 수 있으므로, 서로 조합할 가치가 있는 선택지와 서로 충돌할 수 있는 선택지가 자연스럽게 섞여도 된다.
 - actions는 이번 턴에 즉시 필요한 상태 변경만 0~2개 제안한다. 서사만 진행되어도 되면 빈 배열이 낫다.
 - action이 필요할 때만 정확히 다음 형식을 쓴다:
   {"id":"<제공된 prefix로 시작>","label":"...","actors":["player"],"exclusive_resources":[],"proposal":{"time_delta_min":0,"moves":[],"resource_changes":[],"base_capability_changes":[],"world_changes":[]}}
@@ -201,8 +210,8 @@ export class OpenRouterStoryProvider implements GMProvider {
         signal: controller.signal,
         body: JSON.stringify({
           model: MODEL,
-          temperature: 0.4,
-          max_tokens: 900,
+          temperature: 0.25,
+          max_tokens: 950,
           reasoning: { effort: 'none' },
           response_format: { type: 'json_object' },
           messages: [
