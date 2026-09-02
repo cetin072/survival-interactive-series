@@ -86,12 +86,11 @@ export async function runGMProviderTurn(
   const ambiguity = parsed.proposal.ambiguity ? ` ${parsed.proposal.ambiguity.message}` : ''
   const nextTurn = checkpoint.committed_turn.number + 1
   const scene = sceneFromProposal(parsed.proposal, nextTurn)
-  const publicState = { ...queue.state, scene_id: scene.id }
   const storyAdvancedWithoutMutation = parsed.proposal.actions.length === 0
 
   return createPublicRuntimeCheckpoint({
     ...checkpoint,
-    public_state: publicState,
+    public_state: queue.state,
     current_scene: scene,
     recent_visible_change: accepted || storyAdvancedWithoutMutation
       ? parsed.proposal.narrative
@@ -103,7 +102,6 @@ export async function runGMProviderTurn(
         inputLog(checkpoint, input, logId),
         ...results,
         ...(ambiguity ? [{ id: logId + 1 + results.length, kind: 'system' as const, text: ambiguity }] : []),
-        { id: logId + 2 + results.length, kind: 'scene', text: `TURN ${nextTurn} · ${parsed.proposal.narrative}` },
       ],
     },
   })
