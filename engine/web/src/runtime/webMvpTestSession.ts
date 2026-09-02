@@ -3,7 +3,8 @@ import type { LiveState } from '../state/liveState'
 import type { Choice, LogEntry } from '../types'
 import type { ActionExecutionResult, QueuedAction } from '../validator/types'
 
-export const WEB_MVP_TEST_SESSION_STORAGE_KEY = 'survival-web-mvp-test-session-v1'
+export const WEB_MVP_TEST_SESSION_STORAGE_KEY = 'survival-web-mvp-test-session-v2'
+export const WEB_MVP_TEST_SESSION_CHECKPOINT_ID = 'web-mvp-test-session-v2'
 
 type TestChoice = Choice & { action: QueuedAction }
 
@@ -36,6 +37,51 @@ function createTestState(): LiveState {
 
 function choice(id: number, label: string, queued: QueuedAction): TestChoice {
   return { id, label, action: queued }
+}
+
+function communicationsLoopScene(state: LiveState, sceneId: string): PublicRuntimeScene {
+  const loopStep = state.completed_actions.length + 1
+  const variants = [
+    {
+      narrative: '무전기에서 짧은 잡음이 반복됩니다. 민석은 수신 상태를 다시 분류하고, 서윤은 물 사용 기록을 확인합니다.',
+      first: '통신 로그를 다시 확인한다',
+      second: '물 사용 기록을 대조한다',
+      event: '통신 잡음과 물 사용량을 교차 점검합니다.',
+    },
+    {
+      narrative: '거점 밖의 소음이 잠시 줄었습니다. 가족은 이 틈에 장비와 생활 물자의 우선순위를 다시 맞춥니다.',
+      first: '장비 상태를 짧게 점검한다',
+      second: '생활 물자 목록을 다시 본다',
+      event: '안정 구간을 짧게 활용해 다음 압력에 대비합니다.',
+    },
+    {
+      narrative: '민석이 이전 기록과 다른 통신 패턴을 표시합니다. 확정 정보는 아니지만 다음 판단 전에 확인할 가치가 있습니다.',
+      first: '새 통신 패턴을 확인한다',
+      second: '기존 물자 점검을 우선한다',
+      event: '확정되지 않은 변화와 기존 준비 사이에서 우선순위를 선택합니다.',
+    },
+    {
+      narrative: '가족의 점검 결과가 한 번 더 모였습니다. 큰 이상은 없지만 같은 방식으로만 버티면 정보가 낡기 시작합니다.',
+      first: '외부 상태 확인 순서를 갱신한다',
+      second: '거점 내부 점검을 한 번 더 한다',
+      event: '반복 점검을 압축하고 다음 변화를 찾는 단계입니다.',
+    },
+  ] as const
+  const variant = variants[(loopStep - 1) % variants.length]
+
+  return {
+    id: sceneId,
+    narrative: `연속 점검 ${loopStep} · ${variant.narrative}`,
+    choices: [
+      choice(1, `${loopStep}. ${variant.first}`, action(`test-finish-check-${loopStep}`, `연속 점검 ${loopStep} · ${variant.first}`, {
+        time_delta_min: 10, moves: [], resource_changes: [], world_changes: [{ key: `review_${loopStep}`, from: undefined, to: 'complete' }],
+      })),
+      choice(2, `${loopStep}. ${variant.second}`, action(`test-recheck-water-${loopStep}`, `연속 점검 ${loopStep} · ${variant.second}`, {
+        time_delta_min: 5, moves: [], resource_changes: [], world_changes: [{ key: `water_recheck_${loopStep}`, from: undefined, to: 'complete' }],
+      })),
+    ],
+    presentation_blocks: [{ type: 'EVENT', message: `점검 ${loopStep} · ${variant.event}` }],
+  }
 }
 
 function sceneFor(state: LiveState, sceneId: string): PublicRuntimeScene {
@@ -85,24 +131,8 @@ function sceneFor(state: LiveState, sceneId: string): PublicRuntimeScene {
         ],
         presentation_blocks: [{ type: 'PHASE CHANGE', message: 'TEST SESSION · 거점 점검 단계' }],
       }
-    case 'test-communications': {
-      // This scene is intentionally repeatable for the 10–20 turn human MVP playtest.
-      // Validator correctly rejects completed action IDs, so each synthetic loop action gets a unique ID/key.
-      const loopStep = state.completed_actions.length + 1
-      return {
-        ...common,
-        narrative: '민석의 독립적인 통신 목록이 합쳐졌습니다. 그는 다음 점검은 본인이 계속하겠다고 알립니다.',
-        choices: [
-          choice(1, '짧은 상태 점검을 이어간다', action(`test-finish-check-${loopStep}`, '상태 점검 계속', {
-            time_delta_min: 10, moves: [], resource_changes: [], world_changes: [{ key: `review_${loopStep}`, from: undefined, to: 'complete' }],
-          })),
-          choice(2, '물 저장을 다시 확인한다', action(`test-recheck-water-${loopStep}`, '물 저장 재확인', {
-            time_delta_min: 5, moves: [], resource_changes: [], world_changes: [{ key: `water_recheck_${loopStep}`, from: undefined, to: 'complete' }],
-          })),
-        ],
-        presentation_blocks: [{ type: 'EVENT', message: '가족의 독립 반응: 민석이 통신 점검을 자율적으로 이어갑니다.' }],
-      }
-    }
+    case 'test-communications':
+      return communicationsLoopScene(state, sceneId)
     default:
       return {
         ...common,
@@ -144,8 +174,8 @@ function nextScene(current: string, actionId: string) {
 export function createWebMvpTestSession(): PublicRuntimeCheckpoint {
   const state = createTestState()
   return createPublicRuntimeCheckpoint({
-    payload_visibility: 'public', source_kind: 'synthetic-fixture', checkpoint_id: 'web-mvp-test-session-v1',
-    season_id: state.season_id, phase: state.clock.phase, active_visible_pressure: '정해진 점검 순서를 마쳐야 하는 테스트 압력',
+    payload_visibility: 'public', source_kind: 'synthetic-fixture', checkpoint_id: WEB_MVP_TEST_SESSION_CHECKPOINT_ID,
+    season_id: state.season_id, phase: state.clock.phase, active_visible_pressure: '정해진 점검 순서를 마치고 다음 변화를 찾아야 하는 테스트 압력',
     recent_visible_change: '비정식 테스트 세션을 시작했습니다.', current_scene: sceneFor(state, state.scene_id),
     committed_turn: { number: 0, log: [{ id: 0, kind: 'scene', text: 'TURN 0 · WEB MVP TEST SESSION 시작' }] }, public_state: state,
   })
