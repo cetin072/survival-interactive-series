@@ -124,6 +124,7 @@ export function PlayableTurnLoop() {
   const [stallMessage, setStallMessage] = useState<string | null>(null)
   const [selectedChoiceIds, setSelectedChoiceIds] = useState<number[]>([])
   const [choiceQueueNotice, setChoiceQueueNotice] = useState<string | null>(null)
+  const [choiceOverlayOpen, setChoiceOverlayOpen] = useState(false)
   const [turnChanges, setTurnChanges] = useState<string[]>([])
   const [textSize, setTextSize] = useState<TextSize>(loadTextSize)
   const sceneRef = useRef<HTMLElement | null>(null)
@@ -149,12 +150,22 @@ export function PlayableTurnLoop() {
     previousTurnRef.current = checkpoint.committed_turn.number
   }, [checkpoint.committed_turn.number])
 
+  useEffect(() => {
+    if (!choiceOverlayOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [choiceOverlayOpen])
+
   function applyCheckpoint(current: PublicRuntimeCheckpoint, next: PublicRuntimeCheckpoint) {
     setCheckpoint(next)
     if (next.committed_turn.number > current.committed_turn.number) {
       setStallMessage(null)
       setSelectedChoiceIds([])
       setChoiceQueueNotice(null)
+      setChoiceOverlayOpen(false)
       setTurnChanges(summarizeTurnChanges(current, next))
       return
     }
@@ -167,6 +178,7 @@ export function PlayableTurnLoop() {
     setStallMessage(null)
     setSelectedChoiceIds([])
     setChoiceQueueNotice(null)
+    setChoiceOverlayOpen(false)
     setTurnChanges([])
     setCheckpoint(resetWebMvpTestSession())
   }
@@ -232,17 +244,24 @@ export function PlayableTurnLoop() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (submitting || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return
+      if (event.key === 'Escape' && choiceOverlayOpen) {
+        setChoiceOverlayOpen(false)
+        return
+      }
       if (event.key === 'Enter' && selectedChoiceIds.length > 0) {
         event.preventDefault()
         confirmChoiceQueue()
         return
       }
       const choice = choiceForKey(event.key, checkpoint.current_scene.choices)
-      if (choice) toggleChoice(choice)
+      if (choice) {
+        setChoiceOverlayOpen(true)
+        toggleChoice(choice)
+      }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [checkpoint.current_scene.choices, selectedChoiceIds, submitting])
+  }, [checkpoint.current_scene.choices, selectedChoiceIds, submitting, choiceOverlayOpen])
 
   const selectedLabels = selectedChoiceIds.flatMap((id) => {
     const choice = checkpoint.current_scene.choices.find((item) => item.id === id)
@@ -287,24 +306,49 @@ export function PlayableTurnLoop() {
       <ul>{turnChanges.map((change) => <li key={change}>{change}</li>)}</ul>
     </section>}
     {stallMessage && <p className="test-session-notice" role="alert">{stallMessage}</p>}
-    <ChoiceButtons choices={checkpoint.current_scene.choices} selectedChoiceIds={selectedChoiceIds} maxSelections={MAX_ORDERED_CHOICES} disabled={submitting} onToggle={toggleChoice} />
-    <section className="choice-queue" aria-label="선택 실행 순서">
-      <div>
-        <strong>실행 순서 · 최대 {MAX_ORDERED_CHOICES}개</strong>
-        <span>{selectedLabels.length > 0 ? selectedLabels.map((label, index) => `${index + 1}. ${label}`).join(' → ') : '카드를 순서대로 선택하세요.'}</span>
-        {choiceQueueNotice && <em className="choice-queue-notice">{choiceQueueNotice}</em>}
-      </div>
-      <div className="choice-queue-actions">
-        <button type="button" disabled={selectedChoiceIds.length === 0 || submitting} onClick={() => { setSelectedChoiceIds([]); setChoiceQueueNotice(null) }}>전체 취소</button>
-        <button type="button" className="choice-confirm" disabled={selectedChoiceIds.length === 0 || submitting} onClick={confirmChoiceQueue}>
-          {selectedChoiceIds.length > 0 ? `선택 종료 · ${selectedChoiceIds.length}개 실행` : '선택 종료'}
-        </button>
-      </div>
-    </section>
-    <FreeActionForm onSubmit={submitFreeAction} disabled={submitting} />
+
+    <button type="button" className="choice-stage-launch" onClick={() => setChoiceOverlayOpen(true)} disabled={submitting}>
+      <span>다음 행동 선택</span>
+      <strong>{checkpoint.current_scene.choices.length}개의 선택지 · 최대 {MAX_ORDERED_CHOICES}개 조합</strong>
+    </button>
+
     {submitting && <p className="free-action-help" role="status">AI GM이 다음 장면을 작성 중…</p>}
-    <p className="free-action-help">선택지는 최대 2개까지 묶을 수 있습니다. 자유입력에 `1번` 또는 `1번 → 2번`처럼 적어도 같은 선택으로 처리됩니다.</p>
+    <p className="free-action-help">선택 화면에서 큰 카드와 자유행동을 함께 사용할 수 있습니다. `1번` 또는 `1번 → 2번` 입력도 같은 선택으로 처리됩니다.</p>
     <section className="turn-status" aria-label="현재 턴"><strong>현재 턴</strong><span>{checkpoint.committed_turn.number}</span></section>
     <GameLog entries={checkpoint.committed_turn.log} />
+
+    {choiceOverlayOpen && <div className="choice-overlay" role="dialog" aria-modal="true" aria-label="행동 선택">
+      <section className="choice-overlay-panel">
+        <header className="choice-overlay-header">
+          <div>
+            <span>TURN {checkpoint.committed_turn.number} · ACTION</span>
+            <h2>무엇을 할까?</h2>
+            <p>카드를 최대 {MAX_ORDERED_CHOICES}개까지 순서대로 고르거나, 아래에 직접 행동을 입력하세요.</p>
+          </div>
+          <button type="button" className="choice-overlay-close" onClick={() => setChoiceOverlayOpen(false)} disabled={submitting}>이야기로 돌아가기</button>
+        </header>
+
+        <ChoiceButtons choices={checkpoint.current_scene.choices} selectedChoiceIds={selectedChoiceIds} maxSelections={MAX_ORDERED_CHOICES} disabled={submitting} onToggle={toggleChoice} />
+
+        <div className="choice-free-action">
+          <FreeActionForm onSubmit={submitFreeAction} disabled={submitting} />
+        </div>
+
+        <section className="choice-queue" aria-label="선택 실행 순서">
+          <div>
+            <strong>실행 순서 · 최대 {MAX_ORDERED_CHOICES}개</strong>
+            <span>{selectedLabels.length > 0 ? selectedLabels.map((label, index) => `${index + 1}. ${label}`).join(' → ') : '카드를 순서대로 선택하세요.'}</span>
+            {choiceQueueNotice && <em className="choice-queue-notice">{choiceQueueNotice}</em>}
+          </div>
+          <div className="choice-queue-actions">
+            <button type="button" disabled={selectedChoiceIds.length === 0 || submitting} onClick={() => { setSelectedChoiceIds([]); setChoiceQueueNotice(null) }}>전체 취소</button>
+            <button type="button" className="choice-confirm" disabled={selectedChoiceIds.length === 0 || submitting} onClick={confirmChoiceQueue}>
+              {selectedChoiceIds.length > 0 ? `선택 종료 · ${selectedChoiceIds.length}개 실행` : '선택 종료'}
+            </button>
+          </div>
+        </section>
+        {submitting && <p className="choice-overlay-status" role="status">AI GM이 선택 결과와 다음 장면을 작성 중…</p>}
+      </section>
+    </div>}
   </main>
 }
