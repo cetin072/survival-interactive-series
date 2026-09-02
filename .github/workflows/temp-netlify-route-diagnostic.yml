@@ -1,0 +1,27 @@
+name: Temporary Netlify Route Diagnostic
+
+on:
+  push:
+    branches:
+      - feature/ai-gm-deepseek-provider
+    paths:
+      - '.github/workflows/temp-netlify-route-diagnostic.yml'
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Inspect preview route behavior
+        run: |
+          node <<'NODE'
+          const base='https://deploy-preview-67--survival-zero-ai-test.netlify.app'
+          for (const path of ['/api/gm','/.netlify/functions/gm']) {
+            try {
+              const r=await fetch(base+path,{method:'GET',redirect:'manual'})
+              console.log('ROUTE',JSON.stringify({path,status:r.status,url:r.url,redirected:r.redirected,location:r.headers.get('location'),allowOrigin:r.headers.get('access-control-allow-origin'),contentType:r.headers.get('content-type')}))
+            } catch (e) {
+              console.log('ROUTE_ERROR',JSON.stringify({path,name:e?.name,message:e?.message}))
+            }
+          }
+          NODE
