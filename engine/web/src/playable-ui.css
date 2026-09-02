@@ -39,6 +39,7 @@
 
 .scene-copy {
   padding: 18px;
+  scroll-margin-top: 18px;
 }
 
 .scene-narrative {
@@ -229,6 +230,7 @@
 
   .scene-copy {
     padding: 16px 14px;
+    scroll-margin-top: 12px;
   }
 
   .scene-narrative {
