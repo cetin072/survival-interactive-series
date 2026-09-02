@@ -6,6 +6,7 @@ import type { PublicRuntimeCheckpoint } from '../runtime/publicRuntimeCheckpoint
 import { runGMProviderTurn } from '../runtime/gmTurnRuntime'
 import { HttpGMProvider } from '../runtime/gmTransport'
 import { WEB_MVP_TEST_SESSION_CHECKPOINT_ID, WEB_MVP_TEST_SESSION_STORAGE_KEY, createWebMvpTestSession, resetWebMvpTestSession } from '../runtime/webMvpTestSession'
+import type { Choice } from '../types'
 import { BgmControl } from './BgmControl'
 import { ChoiceButtons } from './ChoiceButtons'
 import { FreeActionForm } from './FreeActionForm'
@@ -16,6 +17,15 @@ import { StatusPanels } from './StatusPanels'
 
 const WEB_MVP_UI_BUILD = 'AI-STORY-GM-20260902-B'
 const WEB_MVP_UI_BUILD_KEY = 'survival-web-mvp-ui-build'
+const TEXT_SIZE_KEY = 'survival-web-mvp-text-size'
+
+type TextSize = 'small' | 'normal' | 'large'
+
+function loadTextSize(): TextSize {
+  if (typeof window === 'undefined') return 'normal'
+  const saved = window.localStorage.getItem(TEXT_SIZE_KEY)
+  return saved === 'small' || saved === 'large' ? saved : 'normal'
+}
 
 function loadSession(): PublicRuntimeCheckpoint {
   if (typeof window === 'undefined') return createWebMvpTestSession()
@@ -42,30 +52,77 @@ function loadSession(): PublicRuntimeCheckpoint {
   return createWebMvpTestSession()
 }
 
+function summarizeTurnChanges(current: PublicRuntimeCheckpoint, next: PublicRuntimeCheckpoint): string[] {
+  const before = current.public_state
+  const after = next.public_state
+  const changes: string[] = []
+
+  if (before.clock.date !== after.clock.date || before.clock.time !== after.clock.time) {
+    changes.push(`시간: ${before.clock.date ?? ''} ${before.clock.time} → ${after.clock.date ?? ''} ${after.clock.time}`.trim())
+  }
+
+  for (const [id, member] of Object.entries(after.party)) {
+    const previous = before.party[id as keyof typeof before.party]
+    if (!previous) continue
+    if (previous.location !== member.location) changes.push(`${member.name} 위치: ${previous.location} → ${member.location}`)
+    if (previous.status !== member.status) changes.push(`${member.name} 상태: ${previous.status} → ${member.status}`)
+  }
+
+  for (const [id, resource] of Object.entries(after.resources)) {
+    const previous = before.resources[id]
+    if (previous && previous.band !== resource.band) changes.push(`${resource.name}: ${previous.band} → ${resource.band}`)
+  }
+
+  for (const [id, base] of Object.entries(after.bases)) {
+    const previous = before.bases[id]
+    if (!previous) continue
+    const added = base.capabilities.filter((capability) => !previous.capabilities.includes(capability))
+    for (const capability of added) changes.push(`${base.name}: ${capability} 확보`)
+  }
+
+  return changes.slice(0, 4)
+}
+
 export function PlayableTurnLoop() {
   const [checkpoint, setCheckpoint] = useState<PublicRuntimeCheckpoint>(loadSession)
   const [showPanels, setShowPanels] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [stallMessage, setStallMessage] = useState<string | null>(null)
+  const [selectedChoiceIds, setSelectedChoiceIds] = useState<number[]>([])
+  const [turnChanges, setTurnChanges] = useState<string[]>([])
+  const [textSize, setTextSize] = useState<TextSize>(loadTextSize)
   const provider = useMemo(() => new HttpGMProvider(), [])
   const snapshot = createGameSnapshot(checkpoint.public_state)
+  const narrativeParagraphs = checkpoint.current_scene.narrative
+    .split(/\n\s*\n/g)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean)
 
   useEffect(() => {
     window.localStorage.setItem(WEB_MVP_TEST_SESSION_STORAGE_KEY, JSON.stringify(checkpoint))
   }, [checkpoint])
 
+  useEffect(() => {
+    window.localStorage.setItem(TEXT_SIZE_KEY, textSize)
+  }, [textSize])
+
   function applyCheckpoint(current: PublicRuntimeCheckpoint, next: PublicRuntimeCheckpoint) {
     setCheckpoint(next)
     if (next.committed_turn.number > current.committed_turn.number) {
       setStallMessage(null)
+      setSelectedChoiceIds([])
+      setTurnChanges(summarizeTurnChanges(current, next))
       return
     }
+    setTurnChanges([])
     setStallMessage('AI GM이 이번 턴을 완료하지 못했습니다. 상태는 바뀌지 않았습니다. 같은 행동을 다시 시도해 주세요.')
   }
 
   function reset() {
     window.localStorage.removeItem(WEB_MVP_TEST_SESSION_STORAGE_KEY)
     setStallMessage(null)
+    setSelectedChoiceIds([])
+    setTurnChanges([])
     setCheckpoint(resetWebMvpTestSession())
   }
 
@@ -81,28 +138,58 @@ export function PlayableTurnLoop() {
     }
   }
 
-  function selectChoice(choiceId: number) {
-    void submitPlayerTurn({ kind: 'numbered-choice', choice_id: choiceId })
+  function toggleChoice(choice: Choice) {
+    setSelectedChoiceIds((current) => current.includes(choice.id)
+      ? current.filter((id) => id !== choice.id)
+      : [...current, choice.id])
+  }
+
+  function confirmChoiceQueue() {
+    if (selectedChoiceIds.length === 0 || submitting) return
+    if (selectedChoiceIds.length === 1) {
+      void submitPlayerTurn({ kind: 'numbered-choice', choice_id: selectedChoiceIds[0] })
+      return
+    }
+    void submitPlayerTurn({ kind: 'ordered-choices', choice_ids: selectedChoiceIds })
   }
 
   async function submitFreeAction(text: string) {
+    setSelectedChoiceIds([])
     await submitPlayerTurn({ kind: 'free-action', text })
   }
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (submitting || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return
+      if (event.key === 'Enter' && selectedChoiceIds.length > 0) {
+        event.preventDefault()
+        confirmChoiceQueue()
+        return
+      }
       const choice = choiceForKey(event.key, checkpoint.current_scene.choices)
-      if (choice) selectChoice(choice.id)
+      if (choice) toggleChoice(choice)
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [checkpoint.current_scene.choices, submitting])
+  }, [checkpoint.current_scene.choices, selectedChoiceIds, submitting])
 
-  return <main className="playable-loop" aria-label="WEB MVP TEST SESSION">
+  const selectedLabels = selectedChoiceIds.flatMap((id) => {
+    const choice = checkpoint.current_scene.choices.find((item) => item.id === id)
+    return choice ? [choice.label] : []
+  })
+
+  return <main className={`playable-loop text-size-${textSize}`} aria-label="WEB MVP TEST SESSION">
     <header className="test-session-header">
       <div><p>생존일기</p><h1>WEB MVP TEST SESSION</h1><span>NON-CANONICAL · TEST ONLY · {WEB_MVP_UI_BUILD}</span></div>
-      <div className="test-session-controls"><BgmControl /><button type="button" onClick={reset}>RESET</button></div>
+      <div className="test-session-controls">
+        <div className="text-size-control" aria-label="본문 글자 크기">
+          <button type="button" aria-pressed={textSize === 'small'} onClick={() => setTextSize('small')}>글-</button>
+          <button type="button" aria-pressed={textSize === 'normal'} onClick={() => setTextSize('normal')}>기본</button>
+          <button type="button" aria-pressed={textSize === 'large'} onClick={() => setTextSize('large')}>글+</button>
+        </div>
+        <BgmControl />
+        <button type="button" onClick={reset}>RESET</button>
+      </div>
     </header>
     <p className="test-session-notice">이 테스트 세션은 실제 S02 Canon을 수정하지 않습니다. 이야기 진행은 AI GM이 제안하고 엔진이 공개 상태 변화만 검증·확정합니다.</p>
     <SceneHeader
@@ -115,13 +202,34 @@ export function PlayableTurnLoop() {
     <p className="playable-loop-pressure">PRESSURE · {checkpoint.active_visible_pressure}</p>
     {showPanels && <StatusPanels family={snapshot.family} resources={snapshot.resources} />}
     <section className="test-base-status" aria-label="테스트 거점 능력"><strong>BASE</strong><span>{checkpoint.base_capabilities.flatMap((base) => base.capabilities).join(' · ')}</span></section>
-    <section className="scene-copy" aria-label="현재 장면"><h2>현재 장면</h2><p>{checkpoint.current_scene.narrative}</p></section>
+    <section className="scene-copy" aria-label="현재 장면">
+      <h2>현재 장면</h2>
+      <div className="scene-narrative">
+        {narrativeParagraphs.map((paragraph, index) => <p key={`${checkpoint.current_scene.id}-${index}`}>{paragraph}</p>)}
+      </div>
+    </section>
     <PresentationBlocks blocks={checkpoint.current_scene.presentation_blocks} />
+    {turnChanges.length > 0 && <section className="turn-changes" aria-label="이번 턴 변화">
+      <h2>이번 턴 변화</h2>
+      <ul>{turnChanges.map((change) => <li key={change}>{change}</li>)}</ul>
+    </section>}
     {stallMessage && <p className="test-session-notice" role="alert">{stallMessage}</p>}
-    <ChoiceButtons choices={checkpoint.current_scene.choices} disabled={submitting} onSelect={(choice) => selectChoice(choice.id)} />
+    <ChoiceButtons choices={checkpoint.current_scene.choices} selectedChoiceIds={selectedChoiceIds} disabled={submitting} onToggle={toggleChoice} />
+    <section className="choice-queue" aria-label="선택 실행 순서">
+      <div>
+        <strong>실행 순서</strong>
+        <span>{selectedLabels.length > 0 ? selectedLabels.map((label, index) => `${index + 1}. ${label}`).join(' → ') : '카드를 순서대로 선택하세요.'}</span>
+      </div>
+      <div className="choice-queue-actions">
+        <button type="button" disabled={selectedChoiceIds.length === 0 || submitting} onClick={() => setSelectedChoiceIds([])}>전체 취소</button>
+        <button type="button" className="choice-confirm" disabled={selectedChoiceIds.length === 0 || submitting} onClick={confirmChoiceQueue}>
+          {selectedChoiceIds.length > 0 ? `선택 종료 · ${selectedChoiceIds.length}개 실행` : '선택 종료'}
+        </button>
+      </div>
+    </section>
     <FreeActionForm onSubmit={submitFreeAction} disabled={submitting} />
     {submitting && <p className="free-action-help" role="status">AI GM이 다음 장면을 작성 중…</p>}
-    <p className="free-action-help">숫자 선택과 자유행동 모두 AI GM이 현재 장면과 최근 진행을 읽고 다음 이야기를 제안합니다. 상태 변화는 엔진 검증을 통과한 것만 반영됩니다.</p>
+    <p className="free-action-help">카드를 여러 개 고르면 터치한 순서대로 AI GM에게 전달됩니다. 자유행동도 계속 사용할 수 있습니다.</p>
     <section className="turn-status" aria-label="현재 턴"><strong>현재 턴</strong><span>{checkpoint.committed_turn.number}</span></section>
     <GameLog entries={checkpoint.committed_turn.log} />
   </main>
