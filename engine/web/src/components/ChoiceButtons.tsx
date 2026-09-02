@@ -4,10 +4,13 @@ type ChoiceButtonsProps = {
   choices: Choice[]
   selectedChoiceIds: number[]
   onToggle: (choice: Choice) => void
+  maxSelections?: number
   disabled?: boolean
 }
 
-export function ChoiceButtons({ choices, selectedChoiceIds, onToggle, disabled = false }: ChoiceButtonsProps) {
+export function ChoiceButtons({ choices, selectedChoiceIds, onToggle, maxSelections = 2, disabled = false }: ChoiceButtonsProps) {
+  const atLimit = selectedChoiceIds.length >= maxSelections
+
   return <section className="choices" aria-label="선택지">
     {choices.map((choice) => {
       const selectedIndex = selectedChoiceIds.indexOf(choice.id)
@@ -23,7 +26,11 @@ export function ChoiceButtons({ choices, selectedChoiceIds, onToggle, disabled =
         <span className="choice-card-index">{choice.id}</span>
         <span className="choice-card-copy">
           <strong>{choice.label}</strong>
-          <small>{selected ? `${selectedIndex + 1}순위로 실행` : '터치해서 실행 순서에 추가'}</small>
+          <small>{selected
+            ? `${selectedIndex + 1}순위로 실행`
+            : atLimit
+              ? `한 턴에 최대 ${maxSelections}개 선택`
+              : `최대 ${maxSelections}개 · 터치한 순서대로 실행`}</small>
         </span>
         {selected && <span className="choice-card-order" aria-label={`${selectedIndex + 1}순위`}>{selectedIndex + 1}</span>}
       </button>
