@@ -1,6 +1,7 @@
 import type { GMPlayerInput, GMProvider, GMProviderResult, GMProviderTurnRequest } from './gmProvider'
 
 const DEFAULT_GM_ENDPOINT = '/api/gm'
+const SAFE_UNAVAILABLE_MESSAGE = '지금은 자유행동 해석을 사용할 수 없습니다. 숫자 선택지는 계속 사용할 수 있습니다.'
 const FORBIDDEN_PUBLIC_KEYS = new Set([
   'hidden_seed',
   'hidden_world_seed',
@@ -80,7 +81,7 @@ export class HttpGMProvider implements GMProvider {
 
   async proposeTurn(request: GMProviderTurnRequest): Promise<GMProviderResult> {
     const requestCheck = validateGMTransportRequest(request)
-    if (!requestCheck.valid) return { status: 'unavailable', message: requestCheck.message }
+    if (!requestCheck.valid) return { status: 'unavailable', message: SAFE_UNAVAILABLE_MESSAGE }
 
     let response: Response
     try {
@@ -90,20 +91,20 @@ export class HttpGMProvider implements GMProvider {
         body: JSON.stringify(requestCheck.value),
       })
     } catch {
-      return { status: 'unavailable', message: 'AI GM transport request failed.' }
+      return { status: 'unavailable', message: SAFE_UNAVAILABLE_MESSAGE }
     }
 
     let payload: unknown
     try {
       payload = await response.json()
     } catch {
-      return { status: 'unavailable', message: `AI GM transport returned invalid JSON (${response.status}).` }
+      return { status: 'unavailable', message: SAFE_UNAVAILABLE_MESSAGE }
     }
 
     const parsed = validateGMTransportResponse(payload)
-    if (!parsed.valid) return { status: 'unavailable', message: parsed.message }
+    if (!parsed.valid) return { status: 'unavailable', message: SAFE_UNAVAILABLE_MESSAGE }
     if (!response.ok && parsed.value.status === 'proposal') {
-      return { status: 'unavailable', message: `AI GM transport rejected the proposal (${response.status}).` }
+      return { status: 'unavailable', message: SAFE_UNAVAILABLE_MESSAGE }
     }
     return parsed.value
   }

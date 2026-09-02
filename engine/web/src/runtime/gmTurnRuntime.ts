@@ -33,13 +33,19 @@ function fallback(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput, mes
 }
 
 function sceneFromProposal(proposal: GMProposal) {
+  const familyBlocks = proposal.family_reactions?.map((reaction) => ({
+    type: 'EVENT' as const,
+    message: `${reaction.member} · ${reaction.disposition}: ${reaction.message}`,
+  })) ?? []
   return {
     id: `gm_turn_scene`,
     narrative: proposal.narrative,
     choices: proposal.next_choices,
-    presentation_blocks: proposal.visible_reaction
-      ? [...proposal.presentation_blocks, { type: 'EVENT' as const, message: proposal.visible_reaction }]
-      : proposal.presentation_blocks,
+    presentation_blocks: [
+      ...proposal.presentation_blocks,
+      ...(proposal.visible_reaction ? [{ type: 'EVENT' as const, message: proposal.visible_reaction }] : []),
+      ...familyBlocks,
+    ],
   }
 }
 

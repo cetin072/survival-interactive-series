@@ -4,9 +4,10 @@ import { MockProvider, NullProvider } from './gmProvider'
 import { runGMProviderTurn } from './gmTurnRuntime'
 import { HttpGMProvider } from './gmTransport'
 import { createSyntheticPublicRuntimeFixture } from './syntheticPublicRuntimeFixture'
+import { createSyntheticMockProvider } from './syntheticPublicRuntimeFixture'
 
 function endpointFetch(provider?: MockProvider | NullProvider) {
-  return async (_input: RequestInfo | URL, init?: RequestInit) => handleGMRequest(new Request('https://example.test/api/gm', init), provider)
+  return async (_input: RequestInfo | URL, init?: RequestInit) => handleGMRequest(new Request('https://example.test/api/gm', init), provider ?? createSyntheticMockProvider())
 }
 
 describe('/api/gm synthetic transport', () => {

@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { choiceForKey } from '../input/action'
 import { createGameSnapshot } from '../state/snapshot'
 import type { PublicRuntimeCheckpoint } from '../runtime/publicRuntimeCheckpoint'
+import { MockProvider } from '../runtime/gmProvider'
+import { runGMProviderTurn } from '../runtime/gmTurnRuntime'
+import { HttpGMProvider } from '../runtime/gmTransport'
 import { WEB_MVP_TEST_SESSION_STORAGE_KEY, commitWebMvpChoice, createWebMvpTestSession, resetWebMvpTestSession, submitWebMvpFreeAction } from '../runtime/webMvpTestSession'
 import { BgmControl } from './BgmControl'
 import { ChoiceButtons } from './ChoiceButtons'
@@ -31,6 +34,8 @@ function loadSession(): PublicRuntimeCheckpoint {
 export function PlayableTurnLoop() {
   const [checkpoint, setCheckpoint] = useState<PublicRuntimeCheckpoint>(loadSession)
   const [showPanels, setShowPanels] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const provider = useMemo(() => new HttpGMProvider(), [])
   const snapshot = createGameSnapshot(checkpoint.public_state)
 
   useEffect(() => {
@@ -43,11 +48,28 @@ export function PlayableTurnLoop() {
   }
 
   function selectChoice(choiceId: number) {
+    if (submitting) return
     setCheckpoint((current) => commitWebMvpChoice(current, choiceId))
   }
 
-  function submitFreeAction(text: string) {
-    setCheckpoint((current) => submitWebMvpFreeAction(current, text))
+  async function submitFreeAction(text: string) {
+    if (submitting) return
+    setSubmitting(true)
+    const current = checkpoint
+    try {
+      const input = { kind: 'free-action' as const, text }
+      const result = await provider.proposeTurn({ input, checkpoint: current })
+      if (result.status === 'unavailable') {
+        // When live interpretation is unavailable, retain the Phase 2 supported parser and its safe fallback.
+        setCheckpoint(submitWebMvpFreeAction(current, text))
+        return
+      }
+      setCheckpoint(await runGMProviderTurn(current, input, new MockProvider(() => result)))
+    } catch {
+      setCheckpoint(submitWebMvpFreeAction(current, text))
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   useEffect(() => {
@@ -78,9 +100,10 @@ export function PlayableTurnLoop() {
     <section className="test-base-status" aria-label="테스트 거점 능력"><strong>TEST BASE</strong><span>{checkpoint.base_capabilities.flatMap((base) => base.capabilities).join(' · ')}</span></section>
     <section className="scene-copy" aria-label="현재 장면"><h2>현재 장면</h2><p>{checkpoint.current_scene.narrative}</p></section>
     <PresentationBlocks blocks={checkpoint.current_scene.presentation_blocks} />
-    <ChoiceButtons choices={checkpoint.current_scene.choices} onSelect={(choice) => selectChoice(choice.id)} />
-    <FreeActionForm onSubmit={submitFreeAction} />
-    <p className="free-action-help">테스트 지원 입력: “물 상태를 확인한다”, “통신 상태를 확인한다” (첫 장면). 그 외 입력은 안전하게 상태 변경 없이 기록됩니다.</p>
+    <ChoiceButtons choices={checkpoint.current_scene.choices} disabled={submitting} onSelect={(choice) => selectChoice(choice.id)} />
+    <FreeActionForm onSubmit={submitFreeAction} disabled={submitting} />
+    {submitting && <p className="free-action-help" role="status">AI 응답 중…</p>}
+    <p className="free-action-help">자유행동은 서버의 AI GM이 제안하고 엔진이 검증·커밋합니다. 연결할 수 없으면 테스트 지원 입력 또는 숫자 선택지를 계속 사용할 수 있습니다.</p>
     <section className="turn-status" aria-label="현재 턴"><strong>현재 턴</strong><span>{checkpoint.committed_turn.number}</span></section>
     <GameLog entries={checkpoint.committed_turn.log} />
   </main>

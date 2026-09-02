@@ -1,7 +1,7 @@
 import { validateGMProposal } from '../../src/runtime/gmProposal'
 import type { GMProvider } from '../../src/runtime/gmProvider'
 import { validateGMTransportRequest } from '../../src/runtime/gmTransport'
-import { createSyntheticMockProvider } from '../../src/runtime/syntheticPublicRuntimeFixture'
+import { createOpenRouterProviderFromEnvironment } from './openRouterProvider'
 
 const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8' }
 
@@ -11,9 +11,9 @@ function json(status: number, body: unknown): Response {
 
 /**
  * Testable server boundary. Production/default execution uses only the deterministic
- * synthetic MockProvider. A real paid provider is intentionally out of scope for #61.
+ * OpenRouter is selected only inside this server function when its server environment has a key.
  */
-export async function handleGMRequest(request: Request, provider: GMProvider = createSyntheticMockProvider()): Promise<Response> {
+export async function handleGMRequest(request: Request, provider: GMProvider = createOpenRouterProviderFromEnvironment()): Promise<Response> {
   if (request.method !== 'POST') {
     return json(405, { status: 'unavailable', message: 'POST /api/gm only.' })
   }
@@ -28,8 +28,7 @@ export async function handleGMRequest(request: Request, provider: GMProvider = c
   const parsedRequest = validateGMTransportRequest(payload)
   if (!parsedRequest.valid) return json(400, { status: 'unavailable', message: parsedRequest.message })
 
-  // #61 server backend is synthetic-only. Never let a real Canon checkpoint be handled
-  // by this mock transport and accidentally imply Canon world facts.
+  // This Phase 3 endpoint is intentionally limited to the non-canonical test fixture.
   if (parsedRequest.value.checkpoint.source_kind !== 'synthetic-fixture') {
     return json(503, { status: 'unavailable', message: 'Real Canon AI GM backend is not enabled.' })
   }
