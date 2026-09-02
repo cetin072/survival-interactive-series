@@ -1,6 +1,7 @@
 import type { GMPlayerInput, GMProvider, GMProviderResult, GMProviderTurnRequest } from './gmProvider'
 
 const DEFAULT_GM_ENDPOINT = '/api/gm'
+const DIRECT_NETLIFY_GM_ENDPOINT = '/.netlify/functions/gm'
 const SAFE_UNAVAILABLE_MESSAGE = '지금은 AI GM 연결을 사용할 수 없습니다.'
 const FORBIDDEN_PUBLIC_KEYS = new Set([
   'hidden_seed',
@@ -89,19 +90,30 @@ export class HttpGMProvider implements GMProvider {
     private readonly endpoint = DEFAULT_GM_ENDPOINT,
   ) {}
 
+  private post(endpoint: string, request: GMProviderTurnRequest): Promise<Response> {
+    return this.fetcher(endpoint, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(request),
+    })
+  }
+
   async proposeTurn(request: GMProviderTurnRequest): Promise<GMProviderResult> {
     const requestCheck = validateGMTransportRequest(request)
     if (!requestCheck.valid) return previewUnavailable(request, 'request_validation', requestCheck.message)
 
     let response: Response
     try {
-      response = await this.fetcher(this.endpoint, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(requestCheck.value),
-      })
+      response = await this.post(this.endpoint, requestCheck.value)
     } catch {
-      return previewUnavailable(request, 'network_error')
+      if (this.endpoint !== DEFAULT_GM_ENDPOINT) {
+        return previewUnavailable(request, 'network_error')
+      }
+      try {
+        response = await this.post(DIRECT_NETLIFY_GM_ENDPOINT, requestCheck.value)
+      } catch {
+        return previewUnavailable(request, 'network_error', 'api_and_direct_function_failed')
+      }
     }
 
     let payload: unknown
