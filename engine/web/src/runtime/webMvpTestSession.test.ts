@@ -6,7 +6,7 @@ import { commitPublicRuntimeAction } from './publicRuntimeCheckpoint'
 import { commitWebMvpChoice, createWebMvpTestSession, resetWebMvpTestSession, submitWebMvpFreeAction } from './webMvpTestSession'
 
 describe('WEB MVP TEST SESSION', () => {
-  it('renders a clearly non-canonical first playable scene', () => {
+  it('renders a clearly non-canonical story-first playable scene', () => {
     const checkpoint = createWebMvpTestSession()
     const html = renderToStaticMarkup(createElement(PlayableTurnLoop))
 
@@ -15,7 +15,9 @@ describe('WEB MVP TEST SESSION', () => {
     expect(checkpoint.current_scene.narrative).toContain('실제 S02')
     expect(html).toContain('WEB MVP TEST SESSION')
     expect(html).toContain('NON-CANONICAL')
-    expect(html).toContain('현재 장면')
+    expect(html).toContain('생존일기 이야기')
+    expect(html).toContain('어떻게 할까?')
+    expect(html).toContain('핵심 상태')
   })
 
   it('commits a numbered choice through validation and the action queue, then advances turn, scene, and log', () => {
