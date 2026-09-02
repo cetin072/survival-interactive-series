@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createSyntheticPublicRuntimeFixture } from './syntheticPublicRuntimeFixture'
+import { createWebMvpTestSession } from './webMvpTestSession'
 import { HttpGMProvider, validateGMTransportRequest, validateGMTransportResponse } from './gmTransport'
 
 describe('GM HTTP transport contract', () => {
@@ -10,6 +11,14 @@ describe('GM HTTP transport contract', () => {
     const contaminated = { ...checkpoint, hidden_seed: { event: 'secret' } }
     const result = validateGMTransportRequest({ input: { kind: 'numbered-choice', choice_id: 1 }, checkpoint: contaminated })
     expect(result.valid).toBe(false)
+  })
+
+  it('accepts the exact WEB MVP test-session checkpoint used by the browser', () => {
+    const checkpoint = createWebMvpTestSession()
+    const numbered = validateGMTransportRequest({ input: { kind: 'numbered-choice', choice_id: 1 }, checkpoint })
+    const free = validateGMTransportRequest({ input: { kind: 'free-action', text: '가족에게 먼저 전화한다' }, checkpoint })
+    expect(numbered).toEqual(expect.objectContaining({ valid: true }))
+    expect(free).toEqual(expect.objectContaining({ valid: true }))
   })
 
   it('validates transport response envelopes without trusting proposal shape', () => {
