@@ -4,7 +4,7 @@ import type { QueuedAction } from '../validator/types'
 export type GMProposal = {
   actions: QueuedAction[]
   narrative: string
-  next_choices: Array<Choice & { action: QueuedAction }>
+  next_choices: Array<Choice & { action?: QueuedAction }>
   presentation_blocks: PresentationBlock[]
   visible_reaction?: string
   ambiguity?: { kind: 'linguistic' | 'deferred'; message: string }
@@ -56,8 +56,9 @@ function isQueuedAction(value: unknown): value is QueuedAction {
       && typeof change.key === 'string' && (change.from === undefined || isJsonValue(change.from)) && isJsonValue(change.to))
 }
 
-function isChoice(value: unknown): value is Choice & { action: QueuedAction } {
-  return isObject(value) && onlyKeys(value, ['id', 'label', 'action']) && Number.isInteger(value.id) && typeof value.label === 'string' && isQueuedAction(value.action)
+function isChoice(value: unknown): value is Choice & { action?: QueuedAction } {
+  if (!isObject(value) || !onlyKeys(value, ['id', 'label', 'action']) || !Number.isInteger(value.id) || typeof value.label !== 'string') return false
+  return value.action === undefined || isQueuedAction(value.action)
 }
 
 function isPresentationBlock(value: unknown): value is PresentationBlock {
@@ -76,7 +77,7 @@ export function validateGMProposal(value: unknown): GMProposalValidation {
   if (!isObject(value) || !onlyKeys(value, ['actions', 'narrative', 'next_choices', 'presentation_blocks', 'visible_reaction', 'ambiguity', 'family_reactions'])) return { valid: false, message: 'GM proposal must be a supported object shape.' }
   if (!Array.isArray(value.actions) || !value.actions.every(isQueuedAction)) return { valid: false, message: 'GM proposal has malformed actions.' }
   if (typeof value.narrative !== 'string') return { valid: false, message: 'GM proposal needs narration.' }
-  if (!Array.isArray(value.next_choices) || !value.next_choices.every(isChoice)) return { valid: false, message: 'GM proposal has malformed next choices.' }
+  if (!Array.isArray(value.next_choices) || value.next_choices.length < 2 || value.next_choices.length > 4 || !value.next_choices.every(isChoice)) return { valid: false, message: 'GM proposal needs 2-4 valid next choices.' }
   if (!Array.isArray(value.presentation_blocks) || !value.presentation_blocks.every(isPresentationBlock)) return { valid: false, message: 'GM proposal has malformed presentation blocks.' }
   if (value.visible_reaction !== undefined && typeof value.visible_reaction !== 'string') return { valid: false, message: 'GM proposal has malformed visible reaction.' }
   if (value.ambiguity !== undefined) {
