@@ -21,6 +21,7 @@ export type GMProviderResult =
 export type GMProviderDiagnostic = {
   key_present: boolean
   failure_category?: string
+  response_fingerprint?: Record<string, boolean | number | string | string[] | undefined>
 }
 
 export interface GMProvider {

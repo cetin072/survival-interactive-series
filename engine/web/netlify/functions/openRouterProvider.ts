@@ -21,6 +21,27 @@ export type OpenRouterObservabilityEvent = {
   cost?: number
 }
 
+export type OpenRouterResponseFingerprint = {
+  top_level_type: string
+  top_level_keys?: string[]
+  error_field_present: boolean
+  choices_present: boolean
+  choices_type: string
+  choices_length?: number
+  choice_zero_present: boolean
+  choice_zero_keys?: string[]
+  message_present: boolean
+  message_type: string
+  message_keys?: string[]
+  message_content_type: string
+  output_present: boolean
+  output_type: string
+  response_id_present: boolean
+  response_model_present: boolean
+  openrouter_metadata_present: boolean
+  upstream_provider?: string
+}
+
 type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 
 export type OpenRouterProviderOptions = {
@@ -44,6 +65,36 @@ function safeUsage(value: unknown): Record<string, number> | undefined {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined
   const entries = Object.entries(value).filter(([, item]) => typeof item === 'number' && Number.isFinite(item))
   return entries.length > 0 ? Object.fromEntries(entries) : undefined
+}
+
+function valueType(value: unknown): string {
+  if (value === null) return 'null'
+  if (Array.isArray(value)) return 'array'
+  return typeof value
+}
+
+function objectKeys(value: unknown): string[] | undefined {
+  return value && typeof value === 'object' && !Array.isArray(value) ? Object.keys(value as Record<string, unknown>).sort() : undefined
+}
+
+/** Safe structural summary only. It never includes response values, content, headers, or credentials. */
+export function fingerprintOpenRouterResponse(payload: unknown, upstreamProvider?: string): OpenRouterResponseFingerprint {
+  const top = payload && typeof payload === 'object' && !Array.isArray(payload) ? payload as Record<string, unknown> : undefined
+  const choices = top?.choices
+  const choiceZero = Array.isArray(choices) ? choices[0] : undefined
+  const choice = choiceZero && typeof choiceZero === 'object' && !Array.isArray(choiceZero) ? choiceZero as Record<string, unknown> : undefined
+  const message = choice?.message
+  const messageObject = message && typeof message === 'object' && !Array.isArray(message) ? message as Record<string, unknown> : undefined
+  const metadata = top?.metadata ?? top?.openrouter_metadata
+  return {
+    top_level_type: valueType(payload), top_level_keys: objectKeys(payload), error_field_present: Boolean(top && Object.prototype.hasOwnProperty.call(top, 'error')),
+    choices_present: Boolean(top && Object.prototype.hasOwnProperty.call(top, 'choices')), choices_type: valueType(choices), choices_length: Array.isArray(choices) ? choices.length : undefined,
+    choice_zero_present: choiceZero !== undefined, choice_zero_keys: objectKeys(choiceZero), message_present: Boolean(choice && Object.prototype.hasOwnProperty.call(choice, 'message')),
+    message_type: valueType(message), message_keys: objectKeys(message), message_content_type: valueType(messageObject?.content),
+    output_present: Boolean(top && Object.prototype.hasOwnProperty.call(top, 'output')), output_type: valueType(top?.output),
+    response_id_present: typeof top?.id === 'string', response_model_present: typeof top?.model === 'string',
+    openrouter_metadata_present: metadata !== undefined, upstream_provider: upstreamProvider,
+  }
 }
 
 function publicGMContext(request: GMProviderTurnRequest) {
@@ -196,6 +247,7 @@ export class OpenRouterProvider implements GMProvider {
 
     let retryCount = 0
     let lastFailure: FailureCategory = 'network'
+    let lastFingerprint: OpenRouterResponseFingerprint | undefined
     for (let attempt = 0; attempt < OPENROUTER_MAX_ATTEMPTS; attempt += 1) {
       try {
         const response = await fetchWithTimeout(this.fetchImpl, body, this.apiKey, this.timeoutMs)
@@ -212,6 +264,11 @@ export class OpenRouterProvider implements GMProvider {
         } catch {
           throw new ProviderFailure('malformed_json')
         }
+        const metadata = payload && typeof payload === 'object' && !Array.isArray(payload) ? payload as { usage?: unknown; provider?: unknown } : undefined
+        const upstream = response.headers.get('x-openrouter-provider') ?? (typeof metadata?.provider === 'string' ? metadata.provider : undefined)
+        const fingerprint = fingerprintOpenRouterResponse(payload, upstream)
+        lastFingerprint = fingerprint
+        if (fingerprint.error_field_present) throw new ProviderFailure('unsupported_response_shape')
         const content = payload && typeof payload === 'object' && !Array.isArray(payload)
           ? (payload as { choices?: Array<{ message?: { content?: unknown } }> }).choices?.[0]?.message?.content
           : undefined
@@ -223,16 +280,14 @@ export class OpenRouterProvider implements GMProvider {
           throw new ProviderFailure('malformed_json')
         }
         const schema = validateGMProposal(proposal)
-        const metadata = payload as { usage?: unknown; provider?: unknown; model?: unknown }
-        const upstream = response.headers.get('x-openrouter-provider') ?? (typeof metadata.provider === 'string' ? metadata.provider : undefined)
-        const usage = safeUsage(metadata.usage)
+        const usage = safeUsage(metadata?.usage)
         const cost = usage?.cost
         if (!schema.valid) {
           this.observe({ request_id: requestId, model: OPENROUTER_DEEPSEEK_MODEL, upstream_provider: upstream, latency_ms: Date.now() - startedAt, retry_count: retryCount, success: false, failure_category: 'schema_mismatch', schema_validation: 'failed', usage, cost })
-          return { status: 'unavailable', message: messageFor('schema_mismatch'), diagnostic: { key_present: true, failure_category: 'schema_mismatch' } }
+          return { status: 'unavailable', message: messageFor('schema_mismatch'), diagnostic: { key_present: true, failure_category: 'schema_mismatch', response_fingerprint: fingerprint } }
         }
         this.observe({ request_id: requestId, model: OPENROUTER_DEEPSEEK_MODEL, upstream_provider: upstream, latency_ms: Date.now() - startedAt, retry_count: retryCount, success: true, schema_validation: 'passed', usage, cost })
-        return { status: 'proposal', proposal: schema.proposal, diagnostic: { key_present: true } }
+        return { status: 'proposal', proposal: schema.proposal, diagnostic: { key_present: true, response_fingerprint: fingerprint } }
       } catch (error) {
         lastFailure = error instanceof ProviderFailure ? error.category : 'network'
         if (!shouldRetry(lastFailure) || attempt + 1 >= OPENROUTER_MAX_ATTEMPTS) break
@@ -240,7 +295,7 @@ export class OpenRouterProvider implements GMProvider {
       }
     }
     this.observe({ request_id: requestId, model: OPENROUTER_DEEPSEEK_MODEL, latency_ms: Date.now() - startedAt, retry_count: retryCount, success: false, failure_category: lastFailure, schema_validation: 'not_run' })
-    return { status: 'unavailable', message: messageFor(lastFailure), diagnostic: { key_present: true, failure_category: lastFailure } }
+    return { status: 'unavailable', message: messageFor(lastFailure), diagnostic: { key_present: true, failure_category: lastFailure, response_fingerprint: lastFingerprint } }
   }
 }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { OpenRouterProvider, OPENROUTER_DEEPSEEK_MODEL, OPENROUTER_MAX_ATTEMPTS, type OpenRouterObservabilityEvent } from '../../netlify/functions/openRouterProvider'
+import { fingerprintOpenRouterResponse, OpenRouterProvider, OPENROUTER_DEEPSEEK_MODEL, OPENROUTER_MAX_ATTEMPTS, type OpenRouterObservabilityEvent } from '../../netlify/functions/openRouterProvider'
 import { runGMProviderTurn } from './gmTurnRuntime'
 import { createWebMvpTestSession } from './webMvpTestSession'
 
@@ -91,6 +91,26 @@ describe('OpenRouterProvider', () => {
       expect(result.status).toBe('unavailable')
       const next = await runGMProviderTurn(checkpoint, { kind: 'free-action', text: '통신 상태를 확인한다' }, provider)
       expect(next.public_state).toEqual(checkpoint.public_state)
+    }
+  })
+
+  it('records a structural-only fingerprint for a documented-shape variant without retaining response content', () => {
+    const fingerprint = fingerprintOpenRouterResponse({ id: 'safe-id', model: 'safe-model', choices: [{ message: { role: 'assistant', content: null } }], metadata: { provider: 'safe-provider' } }, 'safe-provider')
+    expect(fingerprint).toMatchObject({ top_level_keys: ['choices', 'id', 'metadata', 'model'], choices_type: 'array', choices_length: 1, choice_zero_keys: ['message'], message_type: 'object', message_keys: ['content', 'role'], message_content_type: 'null', response_id_present: true, response_model_present: true, openrouter_metadata_present: true, upstream_provider: 'safe-provider' })
+    expect(JSON.stringify(fingerprint)).not.toContain('safe-id')
+    expect(JSON.stringify(fingerprint)).not.toContain('safe-model')
+  })
+
+  it('rejects a 200 error envelope and unknown object content without schema validation or commit', async () => {
+    const checkpoint = createWebMvpTestSession()
+    const payloads = [
+      { error: { message: 'not retained' } },
+      { choices: [{ message: { content: { unexpected: true } } }] },
+    ]
+    for (const payload of payloads) {
+      const provider = new OpenRouterProvider({ apiKey: 'test-key', observe: () => {}, fetchImpl: async () => new Response(JSON.stringify(payload), { status: 200 }) })
+      const result = await provider.proposeTurn({ input: { kind: 'free-action', text: '통신 상태를 확인한다' }, checkpoint })
+      expect(result).toMatchObject({ status: 'unavailable', diagnostic: { key_present: true, failure_category: 'unsupported_response_shape' } })
     }
   })
 
