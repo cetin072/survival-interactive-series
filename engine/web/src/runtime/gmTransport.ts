@@ -1,7 +1,7 @@
 import type { GMPlayerInput, GMProvider, GMProviderResult, GMProviderTurnRequest } from './gmProvider'
 
 const DEFAULT_GM_ENDPOINT = '/api/gm'
-const SAFE_UNAVAILABLE_MESSAGE = '지금은 자유행동 해석을 사용할 수 없습니다. 숫자 선택지는 계속 사용할 수 있습니다.'
+const SAFE_UNAVAILABLE_MESSAGE = '지금은 AI GM 연결을 사용할 수 없습니다.'
 const FORBIDDEN_PUBLIC_KEYS = new Set([
   'hidden_seed',
   'hidden_world_seed',
@@ -23,6 +23,16 @@ function containsForbiddenPublicKey(value: unknown): boolean {
   if (Array.isArray(value)) return value.some(containsForbiddenPublicKey)
   if (!isObject(value)) return false
   return Object.entries(value).some(([key, child]) => FORBIDDEN_PUBLIC_KEYS.has(key.toLowerCase()) || containsForbiddenPublicKey(child))
+}
+
+function previewUnavailable(request: GMProviderTurnRequest, category: string, detail?: string): GMProviderResult {
+  if (request.checkpoint.source_kind === 'synthetic-fixture') {
+    return {
+      status: 'unavailable',
+      message: `AI GM transport 진단: ${category}${detail ? ` · ${detail}` : ''}`,
+    }
+  }
+  return { status: 'unavailable', message: SAFE_UNAVAILABLE_MESSAGE }
 }
 
 function validatePlayerInput(value: unknown): value is GMPlayerInput {
@@ -81,7 +91,7 @@ export class HttpGMProvider implements GMProvider {
 
   async proposeTurn(request: GMProviderTurnRequest): Promise<GMProviderResult> {
     const requestCheck = validateGMTransportRequest(request)
-    if (!requestCheck.valid) return { status: 'unavailable', message: SAFE_UNAVAILABLE_MESSAGE }
+    if (!requestCheck.valid) return previewUnavailable(request, 'request_validation', requestCheck.message)
 
     let response: Response
     try {
@@ -91,20 +101,20 @@ export class HttpGMProvider implements GMProvider {
         body: JSON.stringify(requestCheck.value),
       })
     } catch {
-      return { status: 'unavailable', message: SAFE_UNAVAILABLE_MESSAGE }
+      return previewUnavailable(request, 'network_error')
     }
 
     let payload: unknown
     try {
       payload = await response.json()
     } catch {
-      return { status: 'unavailable', message: SAFE_UNAVAILABLE_MESSAGE }
+      return previewUnavailable(request, 'invalid_json', `HTTP ${response.status}`)
     }
 
     const parsed = validateGMTransportResponse(payload)
-    if (!parsed.valid) return { status: 'unavailable', message: SAFE_UNAVAILABLE_MESSAGE }
+    if (!parsed.valid) return previewUnavailable(request, 'malformed_response', parsed.message)
     if (!response.ok && parsed.value.status === 'proposal') {
-      return { status: 'unavailable', message: SAFE_UNAVAILABLE_MESSAGE }
+      return previewUnavailable(request, 'http_rejected', `HTTP ${response.status}`)
     }
     return parsed.value
   }
