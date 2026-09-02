@@ -2,7 +2,7 @@ import type { PublicRuntimeCheckpoint } from './publicRuntimeCheckpoint'
 
 export type GMPlayerInput =
   | { kind: 'numbered-choice'; choice_id: number }
-  | { kind: 'ordered-choices'; choice_ids: number[] }
+  | { kind: 'ordered-choices'; choice_ids: number[]; choice_id?: number }
   | { kind: 'free-action'; text: string }
 
 export type GMProviderTurnRequest = {
