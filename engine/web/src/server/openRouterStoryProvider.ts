@@ -25,17 +25,29 @@ function scrub(value: unknown): unknown {
 function publicContext(request: GMProviderTurnRequest) {
   const checkpoint = request.checkpoint
   const input = request.input
-  const choiceId = input.kind === 'numbered-choice' ? input.choice_id : undefined
-  const selected = choiceId !== undefined
-    ? checkpoint.current_scene.choices.find((choice) => choice.id === choiceId)
-    : undefined
   const nextTurn = checkpoint.committed_turn.number + 1
+  const choiceById = (choiceId: number) => checkpoint.current_scene.choices.find((choice) => choice.id === choiceId)
+
+  const playerAction = input.kind === 'free-action'
+    ? { kind: 'free-action', text: input.text }
+    : input.kind === 'ordered-choices'
+      ? {
+          kind: 'ordered-choices',
+          ordered: input.choice_ids.map((choiceId, index) => ({
+            order: index + 1,
+            id: choiceId,
+            label: choiceById(choiceId)?.label ?? null,
+          })),
+        }
+      : {
+          kind: 'numbered-choice',
+          id: input.choice_id,
+          label: choiceById(input.choice_id)?.label ?? null,
+        }
 
   return {
     turn: nextTurn,
-    player_action: input.kind === 'free-action'
-      ? { kind: 'free-action', text: input.text }
-      : { kind: 'numbered-choice', id: choiceId, label: selected?.label ?? null },
+    player_action: playerAction,
     scene: checkpoint.current_scene.narrative,
     choices: checkpoint.current_scene.choices.map((choice) => ({ id: choice.id, label: choice.label })),
     recent_history: checkpoint.committed_turn.log.slice(-8).map((entry) => ({ kind: entry.kind, text: entry.text })),
@@ -54,25 +66,37 @@ function publicContext(request: GMProviderTurnRequest) {
   }
 }
 
-const SYSTEM_PROMPT = `너는 현대 한국 배경 생존 RPG의 서사형 AI GM이다.
-플레이어가 숫자 선택지를 눌러도, 자유행동을 입력해도 매 턴 반드시 직전 장면을 이어서 한국어 이야기로 진행한다.
-목표는 웹소설처럼 자연스럽게 읽히는 몰입감이다. 체크리스트, 테스트, 매크로처럼 쓰지 마라.
-플레이어 행동의 결과 -> 가족/주변 반응 -> 새로 생긴 압력이나 기회가 자연스럽게 이어져야 한다.
+const SYSTEM_PROMPT = `너는 현대 한국 배경 생존 RPG 《생존일기》의 서사형 AI GM이다.
+플레이어가 숫자 선택지를 눌러도, 여러 선택지를 순서대로 묶어도, 자유행동을 입력해도 매 턴 반드시 직전 장면을 이어서 한국어 이야기로 진행한다.
+목표는 웹소설처럼 자연스럽게 읽히면서도 실제 플레이가 한 턴마다 분명히 앞으로 나아가는 것이다. 체크리스트, 테스트, 매크로처럼 쓰지 마라.
+
+매 턴 서사의 우선순위:
+1. 플레이어 행동이 실제로 무엇을 바꿨는지
+2. 가족/주변 사람이 어떻게 판단하고 반응했는지
+3. 자원·관계·세계에서 의미 있는 변화가 생겼는지
+4. 새 정보·압력·기회가 무엇인지
+5. 다음 선택이 왜 필요한지
+6. 판단에 필요한 최소한의 환경 묘사
+
+환경·날씨·빛·소리 묘사는 행동의 위험, 판단, 시간 압박에 영향을 줄 때만 쓴다. 분위기만 위한 장식적 환경묘사는 한 턴에 최대 1문장 정도로 제한한다.
+플레이어 행동을 한두 문장으로 요약하고 끝내지 마라. 한 턴 안에서 최소 두 개 이상의 의미 있는 진행 비트가 일어나야 한다.
 가족은 독립적인 판단을 가진다. 동의, 수정 제안, 보류, 거절, 독립 행동이 가능하다.
 아무 일 없는 관망은 압축한다. 리듬은 위기 -> 적응 -> 눈에 보이는 성장/보상 -> 새로운 압력을 지향한다.
+ordered-choices가 들어오면 플레이어가 터치한 순서를 의도로 존중한다. 동시에 성립할 수 없으면 멋대로 순서를 바꾸지 말고, 가능한 부분만 진행하거나 충돌/대안을 서사에 드러낸다.
 숨겨진 사실, Canon 변경, Hidden Seed, raw transcript를 만들거나 요구하지 마라. 가족을 NPC라고 부르지 마라.
 
 반드시 JSON 객체 하나만 출력한다. 코드펜스나 설명문은 붙이지 마라.
 형식:
 {
   "actions": [],
-  "narrative": "3~5문장의 자연스러운 다음 장면",
+  "narrative": "3~5개의 짧은 문단으로 구성된 다음 장면. 총 6~10문장 정도. 문단 사이는 빈 줄로 구분한다.",
   "next_choices": [{"id":1,"label":"..."},{"id":2,"label":"..."}],
   "presentation_blocks": [],
   "family_reactions": []
 }
 
 규칙:
+- narrative는 결과 -> 반응 -> 의미 있는 변화/새 압력의 흐름을 갖는다. 길이를 늘리기 위해 배경 묘사를 반복하지 않는다.
 - next_choices는 2~4개이며 미래 선택지 텍스트만 쓴다. action을 넣지 않는다.
 - actions는 이번 턴에 즉시 필요한 상태 변경만 0~2개 제안한다. 서사만 진행되어도 되면 빈 배열이 낫다.
 - action이 필요할 때만 정확히 다음 형식을 쓴다:
@@ -80,7 +104,7 @@ const SYSTEM_PROMPT = `너는 현대 한국 배경 생존 RPG의 서사형 AI GM
 - from 값은 현재 공개 상태와 정확히 일치할 때만 사용한다. 확신이 없으면 해당 상태변경을 actions에 넣지 않는다.
 - presentation_blocks는 0~2개, type은 EVENT/AUTO/PHASE CHANGE 중 하나다.
 - family_reactions는 필요한 가족만 0~3개. member는 wife/son/father, disposition은 agree/amend/defer/decline/independent_action 중 하나다.
-- 전체 JSON은 짧게 유지하되 narrative 자체는 장면이 그려질 정도로 충분히 자연스럽게 쓴다.`
+- 전체 JSON은 구조적으로 간결하게 유지하되 narrative는 플레이어가 다음 장면을 기다릴 만큼 충분히 진행시킨다.`
 
 function parseJsonObject(content: string): unknown | undefined {
   const trimmed = content.trim()
