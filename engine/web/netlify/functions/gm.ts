@@ -1,7 +1,7 @@
 import { validateGMProposal } from '../../src/runtime/gmProposal'
 import type { GMProvider } from '../../src/runtime/gmProvider'
 import { validateGMTransportRequest } from '../../src/runtime/gmTransport'
-import { createOpenRouterProviderFromEnvironment } from './openRouterProvider'
+import { createOpenRouterStoryProviderFromEnvironment } from '../../src/server/openRouterStoryProvider'
 
 const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8' }
 
@@ -20,13 +20,10 @@ function previewDiagnostic(
   return result.diagnostic
 }
 
-/**
- * Testable server boundary. Production/default execution uses only the deterministic
- * OpenRouter is selected only inside this server function when its server environment has a key.
- */
+/** Server boundary: AI proposes a story turn; browser engine remains authoritative. */
 export async function handleGMRequest(
   request: Request,
-  provider: GMProvider = createOpenRouterProviderFromEnvironment(),
+  provider: GMProvider = createOpenRouterStoryProviderFromEnvironment(),
   deployContext?: string,
 ): Promise<Response> {
   if (request.method !== 'POST') {
@@ -43,7 +40,7 @@ export async function handleGMRequest(
   const parsedRequest = validateGMTransportRequest(payload)
   if (!parsedRequest.valid) return json(400, { status: 'unavailable', message: parsedRequest.message })
 
-  // This Phase 3 endpoint is intentionally limited to the non-canonical test fixture.
+  // The live MVP endpoint remains intentionally limited to the non-canonical test session.
   if (parsedRequest.value.checkpoint.source_kind !== 'synthetic-fixture') {
     return json(503, { status: 'unavailable', message: 'Real Canon AI GM backend is not enabled.' })
   }
@@ -69,5 +66,5 @@ export async function handleGMRequest(
 }
 
 export default function gm(request: Request, context: NetlifyRequestContext): Promise<Response> {
-  return handleGMRequest(request, createOpenRouterProviderFromEnvironment(), context.deploy?.context)
+  return handleGMRequest(request, createOpenRouterStoryProviderFromEnvironment(), context.deploy?.context)
 }
