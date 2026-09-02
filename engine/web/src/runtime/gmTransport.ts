@@ -42,7 +42,7 @@ function validatePlayerInput(value: unknown): value is GMPlayerInput {
   if (!isObject(value)) return false
   if (value.kind === 'numbered-choice') return Number.isInteger(value.choice_id) && Number(value.choice_id) > 0
   if (value.kind === 'ordered-choices') {
-    if (!Array.isArray(value.choice_ids) || value.choice_ids.length < 1 || value.choice_ids.length > 4) return false
+    if (!Array.isArray(value.choice_ids) || value.choice_ids.length < 1 || value.choice_ids.length > 2) return false
     if (!value.choice_ids.every((id) => Number.isInteger(id) && Number(id) > 0)) return false
     return new Set(value.choice_ids.map(Number)).size === value.choice_ids.length
   }
