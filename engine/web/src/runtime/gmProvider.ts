@@ -11,8 +11,17 @@ export type GMProviderTurnRequest = {
 
 /** Provider output is deliberately untrusted until the GM runtime validates its proposal shape. */
 export type GMProviderResult =
-  | { status: 'proposal'; proposal: unknown }
-  | { status: 'unavailable'; message: string }
+  | { status: 'proposal'; proposal: unknown; diagnostic?: GMProviderDiagnostic }
+  | { status: 'unavailable'; message: string; diagnostic?: GMProviderDiagnostic }
+
+/**
+ * Server-generated, non-secret diagnostics. These are intentionally optional so
+ * browser/runtime callers do not depend on provider implementation details.
+ */
+export type GMProviderDiagnostic = {
+  key_present: boolean
+  failure_category?: string
+}
 
 export interface GMProvider {
   proposeTurn(request: GMProviderTurnRequest): Promise<GMProviderResult>

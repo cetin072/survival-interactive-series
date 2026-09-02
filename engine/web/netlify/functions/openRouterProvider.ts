@@ -1,12 +1,12 @@
 import { validateGMProposal } from '../../src/runtime/gmProposal'
-import { NullProvider, type GMProvider, type GMProviderResult, type GMProviderTurnRequest } from '../../src/runtime/gmProvider'
+import type { GMProvider, GMProviderResult, GMProviderTurnRequest } from '../../src/runtime/gmProvider'
 
 export const OPENROUTER_DEEPSEEK_MODEL = 'deepseek/deepseek-v4-flash-0731'
 export const OPENROUTER_CHAT_COMPLETIONS_URL = 'https://openrouter.ai/api/v1/chat/completions'
 export const OPENROUTER_TIMEOUT_MS = 12_000
 export const OPENROUTER_MAX_ATTEMPTS = 2
 
-type FailureCategory = 'missing_key' | 'timeout' | 'network' | 'auth_or_config' | 'route_unavailable' | 'upstream_5xx' | 'malformed_json' | 'unsupported_response_shape' | 'schema_mismatch'
+export type FailureCategory = 'missing_key' | 'timeout' | 'network' | 'auth_or_config' | 'route_unavailable' | 'upstream_5xx' | 'malformed_json' | 'unsupported_response_shape' | 'schema_mismatch'
 
 export type OpenRouterObservabilityEvent = {
   request_id: string
@@ -180,7 +180,7 @@ export class OpenRouterProvider implements GMProvider {
     const startedAt = Date.now()
     if (!this.apiKey) {
       this.observe({ request_id: requestId, model: OPENROUTER_DEEPSEEK_MODEL, latency_ms: 0, retry_count: 0, success: false, failure_category: 'missing_key', schema_validation: 'not_run' })
-      return { status: 'unavailable', message: messageFor('missing_key') }
+      return { status: 'unavailable', message: messageFor('missing_key'), diagnostic: { key_present: false, failure_category: 'missing_key' } }
     }
 
     const body = {
@@ -229,10 +229,10 @@ export class OpenRouterProvider implements GMProvider {
         const cost = usage?.cost
         if (!schema.valid) {
           this.observe({ request_id: requestId, model: OPENROUTER_DEEPSEEK_MODEL, upstream_provider: upstream, latency_ms: Date.now() - startedAt, retry_count: retryCount, success: false, failure_category: 'schema_mismatch', schema_validation: 'failed', usage, cost })
-          return { status: 'unavailable', message: messageFor('schema_mismatch') }
+          return { status: 'unavailable', message: messageFor('schema_mismatch'), diagnostic: { key_present: true, failure_category: 'schema_mismatch' } }
         }
         this.observe({ request_id: requestId, model: OPENROUTER_DEEPSEEK_MODEL, upstream_provider: upstream, latency_ms: Date.now() - startedAt, retry_count: retryCount, success: true, schema_validation: 'passed', usage, cost })
-        return { status: 'proposal', proposal: schema.proposal }
+        return { status: 'proposal', proposal: schema.proposal, diagnostic: { key_present: true } }
       } catch (error) {
         lastFailure = error instanceof ProviderFailure ? error.category : 'network'
         if (!shouldRetry(lastFailure) || attempt + 1 >= OPENROUTER_MAX_ATTEMPTS) break
@@ -240,12 +240,12 @@ export class OpenRouterProvider implements GMProvider {
       }
     }
     this.observe({ request_id: requestId, model: OPENROUTER_DEEPSEEK_MODEL, latency_ms: Date.now() - startedAt, retry_count: retryCount, success: false, failure_category: lastFailure, schema_validation: 'not_run' })
-    return { status: 'unavailable', message: messageFor(lastFailure) }
+    return { status: 'unavailable', message: messageFor(lastFailure), diagnostic: { key_present: true, failure_category: lastFailure } }
   }
 }
 
 export function createOpenRouterProviderFromEnvironment(): GMProvider {
   const environment = (globalThis as unknown as { process?: { env?: Record<string, string | undefined> } }).process?.env
   const apiKey = environment?.OPENROUTER_API_KEY
-  return apiKey ? new OpenRouterProvider({ apiKey }) : new NullProvider(messageFor('missing_key'))
+  return new OpenRouterProvider({ apiKey })
 }

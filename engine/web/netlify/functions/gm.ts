@@ -9,11 +9,26 @@ function json(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), { status, headers: JSON_HEADERS })
 }
 
+type NetlifyRequestContext = { deploy?: { context?: string } }
+
+function previewDiagnostic(
+  sourceKind: string,
+  deployContext: string | undefined,
+  result: Awaited<ReturnType<GMProvider['proposeTurn']>>,
+) {
+  if (sourceKind !== 'synthetic-fixture' || deployContext !== 'deploy-preview') return undefined
+  return result.diagnostic
+}
+
 /**
  * Testable server boundary. Production/default execution uses only the deterministic
  * OpenRouter is selected only inside this server function when its server environment has a key.
  */
-export async function handleGMRequest(request: Request, provider: GMProvider = createOpenRouterProviderFromEnvironment()): Promise<Response> {
+export async function handleGMRequest(
+  request: Request,
+  provider: GMProvider = createOpenRouterProviderFromEnvironment(),
+  deployContext?: string,
+): Promise<Response> {
   if (request.method !== 'POST') {
     return json(405, { status: 'unavailable', message: 'POST /api/gm only.' })
   }
@@ -40,14 +55,19 @@ export async function handleGMRequest(request: Request, provider: GMProvider = c
     return json(500, { status: 'unavailable', message: 'AI GM backend failed.' })
   }
 
-  if (result.status === 'unavailable') return json(503, result)
+  const diagnostic = previewDiagnostic(parsedRequest.value.checkpoint.source_kind, deployContext, result)
+  if (result.status === 'unavailable') {
+    return json(503, diagnostic ? { status: result.status, message: result.message, diagnostic } : { status: result.status, message: result.message })
+  }
 
   const proposal = validateGMProposal(result.proposal)
   if (!proposal.valid) {
     return json(502, { status: 'unavailable', message: `AI GM backend returned malformed proposal: ${proposal.message}` })
   }
 
-  return json(200, { status: 'proposal', proposal: proposal.proposal })
+  return json(200, diagnostic ? { status: 'proposal', proposal: proposal.proposal, diagnostic } : { status: 'proposal', proposal: proposal.proposal })
 }
 
-export default handleGMRequest
+export default function gm(request: Request, context: NetlifyRequestContext): Promise<Response> {
+  return handleGMRequest(request, createOpenRouterProviderFromEnvironment(), context.deploy?.context)
+}

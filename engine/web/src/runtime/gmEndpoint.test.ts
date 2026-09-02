@@ -43,6 +43,20 @@ describe('/api/gm synthetic transport', () => {
     expect(next.committed_turn.number).toBe(0)
   })
 
+  it('returns only safe diagnostics for synthetic deploy-preview requests', async () => {
+    const initial = createSyntheticPublicRuntimeFixture()
+    const unavailable = new MockProvider(() => ({ status: 'unavailable' as const, message: 'safe', diagnostic: { key_present: true, failure_category: 'auth_or_config' } }))
+    const preview = await handleGMRequest(new Request('https://example.test/api/gm', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ input: { kind: 'free-action', text: '통신 상태를 확인한다' }, checkpoint: initial }),
+    }), unavailable, 'deploy-preview')
+    expect(await preview.json()).toEqual({ status: 'unavailable', message: 'safe', diagnostic: { key_present: true, failure_category: 'auth_or_config' } })
+
+    const production = await handleGMRequest(new Request('https://example.test/api/gm', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ input: { kind: 'free-action', text: '통신 상태를 확인한다' }, checkpoint: initial }),
+    }), unavailable, 'production')
+    expect(await production.json()).toEqual({ status: 'unavailable', message: 'safe' })
+  })
+
   it('rejects malformed backend proposal before it reaches the browser engine', async () => {
     const initial = createSyntheticPublicRuntimeFixture()
     const malformed = new MockProvider(() => ({ status: 'proposal', proposal: { actions: 'bad' } }))
