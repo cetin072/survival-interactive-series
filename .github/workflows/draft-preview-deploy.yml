@@ -1,0 +1,67 @@
+name: Temporary Draft Preview Deploy
+
+on:
+  push:
+    branches:
+      - feature/ai-gm-deepseek-provider
+    paths:
+      - '.github/workflows/draft-preview-deploy.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy-draft-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: 9bae31a6-7305-44c3-afc0-3feac82d1bfa
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Refuse to deploy without Netlify auth
+        shell: bash
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ]; then
+            echo "NETLIFY_AUTH_TOKEN is not configured in GitHub Actions secrets."
+            exit 2
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: engine/web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: engine/web
+        run: npm ci
+
+      - name: Build web app
+        working-directory: engine/web
+        run: npm run build
+
+      - name: Deploy Draft Preview only
+        shell: bash
+        run: |
+          npx -y netlify-cli@latest deploy \
+            --context deploy-preview \
+            --dir engine/web/dist \
+            --functions engine/web/netlify/functions \
+            --alias mvp-turn-loop-fix \
+            --site "$NETLIFY_SITE_ID" \
+            --auth "$NETLIFY_AUTH_TOKEN" \
+            --message "MVP turn-loop fix preview" \
+            --no-build \
+            --json | tee netlify-draft-deploy.json
+
+          node -e "const fs=require('fs'); const x=JSON.parse(fs.readFileSync('netlify-draft-deploy.json','utf8')); console.log('DRAFT_PREVIEW_URL='+(x.deploy_url||x.deploy_ssl_url||x.url||''));"
+
+      - name: Safety assertion
+        shell: bash
+        run: |
+          if grep -R -- '--prod\|--prod-if-unlocked' .github/workflows/draft-preview-deploy.yml; then
+            echo "Production deploy flag detected."
+            exit 3
+          fi
