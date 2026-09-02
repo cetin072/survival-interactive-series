@@ -63,7 +63,6 @@ jobs:
         run: |
           npx -y netlify-cli@latest deploy \
             --allow-anonymous \
-            --context deploy-preview \
             --dir engine/web/dist \
             --functions tmp-preview-functions \
             --message "Temporary MVP turn-loop human playtest" \
