@@ -45,6 +45,12 @@ describe('OpenRouterProvider', () => {
     expect(result).toMatchObject({ status: 'unavailable' })
   })
 
+  it('does not let an observability failure reject a valid proposal', async () => {
+    const provider = new OpenRouterProvider({ apiKey: 'test-key', observe: () => { throw new Error('logging unavailable') }, fetchImpl: async () => completion(validProposal()) })
+    const result = await provider.proposeTurn({ input: { kind: 'free-action', text: '통신 상태를 확인한다' }, checkpoint: createWebMvpTestSession() })
+    expect(result.status).toBe('proposal')
+  })
+
   it('retries a transient network failure no more than once, then safely falls back', async () => {
     const events: OpenRouterObservabilityEvent[] = []
     let calls = 0

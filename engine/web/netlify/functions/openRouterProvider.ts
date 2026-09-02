@@ -165,7 +165,14 @@ export class OpenRouterProvider implements GMProvider {
     this.apiKey = options.apiKey
     this.fetchImpl = options.fetchImpl ?? fetch
     this.timeoutMs = options.timeoutMs ?? OPENROUTER_TIMEOUT_MS
-    this.observe = options.observe ?? ((event) => console.info('gm_openrouter', event))
+    const report = options.observe ?? ((event: OpenRouterObservabilityEvent) => console.info('gm_openrouter', event))
+    this.observe = (event) => {
+      try {
+        report(event)
+      } catch {
+        // Observability must never turn a valid GM response into an endpoint failure.
+      }
+    }
   }
 
   async proposeTurn(request: GMProviderTurnRequest): Promise<GMProviderResult> {
