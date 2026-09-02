@@ -1,10 +1,10 @@
 [build]
   base = "engine/web"
   command = "npm run build"
-  publish = "engine/web/dist"
+  publish = "dist"
 
 [functions]
-  directory = "engine/web/netlify/functions"
+  directory = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "22"
