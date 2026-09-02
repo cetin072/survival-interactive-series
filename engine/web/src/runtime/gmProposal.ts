@@ -57,7 +57,8 @@ function isQueuedAction(value: unknown): value is QueuedAction {
 }
 
 function isChoice(value: unknown): value is Choice & { action?: QueuedAction } {
-  if (!isObject(value) || !onlyKeys(value, ['id', 'label', 'action']) || !Number.isInteger(value.id) || typeof value.label !== 'string') return false
+  if (!isObject(value) || !onlyKeys(value, ['id', 'label', 'description', 'action']) || !Number.isInteger(value.id) || typeof value.label !== 'string') return false
+  if (value.description !== undefined && typeof value.description !== 'string') return false
   return value.action === undefined || isQueuedAction(value.action)
 }
 
