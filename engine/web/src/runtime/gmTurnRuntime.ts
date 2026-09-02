@@ -44,10 +44,7 @@ function fallback(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput, mes
   const logId = preservedLog.length
   return createPublicRuntimeCheckpoint({
     ...checkpoint,
-    current_scene: {
-      ...checkpoint.current_scene,
-      narrative: `${message} 상태를 바꾸지 않았습니다. 같은 행동을 다시 시도할 수 있습니다.`,
-    },
+    current_scene: checkpoint.current_scene,
     committed_turn: {
       ...checkpoint.committed_turn,
       log: [...preservedLog, inputLog(checkpoint, input, logId), { id: logId + 1, kind: 'system', text: message }],
