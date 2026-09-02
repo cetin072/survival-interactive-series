@@ -9,7 +9,10 @@ function advanceToTurn(target: number, firstChoice: number) {
   const narratives = new Set([checkpoint.current_scene.narrative])
   while (checkpoint.committed_turn.number < target) {
     const before = checkpoint.committed_turn.number
-    const choiceId = checkpoint.current_scene.choices.some((choice) => choice.id === 1) ? 1 : checkpoint.current_scene.choices[0].id
+    const preferred = checkpoint.committed_turn.number % 2 === 0 ? 2 : 1
+    const choiceId = checkpoint.current_scene.choices.some((choice) => choice.id === preferred)
+      ? preferred
+      : checkpoint.current_scene.choices[0].id
     checkpoint = commitWebMvpChoice(checkpoint, choiceId)
     expect(checkpoint.committed_turn.number).toBe(before + 1)
     narratives.add(checkpoint.current_scene.narrative)
