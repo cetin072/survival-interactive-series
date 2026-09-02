@@ -25,11 +25,17 @@ function inputLog(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput, id:
 }
 
 function withCurrentScenePreserved(checkpoint: PublicRuntimeCheckpoint): LogEntry[] {
-  const alreadyLogged = checkpoint.committed_turn.log.some((entry) => entry.kind === 'scene' && entry.text === checkpoint.current_scene.narrative)
-  if (alreadyLogged) return checkpoint.committed_turn.log
+  const log = checkpoint.committed_turn.log
+  const alreadyLogged = log.some((entry) => entry.kind === 'scene' && entry.text === checkpoint.current_scene.narrative)
+  if (alreadyLogged) return log
+
+  if (checkpoint.committed_turn.number === 0 && log.length === 1 && log[0]?.kind === 'scene') {
+    return [{ ...log[0], text: checkpoint.current_scene.narrative }]
+  }
+
   return [
-    ...checkpoint.committed_turn.log,
-    { id: checkpoint.committed_turn.log.length, kind: 'scene', text: checkpoint.current_scene.narrative },
+    ...log,
+    { id: log.length, kind: 'scene', text: checkpoint.current_scene.narrative },
   ]
 }
 
