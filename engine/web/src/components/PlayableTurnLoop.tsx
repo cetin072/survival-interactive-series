@@ -14,9 +14,19 @@ import { PresentationBlocks } from './PresentationBlocks'
 import { SceneHeader } from './SceneHeader'
 import { StatusPanels } from './StatusPanels'
 
+const WEB_MVP_UI_BUILD = 'AI-STORY-GM-20260902-B'
+const WEB_MVP_UI_BUILD_KEY = 'survival-web-mvp-ui-build'
+
 function loadSession(): PublicRuntimeCheckpoint {
   if (typeof window === 'undefined') return createWebMvpTestSession()
   try {
+    const previousBuild = window.localStorage.getItem(WEB_MVP_UI_BUILD_KEY)
+    if (previousBuild !== WEB_MVP_UI_BUILD) {
+      window.localStorage.removeItem(WEB_MVP_TEST_SESSION_STORAGE_KEY)
+      window.localStorage.setItem(WEB_MVP_UI_BUILD_KEY, WEB_MVP_UI_BUILD)
+      return createWebMvpTestSession()
+    }
+
     const raw = window.localStorage.getItem(WEB_MVP_TEST_SESSION_STORAGE_KEY)
     if (!raw) return createWebMvpTestSession()
     const saved: unknown = JSON.parse(raw)
@@ -91,7 +101,7 @@ export function PlayableTurnLoop() {
 
   return <main className="playable-loop" aria-label="WEB MVP TEST SESSION">
     <header className="test-session-header">
-      <div><p>생존일기</p><h1>WEB MVP TEST SESSION</h1><span>NON-CANONICAL · TEST ONLY</span></div>
+      <div><p>생존일기</p><h1>WEB MVP TEST SESSION</h1><span>NON-CANONICAL · TEST ONLY · {WEB_MVP_UI_BUILD}</span></div>
       <div className="test-session-controls"><BgmControl /><button type="button" onClick={reset}>RESET</button></div>
     </header>
     <p className="test-session-notice">이 테스트 세션은 실제 S02 Canon을 수정하지 않습니다. 이야기 진행은 AI GM이 제안하고 엔진이 공개 상태 변화만 검증·확정합니다.</p>
