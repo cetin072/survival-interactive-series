@@ -1,7 +1,7 @@
 [build]
   base = "engine/web"
   command = "npm run build"
-  publish = "dist"
+  publish = "engine/web/dist"
 
 [functions]
   directory = "engine/web/netlify/functions"
