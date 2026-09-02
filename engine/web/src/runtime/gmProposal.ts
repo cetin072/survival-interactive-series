@@ -77,7 +77,7 @@ export function validateGMProposal(value: unknown): GMProposalValidation {
   if (!isObject(value) || !onlyKeys(value, ['actions', 'narrative', 'next_choices', 'presentation_blocks', 'visible_reaction', 'ambiguity', 'family_reactions'])) return { valid: false, message: 'GM proposal must be a supported object shape.' }
   if (!Array.isArray(value.actions) || !value.actions.every(isQueuedAction)) return { valid: false, message: 'GM proposal has malformed actions.' }
   if (typeof value.narrative !== 'string') return { valid: false, message: 'GM proposal needs narration.' }
-  if (!Array.isArray(value.next_choices) || value.next_choices.length < 2 || value.next_choices.length > 4 || !value.next_choices.every(isChoice)) return { valid: false, message: 'GM proposal needs 2-4 valid next choices.' }
+  if (!Array.isArray(value.next_choices) || value.next_choices.length < 1 || value.next_choices.length > 4 || !value.next_choices.every(isChoice)) return { valid: false, message: 'GM proposal needs 1-4 valid next choices.' }
   if (!Array.isArray(value.presentation_blocks) || !value.presentation_blocks.every(isPresentationBlock)) return { valid: false, message: 'GM proposal has malformed presentation blocks.' }
   if (value.visible_reaction !== undefined && typeof value.visible_reaction !== 'string') return { valid: false, message: 'GM proposal has malformed visible reaction.' }
   if (value.ambiguity !== undefined) {
