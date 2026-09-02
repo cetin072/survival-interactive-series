@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { choiceForKey } from '../input/action'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { choiceForKey, choiceShortcutFromText } from '../input/action'
 import { createGameSnapshot } from '../state/snapshot'
 import type { GMPlayerInput } from '../runtime/gmProvider'
 import type { PublicRuntimeCheckpoint } from '../runtime/publicRuntimeCheckpoint'
@@ -126,6 +126,8 @@ export function PlayableTurnLoop() {
   const [choiceQueueNotice, setChoiceQueueNotice] = useState<string | null>(null)
   const [turnChanges, setTurnChanges] = useState<string[]>([])
   const [textSize, setTextSize] = useState<TextSize>(loadTextSize)
+  const sceneRef = useRef<HTMLElement | null>(null)
+  const previousTurnRef = useRef(checkpoint.committed_turn.number)
   const provider = useMemo(() => new HttpGMProvider(), [])
   const snapshot = createGameSnapshot(checkpoint.public_state)
   const narrativeGroups = buildNarrativeGroups(checkpoint.current_scene.narrative)
@@ -137,6 +139,15 @@ export function PlayableTurnLoop() {
   useEffect(() => {
     window.localStorage.setItem(TEXT_SIZE_KEY, textSize)
   }, [textSize])
+
+  useEffect(() => {
+    if (checkpoint.committed_turn.number > previousTurnRef.current) {
+      window.requestAnimationFrame(() => {
+        sceneRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      })
+    }
+    previousTurnRef.current = checkpoint.committed_turn.number
+  }, [checkpoint.committed_turn.number])
 
   function applyCheckpoint(current: PublicRuntimeCheckpoint, next: PublicRuntimeCheckpoint) {
     setCheckpoint(next)
@@ -199,6 +210,22 @@ export function PlayableTurnLoop() {
   async function submitFreeAction(text: string) {
     setSelectedChoiceIds([])
     setChoiceQueueNotice(null)
+
+    const shortcut = choiceShortcutFromText(text, checkpoint.current_scene.choices, MAX_ORDERED_CHOICES)
+    if (shortcut?.kind === 'invalid') {
+      setStallMessage(shortcut.message)
+      return
+    }
+    if (shortcut?.kind === 'choices') {
+      setStallMessage(null)
+      if (shortcut.choiceIds.length === 1) {
+        await submitPlayerTurn({ kind: 'numbered-choice', choice_id: shortcut.choiceIds[0] })
+      } else {
+        await submitPlayerTurn({ kind: 'ordered-choices', choice_ids: shortcut.choiceIds })
+      }
+      return
+    }
+
     await submitPlayerTurn({ kind: 'free-action', text })
   }
 
@@ -246,7 +273,7 @@ export function PlayableTurnLoop() {
     <p className="playable-loop-pressure">PRESSURE · {checkpoint.active_visible_pressure}</p>
     {showPanels && <StatusPanels family={snapshot.family} resources={snapshot.resources} />}
     <section className="test-base-status" aria-label="테스트 거점 능력"><strong>BASE</strong><span>{checkpoint.base_capabilities.flatMap((base) => base.capabilities).join(' · ')}</span></section>
-    <section className="scene-copy" aria-label="현재 장면">
+    <section className="scene-copy" aria-label="현재 장면" ref={sceneRef}>
       <h2>현재 장면</h2>
       <div className="scene-narrative">
         {narrativeGroups.map((group, groupIndex) => <div className="story-paragraph" key={`${checkpoint.current_scene.id}-${groupIndex}`}>
@@ -276,7 +303,7 @@ export function PlayableTurnLoop() {
     </section>
     <FreeActionForm onSubmit={submitFreeAction} disabled={submitting} />
     {submitting && <p className="free-action-help" role="status">AI GM이 다음 장면을 작성 중…</p>}
-    <p className="free-action-help">선택지는 최대 2개까지 묶을 수 있고, 터치한 순서대로 AI GM에게 전달됩니다. 자유행동도 계속 사용할 수 있습니다.</p>
+    <p className="free-action-help">선택지는 최대 2개까지 묶을 수 있습니다. 자유입력에 `1번` 또는 `1번 → 2번`처럼 적어도 같은 선택으로 처리됩니다.</p>
     <section className="turn-status" aria-label="현재 턴"><strong>현재 턴</strong><span>{checkpoint.committed_turn.number}</span></section>
     <GameLog entries={checkpoint.committed_turn.log} />
   </main>
