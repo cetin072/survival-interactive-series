@@ -9,7 +9,7 @@ export const PUBLIC_RUNTIME_CHECKPOINT_VERSION = 1 as const
 export type PublicRuntimeScene = {
   id: string
   narrative: string
-  choices: Array<Choice & { action?: QueuedAction }>
+  choices: Array<Choice & { action: QueuedAction }>
   presentation_blocks: PresentationBlock[]
 }
 
