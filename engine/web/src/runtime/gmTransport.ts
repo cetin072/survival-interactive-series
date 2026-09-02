@@ -16,6 +16,8 @@ type ValidationResult<T> =
   | { valid: true; value: T }
   | { valid: false; message: string }
 
+const browserSafeFetch: FetchLike = (input, init) => globalThis.fetch(input, init)
+
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
@@ -86,7 +88,7 @@ export function validateGMTransportResponse(value: unknown): ValidationResult<GM
 
 export class HttpGMProvider implements GMProvider {
   constructor(
-    private readonly fetcher: FetchLike = fetch,
+    private readonly fetcher: FetchLike = browserSafeFetch,
     private readonly endpoint = DEFAULT_GM_ENDPOINT,
   ) {}
 
