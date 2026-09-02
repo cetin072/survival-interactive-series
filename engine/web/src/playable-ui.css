@@ -219,6 +219,207 @@
   font: var(--choice-font-size)/1.45 system-ui, sans-serif;
 }
 
+.choice-stage-launch {
+  width: 100%;
+  margin: 16px 0 8px;
+  padding: 18px;
+  border: 1px solid #6a8d72;
+  background: #19251d;
+  color: #edf4ee;
+  text-align: left;
+  display: grid;
+  gap: 5px;
+}
+
+.choice-stage-launch span {
+  font: 800 1rem/1.3 system-ui, sans-serif;
+}
+
+.choice-stage-launch strong {
+  color: #9db7a2;
+  font: 600 .76rem/1.45 system-ui, sans-serif;
+}
+
+.choice-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(4, 8, 6, .97);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.choice-overlay-panel {
+  width: min(1180px, 100%);
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: 28px clamp(18px, 3vw, 38px) 40px;
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+
+.choice-overlay-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.choice-overlay-header > div {
+  max-width: 720px;
+}
+
+.choice-overlay-header span {
+  color: #82ae8c;
+  font: 700 .72rem/1.4 system-ui, sans-serif;
+  letter-spacing: .08em;
+}
+
+.choice-overlay-header h2 {
+  margin: 6px 0 6px;
+  color: #f1f6f2;
+  font: 800 clamp(1.5rem, 3vw, 2.4rem)/1.15 system-ui, sans-serif;
+}
+
+.choice-overlay-header p {
+  margin: 0;
+  color: #aebbb0;
+  font: .92rem/1.65 system-ui, sans-serif;
+}
+
+.choice-overlay-close {
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #405247;
+  background: #0d1410;
+  color: #c1ccc3;
+  white-space: nowrap;
+}
+
+.choice-overlay .choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.choice-overlay .choice-card {
+  min-height: 220px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 18px;
+  border: 1px solid #3e5e47;
+  background: linear-gradient(180deg, #152219 0%, #101812 100%);
+  color: #edf4ee;
+  text-align: left;
+}
+
+.choice-overlay .choice-card:hover {
+  border-color: #6f9778;
+  background: linear-gradient(180deg, #1a2a20 0%, #121c15 100%);
+}
+
+.choice-overlay .choice-card.selected {
+  border-color: #9bc6a3;
+  box-shadow: inset 0 0 0 2px rgba(155, 198, 163, .18);
+  background: linear-gradient(180deg, #203126 0%, #162219 100%);
+}
+
+.choice-overlay .choice-card:disabled:not(.selected) {
+  opacity: .45;
+}
+
+.choice-card-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.choice-overlay .choice-card-index {
+  width: 42px;
+  height: 42px;
+  border-color: #71917a;
+  font-size: 1rem;
+}
+
+.choice-overlay .choice-card-order {
+  width: auto;
+  height: auto;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: .72rem;
+}
+
+.choice-overlay .choice-card-copy {
+  display: grid;
+  gap: 12px;
+}
+
+.choice-overlay .choice-card-copy strong {
+  font: 800 clamp(1.05rem, 2vw, 1.35rem)/1.45 system-ui, sans-serif;
+}
+
+.choice-card-description {
+  display: block;
+  color: #bac7bd;
+  font: .9rem/1.75 system-ui, sans-serif;
+  word-break: keep-all;
+}
+
+.choice-overlay .choice-card > small {
+  color: #829488;
+  font: .72rem/1.45 system-ui, sans-serif;
+}
+
+.choice-free-action {
+  margin-top: 2px;
+  padding: 16px;
+  border: 1px solid #33483a;
+  background: #0b120e;
+}
+
+.choice-free-action .free-action {
+  margin: 0;
+}
+
+.choice-free-action .free-action label {
+  display: block;
+  margin-bottom: 8px;
+  color: #a9c7af;
+  font-weight: 700;
+}
+
+.choice-free-action .free-action > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.choice-free-action .free-action input {
+  min-height: 48px;
+}
+
+.choice-free-action .free-action button {
+  min-width: 92px;
+}
+
+.choice-overlay .choice-queue {
+  margin-top: 0;
+}
+
+.choice-overlay-status {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #5d6644;
+  background: #15180e;
+  color: #d7dfb1;
+  font: .82rem/1.55 system-ui, sans-serif;
+}
+
 @media (max-width: 560px) {
   .test-session-header {
     display: grid;
@@ -246,12 +447,43 @@
     line-height: 1.86;
   }
 
-  .choices .choice-card {
-    grid-template-columns: 34px minmax(0, 1fr) 28px;
-    min-height: 76px;
+  .choice-queue-actions {
+    grid-template-columns: 1fr;
   }
 
-  .choice-queue-actions {
+  .choice-overlay-panel {
+    padding: 18px 12px 30px;
+    gap: 14px;
+  }
+
+  .choice-overlay-header {
+    display: grid;
+  }
+
+  .choice-overlay-close {
+    justify-self: start;
+  }
+
+  .choice-overlay .choice-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .choice-overlay .choice-card {
+    min-height: 190px;
+    padding: 18px;
+  }
+
+  .choice-overlay .choice-card-copy strong {
+    font-size: 1.08rem;
+  }
+
+  .choice-card-description {
+    font-size: .88rem;
+    line-height: 1.72;
+  }
+
+  .choice-free-action .free-action > div {
     grid-template-columns: 1fr;
   }
 }
