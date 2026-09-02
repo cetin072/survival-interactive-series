@@ -1,9 +1,17 @@
-import { CanonV2RuntimeBlock } from './components/CanonV2RuntimeBlock'
-import { PlayableTurnLoop } from './components/PlayableTurnLoop'
+import { StateConsole } from './components/StateConsole'
 import { loadCanonV2Runtime } from './runtime/canonV2Runtime'
 
 export default function App() {
-  return <CanonV2RuntimeBlock block={loadCanonV2Runtime()}>
-    <PlayableTurnLoop />
-  </CanonV2RuntimeBlock>
+  const runtime = loadCanonV2Runtime()
+
+  return <StateConsole
+    view={runtime.view}
+    source="canon-v2-bundled"
+    sourceWarning={runtime.warning}
+    refreshing={false}
+    onRefresh={() => undefined}
+    showRefresh={false}
+    playBridge={null}
+    bgmControl={null}
+  />
 }
