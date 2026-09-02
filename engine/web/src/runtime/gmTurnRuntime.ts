@@ -23,7 +23,7 @@ function fallback(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput, mes
     ...checkpoint,
     current_scene: {
       ...checkpoint.current_scene,
-      narrative: `${message} 상태를 바꾸지 않았고, 다시 시도하거나 공개 선택지로 진행할 수 있습니다.`,
+      narrative: `${message} 상태를 바꾸지 않았습니다. 같은 행동을 다시 시도할 수 있습니다.`,
     },
     committed_turn: {
       ...checkpoint.committed_turn,
@@ -32,13 +32,13 @@ function fallback(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput, mes
   })
 }
 
-function sceneFromProposal(proposal: GMProposal) {
+function sceneFromProposal(proposal: GMProposal, turnNumber: number) {
   const familyBlocks = proposal.family_reactions?.map((reaction) => ({
     type: 'EVENT' as const,
     message: `${reaction.member} · ${reaction.disposition}: ${reaction.message}`,
   })) ?? []
   return {
-    id: `gm_turn_scene`,
+    id: `gm_turn_${turnNumber}`,
     narrative: proposal.narrative,
     choices: proposal.next_choices,
     presentation_blocks: [
@@ -71,15 +71,27 @@ export async function runGMProviderTurn(
   const results = queue.results.map((result, index) => resultLog(result, logId + 1 + index))
   const accepted = queue.results.some((result) => result.outcome === 'success' || result.outcome === 'partial_success')
   const ambiguity = parsed.proposal.ambiguity ? ` ${parsed.proposal.ambiguity.message}` : ''
+  const nextTurn = checkpoint.committed_turn.number + 1
+  const scene = sceneFromProposal(parsed.proposal, nextTurn)
+  const publicState = { ...queue.state, scene_id: scene.id }
+  const storyAdvancedWithoutMutation = parsed.proposal.actions.length === 0
 
   return createPublicRuntimeCheckpoint({
     ...checkpoint,
-    public_state: queue.state,
-    current_scene: sceneFromProposal(parsed.proposal),
-    recent_visible_change: accepted ? parsed.proposal.narrative : '엔진이 상태 변경을 커밋하지 않았습니다.',
+    public_state: publicState,
+    current_scene: scene,
+    recent_visible_change: accepted || storyAdvancedWithoutMutation
+      ? parsed.proposal.narrative
+      : '일부 상태 변경은 엔진 검증에서 거부됐지만 장면은 계속 진행되었습니다.',
     committed_turn: {
-      number: checkpoint.committed_turn.number + 1,
-      log: [...checkpoint.committed_turn.log, inputLog(checkpoint, input, logId), ...results, ...(ambiguity ? [{ id: logId + 1 + results.length, kind: 'system' as const, text: ambiguity }] : [])],
+      number: nextTurn,
+      log: [
+        ...checkpoint.committed_turn.log,
+        inputLog(checkpoint, input, logId),
+        ...results,
+        ...(ambiguity ? [{ id: logId + 1 + results.length, kind: 'system' as const, text: ambiguity }] : []),
+        { id: logId + 2 + results.length, kind: 'scene', text: `TURN ${nextTurn} · ${parsed.proposal.narrative}` },
+      ],
     },
   })
 }
