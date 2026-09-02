@@ -10,7 +10,8 @@ describe('WEB MVP TEST SESSION', () => {
     const checkpoint = createWebMvpTestSession()
     const html = renderToStaticMarkup(createElement(PlayableTurnLoop))
 
-    expect(checkpoint.current_scene.choices).toHaveLength(3)
+    expect(checkpoint.current_scene.choices).toHaveLength(4)
+    expect(checkpoint.current_scene.choices.every((choice) => Boolean(choice.description))).toBe(true)
     expect(checkpoint.current_scene.narrative).toContain('실제 S02')
     expect(html).toContain('WEB MVP TEST SESSION')
     expect(html).toContain('NON-CANONICAL')
