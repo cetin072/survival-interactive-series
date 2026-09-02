@@ -12,7 +12,7 @@ import { ChoiceButtons } from './ChoiceButtons'
 import { FreeActionForm } from './FreeActionForm'
 import { PresentationBlocks } from './PresentationBlocks'
 
-const WEB_MVP_UI_BUILD = 'AI-STORY-GM-20260903-C'
+const WEB_MVP_UI_BUILD = 'AI-STORY-GM-20260903-D'
 const WEB_MVP_UI_BUILD_KEY = 'survival-web-mvp-ui-build'
 const TEXT_SIZE_KEY = 'survival-web-mvp-text-size'
 const MAX_ORDERED_CHOICES = 2
@@ -149,6 +149,7 @@ export function PlayableTurnLoop() {
   const [stallMessage, setStallMessage] = useState<string | null>(null)
   const [selectedChoiceIds, setSelectedChoiceIds] = useState<number[]>([])
   const [choiceQueueNotice, setChoiceQueueNotice] = useState<string | null>(null)
+  const [choiceModalOpen, setChoiceModalOpen] = useState(false)
   const [turnChanges, setTurnChanges] = useState<string[]>([])
   const [textSize, setTextSize] = useState<TextSize>(loadTextSize)
   const [hudPanel, setHudPanel] = useState<HudPanel>(null)
@@ -187,6 +188,7 @@ export function PlayableTurnLoop() {
       setStallMessage(null)
       setSelectedChoiceIds([])
       setChoiceQueueNotice(null)
+      setChoiceModalOpen(false)
       setTurnChanges(summarizeTurnChanges(current, next))
       return
     }
@@ -199,13 +201,28 @@ export function PlayableTurnLoop() {
     setStallMessage(null)
     setSelectedChoiceIds([])
     setChoiceQueueNotice(null)
+    setChoiceModalOpen(false)
     setTurnChanges([])
     setHudPanel(null)
     setCheckpoint(resetWebMvpTestSession())
   }
 
+  function openChoiceModal() {
+    if (submitting) return
+    setHudPanel(null)
+    setChoiceModalOpen(true)
+  }
+
+  function closeChoiceModal() {
+    if (submitting) return
+    setChoiceModalOpen(false)
+    setSelectedChoiceIds([])
+    setChoiceQueueNotice(null)
+  }
+
   async function submitPlayerTurn(input: GMPlayerInput) {
     if (submitting) return
+    setChoiceModalOpen(false)
     setSubmitting(true)
     const current = checkpoint
     try {
@@ -265,10 +282,17 @@ export function PlayableTurnLoop() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (submitting || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return
-      if (event.key === 'Escape' && hudPanel) {
-        setHudPanel(null)
-        return
+      if (event.key === 'Escape') {
+        if (choiceModalOpen) {
+          closeChoiceModal()
+          return
+        }
+        if (hudPanel) {
+          setHudPanel(null)
+          return
+        }
       }
+      if (!choiceModalOpen) return
       if (event.key === 'Enter' && selectedChoiceIds.length > 0) {
         event.preventDefault()
         confirmChoiceQueue()
@@ -279,12 +303,17 @@ export function PlayableTurnLoop() {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [checkpoint.current_scene.choices, selectedChoiceIds, submitting, hudPanel])
+  }, [checkpoint.current_scene.choices, selectedChoiceIds, submitting, hudPanel, choiceModalOpen])
 
   const selectedLabels = selectedChoiceIds.flatMap((id) => {
     const choice = checkpoint.current_scene.choices.find((item) => item.id === id)
     return choice ? [choice.label] : []
   })
+
+  const openHudPanel = (panel: Exclude<HudPanel, null>) => {
+    setChoiceModalOpen(false)
+    setHudPanel(hudPanel === panel ? null : panel)
+  }
 
   return <main className={`playable-loop survival-shell text-size-${textSize}`} aria-label="WEB MVP TEST SESSION">
     <header className="survival-top-hud">
@@ -294,7 +323,7 @@ export function PlayableTurnLoop() {
         <span className="survival-location">🏠 {snapshot.location}</span>
         <span className="survival-risk">⚠ {pressureLabel(checkpoint.active_visible_pressure)}</span>
       </div>
-      <button type="button" className="survival-settings-button" aria-label="설정" onClick={() => setHudPanel(hudPanel === 'settings' ? null : 'settings')}>⚙</button>
+      <button type="button" className="survival-settings-button" aria-label="설정" onClick={() => openHudPanel('settings')}>⚙</button>
     </header>
 
     <section className="story-scroll" aria-label="생존일기 이야기">
@@ -315,37 +344,51 @@ export function PlayableTurnLoop() {
 
         {stallMessage && <p className="story-alert" role="alert">{stallMessage}</p>}
 
-        <section className="inline-choice-phase" aria-label="현재 선택">
-          <div className="inline-choice-heading">
-            <span>TURN {checkpoint.committed_turn.number}</span>
-            <h2>어떻게 할까?</h2>
-            <p>카드를 최대 {MAX_ORDERED_CHOICES}개까지 터치한 순서대로 실행할 수 있습니다.</p>
-          </div>
-
-          <ChoiceButtons choices={checkpoint.current_scene.choices} selectedChoiceIds={selectedChoiceIds} maxSelections={MAX_ORDERED_CHOICES} disabled={submitting} onToggle={toggleChoice} />
-
-          <div className="inline-free-action">
-            <FreeActionForm onSubmit={submitFreeAction} disabled={submitting} />
-          </div>
-
-          <section className="choice-queue" aria-label="선택 실행 순서">
-            <div>
-              <strong>실행 순서</strong>
-              <span>{selectedLabels.length > 0 ? selectedLabels.map((label, index) => `${index + 1}. ${label}`).join(' → ') : '카드를 선택하거나 직접 행동을 입력하세요.'}</span>
-              {choiceQueueNotice && <em className="choice-queue-notice">{choiceQueueNotice}</em>}
-            </div>
-            <div className="choice-queue-actions">
-              <button type="button" disabled={selectedChoiceIds.length === 0 || submitting} onClick={() => { setSelectedChoiceIds([]); setChoiceQueueNotice(null) }}>취소</button>
-              <button type="button" className="choice-confirm" disabled={selectedChoiceIds.length === 0 || submitting} onClick={confirmChoiceQueue}>
-                {selectedChoiceIds.length > 0 ? `선택 종료 · ${selectedChoiceIds.length}개 실행` : '선택 종료'}
-              </button>
-            </div>
-          </section>
-
-          {submitting && <p className="story-loading" role="status">AI GM이 선택 결과와 다음 이야기를 작성 중…</p>}
-        </section>
+        <div className="story-end-space" aria-hidden="true" />
       </div>
     </section>
+
+    {!choiceModalOpen && !hudPanel && !submitting && <button type="button" className="choice-launcher" onClick={openChoiceModal}>
+      <span>TURN {checkpoint.committed_turn.number}</span>
+      <strong>행동 선택</strong>
+      <small>{Math.min(4, checkpoint.current_scene.choices.length)}개 선택지 · 최대 2개</small>
+    </button>}
+
+    {submitting && <div className="gm-writing-indicator" role="status">
+      <span className="gm-writing-dot" />
+      AI GM이 다음 장면을 쓰고 있습니다…
+    </div>}
+
+    {choiceModalOpen && <section className="choice-modal-backdrop" role="dialog" aria-modal="true" aria-label="행동 선택">
+      <div className="choice-modal">
+        <header className="choice-modal-header">
+          <div>
+            <span>TURN {checkpoint.committed_turn.number}</span>
+            <h2>어떻게 할까?</h2>
+          </div>
+          <button type="button" className="choice-modal-close" onClick={closeChoiceModal} aria-label="선택창 닫기">×</button>
+        </header>
+
+        <ChoiceButtons choices={checkpoint.current_scene.choices} selectedChoiceIds={selectedChoiceIds} maxSelections={MAX_ORDERED_CHOICES} disabled={submitting} onToggle={toggleChoice} />
+
+        <div className="choice-modal-free-action">
+          <FreeActionForm onSubmit={submitFreeAction} disabled={submitting} />
+        </div>
+
+        <footer className="choice-modal-footer">
+          <div className="choice-order-summary" aria-live="polite">
+            <strong>{selectedLabels.length > 0 ? selectedLabels.map((label, index) => `${index + 1}. ${label}`).join(' → ') : '카드를 터치하면 실행 순서가 표시됩니다.'}</strong>
+            {choiceQueueNotice && <span>{choiceQueueNotice}</span>}
+          </div>
+          <div className="choice-modal-actions">
+            <button type="button" onClick={() => { setSelectedChoiceIds([]); setChoiceQueueNotice(null) }} disabled={selectedChoiceIds.length === 0 || submitting}>초기화</button>
+            <button type="button" className="choice-confirm" disabled={selectedChoiceIds.length === 0 || submitting} onClick={confirmChoiceQueue}>
+              {selectedChoiceIds.length > 0 ? `선택 종료 · ${selectedChoiceIds.length}` : '선택 종료'}
+            </button>
+          </div>
+        </footer>
+      </div>
+    </section>}
 
     {hudPanel && <section className="hud-detail-sheet" aria-label="상세 상태">
       <div className="hud-detail-header">
@@ -377,10 +420,10 @@ export function PlayableTurnLoop() {
     </section>}
 
     <nav className="survival-bottom-hud" aria-label="핵심 상태">
-      <button type="button" aria-pressed={hudPanel === 'family'} onClick={() => setHudPanel(hudPanel === 'family' ? null : 'family')}><span>👨‍👩‍👦</span><strong>가족</strong><small>{familyCount}/{familyCount}</small></button>
-      <button type="button" aria-pressed={hudPanel === 'base'} onClick={() => setHudPanel(hudPanel === 'base' ? null : 'base')}><span>🏠</span><strong>거점</strong><small>{bases[0]?.name ?? '없음'}</small></button>
-      <button type="button" aria-pressed={hudPanel === 'vehicle'} onClick={() => setHudPanel(hudPanel === 'vehicle' ? null : 'vehicle')}><span>🚗</span><strong>차량</strong><small>{vehicles.length > 0 ? `${vehicles.length}대` : '없음'}</small></button>
-      <button type="button" aria-pressed={hudPanel === 'resource'} onClick={() => setHudPanel(hudPanel === 'resource' ? null : 'resource')}><span>📦</span><strong>물자</strong><small>{water ? `물 ${water.band}` : `${resources.length}종`}</small></button>
+      <button type="button" aria-pressed={hudPanel === 'family'} onClick={() => openHudPanel('family')}><span>👨‍👩‍👦</span><strong>가족</strong><small>{familyCount}/{familyCount}</small></button>
+      <button type="button" aria-pressed={hudPanel === 'base'} onClick={() => openHudPanel('base')}><span>🏠</span><strong>거점</strong><small>{bases[0]?.name ?? '없음'}</small></button>
+      <button type="button" aria-pressed={hudPanel === 'vehicle'} onClick={() => openHudPanel('vehicle')}><span>🚗</span><strong>차량</strong><small>{vehicles.length > 0 ? `${vehicles.length}대` : '없음'}</small></button>
+      <button type="button" aria-pressed={hudPanel === 'resource'} onClick={() => openHudPanel('resource')}><span>📦</span><strong>물자</strong><small>{water ? `물 ${water.band}` : `${resources.length}종`}</small></button>
     </nav>
   </main>
 }
