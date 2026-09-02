@@ -24,8 +24,18 @@ function inputLog(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput, id:
   return choice ? choiceLog(choice, id) : { id, kind: 'system', text: `알 수 없는 선택: ${input.choice_id}` }
 }
 
+function withCurrentScenePreserved(checkpoint: PublicRuntimeCheckpoint): LogEntry[] {
+  const alreadyLogged = checkpoint.committed_turn.log.some((entry) => entry.kind === 'scene' && entry.text === checkpoint.current_scene.narrative)
+  if (alreadyLogged) return checkpoint.committed_turn.log
+  return [
+    ...checkpoint.committed_turn.log,
+    { id: checkpoint.committed_turn.log.length, kind: 'scene', text: checkpoint.current_scene.narrative },
+  ]
+}
+
 function fallback(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput, message: string): PublicRuntimeCheckpoint {
-  const logId = checkpoint.committed_turn.log.length
+  const preservedLog = withCurrentScenePreserved(checkpoint)
+  const logId = preservedLog.length
   return createPublicRuntimeCheckpoint({
     ...checkpoint,
     current_scene: {
@@ -34,7 +44,7 @@ function fallback(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput, mes
     },
     committed_turn: {
       ...checkpoint.committed_turn,
-      log: [...checkpoint.committed_turn.log, inputLog(checkpoint, input, logId), { id: logId + 1, kind: 'system', text: message }],
+      log: [...preservedLog, inputLog(checkpoint, input, logId), { id: logId + 1, kind: 'system', text: message }],
     },
   })
 }
@@ -87,7 +97,8 @@ export async function runGMProviderTurn(
   if (!parsed.valid) return fallback(checkpoint, input, `AI GM 제안을 처리하지 않았습니다: ${parsed.message}`)
 
   const queue = runActionQueue(checkpoint.public_state, parsed.proposal.actions)
-  const logId = checkpoint.committed_turn.log.length
+  const preservedLog = withCurrentScenePreserved(checkpoint)
+  const logId = preservedLog.length
   const results = queue.results.map((result, index) => resultLog(result, logId + 1 + index))
   const accepted = queue.results.some((result) => result.outcome === 'success' || result.outcome === 'partial_success')
   const ambiguity = parsed.proposal.ambiguity ? ` ${parsed.proposal.ambiguity.message}` : ''
@@ -107,7 +118,7 @@ export async function runGMProviderTurn(
     committed_turn: {
       number: nextTurn,
       log: [
-        ...checkpoint.committed_turn.log,
+        ...preservedLog,
         inputLog(checkpoint, input, logId),
         ...results,
         ...(ambiguity ? [{ id: logId + 1 + results.length, kind: 'system' as const, text: ambiguity }] : []),
