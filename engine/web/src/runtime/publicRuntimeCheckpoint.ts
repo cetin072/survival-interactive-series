@@ -9,7 +9,7 @@ export const PUBLIC_RUNTIME_CHECKPOINT_VERSION = 1 as const
 export type PublicRuntimeScene = {
   id: string
   narrative: string
-  choices: Array<Choice & { action: QueuedAction }>
+  choices: Array<Choice & { action?: QueuedAction }>
   presentation_blocks: PresentationBlock[]
 }
 
@@ -114,7 +114,7 @@ export function commitPublicRuntimeChoice(
   return commitPublicRuntimeAction(checkpoint, choiceLog(choice, 0), choice.action, nextScene)
 }
 
-/** No provider is called in Phase 2. Free text remains visible, but cannot mutate state without an interpreted proposal. */
+/** Free text stays visible, but this fallback never mutates authoritative state. */
 export function keepPublicRuntimeSafeAfterFreeAction(
   checkpoint: PublicRuntimeCheckpoint,
   action: string,
@@ -124,7 +124,7 @@ export function keepPublicRuntimeSafeAfterFreeAction(
     ...checkpoint,
     current_scene: {
       ...checkpoint.current_scene,
-      narrative: '자유행동 해석 연결 전입니다. 상태를 바꾸지 않았고, 아래 공개 선택지로 이번 턴을 계속할 수 있습니다.',
+      narrative: 'AI GM 응답을 커밋하지 못했습니다. 상태는 바뀌지 않았습니다. 같은 행동을 다시 시도할 수 있습니다.',
     },
     committed_turn: {
       ...checkpoint.committed_turn,
