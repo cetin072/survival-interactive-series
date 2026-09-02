@@ -27,9 +27,10 @@ describe('OpenRouterProvider', () => {
     const result = await provider.proposeTurn({ input: { kind: 'free-action', text: '통신 상태를 확인한다' }, checkpoint: initial })
     expect(result.status).toBe('proposal')
     expect(calls).toHaveLength(1)
-    const sent = JSON.parse(String(calls[0].body)) as { model: string; reasoning: { effort: string }; response_format: { json_schema: { strict: boolean } } }
+    const sent = JSON.parse(String(calls[0].body)) as { model: string; reasoning: { effort: string }; provider: { require_parameters: boolean }; response_format: { json_schema: { strict: boolean } } }
     expect(sent.model).toBe(OPENROUTER_DEEPSEEK_MODEL)
     expect(sent.reasoning).toEqual({ effort: 'none' })
+    expect(sent.provider).toEqual({ require_parameters: true })
     expect(sent.response_format.json_schema.strict).toBe(true)
     expect(events[0]).toMatchObject({ success: true, retry_count: 0, schema_validation: 'passed', upstream_provider: 'test-upstream' })
     const next = await runGMProviderTurn(initial, { kind: 'free-action', text: '통신 상태를 확인한다' }, provider)
