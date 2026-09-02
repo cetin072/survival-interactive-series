@@ -4,7 +4,7 @@
   publish = "dist"
 
 [functions]
-  directory = "netlify/functions"
+  directory = "engine/web/netlify/functions"
 
 [build.environment]
   NODE_VERSION = "22"
