@@ -35,8 +35,13 @@ function createTestState(): LiveState {
   }
 }
 
-function choice(id: number, label: string, queued: QueuedAction): TestChoice {
-  return { id, label, action: queued }
+function choice(id: number, label: string, queued: QueuedAction, description?: string): TestChoice {
+  return {
+    id,
+    label,
+    description: description ?? `${label}를 중심으로 다음 판단에 필요한 정보를 확인합니다.`,
+    action: queued,
+  }
 }
 
 function communicationsLoopScene(state: LiveState, sceneId: string): PublicRuntimeScene {
@@ -140,13 +145,16 @@ function sceneFor(state: LiveState, sceneId: string): PublicRuntimeScene {
         choices: [
           choice(1, '물 상태를 확인한다', action('test-check-water', '물 상태 확인', {
             time_delta_min: 10, moves: [], resource_changes: [], world_changes: [{ key: 'water_check', from: undefined, to: 'complete' }],
-          })),
+          }), '현재 확보한 물의 상태와 관리 여건부터 확인합니다. 가족의 다음 행동을 정하기 전에 기본 생존 자원을 먼저 파악하는 선택입니다.'),
           choice(2, '가족에게 점검 계획을 제안한다', action('test-request-family-plan', '가족 점검 계획 요청', {
             time_delta_min: 10, moves: [], resource_changes: [], world_changes: [{ key: 'family_plan', from: undefined, to: 'requested' }],
-          })),
+          }), '서윤과 민석에게 지금 확인할 항목과 역할을 제안합니다. 가족의 판단과 수정 의견을 받아 이후 행동을 함께 정하려는 선택입니다.'),
           choice(3, '통신 상태를 확인한다', action('test-initial-comms', '통신 상태 확인', {
             time_delta_min: 10, moves: [], resource_changes: [{ resource_id: 'communications', from: '불안정', to: '점검 중' }], world_changes: [],
-          })),
+          }), '휴대전화와 무전기 등 현재 사용할 수 있는 통신 수단을 점검합니다. 외부 정보와 가족 간 연락 가능성을 먼저 확인하려는 선택입니다.'),
+          choice(4, '주변 상황을 직접 살핀다', action('test-initial-area-review', '주변 상황 확인', {
+            time_delta_min: 10, moves: [], resource_changes: [], world_changes: [{ key: 'area_review', from: undefined, to: 'complete' }],
+          }), '관측소 주변에서 눈으로 확인할 수 있는 변화와 이동 여건을 살핍니다. 장비 정보만 믿지 않고 현장의 실제 상태를 파악하려는 선택입니다.'),
         ],
         presentation_blocks: [{ type: 'EVENT', message: 'WEB MVP TEST SESSION 시작 · NON-CANONICAL' }],
       }
