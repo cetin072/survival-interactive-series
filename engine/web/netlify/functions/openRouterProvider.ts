@@ -241,6 +241,9 @@ export class OpenRouterProvider implements GMProvider {
       // The Chat Completions response contract puts the usable structured result in message.content.
       // Disable optional reasoning so its token stream cannot consume the bounded response before content is produced.
       reasoning: { effort: 'none' },
+      // OpenRouter should only select upstreams that declare support for the exact request parameters
+      // (notably reasoning controls + strict structured output), reducing 200 responses with unusable shapes.
+      provider: { require_parameters: true },
       response_format: { type: 'json_schema', json_schema: { name: 'gm_proposal', strict: true, schema: GM_PROPOSAL_JSON_SCHEMA } },
       messages: [
         { role: 'system', content: 'You are a non-canonical web MVP game master. Return only a GMProposal JSON object that matches the supplied schema. AI proposes; the engine validates and commits. Never invent hidden facts or mutate state.' },
