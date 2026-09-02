@@ -348,7 +348,7 @@ export function PlayableTurnLoop() {
       </div>
     </section>
 
-    {!choiceModalOpen && !hudPanel && !submitting && <button type="button" className="choice-launcher" onClick={openChoiceModal}>
+    {!choiceModalOpen && !hudPanel && !submitting && <button type="button" className="choice-launcher" aria-label="어떻게 할까? 행동 선택" onClick={openChoiceModal}>
       <span>TURN {checkpoint.committed_turn.number}</span>
       <strong>행동 선택</strong>
       <small>{Math.min(4, checkpoint.current_scene.choices.length)}개 선택지 · 최대 2개</small>
