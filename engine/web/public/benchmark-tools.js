@@ -1,7 +1,4 @@
 (() => {
-  const params = new URLSearchParams(window.location.search)
-  if (params.get('benchmark-tools') !== '1') return
-
   const STORAGE_KEY = 'survival-story-benchmark-s01-v1'
 
   function buildTranscript() {
@@ -66,7 +63,7 @@
     const text = buildTranscript()
     try {
       await navigator.clipboard.writeText(text)
-      button.textContent = '대본 복사됨 ✓'
+      button.textContent = '복사됨 ✓'
     } catch {
       const area = document.createElement('textarea')
       area.value = text
@@ -77,29 +74,33 @@
       area.select()
       document.execCommand('copy')
       area.remove()
-      button.textContent = '대본 복사됨 ✓'
+      button.textContent = '복사됨 ✓'
     }
-    window.setTimeout(() => { button.textContent = '대본 복사' }, 1800)
+    window.setTimeout(() => { button.textContent = '대본' }, 1800)
   }
 
   window.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('story-transcript-copy')) return
     const button = document.createElement('button')
+    button.id = 'story-transcript-copy'
     button.type = 'button'
-    button.textContent = '대본 복사'
-    button.setAttribute('aria-label', '현재 Story Benchmark 대본 복사')
+    button.textContent = '대본'
+    button.setAttribute('aria-label', '현재 생존일기 대본 복사')
     Object.assign(button.style, {
       position: 'fixed',
-      right: '12px',
-      bottom: '14px',
+      right: '54px',
+      top: 'max(7px, env(safe-area-inset-top))',
       zIndex: '99999',
-      border: '1px solid rgba(255,255,255,.22)',
-      borderRadius: '999px',
-      padding: '10px 14px',
-      background: '#18211d',
-      color: '#f5f7f6',
-      fontSize: '14px',
-      fontWeight: '700',
-      boxShadow: '0 6px 20px rgba(0,0,0,.28)'
+      minWidth: '48px',
+      height: '34px',
+      border: '1px solid #3c5142',
+      borderRadius: '0',
+      padding: '0 8px',
+      background: '#0d1710',
+      color: '#c4d0c7',
+      fontSize: '12px',
+      fontWeight: '800',
+      lineHeight: '1'
     })
     button.addEventListener('click', () => copyTranscript(button))
     document.body.appendChild(button)
