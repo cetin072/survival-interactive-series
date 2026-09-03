@@ -6,6 +6,7 @@ import { addChoiceReferenceContext } from '../../src/server/playerActionContext'
 
 const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8' }
 const PREVIEW_STORY_MODEL = 'deepseek/deepseek-v4-pro-0813:nitro'
+const PREVIEW_TIMEOUT_MS = 45_000
 
 type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 
@@ -43,12 +44,13 @@ class ChoiceReferenceAwareProvider implements GMProvider {
 
 function createOpenRouterStoryProviderFromEnvironment(deployContext?: string): GMProvider {
   const environment = (globalThis as unknown as { process?: { env?: Record<string, string | undefined> } }).process?.env
-  const fetchImpl = deployContext === 'deploy-preview'
+  const isPreview = deployContext === 'deploy-preview'
+  const fetchImpl = isPreview
     ? modelOverrideFetch(PREVIEW_STORY_MODEL)
     : fetch
 
   return new ChoiceReferenceAwareProvider(
-    new OpenRouterStoryProvider(environment?.OPENROUTER_API_KEY, fetchImpl),
+    new OpenRouterStoryProvider(environment?.OPENROUTER_API_KEY, fetchImpl, isPreview ? PREVIEW_TIMEOUT_MS : undefined),
   )
 }
 
