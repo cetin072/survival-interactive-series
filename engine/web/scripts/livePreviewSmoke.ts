@@ -6,10 +6,17 @@ import type { PublicRuntimeCheckpoint } from '../src/runtime/publicRuntimeCheckp
 
 const preview = process.env.PREVIEW_URL ?? 'https://deploy-preview-67--survival-zero-ai-test.netlify.app'
 const endpoint = `${preview}/.netlify/functions/gm`
+const keyStatusEndpoint = `${preview}/.netlify/functions/openrouter-key-status`
 
 type SmokeResult = { label: string; ok: boolean; detail: string }
+type KeyHealth = {
+  status?: string
+  has_spending_limit?: boolean
+  spending_limit_exhausted?: boolean
+  http_status?: number
+}
+
 const results: SmokeResult[] = []
-// Stability pass 2 intentionally repeats the same 10 live inputs against Deploy Preview.
 
 function mudTimes(narrative: string): string[] {
   return [...narrative.matchAll(/^##\s+(\d{2}:\d{2})\b/gmu)].map((match) => match[1]!)
@@ -42,6 +49,15 @@ function assertCommitted(before: PublicRuntimeCheckpoint, after: PublicRuntimeCh
   }
 }
 
+async function assertKeyHealthy() {
+  const response = await fetch(keyStatusEndpoint)
+  const health = await response.json() as KeyHealth
+  console.log(`OPENROUTER KEY PREFLIGHT: ${JSON.stringify(health)}`)
+  if (!response.ok || health.status !== 'valid_key' || health.spending_limit_exhausted === true) {
+    throw new Error(`OpenRouter key preflight failed: ${JSON.stringify(health)}`)
+  }
+}
+
 async function tryTurn(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput, label: string): Promise<PublicRuntimeCheckpoint | undefined> {
   const provider = new HttpGMProvider(fetch, endpoint)
   const started = Date.now()
@@ -63,6 +79,8 @@ async function tryTurn(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput
 }
 
 async function main() {
+  await assertKeyHealthy()
+
   const independent: Array<[string, GMPlayerInput]> = [
     ['choice-1', { kind: 'numbered-choice', choice_id: 1 }],
     ['choice-2', { kind: 'numbered-choice', choice_id: 2 }],
