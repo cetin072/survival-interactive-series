@@ -5,6 +5,7 @@ import { OpenRouterStoryProvider } from './openRouterStoryProvider'
 
 type CapturedRequest = {
   body?: {
+    max_tokens?: number
     messages?: Array<{ role?: string; content?: string }>
   }
 }
@@ -21,21 +22,39 @@ function compactResponse(candidate: unknown): Response {
   })
 }
 
-describe('OpenRouter Story Provider — GM Pipeline v2.1', () => {
-  it('sends compact continuity memory and commits compiled intents through Validator/Action Queue', async () => {
+function longTurn(prefix: string): string {
+  return `${prefix}
+
+준호는 첫 판단을 실행한 뒤 거기서 멈추지 않고 다음 상황까지 이어서 본다. 회사 안에서는 조기 퇴근을 준비하는 직원들이 늘고, 차량 출구 쪽 혼잡도 빠르게 커진다. 지금 무엇을 먼저 하느냐가 이후 이동 범위를 바꿀 수 있다.
+
+민석은 보호자 연락이 시작된 학원 안에서 휴대폰으로 주변 교통을 확인한다. 단순히 기다리기보다 큰길과 골목의 정체 차이를 보고 준호에게 자신이 확인한 내용을 전달한다. 경험은 부족하지만 가족에게 필요한 역할을 하려는 태도가 드러난다.
+
+서윤은 병원에서 자기 상황을 따로 판단한다. 응급실 대응이 시작되면 바로 나오기 어렵다는 점을 분명히 하고, 운전 중인 준호가 모든 연락을 떠안지 않도록 자신이 할 수 있는 연락을 맡겠다고 한다. 가족 계획은 준호의 말 한마디대로만 움직이지 않는다.
+
+정호 쪽에서는 외곽 도로와 마을 상황이 동시에 변한다. 정호는 아들이 걱정한다고 곧바로 구조 대상처럼 행동하지 않고, 자신이 아는 동네 상황과 이웃의 사정을 함께 보면서 움직일 시점을 판단하려 한다. 그 판단 때문에 준호의 계획과 긴장이 생긴다.
+
+그 사이 재난 안내는 한 단계 더 구체화된다. 단순한 대피 준비 권고였던 문구가 특정 외곽 도로의 통제 가능성과 이동 시점에 대한 안내로 바뀌면서 가족이 쓸 수 있는 시간이 줄어든다. 세계는 준호가 다음 버튼을 누를 때까지 멈춰 있지 않는다.
+
+준호는 이미 정한 방향 안에서 차량 확보, 연락 공유, 이동 준비 같은 세부 행동은 계속 처리한다. 작은 실행 하나마다 다시 결정을 묻지 않고, 가족도 각자 자기 위치에서 필요한 일을 진행한다. 한 번의 선택이 실제 여러 장면으로 이어진다.
+
+마지막에는 기존 계획을 그대로 유지하기 어려운 새로운 조건이 생긴다. 이제는 단순히 전화 한 번 더 할지가 아니라 누구를 먼저 회수할지, 외곽 위험을 감수할지, 가족의 자율 판단을 어디까지 믿을지처럼 전략적인 선택이 필요해진다.`
+}
+
+describe('OpenRouter Story Provider — GM Pipeline v2.2', () => {
+  it('sends compact continuity and family addressing, then commits compiled intents through Validator/Action Queue', async () => {
     const captured: CapturedRequest = {}
     const fetchImpl: typeof fetch = async (_input, init) => {
       captured.body = JSON.parse(String(init?.body)) as CapturedRequest['body']
       return compactResponse({
-        story: '## 18:21 — 학원으로 출발\n\n민석에게 전화한 뒤 차량에 올라 학원 방향으로 출발한다. 민석에게서 조기 귀가가 시작됐다는 연락이 왔다.',
-        choices: ['민석에게 직행한다', '정호의 대피 위치를 정한다', '서윤과 합류점을 정한다', '도로 통제 한 곳만 확인한다'],
+        story: longTurn('## 18:21 — 학원으로 출발\n\n민석에게 전화한 뒤 차량에 올라 학원 방향으로 출발한다. 민석에게서 조기 귀가가 시작됐다는 연락이 왔다.'),
+        choices: ['민석을 우선 회수하고 외곽 대응은 가족에게 맡긴다', '민석과 중간 합류 지점을 정하고 외곽으로 방향을 튼다', '서윤과 역할을 다시 나눠 두 위험을 동시에 처리한다', '외곽 통제가 확정되기 전에 가족 전체 합류 계획을 바꾼다'],
         state_hints: [
           { kind: 'time', minutes: 4 },
           { kind: 'move', entity: 'player', to: '민석 학원' },
           { kind: 'move', entity: 'family_car', to: '민석 학원' },
           { kind: 'signal', text: '민석 학원에서 보호자 조기 귀가가 시작됐다' },
         ],
-        action_resolution: { status: 'completed', summary: '민석에게 연락하고 학원 방향으로 출발했다.' },
+        action_resolution: { status: 'completed', summary: '민석에게 연락하고 학원 방향으로 출발한 뒤 후속 가족 대응까지 이어갔다.' },
         open_threads: ['정호의 외곽 대피 여부는 아직 확인되지 않았다'],
       })
     }
@@ -49,6 +68,10 @@ describe('OpenRouter Story Provider — GM Pipeline v2.1', () => {
     expect(userMessage).toContain('recent_story_memory')
     expect(userMessage).toContain('open_threads')
     expect(userMessage).toContain('writable_ids')
+    expect(userMessage).toContain('family_addressing')
+    expect(userMessage).toContain('아버님')
+    expect(userMessage).toContain('할아버지')
+    expect(captured.body?.max_tokens).toBe(4200)
     expect(userMessage).not.toContain('raw_transcript')
     expect(userMessage).not.toContain('hidden_seed')
     expect(userMessage).not.toContain('action_id_prefix')
@@ -80,16 +103,16 @@ describe('OpenRouter Story Provider — GM Pipeline v2.1', () => {
     expect(next.current_scene).toEqual(initial.current_scene)
   })
 
-  it('drops unsupported hints but still permits a grounded story-only turn', async () => {
+  it('drops unsupported hints but still permits a grounded long story-only turn', async () => {
     const fetchImpl: typeof fetch = async () => compactResponse({
-      story: '## 18:20 — 가족 통화\n\n서윤과 가족 합류 순서를 먼저 정한다. 서윤은 병원 상황을 보고 움직이겠다고 답한다.',
-      choices: ['민석에게 연락한다', '정호에게 연락한다', '바로 출발한다', '회사 공지를 확인한다'],
+      story: longTurn('## 가족 통화\n\n서윤과 가족 합류 순서를 먼저 정한다. 서윤은 병원 상황을 보고 움직이겠다고 답하고, 가족들은 각자 할 수 있는 후속 행동을 이어간다.'),
+      choices: ['민석을 우선 회수한다', '정호의 자력 대피를 우선한다', '서윤과 합류 우선순위를 바꾼다', '외곽 위험이 커지기 전에 전체 계획을 다시 짠다'],
       state_hints: [
         { kind: 'move', entity: 'unknown_person', to: '비밀 장소' },
         { kind: 'resource', resource_id: 'unknown_resource', to: '무한' },
         { kind: 'canon_change', value: 'drop' },
       ],
-      action_resolution: { status: 'completed', summary: '서윤과 가족 합류 순서를 먼저 정했다.' },
+      action_resolution: { status: 'completed', summary: '서윤과 가족 합류 순서를 먼저 정하고 각 가족의 후속 대응을 이어갔다.' },
       open_threads: [],
     })
 
