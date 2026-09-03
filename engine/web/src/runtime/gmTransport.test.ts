@@ -115,7 +115,41 @@ describe('GM HTTP transport contract', () => {
     expect(result.status).toBe('proposal')
   })
 
-  it('returns safe unavailable result on network, HTTP proposal rejection, or invalid JSON', async () => {
+  it('retries a transient 503/invalid gateway response once without requiring another player click', async () => {
+    const checkpoint = createSyntheticPublicRuntimeFixture()
+    const calls: string[] = []
+    const provider = new HttpGMProvider(async (input) => {
+      calls.push(String(input))
+      if (calls.length === 1) return new Response('<html>gateway unavailable</html>', { status: 503 })
+      return new Response(JSON.stringify({ status: 'proposal', proposal: { actions: [], narrative: 'recovered', next_choices: [], presentation_blocks: [] } }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    })
+
+    const result = await provider.proposeTurn({ input: { kind: 'ordered-choices', choice_ids: [1, 2] }, checkpoint })
+    expect(calls).toEqual(['/api/gm', '/.netlify/functions/gm'])
+    expect(result.status).toBe('proposal')
+  })
+
+  it('retries the same explicit endpoint once after a transient response', async () => {
+    const checkpoint = createSyntheticPublicRuntimeFixture()
+    let calls = 0
+    const provider = new HttpGMProvider(async () => {
+      calls += 1
+      if (calls === 1) return new Response('gateway timeout', { status: 504 })
+      return new Response(JSON.stringify({ status: 'proposal', proposal: { actions: [], narrative: 'recovered', next_choices: [], presentation_blocks: [] } }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    }, '/.netlify/functions/gm')
+
+    const result = await provider.proposeTurn({ input: { kind: 'numbered-choice', choice_id: 3 }, checkpoint })
+    expect(calls).toBe(2)
+    expect(result.status).toBe('proposal')
+  })
+
+  it('returns safe unavailable result after retrying network, HTTP proposal rejection, or invalid JSON failures', async () => {
     const checkpoint = createSyntheticPublicRuntimeFixture()
     const request = { input: { kind: 'numbered-choice' as const, choice_id: 1 }, checkpoint }
 
