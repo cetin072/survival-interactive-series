@@ -7,6 +7,9 @@ import type { PublicRuntimeCheckpoint } from '../src/runtime/publicRuntimeCheckp
 const preview = process.env.PREVIEW_URL ?? 'https://deploy-preview-67--survival-zero-ai-test.netlify.app'
 const endpoint = `${preview}/.netlify/functions/gm`
 
+type SmokeResult = { label: string; ok: boolean; detail: string }
+const results: SmokeResult[] = []
+
 function mudTimes(narrative: string): string[] {
   return [...narrative.matchAll(/^##\s+(\d{2}:\d{2})\b/gmu)].map((match) => match[1]!)
 }
@@ -38,14 +41,24 @@ function assertCommitted(before: PublicRuntimeCheckpoint, after: PublicRuntimeCh
   }
 }
 
-async function runTurn(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput, label: string) {
+async function tryTurn(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput, label: string): Promise<PublicRuntimeCheckpoint | undefined> {
   const provider = new HttpGMProvider(fetch, endpoint)
   const started = Date.now()
-  const next = await runGMProviderTurn(checkpoint, input, provider)
-  const ms = Date.now() - started
-  assertCommitted(checkpoint, next, label)
-  console.log(`PASS ${label} ${ms}ms turn=${next.committed_turn.number} time=${next.time} location=${next.player_location} choices=${next.current_scene.choices.length}`)
-  return next
+  try {
+    const next = await runGMProviderTurn(checkpoint, input, provider)
+    const ms = Date.now() - started
+    assertCommitted(checkpoint, next, label)
+    const detail = `${ms}ms turn=${next.committed_turn.number} time=${next.time} location=${next.player_location} choices=${next.current_scene.choices.length}`
+    results.push({ label, ok: true, detail })
+    console.log(`PASS ${label} ${detail}`)
+    return next
+  } catch (error) {
+    const ms = Date.now() - started
+    const detail = `${ms}ms ${error instanceof Error ? error.message : String(error)}`
+    results.push({ label, ok: false, detail })
+    console.error(`FAIL ${label} ${detail}`)
+    return undefined
+  }
 }
 
 async function main() {
@@ -60,19 +73,24 @@ async function main() {
   ]
 
   for (const [label, input] of independent) {
-    await runTurn(createStorytellingBenchmarkSession(), input, label)
+    await tryTurn(createStorytellingBenchmarkSession(), input, label)
   }
 
-  let chain = createStorytellingBenchmarkSession()
-  chain = await runTurn(chain, { kind: 'numbered-choice', choice_id: 1 }, 'chain-turn-1')
-  chain = await runTurn(chain, { kind: 'numbered-choice', choice_id: 1 }, 'chain-turn-2')
-  chain = await runTurn(chain, { kind: 'free-action', text: '현재 가족 상황을 기준으로 가장 위험한 곳에 있는 가족부터 챙기되, 이미 정한 이동은 계속 진행한다' }, 'chain-turn-3-free')
+  let chain: PublicRuntimeCheckpoint | undefined = createStorytellingBenchmarkSession()
+  chain = chain ? await tryTurn(chain, { kind: 'numbered-choice', choice_id: 1 }, 'chain-turn-1') : undefined
+  chain = chain ? await tryTurn(chain, { kind: 'numbered-choice', choice_id: 1 }, 'chain-turn-2') : undefined
+  chain = chain ? await tryTurn(chain, { kind: 'free-action', text: '현재 가족 상황을 기준으로 가장 위험한 곳에 있는 가족부터 챙기되, 이미 정한 이동은 계속 진행한다' }, 'chain-turn-3-free') : undefined
 
-  console.log('LIVE PREVIEW SMOKE: 10/10 PASS')
+  const passed = results.filter((result) => result.ok).length
+  console.log('--- LIVE PREVIEW SMOKE SUMMARY ---')
+  for (const result of results) console.log(`${result.ok ? 'PASS' : 'FAIL'} ${result.label}: ${result.detail}`)
+  console.log(`LIVE PREVIEW SMOKE: ${passed}/${results.length} PASS`)
+
+  if (passed !== 10 || results.length !== 10) process.exit(1)
 }
 
 main().catch((error) => {
-  console.error('LIVE PREVIEW SMOKE FAILED')
+  console.error('LIVE PREVIEW SMOKE HARNESS FAILED')
   console.error(error instanceof Error ? error.stack : String(error))
   process.exit(1)
 })
