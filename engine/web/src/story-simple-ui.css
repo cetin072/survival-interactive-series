@@ -94,22 +94,106 @@ body {
 
 .story-simple-scene + .story-simple-scene,
 .story-simple-player-log + .story-simple-scene {
-  margin-top: 2.4rem;
+  margin-top: 2.5rem;
 }
 
-.story-simple-scene p {
+.story-mud-blocks {
+  display: grid;
+  gap: 1.08rem;
+}
+
+.story-mud-heading {
+  margin: .35rem 0 .15rem;
+  color: #f1f6f2;
+  font: 900 1.20rem/1.35 system-ui, sans-serif;
+  letter-spacing: -.02em;
+  word-break: keep-all;
+}
+
+.story-mud-subheading {
+  margin: .55rem 0 0;
+  padding-top: .75rem;
+  border-top: 1px solid #34473a;
+  color: #9fc0a7;
+  font: 850 .76rem/1.35 system-ui, sans-serif;
+  letter-spacing: .06em;
+}
+
+.story-mud-paragraph {
   margin: 0;
   color: #edf2ee;
-  font-size: 1.24rem;
-  font-weight: 500;
-  line-height: 1.82;
+  font: 500 1.22rem/1.80 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: -.018em;
   word-break: keep-all;
   overflow-wrap: break-word;
 }
 
-.story-simple-scene p + p {
-  margin-top: 1.35rem;
+.story-mud-dialogue {
+  padding: 12px 14px;
+  border-left: 3px solid #789a81;
+  background: #0d1811;
+}
+
+.story-mud-dialogue strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #91bc9c;
+  font: 850 .72rem/1.25 system-ui, sans-serif;
+  letter-spacing: .035em;
+}
+
+.story-mud-dialogue p {
+  margin: 0;
+  color: #f1f5f2;
+  font: 650 1.08rem/1.68 system-ui, sans-serif;
+  word-break: keep-all;
+}
+
+.story-mud-signal {
+  padding: 12px 14px;
+  border: 1px solid #665a35;
+  border-left: 3px solid #d0aa62;
+  background: #17150f;
+}
+
+.story-mud-signal strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #d8b66f;
+  font: 900 .70rem/1.25 system-ui, sans-serif;
+  letter-spacing: .06em;
+}
+
+.story-mud-signal p {
+  margin: 0;
+  color: #e4dac2;
+  font: 600 .98rem/1.62 system-ui, sans-serif;
+  word-break: keep-all;
+}
+
+.story-mud-signal p + p { margin-top: 5px; }
+
+.story-mud-list {
+  margin: 0;
+  padding: 12px 14px 12px 32px;
+  border: 1px solid #33483a;
+  background: #0d1610;
+  color: #d9e3db;
+}
+
+.story-mud-list li {
+  padding-left: 2px;
+  font: 600 .96rem/1.60 system-ui, sans-serif;
+  word-break: keep-all;
+}
+
+.story-mud-list li + li { margin-top: 4px; }
+
+.story-mud-divider {
+  width: 100%;
+  margin: .45rem 0;
+  border: 0;
+  border-top: 1px solid #34483a;
 }
 
 .story-simple-player-log {
@@ -280,10 +364,11 @@ body {
     padding: 20px 17px max(34px, env(safe-area-inset-bottom));
   }
 
-  .story-simple-scene p {
-    font-size: 1.27rem;
-    line-height: 1.84;
-  }
+  .story-mud-blocks { gap: 1rem; }
+  .story-mud-heading { font-size: 1.16rem; }
+  .story-mud-paragraph { font-size: 1.24rem; line-height: 1.82; }
+  .story-mud-dialogue p { font-size: 1.06rem; }
+  .story-mud-signal p { font-size: .96rem; }
 
   .story-simple-choice-list > button {
     min-height: 56px;
