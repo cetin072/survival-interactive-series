@@ -79,6 +79,34 @@ function existingOpenThreads(request: GMProviderTurnRequest): string[] {
   return value.filter((item): item is string => typeof item === 'string').slice(0, 4)
 }
 
+function extractChoiceStrings(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  const result: string[] = []
+  for (const item of value) {
+    if (typeof item === 'string' && item.trim()) {
+      result.push(item.trim())
+      continue
+    }
+    if (!isRecord(item)) continue
+    for (const key of ['label', 'text', 'action']) {
+      const candidate = item[key]
+      if (typeof candidate === 'string' && candidate.trim()) {
+        result.push(candidate.trim())
+        break
+      }
+    }
+  }
+  return result
+}
+
+function candidateStory(parsed: Record<string, unknown>): string | undefined {
+  for (const key of ['story', 'narrative', 'scene', 'text']) {
+    const value = parsed[key]
+    if (typeof value === 'string' && value.trim()) return value.trim()
+  }
+  return undefined
+}
+
 /**
  * Emergency fallback output is repaired deterministically rather than rejected for
  * non-critical schema omissions. Story text is never invented by the server.
@@ -87,11 +115,14 @@ export function repairFastFallbackCandidate(
   request: GMProviderTurnRequest,
   parsed: unknown,
 ): CompactStoryCandidate | undefined {
-  if (!isRecord(parsed) || typeof parsed.story !== 'string' || !parsed.story.trim()) return undefined
+  if (!isRecord(parsed)) return undefined
+  const story = candidateStory(parsed)
+  if (!story) return undefined
 
-  const generatedChoices = Array.isArray(parsed.choices)
-    ? parsed.choices.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
-    : []
+  const generatedChoices = [
+    ...extractChoiceStrings(parsed.choices),
+    ...extractChoiceStrings(parsed.next_choices),
+  ]
   const previousChoices = request.checkpoint.current_scene.choices.map((choice) => choice.label)
   const repairedChoices = [...new Set([...generatedChoices, ...previousChoices])].slice(0, 4)
   if (repairedChoices.length < 2) return undefined
@@ -102,6 +133,7 @@ export function repairFastFallbackCandidate(
 
   const candidate = normalizeCompactStoryCandidate({
     ...parsed,
+    story,
     choices: repairedChoices,
     state_hints: Array.isArray(parsed.state_hints) ? parsed.state_hints : [],
     action_resolution: actionResolution,
@@ -109,6 +141,25 @@ export function repairFastFallbackCandidate(
   })
 
   return candidate && candidate.choices.length >= 2 ? candidate : undefined
+}
+
+function repairPlainTextFallback(request: GMProviderTurnRequest, content: string): CompactStoryCandidate | undefined {
+  const story = content
+    .replace(/^```(?:text|markdown)?\s*/i, '')
+    .replace(/```\s*$/i, '')
+    .trim()
+  if (story.length < 80) return undefined
+
+  return normalizeCompactStoryCandidate({
+    story,
+    choices: request.checkpoint.current_scene.choices.map((choice) => choice.label).slice(0, 4),
+    state_hints: [],
+    action_resolution: {
+      status: 'attempted',
+      summary: `비상 GM이 플레이어 행동을 이어서 처리했다: ${playerActionSummary(request)}`,
+    },
+    open_threads: existingOpenThreads(request),
+  })
 }
 
 export class OpenRouterFastFallbackProvider implements GMProvider {
@@ -170,12 +221,14 @@ export class OpenRouterFastFallbackProvider implements GMProvider {
       const payload = await response.json() as OpenRouterPayload
       const choice = payload.choices?.[0]
       const content = choice?.message?.content
-      if (typeof content !== 'string') {
+      if (typeof content !== 'string' || !content.trim()) {
         return { status: 'unavailable', message: 'Fast fallback 응답 형식이 올바르지 않습니다.', diagnostic: { key_present: true, failure_category: 'unsupported_response_shape' } }
       }
 
       const parsed = parseJsonObject(content)
-      const candidate = parsed === undefined ? undefined : repairFastFallbackCandidate(request, parsed)
+      const candidate = parsed === undefined
+        ? repairPlainTextFallback(request, content)
+        : repairFastFallbackCandidate(request, parsed) ?? repairPlainTextFallback(request, content)
       if (!candidate) {
         return { status: 'unavailable', message: 'Fast fallback 이야기 구조를 복구하지 못했습니다.', diagnostic: { key_present: true, failure_category: 'compact_schema_mismatch' } }
       }
@@ -192,7 +245,7 @@ export class OpenRouterFastFallbackProvider implements GMProvider {
         diagnostic: {
           key_present: true,
           response_fingerprint: {
-            contract: 'compact_story_fast_fallback_v2',
+            contract: 'compact_story_fast_fallback_v3',
             story_chars: candidate.story.length,
             choice_count: candidate.choices.length,
           },
