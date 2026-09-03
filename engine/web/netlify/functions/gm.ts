@@ -7,13 +7,21 @@ import { addChoiceReferenceContext } from '../../src/server/playerActionContext'
 const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8' }
 const PREVIEW_STORY_MODEL = 'deepseek/deepseek-v4-pro-0813:nitro'
 const PREVIEW_TIMEOUT_MS = 45_000
+const PREVIEW_TRANSIENT_RETRY_DELAY_MS = 250
 
 type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
-
 type NetlifyRequestContext = { deploy?: { context?: string } }
 
 function json(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), { status, headers: JSON_HEADERS })
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function isTransientUpstreamStatus(status: number): boolean {
+  return status === 408 || status === 429 || status >= 500
 }
 
 function modelOverrideFetch(model: string): FetchLike {
@@ -27,10 +35,27 @@ function modelOverrideFetch(model: string): FetchLike {
       return fetch(input, init)
     }
 
-    return fetch(input, {
+    const requestInit: RequestInit = {
       ...init,
       body: JSON.stringify({ ...body, model }),
-    })
+    }
+    const requestOnce = () => fetch(input, requestInit)
+
+    let response: Response
+    try {
+      response = await requestOnce()
+    } catch (error) {
+      if (init.signal?.aborted) throw error
+      await sleep(PREVIEW_TRANSIENT_RETRY_DELAY_MS)
+      return requestOnce()
+    }
+
+    if (isTransientUpstreamStatus(response.status) && !init.signal?.aborted) {
+      await sleep(PREVIEW_TRANSIENT_RETRY_DELAY_MS)
+      return requestOnce()
+    }
+
+    return response
   }
 }
 
