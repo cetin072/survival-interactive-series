@@ -31,7 +31,7 @@ describe('GM HTTP transport contract', () => {
     expect(validateGMTransportResponse({ status: 'proposal' }).valid).toBe(false)
   })
 
-  it('posts to /api/gm and returns a structured proposal envelope', async () => {
+  it('posts to /api/gm and marks the first request as attempt zero', async () => {
     const checkpoint = createSyntheticPublicRuntimeFixture()
     const calls: Array<{ input: RequestInfo | URL; init?: RequestInit }> = []
     const provider = new HttpGMProvider(async (input, init) => {
@@ -46,6 +46,7 @@ describe('GM HTTP transport contract', () => {
     expect(calls).toHaveLength(1)
     expect(String(calls[0].input)).toBe('/api/gm')
     expect(calls[0].init?.method).toBe('POST')
+    expect(new Headers(calls[0].init?.headers).get('x-gm-retry-attempt')).toBe('0')
     expect(result.status).toBe('proposal')
   })
 
@@ -98,11 +99,11 @@ describe('GM HTTP transport contract', () => {
     }
   })
 
-  it('retries the direct Netlify function path after /api/gm network failure', async () => {
+  it('retries the direct Netlify function path after /api/gm network failure and marks attempt one', async () => {
     const checkpoint = createSyntheticPublicRuntimeFixture()
-    const calls: string[] = []
-    const provider = new HttpGMProvider(async (input) => {
-      calls.push(String(input))
+    const calls: Array<{ path: string; attempt: string | null }> = []
+    const provider = new HttpGMProvider(async (input, init) => {
+      calls.push({ path: String(input), attempt: new Headers(init?.headers).get('x-gm-retry-attempt') })
       if (String(input) === '/api/gm') throw new Error('rewrite failed')
       return new Response(JSON.stringify({ status: 'proposal', proposal: { actions: [], narrative: 'ok', next_choices: [], presentation_blocks: [] } }), {
         status: 200,
@@ -111,15 +112,18 @@ describe('GM HTTP transport contract', () => {
     })
 
     const result = await provider.proposeTurn({ input: { kind: 'numbered-choice', choice_id: 1 }, checkpoint })
-    expect(calls).toEqual(['/api/gm', '/.netlify/functions/gm'])
+    expect(calls).toEqual([
+      { path: '/api/gm', attempt: '0' },
+      { path: '/.netlify/functions/gm', attempt: '1' },
+    ])
     expect(result.status).toBe('proposal')
   })
 
   it('retries a transient 503/invalid gateway response once without requiring another player click', async () => {
     const checkpoint = createSyntheticPublicRuntimeFixture()
-    const calls: string[] = []
-    const provider = new HttpGMProvider(async (input) => {
-      calls.push(String(input))
+    const calls: Array<{ path: string; attempt: string | null }> = []
+    const provider = new HttpGMProvider(async (input, init) => {
+      calls.push({ path: String(input), attempt: new Headers(init?.headers).get('x-gm-retry-attempt') })
       if (calls.length === 1) return new Response('<html>gateway unavailable</html>', { status: 503 })
       return new Response(JSON.stringify({ status: 'proposal', proposal: { actions: [], narrative: 'recovered', next_choices: [], presentation_blocks: [] } }), {
         status: 200,
@@ -128,16 +132,19 @@ describe('GM HTTP transport contract', () => {
     })
 
     const result = await provider.proposeTurn({ input: { kind: 'ordered-choices', choice_ids: [1, 2] }, checkpoint })
-    expect(calls).toEqual(['/api/gm', '/.netlify/functions/gm'])
+    expect(calls).toEqual([
+      { path: '/api/gm', attempt: '0' },
+      { path: '/.netlify/functions/gm', attempt: '1' },
+    ])
     expect(result.status).toBe('proposal')
   })
 
-  it('retries the same explicit endpoint once after a transient response', async () => {
+  it('retries the same explicit endpoint once after a transient response and marks fallback attempt', async () => {
     const checkpoint = createSyntheticPublicRuntimeFixture()
-    let calls = 0
-    const provider = new HttpGMProvider(async () => {
-      calls += 1
-      if (calls === 1) return new Response('gateway timeout', { status: 504 })
+    const attempts: Array<string | null> = []
+    const provider = new HttpGMProvider(async (_input, init) => {
+      attempts.push(new Headers(init?.headers).get('x-gm-retry-attempt'))
+      if (attempts.length === 1) return new Response('gateway timeout', { status: 504 })
       return new Response(JSON.stringify({ status: 'proposal', proposal: { actions: [], narrative: 'recovered', next_choices: [], presentation_blocks: [] } }), {
         status: 200,
         headers: { 'content-type': 'application/json' },
@@ -145,7 +152,7 @@ describe('GM HTTP transport contract', () => {
     }, '/.netlify/functions/gm')
 
     const result = await provider.proposeTurn({ input: { kind: 'numbered-choice', choice_id: 3 }, checkpoint })
-    expect(calls).toBe(2)
+    expect(attempts).toEqual(['0', '1'])
     expect(result.status).toBe('proposal')
   })
 
