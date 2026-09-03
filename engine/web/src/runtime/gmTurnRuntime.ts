@@ -39,15 +39,19 @@ function withCurrentScenePreserved(checkpoint: PublicRuntimeCheckpoint): LogEntr
   ]
 }
 
-function fallback(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput, message: string): PublicRuntimeCheckpoint {
+/**
+ * Provider failures must never look like committed player decisions.
+ * Keep only a system diagnostic so retrying the same choice cannot duplicate
+ * visible choice/free-action history or pollute recent_decisions.
+ */
+function fallback(checkpoint: PublicRuntimeCheckpoint, message: string): PublicRuntimeCheckpoint {
   const preservedLog = withCurrentScenePreserved(checkpoint)
-  const logId = preservedLog.length
   return createPublicRuntimeCheckpoint({
     ...checkpoint,
     current_scene: checkpoint.current_scene,
     committed_turn: {
       ...checkpoint.committed_turn,
-      log: [...preservedLog, inputLog(checkpoint, input, logId), { id: logId + 1, kind: 'system', text: message }],
+      log: [...preservedLog, { id: preservedLog.length, kind: 'system', text: message }],
     },
   })
 }
@@ -92,12 +96,12 @@ export async function runGMProviderTurn(
   try {
     providerResult = await provider.proposeTurn({ input, checkpoint })
   } catch {
-    return fallback(checkpoint, input, 'AI GM 연결에 실패했습니다.')
+    return fallback(checkpoint, 'AI GM 연결에 실패했습니다.')
   }
-  if (providerResult.status === 'unavailable') return fallback(checkpoint, input, providerResult.message)
+  if (providerResult.status === 'unavailable') return fallback(checkpoint, providerResult.message)
 
   const parsed = validateGMProposal(providerResult.proposal)
-  if (!parsed.valid) return fallback(checkpoint, input, `AI GM 제안을 처리하지 않았습니다: ${parsed.message}`)
+  if (!parsed.valid) return fallback(checkpoint, `AI GM 제안을 처리하지 않았습니다: ${parsed.message}`)
 
   const queue = runActionQueue(checkpoint.public_state, parsed.proposal.actions)
   const preservedLog = withCurrentScenePreserved(checkpoint)
