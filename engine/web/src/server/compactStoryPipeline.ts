@@ -8,6 +8,9 @@ const PARTY_IDS = new Set<PartyMemberId>(['player', 'wife', 'son', 'father'])
 const MAX_HINTS = 6
 const MAX_TIME_DELTA_MIN = 180
 const MAX_SIGNALS = 6
+const MAX_OPEN_THREADS = 4
+const MAX_RECENT_STORY_MEMORY = 3
+const MAX_STORY_MEMORY_CHARS = 900
 
 export type StoryStateHint =
   | { kind: 'time'; minutes: number }
@@ -16,11 +19,20 @@ export type StoryStateHint =
   | { kind: 'base_capability'; base_id: string; add: string }
   | { kind: 'signal'; text: string }
 
+export type ActionResolution = {
+  status: 'attempted' | 'completed' | 'partial' | 'blocked'
+  summary: string
+}
+
 export type CompactStoryCandidate = {
   story: string
   choices: string[]
   state_hints: StoryStateHint[]
+  action_resolution?: ActionResolution
+  open_threads?: string[]
 }
+
+export type StoryQualityIssue = 'missing_action_resolution' | 'action_not_grounded' | 'repeated_scene' | 'internal_repetition'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -42,6 +54,13 @@ function playerAction(request: GMProviderTurnRequest) {
   return { kind: 'numbered-choice', action: choiceLabel(checkpoint, input.choice_id) }
 }
 
+function playerActionText(request: GMProviderTurnRequest): string {
+  const action = playerAction(request)
+  if (action.kind === 'free-action') return action.text
+  if (action.kind === 'ordered-choices') return action.ordered.map((item) => item.action).join(' / ')
+  return action.action
+}
+
 function stringArray(value: JsonValue | undefined, max = MAX_SIGNALS): string[] {
   if (!Array.isArray(value)) return []
   return value.filter((item): item is string => typeof item === 'string').slice(-max)
@@ -53,6 +72,40 @@ function boundedCharacterNotes(value: JsonValue | undefined): Record<string, str
     .filter(([, note]) => typeof note === 'string')
     .slice(0, 4)
     .map(([id, note]) => [id, String(note).slice(0, 240)]))
+}
+
+function compactSceneMemory(text: string): string {
+  const lines = text.replace(/\r/g, '').split('\n').map((line) => line.trim()).filter(Boolean)
+  if (lines.length === 0) return ''
+
+  const structural: string[] = []
+  const prose: string[] = []
+  for (const line of lines) {
+    if (/^#{2,3}\s/.test(line) || /^>/.test(line) || /^-\s/.test(line) || /^[^:：]{1,28}[:：]\s*[“"']/.test(line)) {
+      structural.push(line)
+    } else if (!/^###?\s*(현재|선택|행동)/.test(line)) {
+      prose.push(line)
+    }
+  }
+
+  const selected = [
+    ...structural,
+    ...prose.slice(0, 2),
+    ...prose.slice(-2),
+  ].filter((line, index, all) => all.indexOf(line) === index)
+
+  return selected.join('\n').slice(0, MAX_STORY_MEMORY_CHARS)
+}
+
+function recentStoryMemory(checkpoint: PublicRuntimeCheckpoint): string[] {
+  const scenes = checkpoint.committed_turn.log
+    .filter((entry) => entry.kind === 'scene' && entry.text !== checkpoint.current_scene.narrative)
+    .map((entry) => entry.text)
+    .filter((text, index, all) => all.indexOf(text) === index)
+    .slice(-MAX_RECENT_STORY_MEMORY)
+    .map(compactSceneMemory)
+    .filter(Boolean)
+  return scenes
 }
 
 /**
@@ -71,6 +124,8 @@ export function buildCompactGMBrief(request: GMProviderTurnRequest) {
     turn: checkpoint.committed_turn.number + 1,
     player_action: playerAction(request),
     current_scene: checkpoint.current_scene.narrative,
+    recent_story_memory: recentStoryMemory(checkpoint),
+    open_threads: stringArray(state.public_world.gm_open_threads, MAX_OPEN_THREADS),
     now: {
       date: checkpoint.date,
       time: checkpoint.time,
@@ -127,6 +182,23 @@ function normalizeHint(value: unknown): StoryStateHint | undefined {
   return undefined
 }
 
+function normalizeActionResolution(value: unknown): ActionResolution | undefined {
+  if (!isRecord(value) || typeof value.status !== 'string' || typeof value.summary !== 'string') return undefined
+  if (!['attempted', 'completed', 'partial', 'blocked'].includes(value.status)) return undefined
+  const summary = value.summary.trim().slice(0, 240)
+  if (!summary) return undefined
+  return { status: value.status as ActionResolution['status'], summary }
+}
+
+function normalizeOpenThreads(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) return undefined
+  return value
+    .filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+    .map((item) => item.trim().slice(0, 180))
+    .filter((item, index, all) => all.indexOf(item) === index)
+    .slice(0, MAX_OPEN_THREADS)
+}
+
 export function normalizeCompactStoryCandidate(value: unknown): CompactStoryCandidate | undefined {
   if (!isRecord(value) || typeof value.story !== 'string' || !Array.isArray(value.choices)) return undefined
   const story = value.story.trim()
@@ -142,10 +214,41 @@ export function normalizeCompactStoryCandidate(value: unknown): CompactStoryCand
     .map(normalizeHint)
     .filter((hint): hint is StoryStateHint => Boolean(hint))
 
-  return { story, choices, state_hints: stateHints }
+  return {
+    story,
+    choices,
+    state_hints: stateHints,
+    action_resolution: normalizeActionResolution(value.action_resolution),
+    open_threads: normalizeOpenThreads(value.open_threads),
+  }
 }
 
-function compileHints(checkpoint: PublicRuntimeCheckpoint, hints: StoryStateHint[], turnNumber: number): QueuedAction[] {
+function parseClockMinutes(value: string): number | undefined {
+  const match = /^(\d{2}):(\d{2})$/.exec(value)
+  if (!match) return undefined
+  const hour = Number(match[1])
+  const minute = Number(match[2])
+  if (hour > 23 || minute > 59) return undefined
+  return hour * 60 + minute
+}
+
+function inferTimeDeltaFromStory(checkpoint: PublicRuntimeCheckpoint, story: string): number {
+  const heading = story.match(/^##\s+(\d{2}:\d{2})\b/m)?.[1]
+  if (!heading) return 0
+  const from = parseClockMinutes(checkpoint.time)
+  const to = parseClockMinutes(heading)
+  if (from === undefined || to === undefined) return 0
+  const delta = to - from
+  return delta > 0 && delta <= MAX_TIME_DELTA_MIN ? delta : 0
+}
+
+function compileHints(
+  checkpoint: PublicRuntimeCheckpoint,
+  hints: StoryStateHint[],
+  turnNumber: number,
+  story: string,
+  openThreads?: string[],
+): QueuedAction[] {
   const state = checkpoint.public_state
   let timeDelta = 0
   const partyMoves = new Map<string, string>()
@@ -171,6 +274,8 @@ function compileHints(checkpoint: PublicRuntimeCheckpoint, hints: StoryStateHint
     }
     if (hint.kind === 'signal') signals.add(hint.text)
   }
+
+  if (timeDelta === 0) timeDelta = inferTimeDeltaFromStory(checkpoint, story)
 
   const moves = [
     ...[...partyMoves.entries()].map(([entityId, to]) => ({
@@ -211,6 +316,13 @@ function compileHints(checkpoint: PublicRuntimeCheckpoint, hints: StoryStateHint
     }
   }
 
+  if (openThreads !== undefined) {
+    const current = stringArray(state.public_world.gm_open_threads, MAX_OPEN_THREADS)
+    if (JSON.stringify(current) !== JSON.stringify(openThreads)) {
+      worldChanges.push({ key: 'gm_open_threads', from: state.public_world.gm_open_threads, to: openThreads })
+    }
+  }
+
   if (timeDelta === 0 && moves.length === 0 && resourceChanges.length === 0 && baseCapabilityChanges.length === 0 && worldChanges.length === 0) return []
 
   const actors = new Set<PartyMemberId>()
@@ -237,6 +349,83 @@ function compileHints(checkpoint: PublicRuntimeCheckpoint, hints: StoryStateHint
   }]
 }
 
+function similarityText(value: string): string {
+  return value.toLowerCase().replace(/[#>*_`\[\](){}"'.,!?·:;\-\s]/g, '')
+}
+
+function trigramSet(value: string): Set<string> {
+  const normalized = similarityText(value)
+  const grams = new Set<string>()
+  if (normalized.length < 3) {
+    if (normalized) grams.add(normalized)
+    return grams
+  }
+  for (let index = 0; index <= normalized.length - 3; index += 1) grams.add(normalized.slice(index, index + 3))
+  return grams
+}
+
+function diceSimilarity(a: string, b: string): number {
+  const left = trigramSet(a)
+  const right = trigramSet(b)
+  if (left.size === 0 || right.size === 0) return 0
+  let overlap = 0
+  for (const gram of left) if (right.has(gram)) overlap += 1
+  return (2 * overlap) / (left.size + right.size)
+}
+
+function hasInternalRepetition(story: string): boolean {
+  const blocks = story.split(/\n\s*\n/).map(similarityText).filter((block) => block.length >= 45)
+  for (let i = 0; i < blocks.length; i += 1) {
+    for (let j = i + 1; j < blocks.length; j += 1) {
+      if (blocks[i] === blocks[j] || diceSimilarity(blocks[i]!, blocks[j]!) >= 0.92) return true
+    }
+  }
+  return false
+}
+
+function actionTerms(text: string): string[] {
+  return text
+    .replace(/[→/,.!?()\[\]"']/g, ' ')
+    .split(/\s+/)
+    .map((token) => token.replace(/(에서|에게|한테|으로|로|부터|까지|와|과|랑|이랑|을|를|은|는|이|가|도|만)$/u, ''))
+    .map((token) => token.trim())
+    .filter((token) => token.length >= 2 && !['그리고', '일단', '함께', '다시', '바로', '그쪽', '한다', '하기'].includes(token))
+    .sort((a, b) => b.length - a.length)
+    .slice(0, 8)
+}
+
+function storyGroundsAction(request: GMProviderTurnRequest, candidate: CompactStoryCandidate): boolean {
+  const terms = actionTerms(playerActionText(request))
+  if (terms.length === 0) return true
+  const target = similarityText(`${candidate.story} ${candidate.action_resolution?.summary ?? ''}`)
+  const hits = terms.filter((term) => {
+    const normalized = similarityText(term)
+    if (!normalized) return false
+    if (target.includes(normalized)) return true
+    return normalized.length >= 4 && target.includes(normalized.slice(0, 3))
+  })
+  return hits.length >= Math.min(2, terms.length)
+}
+
+function priorScenes(checkpoint: PublicRuntimeCheckpoint): string[] {
+  return checkpoint.committed_turn.log
+    .filter((entry) => entry.kind === 'scene')
+    .map((entry) => entry.text)
+    .filter((text, index, all) => all.indexOf(text) === index)
+    .slice(-3)
+}
+
+export function evaluateStoryCandidateQuality(request: GMProviderTurnRequest, candidate: CompactStoryCandidate): StoryQualityIssue[] {
+  const issues: StoryQualityIssue[] = []
+  if (!candidate.action_resolution) issues.push('missing_action_resolution')
+  else if (!storyGroundsAction(request, candidate)) issues.push('action_not_grounded')
+
+  const comparisonScenes = [request.checkpoint.current_scene.narrative, ...priorScenes(request.checkpoint)]
+  if (comparisonScenes.some((scene) => scene && diceSimilarity(scene, candidate.story) >= 0.78)) issues.push('repeated_scene')
+  if (hasInternalRepetition(candidate.story)) issues.push('internal_repetition')
+  return [...new Set(issues)]
+}
+
 /** Compile model-friendly Story + Minimal Intent into the existing trusted engine proposal contract. */
 export function compileCompactStoryCandidate(
   checkpoint: PublicRuntimeCheckpoint,
@@ -244,7 +433,7 @@ export function compileCompactStoryCandidate(
 ): GMProposal {
   const nextTurn = checkpoint.committed_turn.number + 1
   return {
-    actions: compileHints(checkpoint, candidate.state_hints, nextTurn),
+    actions: compileHints(checkpoint, candidate.state_hints, nextTurn, candidate.story, candidate.open_threads),
     narrative: candidate.story,
     next_choices: candidate.choices.map((label, index) => ({ id: index + 1, label })),
     presentation_blocks: [],
