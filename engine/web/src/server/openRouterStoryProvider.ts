@@ -12,6 +12,7 @@ import {
 const MODEL = 'deepseek/deepseek-v4-flash-0731:nitro'
 const ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
 const TIMEOUT_MS = 25_000
+const MIN_LONG_TURN_CHARS = 1_100
 
 type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 
@@ -229,14 +230,20 @@ function parseJsonObject(content: string): unknown | undefined {
   return undefined
 }
 
-function retryInstruction(issues: StoryQualityIssue[]): string {
+function needsExpansion(candidate: CompactStoryCandidate): boolean {
+  return candidate.action_resolution?.status !== 'blocked' && candidate.story.length < MIN_LONG_TURN_CHARS
+}
+
+function retryInstruction(issues: StoryQualityIssue[], expandTurn: boolean): string {
   const labels: Record<StoryQualityIssue, string> = {
     missing_action_resolution: 'player_action 처리 결과가 구조화되지 않음',
     action_not_grounded: 'player_action의 핵심 장소/인물/목적이 실제 story에 충분히 반영되지 않음',
     repeated_scene: '직전/최근 장면과 너무 비슷하거나 사실상 복제됨',
     internal_repetition: '한 장면 안에서 같은 문단/사실이 반복됨',
   }
-  return `첫 초안은 폐기한다. 문제: ${issues.map((issue) => labels[issue]).join('; ')}.\n이전 초안을 수정해서 붙이지 말고 current_scene 다음 시점부터 새 장면을 처음부터 다시 작성하라. player_action을 실제로 처리하고, 이미 나온 재난문자/도로정체/질문을 반복하는 대신 여러 개의 의미 있는 진행 비트가 이어진 뒤 새로운 전략적 판단점에 도달하게 하라.`
+  const problems = issues.map((issue) => labels[issue])
+  if (expandTurn) problems.push('한 번의 선택 뒤 진행량과 관전 가능한 이야기 길이가 부족함')
+  return `첫 초안은 폐기한다. 문제: ${problems.join('; ')}.\n이전 초안을 늘여 붙이지 말고 current_scene 다음 시점부터 새 장면을 처음부터 다시 작성하라. player_action을 실제로 처리하고, 이미 나온 사실을 반복하는 대신 4~6개의 의미 있는 진행 비트를 자연스럽게 이어가라. 중간의 사소한 실행은 GM과 가족이 알아서 처리하고, 새로운 전략적 판단이 필요해진 뒤에만 choices를 제시하라.`
 }
 
 export class OpenRouterStoryProvider implements GMProvider {
@@ -266,7 +273,7 @@ export class OpenRouterStoryProvider implements GMProvider {
         family_reference_rules: publicWorld.family_reference_rules ?? [],
       }
 
-      const requestCandidate = async (retry?: { previous: string; issues: StoryQualityIssue[] }): Promise<
+      const requestCandidate = async (retry?: { previous: string; issues: StoryQualityIssue[]; expandTurn: boolean }): Promise<
         | { status: 'ok'; candidate: CompactStoryCandidate; raw: string; finishReason?: string }
         | { status: 'error'; message: string; category: string; finishReason?: string }
       > => {
@@ -276,7 +283,7 @@ export class OpenRouterStoryProvider implements GMProvider {
         ]
         if (retry) {
           messages.push({ role: 'assistant', content: retry.previous })
-          messages.push({ role: 'user', content: retryInstruction(retry.issues) })
+          messages.push({ role: 'user', content: retryInstruction(retry.issues, retry.expandTurn) })
         }
 
         const response = await this.fetchImpl(ENDPOINT, {
@@ -339,23 +346,25 @@ export class OpenRouterStoryProvider implements GMProvider {
       let selected = first.candidate
       let retryCount = 0
       let qualityIssues = evaluateStoryCandidateQuality(request, selected)
-      if (qualityIssues.length > 0) {
+      let expandTurn = needsExpansion(selected)
+      if (qualityIssues.length > 0 || expandTurn) {
         retryCount = 1
-        const second = await requestCandidate({ previous: first.raw, issues: qualityIssues })
+        const second = await requestCandidate({ previous: first.raw, issues: qualityIssues, expandTurn })
         if (second.status === 'error') {
           return {
             status: 'unavailable',
             message: 'AI GM이 첫 장면의 품질 문제를 수정하지 못했습니다. 같은 행동을 다시 시도해 주세요.',
-            diagnostic: { key_present: true, failure_category: 'quality_retry_failed', response_fingerprint: { first_issues: qualityIssues, retry_error: second.category } },
+            diagnostic: { key_present: true, failure_category: 'quality_retry_failed', response_fingerprint: { first_issues: qualityIssues, first_too_short: expandTurn, retry_error: second.category } },
           }
         }
         selected = second.candidate
         qualityIssues = evaluateStoryCandidateQuality(request, selected)
-        if (qualityIssues.length > 0) {
+        expandTurn = needsExpansion(selected)
+        if (qualityIssues.length > 0 || expandTurn) {
           return {
             status: 'unavailable',
-            message: 'AI GM 장면이 이전 상황을 충분히 이어가지 못했습니다. 같은 행동을 다시 시도해 주세요.',
-            diagnostic: { key_present: true, failure_category: 'quality_guard_rejected', response_fingerprint: { issues: qualityIssues } },
+            message: 'AI GM 장면이 충분한 진행과 연속성을 만들지 못했습니다. 같은 행동을 다시 시도해 주세요.',
+            diagnostic: { key_present: true, failure_category: 'quality_guard_rejected', response_fingerprint: { issues: qualityIssues, too_short: expandTurn, story_chars: selected.story.length } },
           }
         }
       }
