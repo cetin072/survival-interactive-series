@@ -39,7 +39,7 @@ function createBenchmarkState(): LiveState {
       father: { name: '정호', location: '외곽주택', with: [], status: '혼자 있음 · 산림 인접 지역' },
     },
     vehicles: {
-      family_car: { name: '가족 차량', location: '회사 주차장', status: '이용 가능', operator: 'player' },
+      family_car: { name: '가족 차량', location: '회사', status: '회사 주차장에 주차 · 이용 가능', operator: 'player' },
     },
     bases: {
       city_apartment: { name: '도심 아파트', location: '도심', status: '일상 거주지', capabilities: ['기본 생활공간', '일반 가정 물자'] },
