@@ -8,24 +8,10 @@ import { stabilizeStoryProposal } from '../../src/server/storyProposalGuard'
 const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8' }
 const PREVIEW_PRIMARY_MODEL = 'deepseek/deepseek-v4-pro-0813:nitro'
 const PREVIEW_FALLBACK_MODEL = 'deepseek/deepseek-v4-flash-0731:nitro'
-const PREVIEW_PRIMARY_TIMEOUT_MS = 32_000
-const PREVIEW_FALLBACK_TIMEOUT_MS = 22_000
+const PREVIEW_PRIMARY_TIMEOUT_MS = 26_000
+const PREVIEW_FALLBACK_TIMEOUT_MS = 24_000
+const PREVIEW_PRIMARY_PREFERENCE_MS = 20_000
 const PREVIEW_TRANSIENT_RETRY_DELAY_MS = 250
-
-const PREVIEW_MODEL_FALLBACK_CATEGORIES = new Set([
-  'timeout',
-  'network',
-  'route_unavailable',
-  'upstream_5xx',
-  'provider_error',
-  'unsupported_response_shape',
-  'truncated_output',
-  'malformed_json',
-  'compact_schema_mismatch',
-  'quality_retry_failed',
-  'quality_guard_rejected',
-  'compiled_schema_mismatch',
-])
 
 type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 type NetlifyRequestContext = { deploy?: { context?: string } }
@@ -95,6 +81,30 @@ class ChoiceReferenceAwareProvider implements GMProvider {
   }
 }
 
+function rejectedProviderResult(message: string): GMProviderResult {
+  return {
+    status: 'unavailable',
+    message,
+    diagnostic: { key_present: true, failure_category: 'network' },
+  }
+}
+
+function withFallbackDiagnostic(result: GMProviderResult, primaryFailure: string): GMProviderResult {
+  if (result.status === 'unavailable') return result
+  return {
+    ...result,
+    diagnostic: {
+      ...result.diagnostic,
+      key_present: result.diagnostic?.key_present ?? true,
+      response_fingerprint: {
+        ...(result.diagnostic?.response_fingerprint ?? {}),
+        fallback_used: true,
+        primary_failure: primaryFailure,
+      },
+    },
+  }
+}
+
 class PreviewResilientProvider implements GMProvider {
   constructor(
     private readonly primary: GMProvider,
@@ -102,40 +112,59 @@ class PreviewResilientProvider implements GMProvider {
   ) {}
 
   async proposeTurn(request: Parameters<GMProvider['proposeTurn']>[0]): Promise<GMProviderResult> {
-    const primaryResult = await this.primary.proposeTurn(request)
-    if (primaryResult.status === 'proposal') return primaryResult
+    // Start both models together. Deploy Preview has an observed ~30s gateway edge,
+    // so a sequential Pro -> Flash fallback cannot be reliable.
+    const primaryPromise = this.primary.proposeTurn(request)
+      .catch(() => rejectedProviderResult('Preview primary model failed.'))
+    const fallbackPromise = this.fallback.proposeTurn(request)
+      .catch(() => rejectedProviderResult('Preview fallback model failed.'))
 
-    const category = primaryResult.diagnostic?.failure_category
-    if (category === 'auth_or_config' || (category && !PREVIEW_MODEL_FALLBACK_CATEGORIES.has(category))) {
-      return primaryResult
-    }
+    const preferred = await Promise.race([
+      primaryPromise.then((result) => ({ kind: 'primary' as const, result })),
+      sleep(PREVIEW_PRIMARY_PREFERENCE_MS).then(() => ({ kind: 'preference-timeout' as const })),
+    ])
 
-    const fallbackResult = await this.fallback.proposeTurn(request)
-    if (fallbackResult.status === 'unavailable') {
+    if (preferred.kind === 'primary') {
+      if (preferred.result.status === 'proposal') return preferred.result
+      if (preferred.result.diagnostic?.failure_category === 'auth_or_config') return preferred.result
+
+      const fallbackResult = await fallbackPromise
+      if (fallbackResult.status === 'proposal') {
+        return withFallbackDiagnostic(fallbackResult, preferred.result.diagnostic?.failure_category ?? 'primary_unavailable')
+      }
       return {
         ...fallbackResult,
-        message: `${primaryResult.message} / 안전 폴백도 완료하지 못했습니다: ${fallbackResult.message}`,
+        message: `${preferred.result.message} / 안전 폴백도 완료하지 못했습니다: ${fallbackResult.message}`,
         diagnostic: {
-          key_present: primaryResult.diagnostic?.key_present ?? fallbackResult.diagnostic?.key_present ?? true,
-          failure_category: fallbackResult.diagnostic?.failure_category ?? category ?? 'preview_fallback_failed',
+          key_present: preferred.result.diagnostic?.key_present ?? fallbackResult.diagnostic?.key_present ?? true,
+          failure_category: fallbackResult.diagnostic?.failure_category ?? preferred.result.diagnostic?.failure_category ?? 'preview_fallback_failed',
           response_fingerprint: {
             fallback_used: true,
-            primary_failure: category ?? 'unknown',
+            primary_failure: preferred.result.diagnostic?.failure_category ?? 'primary_unavailable',
             fallback_failure: fallbackResult.diagnostic?.failure_category ?? 'unknown',
           },
         },
       }
     }
 
+    // Pro is still running after the preference window. Flash has already been
+    // running in parallel, so using it here stays inside the gateway budget.
+    const fallbackResult = await fallbackPromise
+    if (fallbackResult.status === 'proposal') return withFallbackDiagnostic(fallbackResult, 'primary_slow')
+
+    const primaryResult = await primaryPromise
+    if (primaryResult.status === 'proposal') return primaryResult
+
     return {
       ...fallbackResult,
+      message: `${primaryResult.message} / 안전 폴백도 완료하지 못했습니다: ${fallbackResult.message}`,
       diagnostic: {
-        ...fallbackResult.diagnostic,
-        key_present: fallbackResult.diagnostic?.key_present ?? true,
+        key_present: primaryResult.diagnostic?.key_present ?? fallbackResult.diagnostic?.key_present ?? true,
+        failure_category: fallbackResult.diagnostic?.failure_category ?? primaryResult.diagnostic?.failure_category ?? 'preview_fallback_failed',
         response_fingerprint: {
-          ...(fallbackResult.diagnostic?.response_fingerprint ?? {}),
           fallback_used: true,
-          primary_failure: category ?? 'unknown',
+          primary_failure: primaryResult.diagnostic?.failure_category ?? 'primary_slow',
+          fallback_failure: fallbackResult.diagnostic?.failure_category ?? 'unknown',
         },
       },
     }
