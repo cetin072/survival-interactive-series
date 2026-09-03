@@ -128,4 +128,29 @@ describe('OpenRouter Story Provider — GM Pipeline v2.2', () => {
     expect(next.public_state.party).toEqual(initial.public_state.party)
     expect(next.current_scene.narrative).toContain('가족 통화')
   })
+
+  it('uses a valid first short turn when the optional expansion retry fails', async () => {
+    let calls = 0
+    const shortCandidate = {
+      story: '## 18:20 — 학원 쪽으로 움직일 준비\n\n민석에게 연락해 학원에서 보호자 조기 귀가가 시작됐는지 확인한다. 민석은 로비에서 기다릴 수 있다고 답하고, 준호는 회사 주차장으로 내려가 차량을 확보해 학원 방향으로 움직일 준비를 한다. 서윤에게도 민석을 먼저 회수하겠다고 짧게 공유한다.',
+      choices: ['민석을 직접 회수한다', '서윤과 회수 역할을 바꾼다', '정호의 외곽 상황을 우선한다', '가족 전체 합류 지점을 다시 정한다'],
+      state_hints: [{ kind: 'time', minutes: 3 }],
+      action_resolution: { status: 'completed' as const, summary: '민석에게 연락하고 학원 쪽으로 움직일 준비를 시작했다.' },
+      open_threads: ['정호의 외곽 상황은 아직 확인되지 않았다'],
+    }
+    const fetchImpl: typeof fetch = async () => {
+      calls += 1
+      if (calls === 1) return compactResponse(shortCandidate)
+      throw new Error('optional expansion route failed')
+    }
+
+    const initial = createStorytellingBenchmarkSession()
+    const provider = new OpenRouterStoryProvider('test-key', fetchImpl)
+    const next = await runGMProviderTurn(initial, { kind: 'numbered-choice', choice_id: 1 }, provider)
+
+    expect(calls).toBe(2)
+    expect(next.committed_turn.number).toBe(1)
+    expect(next.current_scene.narrative).toContain('학원 쪽으로 움직일 준비')
+    expect(next.committed_turn.log.filter((entry) => entry.kind === 'choice')).toHaveLength(1)
+  })
 })
