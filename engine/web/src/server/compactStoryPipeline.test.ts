@@ -178,7 +178,7 @@ describe('GM Pipeline v2.1 compact story boundary', () => {
       story: '## 18:28 — 랜드마크 앞\n\n민석과 통화해 랜드마크 1층 출입구에서 만나기로 정하고 그쪽으로 이동을 시작한다.',
       choices: ['A', 'B', 'C', 'D'],
       state_hints: [],
-      action_resolution: { status: 'attempted' as const, summary: '랜드마크를 민석과의 합류 지점으로 정했다.' },
+      action_resolution: { status: 'attempted' as const, summary: '랜드마크에서 아들과 만나자고 합의하고 합류 지점으로 정했다.' },
       open_threads: ['민석과 랜드마크에서 실제 합류할 때까지 이동 필요'],
     }
 
