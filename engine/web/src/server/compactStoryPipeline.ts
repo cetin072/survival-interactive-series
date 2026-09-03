@@ -12,6 +12,11 @@ const MAX_OPEN_THREADS = 4
 const MAX_RECENT_STORY_MEMORY = 3
 const MAX_STORY_MEMORY_CHARS = 900
 
+type CompactPlayerAction =
+  | { kind: 'free-action'; text: string }
+  | { kind: 'ordered-choices'; ordered: Array<{ order: number; action: string }> }
+  | { kind: 'numbered-choice'; action: string }
+
 export type StoryStateHint =
   | { kind: 'time'; minutes: number }
   | { kind: 'move'; entity: string; to: string }
@@ -42,7 +47,7 @@ function choiceLabel(checkpoint: PublicRuntimeCheckpoint, id: number): string {
   return checkpoint.current_scene.choices.find((choice) => choice.id === id)?.label ?? `선택 ${id}`
 }
 
-function playerAction(request: GMProviderTurnRequest) {
+function playerAction(request: GMProviderTurnRequest): CompactPlayerAction {
   const { checkpoint, input } = request
   if (input.kind === 'free-action') return { kind: 'free-action', text: input.text.trim() }
   if (input.kind === 'ordered-choices') {
@@ -98,20 +103,16 @@ function compactSceneMemory(text: string): string {
 }
 
 function recentStoryMemory(checkpoint: PublicRuntimeCheckpoint): string[] {
-  const scenes = checkpoint.committed_turn.log
+  return checkpoint.committed_turn.log
     .filter((entry) => entry.kind === 'scene' && entry.text !== checkpoint.current_scene.narrative)
     .map((entry) => entry.text)
     .filter((text, index, all) => all.indexOf(text) === index)
     .slice(-MAX_RECENT_STORY_MEMORY)
     .map(compactSceneMemory)
     .filter(Boolean)
-  return scenes
 }
 
-/**
- * Public-only, bounded story brief. The engine keeps full authoritative state and history;
- * the model sees only enough information to continue the current scene coherently.
- */
+/** Public-only, bounded story brief. Full authoritative history stays in the engine. */
 export function buildCompactGMBrief(request: GMProviderTurnRequest) {
   const { checkpoint } = request
   const state = checkpoint.public_state
@@ -308,11 +309,7 @@ function compileHints(
     const current = stringArray(state.public_world.current_public_signals)
     const merged = [...new Set([...current, ...signals])].slice(-MAX_SIGNALS)
     if (JSON.stringify(merged) !== JSON.stringify(current)) {
-      worldChanges.push({
-        key: 'current_public_signals',
-        from: state.public_world.current_public_signals,
-        to: merged,
-      })
+      worldChanges.push({ key: 'current_public_signals', from: state.public_world.current_public_signals, to: merged })
     }
   }
 
@@ -404,7 +401,8 @@ function storyGroundsAction(request: GMProviderTurnRequest, candidate: CompactSt
     if (target.includes(normalized)) return true
     return normalized.length >= 4 && target.includes(normalized.slice(0, 3))
   })
-  return hits.length >= Math.min(2, terms.length)
+  const requiredHits = request.input.kind === 'free-action' ? 1 : Math.min(2, terms.length)
+  return hits.length >= requiredHits
 }
 
 function priorScenes(checkpoint: PublicRuntimeCheckpoint): string[] {
