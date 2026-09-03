@@ -122,7 +122,9 @@ export async function handleGMRequest(
 
   const diagnostic = previewDiagnostic(parsedRequest.value.checkpoint.source_kind, deployContext, result)
   if (result.status === 'unavailable') {
-    return json(503, diagnostic ? { status: result.status, message: result.message, diagnostic } : { status: result.status, message: result.message })
+    const category = diagnostic?.failure_category
+    const message = category ? `${result.message} [${category}]` : result.message
+    return json(503, diagnostic ? { status: result.status, message, diagnostic } : { status: result.status, message })
   }
 
   const proposal = validateGMProposal(result.proposal)
