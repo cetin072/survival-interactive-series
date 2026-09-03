@@ -4,6 +4,7 @@ import {
   buildCompactGMBrief,
   compileCompactStoryCandidate,
   normalizeCompactStoryCandidate,
+  type CompactStoryCandidate,
 } from './compactStoryPipeline'
 
 const MODEL = 'deepseek/deepseek-v4-flash-0731:nitro'
@@ -38,6 +39,10 @@ JSON 객체 하나만 출력한다. 코드펜스 금지.
   "open_threads":[]
 }`
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
 function parseJsonObject(content: string): unknown | undefined {
   const trimmed = content.trim()
   const candidates = [trimmed]
@@ -54,6 +59,56 @@ function parseJsonObject(content: string): unknown | undefined {
     }
   }
   return undefined
+}
+
+function playerActionSummary(request: GMProviderTurnRequest): string {
+  const input = request.input
+  if (input.kind === 'free-action') return input.text.trim().slice(0, 180)
+  if (input.kind === 'ordered-choices') {
+    return input.choice_ids
+      .map((id) => request.checkpoint.current_scene.choices.find((choice) => choice.id === id)?.label ?? `선택 ${id}`)
+      .join(' → ')
+      .slice(0, 180)
+  }
+  return (request.checkpoint.current_scene.choices.find((choice) => choice.id === input.choice_id)?.label ?? `선택 ${input.choice_id}`).slice(0, 180)
+}
+
+function existingOpenThreads(request: GMProviderTurnRequest): string[] {
+  const value = request.checkpoint.public_state.public_world.gm_open_threads
+  if (!Array.isArray(value)) return []
+  return value.filter((item): item is string => typeof item === 'string').slice(0, 4)
+}
+
+/**
+ * Emergency fallback output is repaired deterministically rather than rejected for
+ * non-critical schema omissions. Story text is never invented by the server.
+ */
+export function repairFastFallbackCandidate(
+  request: GMProviderTurnRequest,
+  parsed: unknown,
+): CompactStoryCandidate | undefined {
+  if (!isRecord(parsed) || typeof parsed.story !== 'string' || !parsed.story.trim()) return undefined
+
+  const generatedChoices = Array.isArray(parsed.choices)
+    ? parsed.choices.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+    : []
+  const previousChoices = request.checkpoint.current_scene.choices.map((choice) => choice.label)
+  const repairedChoices = [...new Set([...generatedChoices, ...previousChoices])].slice(0, 4)
+  if (repairedChoices.length < 2) return undefined
+
+  const actionResolution = isRecord(parsed.action_resolution)
+    ? parsed.action_resolution
+    : { status: 'attempted', summary: `비상 GM이 플레이어 행동을 이어서 처리했다: ${playerActionSummary(request)}` }
+
+  const candidate = normalizeCompactStoryCandidate({
+    ...parsed,
+    choices: repairedChoices,
+    state_hints: Array.isArray(parsed.state_hints) ? parsed.state_hints : [],
+    action_resolution: actionResolution,
+    open_threads: Array.isArray(parsed.open_threads) ? parsed.open_threads : existingOpenThreads(request),
+  })
+
+  return candidate && candidate.choices.length >= 2 ? candidate : undefined
 }
 
 export class OpenRouterFastFallbackProvider implements GMProvider {
@@ -120,9 +175,9 @@ export class OpenRouterFastFallbackProvider implements GMProvider {
       }
 
       const parsed = parseJsonObject(content)
-      const candidate = parsed === undefined ? undefined : normalizeCompactStoryCandidate(parsed)
-      if (!candidate || candidate.choices.length !== 4) {
-        return { status: 'unavailable', message: 'Fast fallback 이야기 구조가 올바르지 않습니다.', diagnostic: { key_present: true, failure_category: 'compact_schema_mismatch' } }
+      const candidate = parsed === undefined ? undefined : repairFastFallbackCandidate(request, parsed)
+      if (!candidate) {
+        return { status: 'unavailable', message: 'Fast fallback 이야기 구조를 복구하지 못했습니다.', diagnostic: { key_present: true, failure_category: 'compact_schema_mismatch' } }
       }
 
       const compiled = compileCompactStoryCandidate(request.checkpoint, candidate)
@@ -137,7 +192,7 @@ export class OpenRouterFastFallbackProvider implements GMProvider {
         diagnostic: {
           key_present: true,
           response_fingerprint: {
-            contract: 'compact_story_fast_fallback_v1',
+            contract: 'compact_story_fast_fallback_v2',
             story_chars: candidate.story.length,
             choice_count: candidate.choices.length,
           },
