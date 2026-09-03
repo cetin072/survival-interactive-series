@@ -3,6 +3,7 @@ import type { GMProvider, GMProviderResult } from '../../src/runtime/gmProvider'
 import { validateGMTransportRequest } from '../../src/runtime/gmTransport'
 import { OpenRouterStoryProvider } from '../../src/server/openRouterStoryProvider'
 import { addChoiceReferenceContext } from '../../src/server/playerActionContext'
+import { stabilizeStoryProposal } from '../../src/server/storyProposalGuard'
 
 const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8' }
 const PREVIEW_PRIMARY_MODEL = 'deepseek/deepseek-v4-pro-0813:nitro'
@@ -217,7 +218,15 @@ export async function handleGMRequest(
     return json(502, { status: 'unavailable', message: `AI GM backend returned malformed proposal: ${proposal.message}` })
   }
 
-  return json(200, diagnostic ? { status: 'proposal', proposal: proposal.proposal, diagnostic } : { status: 'proposal', proposal: proposal.proposal })
+  const stabilized = stabilizeStoryProposal(parsedRequest.value.checkpoint, proposal.proposal)
+  const stabilizedProposal = validateGMProposal(stabilized)
+  if (!stabilizedProposal.valid) {
+    return json(502, { status: 'unavailable', message: `AI GM story guard produced malformed proposal: ${stabilizedProposal.message}` })
+  }
+
+  return json(200, diagnostic
+    ? { status: 'proposal', proposal: stabilizedProposal.proposal, diagnostic }
+    : { status: 'proposal', proposal: stabilizedProposal.proposal })
 }
 
 export default function gm(request: Request, context: NetlifyRequestContext): Promise<Response> {
