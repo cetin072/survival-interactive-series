@@ -1,7 +1,7 @@
 import { validateGMProposal } from '../../src/runtime/gmProposal'
 import type { GMProvider } from '../../src/runtime/gmProvider'
 import { validateGMTransportRequest } from '../../src/runtime/gmTransport'
-import { createOpenRouterStoryProviderFromEnvironment } from '../../src/server/openRouterStoryProvider'
+import { OpenRouterStoryProvider } from '../../src/server/openRouterStoryProvider'
 
 const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8' }
 
@@ -10,6 +10,11 @@ function json(status: number, body: unknown): Response {
 }
 
 type NetlifyRequestContext = { deploy?: { context?: string } }
+
+function createOpenRouterStoryProviderFromEnvironment(): GMProvider {
+  const environment = (globalThis as unknown as { process?: { env?: Record<string, string | undefined> } }).process?.env
+  return new OpenRouterStoryProvider(environment?.OPENROUTER_API_KEY)
+}
 
 function previewDiagnostic(
   sourceKind: string,
