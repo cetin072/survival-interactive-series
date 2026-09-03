@@ -9,6 +9,7 @@ const endpoint = `${preview}/.netlify/functions/gm`
 
 type SmokeResult = { label: string; ok: boolean; detail: string }
 const results: SmokeResult[] = []
+// Stability pass 2 intentionally repeats the same 10 live inputs against Deploy Preview.
 
 function mudTimes(narrative: string): string[] {
   return [...narrative.matchAll(/^##\s+(\d{2}:\d{2})\b/gmu)].map((match) => match[1]!)
