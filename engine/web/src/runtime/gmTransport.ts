@@ -50,11 +50,6 @@ function validatePlayerInput(value: unknown): value is GMPlayerInput {
   return false
 }
 
-/**
- * Transport validation deliberately checks the public boundary rather than re-defining
- * the full engine state schema. Deep physical/state validation remains authoritative in
- * Validator/Action Queue after a proposal returns.
- */
 export function validateGMTransportRequest(value: unknown): ValidationResult<GMProviderTurnRequest> {
   if (!isObject(value) || !validatePlayerInput(value.input) || !isObject(value.checkpoint)) {
     return { valid: false, message: 'Malformed GM transport request.' }
@@ -100,6 +95,10 @@ function requestFingerprint(request: GMProviderTurnRequest): string {
   })
 }
 
+function isTransientHttpStatus(status: number): boolean {
+  return status === 408 || status === 429 || status === 502 || status === 503 || status === 504
+}
+
 export class HttpGMProvider implements GMProvider {
   private readonly inFlight = new Map<string, Promise<GMProviderResult>>()
 
@@ -116,37 +115,62 @@ export class HttpGMProvider implements GMProvider {
     })
   }
 
+  private endpointForAttempt(attempt: number): string {
+    if (attempt > 0 && this.endpoint === DEFAULT_GM_ENDPOINT) return DIRECT_NETLIFY_GM_ENDPOINT
+    return this.endpoint
+  }
+
   private async performTurn(request: GMProviderTurnRequest): Promise<GMProviderResult> {
     const requestCheck = validateGMTransportRequest(request)
     if (!requestCheck.valid) return previewUnavailable(request, 'request_validation', requestCheck.message)
 
-    let response: Response
-    try {
-      response = await this.post(this.endpoint, requestCheck.value)
-    } catch {
-      if (this.endpoint !== DEFAULT_GM_ENDPOINT) {
-        return previewUnavailable(request, 'network_error')
-      }
+    let lastCategory = 'network_error'
+    let lastDetail: string | undefined
+
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const endpoint = this.endpointForAttempt(attempt)
+      let response: Response
       try {
-        response = await this.post(DIRECT_NETLIFY_GM_ENDPOINT, requestCheck.value)
+        response = await this.post(endpoint, requestCheck.value)
       } catch {
-        return previewUnavailable(request, 'network_error', 'api_and_direct_function_failed')
+        lastCategory = 'network_error'
+        lastDetail = attempt === 0 ? 'first_request_failed' : 'retry_failed'
+        continue
       }
+
+      if (isTransientHttpStatus(response.status) && attempt === 0) {
+        lastCategory = 'transient_http'
+        lastDetail = `HTTP ${response.status}`
+        continue
+      }
+
+      let payload: unknown
+      try {
+        payload = await response.json()
+      } catch {
+        lastCategory = 'invalid_json'
+        lastDetail = `HTTP ${response.status}`
+        if (attempt === 0) continue
+        return previewUnavailable(request, lastCategory, lastDetail)
+      }
+
+      const parsed = validateGMTransportResponse(payload)
+      if (!parsed.valid) {
+        lastCategory = 'malformed_response'
+        lastDetail = parsed.message
+        if (attempt === 0) continue
+        return previewUnavailable(request, lastCategory, lastDetail)
+      }
+      if (!response.ok && parsed.value.status === 'proposal') {
+        lastCategory = 'http_rejected'
+        lastDetail = `HTTP ${response.status}`
+        if (attempt === 0 && isTransientHttpStatus(response.status)) continue
+        return previewUnavailable(request, lastCategory, lastDetail)
+      }
+      return parsed.value
     }
 
-    let payload: unknown
-    try {
-      payload = await response.json()
-    } catch {
-      return previewUnavailable(request, 'invalid_json', `HTTP ${response.status}`)
-    }
-
-    const parsed = validateGMTransportResponse(payload)
-    if (!parsed.valid) return previewUnavailable(request, 'malformed_response', parsed.message)
-    if (!response.ok && parsed.value.status === 'proposal') {
-      return previewUnavailable(request, 'http_rejected', `HTTP ${response.status}`)
-    }
-    return parsed.value
+    return previewUnavailable(request, lastCategory, lastDetail)
   }
 
   proposeTurn(request: GMProviderTurnRequest): Promise<GMProviderResult> {
