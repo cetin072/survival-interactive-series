@@ -286,20 +286,30 @@ export class OpenRouterStoryProvider implements GMProvider {
           messages.push({ role: 'user', content: retryInstruction(retry.issues, retry.expandTurn) })
         }
 
-        const response = await this.fetchImpl(ENDPOINT, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${this.apiKey}`, 'Content-Type': 'application/json' },
-          signal: controller.signal,
-          body: JSON.stringify({
-            model: MODEL,
-            temperature: 0.30,
-            max_tokens: 4200,
-            reasoning: { effort: 'none' },
-            provider: { require_parameters: true },
-            response_format: { type: 'json_object' },
-            messages,
-          }),
-        })
+        let response: Response
+        try {
+          response = await this.fetchImpl(ENDPOINT, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${this.apiKey}`, 'Content-Type': 'application/json' },
+            signal: controller.signal,
+            body: JSON.stringify({
+              model: MODEL,
+              temperature: 0.30,
+              max_tokens: 4200,
+              reasoning: { effort: 'none' },
+              provider: { require_parameters: true },
+              response_format: { type: 'json_object' },
+              messages,
+            }),
+          })
+        } catch {
+          const timedOut = controller.signal.aborted
+          return {
+            status: 'error',
+            message: timedOut ? 'AI GM 응답 시간이 초과되었습니다. 다시 시도해 주세요.' : 'AI GM 연결에 실패했습니다. 다시 시도해 주세요.',
+            category: timedOut ? 'timeout' : 'network',
+          }
+        }
 
         if (!response.ok) {
           const failure = response.status === 401 || response.status === 403 ? 'auth_or_config'
@@ -349,22 +359,30 @@ export class OpenRouterStoryProvider implements GMProvider {
       let expandTurn = needsExpansion(selected)
       if (qualityIssues.length > 0 || expandTurn) {
         retryCount = 1
+        const expansionOnly = qualityIssues.length === 0 && expandTurn
         const second = await requestCandidate({ previous: first.raw, issues: qualityIssues, expandTurn })
         if (second.status === 'error') {
-          return {
-            status: 'unavailable',
-            message: 'AI GM이 첫 장면의 품질 문제를 수정하지 못했습니다. 같은 행동을 다시 시도해 주세요.',
-            diagnostic: { key_present: true, failure_category: 'quality_retry_failed', response_fingerprint: { first_issues: qualityIssues, first_too_short: expandTurn, retry_error: second.category } },
+          if (expansionOnly) {
+            selected = first.candidate
+            qualityIssues = []
+            expandTurn = needsExpansion(selected)
+          } else {
+            return {
+              status: 'unavailable',
+              message: 'AI GM이 첫 장면의 품질 문제를 수정하지 못했습니다. 같은 행동을 다시 시도해 주세요.',
+              diagnostic: { key_present: true, failure_category: 'quality_retry_failed', response_fingerprint: { first_issues: qualityIssues, first_too_short: expandTurn, retry_error: second.category } },
+            }
           }
-        }
-        selected = second.candidate
-        qualityIssues = evaluateStoryCandidateQuality(request, selected)
-        expandTurn = needsExpansion(selected)
-        if (qualityIssues.length > 0 || expandTurn) {
-          return {
-            status: 'unavailable',
-            message: 'AI GM 장면이 충분한 진행과 연속성을 만들지 못했습니다. 같은 행동을 다시 시도해 주세요.',
-            diagnostic: { key_present: true, failure_category: 'quality_guard_rejected', response_fingerprint: { issues: qualityIssues, too_short: expandTurn, story_chars: selected.story.length } },
+        } else {
+          selected = second.candidate
+          qualityIssues = evaluateStoryCandidateQuality(request, selected)
+          expandTurn = needsExpansion(selected)
+          if (qualityIssues.length > 0) {
+            return {
+              status: 'unavailable',
+              message: 'AI GM 장면이 이전 상황을 충분히 이어가지 못했습니다. 같은 행동을 다시 시도해 주세요.',
+              diagnostic: { key_present: true, failure_category: 'quality_guard_rejected', response_fingerprint: { issues: qualityIssues, too_short: expandTurn, story_chars: selected.story.length } },
+            }
           }
         }
       }
@@ -391,6 +409,7 @@ export class OpenRouterStoryProvider implements GMProvider {
             open_thread_count: selected.open_threads?.length ?? 0,
             action_status: selected.action_resolution?.status,
             story_chars: selected.story.length,
+            story_below_target: needsExpansion(selected),
             quality_retry_count: retryCount,
           },
         },
