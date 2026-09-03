@@ -49,6 +49,32 @@ describe('GM HTTP transport contract', () => {
     expect(result.status).toBe('proposal')
   })
 
+  it('coalesces identical in-flight turn requests into one HTTP call', async () => {
+    const checkpoint = createSyntheticPublicRuntimeFixture()
+    let calls = 0
+    let release: (() => void) | undefined
+    const gate = new Promise<void>((resolve) => { release = resolve })
+    const provider = new HttpGMProvider(async () => {
+      calls += 1
+      await gate
+      return new Response(JSON.stringify({ status: 'proposal', proposal: { actions: [], narrative: 'ok', next_choices: [], presentation_blocks: [] } }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    })
+    const request = { input: { kind: 'free-action' as const, text: '민석에게 중간 지점에서 만나자고 한다' }, checkpoint }
+
+    const first = provider.proposeTurn(request)
+    const second = provider.proposeTurn(request)
+    expect(calls).toBe(1)
+    release?.()
+
+    const [a, b] = await Promise.all([first, second])
+    expect(a.status).toBe('proposal')
+    expect(b.status).toBe('proposal')
+    expect(calls).toBe(1)
+  })
+
   it('uses the browser/global fetch receiver for the default transport', async () => {
     const checkpoint = createSyntheticPublicRuntimeFixture()
     const originalFetch = globalThis.fetch
