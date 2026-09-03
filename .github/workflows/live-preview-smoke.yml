@@ -25,7 +25,7 @@ jobs:
       - name: Wait for matching Deploy Preview
         env:
           PREVIEW_URL: https://deploy-preview-67--survival-zero-ai-test.netlify.app
-          EXPECTED_MARKER: live-smoke-20260903-2300-v1
+          EXPECTED_MARKER: live-smoke-20260903-2300-v2
         run: |
           for i in $(seq 1 36); do
             marker="$(curl -fsS --max-time 10 "$PREVIEW_URL/live-smoke-marker.txt" 2>/dev/null || true)"
