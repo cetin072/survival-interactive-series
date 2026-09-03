@@ -7,8 +7,8 @@ import type { PublicRuntimeCheckpoint } from '../src/runtime/publicRuntimeCheckp
 const preview = process.env.PREVIEW_URL ?? 'https://deploy-preview-67--survival-zero-ai-test.netlify.app'
 const endpoint = `${preview}/.netlify/functions/gm`
 
-function lastMudTime(narrative: string): string | undefined {
-  return [...narrative.matchAll(/^##\s+(\d{2}:\d{2})\b/gmu)].at(-1)?.[1]
+function mudTimes(narrative: string): string[] {
+  return [...narrative.matchAll(/^##\s+(\d{2}:\d{2})\b/gmu)].map((match) => match[1]!)
 }
 
 function diagnosticText(checkpoint: PublicRuntimeCheckpoint): string {
@@ -29,9 +29,12 @@ function assertCommitted(before: PublicRuntimeCheckpoint, after: PublicRuntimeCh
   if (after.current_scene.choices.length < 2 || after.current_scene.choices.length > 4) {
     throw new Error(`${label}: invalid next choice count ${after.current_scene.choices.length}`)
   }
-  const visibleTime = lastMudTime(after.current_scene.narrative)
-  if (visibleTime && visibleTime !== after.time) {
-    throw new Error(`${label}: visible/end time mismatch story=${visibleTime} engine=${after.time}`)
+
+  const times = mudTimes(after.current_scene.narrative)
+  const visibleEndTime = times.at(-1)
+  const headingRepresentsEnd = times.length > 1 || (visibleEndTime !== undefined && visibleEndTime !== before.time)
+  if (headingRepresentsEnd && visibleEndTime !== after.time) {
+    throw new Error(`${label}: visible/end time mismatch story=${visibleEndTime} engine=${after.time}`)
   }
 }
 
