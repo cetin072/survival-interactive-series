@@ -3,7 +3,7 @@ import { createStorytellingBenchmarkSession } from '../runtime/storytellingBench
 import { buildCompactGMBrief, compileCompactStoryCandidate, normalizeCompactStoryCandidate } from './compactStoryPipeline'
 
 describe('GM Pipeline v2 compact story boundary', () => {
-  it('builds a bounded public brief without raw transcript fields', () => {
+  it('builds a bounded public brief without raw, hidden, or old action contract fields', () => {
     const checkpoint = createStorytellingBenchmarkSession()
     const brief = buildCompactGMBrief({ checkpoint, input: { kind: 'numbered-choice', choice_id: 2 } })
     const serialized = JSON.stringify(brief)
@@ -13,6 +13,29 @@ describe('GM Pipeline v2 compact story boundary', () => {
     expect(serialized).not.toContain('raw_transcript')
     expect(serialized).not.toContain('hidden_seed')
     expect(serialized).not.toContain('action_id_prefix')
+    expect(serialized).not.toContain('exclusive_resources')
+    expect(serialized).not.toContain('presentation_blocks')
+  })
+
+  it('preserves ordered choice order in the compact brief', () => {
+    const checkpoint = createStorytellingBenchmarkSession()
+    const brief = buildCompactGMBrief({ checkpoint, input: { kind: 'ordered-choices', choice_ids: [3, 1] } })
+
+    expect(brief.player_action).toEqual({
+      kind: 'ordered-choices',
+      ordered: [
+        { order: 1, action: checkpoint.current_scene.choices[2]?.label },
+        { order: 2, action: checkpoint.current_scene.choices[0]?.label },
+      ],
+    })
+  })
+
+  it('passes free action text without adding engine proposal details', () => {
+    const checkpoint = createStorytellingBenchmarkSession()
+    const brief = buildCompactGMBrief({ checkpoint, input: { kind: 'free-action', text: '아버지에게 대피 준비를 시키고 민석에게 전화한다' } })
+
+    expect(brief.player_action).toEqual({ kind: 'free-action', text: '아버지에게 대피 준비를 시키고 민석에게 전화한다' })
+    expect(brief.recent_decisions.length).toBeLessThanOrEqual(4)
   })
 
   it('normalizes only the small allowed story candidate shape', () => {
@@ -25,14 +48,16 @@ describe('GM Pipeline v2 compact story boundary', () => {
         { kind: 'unknown', value: 'drop me' },
       ],
       actions: [{ malicious: true }],
+      presentation_blocks: [{ type: 'EVENT', message: 'drop me too' }],
     })
 
     expect(candidate?.choices).toHaveLength(4)
     expect(candidate?.state_hints).toHaveLength(2)
     expect(candidate).not.toHaveProperty('actions')
+    expect(candidate).not.toHaveProperty('presentation_blocks')
   })
 
-  it('compiles hints using authoritative from-state and drops unknown entities', () => {
+  it('compiles safe hints using authoritative from-state and drops unknown entities/resources/bases', () => {
     const checkpoint = createStorytellingBenchmarkSession()
     const proposal = compileCompactStoryCandidate(checkpoint, {
       story: '다음 장면',
@@ -41,6 +66,8 @@ describe('GM Pipeline v2 compact story boundary', () => {
         { kind: 'time', minutes: 5 },
         { kind: 'move', entity: 'player', to: '회사 주차장' },
         { kind: 'move', entity: 'unknown_person', to: '어딘가' },
+        { kind: 'resource', resource_id: 'unknown_resource', to: '없음' },
+        { kind: 'base_capability', base_id: 'unknown_base', add: '비밀 시설' },
         { kind: 'signal', text: '외곽 진입 통제가 시작됐다.' },
       ],
     })
@@ -50,8 +77,31 @@ describe('GM Pipeline v2 compact story boundary', () => {
     expect(action.id).toBe('t1_story-state')
     expect(action.proposal.time_delta_min).toBe(5)
     expect(action.proposal.moves).toEqual([{ entity_type: 'party', entity_id: 'player', from: '회사', to: '회사 주차장' }])
+    expect(action.proposal.resource_changes).toEqual([])
+    expect(action.proposal.base_capability_changes).toEqual([])
     expect(action.proposal.world_changes).toHaveLength(1)
     expect(proposal.next_choices.map((choice) => choice.id)).toEqual([1, 2, 3, 4])
+  })
+
+  it('bounds cumulative time and de-duplicates repeated state hints', () => {
+    const checkpoint = createStorytellingBenchmarkSession()
+    const proposal = compileCompactStoryCandidate(checkpoint, {
+      story: '시간이 흐른다.',
+      choices: ['1', '2', '3', '4'],
+      state_hints: [
+        { kind: 'time', minutes: 150 },
+        { kind: 'time', minutes: 90 },
+        { kind: 'resource', resource_id: 'communications', to: '불안정' },
+        { kind: 'resource', resource_id: 'communications', to: '불안정' },
+        { kind: 'signal', text: '도로 통제 확대' },
+        { kind: 'signal', text: '도로 통제 확대' },
+      ],
+    })
+
+    const action = proposal.actions[0]!
+    expect(action.proposal.time_delta_min).toBe(180)
+    expect(action.proposal.resource_changes).toHaveLength(1)
+    expect(action.proposal.world_changes).toHaveLength(1)
   })
 
   it('allows story-only turns when no safe state hint exists', () => {
