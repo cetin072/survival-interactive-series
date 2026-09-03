@@ -49,7 +49,7 @@ describe('/api/gm synthetic transport', () => {
     const preview = await handleGMRequest(new Request('https://example.test/api/gm', {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ input: { kind: 'free-action', text: '통신 상태를 확인한다' }, checkpoint: initial }),
     }), unavailable, 'deploy-preview')
-    expect(await preview.json()).toEqual({ status: 'unavailable', message: 'safe', diagnostic: { key_present: true, failure_category: 'auth_or_config' } })
+    expect(await preview.json()).toEqual({ status: 'unavailable', message: 'safe [auth_or_config]', diagnostic: { key_present: true, failure_category: 'auth_or_config' } })
 
     const production = await handleGMRequest(new Request('https://example.test/api/gm', {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ input: { kind: 'free-action', text: '통신 상태를 확인한다' }, checkpoint: initial }),
