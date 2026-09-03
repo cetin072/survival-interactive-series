@@ -4,6 +4,7 @@ import { validateGMTransportRequest } from '../../src/runtime/gmTransport'
 import { OpenRouterStoryProvider } from '../../src/server/openRouterStoryProvider'
 import { OpenRouterFastFallbackProvider } from '../../src/server/openRouterFastFallbackProvider'
 import { addChoiceReferenceContext } from '../../src/server/playerActionContext'
+import { selectStoryProviderTier } from '../../src/server/previewProviderRouting'
 import { stabilizeStoryProposal } from '../../src/server/storyProposalGuard'
 
 const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8' }
@@ -100,13 +101,11 @@ function createFastFallbackProvider(): GMProvider {
 
 function createOpenRouterStoryProviderFromEnvironment(deployContext?: string, retryAttempt = 0): GMProvider {
   const environment = (globalThis as unknown as { process?: { env?: Record<string, string | undefined> } }).process?.env
-  const isPreview = deployContext === 'deploy-preview'
+  const tier = selectStoryProviderTier(deployContext, retryAttempt)
 
-  if (!isPreview) {
-    return new ChoiceReferenceAwareProvider(new OpenRouterStoryProvider(environment?.OPENROUTER_API_KEY))
-  }
-
-  return retryAttempt > 0 ? createFastFallbackProvider() : createPrimaryStoryProvider()
+  if (tier === 'preview-primary') return createPrimaryStoryProvider()
+  if (tier === 'preview-fallback') return createFastFallbackProvider()
+  return new ChoiceReferenceAwareProvider(new OpenRouterStoryProvider(environment?.OPENROUTER_API_KEY))
 }
 
 function previewDiagnostic(
