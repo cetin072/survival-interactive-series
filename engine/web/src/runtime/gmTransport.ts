@@ -107,10 +107,13 @@ export class HttpGMProvider implements GMProvider {
     private readonly endpoint = DEFAULT_GM_ENDPOINT,
   ) {}
 
-  private post(endpoint: string, request: GMProviderTurnRequest): Promise<Response> {
+  private post(endpoint: string, request: GMProviderTurnRequest, attempt: number): Promise<Response> {
     return this.fetcher(endpoint, {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: {
+        'content-type': 'application/json',
+        'x-gm-retry-attempt': String(attempt),
+      },
       body: JSON.stringify(request),
     })
   }
@@ -131,7 +134,7 @@ export class HttpGMProvider implements GMProvider {
       const endpoint = this.endpointForAttempt(attempt)
       let response: Response
       try {
-        response = await this.post(endpoint, requestCheck.value)
+        response = await this.post(endpoint, requestCheck.value, attempt)
       } catch {
         lastCategory = 'network_error'
         lastDetail = attempt === 0 ? 'first_request_failed' : 'retry_failed'
