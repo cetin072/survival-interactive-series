@@ -22,6 +22,26 @@ describe('Fast fallback repair', () => {
     expect(candidate?.open_threads).toEqual(['정호의 외곽 대피 여부 확인'])
   })
 
+  it('accepts narrative/next_choices aliases and object-shaped choice labels', () => {
+    const checkpoint = createStorytellingBenchmarkSession()
+    const candidate = repairFastFallbackCandidate({
+      checkpoint,
+      input: { kind: 'numbered-choice', choice_id: 3 },
+    }, {
+      narrative: '## 18:23 — 병원과 통화\n\n서윤은 병원 비상대응 때문에 바로 이동하기 어렵다고 판단하고 가족 합류 기준을 다시 정한다.',
+      next_choices: [
+        { label: '민석을 우선 회수한다' },
+        { text: '정호의 자력 대피를 우선한다' },
+      ],
+    })
+
+    expect(candidate).toBeDefined()
+    expect(candidate?.story).toContain('병원과 통화')
+    expect(candidate?.choices).toHaveLength(4)
+    expect(candidate?.choices[0]).toBe('민석을 우선 회수한다')
+    expect(candidate?.choices[1]).toBe('정호의 자력 대피를 우선한다')
+  })
+
   it('rejects output with no usable story even if choices exist', () => {
     const checkpoint = createStorytellingBenchmarkSession()
     const candidate = repairFastFallbackCandidate({
