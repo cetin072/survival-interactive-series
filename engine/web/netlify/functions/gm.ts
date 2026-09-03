@@ -2,14 +2,14 @@ import { validateGMProposal } from '../../src/runtime/gmProposal'
 import type { GMProvider, GMProviderResult } from '../../src/runtime/gmProvider'
 import { validateGMTransportRequest } from '../../src/runtime/gmTransport'
 import { OpenRouterStoryProvider } from '../../src/server/openRouterStoryProvider'
+import { OpenRouterFastFallbackProvider } from '../../src/server/openRouterFastFallbackProvider'
 import { addChoiceReferenceContext } from '../../src/server/playerActionContext'
 import { stabilizeStoryProposal } from '../../src/server/storyProposalGuard'
 
 const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8' }
 const PREVIEW_PRIMARY_MODEL = 'deepseek/deepseek-v4-pro-0813:nitro'
-const PREVIEW_FALLBACK_MODEL = 'deepseek/deepseek-v4-flash-0731:nitro'
 const PREVIEW_PRIMARY_TIMEOUT_MS = 26_000
-const PREVIEW_FALLBACK_TIMEOUT_MS = 24_000
+const PREVIEW_FALLBACK_TIMEOUT_MS = 22_000
 const PREVIEW_PRIMARY_PREFERENCE_MS = 20_000
 const PREVIEW_TRANSIENT_RETRY_DELAY_MS = 250
 
@@ -112,8 +112,8 @@ class PreviewResilientProvider implements GMProvider {
   ) {}
 
   async proposeTurn(request: Parameters<GMProvider['proposeTurn']>[0]): Promise<GMProviderResult> {
-    // Start both models together. Deploy Preview has an observed ~30s gateway edge,
-    // so a sequential Pro -> Flash fallback cannot be reliable.
+    // Start both providers together. The live Deploy Preview shows an HTTP 504
+    // edge at roughly 30 seconds, so sequential fallback is not reliable.
     const primaryPromise = this.primary.proposeTurn(request)
       .catch(() => rejectedProviderResult('Preview primary model failed.'))
     const fallbackPromise = this.fallback.proposeTurn(request)
@@ -147,8 +147,9 @@ class PreviewResilientProvider implements GMProvider {
       }
     }
 
-    // Pro is still running after the preference window. Flash has already been
-    // running in parallel, so using it here stays inside the gateway budget.
+    // Pro is still running after the preference window. The fast Flash fallback
+    // has already been running in parallel and never blocks on narrative quality
+    // heuristics, so it can keep the game alive inside the gateway budget.
     const fallbackResult = await fallbackPromise
     if (fallbackResult.status === 'proposal') return withFallbackDiagnostic(fallbackResult, 'primary_slow')
 
@@ -171,12 +172,21 @@ class PreviewResilientProvider implements GMProvider {
   }
 }
 
-function createStoryProviderForModel(model: string, timeoutMs: number): GMProvider {
+function createPrimaryStoryProvider(): GMProvider {
   const environment = (globalThis as unknown as { process?: { env?: Record<string, string | undefined> } }).process?.env
   return new OpenRouterStoryProvider(
     environment?.OPENROUTER_API_KEY,
-    modelOverrideFetch(model),
-    timeoutMs,
+    modelOverrideFetch(PREVIEW_PRIMARY_MODEL),
+    PREVIEW_PRIMARY_TIMEOUT_MS,
+  )
+}
+
+function createFastFallbackProvider(): GMProvider {
+  const environment = (globalThis as unknown as { process?: { env?: Record<string, string | undefined> } }).process?.env
+  return new OpenRouterFastFallbackProvider(
+    environment?.OPENROUTER_API_KEY,
+    fetch,
+    PREVIEW_FALLBACK_TIMEOUT_MS,
   )
 }
 
@@ -189,8 +199,8 @@ function createOpenRouterStoryProviderFromEnvironment(deployContext?: string): G
   }
 
   return new ChoiceReferenceAwareProvider(new PreviewResilientProvider(
-    createStoryProviderForModel(PREVIEW_PRIMARY_MODEL, PREVIEW_PRIMARY_TIMEOUT_MS),
-    createStoryProviderForModel(PREVIEW_FALLBACK_MODEL, PREVIEW_FALLBACK_TIMEOUT_MS),
+    createPrimaryStoryProvider(),
+    createFastFallbackProvider(),
   ))
 }
 
