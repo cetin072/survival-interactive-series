@@ -2,18 +2,54 @@ import { validateGMProposal } from '../../src/runtime/gmProposal'
 import type { GMProvider } from '../../src/runtime/gmProvider'
 import { validateGMTransportRequest } from '../../src/runtime/gmTransport'
 import { OpenRouterStoryProvider } from '../../src/server/openRouterStoryProvider'
+import { addChoiceReferenceContext } from '../../src/server/playerActionContext'
 
 const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8' }
+const PREVIEW_STORY_MODEL = 'deepseek/deepseek-v4-pro-0813:nitro'
+
+type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+
+type NetlifyRequestContext = { deploy?: { context?: string } }
 
 function json(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), { status, headers: JSON_HEADERS })
 }
 
-type NetlifyRequestContext = { deploy?: { context?: string } }
+function modelOverrideFetch(model: string): FetchLike {
+  return async (input, init) => {
+    if (typeof init?.body !== 'string') return fetch(input, init)
 
-function createOpenRouterStoryProviderFromEnvironment(): GMProvider {
+    let body: Record<string, unknown>
+    try {
+      body = JSON.parse(init.body) as Record<string, unknown>
+    } catch {
+      return fetch(input, init)
+    }
+
+    return fetch(input, {
+      ...init,
+      body: JSON.stringify({ ...body, model }),
+    })
+  }
+}
+
+class ChoiceReferenceAwareProvider implements GMProvider {
+  constructor(private readonly delegate: GMProvider) {}
+
+  proposeTurn(request: Parameters<GMProvider['proposeTurn']>[0]) {
+    return this.delegate.proposeTurn(addChoiceReferenceContext(request))
+  }
+}
+
+function createOpenRouterStoryProviderFromEnvironment(deployContext?: string): GMProvider {
   const environment = (globalThis as unknown as { process?: { env?: Record<string, string | undefined> } }).process?.env
-  return new OpenRouterStoryProvider(environment?.OPENROUTER_API_KEY)
+  const fetchImpl = deployContext === 'deploy-preview'
+    ? modelOverrideFetch(PREVIEW_STORY_MODEL)
+    : fetch
+
+  return new ChoiceReferenceAwareProvider(
+    new OpenRouterStoryProvider(environment?.OPENROUTER_API_KEY, fetchImpl),
+  )
 }
 
 function previewDiagnostic(
@@ -71,5 +107,5 @@ export async function handleGMRequest(
 }
 
 export default function gm(request: Request, context: NetlifyRequestContext): Promise<Response> {
-  return handleGMRequest(request, createOpenRouterStoryProviderFromEnvironment(), context.deploy?.context)
+  return handleGMRequest(request, createOpenRouterStoryProviderFromEnvironment(context.deploy?.context), context.deploy?.context)
 }
