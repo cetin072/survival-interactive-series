@@ -7,7 +7,8 @@ import { addChoiceReferenceContext } from '../../src/server/playerActionContext'
 const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8' }
 const PREVIEW_PRIMARY_MODEL = 'deepseek/deepseek-v4-pro-0813:nitro'
 const PREVIEW_FALLBACK_MODEL = 'deepseek/deepseek-v4-flash-0731:nitro'
-const PREVIEW_TIMEOUT_MS = 45_000
+const PREVIEW_PRIMARY_TIMEOUT_MS = 32_000
+const PREVIEW_FALLBACK_TIMEOUT_MS = 22_000
 const PREVIEW_TRANSIENT_RETRY_DELAY_MS = 250
 
 const PREVIEW_MODEL_FALLBACK_CATEGORIES = new Set([
@@ -140,12 +141,12 @@ class PreviewResilientProvider implements GMProvider {
   }
 }
 
-function createStoryProviderForModel(model: string): GMProvider {
+function createStoryProviderForModel(model: string, timeoutMs: number): GMProvider {
   const environment = (globalThis as unknown as { process?: { env?: Record<string, string | undefined> } }).process?.env
   return new OpenRouterStoryProvider(
     environment?.OPENROUTER_API_KEY,
     modelOverrideFetch(model),
-    PREVIEW_TIMEOUT_MS,
+    timeoutMs,
   )
 }
 
@@ -158,8 +159,8 @@ function createOpenRouterStoryProviderFromEnvironment(deployContext?: string): G
   }
 
   return new ChoiceReferenceAwareProvider(new PreviewResilientProvider(
-    createStoryProviderForModel(PREVIEW_PRIMARY_MODEL),
-    createStoryProviderForModel(PREVIEW_FALLBACK_MODEL),
+    createStoryProviderForModel(PREVIEW_PRIMARY_MODEL, PREVIEW_PRIMARY_TIMEOUT_MS),
+    createStoryProviderForModel(PREVIEW_FALLBACK_MODEL, PREVIEW_FALLBACK_TIMEOUT_MS),
   ))
 }
 
