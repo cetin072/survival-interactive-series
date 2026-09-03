@@ -7,6 +7,7 @@ import type { PublicRuntimeCheckpoint } from '../src/runtime/publicRuntimeCheckp
 const preview = process.env.PREVIEW_URL ?? 'https://deploy-preview-67--survival-zero-ai-test.netlify.app'
 const endpoint = `${preview}/.netlify/functions/gm`
 const keyStatusEndpoint = `${preview}/.netlify/functions/openrouter-key-status`
+const smokeMode = process.env.SMOKE_MODE === 'full' ? 'full' : 'quick'
 
 type SmokeResult = { label: string; ok: boolean; detail: string }
 type KeyHealth = {
@@ -78,9 +79,26 @@ async function tryTurn(checkpoint: PublicRuntimeCheckpoint, input: GMPlayerInput
   }
 }
 
-async function main() {
-  await assertKeyHealthy()
+async function runQuickSmoke() {
+  const independent: Array<[string, GMPlayerInput]> = [
+    ['choice-1', { kind: 'numbered-choice', choice_id: 1 }],
+    ['ordered-1-2', { kind: 'ordered-choices', choice_ids: [1, 2] }],
+    ['free-role-split', { kind: 'free-action', text: '서윤이 병원에서 나올 수 있으면 민석을 맡고, 못 나오면 아버지는 스스로 대피하도록 하고 내가 민석을 데리러 간다' }],
+  ]
 
+  for (const [label, input] of independent) {
+    await tryTurn(createStorytellingBenchmarkSession(), input, label)
+  }
+
+  let chain: PublicRuntimeCheckpoint | undefined = createStorytellingBenchmarkSession()
+  chain = chain ? await tryTurn(chain, { kind: 'numbered-choice', choice_id: 1 }, 'chain-turn-1') : undefined
+  chain = chain ? await tryTurn(chain, {
+    kind: 'free-action',
+    text: '민석을 데리러 가는 흐름은 유지하면서 아버지와 서윤도 각자 상황에 맞게 움직이도록 한다',
+  }, 'chain-turn-2-free') : undefined
+}
+
+async function runFullSmoke() {
   const independent: Array<[string, GMPlayerInput]> = [
     ['choice-1', { kind: 'numbered-choice', choice_id: 1 }],
     ['choice-2', { kind: 'numbered-choice', choice_id: 2 }],
@@ -99,13 +117,22 @@ async function main() {
   chain = chain ? await tryTurn(chain, { kind: 'numbered-choice', choice_id: 1 }, 'chain-turn-1') : undefined
   chain = chain ? await tryTurn(chain, { kind: 'numbered-choice', choice_id: 1 }, 'chain-turn-2') : undefined
   chain = chain ? await tryTurn(chain, { kind: 'free-action', text: '현재 가족 상황을 기준으로 가장 위험한 곳에 있는 가족부터 챙기되, 이미 정한 이동은 계속 진행한다' }, 'chain-turn-3-free') : undefined
+}
 
+async function main() {
+  console.log(`LIVE PREVIEW SMOKE MODE: ${smokeMode}`)
+  await assertKeyHealthy()
+
+  if (smokeMode === 'full') await runFullSmoke()
+  else await runQuickSmoke()
+
+  const expected = smokeMode === 'full' ? 10 : 5
   const passed = results.filter((result) => result.ok).length
   console.log('--- LIVE PREVIEW SMOKE SUMMARY ---')
   for (const result of results) console.log(`${result.ok ? 'PASS' : 'FAIL'} ${result.label}: ${result.detail}`)
   console.log(`LIVE PREVIEW SMOKE: ${passed}/${results.length} PASS`)
 
-  if (passed !== 10 || results.length !== 10) process.exit(1)
+  if (passed !== expected || results.length !== expected) process.exit(1)
 }
 
 main().catch((error) => {
