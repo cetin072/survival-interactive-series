@@ -91,7 +91,18 @@ export function validateGMTransportResponse(value: unknown): ValidationResult<GM
   return { valid: false, message: 'Malformed GM transport response.' }
 }
 
+function requestFingerprint(request: GMProviderTurnRequest): string {
+  return JSON.stringify({
+    checkpoint_id: request.checkpoint.checkpoint_id,
+    turn: request.checkpoint.committed_turn.number,
+    scene_id: request.checkpoint.current_scene.id,
+    input: request.input,
+  })
+}
+
 export class HttpGMProvider implements GMProvider {
+  private readonly inFlight = new Map<string, Promise<GMProviderResult>>()
+
   constructor(
     private readonly fetcher: FetchLike = browserSafeFetch,
     private readonly endpoint = DEFAULT_GM_ENDPOINT,
@@ -105,7 +116,7 @@ export class HttpGMProvider implements GMProvider {
     })
   }
 
-  async proposeTurn(request: GMProviderTurnRequest): Promise<GMProviderResult> {
+  private async performTurn(request: GMProviderTurnRequest): Promise<GMProviderResult> {
     const requestCheck = validateGMTransportRequest(request)
     if (!requestCheck.valid) return previewUnavailable(request, 'request_validation', requestCheck.message)
 
@@ -136,5 +147,17 @@ export class HttpGMProvider implements GMProvider {
       return previewUnavailable(request, 'http_rejected', `HTTP ${response.status}`)
     }
     return parsed.value
+  }
+
+  proposeTurn(request: GMProviderTurnRequest): Promise<GMProviderResult> {
+    const fingerprint = requestFingerprint(request)
+    const existing = this.inFlight.get(fingerprint)
+    if (existing) return existing
+
+    const pending = this.performTurn(request).finally(() => {
+      this.inFlight.delete(fingerprint)
+    })
+    this.inFlight.set(fingerprint, pending)
+    return pending
   }
 }
