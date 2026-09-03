@@ -1,12 +1,12 @@
 name: Live preview GM smoke
 
+# Paid live-AI verification is deliberately opt-in.
+# Bump engine/web/public/live-smoke-marker.txt only when a real provider smoke is wanted.
 on:
   pull_request:
     branches: [main]
     paths:
       - 'engine/web/public/live-smoke-marker.txt'
-      - 'engine/web/scripts/livePreviewSmoke.ts'
-      - '.github/workflows/live-preview-smoke.yml'
 
 jobs:
   smoke:
@@ -25,8 +25,9 @@ jobs:
       - name: Wait for matching Deploy Preview
         env:
           PREVIEW_URL: https://deploy-preview-67--survival-zero-ai-test.netlify.app
-          EXPECTED_MARKER: live-smoke-20260903-2300-v3
         run: |
+          EXPECTED_MARKER="$(tr -d '\r\n' < engine/web/public/live-smoke-marker.txt)"
+          echo "Expected marker: $EXPECTED_MARKER"
           for i in $(seq 1 36); do
             marker="$(curl -fsS --max-time 10 "$PREVIEW_URL/live-smoke-marker.txt" 2>/dev/null || true)"
             if [ "$marker" = "$EXPECTED_MARKER" ]; then
@@ -38,8 +39,16 @@ jobs:
           done
           echo "Deploy Preview marker did not become available in time."
           exit 1
-      - name: Run 10 live GM turns
+      - name: Run paid live GM smoke
         working-directory: engine/web
         env:
           PREVIEW_URL: https://deploy-preview-67--survival-zero-ai-test.netlify.app
-        run: npx --yes tsx@4.20.6 scripts/livePreviewSmoke.ts
+        run: |
+          marker="$(tr -d '\r\n' < public/live-smoke-marker.txt)"
+          if [[ "$marker" == full-* ]]; then
+            export SMOKE_MODE=full
+          else
+            export SMOKE_MODE=quick
+          fi
+          echo "Live smoke mode: $SMOKE_MODE"
+          npx --yes tsx@4.20.6 scripts/livePreviewSmoke.ts
