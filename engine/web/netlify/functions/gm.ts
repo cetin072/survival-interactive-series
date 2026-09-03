@@ -1,13 +1,29 @@
 import { validateGMProposal } from '../../src/runtime/gmProposal'
-import type { GMProvider } from '../../src/runtime/gmProvider'
+import type { GMProvider, GMProviderResult } from '../../src/runtime/gmProvider'
 import { validateGMTransportRequest } from '../../src/runtime/gmTransport'
 import { OpenRouterStoryProvider } from '../../src/server/openRouterStoryProvider'
 import { addChoiceReferenceContext } from '../../src/server/playerActionContext'
 
 const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8' }
-const PREVIEW_STORY_MODEL = 'deepseek/deepseek-v4-pro-0813:nitro'
+const PREVIEW_PRIMARY_MODEL = 'deepseek/deepseek-v4-pro-0813:nitro'
+const PREVIEW_FALLBACK_MODEL = 'deepseek/deepseek-v4-flash-0731:nitro'
 const PREVIEW_TIMEOUT_MS = 45_000
 const PREVIEW_TRANSIENT_RETRY_DELAY_MS = 250
+
+const PREVIEW_MODEL_FALLBACK_CATEGORIES = new Set([
+  'timeout',
+  'network',
+  'route_unavailable',
+  'upstream_5xx',
+  'provider_error',
+  'unsupported_response_shape',
+  'truncated_output',
+  'malformed_json',
+  'compact_schema_mismatch',
+  'quality_retry_failed',
+  'quality_guard_rejected',
+  'compiled_schema_mismatch',
+])
 
 type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 type NetlifyRequestContext = { deploy?: { context?: string } }
@@ -35,9 +51,19 @@ function modelOverrideFetch(model: string): FetchLike {
       return fetch(input, init)
     }
 
+    const existingProvider = typeof body.provider === 'object' && body.provider !== null
+      ? body.provider as Record<string, unknown>
+      : {}
     const requestInit: RequestInit = {
       ...init,
-      body: JSON.stringify({ ...body, model }),
+      body: JSON.stringify({
+        ...body,
+        model,
+        provider: {
+          ...existingProvider,
+          allow_fallbacks: true,
+        },
+      }),
     }
     const requestOnce = () => fetch(input, requestInit)
 
@@ -67,16 +93,74 @@ class ChoiceReferenceAwareProvider implements GMProvider {
   }
 }
 
+class PreviewResilientProvider implements GMProvider {
+  constructor(
+    private readonly primary: GMProvider,
+    private readonly fallback: GMProvider,
+  ) {}
+
+  async proposeTurn(request: Parameters<GMProvider['proposeTurn']>[0]): Promise<GMProviderResult> {
+    const primaryResult = await this.primary.proposeTurn(request)
+    if (primaryResult.status === 'proposal') return primaryResult
+
+    const category = primaryResult.diagnostic?.failure_category
+    if (category === 'auth_or_config' || (category && !PREVIEW_MODEL_FALLBACK_CATEGORIES.has(category))) {
+      return primaryResult
+    }
+
+    const fallbackResult = await this.fallback.proposeTurn(request)
+    if (fallbackResult.status === 'unavailable') {
+      return {
+        ...fallbackResult,
+        message: `${primaryResult.message} / 안전 폴백도 완료하지 못했습니다: ${fallbackResult.message}`,
+        diagnostic: {
+          key_present: primaryResult.diagnostic?.key_present ?? fallbackResult.diagnostic?.key_present ?? true,
+          failure_category: fallbackResult.diagnostic?.failure_category ?? category ?? 'preview_fallback_failed',
+          response_fingerprint: {
+            fallback_used: true,
+            primary_failure: category ?? 'unknown',
+            fallback_failure: fallbackResult.diagnostic?.failure_category ?? 'unknown',
+          },
+        },
+      }
+    }
+
+    return {
+      ...fallbackResult,
+      diagnostic: {
+        ...fallbackResult.diagnostic,
+        key_present: fallbackResult.diagnostic?.key_present ?? true,
+        response_fingerprint: {
+          ...(fallbackResult.diagnostic?.response_fingerprint ?? {}),
+          fallback_used: true,
+          primary_failure: category ?? 'unknown',
+        },
+      },
+    }
+  }
+}
+
+function createStoryProviderForModel(model: string): GMProvider {
+  const environment = (globalThis as unknown as { process?: { env?: Record<string, string | undefined> } }).process?.env
+  return new OpenRouterStoryProvider(
+    environment?.OPENROUTER_API_KEY,
+    modelOverrideFetch(model),
+    PREVIEW_TIMEOUT_MS,
+  )
+}
+
 function createOpenRouterStoryProviderFromEnvironment(deployContext?: string): GMProvider {
   const environment = (globalThis as unknown as { process?: { env?: Record<string, string | undefined> } }).process?.env
   const isPreview = deployContext === 'deploy-preview'
-  const fetchImpl = isPreview
-    ? modelOverrideFetch(PREVIEW_STORY_MODEL)
-    : fetch
 
-  return new ChoiceReferenceAwareProvider(
-    new OpenRouterStoryProvider(environment?.OPENROUTER_API_KEY, fetchImpl, isPreview ? PREVIEW_TIMEOUT_MS : undefined),
-  )
+  if (!isPreview) {
+    return new ChoiceReferenceAwareProvider(new OpenRouterStoryProvider(environment?.OPENROUTER_API_KEY))
+  }
+
+  return new ChoiceReferenceAwareProvider(new PreviewResilientProvider(
+    createStoryProviderForModel(PREVIEW_PRIMARY_MODEL),
+    createStoryProviderForModel(PREVIEW_FALLBACK_MODEL),
+  ))
 }
 
 function previewDiagnostic(
