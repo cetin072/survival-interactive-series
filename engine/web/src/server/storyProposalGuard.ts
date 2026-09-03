@@ -6,6 +6,7 @@ const MAX_SYNC_MINUTES = 180
 const LOCATION_WORDS = /(도로|진입로|주차장|학원|병원|아파트|주택|회관|삼거리|교차로|골목|역|터미널|대피소|회사|학교|마트|편의점|농협|국도|지방도로|순환도로|거점|집|현장)/
 const STRATEGIC_CHOICE_WORDS = /(우선|먼저|합류|대피|철수|포기|위험|혼자|보내|데리|만나|지점|거점|진입|빠져|우회|샛길|맡|역할|바꾸|정한다|설득|나오|들어가|계속 가|차량|외곽|도심)/
 const MICRO_CHOICE_PATTERN = /((다시\s*)?(전화|연락).*(확인|알리|물어|조율)|상황.*(다시\s*)?확인|시간.*(다시\s*)?조율|지도.*(확인|검색)|정보.*(확인|검색))/
+const TIME_ONLY_COORDINATION_PATTERN = /(알리|전하|공유).*(합류|도착).*(시간|시각).*(다시\s*)?(조율|맞추|확인)|(합류|도착).*(시간|시각).*(다시\s*)?(조율|맞추|확인)/
 
 type StoryEnd = {
   time?: string
@@ -111,6 +112,7 @@ function synchronizeAction(
 
 function isMicroChoice(label: string): boolean {
   const normalized = label.replace(/\s+/g, ' ').trim()
+  if (TIME_ONLY_COORDINATION_PATTERN.test(normalized)) return true
   if (!MICRO_CHOICE_PATTERN.test(normalized)) return false
   return !STRATEGIC_CHOICE_WORDS.test(normalized)
 }
