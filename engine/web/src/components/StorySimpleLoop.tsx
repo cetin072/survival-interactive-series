@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, useEffect } from 'react'
 import { choiceShortcutFromText } from '../input/action'
 import { createGameSnapshot } from '../state/snapshot'
 import type { GMPlayerInput } from '../runtime/gmProvider'
@@ -15,9 +15,18 @@ import {
 import type { LogEntry } from '../types'
 import '../story-simple-ui.css'
 
-const UI_BUILD = 'STORY-SIMPLE-20260903-A'
+const UI_BUILD = 'STORY-MUD-20260903-B'
 const UI_BUILD_KEY = 'survival-story-simple-ui-build'
 const MAX_ORDERED_CHOICES = 2
+
+type StoryBlock =
+  | { type: 'heading'; text: string }
+  | { type: 'subheading'; text: string }
+  | { type: 'paragraph'; text: string }
+  | { type: 'dialogue'; speaker: string; text: string }
+  | { type: 'signal'; label?: string; lines: string[] }
+  | { type: 'list'; items: string[] }
+  | { type: 'divider' }
 
 function loadSession(): PublicRuntimeCheckpoint {
   if (typeof window === 'undefined') return createStorytellingBenchmarkSession()
@@ -55,14 +64,111 @@ function visibleStoryEntries(checkpoint: PublicRuntimeCheckpoint): LogEntry[] {
   return [...entries, { id: -1, kind: 'scene', text: checkpoint.current_scene.narrative }]
 }
 
-function narrativeParagraphs(text: string): string[] {
-  const explicit = text.split(/\n\s*\n/g).map((value) => value.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean)
-  if (explicit.length > 1) return explicit
+function stripInlineMarkup(text: string): string {
+  return text.replace(/\*\*/g, '').replace(/__+/g, '').trim()
+}
 
-  const sentences = text.match(/[^.!?。！？]+[.!?。！？]+(?:[\"”’']+)?|[^.!?。！？]+$/g)?.map((value) => value.trim()).filter(Boolean) ?? [text]
-  const groups: string[] = []
-  for (let index = 0; index < sentences.length; index += 2) groups.push(sentences.slice(index, index + 2).join(' '))
-  return groups
+function parseStoryBlocks(text: string): StoryBlock[] {
+  const lines = text.replace(/\r/g, '').split('\n')
+  const blocks: StoryBlock[] = []
+  let paragraph: string[] = []
+
+  const flushParagraph = () => {
+    const value = stripInlineMarkup(paragraph.join(' ').replace(/\s+/g, ' '))
+    if (value) blocks.push({ type: 'paragraph', text: value })
+    paragraph = []
+  }
+
+  let index = 0
+  while (index < lines.length) {
+    const raw = lines[index] ?? ''
+    const line = raw.trim()
+
+    if (!line) {
+      flushParagraph()
+      index += 1
+      continue
+    }
+
+    if (line === '---') {
+      flushParagraph()
+      blocks.push({ type: 'divider' })
+      index += 1
+      continue
+    }
+
+    if (line.startsWith('### ')) {
+      flushParagraph()
+      blocks.push({ type: 'subheading', text: stripInlineMarkup(line.slice(4)) })
+      index += 1
+      continue
+    }
+
+    if (line.startsWith('## ')) {
+      flushParagraph()
+      blocks.push({ type: 'heading', text: stripInlineMarkup(line.slice(3)) })
+      index += 1
+      continue
+    }
+
+    if (line.startsWith('>')) {
+      flushParagraph()
+      const quoteLines: string[] = []
+      while (index < lines.length && (lines[index] ?? '').trim().startsWith('>')) {
+        quoteLines.push(stripInlineMarkup((lines[index] ?? '').trim().replace(/^>\s?/, '')))
+        index += 1
+      }
+      const first = quoteLines[0] ?? ''
+      const labelMatch = first.match(/^\[([^\]]+)\]$/)
+      blocks.push({
+        type: 'signal',
+        label: labelMatch?.[1],
+        lines: labelMatch ? quoteLines.slice(1) : quoteLines,
+      })
+      continue
+    }
+
+    if (line.startsWith('- ')) {
+      flushParagraph()
+      const items: string[] = []
+      while (index < lines.length && (lines[index] ?? '').trim().startsWith('- ')) {
+        items.push(stripInlineMarkup((lines[index] ?? '').trim().slice(2)))
+        index += 1
+      }
+      blocks.push({ type: 'list', items })
+      continue
+    }
+
+    const dialogue = stripInlineMarkup(line).match(/^([^:：]{1,28})[:：]\s*(.+)$/)
+    if (dialogue && /[“”"']/u.test(dialogue[2])) {
+      flushParagraph()
+      blocks.push({ type: 'dialogue', speaker: dialogue[1].trim(), text: dialogue[2].trim() })
+      index += 1
+      continue
+    }
+
+    paragraph.push(line)
+    index += 1
+  }
+
+  flushParagraph()
+  return blocks
+}
+
+function StoryNarrative({ text }: { text: string }) {
+  const blocks = parseStoryBlocks(text)
+  return <div className="story-mud-blocks">
+    {blocks.map((block, index) => {
+      const key = `${index}-${block.type}`
+      if (block.type === 'heading') return <h2 className="story-mud-heading" key={key}>{block.text}</h2>
+      if (block.type === 'subheading') return <h3 className="story-mud-subheading" key={key}>{block.text}</h3>
+      if (block.type === 'dialogue') return <div className="story-mud-dialogue" key={key}><strong>{block.speaker}</strong><p>{block.text}</p></div>
+      if (block.type === 'signal') return <aside className="story-mud-signal" key={key}>{block.label && <strong>[{block.label}]</strong>}{block.lines.map((line, lineIndex) => <p key={`${key}-${lineIndex}`}>{line}</p>)}</aside>
+      if (block.type === 'list') return <ul className="story-mud-list" key={key}>{block.items.map((item, itemIndex) => <li key={`${key}-${itemIndex}`}>{item}</li>)}</ul>
+      if (block.type === 'divider') return <hr className="story-mud-divider" key={key} />
+      return <p className="story-mud-paragraph" key={key}>{block.text}</p>
+    })}
+  </div>
 }
 
 function pressureLabel(pressure: string): string {
@@ -85,20 +191,6 @@ export function StorySimpleLoop() {
   const snapshot = createGameSnapshot(checkpoint.public_state)
   const storyEntries = visibleStoryEntries(checkpoint)
   const lastSceneIndex = storyEntries.reduce((latest, entry, index) => entry.kind === 'scene' ? index : latest, -1)
-
-  useEffect(() => {
-    const syncViewportHeight = () => {
-      const height = window.visualViewport?.height ?? window.innerHeight
-      document.documentElement.style.setProperty('--survival-viewport-height', `${Math.round(height)}px`)
-    }
-    syncViewportHeight()
-    window.visualViewport?.addEventListener('resize', syncViewportHeight)
-    window.addEventListener('resize', syncViewportHeight)
-    return () => {
-      window.visualViewport?.removeEventListener('resize', syncViewportHeight)
-      window.removeEventListener('resize', syncViewportHeight)
-    }
-  }, [])
 
   useEffect(() => {
     window.localStorage.setItem(STORY_BENCHMARK_STORAGE_KEY, JSON.stringify(checkpoint))
@@ -198,7 +290,7 @@ export function StorySimpleLoop() {
       <div className="story-simple-column">
         {storyEntries.map((entry, index) => entry.kind === 'scene'
           ? <article className="story-simple-scene" ref={index === lastSceneIndex ? latestSceneRef : undefined} key={`scene-${entry.id}-${index}`}>
-              {narrativeParagraphs(entry.text).map((paragraph, paragraphIndex) => <p key={`${paragraphIndex}-${paragraph.slice(0, 18)}`}>{paragraph}</p>)}
+              <StoryNarrative text={entry.text} />
             </article>
           : <div className="story-simple-player-log" key={`log-${entry.id}-${index}`}>
               <span>{entry.kind === 'free-action' ? '직접 행동' : '내 선택'}</span>
