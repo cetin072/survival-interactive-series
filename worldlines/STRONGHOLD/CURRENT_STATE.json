@@ -1,11 +1,11 @@
 {
   "worldline": "STRONGHOLD",
   "continuity": "continuous",
-  "status": "ready_to_start",
+  "status": "active",
   "clock": {
-    "date": null,
-    "time": null,
-    "phase": "normal_life_before_first_play"
+    "date": "2026-09-08",
+    "time": "19:08",
+    "phase": "extended_grid_failure_and_local_adaptation"
   },
   "player": {
     "name": "박도현",
@@ -13,62 +13,164 @@
     "sex": "male",
     "occupation": "중견기업 시설·구매·운영 관리계열 회사원",
     "household": "1인 거주",
-    "location": null,
-    "condition": "정상",
+    "location": "외곽 시골집",
+    "condition": "정상, 누적 피로 있으나 기능 양호",
     "long_term_injuries": [],
-    "current_goal": "평범한 일상 유지"
+    "current_goal": "외곽집의 식량·저장력을 강화하고 기술노동을 거래수단으로 쓰되, 마을 운영 책임은 떠안지 않으며 신뢰 가능한 개인 동맹을 식별한다"
   },
   "assets": {
     "urban_home": {
-      "status": "정상",
-      "description": "현대 한국의 평범한 도심 거주지",
-      "utilities": "정상"
+      "status": "존속, 1차 회수 완료",
+      "description": "도심 아파트. 일부 중요 서류·의약품·식량·의류·캠핑/전력 장비를 외곽집으로 회수함",
+      "utilities": "장기 정전 및 급수 불안정 상태에서 마지막 확인"
     },
     "outer_property": {
       "type": "B",
-      "status": "사용 가능하지만 오래됨",
-      "description": "오래된 시골집 + 작은 별도 창고 + 소규모 토지",
+      "status": "개인 거점으로 초기 전환됨",
+      "description": "오래된 시골집 + 작은 창고 + 소규모 토지",
       "vehicle_access": true,
-      "grid_power": true,
-      "grid_water": true,
-      "independent_power": false,
+      "grid_power": false,
+      "grid_water": false,
+      "independent_power": true,
       "bunker": false,
-      "capabilities": ["기본 주거", "소규모 보관", "기본 공구 사용"]
+      "capabilities": [
+        "기본 주거",
+        "분산 비축",
+        "기본 공구 사용",
+        "빗물 집수",
+        "생활용수 저장",
+        "소형 태양광 발전",
+        "배터리 저장 및 소형 전자기기 충전",
+        "기본 출입 감지",
+        "취약 문·창문 임시 보강",
+        "차량 은폐 주차",
+        "소규모 재배 준비 가능"
+      ]
     },
     "vehicle": {
       "count": 1,
       "status": "정상",
-      "location": null
+      "location": "외곽집",
+      "fuel": "충분하지만 도심 왕복으로 감소, 보존 필요"
     }
   },
   "resources": {
-    "water": "보통",
+    "water": "충분",
     "food": "보통",
     "medical": "보통",
-    "power_backup": "부족",
+    "power_backup": "보통",
     "fuel": "보통",
-    "communications": "보통",
+    "communications": "부족",
     "cash_access": "보통",
-    "tools": "보통",
+    "tools": "충분",
     "information": "보통"
   },
-  "people": [],
-  "relationships": [],
-  "known_routes": [],
+  "people": [
+    {
+      "name": "최영수",
+      "role": "마을 주민, 실무 연결 역할",
+      "location": "마을",
+      "status": "활동 중",
+      "notes": "도현과 반복적으로 협업했으나 아직 핵심 동맹으로 확정되지 않음"
+    },
+    {
+      "name": "이정만",
+      "role": "마을 고령 주민, 지역 수원·농사 사정에 밝음",
+      "location": "마을",
+      "status": "활동 중",
+      "notes": "관정과 옛 샘 정보 제공, 농사 조언 가능"
+    },
+    {
+      "name": "정우진",
+      "role": "마을 연고 주민",
+      "location": "도시권 병원 쪽",
+      "status": "생존 확인, 부친과 병원 이동 중",
+      "notes": "도현이 모친을 마을로 이송함. 귀환 시점 불명"
+    },
+    {
+      "name": "정우진의 어머니",
+      "role": "피난 주민",
+      "location": "마을회관",
+      "status": "안전",
+      "notes": "도현이 도심에서 마을로 이송"
+    },
+    {
+      "name": "김태수",
+      "role": "인근 면 주민",
+      "location": "인근 면",
+      "status": "생존 확인",
+      "notes": "초기 이동 중 차량 구조를 계기로 우회로 정보를 제공함"
+    },
+    {
+      "name": "김서윤",
+      "role": "김태수의 딸",
+      "location": "인근 면",
+      "status": "생존 확인",
+      "notes": "초기 이동 중 함께 만남"
+    }
+  ],
+  "relationships": [
+    {
+      "with": "마을 이장",
+      "state": "기술 지원은 수용되나 운영·배급 권한은 이장에게 명시적으로 위임"
+    },
+    {
+      "with": "최영수",
+      "state": "실무 협력과 정보 교환이 반복됨. 신뢰 가능성은 있으나 검증 계속 필요"
+    },
+    {
+      "with": "농기계 수리점 사장",
+      "state": "발전기·중고 배터리·태양광 장비를 거래/후정산 방식으로 협력. 기술 파트너 후보"
+    },
+    {
+      "with": "골재장",
+      "state": "디젤 60L를 공동급수 지원과 향후 정산 조건으로 거래. 마을 공동 관계로 전환"
+    },
+    {
+      "with": "정우진",
+      "state": "도현이 모친 안전 이송을 맡았고 우진은 병원에 남음. 상호 책임감은 있으나 장기 관계 미정"
+    }
+  ],
+  "known_routes": [
+    "도심-외곽 기본 국도 경로",
+    "대형 교차로를 피하는 농로 우회 경로",
+    "하천 다리를 피하는 북쪽 우회로",
+    "외곽집-마을회관 도보 경로",
+    "마을-면 소재지-농기계 수리점-골재장 경로"
+  ],
   "world": {
-    "public_order": "정상",
-    "power_grid": "정상",
-    "water_supply": "정상",
-    "communications": "정상",
-    "markets": "정상",
-    "healthcare": "정상",
-    "government": "정상"
+    "public_order": "기본 질서는 유지되나 상점·급수·교통에서 갈등 증가",
+    "power_grid": "광범위 장기 장애, 일부 복구 언급 있으나 지역별 편차 큼",
+    "water_supply": "다수 지역 급수 장애, 마을은 독자 수원 체계로 부분 안정",
+    "communications": "간헐적 문자 중심, 지연 심함",
+    "markets": "현금 결제 위주로 축소, 생수·보존식·연료 부족",
+    "healthcare": "병원은 운영 중이나 과밀·환자 이송 발생",
+    "government": "기능 유지 중이나 연료·비상전력·급수 지원 여력 부족",
+    "fuel_logistics": "주유소 다수 영업 중단, 연료가 핵심 교환 자산으로 상승"
   },
   "base_progress": {
-    "primary_long_term_base": null,
-    "outer_property_stage": "old_rural_house",
-    "population": 1
+    "primary_long_term_base": "외곽 시골집",
+    "outer_property_stage": "early_personal_stronghold",
+    "population": 1,
+    "power": "소형 태양광 패널 2계통 활용 가능, 충전컨트롤러·납축전지·인버터로 저전력 저장 체계 구축",
+    "water": "초기 비축 + 200L 빗물 드럼 + 인근 옛 샘/마을 수동우물/공동관정 접근",
+    "security": "대문·뒷문·취약 창문 보강, 소리 기반 출입 감지, 담장 취약부 경보화, 차량 은폐",
+    "storage": "생활/비축/작업 구역 분리, 식량·연료·도구 일부 분산 저장",
+    "food_strategy": "비축-거래-생산준비 3축. 즉시 자급농사보다 농가 거래와 장기 재배 기반을 병행"
   },
-  "open_threads": [],
-  "recent_changes": ["STRONGHOLD 세계선 시작 준비 완료"]
+  "open_threads": [
+    "정우진과 부친의 도시권 병원 이동 후 상태 및 귀환 여부",
+    "광범위 정전의 실제 원인·범위·복구 전망 미확정",
+    "연료와 비상전력 장비 부족 심화 가능성",
+    "외곽집 식량 및 저장력 추가 강화 필요",
+    "도현이 신뢰 가능한 개인 동맹 최소 1명을 확보할 필요"
+  ],
+  "recent_changes": [
+    "외곽집을 개인 장기거점으로 명확히 선택함",
+    "소형 독립 태양광-배터리 전력 체계를 구축함",
+    "마을 공동관정은 대형 발전기와 거래한 연료로 복구되어 이장 중심 운영체계로 넘어감",
+    "도현은 기술 지원까지만 하고 사람 통제·배급·분쟁·공동 의사결정은 맡지 않는 원칙을 확정함",
+    "도심 집 1차 회수에서 중요 서류·의약품·보존식·100W 태양광 패널·인버터 등을 확보함",
+    "식량 전략을 비축·기술노동 기반 거래·장기 생산 준비로 전환하려는 단계"
+  ]
 }
