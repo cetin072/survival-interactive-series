@@ -1,0 +1,74 @@
+{
+  "worldline": "STRONGHOLD",
+  "continuity": "continuous",
+  "status": "ready_to_start",
+  "clock": {
+    "date": null,
+    "time": null,
+    "phase": "normal_life_before_first_play"
+  },
+  "player": {
+    "name": "박도현",
+    "age": 42,
+    "sex": "male",
+    "occupation": "중견기업 시설·구매·운영 관리계열 회사원",
+    "household": "1인 거주",
+    "location": null,
+    "condition": "정상",
+    "long_term_injuries": [],
+    "current_goal": "평범한 일상 유지"
+  },
+  "assets": {
+    "urban_home": {
+      "status": "정상",
+      "description": "현대 한국의 평범한 도심 거주지",
+      "utilities": "정상"
+    },
+    "outer_property": {
+      "type": "B",
+      "status": "사용 가능하지만 오래됨",
+      "description": "오래된 시골집 + 작은 별도 창고 + 소규모 토지",
+      "vehicle_access": true,
+      "grid_power": true,
+      "grid_water": true,
+      "independent_power": false,
+      "bunker": false,
+      "capabilities": ["기본 주거", "소규모 보관", "기본 공구 사용"]
+    },
+    "vehicle": {
+      "count": 1,
+      "status": "정상",
+      "location": null
+    }
+  },
+  "resources": {
+    "water": "보통",
+    "food": "보통",
+    "medical": "보통",
+    "power_backup": "부족",
+    "fuel": "보통",
+    "communications": "보통",
+    "cash_access": "보통",
+    "tools": "보통",
+    "information": "보통"
+  },
+  "people": [],
+  "relationships": [],
+  "known_routes": [],
+  "world": {
+    "public_order": "정상",
+    "power_grid": "정상",
+    "water_supply": "정상",
+    "communications": "정상",
+    "markets": "정상",
+    "healthcare": "정상",
+    "government": "정상"
+  },
+  "base_progress": {
+    "primary_long_term_base": null,
+    "outer_property_stage": "old_rural_house",
+    "population": 1
+  },
+  "open_threads": [],
+  "recent_changes": ["STRONGHOLD 세계선 시작 준비 완료"]
+}
