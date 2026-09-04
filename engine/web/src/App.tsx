@@ -1,4 +1,4 @@
-import { PlayableTurnLoop } from './components/PlayableTurnLoop'
+import { StorySimpleLoop } from './components/StorySimpleLoop'
 import { StateConsole } from './components/StateConsole'
 import { loadCanonV2Runtime } from './runtime/canonV2Runtime'
 
@@ -6,7 +6,7 @@ export default function App() {
   const runtime = loadCanonV2Runtime()
 
   return <div className="app-shell">
-    <PlayableTurnLoop />
+    <StorySimpleLoop />
     <details className="canon-console-details">
       <summary>Canon v2 공개 baseline 보기 (개발용 상태판)</summary>
       <StateConsole
