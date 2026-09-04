@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { handleGMRequest } from '../../netlify/functions/gm'
+import { OpenRouterDeepSeekProvider } from '../../netlify/functions/openRouterProvider'
 import { MockProvider, NullProvider } from './gmProvider'
 import { runGMProviderTurn } from './gmTurnRuntime'
 import { HttpGMProvider } from './gmTransport'
@@ -52,11 +53,12 @@ describe('/api/gm synthetic transport', () => {
     }), malformed)
 
     expect(response.status).toBe(502)
-    const payload = await response.json() as { status: string }
+    const payload = await response.json() as { status: string; meta?: { failure_kind?: string } }
     expect(payload.status).toBe('unavailable')
+    expect(payload.meta?.failure_kind).toBe('schema_error')
   })
 
-  it('rejects malformed request and refuses real Canon checkpoint on synthetic backend', async () => {
+  it('rejects malformed request and refuses Canon checkpoints even when a server key is configured', async () => {
     const malformed = await handleGMRequest(new Request('https://example.test/api/gm', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -65,11 +67,13 @@ describe('/api/gm synthetic transport', () => {
     expect(malformed.status).toBe(400)
 
     const checkpoint = { ...createSyntheticPublicRuntimeFixture(), source_kind: 'canon-v2' as const }
+    const fetcher = vi.fn(async () => new Response('{}'))
     const canonAttempt = await handleGMRequest(new Request('https://example.test/api/gm', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ input: { kind: 'numbered-choice', choice_id: 1 }, checkpoint }),
-    }))
+    }), new OpenRouterDeepSeekProvider('test-only-key', fetcher), { OPENROUTER_API_KEY: 'test-only-key' })
     expect(canonAttempt.status).toBe(503)
+    expect(fetcher).not.toHaveBeenCalled()
   })
 })
