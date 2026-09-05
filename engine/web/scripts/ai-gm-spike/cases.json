@@ -1,0 +1,183 @@
+[
+  {
+    "id": "simple-inspect-water",
+    "description": "one simple action",
+    "state": { "player_location": "apartment", "time": "08:10" },
+    "allowed": { "actors": ["player"], "targets": ["water_stock"], "locations": ["apartment"], "vehicles": [], "items": [] },
+    "facts": ["water_stock is in the apartment storage room"],
+    "input": "물 비축량을 확인한다.",
+    "expected": { "actions": [{ "verb": "inspect", "actor": "player", "target": "water_stock" }], "ambiguous": false }
+  },
+  {
+    "id": "ordered-move-then-inspect",
+    "description": "two ordered actions",
+    "state": { "player_location": "apartment", "time": "08:20" },
+    "allowed": { "actors": ["player"], "targets": ["shelter_stock"], "locations": ["apartment", "shelter"], "vehicles": [], "items": [] },
+    "facts": ["shelter is reachable on foot"],
+    "input": "대피소로 걸어가서 비축품을 확인한다.",
+    "expected": { "actions": [{ "verb": "move", "actor": "player", "to": "shelter" }, { "verb": "inspect", "actor": "player", "target": "shelter_stock" }], "ambiguous": false }
+  },
+  {
+    "id": "three-step-secure-move-call",
+    "description": "three ordered actions",
+    "state": { "player_location": "apartment", "time": "08:30" },
+    "allowed": { "actors": ["player"], "targets": ["apartment_door", "wife"], "locations": ["apartment", "shelter"], "vehicles": [], "items": [] },
+    "facts": ["wife is at shelter"],
+    "input": "현관문을 잠그고 대피소로 간 다음 아내에게 전화한다.",
+    "expected": { "actions": [{ "verb": "secure", "actor": "player", "target": "apartment_door" }, { "verb": "move", "actor": "player", "to": "shelter" }, { "verb": "call", "actor": "player", "target": "wife" }], "ambiguous": false }
+  },
+  {
+    "id": "phone-request",
+    "description": "phone/request action",
+    "state": { "player_location": "office", "time": "09:00" },
+    "allowed": { "actors": ["player"], "targets": ["wife", "son"], "locations": ["office"], "vehicles": [], "items": [] },
+    "facts": ["wife and son are together at home"],
+    "input": "아내에게 전화해서 아들 상태를 확인해 달라고 부탁한다.",
+    "expected": { "actions": [{ "verb": "call", "actor": "player", "target": "wife" }, { "verb": "request", "actor": "player", "target": "wife" }], "ambiguous": false }
+  },
+  {
+    "id": "vehicle-movement",
+    "description": "movement with vehicle",
+    "state": { "player_location": "apartment", "vehicles": { "family_car": "apartment" } },
+    "allowed": { "actors": ["player"], "targets": [], "locations": ["apartment", "school"], "vehicles": ["family_car"], "items": [] },
+    "facts": ["player is the permitted driver of family_car"],
+    "input": "가족 차를 타고 학교로 간다.",
+    "expected": { "actions": [{ "verb": "move", "actor": "player", "to": "school", "vehicle": "family_car" }], "ambiguous": false }
+  },
+  {
+    "id": "walking-movement",
+    "description": "movement without vehicle",
+    "state": { "player_location": "market" },
+    "allowed": { "actors": ["player"], "targets": [], "locations": ["market", "apartment"], "vehicles": [], "items": [] },
+    "facts": ["apartment is a ten-minute walk away"],
+    "input": "차는 두고 집까지 걸어간다.",
+    "expected": { "actions": [{ "verb": "move", "actor": "player", "to": "apartment" }], "ambiguous": false }
+  },
+  {
+    "id": "pickup-and-transfer",
+    "description": "item pickup/transfer",
+    "state": { "player_location": "shelter", "wife_location": "shelter" },
+    "allowed": { "actors": ["player"], "targets": ["wife"], "locations": ["shelter"], "vehicles": [], "items": ["water_bottle"] },
+    "facts": ["one water_bottle is on the supply table"],
+    "input": "물병을 집어서 아내에게 건넨다.",
+    "expected": { "actions": [{ "verb": "pickup", "actor": "player", "items": ["water_bottle"] }, { "verb": "transfer", "actor": "player", "target": "wife", "items": ["water_bottle"] }], "ambiguous": false }
+  },
+  {
+    "id": "family-member-request",
+    "description": "family member request",
+    "state": { "player_location": "shelter", "daughter_location": "shelter" },
+    "allowed": { "actors": ["player"], "targets": ["daughter"], "locations": ["shelter"], "vehicles": [], "items": [] },
+    "facts": ["daughter is nearby and can hear the player"],
+    "input": "딸에게 출입구 근처를 계속 살펴봐 달라고 한다.",
+    "expected": { "actions": [{ "verb": "request", "actor": "player", "target": "daughter" }], "ambiguous": false }
+  },
+  {
+    "id": "player-and-family-actions",
+    "description": "player + family actions in one sentence",
+    "state": { "player_location": "apartment", "wife_location": "apartment" },
+    "allowed": { "actors": ["player", "wife"], "targets": ["wife", "apartment_door"], "locations": ["apartment", "shelter"], "vehicles": [], "items": [] },
+    "facts": ["wife can act independently after a request"],
+    "input": "나는 대피소로 가고 아내에게는 현관문을 잠가 달라고 한다.",
+    "expected": { "actions": [{ "verb": "move", "actor": "player", "to": "shelter" }, { "verb": "request", "actor": "player", "target": "wife" }], "ambiguous": false }
+  },
+  {
+    "id": "resolvable-pronoun",
+    "description": "locally resolvable pronoun/reference",
+    "state": { "player_location": "market", "visible_items": ["battery_pack"] },
+    "allowed": { "actors": ["player"], "targets": [], "locations": ["market"], "vehicles": [], "items": ["battery_pack"] },
+    "facts": ["Only battery_pack is mentioned and visible; 'that pack' refers to it."],
+    "input": "아까 본 그 팩을 챙긴다.",
+    "expected": { "actions": [{ "verb": "pickup", "actor": "player", "items": ["battery_pack"] }], "ambiguous": false }
+  },
+  {
+    "id": "ambiguous-target",
+    "description": "genuinely ambiguous target",
+    "state": { "player_location": "shelter", "family": ["son", "daughter"] },
+    "allowed": { "actors": ["player"], "targets": ["son", "daughter"], "locations": ["shelter"], "vehicles": [], "items": [] },
+    "facts": ["Both children are reachable by phone; no earlier reference resolves 'the child'."],
+    "input": "아이에게 전화한다.",
+    "expected": { "actions": [], "ambiguous": true }
+  },
+  {
+    "id": "ambiguous-destination",
+    "description": "genuinely ambiguous destination",
+    "state": { "player_location": "apartment", "vehicles": { "family_car": "apartment" } },
+    "allowed": { "actors": ["player"], "targets": [], "locations": ["apartment", "city_hall", "central_station"], "vehicles": ["family_car"], "items": [] },
+    "facts": ["Both city_hall and central_station are commonly called 'downtown'; no route is selected."],
+    "input": "차 타고 시내로 간다.",
+    "expected": { "actions": [], "ambiguous": true }
+  },
+  {
+    "id": "impossible-contradictory-request",
+    "description": "impossible/contradictory request relative to supplied state",
+    "state": { "player_location": "school", "vehicles": { "family_car": "market" } },
+    "allowed": { "actors": ["player"], "targets": [], "locations": ["school", "shelter"], "vehicles": ["family_car"], "items": [] },
+    "facts": ["family_car is at market and no one can bring it to school this turn. This makes execution invalid later, but does not make the player's stated intent linguistically ambiguous."],
+    "input": "여기 있는 가족 차를 타고 대피소로 간다.",
+    "expected": { "actions": [{ "verb": "move", "actor": "player", "to": "shelter", "vehicle": "family_car" }], "ambiguous": false }
+  },
+  {
+    "id": "conditional-phrasing",
+    "description": "conditional phrasing",
+    "state": { "player_location": "apartment", "weather": "unknown" },
+    "allowed": { "actors": ["player"], "targets": ["apartment_door"], "locations": ["apartment"], "vehicles": [], "items": [] },
+    "facts": ["No weather forecast or trigger status is available."],
+    "input": "비가 오면 현관문을 잠근다.",
+    "expected": { "actions": [], "ambiguous": true },
+    "expectedDisposition": "deferred_condition"
+  },
+  {
+    "id": "negative-phrasing",
+    "description": "negative phrasing",
+    "state": { "player_location": "office" },
+    "allowed": { "actors": ["player"], "targets": ["wife"], "locations": ["office"], "vehicles": [], "items": [] },
+    "facts": ["There is no other requested action."],
+    "input": "아내에게 전화하지 않는다.",
+    "expected": { "actions": [], "ambiguous": false }
+  },
+  {
+    "id": "correction-revision",
+    "description": "correction/revision phrasing",
+    "state": { "player_location": "market", "vehicles": { "family_car": "market" } },
+    "allowed": { "actors": ["player"], "targets": [], "locations": ["market", "school", "apartment"], "vehicles": ["family_car"], "items": [] },
+    "facts": ["The correction replaces the earlier destination."],
+    "input": "차로 학교에 간다. 아니, 학교 말고 집으로 간다.",
+    "expected": { "actions": [{ "verb": "move", "actor": "player", "to": "apartment", "vehicle": "family_car" }], "ambiguous": false }
+  },
+  {
+    "id": "colloquial-korean",
+    "description": "Korean colloquial wording",
+    "state": { "player_location": "shelter" },
+    "allowed": { "actors": ["player"], "targets": ["son"], "locations": ["shelter"], "vehicles": [], "items": [] },
+    "facts": ["son is elsewhere but reachable by phone"],
+    "input": "아들한테 톡해서 어디 있는지 물어봐.",
+    "expected": { "actions": [{ "verb": "call", "actor": "player", "target": "son" }], "ambiguous": false }
+  },
+  {
+    "id": "terse-command",
+    "description": "terse command",
+    "state": { "player_location": "apartment" },
+    "allowed": { "actors": ["player"], "targets": [], "locations": ["apartment"], "vehicles": [], "items": ["water_bottle"] },
+    "facts": ["water_bottle is on the kitchen table"],
+    "input": "물 챙겨.",
+    "expected": { "actions": [{ "verb": "pickup", "actor": "player", "items": ["water_bottle"] }], "ambiguous": false }
+  },
+  {
+    "id": "multiple-objects",
+    "description": "multiple objects",
+    "state": { "player_location": "apartment" },
+    "allowed": { "actors": ["player"], "targets": [], "locations": ["apartment"], "vehicles": [], "items": ["water_bottle", "first_aid_kit"] },
+    "facts": ["Both items are in the entryway cabinet"],
+    "input": "물병과 구급상자를 둘 다 챙긴다.",
+    "expected": { "actions": [{ "verb": "pickup", "actor": "player", "items": ["water_bottle", "first_aid_kit"] }], "ambiguous": false }
+  },
+  {
+    "id": "realistic-compound-survival",
+    "description": "realistic S01–S05-style compound survival action using synthetic IDs",
+    "state": { "player_location": "apartment", "daughter_location": "school", "vehicles": { "family_car": "apartment" }, "time": "17:40" },
+    "allowed": { "actors": ["player"], "targets": ["daughter", "wife"], "locations": ["apartment", "school", "shelter"], "vehicles": ["family_car"], "items": ["first_aid_kit"] },
+    "facts": ["player may drive family_car; daughter is waiting at school; wife is at shelter"],
+    "input": "차로 학교에 가서 딸을 데리고 대피소로 가고, 가는 길에 아내에게 구급상자를 준비하라고 전화한다.",
+    "expected": { "actions": [{ "verb": "move", "actor": "player", "to": "school", "vehicle": "family_car" }, { "verb": "pickup", "actor": "player", "target": "daughter" }, { "verb": "move", "actor": "player", "to": "shelter", "vehicle": "family_car" }, { "verb": "call", "actor": "player", "target": "wife" }, { "verb": "request", "actor": "player", "target": "wife", "items": ["first_aid_kit"] }], "ambiguous": false }
+  }
+]
