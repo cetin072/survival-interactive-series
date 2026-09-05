@@ -4,9 +4,11 @@
 
 ## 작업 시작
 
-- 최신 `main`, 관련 Issue, 현재 Draft PR과 프로젝트 부팅/기획 문서를 먼저 확인합니다.
+- 일반 작업은 현재 Issue/요청 + `AGENTS.md` + 직접 관련 파일/테스트를 먼저 확인합니다.
+- 큰 기능·여러 모듈 변경은 관련 부팅/기획 문서와 현재 Draft PR/review를 추가로 확인합니다.
+- 아키텍처·보안·Runtime AI 경계·배포 구조 변경에서만 중앙 공통 표준 원문을 반드시 다시 확인합니다.
 - 기존 Issue/branch/Draft PR이 있으면 같은 작업 흐름을 이어가고, 표준 도입만을 이유로 새 구현 브랜치를 중복 생성하지 않습니다.
-- Canon, Raw Transcript, Hidden World Seed 등 프로젝트 고유 경계는 기존 문서와 현재 Issue를 우선합니다.
+- Canon, Raw Transcript, Hidden World Seed 등 프로젝트 고유 경계는 해당 작업과 직접 관련될 때 기존 문서와 현재 Issue를 우선합니다.
 
 ## 공통 웹 아키텍처 기준
 
