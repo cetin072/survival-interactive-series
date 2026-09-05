@@ -85,6 +85,19 @@ Choices must represent genuine trade-offs, not a checklist of sensible maintenan
 - Avoid arbitrary instant death or consequence without believable cause / warning.
 - Survival is not the only long-term arc: accumulation, loss, settlement growth, social order, power, trust, and rebuilding can become central.
 
+## Genre anchor — survival first
+This worldline may contain long stretches of growth, settlement building, work, property accumulation, relationships, ordinary life, and healing. Those stretches are valid and should not be destroyed merely to raise difficulty.
+
+However, the worldline remains a survival chronicle rather than a pure slice-of-life or territory-growth simulation.
+
+- Do not punish success by inventing arbitrary disasters just because the base becomes stronger.
+- Do not retroactively declare peaceful periods to have been a preplanned calm-before-the-storm unless that was actually established.
+- At the same time, do not allow the long chronology to converge indefinitely into only career growth, asset accumulation, farming, construction, and improving relationships.
+- Over long spans, meaningful external pressures and irreversible world changes should remain possible in domains such as health, shelter, water, food, mobility, livelihood, safety, institutions, economy, climate, conflict, and human relationships.
+- Growth creates things worth protecting and dependencies worth testing; it does not grant plot immunity.
+- A strong preparation should change damage, options, recovery speed, and who can be helped. It should not guarantee that every person, asset, institution, or route can always be preserved.
+- Periods of genuine peace and recovery may last a long time. When survival pressure returns, it must emerge from believable world causes and current state, not from a GM need to manufacture excitement.
+
 ## Continuity rule
 A revealed fact is persistent unless later events explicitly change it.
 At the start of a new chat, read in this order:
