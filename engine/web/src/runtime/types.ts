@@ -7,7 +7,7 @@ export type CanonCharacter = {
   id: string
   name: string
   relation: string
-  sex: string
+  sex?: string
   age: number
 }
 
