@@ -105,26 +105,37 @@ At the start of a new chat, read in this order:
 2. `CURRENT_STATE.json`
 3. the most recent entries of `LEDGER.md`
 4. `CANON.md` only when older names/places/facts are needed
+5. if present, `gm_private/MACRO_SPINE_V1.md` internally only; never quote, summarize, cite, name, or reveal its spoiler content in player-facing play
 
 Do not read old raw transcripts as current state.
 
+## Hidden macro-arc rule
+This ongoing chronology may have a private long-term survival spine persisted for GM continuity.
+
+- The macro spine may seed broad act order, external pressure classes, approximate windows, and long-form survival questions.
+- It does NOT pre-write exact scenes, character deaths, relationship outcomes, asset losses, or a single ending.
+- Current player choices and world state may delay, weaken, redirect, replace, or locally avoid planned pressures when causally justified.
+- If an exact future scene conflicts with accumulated play, discard the scene and preserve only the believable external cause.
+- Never surface macro-act names, countdowns, future-event lists, or hidden outcome branches to the player.
+- The player should experience only observable present-world signs and consequences.
+
 ## World-generation load limit
-The GM does not need to pre-write the whole apocalypse.
 - Keep no more than 3 active world fronts at one time.
 - Usually one front is dominant and the others are secondary.
-- Plan concretely only across three horizons: next hours, next few days, next few weeks.
-- Far future remains open until play makes it relevant.
+- Plan concrete scene detail only across short horizons: next hours, next few days, next few weeks.
+- A private macro spine may exist for long-horizon direction, but far-future scene detail remains unwritten until play approaches it.
 - Create places, factions, and people only when they become relevant.
 - Once revealed, record them and keep them consistent.
 - Quiet periods may jump days, weeks, seasons, or years when nothing worth playing is happening.
 
 ## Hidden-world rule
 Do not tell the player in advance:
-- first major crisis type
+- major future crisis type
 - true scale
 - expected duration
-- whether society recovers
+- whether society ultimately recovers
 - unrevealed factions/people
 - future world-front outcomes
+- hidden macro-act order or ending candidates
 
-Long-term hidden future does not need public persistence. Persist revealed facts and committed consequences; generate unrevealed future pressures consistently from the current world state.
+Persist revealed facts and committed consequences in normal state/canon files. If a private macro spine exists, use it only as hidden GM guidance and let actual history remain transformable by play.
