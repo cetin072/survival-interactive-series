@@ -30,7 +30,7 @@
 - 세계 상태 변화
 - 플레이 재미 피드백과 다음 장 적용점
 
-원문을 직접 확인할 수 없는 부분은 기억으로 대사를 만들어 `RAW`라고 저장하지 않는다.
+운영용 Archive는 요약 기록이며 RAW 원문을 대체하지 않는다.
 
 ### B. CURRENT_STATE.json 최신화
 종료 시점이 항상 권위 있는 최신 스냅샷이 되게 한다.
@@ -76,7 +76,52 @@
 
 다음 BOOT에서 반드시 읽도록 한다.
 
-### F. NEXT ROOM BOOT 생성/갱신
+### F. RAW TRANSCRIPT COLD ARCHIVE — mandatory
+**종료 처리의 필수 단계다.** 운영용 요약 Archive만 만들고 RAW를 생략한 상태를 `완전 아카이빙 완료`라고 보고하지 않는다.
+
+기본 흐름:
+
+> RAW PLAY → CANON / LEDGER / CURRENT_STATE → IP PACKAGE
+
+보존 대상:
+- 실제 USER 입력 전부: 숫자 선택, `ㄱ`, AUTO, 자유행동, 수정 지시, 플레이 중 메타 피드백 포함
+- 실제 GM/ASSISTANT 공개 출력 전부: 장면, 대사, 선택지, 결과, 플레이어에게 보인 운영 메타 포함
+- IP 확장에 가치 있는 시즌 종료 회고·재미 피드백·설정 수정 대화
+
+보존 금지:
+- 시스템 프롬프트
+- 개발자 지침
+- 비공개 chain-of-thought / 내부추론
+- Hidden World Seed의 비공개 내용
+- Tool 내부 로그
+- API key / password / token
+- 게임과 무관한 실제 개인정보·민감정보. 필요 시 `[REDACTED]`
+
+원칙:
+- 실제 확인 가능한 원문만 저장한다.
+- 기억, 요약, Canon, 대화 요약본을 원문처럼 재구성하지 않는다.
+- 정확한 원문 접근이 끊긴 구간은 반드시 `[원문 확인 불가 구간]`으로 표시한다.
+- 원문의 오탈자·짧은 입력·잘못된 GM 출력도 역사자료로 보존한다. 단, 공개 저장소 안전상 개인정보는 예외적으로 `[REDACTED]` 가능.
+- RAW는 Cold Archive이며 정상 플레이 부팅 입력이 아니다.
+- RAW와 Canon이 충돌할 경우 현재 세계 사실의 Source of Truth는 승인된 Canon/CURRENT_STATE다. RAW는 당시 실제 대화를 복원하는 역사자료다.
+
+권장 경로:
+`worldlines/STRONGHOLD/raw_transcript/`
+
+권장 파일:
+- `INDEX.md`
+- `PART_001.md`
+- `PART_002.md`
+- ...
+
+방/분기가 종료될 때 정확한 대화 원문에 직접 접근 가능한 범위는 그 종료 응답에서 최대한 Cold Archive로 저장한다.
+원문 접근이 불완전한 경우 `INDEX.md`에 보존 완료 범위와 미확인 범위를 명시하고, 채팅 원문/정식 export 등 신뢰 가능한 원문 접근이 다시 가능해질 때 backfill한다.
+
+**사용자에게 과거 대사를 기억해서 다시 입력시키지 않는다.**
+
+세부 안전 원칙은 저장소의 `docs/RAW_TRANSCRIPT_ARCHIVE_POLICY.md`를 따른다.
+
+### G. NEXT ROOM BOOT 생성/갱신
 새 채팅방에서 전체 과거 대화를 다시 읽지 않아도 이어갈 수 있게 한다.
 
 최소 부팅 순서:
@@ -90,37 +135,44 @@
 8. 필요 시 CANON
 9. GM private macro file은 내부에서만 읽고 미래를 사용자에게 노출하지 않음
 
-## 3. RAW TRANSCRIPT 원칙
+RAW TRANSCRIPT 전체는 정상 부팅에서 읽지 않는다.
 
-운영용 아카이브와 RAW 원문은 다르다.
+## 3. 종료 완료 판정
 
-- 원문을 실제로 추출/검증할 수 있으면 RAW TRANSCRIPT를 별도 보존할 수 있다.
-- 원문 접근이 불완전하면 대화방 자체를 1차 원본으로 유지한다.
-- 기억으로 빠진 대사를 재구성해 RAW처럼 만들지 않는다.
-- 운영용 ROOM_ARCHIVE는 사실·선택·결과를 압축한 2차 기록임을 명시한다.
+종료는 다음 묶음이다.
+
+`ROOM/ARC ARCHIVE + CURRENT_STATE + LEDGER + CHARACTER CONTINUITY + PLAYER FEEDBACK + RAW TRANSCRIPT STATUS/ARCHIVE + NEXT ROOM BOOT`
+
+- RAW 원문이 전부 실제 확인 가능하고 저장됐으면: `RAW COMPLETE`
+- 일부 원문이 현재 접근 불가해 정확히 저장할 수 없으면: `RAW PARTIAL / BACKFILL REQUIRED`
+
+후자의 경우에도 Canon/상태 종료는 진행할 수 있지만, 사용자에게 **원본까지 완전 아카이빙 완료됐다고 말해서는 안 된다.**
 
 ## 4. 종료 후 사용자에게 보고할 항목
 
-길게 설명하지 않고 아래 상태만 명확히 보고한다.
+길게 설명하지 않고 아래 상태를 명확히 보고한다.
 
-- 아카이브 완료 여부
+- 운영 Archive 완료 여부
 - CURRENT_STATE 최신화 여부
 - 영구 변화 장부화 여부
+- 캐릭터 연속성 반영 여부
 - 피드백 반영 여부
+- RAW 원문 상태: COMPLETE 또는 PARTIAL/BACKFILL REQUIRED
 - 다음방 BOOT 준비 여부
-- RAW 원문 보존 범위/한계
 
 ## 5. 다음 시즌/분기에서의 원칙
 
 종료 아카이빙은 플레이를 멈추게 하는 별도 프로젝트가 아니다.
-가능한 GitHub 작업은 그 종료 응답 안에서 처리한 뒤 바로 다음방 인수인계를 제공한다.
+가능한 GitHub 작업은 종료 응답 안에서 처리한 뒤 바로 다음방 인수인계를 제공한다.
 
 사용자에게 동일한 내용을 다시 복사해 정리시키지 않는다.
 
-## 6. 이번 규칙이 생긴 이유
+## 6. 이 규칙이 생긴 이유
 
-2031 산불 장 종료 시 `FEEDBACK_2031_WILDFIRE_ARC.md`와 `NEXT_ROOM_BOOT_2032_01.md`는 먼저 만들어졌지만 `CURRENT_STATE`가 2031년 2월에 남아 있고 정식 종료 아카이브가 아직 없었다.
+2031 산불 장 종료 시 `FEEDBACK_2031_WILDFIRE_ARC.md`와 `NEXT_ROOM_BOOT_2032_01.md`는 먼저 만들어졌지만 `CURRENT_STATE`가 2031년 2월에 남아 있고 정식 종료 아카이브가 없었다.
 
-이후부터는 **다음방 부팅 파일만 만드는 것을 종료처리 완료로 착각하지 않는다.**
+그 뒤 상태/장부/운영 Archive를 보완했지만, 초기 종료 프로토콜에서 RAW 원문을 `가능하면` 수준으로 약하게 다뤄 기존 장기 IP 보존 정책과 어긋나는 문제가 확인됐다.
 
-종료 = `archive + state + permanent changes + feedback + next boot`를 하나의 묶음으로 처리한다.
+따라서 이후부터는 **다음방 부팅 파일이나 요약 Archive만 만드는 것을 종료 아카이빙 완료로 착각하지 않는다.**
+
+원문은 장기 IP의 1차 자산이고, Canon은 현재 사실의 압축본이며, IP Package는 각색용 추출물이다.
