@@ -4,8 +4,22 @@
 
 ---
 
+## -1. GLOBAL WORLDLINE ROUTING OVERRIDE
+
+이 문서는 기존 가족 기반 runtime의 문서 로드맵이다.
+
+사용자가 exact boot/handoff/checkpoint 파일명, 별도 worldline, 별도 branch, 특정 주인공의 연속 연대기를 명시했다면 아래 A의 6개 파일을 먼저 읽지 않는다.
+
+먼저 루트 `WORLDLINE_ROUTER.md`를 적용해 실제 branch/ref를 찾는다.
+
+- default branch에서 exact 파일을 못 찾았다는 이유로 이 runtime에 폴백하지 않는다.
+- 독립 worldline이 확인되면 그 branch의 BOOT/CURRENT_STATE/latest handoff가 우선한다.
+- identity 또는 필수 파일 검증 실패 시 fail closed 하고 장면을 생성하지 않는다.
+
+---
+
 ## A. 항상 읽기 — 최소 부팅 세트
-새 채팅에서 실제 플레이를 시작/재개할 때 기본적으로 아래만 읽는다.
+새 채팅에서 실제 플레이를 시작/재개할 때, **별도 worldline 지시가 없는 기존 가족 runtime**에서는 기본적으로 아래만 읽는다.
 
 1. `runtime/GM_KERNEL.md`
 2. `core/CHARACTERS.json`
