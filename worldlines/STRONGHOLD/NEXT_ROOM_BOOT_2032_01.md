@@ -8,6 +8,49 @@
 - Worldline directory: `worldlines/STRONGHOLD/`
 - `main` 또는 다른 세계선에 기록하지 않는다.
 
+## 1-A. Worldline routing hard gate — mandatory
+
+이 파일이 새 방에서 **명시적으로 이름으로 호출되면**, 기본 브랜치에서 같은 파일을 찾지 못했다는 이유로 다른 부팅 체계나 다른 세계선으로 폴백하지 않는다.
+
+부팅 시작 전에 반드시 다음을 먼저 확인한다.
+
+1. 저장소 전체의 브랜치까지 포함해 이 파일의 실제 위치를 찾는다.
+2. 이 파일의 정식 ref가 `worldline/stronghold-chronicle`인지 확인한다.
+3. `BOOT.md`의 worldline identity가 `STRONGHOLD`인지 확인한다.
+4. `CURRENT_STATE.json`의 player가 `박도현`인지 확인한다.
+5. 현재 연속 시점이 2032-01 전후인지 확인한다.
+
+하나라도 맞지 않거나 필수 파일을 실제로 열지 못하면 **장면을 생성하지 않는다.** 다른 런타임을 대신 로드하지 말고 부팅 불일치를 명시한다.
+
+### 이 부팅에서 세계상태 소스로 사용 금지
+다음은 다른 세대/세계선의 자료이므로 이 파일이 별도로 지시하지 않는 한 STRONGHOLD의 현재 사실을 만들기 위해 읽거나 폴백 소스로 사용하지 않는다.
+
+- 루트 `START_HERE.md`, `REBOOT_START_HERE.md`
+- `runtime/*`
+- `core/*`
+- `players/main/*`
+- `canon_v2/*`
+- `seasons/*`
+- `seasons_v2/*`
+- 한준호·서윤·민석·정호 4인 가족 세계선의 상태/자산/사건 기록
+
+### 현재성 우선순위
+현재 장면과 세계 사실이 충돌할 때 우선순위는 다음과 같다.
+
+1. 사용자 최신 명시 교정
+2. 이 파일 `NEXT_ROOM_BOOT_2032_01.md`의 최신 장면 오버레이
+3. `CURRENT_STATE.json`
+4. 최신 `LEDGER_APPEND_2031_03_TO_2032_01.md` / 최근 archive / 최신 Character Bible addendum
+5. `BOOT.md`의 세계선 불변 규칙
+6. 오래된 `CANON.md`와 과거 장부
+7. 내부 장기 계획 자료
+
+`PLAYER_FEEDBACK.md`와 `FEEDBACK_2031_WILDFIRE_ARC.md`는 **운영/재미 규칙**이며 세계 사실을 소급 변경하지 않는다.
+
+내부 장기 계획 자료에 현재보다 오래된 기준시점·예정시점·즉시 진행 지시가 남아 있더라도, 이미 플레이된 2032-01 상태를 과거로 되돌리거나 미플레이 과거 사건을 소급 삽입하지 않는다. 현재 시점 이후에 적용 가능한 원칙만 현재 상태에 맞게 해석한다.
+
+핵심은 **fail closed**다. 정확한 세계선을 확인하지 못한 상태에서 그럴듯한 다른 세계선을 대신 시작하는 것보다 부팅을 멈추는 것이 옳다.
+
 ## 2. 새 방 필수 부팅 순서
 다음 순서로 읽는다.
 1. `BOOT.md`
@@ -17,10 +60,12 @@
 5. **`FEEDBACK_2031_WILDFIRE_ARC.md` — 이번 분기 재미 저하 원인과 다음 분기 수정 규칙. 반드시 읽고 실제 운영에 적용**
 6. `ARC_PROMISE_PACING_V1.md`
 7. `CHARACTER_BIBLE_V1.md`
-8. 필요 시 `RELATIONSHIP_CHARACTER_POLICY_V2.md`, `RELATIONSHIP_CHARACTER_DESIGN_V1.md`, `ANTAGONIST_DESIGN_V1.md`
-9. 필요한 최근 아카이브/LEDGER
-10. 오래된 사실이 필요할 때만 `CANON.md`
-11. `gm_private/MACRO_SPINE_V1.md`가 있으면 GM 내부에서만 읽고 절대 사용자에게 이름/내용/미래를 노출하지 않는다.
+8. `CHARACTER_BIBLE_ADDENDUM_2031_12.md`
+9. `LEDGER_APPEND_2031_03_TO_2032_01.md`
+10. `ROOM_ARCHIVE_2031_03_TO_2032_01.md`
+11. 필요 시 `RELATIONSHIP_CHARACTER_POLICY_V2.md`, `RELATIONSHIP_CHARACTER_DESIGN_V1.md`, `ANTAGONIST_DESIGN_V1.md`
+12. 오래된 사실이 필요할 때만 `CANON.md`
+13. `gm_private/MACRO_SPINE_V1.md`가 있으면 GM 내부에서만 읽고 절대 사용자에게 이름/내용/미래를 노출하지 않는다. 단, 위의 **현재성 우선순위**를 반드시 적용해 과거 기준시점의 지시를 소급 실행하지 않는다.
 
 **중요:** 새 방에서 세계상태만 읽고 시작하면 안 된다. `FEEDBACK_2031_WILDFIRE_ARC.md`를 반드시 읽어야 한다. 이번 방의 핵심 목적은 연속성뿐 아니라 **재미/진행 구조 개선**이다.
 
