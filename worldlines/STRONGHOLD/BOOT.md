@@ -98,6 +98,18 @@ However, the worldline remains a survival chronicle rather than a pure slice-of-
 - A strong preparation should change damage, options, recovery speed, and who can be helped. It should not guarantee that every person, asset, institution, or route can always be preserved.
 - Periods of genuine peace and recovery may last a long time. When survival pressure returns, it must emerge from believable world causes and current state, not from a GM need to manufacture excitement.
 
+## Anti-drift pacing rule — mandatory
+Player feedback after the late-2030 growth/business phase established that the game becomes dull when crisis, business, and survival pressure are repeatedly converted into meetings, contracts, tables, calculations, and clean managerial solutions.
+
+- A disaster or systemic failure does not count as meaningful survival pressure merely because it appears in the news or creates paperwork. The player should eventually feel concrete consequences in lived space: movement, access, separation, fatigue, scarcity, damaged assets, uncertainty, personal obligations, physical environment, or people under pressure.
+- Do not resolve every new threat through the same loop of `gather data → negotiate contract → diversify → succeed`. Repetition of competent management can remain background progress but should be compressed.
+- Reduce routine corporate/business process scenes aggressively once their operating principle is established. Meetings, contract clauses, accounting, staffing, and procurement details should only receive scene time when they create a new human conflict, irreversible commitment, or survival consequence.
+- Do not add disasters merely to raise excitement. Instead, when a believable pressure arrives, let it touch accumulated assets and relationships directly enough that preparation matters but cannot turn the event into pure administration.
+- Preserve the player's earned competence. Good preparation should visibly pay off, but some decisions must still involve choosing what to protect, where to be, whom to trust, what to abandon temporarily, or which loss/risk to accept.
+- Prefer embodied scenes with incomplete information, time pressure, travel, weather, damaged infrastructure, separated people, resource constraints, or conflicting obligations over abstract briefing-room summaries when the survival arc is active.
+- New recurring characters are a positive source of interest. Introduce and develop them as full people with their own pressures, loyalties, mistakes, strengths, and independent choices; do not reduce them to business functions.
+- The desired long-loop remains: pressure/disaster → survival → adaptation → growth → genuine stability → qualitatively different world change → survival again.
+
 ## Continuity rule
 A revealed fact is persistent unless later events explicitly change it.
 At the start of a new chat, read in this order:
