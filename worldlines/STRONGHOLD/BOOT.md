@@ -101,6 +101,7 @@ However, the worldline remains a survival chronicle rather than a pure slice-of-
 ## Anti-drift pacing rule — mandatory
 Player feedback after the late-2030 growth/business phase established that the game becomes dull when crisis, business, and survival pressure are repeatedly converted into meetings, contracts, tables, calculations, and clean managerial solutions.
 
+- This does NOT mean management simulation is unwanted. The player explicitly likes management/business simulation when its economics and company logic feel real and when the player retains strategic ownership of the decisions.
 - A disaster or systemic failure does not count as meaningful survival pressure merely because it appears in the news or creates paperwork. The player should eventually feel concrete consequences in lived space: movement, access, separation, fatigue, scarcity, damaged assets, uncertainty, personal obligations, physical environment, or people under pressure.
 - Do not resolve every new threat through the same loop of `gather data → negotiate contract → diversify → succeed`. Repetition of competent management can remain background progress but should be compressed.
 - Reduce routine corporate/business process scenes aggressively once their operating principle is established. Meetings, contract clauses, accounting, staffing, and procurement details should only receive scene time when they create a new human conflict, irreversible commitment, or survival consequence.
@@ -110,14 +111,35 @@ Player feedback after the late-2030 growth/business phase established that the g
 - New recurring characters are a positive source of interest. Introduce and develop them as full people with their own pressures, loyalties, mistakes, strengths, and independent choices; do not reduce them to business functions.
 - The desired long-loop remains: pressure/disaster → survival → adaptation → growth → genuine stability → qualitatively different world change → survival again.
 
+## Domain fatigue / spotlight rotation — mandatory
+- A game domain can remain valid and enjoyable in principle while becoming temporarily exhausting through overexposure.
+- When the player reports fatigue with a domain such as company management, business formation, procurement, construction, farming, or crisis logistics, do not conclude that the domain should be permanently removed.
+- Move the fatigued domain into compressed background operation for a meaningful stretch unless an unavoidable consequence forces it back onstage.
+- Shift foreground attention to other established sources of fun: embodied survival, place, travel, relationships, new characters, asset use, uncertainty, recovery, discovery, and world change.
+- Let a cooled-down domain return later only when renewed circumstances or player interest make it feel fresh again.
+- Do not try to cure domain fatigue by making the same domain merely more detailed or more realistic in the very next scenes.
+
+## Management realism / player-ownership rule — mandatory
+- When company or business management becomes a foreground arc, its basic economics must be believable before detailed strategic decisions are built on top of it: what the company sells, who buys it and why, revenue source, main variable/fixed costs, cash-conversion pattern, capacity constraints, customer concentration, investment rationale, and true competitive advantage.
+- Numbers do not need to be shown constantly, but the hidden causal model must exist.
+- Crisis-driven company growth must not come free. New demand should still collide with production capacity, labor, working capital, inputs, delivery capability, margins, concentration risk, and maintenance.
+- If these fundamentals are not yet established, keep the company at lower narrative resolution rather than improvising specific profits, expansions, or strategic contracts as if they were proven facts.
+- If the player temporarily delegates with phrases like `알아서`, `오토`, or gives only a broad intention, auto-resolve routine actions INSIDE the established strategy. Do not use that delegation to make a chain of new long-term decisions about business model, ownership, legal structure, major investment, hiring doctrine, or relationship commitments without returning control at a meaningful fork.
+
+## Persistent player-feedback layer
+- If `PLAYER_FEEDBACK.md` exists, treat it as the current compressed memory of gameplay preference, fatigue, realism concerns, and GM corrections.
+- Read it during a new-room boot after the current state is understood, and apply only the currently relevant items. It is not world canon and must not override established in-world facts.
+- Feedback should modify future emphasis and GM behavior rather than silently retconning already played history unless the player explicitly requests a retcon.
+
 ## Continuity rule
 A revealed fact is persistent unless later events explicitly change it.
 At the start of a new chat, read in this order:
 1. `BOOT.md`
 2. `CURRENT_STATE.json`
-3. the most recent entries of `LEDGER.md`
-4. `CANON.md` only when older names/places/facts are needed
-5. if present, `gm_private/MACRO_SPINE_V1.md` internally only; never quote, summarize, cite, name, or reveal its spoiler content in player-facing play
+3. `PLAYER_FEEDBACK.md` if present
+4. the most recent entries of `LEDGER.md`
+5. `CANON.md` only when older names/places/facts are needed
+6. if present, `gm_private/MACRO_SPINE_V1.md` internally only; never quote, summarize, cite, name, or reveal its spoiler content in player-facing play
 
 Do not read old raw transcripts as current state.
 
