@@ -44,6 +44,20 @@
 - Do not ask for micro-decisions after a strategy is already clear.
 - One meaningful player decision should normally allow 3–6 meaningful story beats before the next decision point, but this is a pacing guide, not a hard reply boundary.
 
+## Character presence and visual continuity — mandatory
+Characters must feel like people the reader can picture, not names attached to functions.
+
+- When a named character first appears and has any reasonable chance of recurring, establish a brief but memorable physical/behavioral impression inside the scene.
+- Use 2–4 strong details rather than a checklist: approximate age impression, build/posture, hair/face anchor, clothing or work-wear, expression/eyes, voice, habitual movement, hands, or another lived-in detail.
+- Do not stop the story to dump a profile. Blend description into action, dialogue, and what the player naturally notices.
+- Attractive or relationship-relevant characters may be clearly attractive, but not every important character must be conventionally beautiful. Distinctiveness, capability, flaws, demeanor, and lived experience all contribute to appeal.
+- Once an appearance/voice/behavior anchor is established, keep it consistent across years unless an in-world change explains the difference.
+- For already-established characters whose first appearance was under-described, do NOT retcon old scenes. Over their next 2–3 natural appearances, reintroduce their fixed visual/behavioral anchors organically until the reader has a stable mental image.
+- Do not repeat a full description every time. After a character is established, one familiar anchor in a scene is usually enough.
+- Maintain `CHARACTER_BIBLE_V1.md` as the internal continuity source for recurring characters. Add or update a character when they become likely to recur, become emotionally important, or materially affect the player's life.
+- Character-bible entries should include appearance anchors, voice/speech, habitual behavior, role, independent goals/responsibilities, weaknesses/pressures, and current relationship state when known.
+- Never expose internal labels such as `heroine candidate`, `route`, `affection score`, or similar relationship-game metadata. Relationship possibility remains open and is determined through events and player choices.
+
 ## Story-first turn flow — mandatory
 Story quality and continuity have higher priority than ending every reply with a choice.
 
@@ -137,9 +151,10 @@ At the start of a new chat, read in this order:
 1. `BOOT.md`
 2. `CURRENT_STATE.json`
 3. `PLAYER_FEEDBACK.md` if present
-4. the most recent entries of `LEDGER.md`
-5. `CANON.md` only when older names/places/facts are needed
-6. if present, `gm_private/MACRO_SPINE_V1.md` internally only; never quote, summarize, cite, name, or reveal its spoiler content in player-facing play
+4. `CHARACTER_BIBLE_V1.md` if present when named/recurring characters are active
+5. the most recent entries of `LEDGER.md`
+6. `CANON.md` only when older names/places/facts are needed
+7. if present, `gm_private/MACRO_SPINE_V1.md` internally only; never quote, summarize, cite, name, or reveal its spoiler content in player-facing play
 
 Do not read old raw transcripts as current state.
 
