@@ -3,7 +3,7 @@
 목표: 긴 플레이를 여러 채팅방에 걸쳐 이어도 세계 사실과 영구 자산을 잃지 않되, GM이 매번 전체 대화를 다시 읽지 않아도 되게 한다.
 
 ## 1. 저장 구조
-현재 상태는 세 층만 유지한다.
+현재 상태는 세 층을 중심으로 유지하고, RAW 원문은 별도 Cold Archive 층으로 보존한다.
 
 ### A. CURRENT_STATE.json — 지금의 진실
 가장 최신의 권위 있는 스냅샷이다.
@@ -44,13 +44,30 @@ Append-only 기록.
 CURRENT_STATE에 매번 넣기엔 무겁지만 계속 기억해야 하는 공개 사실.
 예: 등장인물 배경, 장소 설명, 거점 역사, 세력의 성격, 과거 주요 사건의 요약.
 
+### D. RAW TRANSCRIPT — 원문 Cold Archive
+실제 플레이 당시 사용자와 GM이 주고받은 공개 원문을 장기 IP 자산으로 보존한다.
+
+- 정상 부팅 Source of Truth가 아니다.
+- 평소 플레이에는 로드하지 않는다.
+- 소설/웹툰/게임/영상 각색, 특정 장면 복원, 실제 대사 검증, Canon 근거 확인 때 필요한 구간만 읽는다.
+- 요약 Archive나 Canon으로 대체하지 않는다.
+- 기억으로 재구성하지 않는다.
+
+기본 흐름:
+`RAW PLAY -> CANON/LEDGER/CURRENT_STATE -> IP PACKAGE`
+
 ## 2. 읽는 순서
 새 채팅방에서는 절대 전체 과거 원문부터 읽지 않는다.
 
 1. `BOOT.md`
 2. `CURRENT_STATE.json`
-3. `LEDGER.md` 최근 15~25개 항목
-4. 필요할 때만 `CANON.md`
+3. 최신 `NEXT_ROOM_BOOT_*`
+4. `PLAYER_FEEDBACK.md` 및 직전 장 피드백
+5. `LEDGER.md` 최근 항목 / 최신 LEDGER_APPEND
+6. 필요한 Character Bible / pacing 문서
+7. 필요할 때만 `CANON.md`
+
+RAW TRANSCRIPT는 정상 부팅에서 읽지 않는다.
 
 이 방식으로 장기 플레이가 길어져도 부팅 비용을 거의 일정하게 유지한다.
 
@@ -67,6 +84,8 @@ CURRENT_STATE에 매번 넣기엔 무겁지만 계속 기억해야 하는 공개
 
 ### 일반 플레이
 대략 3~6개의 중요한 플레이어 결정 또는 하나의 큰 장면 묶음이 끝날 때 한 번 갱신하면 충분하다.
+
+RAW는 매 턴 commit하지 않고, 시즌/분기/방 종료 후 후처리에서 묶어서 Cold Archive한다.
 
 ## 4. 수치화 원칙
 모든 것을 숫자로 세지 않는다.
@@ -134,12 +153,29 @@ CURRENT_STATE에 매번 넣기엔 무겁지만 계속 기억해야 하는 공개
 모순이 생겼다면 이야기를 억지로 유지하지 말고 가장 작은 수정으로 현재 상태를 우선한다.
 
 ## 8. 원문 보존
-재미있는 대화 원문은 IP 자산으로 별도 보존할 수 있지만, 런타임 상태의 근거로 매번 읽지 않는다.
+RAW 원문은 IP 확장을 위한 1차 자료다.
 
-원칙:
-`RAW PLAY -> LEDGER/CANON -> CURRENT_STATE`
+보존 대상:
+- 실제 USER 입력
+- 실제 GM/ASSISTANT 공개 출력
+- 선택지/AUTO/자유행동
+- 장기 가치가 있는 플레이 중 메타 피드백
 
-현재 플레이 부팅에는 `CURRENT_STATE`가 최우선이다.
+보존하지 않는 것:
+- 시스템/개발자 지침
+- 비공개 내부추론
+- Hidden Seed 내부내용
+- Tool 내부 로그
+- 비밀값
+- 게임과 무관한 개인정보·민감정보
+
+정확성 원칙:
+- 실제 확인 가능한 원문만 저장
+- 접근 불가 구간은 `[원문 확인 불가 구간]`
+- 기억/요약으로 대사를 복원하지 않음
+- RAW의 오류도 역사자료로 남기되 개인정보는 필요 시 `[REDACTED]`
+
+현재 RAW 완전성 상태는 `RAW_ARCHIVE_MANIFEST.md`와 `raw_transcript/INDEX.md`에서 추적한다.
 
 ## 9. 부담 제한
 GM은 매 턴 세계 전체를 시뮬레이션하지 않는다.
@@ -156,18 +192,22 @@ GM은 매 턴 세계 전체를 시뮬레이션하지 않는다.
 
 플레이어가 `시즌 종료`, `분기 종료`, `에피소드 종료`, `여기까지 마무리`, `다음 채팅방으로 가자` 등 종료 의사를 명시하거나 GM과 큰 장의 종료에 합의하면 **별도 요청을 기다리지 않고 종료 기록을 자동 실행한다.**
 
-종료처리 완료 조건은 다음 묶음 전체다.
+종료처리 묶음:
 
 1. 최신 장의 `ROOM_ARCHIVE_*` 또는 `ARC_ARCHIVE_*` 생성
 2. `CURRENT_STATE.json`을 종료 시점으로 최신화
-3. 되돌리기 어려운 변화는 `LEDGER.md`에 반영. 안전한 append가 불가능한 경우 `LEDGER_APPEND_<기간>.md` shard 생성
+3. 되돌리기 어려운 변화는 `LEDGER.md` 또는 안전한 `LEDGER_APPEND_<기간>.md`에 반영
 4. 신규 반복 인물/관계 변화가 있으면 Character Bible 또는 addendum 반영
-5. 플레이 재미 피드백은 세계 사실과 분리해 `PLAYER_FEEDBACK.md` 또는 별도 `FEEDBACK_<ARC>.md`에 반영
-6. 다음 채팅방용 최신 `NEXT_ROOM_BOOT_*` 준비
-7. 새 BOOT에서 최근 archive/ledger/feedback을 읽도록 연결
+5. 플레이 재미 피드백은 세계 사실과 분리해 `PLAYER_FEEDBACK.md` 또는 `FEEDBACK_<ARC>.md`에 반영
+6. **RAW TRANSCRIPT Cold Archive 처리 및 완전성 판정**
+7. 다음 채팅방용 최신 `NEXT_ROOM_BOOT_*` 준비
 
-다음방 부팅 파일만 만든 것을 종료 아카이빙 완료로 간주하지 않는다.
+다음방 부팅 파일이나 운영용 요약 Archive만 만든 것을 전체 아카이빙 완료로 간주하지 않는다.
+
+RAW 상태:
+- 전 원문 검증/저장 완료 → `RAW COMPLETE`
+- 일부 원문 접근 불가 → `RAW PARTIAL / BACKFILL REQUIRED`
+
+원문 접근이 불완전한 경우에도 Canon/State 종료는 할 수 있지만, 사용자에게 원본까지 완전히 저장됐다고 보고해서는 안 된다.
 
 세부 절차의 권위 파일은 `ARC_CLOSE_PROTOCOL_V1.md`다.
-
-RAW TRANSCRIPT는 실제 원문을 검증해 추출할 수 있을 때만 별도 보존한다. 원문 접근이 불완전하면 ChatGPT 대화방을 1차 원본으로 유지하고, 기억으로 누락 대사를 재구성해 RAW처럼 저장하지 않는다.
