@@ -4,6 +4,23 @@
 
 ---
 
+## -1. GLOBAL WORLDLINE ROUTING GATE — 먼저 실행
+
+이 파일의 Canon Gate는 **기존 가족 기반 default/legacy runtime용**이다.
+
+사용자가 정확한 boot/handoff/checkpoint 파일명, 특정 worldline, 특정 branch, 또는 특정 주인공의 연속 연대기를 명시했다면 아래 기본 부팅으로 바로 들어가지 않는다.
+
+먼저 `WORLDLINE_ROUTER.md`를 적용한다.
+
+- exact boot 파일은 default branch뿐 아니라 저장소 브랜치까지 찾아 실제 ref/path를 확인한다.
+- 독립 worldline이 확인되면 그 branch의 BOOT/CURRENT_STATE/latest handoff를 읽는다.
+- 그 worldline과 무관한 `core/*`, `players/main/*`, `canon_v2/*`, `seasons*/*`는 fallback current-state 소스로 사용하지 않는다.
+- identity/필수 파일 검증이 실패하면 fail closed 하고 장면을 생성하지 않는다.
+
+**명시적 worldline 요청이 있는 경우 이 문서의 아래 Canon Gate보다 해당 worldline boot가 우선한다.**
+
+---
+
 ## 0. BOOT GATE — 하드 규칙
 부팅이 끝나기 전에 장면·선택지·시즌 설정을 즉흥 생성하지 않는다.
 
@@ -201,9 +218,14 @@ GitHub는 장기 기억용 체크포인트다.
 # 핵심
 플레이 시작마다 모든 설계문서를 읽지 않는다.
 
+명시적 worldline이 없을 때만:
 `Kernel + Characters + Persistent Canon + Save`
 로 시작하고 실제로 필요한 모듈만 추가한다.
 
+명시적 worldline이 있으면:
+`WORLDLINE_ROUTER → 해당 branch의 BOOT / CURRENT_STATE / latest handoff`
+를 따른다.
+
 정확성을 위해 문서를 많이 읽는 대신:
-`BOOT GATE → 최소 World Seed → TURN STATE GATE`
+`ROUTING GATE → BOOT GATE → 최소 World Seed → TURN STATE GATE`
 를 지킨다.
