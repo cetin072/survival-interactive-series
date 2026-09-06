@@ -2,6 +2,18 @@
 
 이 문서는 기존 Legacy S01~S07과 분리된 **정식 《생존일기》 Canon v2**를 시작·이어가기 위한 부팅 문서다.
 
+## -1. GLOBAL WORLDLINE ROUTING GATE
+
+이 문서는 Canon v2 가족 시즌 전용이다.
+
+사용자가 exact boot/handoff/checkpoint 파일명, 별도 worldline/branch, 또는 박도현처럼 다른 연속 연대기의 주인공을 명시했다면 이 문서의 Canon v2 라우팅을 실행하지 않는다.
+
+먼저 루트 `WORLDLINE_ROUTER.md`로 실제 branch/ref를 찾고, 해당 worldline의 BOOT/CURRENT_STATE/latest handoff를 따른다.
+
+- default branch miss를 파일 부재로 오인하지 않는다.
+- 다른 세계선의 자료로 fallback하지 않는다.
+- identity/필수 파일 검증 실패 시 fail closed 하고 장면을 만들지 않는다.
+
 ## 0. 가장 중요한 경계
 
 Legacy S01~S07의 누적 현재상태는 Canon v2의 현재 상태가 아니다.

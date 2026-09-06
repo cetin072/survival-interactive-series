@@ -10,6 +10,15 @@
 - 기존 Issue/branch/Draft PR이 있으면 같은 작업 흐름을 이어가고, 표준 도입만을 이유로 새 구현 브랜치를 중복 생성하지 않습니다.
 - Canon, Raw Transcript, Hidden World Seed 등 프로젝트 고유 경계는 해당 작업과 직접 관련될 때 기존 문서와 현재 Issue를 우선합니다.
 
+## Worldline / Boot 라우팅 — 하드 가드
+
+- 사용자가 정확한 boot/handoff/checkpoint 파일명, worldline 이름, branch 이름, 특정 주인공의 연속 연대기를 명시하면 루트의 기본 부팅 절차보다 **그 명시적 대상이 우선**합니다.
+- 정확한 파일이 default branch에 없다고 해서 파일이 없는 것으로 판단하지 않습니다. 저장소의 브랜치까지 확인해 실제 ref/path를 찾습니다.
+- 독립 worldline을 찾은 뒤에는 그 branch의 BOOT/CURRENT_STATE/최신 handoff가 권위 소스이며, 다른 세계선의 `core/*`, `players/main/*`, `canon_v2/*`, `seasons*/*`를 fallback으로 섞지 않습니다.
+- exact boot 또는 worldline identity를 확인하지 못하면 fail closed 합니다. 다른 주인공/세계선을 추정해 장면을 생성하지 않습니다.
+- 저장소 수준 registry는 `WORLDLINE_ROUTER.md`를 확인합니다.
+- 현재 상태보다 오래된 내부 계획 문서가 있어도 이미 플레이된 역사를 되감거나 과거 예정 사건을 소급 삽입하지 않습니다. 최신 handoff/current state가 시간축에서 우선합니다.
+
 ## 공통 웹 아키텍처 기준
 
 - 웹 제작 공통 source of truth는 `cetin072/ai-development-system`의 `docs/WEB_ARCHITECTURE_STANDARD_V1.md`입니다.
