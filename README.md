@@ -1,126 +1,111 @@
-# Survival Interactive Series
+# Survival Interactive Series — 《생존일기》
 
-가칭 **《생존기록》** — 현대 가족 중심의 현실형 생존 인터랙티브 드라마.
+현대 한국을 배경으로 **장기 누적 상태 + AI GM + 플레이어 선택**으로 진행하는 텍스트 중심 생존 인터랙티브 프로젝트.
 
-## 현재 상태
-- S01~S05 첫 플레이 완료.
-- S01~S05 중간점검 완료: `docs/MIDTERM_REVIEW_S01_S05.md`
-- Runtime: **v4**
-- Thin Engine 기본설계: `docs/THIN_ENGINE_SPEC_V0_1.md`
-- Thin Engine 웹게임 구현설계: `docs/THIN_ENGINE_WEB_GAME_V0_1.md`
-- 다음 단계: **Thin Engine Web v0.1 구현 → S01 회귀테스트 → S06 웹 플레이**
-- S06 상태: `READY FOR HIDDEN WORLD SEED`, 단 엔진 회귀테스트 전까지 Seed 생성 보류
+## 현재 프로젝트 상태
 
-현재 프로젝트는 핵심 게임 시스템 탐색을 상당 부분 마쳤고, **AI GM의 기억·상태·표현 부담을 줄이는 얇은 웹엔진 구현 단계**로 진입한다.
+저장소에는 서로 다른 세대/세계선이 함께 보존되어 있다.
 
-## 목표
-- 재미와 몰입이 0순위.
-- 가족 4인을 실제 파티처럼 운영.
-- 현실적인 재난·사회·거점·정보·경제 압력을 경험.
-- 플레이 중 강의하지 않고 시즌 종료 후 원할 때만 복기.
-- 시즌 길이와 전개는 고정 대본보다 실제 플레이 완성도를 따른다.
-- 좋은 준비는 실제 보상하되, 모든 목표의 무손실 보존이 매번 기본값이 되지는 않게 한다.
+### A. Legacy
+과거 S01~S07 및 초기 runtime/core/player 구조.
+현재 플레이 상태가 아니라 역사·설계 참고 자산이다.
 
-## 핵심 재미
-1. 가족 운영
-2. 거점 성장
-3. 이해관계 기반 협업
-4. 플레이어와 독립적으로 움직이는 세계 압력
-5. 무엇을 우선하고 무엇을 포기할지 결정하는 비싼 선택
+### B. Canon v2 Family
+준호·서윤·민석·정호 4인 가족 중심의 별도 정식 세계선.
+보존하지만 현재 주력 STRONGHOLD와 상태를 공유하지 않는다.
 
-## 현재 플레이 구조
-- 장기 기록/설계: GitHub
-- AI GM: ChatGPT/OpenAI 모델
-- 플레이어: 숫자 선택 + 복수선택 + 자유행동
-- 세계구상/기획: 사용자 + AI
+### C. STRONGHOLD — 현재 주력
+박도현 중심의 단일 장기 연대기.
 
-Thin Engine Web v0.1부터는:
-- **프로그램**: Live State + Action Queue + Validator + MUD Renderer + Cloud Save
-- **AI GM**: 세계·인물·사건·선택·즉흥반응
-- **플레이어**: 판단
-- **GitHub**: 장기 Canon/시즌 종료 기록
+- Branch: `worldline/stronghold-chronicle`
+- Directory: `worldlines/STRONGHOLD/`
+- 새방 진입점: `worldlines/STRONGHOLD/START_ROOM.md`
+- 현재 활성 시점: 2032년 3월 말
+- 박도현 현재 연령 기준: 39세
+- 핵심 방향: 생존 → 적응 → 축적 → 애착 → 실제 대가/손실 가능성 → 변화한 세계에서 다시 생존
 
-핵심:
-`AI proposes, engine commits.`
+## 현재 우선순위
 
-## Thin Engine Web v0.1
-설치형 앱이 아니라 **인터넷 연결만 있으면 URL로 접속하는 개인용 웹게임**을 목표로 한다.
+**Play First / Build Later**
 
-기본 목표:
-- PC/모바일 브라우저
-- 숫자 버튼/키보드 숫자
-- 복수행동
-- 자유 자연어 입력
-- MUD 텍스트 UI 자동 렌더링
-- 개인 접근코드
-- PC↔모바일 Cloud Save
-- AI GM의 State Proposal을 Validator가 검사한 뒤 Commit
+지금은 웹 기능 확장보다 실제 플레이의 재미, 장기 연속성, AI GM 품질을 먼저 검증한다.
 
-권장 구현:
-- React + TypeScript + Vite
-- Netlify Hosting + Functions + Blobs
-- OpenAI API는 서버 Function에서만 호출
+- 중요한 것은 재미와 몰입
+- 세계는 리셋 없이 누적
+- 좋은 준비는 실제 보상
+- 그러나 모든 사람·자산·관계가 항상 무손실 보존되지는 않음
+- 평범한 루틴은 압축
+- 실제 갈림길에서만 플레이어 선택
+- 회사/사업/건설/행정은 필요할 때만 전면화
+- 사람은 독립적으로 판단하며 박도현의 말판이 아님
 
-v0.1에는 회원가입·멀티유저·결제·공개서비스·AI 삽화 자동생성·복잡한 게임서버를 넣지 않는다.
+## STRONGHOLD Source of Truth
 
-## 새 채팅 시작점 — 기존 ChatGPT 플레이
-기존 ChatGPT GM 방식으로 플레이할 경우 **`START_HERE.md` 하나부터** 읽는다.
+### 새 방
+`START_ROOM.md` 하나에서 시작한다.
 
-### 실제 플레이 기본 로드
-1. `runtime/GM_KERNEL.md`
-2. `core/CHARACTERS.json`
-3. `core/PERSISTENT_CANON.md`
-4. `players/main/SAVE_STATE.json`
+### 상태 계층
+- `BOOT.md` — 게임/GM 불변 원칙
+- `CURRENT_STATE.json` — Long State 체크포인트
+- `STATE_PROTOCOL.md` — 상태 우선순위
+- `LIVE_SCENE_STATE.md` — ACTIVE일 때 현재 장면 Hot State
+- `PLAYER_FEEDBACK.md` — 현재 유효한 플레이 피드백
+- `LEDGER.md` / 최신 append — 영구 변화
+- Character Bible — 인물 외형/성향/관계 앵커
+- `CANON.md` — 오래된 안정 사실
+- RAW transcript — Cold Archive, 정상 부팅 입력 아님
 
-진행 중인 시즌을 이어갈 때만 해당 `GM_STATE.json`을 추가한다.
-나머지 문서는 `runtime/LOAD_MAP.md`에 따라 필요할 때만 읽는다.
+충돌 시:
 
-## Source of Truth
-이 저장소가 장기 설정·세이브·시나리오 기록의 원본이다.
+`사용자 최신 교정 → ACTIVE LIVE → CURRENT_STATE → 최신 영구 기록 → BOOT → 오래된 Canon/Archive`
 
-우선권 핵심:
-- 플레이 운영 핵심 → `runtime/GM_KERNEL.md`
-- 캐릭터 최신값 → `core/CHARACTERS.json`
-- 지속 세계/거점/관계 → `core/PERSISTENT_CANON.md`
-- 현재 공개 장기 상태 → `players/main/SAVE_STATE.json`
-- 현재 시즌 숨은 상태 → 해당 시즌 `GM_STATE.json`
-- 웹게임 실행 중 순간 상태 → Thin Engine Cloud Live State
+## AI와 상태 책임
 
-GitHub는 웹게임의 매턴 실시간 DB로 사용하지 않는다.
+목표는 AI를 제거하는 것이 아니라 책임을 나누는 것이다.
 
-## 구조
-- `runtime/` : 실제 플레이에 필요한 경량 GM 계층
-- `core/` : 최신 캐릭터·Persistent Canon + 장기 설계 참조
-- `players/` : 현재 SAVE, CHECKPOINT, 로그
-- `seasons/` : 시즌별 상태, 실제 플레이 Canon, 회고
-- `docs/` : 상세 규칙·모듈·중간점검·Thin Engine 설계
-- `engine/` : Thin Engine Web 구현 예정 영역
-- `schemas/` : JSON 형식 검증
-- `tools/` : SAVE/현재 시즌 상태 검증
-- `playtests/` : 과거 테스트 기록
-- `idea_vault/` : 미래 아이디어
-- `knowledge/` : 현실 검증 자료
+### deterministic state가 맡기 좋은 것
+- 날짜/시간
+- 인물 age reference
+- 위치
+- 차량/거점/자산
+- resource band
+- pending vs completed
+- 영구 사건
+- 현재 장면 체크포인트
 
-## 확정 구현 순서
-1. Web Shell
-2. State Engine
-3. Validator
-4. Cloud Save + 개인 접근코드
-5. MUD Renderer
-6. AI GM Integration
-7. S01 「불길」 일부 회귀테스트
-8. S06 신규 웹 플레이
+### AI GM이 맡는 것
+- 장면 서술
+- 대화
+- 독립 인물 반응
+- 자유행동 해석
+- 사건·갈등 생성
+- 서사적 결과 표현
 
-S01 회귀테스트가 끝나기 전에는 S06 Hidden World Seed를 만들지 않는다.
+## 웹게임 개발
 
-## 운영 원칙
-- 규칙을 많이 읽는 것이 정확성이라고 보지 않는다.
-- 새 문제가 생길 때마다 규칙을 추가하지 않는다.
-- 먼저 GM_KERNEL의 기존 규칙으로 해결한다.
-- GitHub는 매 턴 저장장치가 아니라 장기 기억용이다.
-- 최근 시즌과 같은 재난 이름뿐 아니라 같은 **플레이 행동 루프**의 반복도 피한다.
-- 개발 목적은 플레이를 편하게 하고 오류를 줄이는 것이다.
-- 개발 자체가 플레이보다 커지면 기능 확대를 멈춘다.
+웹 MVP/Thin Engine 실험은 별도 Issue/PR로 보존 중이며 현재 플레이보다 우선하지 않는다.
 
-## 주의
-저장소는 Public이다. 실제 주소·전화번호·계정정보·API 키·비밀번호·토큰·개인 접근코드 등 민감정보를 저장하지 않는다.
+- 웹 런타임 아키텍처 감사: Issue #69
+- STRONGHOLD 운영체계 정리: Issue #74
+
+웹 개발 재개 시 기존 Draft/Preview 흐름을 먼저 검토한다. Production 배포나 main 병합을 자동으로 진행하지 않는다.
+
+## RAW / IP 보존
+
+RAW 대화는 장기 IP 자산의 1차 자료다.
+
+`RAW PLAY → CANON / LEDGER / CURRENT_STATE → IP PACKAGE`
+
+원칙:
+- 실제 확인 가능한 원문만 저장
+- 기억/요약으로 빠진 대사를 재창작하지 않음
+- 신규 플레이는 큰 장/방 종료 때 가능한 범위에서 Cold Archive
+- 과거 RAW 전체 백필 완료를 플레이 재개 조건으로 만들지 않음
+
+## 시작 위치
+
+세계선 선택과 부팅은 루트 `START_HERE.md`를 따른다.
+
+## Public repository 주의
+
+실제 주소·전화번호·계정정보·API 키·비밀번호·토큰·개인 접근코드 등 민감정보를 저장하지 않는다.
