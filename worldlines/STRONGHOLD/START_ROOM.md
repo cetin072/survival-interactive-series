@@ -22,6 +22,7 @@ Status: **AUTHORITATIVE BOOT ENTRYPOINT**
 - `canon_v2/*`, `seasons_v2/*`
 - 한준호·서윤·민석·정호 4인 가족 세계선의 현재 상태
 - 오래된 `NEXT_ROOM_BOOT_*` 파일
+- RETIRED / HISTORICAL 표시가 된 과거 운영문서
 
 ## 1. 새 방 최소 부팅 순서
 
@@ -33,9 +34,9 @@ Status: **AUTHORITATIVE BOOT ENTRYPOINT**
 4. `STATE_PROTOCOL.md` — 상태 우선순위와 업데이트 규칙
 5. `LIVE_SCENE_STATE.md` — **Status가 ACTIVE일 때 반드시 읽고 현재 장면에 오버레이**
 6. `PLAYER_FEEDBACK.md` — 현재 유효한 플레이 취향/운영 교정
-7. 필요할 때만 최근 `LEDGER.md`/`LEDGER_APPEND_*`, `CHARACTER_BIBLE_V1.md`, `CHARACTER_BIBLE_ADDENDUM_*`, `RELATIONSHIP_CHARACTER_POLICY_V2.md`, `CANON.md`
+7. 필요할 때만 최근 `LEDGER.md`/`LEDGER_APPEND_*`, `CHARACTER_BIBLE_V1.md`, `RELATIONSHIP_CHARACTER_POLICY_V2.md`, `CANON.md`
 
-기본 부팅에서 과거 RAW 전체, 과거 ROOM_ARCHIVE, 과거 `NEXT_ROOM_BOOT_*`, 개별 회고문을 전부 읽지 않는다.
+기본 부팅에서 과거 RAW 전체, ROOM_ARCHIVE, `NEXT_ROOM_BOOT_*`, 개별 회고문, retired addendum, retired macro 계획을 읽지 않는다.
 
 ## 2. 현재성 우선순위
 
@@ -44,7 +45,7 @@ Status: **AUTHORITATIVE BOOT ENTRYPOINT**
 1. 사용자의 최신 명시 교정
 2. ACTIVE `LIVE_SCENE_STATE.md`의 현재 장면 사실/rollback boundary
 3. `CURRENT_STATE.json` Long State
-4. 최신 영구 변화 `LEDGER` / 최신 Character Bible 보강
+4. 최신 영구 변화 `LEDGER` / `CHARACTER_BIBLE_V1.md`
 5. `BOOT.md`의 불변 운영 원칙
 6. 오래된 `CANON.md` / Archive
 7. 비활성·과거 계획 문서
@@ -55,14 +56,16 @@ Status: **AUTHORITATIVE BOOT ENTRYPOINT**
 - LIVE는 그 이후의 진행 중인 Hot State다.
 - `이동 중`, `합류 예정`, `통화 예정`을 완료된 사실로 선행 확정하지 않는다.
 
-## 3. 숨은 장기계획
+## 3. 장기계획 상태
 
-`gm_private/MACRO_SPINE_V1.md`는 현재 장면보다 우선할 수 없다.
+현재 `gm_private/MACRO_SPINE_V1.md`는 **RETIRED** 상태다.
+정상 부팅에서 읽지 않는다.
 
-- 현재 앵커와 정합한 버전만 장기 방향 참고용으로 사용한다.
-- 과거 기준의 즉시 실행 지시를 현재 장면에 소급 적용하지 않는다.
-- 정확한 미래 장면·사망·관계 결과·손실을 선확정하지 않는다.
-- 숨은 계획의 존재/내용/순서/예정 사건은 플레이어에게 노출하지 않는다.
+새 장기 방향이 필요하면:
+- 현재 세계 상태에서 자연스럽게 설계
+- 정확한 미래 장면/사망/관계결과/손실/엔딩을 선확정하지 않음
+- 플레이어 축적과 선택이 결과를 바꾸게 함
+- 현재와 가까운 hours / days / weeks만 고해상도로 계획
 
 ## 4. 게임 시작
 
