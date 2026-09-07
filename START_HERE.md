@@ -1,209 +1,86 @@
-# START HERE — Lightweight GM Boot Sequence v4
+# START HERE — Worldline Router
 
-새 채팅에서 실제 플레이를 시작/재개할 때 사용하는 최소 부팅 절차다.
+이 저장소에는 서로 다른 세대/세계선이 공존한다. **현재 상태를 섞어 읽지 않는다.**
 
----
+## 1. 현재 주력 — STRONGHOLD
 
-## 0. BOOT GATE — 하드 규칙
-부팅이 끝나기 전에 장면·선택지·시즌 설정을 즉흥 생성하지 않는다.
+현재 `worldline/stronghold-chronicle` 브랜치에서 주력으로 플레이 중인 연속 세계선이다.
 
-사용자가 `S06 시작`, `생존기록 시작`, `이어가기` 등을 입력하면 내부적으로 먼저 확인한다.
-- `core/CHARACTERS.json`
-- `core/RUNTIME_INVARIANTS.json`의 hard Canon
-- 최신 Persistent Canon
-- 최신 RUNTIME_STATE / Save 상태
-- 새 시즌인지 이어서인지
-- 새 시즌이면 current season handoff
-- 첫 장면의 가족 위치·동행·차량·기본 거점 상태
+- 주인공: 박도현
+- 현재 활성 시점: 2032년 3월 말
+- 새 채팅 시작/재개 진입점: `worldlines/STRONGHOLD/START_ROOM.md`
 
-GitHub에 저장되지 않은 과거 시험 플레이를 Canon으로 임의 추정하지 않는다.
+STRONGHOLD를 시작하거나 이어갈 때는 **루트 Legacy runtime이나 Canon v2 가족 세계선으로 폴백하지 않는다.**
 
-### PRESENTATION GATE — 첫 출력 전 하드 검사
-WORLD/STATE GATE가 끝난 뒤, 첫 장면을 보내기 전에 다음을 내부적으로 확인한다.
+### STRONGHOLD 최소 부팅
+1. `worldlines/STRONGHOLD/START_ROOM.md`
+2. 그 파일이 지시하는 최소 파일만 읽는다.
 
-- presentation profile `MUD_TEXT_V1`이 활성 상태다.
-- 첫 Scene Header를 준비했다.
-- 숫자 선택지와 자유행동 입력을 준비했다.
-- 현재 장면에 필요한 MUD tag를 골랐다. (WORLD / FAMILY / RESOURCE / EVENT / AUTO / 정보원)
-- 게임 본문·대사·선택지에 `NPC`, `GM`, `Canon`, `Hidden State` 같은 메타용어가 노출되지 않는다.
-
-첫 출력이 plain prose only라면 출력하지 않고 MUD_TEXT_V1로 재구성한다. 모든 HUD·태그를
-상시 출력하지 않으며, 과도한 ASCII art나 이미지 생성도 요구하지 않는다.
-
-부팅 순서:
-`BOOT GATE → WORLD/STATE GATE → PRESENTATION GATE → first scene`
+`START_ROOM.md`가 STRONGHOLD 새방 부팅의 유일한 권위 진입점이다.
 
 ---
 
-## 1. 기본 부팅 — Canon Gate
-1. `runtime/GM_KERNEL.md`
-2. `core/CHARACTERS.json`
-3. `core/RUNTIME_INVARIANTS.json`
-4. `core/PERSISTENT_CANON.md`
-5. `players/main/RUNTIME_STATE.json`
-6. `players/main/SAVE_STATE.json`
+## 2. Canon v2 — 4인 가족 세계선
 
-새 시즌이면 current season handoff를 추가로 읽는다. 부팅 완료 전에는 이 기준과 충돌하는
-즉흥 장면을 생성하지 않는다. 기본 생활 위치와 다른 시작 배치는 현재 사건·이동·대피 등
-명시된 override reason이 있을 때만 허용한다.
-상세 모듈은 `runtime/LOAD_MAP.md`를 따른다.
+준호·서윤·민석·정호 중심의 별도 정식 세계선이다.
+현재 STRONGHOLD와 상태를 공유하지 않는다.
 
----
+Canon v2를 명시적으로 시작/재개할 때만:
+- `REBOOT_START_HERE.md`
+- `canon_v2/*`
+- `seasons_v2/*`
 
-## 2. 이어서 플레이
-SAVE_STATE가 진행 중 시즌이면:
-- 해당 시즌 `seasons/Sxx/GM_STATE.json`을 추가로 읽는다.
-- 필요할 때만 CHECKPOINT를 읽는다.
-
-장면 시작 전에 현재 가족 위치·동행·차량·진행 중 행동을 다시 맞춘다.
+를 사용한다.
 
 ---
 
-## 3. 새 시즌
-직전 시즌이 종료 상태라면 새 시즌 시작 직전에만:
-- `docs/WORLD_SEED_PROTOCOL.md`
-- 장기 초재난형이면 필요 시 `docs/MEGADISASTER_LONG_ARC_RULE.md`
-- NORMAL 세부 판정이 실제 쟁점이면 `docs/NORMAL_DIFFICULTY_RULE.md`
+## 3. Legacy
 
-를 읽는다.
+과거 S01~S07 및 초기 runtime/core/player 구조는 역사·설계 참고용이다.
+현재 STRONGHOLD 또는 Canon v2의 현재 상태로 사용하지 않는다.
 
-### 월드 시드 최소값
-비공개로 잠근다.
-- 날짜·시간대
-- 가족 4명의 현재 위치 또는 마지막 확인 위치
-- 주요 차량 위치
-- 도심/외곽 거점의 현재 기본 상태
-- 현재 관련 기관의 기본 상태
-- 재난/사건의 실제 성격
-- 핵심 외생 압력 2~3개
-- 필요 시 예비 압력 1개 이하
-- 주요 조건부 사건과 Phase 전환 조건
-- 종료 가능한 안정상태 조건
-
-완성 대본, 정답 루트, 확정 클라이맥스, 확정 엔딩은 만들지 않는다.
-
-핵심:
-`세계는 먼저 존재하고, 이야기는 플레이로 생긴다.`
+대표 경로:
+- `runtime/*`
+- `core/*`
+- `players/*`
+- `seasons/*`
 
 ---
 
-## 4. Diversity Gate
-새 시즌 시드 잠금 전에 최근 2~3개 시즌과 비교한다.
+## 4. 현재 개발 전략
 
-재난 이름이 아니라 다음이 반복되는지 본다.
-- 첫 행동
-- 핵심 자원
-- 주 거점
-- 가족 합류 방식
-- 플레이 동사
-- 문제 해결 루프
+현재 우선순위는 **Play First / Build Later**다.
 
-최근 시즌과 사실상 같은 구조면 다른 압력/시작배치/행동군을 우선 검토한다.
+- 실제 장기 플레이로 재미·GM 구조를 먼저 검증한다.
+- 웹게임 개발은 별도 Issue/PR에서 재개한다.
+- STRONGHOLD의 현재 장면·관계·상태를 기존 가족 Thin Engine에 억지로 끼워 넣지 않는다.
+- 개발이 다시 시작되면 AI GM과 deterministic state 책임을 분리한다.
 
-장기 Canon상 자연스럽거나 사용자가 원하면 반복할 수 있지만, 단순히 재난 이름만 바꿔 같은 게임을 다시 하지 않는다.
+웹 런타임 감사: Issue #69
+STRONGHOLD 운영체계 정리: Issue #74
 
 ---
 
-## 5. 첫 선택 전에 공개할 상식
-플레이어가 현실적으로 이미 알고 있을 정보는 숨기지 않는다.
-- 가족 현재 위치 또는 마지막 확인 위치
-- 평소 거주 구조
-- 주요 차량·거점 기본 상태
-- 이미 Canon으로 보유한 주요 능력·비축·관계
-- 날짜·요일·시간대 등 생활 맥락
+## 5. Source of Truth 원칙
 
-선택 뒤 뒤늦게 공개해서 앞 선택의 의미를 바꾸지 않는다.
+### STRONGHOLD
+- 새방 라우팅: `worldlines/STRONGHOLD/START_ROOM.md`
+- 게임 규칙: `BOOT.md`
+- Long State: `CURRENT_STATE.json`
+- 상태 우선순위: `STATE_PROTOCOL.md`
+- 현재 활성 장면: ACTIVE `LIVE_SCENE_STATE.md`
+- 현재 플레이 피드백: `PLAYER_FEEDBACK.md`
+- 영구 사건: `LEDGER.md` / 최신 append
+- 캐릭터 앵커: Character Bible
+- 오래된 안정 사실: `CANON.md`
+- RAW: Cold Archive이며 정상 부팅 입력이 아님
 
----
-
-## 6. 플레이
-기본 입력:
-- `2`
-- `3 → 5 → 1`
-- 가족 역할분담
-- 자연어 자유행동
-
-상세 운영은 `runtime/GM_KERNEL.md`가 최우선이다.
-
-특히:
-- 복수선택은 전부 성공을 보장하지 않는다.
-- 가족은 독립적으로 행동·제안할 수 있다.
-- 기관은 자기 권한으로 결정한다.
-- 반복 운영은 AUTO.
-- Phase가 바뀌면 플레이 행동 종류도 바뀌어야 한다.
-- 기존 거점/관계/장비 능력은 실제로 보상한다.
-- 메인 압력이 끝나면 시즌 종료를 우선 검토한다.
-- 매 선택지 직전 TURN STATE GATE를 통과한다.
+### 충돌 시
+STRONGHOLD에서는 사용자 최신 교정 → ACTIVE LIVE → CURRENT_STATE → 최신 영구 기록 → BOOT → 오래된 Canon/Archive 순으로 본다.
 
 ---
 
-## 7. MUD 화면
-플레이 기본 시각층은 `MUD_TEXT_V1` 텍스트 MUD다.
-필요한 변화만 표시한다.
+## 6. 보안/저장소 주의
 
-첫 장면/큰 장면 전환에는 Scene Header를 기본 사용하고, 선택지는 숫자로 제시한다.
-
-가능 요소:
-- Scene Header
-- WORLD STATE
-- FAMILY
-- RESOURCE
-- 정보원 태그
-- AUTO
-- EVENT
-- PHASE CHANGE
-
-모든 상태판을 매 턴 반복하지 않는다.
-사용자가 별도로 이미지 생성을 요청하지 않았다면 `그래픽/UI/화면`은 우선 MUD 텍스트 표현을 뜻한다.
-
----
-
-## 8. 저장
-GitHub는 장기 기억용 체크포인트다.
-매 턴 저장하지 않는다.
-
-우선 저장:
-- Phase 변화
-- 가족 큰 분리/합류/역할 변화
-- 거점·장기자산·관계·고용 변화
-- 중요한 손실/획득
-- 세션/시즌 종료 또는 채팅 이동
-
-보통 한 세션 1~3회면 충분하다.
-
----
-
-## 9. 충돌 우선순위
-설정 충돌은 `runtime/LOAD_MAP.md`를 따른다.
-최신 사용자 Canon Correction과 `CHARACTERS / PERSISTENT_CANON / 현재 GM_STATE / SAVE_STATE`를 우선한다.
-
----
-
-## 10. 본편과 복기 분리
-플레이 중 현실 교육·GM 자기평가·설계 해설을 노출하지 않는다.
-시즌 종료 후 필요할 때만:
-- 플레이어 생존 복기
-- 게임/GM 시스템 복기
-을 분리한다.
-
----
-
-## 메타 명령
-- `저장` → 의미 있는 체크포인트 저장
-- `메모:` → 아이디어 기록
-- `설정확정:` → Canon 반영
-- `버그:` → 플레이테스트 기록
-- `상태` → 공개 상태 요약
-- `종료` → 체크포인트 저장 후 종료
-
----
-
-# 핵심
-플레이 시작마다 모든 설계문서를 읽지 않는다.
-
-`Kernel + Characters + Persistent Canon + Save`
-로 시작하고 실제로 필요한 모듈만 추가한다.
-
-정확성을 위해 문서를 많이 읽는 대신:
-`BOOT GATE → 최소 World Seed → TURN STATE GATE`
-를 지킨다.
+저장소는 Public이다.
+실제 주소·전화번호·계정정보·API 키·비밀번호·토큰·개인 접근코드 등 민감정보를 저장하지 않는다.
