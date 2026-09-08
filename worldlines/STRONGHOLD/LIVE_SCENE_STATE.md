@@ -9,7 +9,7 @@ Purpose: 현재 장면 연속성만 잠그는 Hot State. 장기 세계설정 파
 - Authoritative long state: `CURRENT_STATE.json`
 - Permanent changes: `LEDGER_APPEND_2032_03_TO_2032_09.md`
 - Operational archive: `ROOM_ARCHIVE_2032_03_TO_2032_09.md`
-- Season feedback: `FEEDBACK_2032_SPRING_SUMMER_ARC_DRAFT.md` (파일명은 draft지만 내용 Status는 FINAL)
+- Season feedback: `FEEDBACK_2032_SPRING_SUMMER_ARC.md`
 - Player feedback memory: `PLAYER_FEEDBACK.md`
 - RAW archive: `raw_transcript/` 아래 이번 시즌 PARTIAL 보존본. 정확한 원문 접근 불가 구간은 backfill 필요.
 
@@ -25,6 +25,6 @@ Purpose: 현재 장면 연속성만 잠그는 Hot State. 장기 세계설정 파
 
 ## Next-room rule
 - 이 LIVE 장면을 재개하지 않는다.
-- 다음 방은 `START_ROOM.md` → `BOOT.md` → `CURRENT_STATE.json` → `PLAYER_FEEDBACK.md` 순으로 부팅하고, 평시 유지·구매·정비는 압축한다.
+- 다음 방은 `START_ROOM.md` → `BOOT.md` → `CURRENT_STATE.json` → `STATE_PROTOCOL.md` → `PLAYER_FEEDBACK.md` 순으로 부팅하고, 평시 유지·구매·정비는 압축한다.
 - 다음 고해상도 플레이는 박도현의 판단을 실제로 요구하는 새로운 중심문제가 생길 때 시작한다.
 - 사용자 장기 취향상 큰 사고가 세계를 실제로 비틀고 일부 정상성이 되돌아오지 않는 포스트아포칼립스 전환도 허용한다. 다만 정확한 재난 종류·규모·장기화·결과는 사전 공개하거나 이 파일에서 선확정하지 않는다.
