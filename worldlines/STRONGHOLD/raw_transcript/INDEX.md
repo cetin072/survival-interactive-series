@@ -86,6 +86,24 @@ Status: **PARTIAL / BACKFILL REQUIRED / COLD ARCHIVE / NOT BOOT INPUT**
 - 원 채팅/export에 직접 접근 가능한 시점에 USER/GM 전체 공개 원문을 순서대로 교차 검증하여 PART 파일을 추가한다.
 - 운영 아카이브를 RAW 완료로 잘못 표시하지 않는다.
 
+### E. 2032-09 ~ 2038-04 기록·신원 붕괴 / 세계 재편 / 독립 / 거점 B / 토지 매입 장
+**RAW PARTIAL / BACKFILL REQUIRED**
+
+운영용 요약:
+- `../ROOM_ARCHIVE_2032_09_TO_2038_04.md`
+- `../FEEDBACK_2032_09_TO_2038_04.md`
+- `../LEDGER_APPEND_2032_09_TO_2038_04.md`
+
+현재 확보한 RAW 처리:
+- `RAW_2032_09_TO_2038_04_PARTIAL_01.md`
+  - 현재 종료 시점에서 문자 그대로 확인 가능한 USER 입력을 원순서로 보존.
+  - 특히 선택 의미 보존 오류 지적과 `개별사건 반복` 피드백을 원문 그대로 포함.
+  - 2032-09 초반 압축 이전 구간 및 GM/ASSISTANT 전체 공개 출력은 원문을 임의 재구성하지 않고 BACKFILL 대상으로 남김.
+
+후속 목표:
+- 원 채팅/export에 접근 가능한 시점에 USER/GM 전체 원문을 PART 단위로 추가한다.
+- 현재 운영 아카이브·CURRENT_STATE가 RAW 완료를 의미하지 않는다.
+
 ## 종료 시 이후 자동 규칙
 
 `STATE_PROTOCOL.md`의 종료/방 이동 규칙에 따라 시즌/분기 종료 시 RAW TRANSCRIPT 처리를 수행한다.
