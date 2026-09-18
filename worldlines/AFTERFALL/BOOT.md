@@ -12,9 +12,10 @@ Status: **AUTHORITATIVE**
 ## 2. 최소 부팅 순서
 1. `START_ROOM.md`
 2. `RPG_DESIGN_V1.md`
-3. `SAVE_SCHEMA_V1.md`
-4. `CURRENT_STATE.json`
-5. Supabase `survival_rpg.saves`의 `AFTERFALL` row
+3. `CHARACTER_VISUAL_RULE_V1.md`
+4. `SAVE_SCHEMA_V1.md`
+5. `CURRENT_STATE.json`
+6. Supabase `survival_rpg.saves`의 `AFTERFALL` row
 
 이후 실제로 필요할 때만 최근 `events`를 조회한다.
 RAW나 과거 세계선 전체를 정상 부팅 입력으로 읽지 않는다.
@@ -25,8 +26,9 @@ Save status가 `PREPLAY_READY`이면:
 2. 모두 자녀 없음.
 3. 모두 옛 사회에서 유용한 실전 능력 하나를 갖지만 자산/권력은 제한적.
 4. 나이·직업·경제상태·연애상태·성격 강점/약점이 서로 달라야 한다.
-5. 사용자가 하나를 선택하거나 자유수정하면 즉시 CHARACTER_CREATED로 저장한다.
-6. 그 뒤 비공개 World Seed를 잠그고 첫 재난 장면으로 진입한다.
+5. **세 후보 모두 외모·체형·첫인상·분위기가 서로 구분되도록 짧게 묘사한다.** 이름/직업/스탯만 제시하지 않는다.
+6. 사용자가 하나를 선택하거나 자유수정하면 외모 앵커까지 함께 즉시 CHARACTER_CREATED로 저장한다.
+7. 그 뒤 비공개 World Seed를 잠그고 첫 재난 장면으로 진입한다.
 
 질문지 10개짜리 캐릭터 생성은 하지 않는다.
 
@@ -96,3 +98,11 @@ Save status가 `PREPLAY_READY`이면:
 를 사용하지 않는다.
 
 필요성이 실제 플레이에서 증명될 때만 추가한다.
+
+
+## 10. Character Presentation Gate
+- 반복 등장 가능성이 높은 새 인물은 첫 고해상도 등장 때 `CHARACTER_VISUAL_RULE_V1.md`를 적용한다.
+- 특히 주요 여성 인물은 외모·첫인상·분위기를 생략하지 않는다.
+- 설정표처럼 길게 나열하지 말고 장면 안에서 2~5문장 정도로 그림이 생기게 한다.
+- 확정된 외모 앵커는 Save에 보존하고 이유 없이 바꾸지 않는다.
+- 외모/매력과 연애 가능성은 별개로 판정한다.
