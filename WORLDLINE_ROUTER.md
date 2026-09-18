@@ -82,3 +82,16 @@ STRONGHOLD의 정확한 로드 순서와 금지사항은 해당 branch의 최신
 - current time anchor
 
 세부 Canon은 이 파일에 복제하지 않는다. 이 파일은 **라우팅 전용**이다.
+
+
+### AFTERFALL
+- Branch: `worldline/afterfall-rpg`
+- Directory: `worldlines/AFTERFALL/`
+- Current protagonist: **첫 플레이에서 생성 / 자녀 없는 30~40대 남성**
+- Current continuation entrypoint: `worldlines/AFTERFALL/START_ROOM.md`
+- Current runtime state: Supabase `taejang-phase1-staging.survival_rpg.saves`, `worldline_id='AFTERFALL'`
+- Current time anchor: **PREPLAY_READY / S1 character creation pending**
+
+AFTERFALL은 박도현 STRONGHOLD 및 가족 Canon v2와 독립된 RPG 연대기다.
+현재 런타임 상태의 Source of Truth는 GitHub CURRENT_STATE가 아니라 Supabase Save다.
+GitHub는 부팅/기획/시즌 아카이브/IP 보존을 담당한다.
