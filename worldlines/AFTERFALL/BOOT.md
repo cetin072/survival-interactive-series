@@ -83,13 +83,21 @@ Save status가 `PREPLAY_READY`이면:
 - 연애/성인관계는 자연스럽게 가능하나 자동 하렘/자동 성공 금지.
 - 어린이는 시작 파티에 없음.
 
-## 8. 저장/아카이브
+## 8. Solo Play 관계 가드
+- 솔로 플레이 기본값은 **1인 거주 / 미혼 / 배우자·연인·자녀·동거인 없음**이다.
+- 부모·형제·과거 인간관계는 플레이어가 먼저 언급하거나 명시적으로 확정하기 전까지 UNDEFINED다.
+- 미확정 관계를 GM이 임의 생성하거나 연락·귀가·구조·합류의 동기로 사용하지 않는다.
+- 관계의 존재는 플레이어의 걱정·의무·우선순위를 뜻하지 않는다. **NPC relationship ≠ player motivation.**
+- 활성화된 관계 사건도 선택 가능한 hook일 뿐이다. 무시·거절·이탈·단절을 정상 선택으로 인정한다.
+- 관계 NPC가 메인 목표를 대체하거나 이동 목적지를 자동 생성하지 않는다.
+
+## 9. 저장/아카이브
 실시간 Save: Supabase.
 중요 사건 로그: Supabase events.
 시즌 종료/IP 보존: GitHub에 RAW, ARC ARCHIVE, FEEDBACK, 필요 Canon을 생성.
 플레이 도중 GitHub를 턴 DB로 쓰지 않는다.
 
-## 9. 외부 시스템 금지
+## 10. 외부 시스템 금지
 개인 플레이 중에는 기본적으로:
 - Netlify 웹게임
 - OpenRouter/OpenAI 별도 Runtime API
@@ -100,7 +108,7 @@ Save status가 `PREPLAY_READY`이면:
 필요성이 실제 플레이에서 증명될 때만 추가한다.
 
 
-## 10. Character Presentation Gate
+## 11. Character Presentation Gate
 - 반복 등장 가능성이 높은 새 인물은 첫 고해상도 등장 때 `CHARACTER_VISUAL_RULE_V1.md`를 적용한다.
 - 특히 주요 여성 인물은 외모·첫인상·분위기를 생략하지 않는다.
 - 설정표처럼 길게 나열하지 말고 장면 안에서 2~5문장 정도로 그림이 생기게 한다.
