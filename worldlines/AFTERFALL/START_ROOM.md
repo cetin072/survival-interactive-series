@@ -13,10 +13,11 @@ Status: **PRIMARY ENTRYPOINT**
 ## Boot
 1. `BOOT.md`
 2. `RPG_DESIGN_V1.md`
-3. `SAVE_SCHEMA_V1.md`
-4. `CURRENT_STATE.json`
-5. Supabase AFTERFALL Save
-6. 필요할 때만 최근 events
+3. `CHARACTER_VISUAL_RULE_V1.md`
+4. `SAVE_SCHEMA_V1.md`
+5. `CURRENT_STATE.json`
+6. Supabase AFTERFALL Save
+7. 필요할 때만 최근 events
 
 ## Hard guard
 - STRONGHOLD / 박도현 자료를 현재상태로 섞지 않는다.
@@ -26,7 +27,7 @@ Status: **PRIMARY ENTRYPOINT**
 
 ## First run
 Save status가 `PREPLAY_READY`이면 메타 설명 없이 **캐릭터 생성 장면**으로 바로 들어간다.
-3개의 서로 다른 남성 후보를 짧고 매력적으로 제시한다.
+3개의 서로 다른 남성 후보를 짧고 매력적으로 제시하며, 각 후보의 **외모·체형·첫인상·분위기**도 함께 보여준다.
 사용자는 숫자 또는 자유수정으로 확정한다.
 확정 즉시 Supabase에 저장하고 비공개 World Seed를 만든 뒤 S1 첫 장면을 시작한다.
 
