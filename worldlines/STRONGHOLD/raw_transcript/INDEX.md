@@ -143,3 +143,23 @@ RAW가 COMPLETE가 아니면 그 사실을 숨기지 않는다.
 - Canon 근거 재확인
 
 > **원문은 충분히 저장하고, 플레이 때는 가볍게 읽는다.**
+
+
+### F. 2038-05 ~ 2039-12 이상 일사 / 야간·지하사회 / 분산망 / 기록현실 장
+**RAW PARTIAL / BACKFILL REQUIRED**
+
+운영용 요약:
+- `../ROOM_ARCHIVE_2038_05_TO_2039_12.md`
+- `../FEEDBACK_2038_05_TO_2039_12.md`
+- `../LEDGER_APPEND_2038_05_TO_2039_12.md`
+- `../REALITY_SURVIVAL_DEBRIEF_2038_05_TO_2039_12.md`
+
+현재 RAW:
+- `RAW_2038_05_TO_2039_12_PARTIAL_01.md`
+
+중요:
+- 시즌 시작 지침에는 Rolling RAW가 의무였지만 실제 플레이 중 자동 flush가 수행되지 않았다.
+- 현재 PART는 일부 USER 원문 중심이며 대부분의 GM/ASSISTANT 공개 원문과 일부 USER 입력이 빠져 있다.
+- 이 범위는 **COMPLETE로 간주하지 않는다.**
+- 원 채팅/export 접근 시 누락구간을 문자 그대로 backfill한다. 요약/기억으로 재창작하지 않는다.
+- 시즌 자체는 아카이브/상태/피드백 기준으로 정상 종료되었으며 RAW backfill을 다음 플레이 시작 조건으로 만들지 않는다.
