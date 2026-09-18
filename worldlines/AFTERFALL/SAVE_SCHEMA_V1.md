@@ -39,6 +39,31 @@ GitHub의 CURRENT_STATE는 런타임 상태 복제본이 아니라 이 Save를 �
 초기에는 필요한 것만 채운다.
 빈 시스템을 억지로 수치화하지 않는다.
 
+## 관계 상태 계약
+솔로 플레이에서는 player.relationship_profile을 권장한다.
+
+```json
+{
+  "mode": "SOLO",
+  "living_arrangement": "ALONE",
+  "spouse": "NONE",
+  "partner": "NONE",
+  "children": "NONE",
+  "cohabitants": "NONE",
+  "parents": "UNDEFINED",
+  "siblings": "UNDEFINED",
+  "generation_policy": "LAZY",
+  "relationship_is_not_motivation": true
+}
+```
+
+- NONE은 현재 없다고 확정된 관계다.
+- UNDEFINED는 생사·관계·거주지 모두 미확정이며, 부재나 사망을 뜻하지 않는다.
+- UNDEFINED 관계는 known_characters, 관측 기록, 퀘스트, 목적지, pending consequence에 생성하지 않는다.
+- 플레이어가 직접 언급하거나 확정하기 전에는 관계 NPC를 만들지 않는다.
+- 관계가 확정되어도 연락·귀가·구조·합류 의지는 별도 선택 없이는 저장하지 않는다.
+- 관계 교정 시 과거 이벤트를 삭제하지 않고 CONTINUITY_CORRECTION 이벤트로 무효 범위를 남긴다.
+
 ## saves.gm_state — GM 전용 비공개 런타임
 - Hidden World Seed
 - 아직 공개되지 않은 외부 사건
