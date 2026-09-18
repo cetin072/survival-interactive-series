@@ -1,0 +1,16 @@
+{
+  "worldline": "AFTERFALL",
+  "branch": "worldline/afterfall-rpg",
+  "status": "PREPLAY_READY",
+  "runtime_source_of_truth": {
+    "provider": "Supabase",
+    "project": "taejang-phase1-staging",
+    "schema": "survival_rpg",
+    "table": "saves",
+    "worldline_id": "AFTERFALL"
+  },
+  "protagonist": null,
+  "season": 1,
+  "phase": "CHARACTER_CREATION_PENDING",
+  "note": "Dynamic runtime facts must be loaded from Supabase. Do not duplicate live state here."
+}
