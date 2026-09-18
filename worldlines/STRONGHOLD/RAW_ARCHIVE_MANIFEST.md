@@ -47,3 +47,14 @@ Status: **ACTIVE / IP PRESERVATION TRACKER**
 4. 매체별 각색 후보 추출
 
 RAW는 `실제 플레이가 어떻게 살아 있었는가`, Canon/State는 `무엇이 사실로 남았는가`를 각각 보존한다.
+
+
+## 2038-05 ~ 2039-12 종료 감사
+- RAW 상태: **PARTIAL / BACKFILL REQUIRED**
+- 현재 파일: `raw_transcript/RAW_2038_05_TO_2039_12_PARTIAL_01.md`
+- 운영 요약: `ROOM_ARCHIVE_2038_05_TO_2039_12.md`
+- 영구 변화: `LEDGER_APPEND_2038_05_TO_2039_12.md`
+- 피드백: `FEEDBACK_2038_05_TO_2039_12.md`
+- 현실 디브리프: `REALITY_SURVIVAL_DEBRIEF_2038_05_TO_2039_12.md`
+- 누락 원인: 시즌 중 의무 Rolling RAW가 실제 실행되지 않음.
+- 처리: 누락분을 요약으로 복원하지 않고 원 채팅/export 접근 시에만 backfill. 다음 시즌 시작은 차단하지 않음.
