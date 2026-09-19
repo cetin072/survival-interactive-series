@@ -32,6 +32,7 @@ GitHub의 CURRENT_STATE는 런타임 상태 복제본이 아니라 이 Save를 �
   "world_phase": "PRE_COLLAPSE",
   "known_world": {},
   "flags": {},
+  "learned_principles": {},
   "recent_events": []
 }
 ```
@@ -63,6 +64,25 @@ GitHub의 CURRENT_STATE는 런타임 상태 복제본이 아니라 이 Save를 �
 - 플레이어가 직접 언급하거나 확정하기 전에는 관계 NPC를 만들지 않는다.
 - 관계가 확정되어도 연락·귀가·구조·합류 의지는 별도 선택 없이는 저장하지 않는다.
 - 관계 교정 시 과거 이벤트를 삭제하지 않고 CONTINUITY_CORRECTION 이벤트로 무효 범위를 남긴다.
+
+## learned_principles — 플레이 중 체득한 지속 원칙
+플레이어가 실제 상황에서 검증했고 앞으로 반복 판단에 영향을 줄 결론만 저장한다.
+
+권장 예:
+```json
+{
+  "food_strategy": {
+    "code": "DIVERSIFIED_CALORIE_AND_FUEL_EFFICIENCY",
+    "principle": "곡물·감자/고구마·저조리 고열량 식품을 조건에 따라 혼합 확보한다",
+    "source_event_id": 53
+  }
+}
+```
+
+- 상세한 대화와 근거는 events에 남기고 여기에는 재사용 가능한 결론만 둔다.
+- 단순 상식 수집함으로 만들지 않는다. 실제 플레이에서 검증·채택된 것만 승격한다.
+- 후속 장면에서는 이 필드를 다시 설명하기보다 판단과 행동에 재사용한다.
+- 세부 설계는 `EMERGENT_SURVIVAL_LEARNING_V1.md`를 따른다.
 
 ## saves.gm_state — GM 전용 비공개 런타임
 - Hidden World Seed
