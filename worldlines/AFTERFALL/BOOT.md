@@ -13,9 +13,10 @@ Status: **AUTHORITATIVE**
 1. `START_ROOM.md`
 2. `RPG_DESIGN_V1.md`
 3. `CHARACTER_VISUAL_RULE_V1.md`
-4. `SAVE_SCHEMA_V1.md`
-5. `CURRENT_STATE.json`
-6. Supabase `survival_rpg.saves`의 `AFTERFALL` row
+4. `EMERGENT_SURVIVAL_LEARNING_V1.md`
+5. `SAVE_SCHEMA_V1.md`
+6. `CURRENT_STATE.json`
+7. Supabase `survival_rpg.saves`의 `AFTERFALL` row
 
 이후 실제로 필요할 때만 최근 `events`를 조회한다.
 RAW나 과거 세계선 전체를 정상 부팅 입력으로 읽지 않는다.
