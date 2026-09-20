@@ -1,0 +1,28 @@
+{
+  "worldline": "AFTERFALL",
+  "season": 2,
+  "status": "READY_FOR_NEW_ROOM_BOOT",
+  "previous_season": 1,
+  "previous_end_date": "2026-11-20",
+  "previous_end_scene": "겨울 전 갈무리",
+  "runtime_source_of_truth": {
+    "provider": "Supabase",
+    "schema": "survival_rpg",
+    "table": "saves",
+    "worldline_id": "AFTERFALL"
+  },
+  "required_load": [
+    "worldlines/AFTERFALL/BOOT.md",
+    "worldlines/AFTERFALL/PERSISTENT_CANON.md",
+    "worldlines/AFTERFALL/seasons/S02/START_HANDOFF.md",
+    "worldlines/AFTERFALL/CURRENT_STATE.json",
+    "Supabase AFTERFALL save"
+  ],
+  "do_not_boot_from": [
+    "raw_transcript",
+    "STRONGHOLD",
+    "Canon v2 family timeline"
+  ],
+  "presentation": "MUD_TEXT_V1",
+  "future_plot_spoilers": false
+}
