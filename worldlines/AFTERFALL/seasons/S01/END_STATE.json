@@ -1,0 +1,86 @@
+{
+  "worldline": "AFTERFALL",
+  "season": 1,
+  "status": "COMPLETE",
+  "game_date": "2026-11-20",
+  "ending_scene": "겨울 전 갈무리",
+  "protagonist": {
+    "name": "서진우",
+    "age": 32,
+    "job": "응급실 간호사",
+    "role": [
+      "응급의료",
+      "고가치 외부정찰",
+      "외부정보",
+      "교차거점 연결"
+    ]
+  },
+  "core_group": [
+    "서진우",
+    "윤서진",
+    "최은채",
+    "장태훈"
+  ],
+  "allied_base_group": [
+    "한미라",
+    "오세훈",
+    "김도윤"
+  ],
+  "base_model": {
+    "northwest_training_center": "은닉 생활·의료·비축·후방복원거점",
+    "north_yuseong_agritech": "물·농업·장기생산 핵심거점",
+    "structure": "두 거점 정식 연합체 / 합병 아님"
+  },
+  "trusted_external": [
+    "박민호",
+    "정민규"
+  ],
+  "promising_contacts": [
+    "문하진",
+    "강혜린",
+    "최경희",
+    "한지수"
+  ],
+  "trade_observation_contacts": [
+    "배철수",
+    "박재민",
+    "이소라",
+    "최유진"
+  ],
+  "watch_groups": [
+    "서쪽길 관리조",
+    "동천교 관리조",
+    "백운생활관"
+  ],
+  "resource_resolution": {
+    "food": "MANAGED/ADEQUATE",
+    "water": "STABLE/ADEQUATE",
+    "fuel": "MANAGED/TIGHT_BUT_CONTROLLED",
+    "medical_hygiene": "MANAGED/ADEQUATE",
+    "facility_spares": "STABLE_SINGLE_MAJOR_FAILURE_COVERAGE"
+  },
+  "mobility": {
+    "confirmed_bicycles": 3,
+    "cargo_trailer": 1,
+    "policy": "이동·철수 선택권을 지속 보존"
+  },
+  "world_phase": "FRACTURE",
+  "disaster_cause": "UNCONFIRMED_TO_PLAYER",
+  "season_end_strategy": [
+    "확장보다 갈무리",
+    "두 거점 지속가능성 강화",
+    "기존 외부망 순환점검",
+    "새 집단 남발 금지",
+    "정치적 내부분쟁 불개입",
+    "진우 외부현장 중심",
+    "NPC 독립행동 활성"
+  ],
+  "season2_contract": {
+    "tone": "시즌1보다 강한 아포칼립스 감각",
+    "arc_intensity": "HIGHER",
+    "preserve_earned_value": true,
+    "arbitrary_reset": false,
+    "future_plot_spoilers": false,
+    "npc_offscreen_relationship_dynamics": true
+  }
+}
