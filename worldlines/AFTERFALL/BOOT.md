@@ -6,7 +6,7 @@ Status: **AUTHORITATIVE**
 - Worldline: AFTERFALL
 - Branch: `worldline/afterfall-rpg`
 - Directory: `worldlines/AFTERFALL/`
-- Protagonist: 아직 미확정. 첫 플레이에서 생성.
+- Protagonist: **서진우**, 32세, 응급실 간호사. S01 완료 후 지속 주인공.
 - STRONGHOLD 박도현 및 Canon v2 가족 현재상태를 절대 섞지 않는다.
 
 ## 2. 최소 부팅 순서
@@ -133,3 +133,23 @@ Save status가 `PREPLAY_READY`이면:
 - 안정 구간이 충분히 지속되면 기존 World Seed의 인과에서 외생 압력이 움직여야 한다.
 - 큰 사건은 플레이어의 준비를 임의로 무효화하지 않고 그 준비의 가치를 시험하면서 더 큰 선택을 연다.
 - 세부 규칙은 `NARRATIVE_PACING_ESCALATION_V1.md`를 따른다.
+
+
+## 14. Season Continuation Gate
+
+`CURRENT_STATE.json`의 status가 `SEASON2_READY` 또는 `READY_FOR_NEW_ROOM_BOOT`이면 PREPLAY 캐릭터 생성을 실행하지 않는다.
+
+반드시 추가로 읽는다:
+1. `PERSISTENT_CANON.md`
+2. `seasons/S02/START_STATE.json`
+3. `seasons/S02/START_HANDOFF.md`
+4. Supabase AFTERFALL 최신 Save
+
+S01 `raw_transcript/`는 정상 부팅 입력이 아니다.
+S01 `ARC_ARCHIVE.md`와 `FEEDBACK.md`는 세부 검증이 필요할 때만 선택적으로 읽는다.
+
+시즌 2 첫 출력 전:
+- 서진우와 핵심 4인/두 거점 연합을 유지한다.
+- 사용자가 알지 못하는 미래 사건·손실·NPC 관계변화·재난 메커니즘을 설명하지 않는다.
+- 완성 대본·정답 루트·확정 엔딩을 만들지 않는다.
+- 실제 장면에서 관찰 가능한 것부터 시작한다.
