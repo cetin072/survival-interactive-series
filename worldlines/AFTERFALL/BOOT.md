@@ -15,9 +15,10 @@ Status: **AUTHORITATIVE**
 3. `CHARACTER_VISUAL_RULE_V1.md`
 4. `EMERGENT_SURVIVAL_LEARNING_V1.md`
 5. `ADAPTIVE_RESOURCE_RESOLUTION_V1.md`
-6. `SAVE_SCHEMA_V1.md`
-7. `CURRENT_STATE.json`
-8. Supabase `survival_rpg.saves`의 `AFTERFALL` row
+6. `NARRATIVE_PACING_ESCALATION_V1.md`
+7. `SAVE_SCHEMA_V1.md`
+8. `CURRENT_STATE.json`
+9. Supabase `survival_rpg.saves`의 `AFTERFALL` row
 
 이후 실제로 필요할 때만 최근 `events`를 조회한다.
 RAW나 과거 세계선 전체를 정상 부팅 입력으로 읽지 않는다.
@@ -124,3 +125,11 @@ Save status가 `PREPLAY_READY`이면:
 - 안정된 공급망의 일상 +/−는 자동 처리하며, 위기·수요급증·공급단절 때 해당 자원만 다시 정밀 계산한다.
 - 자원별로 서로 다른 해상도를 가질 수 있다.
 - 세부 규칙은 `ADAPTIVE_RESOURCE_RESOLUTION_V1.md`를 따른다.
+
+
+## 13. Narrative Pacing & Escalation
+- 동일 기능의 정기접촉·파밍·거래·정비가 반복되면 직접 장면화를 중단하고 압축한다.
+- 첫 경험은 자세히, 두 번째는 차이/학습, 세 번째 이후 새 정보·관계변화·위험이 없으면 몽타주/자동처리를 기본으로 한다.
+- 안정 구간이 충분히 지속되면 기존 World Seed의 인과에서 외생 압력이 움직여야 한다.
+- 큰 사건은 플레이어의 준비를 임의로 무효화하지 않고 그 준비의 가치를 시험하면서 더 큰 선택을 연다.
+- 세부 규칙은 `NARRATIVE_PACING_ESCALATION_V1.md`를 따른다.
