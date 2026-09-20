@@ -33,6 +33,7 @@ GitHub의 CURRENT_STATE는 런타임 상태 복제본이 아니라 이 Save를 �
   "known_world": {},
   "flags": {},
   "learned_principles": {},
+  "resource_resolution": {},
   "recent_events": []
 }
 ```
@@ -83,6 +84,24 @@ GitHub의 CURRENT_STATE는 런타임 상태 복제본이 아니라 이 Save를 �
 - 단순 상식 수집함으로 만들지 않는다. 실제 플레이에서 검증·채택된 것만 승격한다.
 - 후속 장면에서는 이 필드를 다시 설명하기보다 판단과 행동에 재사용한다.
 - 세부 설계는 `EMERGENT_SURVIVAL_LEARNING_V1.md`를 따른다.
+
+## resource_resolution — 자원 관리 해상도
+핵심 자원별로 현재 관리 해상도를 선택적으로 저장한다.
+
+```json
+{
+  "food": {"resolution":"MANAGED","status":"ADEQUATE","runway_days":31,"supply_line":"PARTIAL","trend":"NEUTRAL"},
+  "water": {"resolution":"STABLE","status":"SECURE"},
+  "fuel": {"resolution":"SCARCITY","status":"TIGHT","runway_days":11}
+}
+```
+
+- SCARCITY: 정밀 수량/소모/런웨이가 실제 선택을 바꾸는 단계.
+- MANAGED: 일상 소비는 자동 처리하고 며칠분·추세·병목 중심으로 관리.
+- STABLE: 정상 +/−는 자동 상쇄하고 공급망 상태와 취약점만 관리.
+- 자원별 해상도는 독립적이다.
+- 공급단절·수요급증 등 전략적 변화가 생기면 해당 자원만 재정밀화한다.
+- 세부 규칙은 `ADAPTIVE_RESOURCE_RESOLUTION_V1.md`를 따른다.
 
 ## saves.gm_state — GM 전용 비공개 런타임
 - Hidden World Seed
