@@ -1,7 +1,7 @@
 {
   "worldline": "AFTERFALL",
   "branch": "worldline/afterfall-rpg",
-  "status": "PREPLAY_READY",
+  "status": "SEASON2_READY",
   "runtime_source_of_truth": {
     "provider": "Supabase",
     "project": "taejang-phase1-staging",
@@ -9,8 +9,17 @@
     "table": "saves",
     "worldline_id": "AFTERFALL"
   },
-  "protagonist": null,
-  "season": 1,
-  "phase": "CHARACTER_CREATION_PENDING",
+  "protagonist": {
+    "name": "서진우",
+    "age": 32,
+    "job": "응급실 간호사"
+  },
+  "season": 2,
+  "phase": "NEW_ROOM_BOOT_READY",
+  "required_handoff": "worldlines/AFTERFALL/seasons/S02/START_HANDOFF.md",
+  "persistent_canon": "worldlines/AFTERFALL/PERSISTENT_CANON.md",
+  "previous_archive": "worldlines/AFTERFALL/seasons/S01/ARC_ARCHIVE.md",
+  "raw_policy": "S01 RAW is BACKFILL REQUIRED and must not be reconstructed from memory.",
+  "spoiler_policy": "Do not reveal future season 2 plot, losses, relationship changes, or disaster mechanism before they occur in play.",
   "note": "Dynamic runtime facts must be loaded from Supabase. Do not duplicate live state here."
 }
