@@ -14,9 +14,10 @@ Status: **AUTHORITATIVE**
 2. `RPG_DESIGN_V1.md`
 3. `CHARACTER_VISUAL_RULE_V1.md`
 4. `EMERGENT_SURVIVAL_LEARNING_V1.md`
-5. `SAVE_SCHEMA_V1.md`
-6. `CURRENT_STATE.json`
-7. Supabase `survival_rpg.saves`의 `AFTERFALL` row
+5. `ADAPTIVE_RESOURCE_RESOLUTION_V1.md`
+6. `SAVE_SCHEMA_V1.md`
+7. `CURRENT_STATE.json`
+8. Supabase `survival_rpg.saves`의 `AFTERFALL` row
 
 이후 실제로 필요할 때만 최근 `events`를 조회한다.
 RAW나 과거 세계선 전체를 정상 부팅 입력으로 읽지 않는다.
@@ -115,3 +116,11 @@ Save status가 `PREPLAY_READY`이면:
 - 설정표처럼 길게 나열하지 말고 장면 안에서 2~5문장 정도로 그림이 생기게 한다.
 - 확정된 외모 앵커는 Save에 보존하고 이유 없이 바꾸지 않는다.
 - 외모/매력과 연애 가능성은 별개로 판정한다.
+
+
+## 12. Adaptive Resource Resolution
+- 자원 계산은 현재 생존 단계에 맞춰 SCARCITY / MANAGED / STABLE 해상도를 사용한다.
+- 이미 해결한 반복 운영은 자동화하고, 현재의 전략적 병목만 플레이어에게 노출한다.
+- 안정된 공급망의 일상 +/−는 자동 처리하며, 위기·수요급증·공급단절 때 해당 자원만 다시 정밀 계산한다.
+- 자원별로 서로 다른 해상도를 가질 수 있다.
+- 세부 규칙은 `ADAPTIVE_RESOURCE_RESOLUTION_V1.md`를 따른다.
