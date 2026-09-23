@@ -27,7 +27,7 @@ Runtime source of truth: Supabase survival_rpg.saves / AFTERFALL
 - 공개 생활망의 생활·음식 전문가를 겨울살이에 연결
 - 신하영·최유진 같은 외부 생활전문가를 연합원으로 자동영입하지 않은 채 협업 가능성을 탐색
 
-캐릭터 기획 때문에 본편은 이 지점에서 정지했다.
+캐릭터 기획 때문에 본편은 이 지점에서 정지했다.\n\nGM current scene: `WINTER_LIVING_EXPERT_LINK_PREP`\nRuntime save version anchor: `204`
 
 ## 3. Core four
 
