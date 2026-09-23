@@ -92,7 +92,7 @@ STRONGHOLD의 정확한 로드 순서와 금지사항은 해당 branch의 최신
 - Primary entrypoint: `worldlines/AFTERFALL/START_ROOM.md`
 - Current continuation overlay: `worldlines/AFTERFALL/seasons/S02/CURRENT_CHECKPOINT.md`
 - Current runtime state: Supabase `taejang-phase1-staging.survival_rpg.saves`, `worldline_id='AFTERFALL'`
-- Current time anchor: **2026-11-26 09:12 / S02 ACTIVE / FRACTURE**
+- Current time anchor: **2026-11-24 09:10 / S02 ACTIVE / WINTER_REBOOT_V2**
 
 AFTERFALL은 《생존일기》 IP의 세 번째 주인공 연대기다.
 박도현 STRONGHOLD 및 가족 기반 Legacy Chronicle과 현재상태를 공유하지 않는다.
