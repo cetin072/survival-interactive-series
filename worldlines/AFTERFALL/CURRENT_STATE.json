@@ -7,8 +7,16 @@
     "provider": "Supabase",
     "project": "taejang-phase1-staging",
     "schema": "survival_rpg",
-    "table": "saves",
-    "worldline_id": "AFTERFALL"
+    "hot_snapshot": "saves",
+    "worldline_id": "AFTERFALL",
+    "gm_context_function": "get_gm_context",
+    "consistency_function": "check_runtime_consistency",
+    "world_tick_function": "get_world_tick_checklist",
+    "characters": "characters",
+    "pressures": "world_pressures",
+    "scenes": "scenes",
+    "clocks": "clocks",
+    "world_ticks": "world_ticks"
   },
   "protagonist": {
     "name": "서진우",
@@ -26,5 +34,7 @@
   "previous_archive": "worldlines/AFTERFALL/seasons/S01/ARC_ARCHIVE.md",
   "raw_policy": "S01 RAW is BACKFILL REQUIRED and must not be reconstructed from memory.",
   "spoiler_policy": "Do not reveal future season 2 plot, losses, relationship changes, collapse trigger, or disaster mechanism before they occur in play.",
-  "note": "This file is a boot pointer/checkpoint index. Dynamic runtime facts must be loaded from Supabase."
+  "note": "Boot pointer only. Use consistency check + relevant-character GM context before reading raw Save/Events.",
+  "gm_context_rules": "worldlines/AFTERFALL/GM_CONTEXT_V1.md",
+  "save_version_anchor": 203
 }
