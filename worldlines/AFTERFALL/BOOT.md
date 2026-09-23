@@ -20,9 +20,11 @@ Status: **AUTHORITATIVE**
 7. `ADAPTIVE_RESOURCE_RESOLUTION_V1.md`
 8. `NARRATIVE_PACING_ESCALATION_V1.md`
 9. `SAVE_SCHEMA_V1.md`
-10. `CURRENT_STATE.json`
-11. CURRENT_STATE가 지정한 최신 season checkpoint
-12. Supabase `survival_rpg.saves`의 `AFTERFALL` row
+10. `GM_CONTEXT_V1.md`
+11. `CURRENT_STATE.json`
+12. CURRENT_STATE가 지정한 최신 season checkpoint
+13. Supabase `check_runtime_consistency('AFTERFALL')`
+14. 장면 관련 인물만 지정해 `get_gm_context('AFTERFALL', ...)`
 
 새 채팅에서 worldline identity가 애매하면 repository root의 `SURVIVAL_DIARY_IP_BIBLE.md`와 `WORLDLINE_ROUTER.md`를 먼저 확인한다.
 
@@ -58,12 +60,16 @@ Save status가 `PREPLAY_READY`이면:
 - 플레이어 선택과 무관한 강제 손실 목록
 
 ## 5. 턴 처리
-1. 필요한 경우 Supabase Save 확인
-2. 플레이어 행동 의미 잠금
-3. 현재 상태에서 결과 판정
-4. 4~6개 의미 있는 비트까지 자연 진행
-5. 중요 Delta 발생 시 Supabase Save/Event 갱신
-6. 전략적 Choice Gate에서 다시 플레이어에게 반환
+1. 새 장면/큰 전환이면 `check_runtime_consistency` 확인
+2. 장면 관련 인물만 골라 `get_gm_context` 로드
+3. 큰 시간점프/날짜경계면 World Tick checklist 확인
+4. 플레이어 행동 의미 잠금
+5. 현재 상태에서 결과 판정
+6. 4~6개 의미 있는 비트까지 자연 진행
+7. 중요 Delta만 Save / Pressure / Character / Clock / Scene / Event 중 필요한 층에 갱신
+8. 전략적 Choice Gate에서 다시 플레이어에게 반환
+
+전체 Save JSON과 과거 Events를 기본 입력처럼 매 턴 읽지 않는다.
 
 ## 6. MUD / RPG 표시
 첫 장면과 큰 전환:
@@ -101,8 +107,13 @@ Save status가 `PREPLAY_READY`이면:
 - 관계 NPC가 메인 목표를 대체하거나 이동 목적지를 자동 생성하지 않는다.
 
 ## 9. 저장/아카이브
-실시간 Save: Supabase.
-중요 사건 로그: Supabase events.
+실시간 hot Save: Supabase `saves`.
+현재 캐릭터 카드: `characters`.
+현재 Pressure: `world_pressures`.
+주요 장면: `scenes`.
+세력/세계 진행축: `clocks`.
+큰 시간점프 검토: `world_ticks`.
+중요 사건 로그: `events`.
 시즌 종료/IP 보존: GitHub에 RAW, ARC ARCHIVE, FEEDBACK, 필요 Canon을 생성.
 플레이 도중 GitHub를 턴 DB로 쓰지 않는다.
 
@@ -121,7 +132,7 @@ Save status가 `PREPLAY_READY`이면:
 - 반복 등장 가능성이 높은 새 인물은 첫 고해상도 등장 때 `CHARACTER_VISUAL_RULE_V1.md`를 적용한다.
 - 특히 주요 여성 인물은 외모·첫인상·분위기를 생략하지 않는다.
 - 설정표처럼 길게 나열하지 말고 장면 안에서 2~5문장 정도로 그림이 생기게 한다.
-- 확정된 외모 앵커는 Save에 보존하고 이유 없이 바꾸지 않는다.
+- 확정된 외모 앵커는 `survival_rpg.characters.known_facts`에 보존하고 이유 없이 바꾸지 않는다.
 - 외모/매력과 연애 가능성은 별개로 판정한다.
 
 
@@ -149,9 +160,11 @@ Save / CURRENT_STATE가 S02 ACTIVE 또는 이후 진행상태이면 PREPLAY 캐�
 1. `CHARACTER_BIBLE.md`
 2. `WORLD_BIBLE.md`
 3. `PERSISTENT_CANON.md`
-4. `CURRENT_STATE.json`
-5. CURRENT_STATE가 지정한 최신 season checkpoint
-6. Supabase AFTERFALL 최신 Save
+4. `GM_CONTEXT_V1.md`
+5. `CURRENT_STATE.json`
+6. CURRENT_STATE가 지정한 최신 season checkpoint
+7. Supabase `check_runtime_consistency('AFTERFALL')`
+8. 장면 관련 인물만 지정한 `get_gm_context`
 
 현재 S02에서는:
 - `seasons/S02/START_HANDOFF.md` = 시즌 시작 역사자료
