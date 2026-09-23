@@ -11,6 +11,49 @@ Current AFTERFALL runtime game time: `2026-11-26 09:12`
 
 ---
 
+## Post-audit implementation update — 2026-09-24
+
+외부 감사 후 GM 품질에 직접 영향을 주는 개선을 실제 AFTERFALL runtime에 반영했다.
+
+현재 상태:
+- AFTERFALL Save version: **204**
+- Hot `state`: 약 **15.7k chars** (감사 당시 약 163k)
+- `known_world`: 약 **2k chars** (감사 당시 약 130k)
+- 과거 거대 `known_world`와 중복 character/world sources는 `survival_rpg.state_archives`에 보존
+- `survival_rpg.characters`: PLAYER 포함 18명 runtime card
+- `survival_rpg.world_pressures`: 8개 current Pressure
+- `survival_rpg.scenes`: 주요 Scene records
+- `survival_rpg.clocks`: World/Faction progress clocks
+- `survival_rpg.world_ticks`: 큰 시간점프 검토 기록
+- `get_gm_context(worldline, character_ids, scene_limit)`: 장면 관련 정보만 조합
+- `check_runtime_consistency(worldline)`: hot runtime 구조검사
+- `get_world_tick_checklist(worldline)`: 날짜/시간점프 후 세계 검토 checklist
+- Live Save에서 `character_bible`, `world_bible`, `known_characters` 복제품 제거
+- `party`, `bases`, `factions` 현재 구조를 활성화
+- Events에 `event_class / save_version / scene_id / tags` 필드 추가. 과거 84종 specific event_type은 호환을 위해 보존
+- `GM_CONTEXT_V1.md`를 새 부팅 규칙으로 추가
+- `CURRENT_STATE.json` JSON 오류 수정
+- Thin Engine 구현 코드(`engine/web`) 존재를 감사문에 정정함
+
+의도적으로 하지 않은 것:
+- 별도 Supabase 프로젝트 분리
+- Graph DB
+- Vector DB
+- Full event sourcing
+- Multi-agent hot loop
+- Web Thin Engine으로 즉시 플레이 이전
+
+현재 핵심 목적은 **기술적 제품화가 아니라 ChatGPT GM이 더 적은 컨텍스트로 더 정확하고 생동감 있게 플레이하는 것**이다.
+
+남은 주요 감사 포인트:
+1. 실제 플레이에서 GM Context v1이 장면 품질을 얼마나 개선하는가.
+2. Character current location / relationship state를 어느 정도 더 구조화할 가치가 있는가.
+3. Clocks와 World Tick이 과도한 기계화 없이 실제 오프스크린 세계성을 높이는가.
+4. LLM 직접 write를 향후 얼마나 제한해야 하는가.
+5. worldline branch 전략을 유지할지 main directory 기반으로 통합할지.
+
+---
+
 # 0. 이 문서를 읽는 외부 AI에게
 
 이 문서는 우리가 만든 방식을 자랑하거나 정당화하기 위한 문서가 아니다.
