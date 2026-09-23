@@ -1,10 +1,12 @@
 # AFTERFALL — Character Bible v1
 
 Status: AUTHORITATIVE CHARACTER DESIGN
-Runtime structured source: Supabase AFTERFALL state.character_bible
+Runtime structured source: Supabase `survival_rpg.characters`
 
 이 문서는 반복 NPC를 기능 담당자로 납작하게 쓰지 않기 위한 장기 정본이다.
-현재 위치·부상·일시적 감정·최근 사건은 Supabase Save/Event가 우선한다.
+이 문서는 장기 성격 설계 정본이다.
+실제 플레이의 GM 카드는 `survival_rpg.characters`가 우선하고, 현재 위치·부상·일시적 상태는 Runtime/Event가 우선한다.
+Character Bible 전체를 Live Save에 복제하지 않는다.
 
 ## 1. Player character — 서진우
 
