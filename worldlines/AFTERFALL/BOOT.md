@@ -6,6 +6,7 @@ Status: **AUTHORITATIVE**
 - Worldline: AFTERFALL
 - Branch: `worldline/afterfall-rpg`
 - Directory: `worldlines/AFTERFALL/`
+- IP Chronicle: **03 / 서진우**
 - Protagonist: **서진우**, 32세, 응급실 간호사. S01 완료 후 지속 주인공.
 - STRONGHOLD 박도현 및 Canon v2 가족 현재상태를 절대 섞지 않는다.
 
