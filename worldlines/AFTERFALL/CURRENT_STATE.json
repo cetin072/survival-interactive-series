@@ -1,7 +1,8 @@
 {
   "worldline": "AFTERFALL",
+  "ip_chronicle": 3,
   "branch": "worldline/afterfall-rpg",
-  "status": "SEASON2_READY",
+  "status": "ACTIVE",
   "runtime_source_of_truth": {
     "provider": "Supabase",
     "project": "taejang-phase1-staging",
@@ -15,11 +16,15 @@
     "job": "응급실 간호사"
   },
   "season": 2,
-  "phase": "NEW_ROOM_BOOT_READY",
-  "required_handoff": "worldlines/AFTERFALL/seasons/S02/START_HANDOFF.md",
+  "phase": "S02_ACTIVE_FRACTURE",
+  "game_time_anchor": "2026-11-26 09:12",
+  "current_checkpoint": "worldlines/AFTERFALL/seasons/S02/CURRENT_CHECKPOINT.md",
+  "season_start_handoff": "worldlines/AFTERFALL/seasons/S02/START_HANDOFF.md",
+  "character_bible": "worldlines/AFTERFALL/CHARACTER_BIBLE.md",
+  "world_bible": "worldlines/AFTERFALL/WORLD_BIBLE.md",
   "persistent_canon": "worldlines/AFTERFALL/PERSISTENT_CANON.md",
   "previous_archive": "worldlines/AFTERFALL/seasons/S01/ARC_ARCHIVE.md",
   "raw_policy": "S01 RAW is BACKFILL REQUIRED and must not be reconstructed from memory.",
-  "spoiler_policy": "Do not reveal future season 2 plot, losses, relationship changes, or disaster mechanism before they occur in play.",
-  "note": "Dynamic runtime facts must be loaded from Supabase. Do not duplicate live state here."
-}
+  "spoiler_policy": "Do not reveal future season 2 plot, losses, relationship changes, collapse trigger, or disaster mechanism before they occur in play.",
+  "note": "This file is a boot pointer/checkpoint index. Dynamic runtime facts must be loaded from Supabase."
+}\n
