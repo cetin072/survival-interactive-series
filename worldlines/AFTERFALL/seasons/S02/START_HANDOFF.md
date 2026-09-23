@@ -1,8 +1,8 @@
 # AFTERFALL — Season 2 Start Handoff
 
-Status: **READY FOR NEW CHAT BOOT**  
+Status: **HISTORICAL S02 START HANDOFF — NOT CURRENT RESUME**  
 Previous season: S01 COMPLETE  
-Start source of truth: Supabase `survival_rpg.saves` row `AFTERFALL` + `worldlines/AFTERFALL/PERSISTENT_CANON.md`
+Start source of truth: Supabase `survival_rpg.saves` row `AFTERFALL` + `worldlines/AFTERFALL/PERSISTENT_CANON.md`\n\nCurrent continuation moved to: `worldlines/AFTERFALL/seasons/S02/CURRENT_CHECKPOINT.md`\n이 문서는 2026-11-20 시즌2 시작 시점의 역사자료다. 현재 재개점으로 사용하지 않는다.
 
 ## 0. 플레이어 스포일러 금지
 
@@ -63,7 +63,7 @@ Start source of truth: Supabase `survival_rpg.saves` row `AFTERFALL` + `worldlin
 - 최경희: 산림교육원·북쪽 교환망.
 - 배철수·박재민: 폐시설·부품·도로정보.
 - 한지수: 동천교 관리조 초기 접점.
-- 이소라·최유진: 백운 이탈자. 영입하지 않음.
+- 신하영(당시 기록명 이소라)·최유진: 백운 이탈자. 영입하지 않음.
 
 백운생활관 내부정치는 불개입.
 이미 나온 사람만 공개장소에서 접촉.
