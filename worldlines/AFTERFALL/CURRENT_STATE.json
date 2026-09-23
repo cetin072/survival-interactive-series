@@ -25,7 +25,7 @@
   },
   "season": 2,
   "phase": "S02_ACTIVE_FRACTURE",
-  "game_time_anchor": "2026-11-26 09:12",
+  "game_time_anchor": "2026-11-24 09:10",
   "current_checkpoint": "worldlines/AFTERFALL/seasons/S02/CURRENT_CHECKPOINT.md",
   "season_start_handoff": "worldlines/AFTERFALL/seasons/S02/START_HANDOFF.md",
   "character_bible": "worldlines/AFTERFALL/CHARACTER_BIBLE.md",
@@ -34,8 +34,9 @@
   "previous_archive": "worldlines/AFTERFALL/seasons/S01/ARC_ARCHIVE.md",
   "raw_policy": "S01 RAW is BACKFILL REQUIRED and must not be reconstructed from memory.",
   "spoiler_policy": "Do not reveal future season 2 plot, losses, relationship changes, collapse trigger, or disaster mechanism before they occur in play.",
-  "note": "Boot pointer only. Run consistency check, then load relevant-character GM context. Raw Save/Events are fallback, not default context.",
+  "note": "Winter arc rebooted at 2026-11-24 09:10. 신하영·최유진 lead winter living operations; core four support. Superseded winterization timeline must not be replayed as canon.",
   "gm_context_rules": "worldlines/AFTERFALL/GM_CONTEXT_V1.md",
-  "save_version_anchor": 204,
-  "current_scene": "WINTER_LIVING_EXPERT_LINK_PREP"
+  "save_version_anchor": 205,
+  "current_scene": "WINTER_REBOOT_HAYOUNG_YUJIN_LEAD",
+  "active_arc": "WINTER_REBOOT_V2"
 }
