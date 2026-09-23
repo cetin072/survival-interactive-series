@@ -1,10 +1,11 @@
 # AFTERFALL — World Bible v1
 
 Status: AUTHORITATIVE WORLD DESIGN
-Runtime dynamic source: Supabase AFTERFALL Save / Event / gm_state
+Runtime dynamic sources: Supabase `saves` + `world_pressures` + `clocks` + `scenes` + `events`
 
 이 문서는 AFTERFALL 세계가 어떻게 작동하는지를 정의한다.
 오늘 어느 도로가 막혔는지 같은 현재 사실은 Supabase가 우선하며, 이 문서는 세계의 법칙과 사건 생성 구조를 담당한다.
+현재 Pressure 값은 `survival_rpg.world_pressures`가 유일한 runtime source다. 이 문서와 Live Save에 현재 레벨을 복제하지 않는다.
 
 ## 1. Worldline identity
 
