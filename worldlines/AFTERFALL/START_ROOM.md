@@ -7,17 +7,20 @@ Status: **PRIMARY ENTRYPOINT**
 ## Identity
 - Repository: `cetin072/survival-interactive-series`
 - Branch: `worldline/afterfall-rpg`
-- Worldline root: `worldlines/AFTERFALL/`
+- Worldline root: `worldlines/AFTERFALL/`\n- IP Chronicle: **03 / 서진우**
 - Runtime Save: Supabase `taejang-phase1-staging.survival_rpg.saves`, `worldline_id='AFTERFALL'`
 
 ## Boot
 1. `BOOT.md`
 2. `RPG_DESIGN_V1.md`
-3. `CHARACTER_VISUAL_RULE_V1.md`
-4. `SAVE_SCHEMA_V1.md`
-5. `CURRENT_STATE.json`
-6. Supabase AFTERFALL Save
-7. 필요할 때만 최근 events
+3. `CHARACTER_BIBLE.md`
+4. `WORLD_BIBLE.md`
+5. `CHARACTER_VISUAL_RULE_V1.md`
+6. `SAVE_SCHEMA_V1.md`
+7. `CURRENT_STATE.json`
+8. CURRENT_STATE가 지정한 current season checkpoint
+9. Supabase AFTERFALL Save
+10. 필요할 때만 최근 events
 
 ## Hard guard
 - STRONGHOLD / 박도현 자료를 현재상태로 섞지 않는다.
@@ -32,8 +35,11 @@ Save status가 `PREPLAY_READY`이면 메타 설명 없이 **캐릭터 생성 장
 확정 즉시 Supabase에 저장하고 비공개 World Seed를 만든 뒤 S1 첫 장면을 시작한다.
 
 ## Resume
-Save status가 `ACTIVE`이면 현재 Save와 unresolved quest/scene만 읽고 즉시 이어간다.
-오래된 전체 로그를 다시 읽지 않는다.
+Save status가 `ACTIVE`이면:
+- `CURRENT_STATE.json`이 가리키는 최신 checkpoint를 읽는다.
+- Character / World Bible을 적용한다.
+- Supabase 현재 Save와 unresolved quest/scene를 읽고 즉시 이어간다.
+- 오래된 START_HANDOFF나 전체 RAW를 현재상태처럼 다시 적용하지 않는다.
 
 ## Season close
 사용자가 시즌 종료를 선언하면:
