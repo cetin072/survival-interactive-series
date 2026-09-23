@@ -1,6 +1,6 @@
 # WORLDLINE ROUTER — Repository-Level Boot Guard
 
-이 문서는 이 저장소에 여러 플레이 세계선/부팅 세대가 공존할 때 **잘못된 세계선 폴백을 막는 최상위 라우팅 가드**다.
+이 문서는 이 저장소에 여러 플레이 세계선/부팅 세대가 공존할 때 **잘못된 세계선 폴백을 막는 최상위 라우팅 가드**다.\n\nIP 전체 주인공 계보와 Chronicle identity는 `SURVIVAL_DIARY_IP_BIBLE.md`가 담당한다.
 
 ## 1. 최우선 라우팅 규칙
 
@@ -85,13 +85,19 @@ STRONGHOLD의 정확한 로드 순서와 금지사항은 해당 branch의 최신
 
 
 ### AFTERFALL
+- IP Chronicle: **03**
+- Protagonist: **서진우**, 32세, 응급실 간호사
 - Branch: `worldline/afterfall-rpg`
 - Directory: `worldlines/AFTERFALL/`
-- Current protagonist: **첫 플레이에서 생성 / 자녀 없는 30~40대 남성**
-- Current continuation entrypoint: `worldlines/AFTERFALL/START_ROOM.md`
+- Primary entrypoint: `worldlines/AFTERFALL/START_ROOM.md`
+- Current continuation overlay: `worldlines/AFTERFALL/seasons/S02/CURRENT_CHECKPOINT.md`
 - Current runtime state: Supabase `taejang-phase1-staging.survival_rpg.saves`, `worldline_id='AFTERFALL'`
-- Current time anchor: **PREPLAY_READY / S1 character creation pending**
+- Current time anchor: **2026-11-26 09:12 / S02 ACTIVE / FRACTURE**
 
-AFTERFALL은 박도현 STRONGHOLD 및 가족 Canon v2와 독립된 RPG 연대기다.
-현재 런타임 상태의 Source of Truth는 GitHub CURRENT_STATE가 아니라 Supabase Save다.
-GitHub는 부팅/기획/시즌 아카이브/IP 보존을 담당한다.
+AFTERFALL은 《생존일기》 IP의 세 번째 주인공 연대기다.
+박도현 STRONGHOLD 및 가족 기반 Legacy Chronicle과 현재상태를 공유하지 않는다.
+
+현재 런타임 상태의 Source of Truth는 Supabase Save다.
+GitHub는 부팅·세계/캐릭터 바이블·시즌 체크포인트·아카이브·IP 보존을 담당한다.
+
+현재 S02 재개 시 START_HANDOFF가 아니라 CURRENT_CHECKPOINT를 사용한다.
