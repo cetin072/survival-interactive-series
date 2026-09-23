@@ -17,15 +17,19 @@ Status: **PRIMARY ENTRYPOINT**
 4. `WORLD_BIBLE.md`
 5. `CHARACTER_VISUAL_RULE_V1.md`
 6. `SAVE_SCHEMA_V1.md`
-7. `CURRENT_STATE.json`
-8. CURRENT_STATE가 지정한 current season checkpoint
-9. Supabase AFTERFALL Save
-10. 필요할 때만 최근 events
+7. `GM_CONTEXT_V1.md`
+8. `CURRENT_STATE.json`
+9. CURRENT_STATE가 지정한 current season checkpoint
+10. `check_runtime_consistency('AFTERFALL')`
+11. 장면 관련 인물을 지정한 `get_gm_context`
+12. 필요할 때만 과거 scenes / events
 
 ## Hard guard
 - STRONGHOLD / 박도현 자료를 현재상태로 섞지 않는다.
 - Canon v2 가족 세계선 자료를 현재상태로 섞지 않는다.
-- Supabase Save가 현재 런타임 상태의 Source of Truth다.
+- Supabase Save가 hot current snapshot의 Source of Truth다.
+- Character / Pressure / Scene / Clock은 해당 구조화 runtime table을 우선한다.
+- 전체 Save/Event를 습관적으로 전부 읽지 않는다.
 - 게임 중 DB/툴/기획 메타를 사용자에게 노출하지 않는다.
 
 ## First run
@@ -37,8 +41,10 @@ Save status가 `PREPLAY_READY`이면 메타 설명 없이 **캐릭터 생성 장
 ## Resume
 Save status가 `ACTIVE`이면:
 - `CURRENT_STATE.json`이 가리키는 최신 checkpoint를 읽는다.
-- Character / World Bible을 적용한다.
-- Supabase 현재 Save와 unresolved quest/scene를 읽고 즉시 이어간다.
+- Character / World Bible과 `GM_CONTEXT_V1.md`를 적용한다.
+- consistency 결과가 깨끗한지 먼저 확인한다.
+- 현재 장면의 등장인물을 추려 `get_gm_context`만 우선 읽는다.
+- 과거 세부가 필요할 때만 scenes → events 순으로 내려간다.
 - 오래된 START_HANDOFF나 전체 RAW를 현재상태처럼 다시 적용하지 않는다.
 
 ## Season close
