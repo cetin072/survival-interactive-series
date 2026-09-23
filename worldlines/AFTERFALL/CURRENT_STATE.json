@@ -34,7 +34,8 @@
   "previous_archive": "worldlines/AFTERFALL/seasons/S01/ARC_ARCHIVE.md",
   "raw_policy": "S01 RAW is BACKFILL REQUIRED and must not be reconstructed from memory.",
   "spoiler_policy": "Do not reveal future season 2 plot, losses, relationship changes, collapse trigger, or disaster mechanism before they occur in play.",
-  "note": "Boot pointer only. Use consistency check + relevant-character GM context before reading raw Save/Events.",
+  "note": "Boot pointer only. Run consistency check, then load relevant-character GM context. Raw Save/Events are fallback, not default context.",
   "gm_context_rules": "worldlines/AFTERFALL/GM_CONTEXT_V1.md",
-  "save_version_anchor": 203
+  "save_version_anchor": 204,
+  "current_scene": "WINTER_LIVING_EXPERT_LINK_PREP"
 }
