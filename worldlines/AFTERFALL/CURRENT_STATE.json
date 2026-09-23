@@ -27,4 +27,4 @@
   "raw_policy": "S01 RAW is BACKFILL REQUIRED and must not be reconstructed from memory.",
   "spoiler_policy": "Do not reveal future season 2 plot, losses, relationship changes, collapse trigger, or disaster mechanism before they occur in play.",
   "note": "This file is a boot pointer/checkpoint index. Dynamic runtime facts must be loaded from Supabase."
-}\n
+}
