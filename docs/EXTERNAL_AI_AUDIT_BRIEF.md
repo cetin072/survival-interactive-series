@@ -1043,11 +1043,24 @@ MUD RENDERER
 - OpenAI API
 - JSON Schema structured output
 
-그러나 **감사 시점 main repository에서 실제 `engine/package.json`, `engine/src/*`, root `package.json` 등 실행 코드 구현은 확인되지 않았다.**
+실제 main repository에는 `engine/web/` 구현 코드가 존재한다.
+
+확인된 예:
+- `engine/web/package.json` — React/Vite/Vitest 기반 웹 프로젝트
+- `engine/web/netlify/functions/gm.ts` — GM transport server boundary
+- `engine/web/src/runtime/gmProposal.ts` — GM proposal shape validation
+- `engine/web/src/runtime/invariantValidator.ts`
+- `engine/web/src/runtime/consistencyValidator.ts`
+- `engine/web/src/runtime/stateCompiler.ts`
+- `engine/web/src/validator/validateAction.ts`
+
+다만 현재 구현은 주로 Chronicle 01 가족 runtime을 전제로 하며 actor가 `player / wife / son / father`로 고정된 부분이 있다. 또한 `gm.ts`의 현재 기본 backend는 synthetic fixture만 허용하고 real Canon AI GM backend를 활성화하지 않는다.
 
 즉:
 
-> Thin Engine은 구현 아이디어와 implementation-ready 문서 수준이지, 현재 AFTERFALL의 실제 runtime은 아니다.
+> **Thin Engine은 “코드가 없는 설계안”이 아니다. 이미 상당한 validator/runtime 코드가 구현되어 있으나, 현재 AFTERFALL ChatGPT+Supabase 라이브 플레이 경로와 연결되지 않은 별도 runtime 계층이다.**
+
+따라서 감사 핵심 질문은 “Thin Engine을 새로 만들 것인가?”보다 **“이미 만든 validator/runtime을 AFTERFALL의 실제 state mutation 경로와 어떻게 통합하거나 재사용할 것인가?”**다.
 
 외부 감사자는 다음을 평가해 달라.
 
