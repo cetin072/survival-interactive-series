@@ -1,7 +1,7 @@
 # AFTERFALL — Season 2 Current Checkpoint
 
 Status: AUTHORITATIVE CURRENT CONTINUATION OVERLAY
-Game time: 2026-11-26 09:12
+Game time: 2026-11-24 09:10
 Runtime source of truth: Supabase survival_rpg.saves / AFTERFALL
 
 이 문서는 S02 START_HANDOFF 이후 진행된 플레이를 압축해 새 채팅이 현재 지점에서 바로 이어지게 한다.
@@ -18,16 +18,38 @@ Runtime source of truth: Supabase survival_rpg.saves / AFTERFALL
 
 ## 2. Current resume point
 
-2026-11-26 오전.
+**2026-11-24 09:10.**
 
-48시간 회복·겨울화 검증이 끝난 직후다.
+11월 23일 화재·공공대피시설·광역 이상 관측까지는 Canon이다.
 
-다음 플레이의 자연스러운 출발점:
-- 연료 확보와 연료절감을 동시에 고민
-- 공개 생활망의 생활·음식 전문가를 겨울살이에 연결
-- 신하영·최유진 같은 외부 생활전문가를 연합원으로 자동영입하지 않은 채 협업 가능성을 탐색
+기존에 플레이된:
+- 2026-11-24~11-26 핵심 4인 주도 48시간 겨울화
+- 겨울화 Audit
+- 11월 26일 실전검증 완료
 
-캐릭터 기획 때문에 본편은 이 지점에서 정지했다.\n\nGM current scene: `WINTER_LIVING_EXPERT_LINK_PREP`\nRuntime save version anchor: `204`
+는 **SUPERSEDED** 처리했다. 삭제하지 않고 과거 리부트 기록으로만 보존한다.
+
+### Winter Reboot V2
+
+이번 겨울의 전면 주도:
+- **신하영** — 음식 / 조리 / 위생 / 단체생활 / 생활연료 절약
+- **최유진** — 침구 / 세탁 / 수면공간 / 생활물자 / 일상 유지
+
+두 사람은 자동 연합원이 아니다.
+외부 신뢰 생활망의 위치를 유지한 채 겨울 운영의 주도권을 가진다.
+
+기존 핵심 4인은 지원축:
+- 서진우 — 외부 연결 / 응급 / 필요한 현장지원
+- 윤서진 — 의료 / 건강
+- 최은채 — 물류 / 기록
+- 장태훈 — 난방 / 설비 / 급수 / 동파
+
+중요:
+**겨울 운영의 문제정의와 생활 우선순위를 핵심 4인이 먼저 결론내리지 않는다.**
+하영·유진이 실제 생활 관점에서 먼저 본다.
+
+GM current scene: `WINTER_REBOOT_HAYOUNG_YUJIN_LEAD`
+Runtime save version anchor: `205`
 
 ## 3. Core four
 
@@ -114,11 +136,10 @@ Past alias in old Events: 이소라
 - 대전 밖 복수 권역에서도 전력불안정·변압기 화재·무선/위성항법 이상 보고.
 - 원인은 플레이어에게 미확정.
 
-### 48시간 겨울화
-- 사람 피로 회복.
-- 실습센터 핵심구역 겨울운영 검증.
-- 실증단지 핵심 온실·관정 검증.
-- 장기 취약점은 남음.
+### 기존 48시간 겨울화
+
+SUPERSEDED.
+이번 리부트에서는 아직 실행되지 않았다.
 
 ## 7. Current vulnerabilities
 
@@ -169,7 +190,7 @@ WORLD_BIBLE.md 적용.
 
 ## 10. Runtime pressure snapshot
 
-현재 설계기준:
+현재 리부트 기준:
 - FOOD: 2 PRESSURE
 - WATER: 2 PRESSURE
 - POWER: 3 SEVERE
