@@ -180,7 +180,7 @@ WORLD_BIBLE.md 적용.
 - TRUST: 2 PRESSURE
 
 이 값은 체크포인트 스냅샷이다.
-실제 최신값은 Supabase가 우선한다.
+실제 최신값은 `survival_rpg.world_pressures`가 우선한다.
 
 ## 11. Boot order for current continuation
 
@@ -190,14 +190,31 @@ WORLD_BIBLE.md 적용.
 2. BOOT.md
 3. CHARACTER_BIBLE.md
 4. WORLD_BIBLE.md
-5. PERSISTENT_CANON.md
-6. CURRENT_STATE.json
-7. 이 CURRENT_CHECKPOINT.md
-8. Supabase AFTERFALL 최신 Save
-9. 필요할 때만 최근 events
+5. GM_CONTEXT_V1.md
+6. PERSISTENT_CANON.md
+7. CURRENT_STATE.json
+8. 이 CURRENT_CHECKPOINT.md
+9. check_runtime_consistency('AFTERFALL')
+10. 장면 관련 인물만 지정한 get_gm_context
+11. 필요할 때만 recent scenes → events
 
 S01 RAW 전체를 정상부팅하지 않는다.
 S02 START_HANDOFF는 시즌 시작 역사자료이며 현재 재개점이 아니다.
+
+## 11-A. GM Context v1 migration
+
+현재 Runtime은 GM Context v1으로 압축됐다.
+
+- Save hot snapshot: 약 16만자 → 약 1.6만자
+- known_world: 약 13만자 → 약 2천자
+- 캐릭터 runtime: `survival_rpg.characters`
+- Pressure: `world_pressures`
+- Major scene memory: `scenes`
+- Progress direction: `clocks`
+- large time skip review: `world_ticks`
+- 이전 거대 known_world 원본: `state_archives`
+
+이 변경은 이야기 Canon을 삭제한 것이 아니라 현재 GM context에서 역사 산문을 분리한 것이다.
 
 ## 12. Spoiler guard
 
