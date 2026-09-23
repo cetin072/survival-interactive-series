@@ -12,13 +12,18 @@ Status: **AUTHORITATIVE**
 ## 2. 최소 부팅 순서
 1. `START_ROOM.md`
 2. `RPG_DESIGN_V1.md`
-3. `CHARACTER_VISUAL_RULE_V1.md`
-4. `EMERGENT_SURVIVAL_LEARNING_V1.md`
-5. `ADAPTIVE_RESOURCE_RESOLUTION_V1.md`
-6. `NARRATIVE_PACING_ESCALATION_V1.md`
-7. `SAVE_SCHEMA_V1.md`
-8. `CURRENT_STATE.json`
-9. Supabase `survival_rpg.saves`의 `AFTERFALL` row
+3. `CHARACTER_BIBLE.md`
+4. `WORLD_BIBLE.md`
+5. `CHARACTER_VISUAL_RULE_V1.md`
+6. `EMERGENT_SURVIVAL_LEARNING_V1.md`
+7. `ADAPTIVE_RESOURCE_RESOLUTION_V1.md`
+8. `NARRATIVE_PACING_ESCALATION_V1.md`
+9. `SAVE_SCHEMA_V1.md`
+10. `CURRENT_STATE.json`
+11. CURRENT_STATE가 지정한 최신 season checkpoint
+12. Supabase `survival_rpg.saves`의 `AFTERFALL` row
+
+새 채팅에서 worldline identity가 애매하면 repository root의 `SURVIVAL_DIARY_IP_BIBLE.md`와 `WORLDLINE_ROUTER.md`를 먼저 확인한다.
 
 이후 실제로 필요할 때만 최근 `events`를 조회한다.
 RAW나 과거 세계선 전체를 정상 부팅 입력으로 읽지 않는다.
@@ -137,23 +142,30 @@ Save status가 `PREPLAY_READY`이면:
 
 ## 14. Season Continuation Gate
 
-`CURRENT_STATE.json`의 status가 `SEASON2_READY` 또는 `READY_FOR_NEW_ROOM_BOOT`이면 PREPLAY 캐릭터 생성을 실행하지 않는다.
+Save / CURRENT_STATE가 S02 ACTIVE 또는 이후 진행상태이면 PREPLAY 캐릭터 생성을 실행하지 않는다.
 
-반드시 추가로 읽는다:
-1. `PERSISTENT_CANON.md`
-2. `seasons/S02/START_STATE.json`
-3. `seasons/S02/START_HANDOFF.md`
-4. Supabase AFTERFALL 최신 Save
+반드시 읽는다:
+1. `CHARACTER_BIBLE.md`
+2. `WORLD_BIBLE.md`
+3. `PERSISTENT_CANON.md`
+4. `CURRENT_STATE.json`
+5. CURRENT_STATE가 지정한 최신 season checkpoint
+6. Supabase AFTERFALL 최신 Save
+
+현재 S02에서는:
+- `seasons/S02/START_HANDOFF.md` = 시즌 시작 역사자료
+- `seasons/S02/CURRENT_CHECKPOINT.md` = 현재 재개용 overlay
 
 S01 `raw_transcript/`는 정상 부팅 입력이 아니다.
 S01 `ARC_ARCHIVE.md`와 `FEEDBACK.md`는 세부 검증이 필요할 때만 선택적으로 읽는다.
 
-시즌 2 첫 출력 전:
-- 서진우와 핵심 4인/두 거점 연합을 유지한다.
+첫 출력 전:
+- 서진우와 핵심 4인/두 거점 연속성을 유지한다.
+- Character Bible의 NPC 행동엔진을 적용한다.
+- World Bible의 Pressure / no-free-answer 규칙을 적용한다.
 - 사용자가 알지 못하는 미래 사건·손실·NPC 관계변화·재난 메커니즘을 설명하지 않는다.
 - 완성 대본·정답 루트·확정 엔딩을 만들지 않는다.
 - 실제 장면에서 관찰 가능한 것부터 시작한다.
-
 
 ## 15. Worldline Isolation Hard Guard
 - AFTERFALL 재난을 이전 세계선과의 합류·충돌·침범으로 설명하지 않는다.
