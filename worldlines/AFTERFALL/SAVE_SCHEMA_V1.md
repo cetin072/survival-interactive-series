@@ -61,7 +61,7 @@ GitHub의 CURRENT_STATE는 런타임 상태 복제본이 아니라 이 Save를 �
 
 - NONE은 현재 없다고 확정된 관계다.
 - UNDEFINED는 생사·관계·거주지 모두 미확정이며, 부재나 사망을 뜻하지 않는다.
-- UNDEFINED 관계는 known_characters, 관측 기록, 퀘스트, 목적지, pending consequence에 생성하지 않는다.
+- UNDEFINED 관계는 `survival_rpg.characters`, 관측 기록, 퀘스트, 목적지, pending consequence에 생성하지 않는다.
 - 플레이어가 직접 언급하거나 확정하기 전에는 관계 NPC를 만들지 않는다.
 - 관계가 확정되어도 연락·귀가·구조·합류 의지는 별도 선택 없이는 저장하지 않는다.
 - 관계 교정 시 과거 이벤트를 삭제하지 않고 CONTINUITY_CORRECTION 이벤트로 무효 범위를 남긴다.
@@ -154,7 +154,7 @@ GitHub의 CURRENT_STATE는 런타임 상태 복제본이 아니라 이 Save를 �
 
 
 ## 중요 인물 외모 저장
-반복 등장 가능성이 높은 중요 인물은 최소한의 외모 Canon을 Save에 보존할 수 있다.
+반복 등장 가능성이 높은 중요 인물은 최소한의 외모 Canon을 `survival_rpg.characters.known_facts`에 보존한다.
 
 권장 필드:
 - `appearance_anchor`: 나이 인상 / 키 / 체형 / 얼굴 핵심 / 머리 / 목소리 / 특징
@@ -163,3 +163,106 @@ GitHub의 CURRENT_STATE는 런타임 상태 복제본이 아니라 이 Save를 �
 
 외모 수치화는 기본값이 아니다.
 `beauty_score` 같은 단순 미모 점수는 저장하지 않는다.
+
+
+## GM Context v1 Runtime Overlay
+
+2026-09-24 이후 AFTERFALL current runtime은 hot Save 하나에 모든 정보를 넣지 않는다.
+
+### Hot snapshot
+`survival_rpg.saves`
+- 현재 player/body/gear/supplies
+- core party
+- bases
+- factions
+- compact known_world
+- quests / resource_resolution
+- 최근 event cache 소량
+- runtime index
+
+목표:
+- Save 30,000자 이하 유지
+- known_world는 현재 판단정보 중심
+- 과거 날짜별 관측/Intel history를 다시 누적하지 않음
+
+### Characters
+`survival_rpg.characters`
+
+Character Bible 전체와 known_characters 복제품을 Save에서 제거했다.
+PLAYER/CORE/MAJOR/RECURRING을 모두 같은 runtime card contract로 읽는다.
+
+서진우:
+- tier=PLAYER
+- profile.mode=PLAYER_AUTHORED
+- GM 성격 강제 금지
+
+### Current world pressure
+`survival_rpg.world_pressures`
+
+현재 level/trend/summary만 저장.
+정적 규칙은 WORLD_BIBLE.
+
+### Major scenes
+`survival_rpg.scenes`
+
+의미 있는 장면만 구조화:
+- 시간/장소
+- 참여자
+- 작동 Pressure
+- 선택
+- 결과
+- NPC/World 변화
+- key image / line
+- source events
+
+### Clocks
+`survival_rpg.clocks`
+
+세력·세계·NPC·관계의 누적 방향을 저해상도로 추적.
+확정 미래사건 타이머로 사용하지 않음.
+
+### World ticks
+`survival_rpg.world_ticks`
+
+큰 시간 점프 후 세계를 놓치지 않기 위한 검토 기록.
+
+### Cold archive
+`survival_rpg.state_archives`
+
+GM Context v1 이전 known_world 및 중복 캐릭터/세계 구조 원본 보존.
+정상 플레이에서는 읽지 않음.
+
+### Runtime functions
+```sql
+select * from survival_rpg.check_runtime_consistency('AFTERFALL');
+
+select survival_rpg.get_gm_context(
+  'AFTERFALL',
+  array['서진우','장태훈','신하영'],
+  3
+);
+
+select survival_rpg.get_world_tick_checklist('AFTERFALL');
+```
+
+정상 장면에서는 전체 Save보다 `get_gm_context`를 우선한다.
+
+### Events v2 fields
+
+기존 event_type은 역사 호환용으로 유지하면서 다음을 추가했다.
+- save_version
+- event_class
+- scene_id
+- tags
+
+event_class는 SCENE / CHARACTER / RELATIONSHIP / WORLD / RESOURCE / BASE / FACTION / QUEST / CONTINUITY / META / SEASON / SYSTEM 범위로 사용한다.
+
+### Archive-before-delete principle
+
+hot state에서 큰 구조를 제거하기 전:
+1. state_archives에 원본 저장
+2. 새 runtime structure 이관
+3. consistency check
+4. 그 뒤 hot state compaction
+
+과거를 지우는 것이 아니라 hot context에서 분리한다.
