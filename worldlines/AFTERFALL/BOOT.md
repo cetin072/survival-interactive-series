@@ -21,10 +21,11 @@ Status: **AUTHORITATIVE**
 8. `NARRATIVE_PACING_ESCALATION_V1.md`
 9. `SAVE_SCHEMA_V1.md`
 10. `GM_CONTEXT_V1.md`
-11. `CURRENT_STATE.json`
-12. CURRENT_STATE가 지정한 최신 season checkpoint
-13. Supabase `check_runtime_consistency('AFTERFALL')`
-14. 장면 관련 인물만 지정해 `get_scene_context('AFTERFALL', ...)`
+11. `PLAY_SESSION_PROTOCOL_V1.md`
+12. `CURRENT_STATE.json`
+13. CURRENT_STATE가 지정한 최신 season checkpoint
+14. Supabase `check_runtime_consistency('AFTERFALL')`
+15. 장면 관련 인물만 지정해 `get_scene_context('AFTERFALL', ...)`
 
 새 채팅에서 worldline identity가 애매하면 repository root의 `SURVIVAL_DIARY_IP_BIBLE.md`와 `WORLDLINE_ROUTER.md`를 먼저 확인한다.
 
@@ -107,6 +108,7 @@ Save status가 `PREPLAY_READY`이면:
 - 관계 NPC가 메인 목표를 대체하거나 이동 목적지를 자동 생성하지 않는다.
 
 ## 9. 저장/아카이브
+- 채팅방은 세이브가 아니라 플레이 화면이다. 방 이동·세션 원문·재개 규칙은 `PLAY_SESSION_PROTOCOL_V1.md`를 따른다.
 실시간 hot Save: Supabase `saves`.
 현재 캐릭터 카드: `characters`.
 현재 Pressure: `world_pressures`.
