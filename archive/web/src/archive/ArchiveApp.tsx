@@ -10,6 +10,7 @@ import {
   type ArchiveNodeType,
 } from './archiveData'
 import { StoryReader } from './StoryReader'
+import { activeChronicle, chronicles, type ChronicleId } from './transcriptData'
 import './archive.css'
 
 const typeLabel: Record<ArchiveNodeType, string> = {
@@ -350,13 +351,44 @@ function DetailPanel({
   )
 }
 
+function PastChronicles({ onOpenReader }: { onOpenReader: (id: ChronicleId) => void }) {
+  return <section className="past-chronicles" aria-label="지난 생존기">
+    <div className="archive-intro">
+      <p className="archive-eyebrow">SURVIVAL DIARY IP · VERIFIED RECORDS</p>
+      <h2>지난 생존기</h2>
+      <p>확인된 공개 기록만 각 Chronicle의 경계를 지켜 보관합니다. 현재 생존기의 정본과 인물·사건을 섞지 않습니다.</p>
+    </div>
+    <div className="past-chronicle-grid">
+      {chronicles.filter((chronicle) => !chronicle.isActive).map((chronicle) => {
+        const readable = chronicle.transcriptStatus !== 'backfill_required'
+        return <article key={chronicle.id} className="archive-panel past-chronicle-card">
+          <p className="archive-eyebrow">지난 생존기 · {chronicle.id.split('-')[0]}</p>
+          <h2>{chronicle.protagonist}</h2>
+          <p>{chronicle.availabilityNote}</p>
+          <dl className="detail-meta"><div><dt>원문 상태</dt><dd>{chronicle.transcriptStatus === 'partial' ? '일부 검증됨' : 'BACKFILL REQUIRED'}</dd></div><div><dt>검증 경로</dt><dd>{chronicle.sourceRoot}/**</dd></div></dl>
+          {readable ? <button className="primary" onClick={() => onOpenReader(chronicle.id)}>검증 원문 읽기</button> : <p className="archive-muted">원문이 확보되면 이 카드에서 공개합니다.</p>}
+        </article>
+      })}
+    </div>
+  </section>
+}
+
+function CurrentExplorerUnavailable() {
+  return <section className="archive-intro">
+    <p className="archive-eyebrow">{activeChronicle.label} · 공개 기록</p>
+    <h2>현재 생존기의 세계 탐색을 준비하고 있습니다.</h2>
+    <p>검증된 인물·사건·장소 데이터가 등록되기 전에는 다른 생존기의 세계 탐색 데이터를 현재 기록으로 표시하지 않습니다.</p>
+  </section>
+}
+
 export function ArchiveApp() {
   const [selectedId, setSelectedId] = useState('char-jinwoo')
   const [graphRootId, setGraphRootId] = useState('char-jinwoo')
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<'all' | ArchiveNodeType>('all')
   const [recentIds, setRecentIds] = useState<string[]>([])
-  const [viewMode, setViewMode] = useState<'story' | 'archive'>('story')
+  const [viewMode, setViewMode] = useState<'story' | 'archive' | 'past'>('archive')
+  const [readerChronicleId, setReaderChronicleId] = useState<ChronicleId>(activeChronicle.id)
 
   const selected = nodeById.get(selectedId) ?? archiveNodes[0]
   const graphRoot = nodeById.get(graphRootId) ?? selected
@@ -406,6 +438,11 @@ export function ArchiveApp() {
     setViewMode('archive')
   }
 
+  function openReader(chronicleId: ChronicleId) {
+    setReaderChronicleId(chronicleId)
+    setViewMode('story')
+  }
+
   const filteredNodes = useMemo(() => {
     const needle = query.trim().toLowerCase()
     return archiveNodes.filter((node) => {
@@ -433,38 +470,29 @@ export function ArchiveApp() {
   return (
     <main className="archive-shell">
       <header className="archive-header">
-        <div>
-          <p className="archive-kicker">SURVIVAL DIARY · {archiveMeta.worldline}</p>
-          <h1>{archiveMeta.title}</h1>
-          <p className="archive-header-copy">플레이하면서 발견한 세계를 읽고, 연결을 펼쳐가며 탐색하는 기록 열람기.</p>
+        <div className="archive-brand">
+          <p className="archive-kicker">SURVIVAL DIARY IP · {activeChronicle.label}</p>
+          <h1>생존일기 <span>ARCHIVE</span></h1>
         </div>
-        <div className="archive-header-actions">
-          <span className="archive-exit archive-exit-static">READ ONLY</span>
-          <div className="archive-runtime">
-            <span>{archiveMeta.season}</span>
-            <strong>{archiveMeta.gameTime}</strong>
-            <small>save v{archiveMeta.saveVersion}</small>
-          </div>
-        </div>
+        <nav className="archive-primary-nav" aria-label="주요 탐색">
+          <button className={viewMode === 'archive' ? 'active' : ''} onClick={() => setViewMode('archive')}>세계 탐색</button>
+          <button className="primary" onClick={() => openReader(activeChronicle.id)}>생존일기 원문 읽기</button>
+          <button className={viewMode === 'past' ? 'active' : ''} onClick={() => setViewMode('past')}>지난 생존기</button>
+        </nav>
       </header>
 
-      <nav className="archive-mode-nav" aria-label="아카이브 보기 방식">
-        <button className={viewMode === 'story' ? 'active' : ''} onClick={() => setViewMode('story')}>
-          <span>01</span>
-          <strong>작품 읽기</strong>
-          <small>처음 방문자용 Chronicle</small>
-        </button>
-        <button className={viewMode === 'archive' ? 'active' : ''} onClick={() => setViewMode('archive')}>
-          <span>02</span>
-          <strong>세계 탐색</strong>
-          <small>위키 · 관계망 · 타임라인</small>
-        </button>
-      </nav>
-
       {viewMode === 'story' ? (
-        <StoryReader onOpenNode={openStoryNode} />
-      ) : (
+        <StoryReader chronicleId={readerChronicleId} onOpenNode={openStoryNode} onOpenExplorer={() => setViewMode('archive')} />
+      ) : viewMode === 'past' ? (
+        <PastChronicles onOpenReader={openReader} />
+      ) : activeChronicle.id === 'C03-AFTERFALL' ? (
         <>
+      <section className="archive-intro">
+        <p className="archive-eyebrow">C03 AFTERFALL · 서진우 · 공개 기록</p>
+        <h2>먼저 세계를 탐색하세요.</h2>
+        <p>인물, 장소, 사건과 관계를 따라가고, 현재 생존기의 공개 기록 상태를 확인할 수 있습니다.</p>
+        <button onClick={() => openReader(activeChronicle.id)}>현재 생존기 원문 상태 →</button>
+      </section>
       <section className="archive-toolbar">
         <label className="archive-search">
           <span>통합검색</span>
@@ -592,11 +620,13 @@ export function ArchiveApp() {
       </section>
 
         </>
+      ) : (
+        <CurrentExplorerUnavailable />
       )}
 
       <footer className="archive-footer">
         <p>Archive policy: {archiveMeta.visibility} · {archiveMeta.syncPolicy}</p>
-        <p>읽기 전용 V3 · Chronicle / Archive · 숨은 플롯과 GM 전용 상태는 표시하지 않습니다.</p>
+        <p>읽기 전용 V4 · {activeChronicle.label} namespace · 숨은 플롯과 GM 전용 상태는 표시하지 않습니다.</p>
       </footer>
     </main>
   )
