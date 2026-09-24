@@ -47,16 +47,18 @@ function MessageBody({ content }: { content: string }) {
 
 function TranscriptBody({ part }: { part: TranscriptPart }) {
   if (part.status === 'missing_transcript') return <section className="missing-transcript" aria-label="원문 미확보 구간"><p className="reader-status">MISSING TRANSCRIPT</p><h2>이 구간의 공개 원문은 아직 아카이브에 백필되지 않았습니다.</h2><p>정본 요약·체크포인트·운영 기록을 실제 USER/GM 대화로 재구성하지 않습니다.</p><p className="reader-source">기록 위치: {part.source}</p></section>
+  if (part.status === 'verified_fragment') return <section className="transcript-fragment" aria-label="검증된 원문 조각"><p className="reader-status">VERIFIED FRAGMENT · 현재 확인된 원문 일부</p><p>이 출처에서 문자 그대로 확인된 공개 기록만 보입니다. 누락된 GM 장면과 구간은 채우지 않았습니다.</p><pre>{part.content}</pre></section>
   return <div className="transcript-flow">{messagesFromRaw(part.content ?? '').map((message, index) => <section key={index} className={'transcript-message transcript-' + message.role}><p className="transcript-role">{message.label}</p><MessageBody content={message.content} /></section>)}</div>
 }
 
 export function StoryReader({ chronicleId, onOpenNode, onOpenExplorer }: { chronicleId: ChronicleId; onOpenNode: (id: string) => void; onOpenExplorer: () => void }) {
   const chronicle = getChronicle(chronicleId)
   const chronicleParts = useMemo(() => transcriptPartsFor(chronicleId), [chronicleId])
-  const [seasonId, setSeasonId] = useState<'S01' | 'S02'>(chronicleParts[0]?.seasonId ?? 'S01')
+  const [seasonId, setSeasonId] = useState(chronicleParts[0]?.seasonId ?? 'S01')
   const [selectedId, setSelectedId] = useState(chronicleParts[0]?.id ?? '')
   const [progress, setProgress] = useState(0)
   const parts = chronicleParts.filter((part) => part.seasonId === seasonId)
+  const seasonIds = Array.from(new Set(chronicleParts.map((part) => part.seasonId)))
   const selected = chronicleParts.find((part) => part.id === selectedId) ?? chronicleParts[0]
   const globalIndex = selected ? chronicleParts.findIndex((part) => part.id === selected.id) : -1
   const previous = globalIndex > 0 ? chronicleParts[globalIndex - 1] : null
@@ -94,14 +96,14 @@ export function StoryReader({ chronicleId, onOpenNode, onOpenExplorer }: { chron
     <aside className="reader-toc">
       <p className="archive-eyebrow">{chronicle.label}</p><h2>{chronicle.isActive ? '현재 생존기' : '지난 생존기'} 원문</h2><p>{chronicle.availabilityNote}</p>
       <button className="reader-home" onClick={() => openPart(chronicleParts[0])}>{chronicle.isActive ? '현재 기록 상태 보기' : 'Season 1부터 읽기'}</button>
-      <div className="reader-season-tabs" role="tablist" aria-label="시즌 선택">{(['S01', 'S02'] as const).filter((id) => chronicleParts.some((part) => part.seasonId === id)).map((id) => <button key={id} className={seasonId === id ? 'active' : ''} onClick={() => openPart(chronicleParts.find((part) => part.seasonId === id) ?? chronicleParts[0])}>{id}</button>)}</div>
-      <nav className="reader-part-list" aria-label="원문 목차">{parts.map((part) => <button key={part.id} className={selected.id === part.id ? 'selected' : ''} onClick={() => openPart(part)}><span>{part.status === 'verified_transcript' ? '원문' : '미확보'}</span><strong>{part.number ? `PART ${String(part.number).padStart(3, '0')}` : 'GAP'}</strong><small>{part.title}</small></button>)}</nav>
+      <div className="reader-season-tabs" role="tablist" aria-label="시즌 선택">{seasonIds.map((id) => <button key={id} className={seasonId === id ? 'active' : ''} onClick={() => openPart(chronicleParts.find((part) => part.seasonId === id) ?? chronicleParts[0])}>{id}</button>)}</div>
+      <nav className="reader-part-list" aria-label="원문 목차">{parts.map((part) => <button key={part.id} className={selected.id === part.id ? 'selected' : ''} onClick={() => openPart(part)}><span>{part.status === 'verified_transcript' ? '원문' : part.status === 'verified_fragment' ? '일부' : '미확보'}</span><strong>{part.number ? `PART ${String(part.number).padStart(3, '0')}` : 'GAP'}</strong><small>{part.title}</small></button>)}</nav>
     </aside>
     <article className="transcript-reader">
-      <header className="reader-header"><div><p className="archive-eyebrow">{selected.seasonId} · {chronicle.label} · {selected.status === 'verified_transcript' ? 'VERIFIED TRANSCRIPT' : 'MISSING TRANSCRIPT'}</p><h1>{selected.title}</h1><p>{selected.range}</p></div><div className="reader-progress" aria-label={'읽기 진행률 ' + progress + '%'}><strong>{progress}%</strong><span><i style={{ width: progress + '%' }} /></span></div></header>
-      <aside className="reader-integrity-note"><strong>{selected.status === 'verified_transcript' ? '검증 원문' : '원문 미확보'}</strong><p>{selected.status === 'verified_transcript' ? '실제 USER/GM 공개 메시지의 순서와 내용을 보존합니다. 표시 형식만 읽기 쉽게 바꿉니다.' : '이 빈 구간은 정본 요약이나 이벤트 기록으로 대사를 만들지 않습니다.'}</p><small>Source · {selected.source}</small></aside>
+      <header className="reader-header"><div><p className="archive-eyebrow">{selected.seasonId} · {chronicle.label} · {selected.status === 'verified_transcript' ? 'VERIFIED TRANSCRIPT' : selected.status === 'verified_fragment' ? 'VERIFIED FRAGMENT' : 'MISSING TRANSCRIPT'}</p><h1>{selected.title}</h1><p>{selected.range}</p></div><div className="reader-progress" aria-label={'읽기 진행률 ' + progress + '%'}><strong>{progress}%</strong><span><i style={{ width: progress + '%' }} /></span></div></header>
+      <aside className="reader-integrity-note"><strong>{selected.status === 'verified_transcript' ? '검증 원문' : selected.status === 'verified_fragment' ? '검증된 원문 일부' : '원문 미확보'}</strong><p>{selected.status === 'verified_transcript' ? '실제 USER/GM 공개 메시지의 순서와 내용을 보존합니다. 표시 형식만 읽기 쉽게 바꿉니다.' : selected.status === 'verified_fragment' ? '실제 공개 텍스트가 확인된 일부만 보존합니다. 빠진 USER/GM 원문은 보완하지 않습니다.' : '이 빈 구간은 정본 요약이나 이벤트 기록으로 대사를 만들지 않습니다.'}</p><small>Source · {selected.source}</small></aside>
       <TranscriptBody part={selected} />
-      {showC03CanonSummary && <section className="canon-summary" aria-label="정본 요약"><p className="reader-status">정본 요약 · 원문과 별도</p><h2>{seasonSummaries[selected.seasonId].title}</h2><p>{seasonSummaries[selected.seasonId].description}</p></section>}
+      {showC03CanonSummary && selected.seasonId in seasonSummaries && <section className="canon-summary" aria-label="정본 요약"><p className="reader-status">정본 요약 · 원문과 별도</p><h2>{seasonSummaries[selected.seasonId as keyof typeof seasonSummaries].title}</h2><p>{seasonSummaries[selected.seasonId as keyof typeof seasonSummaries].description}</p></section>}
       {selected.relatedNodeIds.length > 0 && <section className="reader-related"><p className="archive-eyebrow">세계 탐색</p><h2>관련 인물·장소</h2><div>{selected.relatedNodeIds.map((id) => { const node = archiveNodeById.get(id); return node ? <button key={id} onClick={() => onOpenNode(id)}><strong>{node.label}</strong><span>{node.subtitle}</span></button> : null })}</div><button className="reader-world-link" onClick={onOpenExplorer}>세계 탐색으로 돌아가기</button></section>}
       <nav className="reader-pager" aria-label="원문 이동">{previous ? <button onClick={() => openPart(previous)}>← {previous.title}</button> : <span />}{next ? <button onClick={() => openPart(next)}>다음 · {next.title} →</button> : <span />}</nav>
     </article>

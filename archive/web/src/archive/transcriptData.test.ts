@@ -35,8 +35,11 @@ describe('Chronicle-isolated public transcript catalog', () => {
     expect(c01.flatMap((part) => part.relatedNodeIds).some((id) => c03EntityIds.has(id))).toBe(false)
   })
 
-  it('keeps C02 as metadata-only until a verified public transcript exists', () => {
-    expect(chronicles.find((chronicle) => chronicle.id === 'C02-STRONGHOLD')).toMatchObject({ transcriptStatus: 'backfill_required' })
-    expect(transcriptPartsFor('C02-STRONGHOLD')).toHaveLength(0)
+  it('publishes C02 literal USER fragments without promoting them to complete transcript', () => {
+    const c02 = transcriptPartsFor('C02-STRONGHOLD')
+    expect(chronicles.find((chronicle) => chronicle.id === 'C02-STRONGHOLD')).toMatchObject({ transcriptStatus: 'partial' })
+    expect(c02).toHaveLength(3)
+    expect(c02.every((part) => part.status === 'verified_fragment' && part.source.startsWith('worldlines/STRONGHOLD/raw_transcript/') && part.contentFormat === 'raw_fragment' && Boolean(part.content?.trim()))).toBe(true)
+    expect(c02.every((part) => part.relatedNodeIds.length === 0)).toBe(true)
   })
 })

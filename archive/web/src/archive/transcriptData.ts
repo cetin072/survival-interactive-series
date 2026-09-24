@@ -8,9 +8,12 @@ import c01S01Part7 from '../../../content/transcripts/C01-HAN-JUNHO/S01/PART_007
 import c01S01Part8 from '../../../content/transcripts/C01-HAN-JUNHO/S01/PART_008.md?raw'
 import c01S01Part9 from '../../../content/transcripts/C01-HAN-JUNHO/S01/PART_009.md?raw'
 import c01S02Part1 from '../../../content/transcripts/C01-HAN-JUNHO/S02/PART_001.md?raw'
+import c02Fragment2032 from '../../../content/transcripts/C02-STRONGHOLD/FRAGMENTS/RAW_2032_03_TO_2032_09_PARTIAL_01.md?raw'
+import c02Fragment2038 from '../../../content/transcripts/C02-STRONGHOLD/FRAGMENTS/RAW_2032_09_TO_2038_04_PARTIAL_01.md?raw'
+import c02Fragment2039 from '../../../content/transcripts/C02-STRONGHOLD/FRAGMENTS/RAW_2038_05_TO_2039_12_PARTIAL_01.md?raw'
 
 export type ChronicleId = 'C01-HAN-JUNHO' | 'C02-STRONGHOLD' | 'C03-AFTERFALL'
-export type TranscriptStatus = 'verified_transcript' | 'missing_transcript'
+export type TranscriptStatus = 'verified_transcript' | 'verified_fragment' | 'missing_transcript'
 export type ChronicleTranscriptStatus = 'available' | 'partial' | 'backfill_required'
 
 export type Chronicle = {
@@ -30,7 +33,7 @@ export type TranscriptPart = {
   ipId: 'survival-diary'
   chronicleId: ChronicleId
   worldlineId: string
-  seasonId: 'S01' | 'S02'
+  seasonId: string
   number: number
   title: string
   range: string
@@ -39,11 +42,12 @@ export type TranscriptPart = {
   sourceVerified: boolean
   relatedNodeIds: string[]
   content?: string
+  contentFormat?: 'conversation' | 'raw_fragment'
 }
 
 export const chronicles: Chronicle[] = [
   { id: 'C01-HAN-JUNHO', ipId: 'survival-diary', label: 'C01 · 한준호', protagonist: '한준호', worldlineId: 'CANON-V2', isActive: false, transcriptStatus: 'partial', sourceRoot: 'seasons_v2', availabilityNote: 'S01 원문 9개와 S02 후반부 1개가 검증되어 있습니다. S02 초반은 원문 미확보입니다.' },
-  { id: 'C02-STRONGHOLD', ipId: 'survival-diary', label: 'C02 · 박도현', protagonist: '박도현', worldlineId: 'STRONGHOLD', isActive: false, transcriptStatus: 'backfill_required', sourceRoot: 'worldlines/STRONGHOLD', availabilityNote: '공개 원문은 아직 BACKFILL REQUIRED 상태입니다. 운영용 Canon과 요약을 원문으로 대체하지 않습니다.' },
+  { id: 'C02-STRONGHOLD', ipId: 'survival-diary', label: 'C02 · 박도현', protagonist: '박도현', worldlineId: 'STRONGHOLD', isActive: false, transcriptStatus: 'partial', sourceRoot: 'worldlines/STRONGHOLD', availabilityNote: '세 시기의 USER 공개 원문 일부가 검증되어 있습니다. GM 공개 장면과 나머지 구간은 BACKFILL REQUIRED입니다.' },
   { id: 'C03-AFTERFALL', ipId: 'survival-diary', label: 'C03 AFTERFALL · 서진우', protagonist: '서진우', worldlineId: 'AFTERFALL', isActive: true, transcriptStatus: 'backfill_required', sourceRoot: 'worldlines/AFTERFALL', availabilityNote: '현재 생존기의 S01 공개 원문은 BACKFILL REQUIRED 상태입니다. 정본 요약은 원문과 분리해 표시합니다.' },
 ]
 
@@ -51,6 +55,7 @@ export const activeChronicle = chronicles.find((chronicle) => chronicle.isActive
 export function getChronicle(id: ChronicleId) { return chronicles.find((chronicle) => chronicle.id === id)! }
 
 const c01 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' | 'relatedNodeIds'>): TranscriptPart => ({ ...part, ipId: 'survival-diary', chronicleId: 'C01-HAN-JUNHO', worldlineId: 'CANON-V2', relatedNodeIds: [] })
+const c02 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' | 'relatedNodeIds'>): TranscriptPart => ({ ...part, ipId: 'survival-diary', chronicleId: 'C02-STRONGHOLD', worldlineId: 'STRONGHOLD', relatedNodeIds: [] })
 
 export const transcriptParts: TranscriptPart[] = [
   c01({ id: 'c01-s01-001', seasonId: 'S01', number: 1, title: '부팅과 첫 장면', range: 'Canon v2 부팅 → 19:01 농로 위기', status: 'verified_transcript', source: 'seasons_v2/S01/raw_transcript/PART_001.md', sourceVerified: true, content: c01S01Part1 }),
@@ -64,6 +69,9 @@ export const transcriptParts: TranscriptPart[] = [
   c01({ id: 'c01-s01-009', seasonId: 'S01', number: 9, title: '첫해의 끝', range: '지역 생활서비스 → S01 종료', status: 'verified_transcript', source: 'seasons_v2/S01/raw_transcript/PART_009.md', sourceVerified: true, content: c01S01Part9 }),
   c01({ id: 'c01-s02-missing', seasonId: 'S02', number: 0, title: '시즌 초반~선택 54', range: 'S02 시작 → SEASON 02 · 54 선택지', status: 'missing_transcript', source: 'seasons_v2/S02/raw_transcript/INDEX.md', sourceVerified: true }),
   c01({ id: 'c01-s02-001', seasonId: 'S02', number: 1, title: '선택 54 이후', range: '도심 아파트 정리 → S02 종료 결정', status: 'verified_transcript', source: 'seasons_v2/S02/raw_transcript/PART_001.md', sourceVerified: true, content: c01S02Part1 }),
+  c02({ id: 'c02-2032-03-fragment', seasonId: '2032-03~09', number: 1, title: '산업단지 사고 이후', range: '2032-03 → 2032-09 · USER 공개 입력 일부', status: 'verified_fragment', source: 'worldlines/STRONGHOLD/raw_transcript/RAW_2032_03_TO_2032_09_PARTIAL_01.md', sourceVerified: true, content: c02Fragment2032, contentFormat: 'raw_fragment' }),
+  c02({ id: 'c02-2032-09-fragment', seasonId: '2032-09~2038-04', number: 1, title: '기록·신원 붕괴 이후', range: '2032-09 → 2038-04 · USER 공개 입력 일부', status: 'verified_fragment', source: 'worldlines/STRONGHOLD/raw_transcript/RAW_2032_09_TO_2038_04_PARTIAL_01.md', sourceVerified: true, content: c02Fragment2038, contentFormat: 'raw_fragment' }),
+  c02({ id: 'c02-2038-05-fragment', seasonId: '2038-05~2039-12', number: 1, title: '이상 일사와 기록현실', range: '2038-05 → 2039-12 · USER 공개 입력·종료 피드백 일부', status: 'verified_fragment', source: 'worldlines/STRONGHOLD/raw_transcript/RAW_2038_05_TO_2039_12_PARTIAL_01.md', sourceVerified: true, content: c02Fragment2039, contentFormat: 'raw_fragment' }),
   { id: 'c03-s01-missing', ipId: 'survival-diary', chronicleId: 'C03-AFTERFALL', worldlineId: 'AFTERFALL', seasonId: 'S01', number: 0, title: 'Season 1 공개 원문', range: 'C03 AFTERFALL · S01', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/INDEX.md', sourceVerified: false, relatedNodeIds: [] },
 ]
 
