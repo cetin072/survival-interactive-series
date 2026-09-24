@@ -171,6 +171,10 @@ AFTERFALL의 세션 운영 규칙은:
 `worldlines/AFTERFALL/PLAY_SESSION_PROTOCOL_V1.md`
 를 따른다.
 
+새 원문은 `survival_rpg.transcript_messages`에 먼저 append-only로 보관할 수
+있다. 이 저장은 Archive publication이나 Canon 확정이 아니며, 실행 절차와
+보안 경계는 `docs/RAW_ROLLING_CAPTURE_V1.md`를 따른다.
+
 ## 10. Transcript Publication Rule
 
 Archive의 공개 원문은 VERIFIED_TRANSCRIPT만 원문으로 표시한다.
