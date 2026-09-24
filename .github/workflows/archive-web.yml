@@ -1,0 +1,33 @@
+name: Validate survival diary archive
+
+on:
+  pull_request:
+    paths:
+      - 'archive/web/**'
+      - '.github/workflows/archive-web.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'archive/web/**'
+      - '.github/workflows/archive-web.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: archive/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: archive/web/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Build
+        run: npm run build

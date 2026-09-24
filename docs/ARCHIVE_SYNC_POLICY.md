@@ -94,9 +94,9 @@ V1:
 
 ## 7. 현재 구현 위치
 
-- Web entry: engine/web/src/App.tsx → #archive
-- Archive UI: engine/web/src/archive/ArchiveApp.tsx
-- Player-safe snapshot: engine/web/src/archive/archiveData.ts
-- Styles: engine/web/src/archive/archive.css
+- Web entry: archive/web/src/App.tsx → standalone Archive
+- Archive UI: archive/web/src/archive/ArchiveApp.tsx
+- Player-safe snapshot: archive/web/src/archive/archiveData.ts
+- Styles: archive/web/src/archive/archive.css
 
 향후 자동화가 충분히 안정되기 전까지는 PLAYER_SAFE snapshot을 명시적으로 생성해 배포한다.

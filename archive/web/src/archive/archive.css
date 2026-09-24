@@ -634,3 +634,5 @@
     display: grid;
   }
 }
+
+.archive-exit-static { cursor: default; }

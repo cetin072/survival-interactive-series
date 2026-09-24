@@ -208,7 +208,7 @@ export function ArchiveApp() {
           <p className="archive-header-copy">플레이하면서 발견한 세계를 읽고, 연결을 따라 들어가는 기록 열람기.</p>
         </div>
         <div className="archive-header-actions">
-          <a href="#" className="archive-exit">게임 화면</a>
+          <span className="archive-exit archive-exit-static">READ ONLY</span>
           <div className="archive-runtime">
             <span>{archiveMeta.season}</span>
             <strong>{archiveMeta.gameTime}</strong>
