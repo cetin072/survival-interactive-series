@@ -5,6 +5,8 @@ Status: **AUTHORITATIVE GM RUNTIME LOADING RULE**
 목적:
 > GM이 더 많은 정보를 읽는 것이 아니라, **현재 장면에 필요한 정보만 짧고 구조적으로 읽고 서사·판단에 집중**하게 한다.
 
+라이브 본편 생성은 `get_scene_context()`를 우선한다. `get_gm_context()`는 감사·디버깅·기획 점검용 확장 컨텍스트다.
+
 이 문서는 World/Character Bible의 대체물이 아니다.
 Bible은 설계 정본이고, 이 문서는 실제 플레이 직전의 로딩·갱신 규칙이다.
 
@@ -110,7 +112,7 @@ WARNING은 현재 선택에 영향을 주는 경우에만 처리한다.
 예: 핵심 4인 장면
 
 ```sql
-select survival_rpg.get_gm_context(
+select survival_rpg.get_scene_context(
   'AFTERFALL',
   array['서진우','윤서진','최은채','장태훈'],
   3
@@ -120,7 +122,7 @@ select survival_rpg.get_gm_context(
 예: 겨울 생활·음식 협업 장면
 
 ```sql
-select survival_rpg.get_gm_context(
+select survival_rpg.get_scene_context(
   'AFTERFALL',
   array['서진우','신하영','최유진','최은채','장태훈'],
   3
@@ -129,6 +131,8 @@ select survival_rpg.get_gm_context(
 
 `p_character_ids = null`은 PLAYER + CORE + MAJOR_RECURRING 전체를 가져오는 기획/점검용이다.
 정상 장면에서는 필요한 인물만 지정한다.
+
+`get_scene_context()`는 라이브 장면용으로 제작 메타를 덜어낸 경량 컨텍스트다. 시즌번호·세이브버전·메타 이벤트 캐시를 기본 payload로 넘기지 않는다.
 
 ---
 
@@ -397,12 +401,9 @@ GitHub Canon 승격 조건:
 
 **GM이 더 잘 놀기 위해서다.**
 
-
-## In-World Language Hard Gate
-- 본편 서술·대사·HUD에는 제작 메타 용어를 쓰지 않는다.
-- 특히 다음 문자열은 본편 출력 직전 금지어로 검사한다: `시즌1`, `시즌 1`, `S1`, `S01`, `시즌2`, `시즌 2`, `S2`, `S02`.
-- 과거 사건을 참조할 때 메타 분류명을 그대로 말하지 말고 세계 안의 시간언어로 변환한다.
-  - 예: `시즌1 병원에서` → `병원에 있던 시절`, `사태 초기에 병원에서`, `응급실에서 버티던 때`.
-- 사용자가 명시적으로 OOC/기획 대화를 요청한 경우에만 시즌·세이브·캐논 등의 메타 용어를 사용할 수 있다.
-- **출력 직전 self-check:** 본편 문장에 위 금지 문자열이 하나라도 남아 있으면 전송하지 말고 in-world 표현으로 다시 쓴다.
-- 이 가드는 내용 생성 규칙보다 마지막 단계에 적용한다. 과거 기록·DB·GitHub에 메타 이름이 있어도 플레이어 출력으로 복사하지 않는다.
+## Live Narration Architecture
+- **Scene generation:** `get_scene_context()`
+- **Audit / debugging / planning:** `get_gm_context()`
+- **Deep history:** 필요한 경우에만 `scenes → events` 순서로 조회
+- 라이브 장면 입력에 제작 메타를 섞지 않는 것이 우선이며, 매 출력마다 별도 금지어 검사를 돌리지 않는다.
+- 과거 사건을 현재 장면에 사용할 때는 사실만 회수한다. 저장소의 시즌명·이벤트 분류명·기획 문구를 장면 문장으로 복사하지 않는다.
