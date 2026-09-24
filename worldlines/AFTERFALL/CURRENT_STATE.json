@@ -41,5 +41,6 @@
   "save_version_anchor": 210,
   "current_scene": "WINTER_RELATIONSHIP_RECLASSIFICATION_AND_EXTERNAL_NODE_DECAY",
   "active_arc": "WINTER_LONG_ARC_V2",
-  "winter_arc_plan": "worldlines/AFTERFALL/seasons/S02/WINTER_LONG_ARC_V2.md"
+  "winter_arc_plan": "worldlines/AFTERFALL/seasons/S02/WINTER_LONG_ARC_V2.md",
+  "play_session_protocol": "worldlines/AFTERFALL/PLAY_SESSION_PROTOCOL_V1.md"
 }
