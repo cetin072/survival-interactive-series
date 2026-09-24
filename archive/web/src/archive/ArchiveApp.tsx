@@ -9,6 +9,7 @@ import {
   type ArchiveNode,
   type ArchiveNodeType,
 } from './archiveData'
+import { StoryReader } from './StoryReader'
 import './archive.css'
 
 const typeLabel: Record<ArchiveNodeType, string> = {
@@ -355,6 +356,7 @@ export function ArchiveApp() {
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<'all' | ArchiveNodeType>('all')
   const [recentIds, setRecentIds] = useState<string[]>([])
+  const [viewMode, setViewMode] = useState<'story' | 'archive'>('story')
 
   const selected = nodeById.get(selectedId) ?? archiveNodes[0]
   const graphRoot = nodeById.get(graphRootId) ?? selected
@@ -394,6 +396,14 @@ export function ArchiveApp() {
     setSelectedId(id)
     setGraphRootId(id)
     rememberNode(id)
+  }
+
+  function openStoryNode(id: string) {
+    if (!nodeById.has(id)) return
+    setSelectedId(id)
+    setGraphRootId(id)
+    rememberNode(id)
+    setViewMode('archive')
   }
 
   const filteredNodes = useMemo(() => {
@@ -438,6 +448,23 @@ export function ArchiveApp() {
         </div>
       </header>
 
+      <nav className="archive-mode-nav" aria-label="아카이브 보기 방식">
+        <button className={viewMode === 'story' ? 'active' : ''} onClick={() => setViewMode('story')}>
+          <span>01</span>
+          <strong>작품 읽기</strong>
+          <small>처음 방문자용 Chronicle</small>
+        </button>
+        <button className={viewMode === 'archive' ? 'active' : ''} onClick={() => setViewMode('archive')}>
+          <span>02</span>
+          <strong>세계 탐색</strong>
+          <small>위키 · 관계망 · 타임라인</small>
+        </button>
+      </nav>
+
+      {viewMode === 'story' ? (
+        <StoryReader onOpenNode={openStoryNode} />
+      ) : (
+        <>
       <section className="archive-toolbar">
         <label className="archive-search">
           <span>통합검색</span>
@@ -564,9 +591,12 @@ export function ArchiveApp() {
         </section>
       </section>
 
+        </>
+      )}
+
       <footer className="archive-footer">
         <p>Archive policy: {archiveMeta.visibility} · {archiveMeta.syncPolicy}</p>
-        <p>읽기 전용 V2 · 숨은 플롯과 GM 전용 상태는 표시하지 않습니다.</p>
+        <p>읽기 전용 V3 · Chronicle / Archive · 숨은 플롯과 GM 전용 상태는 표시하지 않습니다.</p>
       </footer>
     </main>
   )
