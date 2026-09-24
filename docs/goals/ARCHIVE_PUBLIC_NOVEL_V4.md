@@ -45,8 +45,12 @@ fact source when the two differ.
 ## Acceptance criteria
 
 - World exploration is the default landing view and the transcript CTA is visible.
-- C03 transcript parts render completely; unverified S02 periods are visibly
-  missing rather than reconstructed.
+- C01 한준호 기록은 `seasons_v2/**`에서 검증한 S01 9개와 S02 후반 1개만
+  원문으로 읽을 수 있고, S02 초반 공백은 명시한다.
+- C02 박도현 / STRONGHOLD는 검증 원문이 확보되기 전까지 metadata-only 카드로
+  표시한다.
+- 현재 생존기 C03 AFTERFALL / 서진우의 S01은 `worldlines/AFTERFALL/**`
+  원문 backfill 전까지 `MISSING TRANSCRIPT`와 별도 정본 요약으로만 표시한다.
 - Reader state survives a world-explorer round trip.
 - Graph behavior and newest-first timeline remain available.
 - The application builds without exposing private data.
@@ -54,7 +58,8 @@ fact source when the two differ.
 ## Test plan
 
 - Typecheck and production build.
-- Static transcript-data assertions for source attribution and gaps.
+- Static transcript-data assertions for the exact C01/C02/C03 source-root map,
+  gaps, and Chronicle-to-entity isolation.
 - Browser responsive and visual review of explorer and reader.
 - Confirm no diff in `engine/web`.
 

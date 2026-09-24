@@ -214,6 +214,10 @@ Archive의 최상위 정보모델은 단일 Worldline이 아니다.
   구간을 보완하는 데 사용하지 않는다.
 - 원문 reader record는 chronicleId, worldlineId, seasonId, source,
   sourceVerified를 가져야 한다.
+- 공개 source-root 매핑은 고정한다: `seasons_v2/**`는 C01 한준호,
+  `worldlines/STRONGHOLD/**`는 C02 박도현, `worldlines/AFTERFALL/**`는
+  C03 서진우만 가리킨다. 이 경계를 넘는 entity edge와 transcript 연결은
+  허용하지 않는다.
 - `verified transcript`, `canon narrative summary`, `missing transcript`는
   데이터와 화면에서 모두 구분한다. 원문 미확보 구간은 정본·이벤트·기억을
   이용해 USER/GM 대사로 재구성하지 않는다.

@@ -1,21 +1,42 @@
 import { describe, expect, it } from 'vitest'
-import { activeChronicle, transcriptParts } from './transcriptData'
+import { archiveNodes } from './archiveData'
+import { activeChronicle, chronicles, transcriptParts, transcriptPartsFor } from './transcriptData'
 
-describe('C03 public transcript catalog', () => {
-  it('keeps every reader record inside the active C03 AFTERFALL namespace', () => {
-    expect(activeChronicle.id).toBe('C03-AFTERFALL')
-    expect(transcriptParts.every((part) => part.chronicleId === activeChronicle.id && part.worldlineId === 'AFTERFALL')).toBe(true)
+describe('Chronicle-isolated public transcript catalog', () => {
+  it('keeps the source-root to Chronicle mapping exact', () => {
+    expect(chronicles.map(({ id, sourceRoot }) => [id, sourceRoot])).toEqual([
+      ['C01-HAN-JUNHO', 'seasons_v2'],
+      ['C02-STRONGHOLD', 'worldlines/STRONGHOLD'],
+      ['C03-AFTERFALL', 'worldlines/AFTERFALL'],
+    ])
+    expect(transcriptPartsFor('C01-HAN-JUNHO').every((part) => part.source.startsWith('seasons_v2/'))).toBe(true)
+    expect(transcriptPartsFor('C03-AFTERFALL').every((part) => part.source.startsWith('worldlines/AFTERFALL/'))).toBe(true)
   })
 
-  it('marks unverified S02 history as a gap rather than supplying invented dialogue', () => {
-    const gap = transcriptParts.find((part) => part.id === 'c03-s02-missing')
-    expect(gap).toMatchObject({ status: 'missing_transcript', sourceVerified: true })
-    expect(gap?.content).toBeUndefined()
+  it('publishes only C01 raw records that were verified, with the known S02 gap explicit', () => {
+    const c01 = transcriptPartsFor('C01-HAN-JUNHO')
+    expect(c01.filter((part) => part.status === 'verified_transcript')).toHaveLength(10)
+    expect(c01.find((part) => part.id === 'c01-s02-missing')).toMatchObject({ status: 'missing_transcript', sourceVerified: true })
+    expect(c01.filter((part) => part.status === 'verified_transcript').every((part) => Boolean(part.content?.trim()))).toBe(true)
   })
 
-  it('only renders sourced, non-empty records as verified transcript', () => {
-    const verified = transcriptParts.filter((part) => part.status === 'verified_transcript')
-    expect(verified).toHaveLength(10)
-    expect(verified.every((part) => part.source.startsWith('seasons_v2/') && Boolean(part.content?.trim()))).toBe(true)
+  it('does not treat C03 Canon as transcript while AFTERFALL raw backfill is unavailable', () => {
+    expect(activeChronicle).toMatchObject({ id: 'C03-AFTERFALL', isActive: true, transcriptStatus: 'backfill_required' })
+    const c03 = transcriptPartsFor('C03-AFTERFALL')
+    expect(c03).toHaveLength(1)
+    expect(c03[0]).toMatchObject({ id: 'c03-s01-missing', status: 'missing_transcript' })
+    expect(c03[0]?.content).toBeUndefined()
+  })
+
+  it('does not attach C01 transcript records to C03 graph entities', () => {
+    const c01 = transcriptPartsFor('C01-HAN-JUNHO')
+    const c03EntityIds = new Set(archiveNodes.map((node) => node.id))
+    expect(c01.every((part) => part.relatedNodeIds.length === 0)).toBe(true)
+    expect(c01.flatMap((part) => part.relatedNodeIds).some((id) => c03EntityIds.has(id))).toBe(false)
+  })
+
+  it('keeps C02 as metadata-only until a verified public transcript exists', () => {
+    expect(chronicles.find((chronicle) => chronicle.id === 'C02-STRONGHOLD')).toMatchObject({ transcriptStatus: 'backfill_required' })
+    expect(transcriptPartsFor('C02-STRONGHOLD')).toHaveLength(0)
   })
 })
