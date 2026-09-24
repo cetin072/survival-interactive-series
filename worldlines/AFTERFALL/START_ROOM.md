@@ -21,7 +21,7 @@ Status: **PRIMARY ENTRYPOINT**
 8. `CURRENT_STATE.json`
 9. CURRENT_STATE가 지정한 current season checkpoint
 10. `check_runtime_consistency('AFTERFALL')`
-11. 장면 관련 인물을 지정한 `get_gm_context`
+11. 장면 관련 인물을 지정한 `get_scene_context`
 12. 필요할 때만 과거 scenes / events
 
 ## Hard guard
@@ -43,7 +43,8 @@ Save status가 `ACTIVE`이면:
 - `CURRENT_STATE.json`이 가리키는 최신 checkpoint를 읽는다.
 - Character / World Bible과 `GM_CONTEXT_V1.md`를 적용한다.
 - consistency 결과가 깨끗한지 먼저 확인한다.
-- 현재 장면의 등장인물을 추려 `get_gm_context`만 우선 읽는다.
+- 현재 장면의 등장인물을 추려 `get_scene_context`를 우선 읽는다.
+- `get_gm_context`는 감사·디버깅·기획 점검이 필요할 때만 사용한다.
 - 과거 세부가 필요할 때만 scenes → events 순으로 내려간다.
 - 오래된 START_HANDOFF나 전체 RAW를 현재상태처럼 다시 적용하지 않는다.
 
