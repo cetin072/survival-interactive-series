@@ -177,11 +177,16 @@ Archive의 공개 원문은 VERIFIED_TRANSCRIPT만 원문으로 표시한다.
 
 구분:
 - VERIFIED_TRANSCRIPT
+- VERIFIED_FRAGMENT
 - CANON_SUMMARY
 - MISSING_TRANSCRIPT
 - SUPERSEDED
 
 원문이 확보되지 않은 구간을 Canon 요약이나 기억으로 대사화해 원문처럼 게시하지 않는다.
+
+`VERIFIED_FRAGMENT`는 출처에서 문자 그대로 확인한 공개 USER/GM 텍스트가
+일부만 남은 경우다. Reader는 이를 완결 원문으로 승격하지 않고, 누락 구간과
+확인 범위를 함께 표시한다.
 
 ## 11. Chronicle Scope
 
