@@ -1,0 +1,3 @@
+Survival Diary Archive sync marker.
+AFTERFALL save revision 214; checkpoint revision 211.
+PLAYER_SAFE publication audit.
