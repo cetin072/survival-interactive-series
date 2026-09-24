@@ -12,7 +12,7 @@ import c02Fragment2032 from '../../../content/transcripts/C02-STRONGHOLD/FRAGMEN
 import c02Fragment2038 from '../../../content/transcripts/C02-STRONGHOLD/FRAGMENTS/RAW_2032_09_TO_2038_04_PARTIAL_01.md?raw'
 import c02Fragment2039 from '../../../content/transcripts/C02-STRONGHOLD/FRAGMENTS/RAW_2038_05_TO_2039_12_PARTIAL_01.md?raw'
 
-export type ChronicleId = 'C01-HAN-JUNHO' | 'C02-STRONGHOLD' | 'C03-AFTERFALL'
+export type ChronicleId = string
 export type TranscriptStatus = 'verified_transcript' | 'verified_fragment' | 'missing_transcript'
 export type ChronicleTranscriptStatus = 'available' | 'partial' | 'backfill_required'
 
@@ -24,7 +24,7 @@ export type Chronicle = {
   worldlineId: string
   isActive: boolean
   transcriptStatus: ChronicleTranscriptStatus
-  sourceRoot: 'seasons_v2' | 'worldlines/STRONGHOLD' | 'worldlines/AFTERFALL'
+  sourceRoot: string
   availabilityNote: string
 }
 
@@ -51,8 +51,19 @@ export const chronicles: Chronicle[] = [
   { id: 'C03-AFTERFALL', ipId: 'survival-diary', label: 'C03 AFTERFALL · 서진우', protagonist: '서진우', worldlineId: 'AFTERFALL', isActive: true, transcriptStatus: 'backfill_required', sourceRoot: 'worldlines/AFTERFALL', availabilityNote: '현재 생존기의 S01 공개 원문은 BACKFILL REQUIRED 상태입니다. 정본 요약은 원문과 분리해 표시합니다.' },
 ]
 
-export const activeChronicle = chronicles.find((chronicle) => chronicle.isActive)!
-export function getChronicle(id: ChronicleId) { return chronicles.find((chronicle) => chronicle.id === id)! }
+export function partitionChronicles(registry: Chronicle[] = chronicles) {
+  const active = registry.filter((chronicle) => chronicle.isActive)
+  if (active.length !== 1) throw new Error('Chronicle registry must have exactly one active record.')
+  return { active: active[0], past: registry.filter((chronicle) => !chronicle.isActive) }
+}
+
+export const { active: activeChronicle, past: pastChronicles } = partitionChronicles()
+
+export function getChronicle(id: ChronicleId) {
+  const chronicle = chronicles.find((item) => item.id === id)
+  if (!chronicle) throw new Error('Unknown Chronicle: ' + id)
+  return chronicle
+}
 
 const c01 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' | 'relatedNodeIds'>): TranscriptPart => ({ ...part, ipId: 'survival-diary', chronicleId: 'C01-HAN-JUNHO', worldlineId: 'CANON-V2', relatedNodeIds: [] })
 const c02 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' | 'relatedNodeIds'>): TranscriptPart => ({ ...part, ipId: 'survival-diary', chronicleId: 'C02-STRONGHOLD', worldlineId: 'STRONGHOLD', relatedNodeIds: [] })
