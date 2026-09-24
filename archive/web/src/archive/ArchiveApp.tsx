@@ -373,6 +373,14 @@ function PastChronicles({ onOpenReader }: { onOpenReader: (id: ChronicleId) => v
   </section>
 }
 
+function CurrentExplorerUnavailable() {
+  return <section className="archive-intro">
+    <p className="archive-eyebrow">{activeChronicle.label} · 공개 기록</p>
+    <h2>현재 생존기의 세계 탐색을 준비하고 있습니다.</h2>
+    <p>검증된 인물·사건·장소 데이터가 등록되기 전에는 다른 생존기의 세계 탐색 데이터를 현재 기록으로 표시하지 않습니다.</p>
+  </section>
+}
+
 export function ArchiveApp() {
   const [selectedId, setSelectedId] = useState('char-jinwoo')
   const [graphRootId, setGraphRootId] = useState('char-jinwoo')
@@ -463,7 +471,7 @@ export function ArchiveApp() {
     <main className="archive-shell">
       <header className="archive-header">
         <div className="archive-brand">
-          <p className="archive-kicker">SURVIVAL DIARY IP · C03 AFTERFALL</p>
+          <p className="archive-kicker">SURVIVAL DIARY IP · {activeChronicle.label}</p>
           <h1>생존일기 <span>ARCHIVE</span></h1>
         </div>
         <nav className="archive-primary-nav" aria-label="주요 탐색">
@@ -477,7 +485,7 @@ export function ArchiveApp() {
         <StoryReader chronicleId={readerChronicleId} onOpenNode={openStoryNode} onOpenExplorer={() => setViewMode('archive')} />
       ) : viewMode === 'past' ? (
         <PastChronicles onOpenReader={openReader} />
-      ) : (
+      ) : activeChronicle.id === 'C03-AFTERFALL' ? (
         <>
       <section className="archive-intro">
         <p className="archive-eyebrow">C03 AFTERFALL · 서진우 · 공개 기록</p>
@@ -612,11 +620,13 @@ export function ArchiveApp() {
       </section>
 
         </>
+      ) : (
+        <CurrentExplorerUnavailable />
       )}
 
       <footer className="archive-footer">
         <p>Archive policy: {archiveMeta.visibility} · {archiveMeta.syncPolicy}</p>
-        <p>읽기 전용 V4 · C03 AFTERFALL namespace · 숨은 플롯과 GM 전용 상태는 표시하지 않습니다.</p>
+        <p>읽기 전용 V4 · {activeChronicle.label} namespace · 숨은 플롯과 GM 전용 상태는 표시하지 않습니다.</p>
       </footer>
     </main>
   )

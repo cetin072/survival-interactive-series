@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { archiveNodes } from './archiveData'
 import { seasonSummaries } from './storyData'
-import { activeChronicle, getChronicle, transcriptPartsFor, type ChronicleId, type TranscriptPart } from './transcriptData'
+import { getChronicle, transcriptPartsFor, type ChronicleId, type TranscriptPart } from './transcriptData'
 
 const PROGRESS_KEY = 'survival-diary-archive:reader-progress:v4'
 const archiveNodeById = new Map(archiveNodes.map((node) => [node.id, node]))
@@ -89,7 +89,7 @@ export function StoryReader({ chronicleId, onOpenNode, onOpenExplorer }: { chron
   function openPart(part: TranscriptPart) { setSelectedId(part.id); setSeasonId(part.seasonId); window.scrollTo({ top: 0, behavior: 'smooth' }) }
   if (!selected) return null
 
-  const showC03CanonSummary = chronicle.id === activeChronicle.id
+  const showC03CanonSummary = chronicle.id === 'C03-AFTERFALL'
   return <section className="reader-page">
     <aside className="reader-toc">
       <p className="archive-eyebrow">{chronicle.label}</p><h2>{chronicle.isActive ? '현재 생존기' : '지난 생존기'} 원문</h2><p>{chronicle.availabilityNote}</p>
