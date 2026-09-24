@@ -136,7 +136,6 @@ V1:
 
 향후 자동화가 충분히 안정되기 전까지는 PLAYER_SAFE snapshot을 명시적으로 생성해 배포한다.
 
-
 ## 8. 공개 URL 운영 원칙
 
 공개 주소는 고정한다.
@@ -202,3 +201,21 @@ Survival Diary IP
 - Protagonist 서진우
 
 다른 Chronicle/Worldline의 Canon을 섞지 않는다.
+
+## 12. Public Novel / Chronicle hierarchy (V4)
+
+Archive의 최상위 정보모델은 단일 Worldline이 아니다.
+
+`Survival Diary IP → Chronicle → Worldline → Season → content record`
+
+- 현재 활성 namespace는 `C03 AFTERFALL / 서진우`다.
+- C01, C02를 포함한 다른 Chronicle은 확인된 공개 기록만 각각의 namespace에
+  저장한다. 서로 다른 Chronicle의 Canon, 관계, 요약, transcript를 섞거나 빈
+  구간을 보완하는 데 사용하지 않는다.
+- 원문 reader record는 chronicleId, worldlineId, seasonId, source,
+  sourceVerified를 가져야 한다.
+- `verified transcript`, `canon narrative summary`, `missing transcript`는
+  데이터와 화면에서 모두 구분한다. 원문 미확보 구간은 정본·이벤트·기억을
+  이용해 USER/GM 대사로 재구성하지 않는다.
+- 공개 원문은 Raw Archive 정책의 금지 항목을 다시 포함하지 않으며, 정적
+  Archive frontend는 Supabase에 직접 연결하지 않는다.

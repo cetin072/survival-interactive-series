@@ -356,7 +356,7 @@ export function ArchiveApp() {
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<'all' | ArchiveNodeType>('all')
   const [recentIds, setRecentIds] = useState<string[]>([])
-  const [viewMode, setViewMode] = useState<'story' | 'archive'>('story')
+  const [viewMode, setViewMode] = useState<'story' | 'archive'>('archive')
 
   const selected = nodeById.get(selectedId) ?? archiveNodes[0]
   const graphRoot = nodeById.get(graphRootId) ?? selected
@@ -433,38 +433,26 @@ export function ArchiveApp() {
   return (
     <main className="archive-shell">
       <header className="archive-header">
-        <div>
-          <p className="archive-kicker">SURVIVAL DIARY · {archiveMeta.worldline}</p>
-          <h1>{archiveMeta.title}</h1>
-          <p className="archive-header-copy">플레이하면서 발견한 세계를 읽고, 연결을 펼쳐가며 탐색하는 기록 열람기.</p>
+        <div className="archive-brand">
+          <p className="archive-kicker">SURVIVAL DIARY IP · C03 AFTERFALL</p>
+          <h1>생존일기 <span>ARCHIVE</span></h1>
         </div>
-        <div className="archive-header-actions">
-          <span className="archive-exit archive-exit-static">READ ONLY</span>
-          <div className="archive-runtime">
-            <span>{archiveMeta.season}</span>
-            <strong>{archiveMeta.gameTime}</strong>
-            <small>save v{archiveMeta.saveVersion}</small>
-          </div>
-        </div>
+        <nav className="archive-primary-nav" aria-label="주요 탐색">
+          <button className={viewMode === 'archive' ? 'active' : ''} onClick={() => setViewMode('archive')}>세계 탐색</button>
+          <button className="primary" onClick={() => setViewMode('story')}>생존일기 원문 읽기</button>
+        </nav>
       </header>
 
-      <nav className="archive-mode-nav" aria-label="아카이브 보기 방식">
-        <button className={viewMode === 'story' ? 'active' : ''} onClick={() => setViewMode('story')}>
-          <span>01</span>
-          <strong>작품 읽기</strong>
-          <small>처음 방문자용 Chronicle</small>
-        </button>
-        <button className={viewMode === 'archive' ? 'active' : ''} onClick={() => setViewMode('archive')}>
-          <span>02</span>
-          <strong>세계 탐색</strong>
-          <small>위키 · 관계망 · 타임라인</small>
-        </button>
-      </nav>
-
       {viewMode === 'story' ? (
-        <StoryReader onOpenNode={openStoryNode} />
+        <StoryReader onOpenNode={openStoryNode} onOpenExplorer={() => setViewMode('archive')} />
       ) : (
         <>
+      <section className="archive-intro">
+        <p className="archive-eyebrow">C03 AFTERFALL · 서진우 · 공개 기록</p>
+        <h2>먼저 세계를 탐색하세요.</h2>
+        <p>인물, 장소, 사건과 관계를 따라가고, 실제 선택이 남긴 원문 기록을 읽을 수 있습니다.</p>
+        <button onClick={() => setViewMode('story')}>Season 1 원문부터 읽기 →</button>
+      </section>
       <section className="archive-toolbar">
         <label className="archive-search">
           <span>통합검색</span>
@@ -596,7 +584,7 @@ export function ArchiveApp() {
 
       <footer className="archive-footer">
         <p>Archive policy: {archiveMeta.visibility} · {archiveMeta.syncPolicy}</p>
-        <p>읽기 전용 V3 · Chronicle / Archive · 숨은 플롯과 GM 전용 상태는 표시하지 않습니다.</p>
+        <p>읽기 전용 V4 · C03 AFTERFALL namespace · 숨은 플롯과 GM 전용 상태는 표시하지 않습니다.</p>
       </footer>
     </main>
   )
