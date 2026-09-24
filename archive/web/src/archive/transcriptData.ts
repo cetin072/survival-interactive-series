@@ -64,7 +64,7 @@ export const transcriptParts: TranscriptPart[] = [
   c01({ id: 'c01-s01-009', seasonId: 'S01', number: 9, title: '첫해의 끝', range: '지역 생활서비스 → S01 종료', status: 'verified_transcript', source: 'seasons_v2/S01/raw_transcript/PART_009.md', sourceVerified: true, content: c01S01Part9 }),
   c01({ id: 'c01-s02-missing', seasonId: 'S02', number: 0, title: '시즌 초반~선택 54', range: 'S02 시작 → SEASON 02 · 54 선택지', status: 'missing_transcript', source: 'seasons_v2/S02/raw_transcript/INDEX.md', sourceVerified: true }),
   c01({ id: 'c01-s02-001', seasonId: 'S02', number: 1, title: '선택 54 이후', range: '도심 아파트 정리 → S02 종료 결정', status: 'verified_transcript', source: 'seasons_v2/S02/raw_transcript/PART_001.md', sourceVerified: true, content: c01S02Part1 }),
-  { id: 'c03-s01-missing', ipId: 'survival-diary', chronicleId: 'C03-AFTERFALL', worldlineId: 'AFTERFALL', seasonId: 'S01', number: 0, title: 'Season 1 공개 원문', range: 'C03 AFTERFALL · S01', status: 'missing_transcript', source: 'worldlines/AFTERFALL/raw_transcript/INDEX.md', sourceVerified: false, relatedNodeIds: [] },
+  { id: 'c03-s01-missing', ipId: 'survival-diary', chronicleId: 'C03-AFTERFALL', worldlineId: 'AFTERFALL', seasonId: 'S01', number: 0, title: 'Season 1 공개 원문', range: 'C03 AFTERFALL · S01', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/INDEX.md', sourceVerified: false, relatedNodeIds: [] },
 ]
 
 export function transcriptPartsFor(chronicleId: ChronicleId) { return transcriptParts.filter((part) => part.chronicleId === chronicleId) }
