@@ -24,7 +24,7 @@ Status: **AUTHORITATIVE**
 11. `CURRENT_STATE.json`
 12. CURRENT_STATE가 지정한 최신 season checkpoint
 13. Supabase `check_runtime_consistency('AFTERFALL')`
-14. 장면 관련 인물만 지정해 `get_gm_context('AFTERFALL', ...)`
+14. 장면 관련 인물만 지정해 `get_scene_context('AFTERFALL', ...)`
 
 새 채팅에서 worldline identity가 애매하면 repository root의 `SURVIVAL_DIARY_IP_BIBLE.md`와 `WORLDLINE_ROUTER.md`를 먼저 확인한다.
 
@@ -61,7 +61,7 @@ Save status가 `PREPLAY_READY`이면:
 
 ## 5. 턴 처리
 1. 새 장면/큰 전환이면 `check_runtime_consistency` 확인
-2. 장면 관련 인물만 골라 `get_gm_context` 로드
+2. 장면 관련 인물만 골라 `get_scene_context` 로드
 3. 큰 시간점프/날짜경계면 World Tick checklist 확인
 4. 플레이어 행동 의미 잠금
 5. 현재 상태에서 결과 판정
@@ -164,7 +164,7 @@ Save / CURRENT_STATE가 S02 ACTIVE 또는 이후 진행상태이면 PREPLAY 캐�
 5. `CURRENT_STATE.json`
 6. CURRENT_STATE가 지정한 최신 season checkpoint
 7. Supabase `check_runtime_consistency('AFTERFALL')`
-8. 장면 관련 인물만 지정한 `get_gm_context`
+8. 장면 관련 인물만 지정한 `get_scene_context`
 
 현재 S02에서는:
 - `seasons/S02/START_HANDOFF.md` = 시즌 시작 역사자료
@@ -188,12 +188,9 @@ S01 `ARC_ARCHIVE.md`와 `FEEDBACK.md`는 세부 검증이 필요할 때만 선�
 - 유사한 하늘색/이상광 같은 모티프는 가능하지만 재난 원인과 플레이 경험은 독립적으로 유지한다.
 - 별도의 명시적 기획 결정 전에는 worldline crossover를 비활성 상태로 유지한다.
 
-
-## In-World Language Hard Gate
-- 본편 서술·대사·HUD에는 제작 메타 용어를 쓰지 않는다.
-- 특히 다음 문자열은 본편 출력 직전 금지어로 검사한다: `시즌1`, `시즌 1`, `S1`, `S01`, `시즌2`, `시즌 2`, `S2`, `S02`.
-- 과거 사건을 참조할 때 메타 분류명을 그대로 말하지 말고 세계 안의 시간언어로 변환한다.
-  - 예: `시즌1 병원에서` → `병원에 있던 시절`, `사태 초기에 병원에서`, `응급실에서 버티던 때`.
-- 사용자가 명시적으로 OOC/기획 대화를 요청한 경우에만 시즌·세이브·캐논 등의 메타 용어를 사용할 수 있다.
-- **출력 직전 self-check:** 본편 문장에 위 금지 문자열이 하나라도 남아 있으면 전송하지 말고 in-world 표현으로 다시 쓴다.
-- 이 가드는 내용 생성 규칙보다 마지막 단계에 적용한다. 과거 기록·DB·GitHub에 메타 이름이 있어도 플레이어 출력으로 복사하지 않는다.
+## 16. Live Scene Context Boundary
+- 실제 본편 장면 생성의 기본 입력은 Supabase `get_scene_context()`다.
+- `get_scene_context()`는 장면에 필요한 세계상태·Pressure·NPC 카드·최근 장면만 제공하고 시즌번호, 세이브버전, 제작용 상태명, recent meta/event cache 같은 제작 메타를 기본 입력에서 제외한다.
+- `get_gm_context()`는 연속성 감사·기획 점검·디버깅용이며 본편 문장을 직접 만드는 기본 입력으로 사용하지 않는다.
+- 과거 `events`는 세부 사실 확인이 필요할 때만 별도 조회하며, 저장된 메타 분류명이나 문장을 본편 표현으로 재사용하지 않는다.
+- 출력 후 금지어 스캔을 상시 수행하지 않는다. 몰입 언어는 **검수보다 입력 분리로 보장**한다.
