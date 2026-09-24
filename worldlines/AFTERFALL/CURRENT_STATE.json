@@ -25,8 +25,8 @@
   },
   "season": 2,
   "phase": "S02_ACTIVE_FRACTURE",
-  "game_time_anchor": "2026-11-24 09:10",
-  "current_checkpoint": "worldlines/AFTERFALL/seasons/S02/CURRENT_CHECKPOINT.md",
+  "game_time_anchor": "2026-12-10 17:40",
+  "current_checkpoint": "worldlines/AFTERFALL/seasons/S02/CURRENT_CHECKPOINT_2026-12-10.md",
   "season_start_handoff": "worldlines/AFTERFALL/seasons/S02/START_HANDOFF.md",
   "character_bible": "worldlines/AFTERFALL/CHARACTER_BIBLE.md",
   "world_bible": "worldlines/AFTERFALL/WORLD_BIBLE.md",
@@ -34,9 +34,10 @@
   "previous_archive": "worldlines/AFTERFALL/seasons/S01/ARC_ARCHIVE.md",
   "raw_policy": "S01 RAW is BACKFILL REQUIRED and must not be reconstructed from memory.",
   "spoiler_policy": "Do not reveal future season 2 plot, losses, relationship changes, collapse trigger, or disaster mechanism before they occur in play.",
-  "note": "Winter arc rebooted at 2026-11-24 09:10. 신하영·최유진 lead winter living operations; core four support. Superseded winterization timeline must not be replayed as canon.",
+  "note": "Winter long arc active at 2026-12-10 17:40. Theme: maintain the surrounding living world under prolonged extreme cold; isolation and living-network decay are the main pressure. 2026-12-05 seven-person emergency council and two-base mutual backup are canon.",
   "gm_context_rules": "worldlines/AFTERFALL/GM_CONTEXT_V1.md",
-  "save_version_anchor": 205,
-  "current_scene": "WINTER_REBOOT_HAYOUNG_YUJIN_LEAD",
-  "active_arc": "WINTER_REBOOT_V2"
+  "save_version_anchor": 206,
+  "current_scene": "WINTER_NETWORK_ISOLATION_EARLY_SIGNS",
+  "active_arc": "WINTER_LONG_ARC_V2",
+  "winter_arc_plan": "worldlines/AFTERFALL/seasons/S02/WINTER_LONG_ARC_V2.md"
 }
