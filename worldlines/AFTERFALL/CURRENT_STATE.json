@@ -16,7 +16,9 @@
     "pressures": "world_pressures",
     "scenes": "scenes",
     "clocks": "clocks",
-    "world_ticks": "world_ticks"
+    "world_ticks": "world_ticks",
+    "scene_context_function": "get_scene_context",
+    "live_narration_context": "scene_context"
   },
   "protagonist": {
     "name": "서진우",
@@ -34,9 +36,9 @@
   "previous_archive": "worldlines/AFTERFALL/seasons/S01/ARC_ARCHIVE.md",
   "raw_policy": "S01 RAW is BACKFILL REQUIRED and must not be reconstructed from memory.",
   "spoiler_policy": "Do not reveal future season 2 plot, losses, relationship changes, collapse trigger, or disaster mechanism before they occur in play.",
-  "note": "Winter long arc active. Two bases remain relatively stable from early preparation while surrounding living networks degrade. Survival-first protagonist rule and relationship reclassification are active.",
+  "note": "Winter long arc active. Live narration uses a lightweight scene context; full GM context is reserved for continuity audit and planning.",
   "gm_context_rules": "worldlines/AFTERFALL/GM_CONTEXT_V1.md",
-  "save_version_anchor": 206,
+  "save_version_anchor": 210,
   "current_scene": "WINTER_RELATIONSHIP_RECLASSIFICATION_AND_EXTERNAL_NODE_DECAY",
   "active_arc": "WINTER_LONG_ARC_V2",
   "winter_arc_plan": "worldlines/AFTERFALL/seasons/S02/WINTER_LONG_ARC_V2.md"
