@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
+import { archiveNodes } from './archiveData'
 import { chronicleChapters, seasonSummaries, type ChronicleChapter } from './storyData'
 
 const STORY_PROGRESS_KEY = 'survival-diary-archive:story-progress'
+const archiveNodeById = new Map(archiveNodes.map((node) => [node.id, node]))
 
 function statusLabel(status: ChronicleChapter['status']) {
   if (status === 'VERBATIM_PARTIAL') return '정본 서사 · 원문 일부 회수'
@@ -128,11 +130,17 @@ export function StoryReader({
             <p className="archive-eyebrow">RELATED ARCHIVE</p>
             <h2>이 장면의 인물·장소·사건</h2>
             <div>
-              {selected.relatedNodeIds.map((id) => (
-                <button key={id} onClick={() => onOpenNode(id)}>
-                  Archive에서 보기 →
-                </button>
-              ))}
+              {selected.relatedNodeIds.map((id) => {
+                const node = archiveNodeById.get(id)
+                if (!node) return null
+                return (
+                  <button key={id} onClick={() => onOpenNode(id)}>
+                    <strong>{node.label}</strong>
+                    <span>{node.subtitle}</span>
+                    <small>Archive →</small>
+                  </button>
+                )
+              })}
             </div>
           </section>
         )}
