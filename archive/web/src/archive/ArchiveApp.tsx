@@ -10,7 +10,7 @@ import {
   type ArchiveNodeType,
 } from './archiveData'
 import { StoryReader } from './StoryReader'
-import { activeChronicle, chronicles, type ChronicleId } from './transcriptData'
+import { activeChronicle, getChronicle, pastChronicles, transcriptPartsFor, type ChronicleId } from './transcriptData'
 import './archive.css'
 
 const typeLabel: Record<ArchiveNodeType, string> = {
@@ -25,6 +25,36 @@ const nodeById = new Map(archiveNodes.map((node) => [node.id, node]))
 const RECENT_KEY = 'survival-diary-archive:recent'
 const MAX_GRAPH_NODES = 28
 const MAX_GRAPH_DEPTH = 3
+const GRAPH_WIDTH = 920
+const GRAPH_HEIGHT = 660
+
+type ArchiveView = 'story' | 'archive' | 'past'
+
+function readRoute() {
+  const params = new URLSearchParams(window.location.search)
+  const chronicleId = params.get('chronicle')
+  const chronicle = chronicleId ? (() => {
+    try { return getChronicle(chronicleId) } catch { return activeChronicle }
+  })() : activeChronicle
+  return {
+    view: params.get('view') === 'past' ? 'past' : params.get('view') === 'reader' || chronicleId ? 'story' : 'archive' as ArchiveView,
+    chronicleId: chronicle.id,
+    partId: params.get('part') ?? undefined,
+  }
+}
+
+function writeRoute(view: ArchiveView, chronicleId = activeChronicle.id, partId?: string, replace = false) {
+  const url = new URL(window.location.href)
+  url.search = ''
+  if (view === 'story') {
+    url.searchParams.set('view', 'reader')
+    url.searchParams.set('chronicle', chronicleId)
+    if (partId) url.searchParams.set('part', partId)
+  } else if (view === 'past') {
+    url.searchParams.set('view', 'past')
+  }
+  window.history[replace ? 'replaceState' : 'pushState']({}, '', url)
+}
 
 type Neighbor = {
   node: ArchiveNode
@@ -133,6 +163,8 @@ function GraphExplorer({
   onFocusRoot: (id: string) => void
 }) {
   const [expandedIds, setExpandedIds] = useState<string[]>([root.id])
+  const [zoom, setZoom] = useState(1)
+  const [isExpanded, setIsExpanded] = useState(false)
   const [typeVisibility, setTypeVisibility] = useState<GraphTypeVisibility>({
     character: true,
     location: true,
@@ -142,6 +174,7 @@ function GraphExplorer({
 
   useEffect(() => {
     setExpandedIds([root.id])
+    setZoom(1)
   }, [root.id])
 
   const graph = useMemo(
@@ -172,8 +205,17 @@ function GraphExplorer({
     setTypeVisibility((current) => ({ ...current, [type]: !current[type] }))
   }
 
+  const viewportWidth = GRAPH_WIDTH / zoom
+  const viewportHeight = GRAPH_HEIGHT / zoom
+  const viewBox = [
+    (GRAPH_WIDTH - viewportWidth) / 2,
+    (GRAPH_HEIGHT - viewportHeight) / 2,
+    viewportWidth,
+    viewportHeight,
+  ].join(' ')
+
   return (
-    <section className="archive-panel graph-panel" aria-label="연결 그래프">
+    <section className={'archive-panel graph-panel' + (isExpanded ? ' graph-expanded' : '')} aria-label="연결 그래프">
       <div className="panel-heading graph-heading">
         <div>
           <p className="archive-eyebrow">NODE EXPLORER · EXPANDABLE</p>
@@ -182,6 +224,11 @@ function GraphExplorer({
         <div className="graph-heading-meta">
           <span>{graph.visibleIds.length} nodes</span>
           <button onClick={() => setExpandedIds([root.id])}>초기화</button>
+          <button onClick={() => setZoom((current) => Math.max(0.8, Number((current - 0.2).toFixed(1))))} aria-label="그래프 축소">−</button>
+          <button onClick={() => setZoom((current) => Math.min(1.8, Number((current + 0.2).toFixed(1))))} aria-label="그래프 확대">+</button>
+          <button className="graph-expand-button" onClick={() => setIsExpanded((current) => !current)} aria-pressed={isExpanded}>
+            {isExpanded ? '기본 보기' : '넓게 보기'}
+          </button>
         </div>
       </div>
 
@@ -196,11 +243,11 @@ function GraphExplorer({
             {typeLabel[type]}
           </button>
         ))}
-        <p>클릭: 펼치기/접기 · 더블클릭: 중심 이동</p>
+        <p>클릭: 펼치기/접기 · 더블클릭: 중심 이동 · 확대/축소 가능</p>
       </div>
 
       <div className="graph-canvas">
-        <svg viewBox="0 0 920 660" role="img" aria-label={root.label + ' 중심 연결 관계'}>
+        <svg viewBox={viewBox} role="img" aria-label={root.label + ' 중심 연결 관계, 확대율 ' + Math.round(zoom * 100) + '%'}>
           {graph.visibleEdges.map((edge, index) => {
             const from = positions.get(edge.from)
             const to = positions.get(edge.to)
@@ -351,6 +398,12 @@ function DetailPanel({
   )
 }
 
+function transcriptCoverage(chronicleId: ChronicleId) {
+  const parts = transcriptPartsFor(chronicleId)
+  const readable = parts.filter((part) => part.status !== 'missing_transcript').length
+  return { readable, total: parts.length }
+}
+
 function PastChronicles({ onOpenReader }: { onOpenReader: (id: ChronicleId) => void }) {
   return <section className="past-chronicles" aria-label="지난 생존기">
     <div className="archive-intro">
@@ -359,13 +412,15 @@ function PastChronicles({ onOpenReader }: { onOpenReader: (id: ChronicleId) => v
       <p>확인된 공개 기록만 각 Chronicle의 경계를 지켜 보관합니다. 현재 생존기의 정본과 인물·사건을 섞지 않습니다.</p>
     </div>
     <div className="past-chronicle-grid">
-      {chronicles.filter((chronicle) => !chronicle.isActive).map((chronicle) => {
+      {pastChronicles.map((chronicle) => {
         const readable = chronicle.transcriptStatus !== 'backfill_required'
+        const coverage = transcriptCoverage(chronicle.id)
         return <article key={chronicle.id} className="archive-panel past-chronicle-card">
-          <p className="archive-eyebrow">지난 생존기 · {chronicle.id.split('-')[0]}</p>
-          <h2>{chronicle.protagonist}</h2>
+          <p className="archive-eyebrow">SURVIVAL DIARY · ARCHIVE EDITION {chronicle.id.slice(1, 3)}</p>
+          <h2>{chronicle.worldlineId}</h2>
+          <strong className="past-chronicle-protagonist">{chronicle.protagonist}의 생존기</strong>
           <p>{chronicle.availabilityNote}</p>
-          <dl className="detail-meta"><div><dt>원문 상태</dt><dd>{chronicle.transcriptStatus === 'partial' ? '일부 검증됨' : 'BACKFILL REQUIRED'}</dd></div><div><dt>검증 경로</dt><dd>{chronicle.sourceRoot}/**</dd></div></dl>
+          <dl className="detail-meta"><div><dt>원문 상태</dt><dd>{chronicle.transcriptStatus === 'partial' ? '일부 검증됨' : 'BACKFILL REQUIRED'}</dd></div><div><dt>확인 범위</dt><dd>{coverage.readable}/{coverage.total || 0} records</dd></div></dl>
           {readable ? <button className="primary" onClick={() => onOpenReader(chronicle.id)}>검증 원문 읽기</button> : <p className="archive-muted">원문이 확보되면 이 카드에서 공개합니다.</p>}
         </article>
       })}
@@ -373,22 +428,24 @@ function PastChronicles({ onOpenReader }: { onOpenReader: (id: ChronicleId) => v
   </section>
 }
 
-function CurrentExplorerUnavailable() {
+function CurrentExplorerUnavailable({ chronicle }: { chronicle: typeof activeChronicle }) {
   return <section className="archive-intro">
-    <p className="archive-eyebrow">{activeChronicle.label} · 공개 기록</p>
+    <p className="archive-eyebrow">현재 생존기 · {chronicle.worldlineId} · 공개 기록</p>
     <h2>현재 생존기의 세계 탐색을 준비하고 있습니다.</h2>
     <p>검증된 인물·사건·장소 데이터가 등록되기 전에는 다른 생존기의 세계 탐색 데이터를 현재 기록으로 표시하지 않습니다.</p>
   </section>
 }
 
 export function ArchiveApp() {
+  const initialRoute = readRoute()
   const [selectedId, setSelectedId] = useState('char-jinwoo')
   const [graphRootId, setGraphRootId] = useState('char-jinwoo')
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<'all' | ArchiveNodeType>('all')
   const [recentIds, setRecentIds] = useState<string[]>([])
-  const [viewMode, setViewMode] = useState<'story' | 'archive' | 'past'>('archive')
-  const [readerChronicleId, setReaderChronicleId] = useState<ChronicleId>(activeChronicle.id)
+  const [viewMode, setViewMode] = useState<ArchiveView>(initialRoute.view)
+  const [readerChronicleId, setReaderChronicleId] = useState<ChronicleId>(initialRoute.chronicleId)
+  const [readerPartId, setReaderPartId] = useState<string | undefined>(initialRoute.partId)
 
   const selected = nodeById.get(selectedId) ?? archiveNodes[0]
   const graphRoot = nodeById.get(graphRootId) ?? selected
@@ -402,6 +459,17 @@ export function ArchiveApp() {
     } catch {
       setRecentIds([])
     }
+  }, [])
+
+  useEffect(() => {
+    const restoreRoute = () => {
+      const route = readRoute()
+      setViewMode(route.view)
+      setReaderChronicleId(route.chronicleId)
+      setReaderPartId(route.partId)
+    }
+    window.addEventListener('popstate', restoreRoute)
+    return () => window.removeEventListener('popstate', restoreRoute)
   }, [])
 
   function rememberNode(id: string) {
@@ -436,11 +504,24 @@ export function ArchiveApp() {
     setGraphRootId(id)
     rememberNode(id)
     setViewMode('archive')
+    writeRoute('archive')
   }
 
-  function openReader(chronicleId: ChronicleId) {
+  function openReader(chronicleId: ChronicleId, partId?: string) {
     setReaderChronicleId(chronicleId)
+    setReaderPartId(partId)
     setViewMode('story')
+    writeRoute('story', chronicleId, partId)
+  }
+
+  function openView(view: Exclude<ArchiveView, 'story'>) {
+    setViewMode(view)
+    writeRoute(view)
+  }
+
+  function updateReaderPart(partId: string) {
+    setReaderPartId(partId)
+    writeRoute('story', readerChronicleId, partId, true)
   }
 
   const filteredNodes = useMemo(() => {
@@ -475,23 +556,26 @@ export function ArchiveApp() {
           <h1>생존일기 <span>ARCHIVE</span></h1>
         </div>
         <nav className="archive-primary-nav" aria-label="주요 탐색">
-          <button className={viewMode === 'archive' ? 'active' : ''} onClick={() => setViewMode('archive')}>세계 탐색</button>
-          <button className="primary" onClick={() => openReader(activeChronicle.id)}>생존일기 원문 읽기</button>
-          <button className={viewMode === 'past' ? 'active' : ''} onClick={() => setViewMode('past')}>지난 생존기</button>
+          <button className={viewMode === 'archive' ? 'active' : ''} onClick={() => openView('archive')}>세계 탐색</button>
+          <button className="primary" onClick={() => openReader(activeChronicle.id)}>원문 읽기</button>
+          <button className={viewMode === 'past' ? 'active' : ''} onClick={() => openView('past')}>지난 생존기</button>
         </nav>
       </header>
 
       {viewMode === 'story' ? (
-        <StoryReader chronicleId={readerChronicleId} onOpenNode={openStoryNode} onOpenExplorer={() => setViewMode('archive')} />
+        <StoryReader chronicleId={readerChronicleId} initialPartId={readerPartId} onPartChange={updateReaderPart} onOpenNode={openStoryNode} onOpenExplorer={() => openView('archive')} />
       ) : viewMode === 'past' ? (
         <PastChronicles onOpenReader={openReader} />
-      ) : activeChronicle.id === 'C03-AFTERFALL' ? (
+      ) : activeChronicle.worldlineId === archiveMeta.worldline ? (
         <>
       <section className="archive-intro">
-        <p className="archive-eyebrow">C03 AFTERFALL · 서진우 · 공개 기록</p>
-        <h2>먼저 세계를 탐색하세요.</h2>
+        <p className="archive-eyebrow">현재 생존기 · {activeChronicle.worldlineId} · 공개 기록</p>
+        <h2>{activeChronicle.worldlineId}<br />{activeChronicle.protagonist}의 생존기</h2>
         <p>인물, 장소, 사건과 관계를 따라가고, 현재 생존기의 공개 기록 상태를 확인할 수 있습니다.</p>
-        <button onClick={() => openReader(activeChronicle.id)}>현재 생존기 원문 상태 →</button>
+        <div className="current-record-meta" aria-label="현재 아카이브 정보">
+          <span>Worldline · {activeChronicle.worldlineId}</span><span>Season · {archiveMeta.season}</span><span>Revision · {archiveMeta.saveVersion}</span><span>원문 · {transcriptCoverage(activeChronicle.id).readable}/{transcriptCoverage(activeChronicle.id).total || 0} records</span>
+        </div>
+        <button onClick={() => openReader(activeChronicle.id)}>원문 읽기 →</button>
       </section>
       <section className="archive-toolbar">
         <label className="archive-search">
@@ -621,12 +705,12 @@ export function ArchiveApp() {
 
         </>
       ) : (
-        <CurrentExplorerUnavailable />
+        <CurrentExplorerUnavailable chronicle={activeChronicle} />
       )}
 
       <footer className="archive-footer">
-        <p>Archive policy: {archiveMeta.visibility} · {archiveMeta.syncPolicy}</p>
-        <p>읽기 전용 V4 · {activeChronicle.label} namespace · 숨은 플롯과 GM 전용 상태는 표시하지 않습니다.</p>
+        <p>Archive policy: {archiveMeta.visibility} · {archiveMeta.syncPolicy} · 기록 시점 {archiveMeta.gameTime}</p>
+        <p>읽기 전용 V5 · 현재 {activeChronicle.worldlineId} · Archive revision {archiveMeta.saveVersion} · 숨은 플롯과 GM 전용 상태는 표시하지 않습니다.</p>
       </footer>
     </main>
   )

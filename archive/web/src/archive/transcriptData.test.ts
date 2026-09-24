@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { archiveNodes } from './archiveData'
-import { activeChronicle, chronicles, transcriptParts, transcriptPartsFor } from './transcriptData'
+import { activeChronicle, chronicles, partitionChronicles, transcriptPartsFor } from './transcriptData'
 
 describe('Chronicle-isolated public transcript catalog', () => {
   it('keeps the source-root to Chronicle mapping exact', () => {
@@ -26,6 +26,17 @@ describe('Chronicle-isolated public transcript catalog', () => {
     expect(c03).toHaveLength(1)
     expect(c03[0]).toMatchObject({ id: 'c03-s01-missing', status: 'missing_transcript' })
     expect(c03[0]?.content).toBeUndefined()
+  })
+
+  it('derives current and past shelves from the registry instead of a fixed Chronicle id', () => {
+    const promotedRegistry = [
+      ...chronicles.map((chronicle) => ({ ...chronicle, isActive: false })),
+      { ...activeChronicle, id: 'C04-NEW', label: 'C04 NEW · 신규 주인공', worldlineId: 'NEW', protagonist: '신규 주인공', isActive: true },
+    ]
+    const partition = partitionChronicles(promotedRegistry)
+    expect(partition.active.id).toBe('C04-NEW')
+    expect(partition.past.map((chronicle) => chronicle.id)).toContain('C03-AFTERFALL')
+    expect(() => partitionChronicles(promotedRegistry.map((chronicle) => ({ ...chronicle, isActive: true })))).toThrow('exactly one active')
   })
 
   it('does not attach C01 transcript records to C03 graph entities', () => {

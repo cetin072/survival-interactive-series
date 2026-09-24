@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { archiveNodes } from './archiveData'
+import { archiveMeta, archiveNodes } from './archiveData'
 import { seasonSummaries } from './storyData'
 import { getChronicle, transcriptPartsFor, type ChronicleId, type TranscriptPart } from './transcriptData'
 
-const PROGRESS_KEY = 'survival-diary-archive:reader-progress:v4'
+const progressKey = (chronicleId: ChronicleId) => 'survival-diary-archive:reader-progress:v5:' + chronicleId
 const archiveNodeById = new Map(archiveNodes.map((node) => [node.id, node]))
 type RawMessage = { role: 'player' | 'gm' | 'system_public'; label: string; content: string }
 
@@ -51,11 +51,12 @@ function TranscriptBody({ part }: { part: TranscriptPart }) {
   return <div className="transcript-flow">{messagesFromRaw(part.content ?? '').map((message, index) => <section key={index} className={'transcript-message transcript-' + message.role}><p className="transcript-role">{message.label}</p><MessageBody content={message.content} /></section>)}</div>
 }
 
-export function StoryReader({ chronicleId, onOpenNode, onOpenExplorer }: { chronicleId: ChronicleId; onOpenNode: (id: string) => void; onOpenExplorer: () => void }) {
+export function StoryReader({ chronicleId, initialPartId, onPartChange, onOpenNode, onOpenExplorer }: { chronicleId: ChronicleId; initialPartId?: string; onPartChange: (partId: string) => void; onOpenNode: (id: string) => void; onOpenExplorer: () => void }) {
   const chronicle = getChronicle(chronicleId)
   const chronicleParts = useMemo(() => transcriptPartsFor(chronicleId), [chronicleId])
-  const [seasonId, setSeasonId] = useState(chronicleParts[0]?.seasonId ?? 'S01')
-  const [selectedId, setSelectedId] = useState(chronicleParts[0]?.id ?? '')
+  const initialPart = chronicleParts.find((part) => part.id === initialPartId) ?? chronicleParts[0]
+  const [seasonId, setSeasonId] = useState(initialPart?.seasonId ?? 'S01')
+  const [selectedId, setSelectedId] = useState(initialPart?.id ?? '')
   const [progress, setProgress] = useState(0)
   const parts = chronicleParts.filter((part) => part.seasonId === seasonId)
   const seasonIds = Array.from(new Set(chronicleParts.map((part) => part.seasonId)))
@@ -65,37 +66,38 @@ export function StoryReader({ chronicleId, onOpenNode, onOpenExplorer }: { chron
   const next = globalIndex >= 0 && globalIndex < chronicleParts.length - 1 ? chronicleParts[globalIndex + 1] : null
 
   useEffect(() => {
-    const first = chronicleParts[0]
-    if (first) { setSelectedId(first.id); setSeasonId(first.seasonId) }
-  }, [chronicleId, chronicleParts])
-
-  useEffect(() => {
     try {
-      const saved = JSON.parse(window.localStorage.getItem(PROGRESS_KEY) ?? '{}') as { partId?: string; scrollY?: number }
-      const savedPart = chronicleParts.find((part) => part.id === saved.partId)
-      if (savedPart) { setSelectedId(savedPart.id); setSeasonId(savedPart.seasonId); requestAnimationFrame(() => window.scrollTo({ top: saved.scrollY ?? 0 })) }
+      const routedPart = chronicleParts.find((part) => part.id === initialPartId)
+      const saved = JSON.parse(window.localStorage.getItem(progressKey(chronicleId)) ?? '{}') as { partId?: string; scrollY?: number }
+      const selectedPart = routedPart ?? chronicleParts.find((part) => part.id === saved.partId) ?? chronicleParts[0]
+      if (selectedPart) {
+        setSelectedId(selectedPart.id)
+        setSeasonId(selectedPart.seasonId)
+        requestAnimationFrame(() => window.scrollTo({ top: routedPart ? 0 : saved.scrollY ?? 0 }))
+      }
     } catch { /* storage is optional */ }
-  }, [chronicleId, chronicleParts])
+  }, [chronicleId, chronicleParts, initialPartId])
 
   useEffect(() => {
     if (!selected) return
     const saveProgress = () => {
       const maximum = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
       setProgress(Math.round((window.scrollY / maximum) * 100))
-      try { window.localStorage.setItem(PROGRESS_KEY, JSON.stringify({ partId: selected.id, scrollY: window.scrollY })) } catch { /* no-op */ }
+      try { window.localStorage.setItem(progressKey(chronicleId), JSON.stringify({ partId: selected.id, scrollY: window.scrollY })) } catch { /* no-op */ }
     }
-    saveProgress(); window.addEventListener('scroll', saveProgress, { passive: true })
+    saveProgress(); onPartChange(selected.id); window.addEventListener('scroll', saveProgress, { passive: true })
     return () => window.removeEventListener('scroll', saveProgress)
-  }, [selected?.id])
+  }, [chronicleId, selected?.id, onPartChange])
 
   function openPart(part: TranscriptPart) { setSelectedId(part.id); setSeasonId(part.seasonId); window.scrollTo({ top: 0, behavior: 'smooth' }) }
   if (!selected) return null
 
-  const showC03CanonSummary = chronicle.id === 'C03-AFTERFALL'
+  const showCanonicalSummary = chronicle.worldlineId === archiveMeta.worldline
   return <section className="reader-page">
     <aside className="reader-toc">
       <p className="archive-eyebrow">{chronicle.label}</p><h2>{chronicle.isActive ? '현재 생존기' : '지난 생존기'} 원문</h2><p>{chronicle.availabilityNote}</p>
-      <button className="reader-home" onClick={() => openPart(chronicleParts[0])}>{chronicle.isActive ? '현재 기록 상태 보기' : 'Season 1부터 읽기'}</button>
+      <button className="reader-home" onClick={() => openPart(chronicleParts[0])}>처음부터 읽기</button>
+      <button className="reader-explorer-link" onClick={onOpenExplorer}>세계 탐색으로 돌아가기</button>
       <div className="reader-season-tabs" role="tablist" aria-label="시즌 선택">{seasonIds.map((id) => <button key={id} className={seasonId === id ? 'active' : ''} onClick={() => openPart(chronicleParts.find((part) => part.seasonId === id) ?? chronicleParts[0])}>{id}</button>)}</div>
       <nav className="reader-part-list" aria-label="원문 목차">{parts.map((part) => <button key={part.id} className={selected.id === part.id ? 'selected' : ''} onClick={() => openPart(part)}><span>{part.status === 'verified_transcript' ? '원문' : part.status === 'verified_fragment' ? '일부' : '미확보'}</span><strong>{part.number ? `PART ${String(part.number).padStart(3, '0')}` : 'GAP'}</strong><small>{part.title}</small></button>)}</nav>
     </aside>
@@ -103,7 +105,7 @@ export function StoryReader({ chronicleId, onOpenNode, onOpenExplorer }: { chron
       <header className="reader-header"><div><p className="archive-eyebrow">{selected.seasonId} · {chronicle.label} · {selected.status === 'verified_transcript' ? 'VERIFIED TRANSCRIPT' : selected.status === 'verified_fragment' ? 'VERIFIED FRAGMENT' : 'MISSING TRANSCRIPT'}</p><h1>{selected.title}</h1><p>{selected.range}</p></div><div className="reader-progress" aria-label={'읽기 진행률 ' + progress + '%'}><strong>{progress}%</strong><span><i style={{ width: progress + '%' }} /></span></div></header>
       <aside className="reader-integrity-note"><strong>{selected.status === 'verified_transcript' ? '검증 원문' : selected.status === 'verified_fragment' ? '검증된 원문 일부' : '원문 미확보'}</strong><p>{selected.status === 'verified_transcript' ? '실제 USER/GM 공개 메시지의 순서와 내용을 보존합니다. 표시 형식만 읽기 쉽게 바꿉니다.' : selected.status === 'verified_fragment' ? '실제 공개 텍스트가 확인된 일부만 보존합니다. 빠진 USER/GM 원문은 보완하지 않습니다.' : '이 빈 구간은 정본 요약이나 이벤트 기록으로 대사를 만들지 않습니다.'}</p><small>Source · {selected.source}</small></aside>
       <TranscriptBody part={selected} />
-      {showC03CanonSummary && selected.seasonId in seasonSummaries && <section className="canon-summary" aria-label="정본 요약"><p className="reader-status">정본 요약 · 원문과 별도</p><h2>{seasonSummaries[selected.seasonId as keyof typeof seasonSummaries].title}</h2><p>{seasonSummaries[selected.seasonId as keyof typeof seasonSummaries].description}</p></section>}
+      {showCanonicalSummary && selected.seasonId in seasonSummaries && <section className="canon-summary" aria-label="정본 요약"><p className="reader-status">정본 요약 · 원문과 별도</p><h2>{seasonSummaries[selected.seasonId as keyof typeof seasonSummaries].title}</h2><p>{seasonSummaries[selected.seasonId as keyof typeof seasonSummaries].description}</p></section>}
       {selected.relatedNodeIds.length > 0 && <section className="reader-related"><p className="archive-eyebrow">세계 탐색</p><h2>관련 인물·장소</h2><div>{selected.relatedNodeIds.map((id) => { const node = archiveNodeById.get(id); return node ? <button key={id} onClick={() => onOpenNode(id)}><strong>{node.label}</strong><span>{node.subtitle}</span></button> : null })}</div><button className="reader-world-link" onClick={onOpenExplorer}>세계 탐색으로 돌아가기</button></section>}
       <nav className="reader-pager" aria-label="원문 이동">{previous ? <button onClick={() => openPart(previous)}>← {previous.title}</button> : <span />}{next ? <button onClick={() => openPart(next)}>다음 · {next.title} →</button> : <span />}</nav>
     </article>
