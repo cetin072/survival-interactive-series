@@ -466,9 +466,9 @@ export const pressureSnapshot = [
 ]
 
 export const eventOrder = [
-  'event-fireline',
-  'event-shelter',
-  'event-wide-area',
-  'event-winter-council',
   'event-network-decay',
+  'event-winter-council',
+  'event-wide-area',
+  'event-shelter',
+  'event-fireline',
 ]

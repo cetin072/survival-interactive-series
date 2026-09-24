@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   archiveEdges,
   archiveMeta,
@@ -18,12 +18,18 @@ const typeLabel: Record<ArchiveNodeType, string> = {
   reference: '자료',
 }
 
+const typeOrder: ArchiveNodeType[] = ['character', 'location', 'event', 'reference']
 const nodeById = new Map(archiveNodes.map((node) => [node.id, node]))
+const RECENT_KEY = 'survival-diary-archive:recent'
+const MAX_GRAPH_NODES = 28
+const MAX_GRAPH_DEPTH = 3
 
 type Neighbor = {
   node: ArchiveNode
   edge: ArchiveEdge
 }
+
+type GraphTypeVisibility = Record<ArchiveNodeType, boolean>
 
 function getNeighbors(id: string): Neighbor[] {
   return archiveEdges.flatMap((edge) => {
@@ -39,98 +45,269 @@ function getNeighbors(id: string): Neighbor[] {
   })
 }
 
+function shorten(label: string, limit = 9) {
+  return label.length > limit ? label.slice(0, limit) + '…' : label
+}
+
+function buildVisibleGraph(
+  rootId: string,
+  expandedIds: string[],
+  typeVisibility: GraphTypeVisibility,
+) {
+  const expanded = new Set(expandedIds)
+  expanded.add(rootId)
+
+  const visibleIds = new Set<string>([rootId])
+  const depths = new Map<string, number>([[rootId, 0]])
+  const queue: Array<{ id: string; depth: number }> = [{ id: rootId, depth: 0 }]
+
+  while (queue.length > 0 && visibleIds.size < MAX_GRAPH_NODES) {
+    const current = queue.shift()
+    if (!current || current.depth >= MAX_GRAPH_DEPTH || !expanded.has(current.id)) continue
+
+    for (const { node } of getNeighbors(current.id)) {
+      if (!typeVisibility[node.type] && node.id !== rootId) continue
+      if (!visibleIds.has(node.id)) {
+        visibleIds.add(node.id)
+        depths.set(node.id, current.depth + 1)
+        if (visibleIds.size >= MAX_GRAPH_NODES) break
+      }
+      if (expanded.has(node.id) && current.depth + 1 < MAX_GRAPH_DEPTH) {
+        queue.push({ id: node.id, depth: current.depth + 1 })
+      }
+    }
+  }
+
+  const visibleEdges = archiveEdges.filter(
+    (edge) =>
+      visibleIds.has(edge.from) &&
+      visibleIds.has(edge.to) &&
+      (expanded.has(edge.from) || expanded.has(edge.to)),
+  )
+
+  return { visibleIds: Array.from(visibleIds), depths, visibleEdges }
+}
+
+function buildPositions(visibleIds: string[], depths: Map<string, number>) {
+  const centerX = 460
+  const centerY = 330
+  const positions = new Map<string, { x: number; y: number }>()
+  const byDepth = new Map<number, string[]>()
+
+  visibleIds.forEach((id) => {
+    const depth = depths.get(id) ?? 0
+    const bucket = byDepth.get(depth) ?? []
+    bucket.push(id)
+    byDepth.set(depth, bucket)
+  })
+
+  positions.set(visibleIds[0], { x: centerX, y: centerY })
+
+  for (const [depth, ids] of byDepth.entries()) {
+    if (depth === 0) continue
+    const radius = depth === 1 ? 175 : depth === 2 ? 270 : 315
+    const offset = -Math.PI / 2 + depth * 0.22
+    ids.forEach((id, index) => {
+      const angle = offset + (Math.PI * 2 * index) / Math.max(ids.length, 1)
+      positions.set(id, {
+        x: centerX + Math.cos(angle) * radius,
+        y: centerY + Math.sin(angle) * radius,
+      })
+    })
+  }
+
+  return positions
+}
+
 function GraphExplorer({
+  root,
   selected,
   onSelect,
+  onFocusRoot,
 }: {
+  root: ArchiveNode
   selected: ArchiveNode
   onSelect: (id: string) => void
+  onFocusRoot: (id: string) => void
 }) {
-  const neighbors = getNeighbors(selected.id)
-  const visible = neighbors.slice(0, 14)
-  const centerX = 360
-  const centerY = 210
-  const radius = visible.length > 9 ? 158 : 148
+  const [expandedIds, setExpandedIds] = useState<string[]>([root.id])
+  const [typeVisibility, setTypeVisibility] = useState<GraphTypeVisibility>({
+    character: true,
+    location: true,
+    event: true,
+    reference: true,
+  })
+
+  useEffect(() => {
+    setExpandedIds([root.id])
+  }, [root.id])
+
+  const graph = useMemo(
+    () => buildVisibleGraph(root.id, expandedIds, typeVisibility),
+    [root.id, expandedIds, typeVisibility],
+  )
+  const positions = useMemo(
+    () => buildPositions(graph.visibleIds, graph.depths),
+    [graph.visibleIds, graph.depths],
+  )
+  const expanded = new Set(expandedIds)
+
+  function toggleNode(id: string) {
+    onSelect(id)
+    if (id === root.id) return
+
+    const hasVisibleNeighbor = getNeighbors(id).some(({ node }) => typeVisibility[node.type])
+    if (!hasVisibleNeighbor) return
+
+    setExpandedIds((current) =>
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id],
+    )
+  }
+
+  function toggleType(type: ArchiveNodeType) {
+    setTypeVisibility((current) => ({ ...current, [type]: !current[type] }))
+  }
 
   return (
     <section className="archive-panel graph-panel" aria-label="연결 그래프">
-      <div className="panel-heading">
+      <div className="panel-heading graph-heading">
         <div>
-          <p className="archive-eyebrow">NODE EXPLORER</p>
+          <p className="archive-eyebrow">NODE EXPLORER · EXPANDABLE</p>
           <h2>연결 따라가기</h2>
         </div>
-        <p className="graph-count">{neighbors.length} connections</p>
+        <div className="graph-heading-meta">
+          <span>{graph.visibleIds.length} nodes</span>
+          <button onClick={() => setExpandedIds([root.id])}>초기화</button>
+        </div>
+      </div>
+
+      <div className="graph-toolbar" aria-label="그래프 노드 종류">
+        {typeOrder.map((type) => (
+          <button
+            key={type}
+            className={typeVisibility[type] ? 'active' : ''}
+            onClick={() => toggleType(type)}
+          >
+            <span className={'type-dot type-dot-' + type} />
+            {typeLabel[type]}
+          </button>
+        ))}
+        <p>클릭: 펼치기/접기 · 더블클릭: 중심 이동</p>
       </div>
 
       <div className="graph-canvas">
-        <svg viewBox="0 0 720 420" role="img" aria-label={selected.label + ' 연결 관계'}>
-          {visible.map(({ node, edge }, index) => {
-            const angle = (Math.PI * 2 * index) / Math.max(visible.length, 1) - Math.PI / 2
-            const x = centerX + Math.cos(angle) * radius
-            const y = centerY + Math.sin(angle) * radius
-            const lineX = (centerX + x) / 2
-            const lineY = (centerY + y) / 2
+        <svg viewBox="0 0 920 660" role="img" aria-label={root.label + ' 중심 연결 관계'}>
+          {graph.visibleEdges.map((edge, index) => {
+            const from = positions.get(edge.from)
+            const to = positions.get(edge.to)
+            if (!from || !to) return null
+            const selectedEdge = edge.from === selected.id || edge.to === selected.id
+            const showLabel = graph.visibleEdges.length <= 10 || selectedEdge
+            const lineX = (from.x + to.x) / 2
+            const lineY = (from.y + to.y) / 2
+
             return (
               <g key={edge.from + edge.to + edge.label + index}>
-                <line className="graph-edge" x1={centerX} y1={centerY} x2={x} y2={y} />
-                <text className="graph-edge-label" x={lineX} y={lineY - 5} textAnchor="middle">
-                  {edge.label.length > 9 ? edge.label.slice(0, 9) + '…' : edge.label}
-                </text>
+                <line
+                  className={'graph-edge' + (selectedEdge ? ' selected-edge' : '')}
+                  x1={from.x}
+                  y1={from.y}
+                  x2={to.x}
+                  y2={to.y}
+                />
+                <title>{edge.label}</title>
+                {showLabel && (
+                  <text className="graph-edge-label" x={lineX} y={lineY - 5} textAnchor="middle">
+                    {shorten(edge.label, 11)}
+                  </text>
+                )}
               </g>
             )
           })}
 
-          {visible.map(({ node }, index) => {
-            const angle = (Math.PI * 2 * index) / Math.max(visible.length, 1) - Math.PI / 2
-            const x = centerX + Math.cos(angle) * radius
-            const y = centerY + Math.sin(angle) * radius
-            const shortLabel = node.label.length > 10 ? node.label.slice(0, 10) + '…' : node.label
+          {graph.visibleIds.map((id) => {
+            const node = nodeById.get(id)
+            const position = positions.get(id)
+            if (!node || !position) return null
+            const isRoot = node.id === root.id
+            const isSelected = node.id === selected.id
+            const isExpanded = expanded.has(node.id) || isRoot
+            const radius = isRoot ? 42 : isSelected ? 34 : 28
+            const expandable = getNeighbors(node.id).some(({ node: neighbor }) => typeVisibility[neighbor.type])
+
             return (
               <g
                 key={node.id}
-                className={'graph-node graph-node-' + node.type}
-                transform={'translate(' + x + ' ' + y + ')'}
+                className={
+                  'graph-node graph-node-' +
+                  node.type +
+                  (isRoot ? ' graph-node-root' : '') +
+                  (isSelected ? ' graph-node-selected' : '')
+                }
+                transform={'translate(' + position.x + ' ' + position.y + ')'}
                 role="button"
                 tabIndex={0}
                 aria-label={node.label + ' 열기'}
-                onClick={() => onSelect(node.id)}
+                onClick={() => toggleNode(node.id)}
+                onDoubleClick={() => onFocusRoot(node.id)}
                 onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') onSelect(node.id)
+                  if (event.key === 'Enter' || event.key === ' ') toggleNode(node.id)
                 }}
               >
-                <circle r="31" />
-                <text y="4" textAnchor="middle">{shortLabel}</text>
+                <title>{node.label + ' · ' + node.subtitle}</title>
+                <circle r={radius} />
+                <text y={isRoot ? -4 : 3} textAnchor="middle">{shorten(node.label, isRoot ? 11 : 8)}</text>
+                {isRoot && <text className="graph-node-type" y="15" textAnchor="middle">{typeLabel[node.type]}</text>}
+                {!isRoot && expandable && (
+                  <text className="graph-expand-mark" y="20" textAnchor="middle">
+                    {isExpanded ? '−' : '+'}
+                  </text>
+                )}
               </g>
             )
           })}
-
-          <g className={'graph-node graph-node-selected graph-node-' + selected.type} transform={'translate(' + centerX + ' ' + centerY + ')'}>
-            <circle r="46" />
-            <text y="-3" textAnchor="middle">{selected.label.length > 10 ? selected.label.slice(0, 10) + '…' : selected.label}</text>
-            <text className="graph-node-type" y="15" textAnchor="middle">{typeLabel[selected.type]}</text>
-          </g>
         </svg>
       </div>
 
-      {neighbors.length > visible.length && (
-        <p className="graph-note">연결이 많아 가까운 {visible.length}개만 표시 중입니다. 상세 연결 목록에서는 모두 볼 수 있습니다.</p>
-      )}
+      <div className="graph-selection-banner">
+        <div>
+          <span>{typeLabel[selected.type]}</span>
+          <strong>{selected.label}</strong>
+        </div>
+        <p>{selected.subtitle}</p>
+        {selected.id !== root.id && (
+          <button onClick={() => onFocusRoot(selected.id)}>이 노드를 중심으로 보기</button>
+        )}
+      </div>
     </section>
   )
 }
 
 function DetailPanel({
   selected,
+  graphRootId,
   onSelect,
+  onFocusRoot,
 }: {
   selected: ArchiveNode
+  graphRootId: string
   onSelect: (id: string) => void
+  onFocusRoot: (id: string) => void
 }) {
   const neighbors = getNeighbors(selected.id)
 
   return (
     <article className="archive-panel detail-panel">
-      <div className="detail-type">{typeLabel[selected.type]}</div>
+      <div className="detail-topline">
+        <div className="detail-type">{typeLabel[selected.type]}</div>
+        {selected.id !== graphRootId && (
+          <button className="detail-focus-button" onClick={() => onFocusRoot(selected.id)}>
+            그래프 중심
+          </button>
+        )}
+      </div>
       <h1>{selected.label}</h1>
       <p className="detail-subtitle">{selected.subtitle}</p>
       <p className="detail-summary">{selected.summary}</p>
@@ -151,7 +328,7 @@ function DetailPanel({
       </div>
 
       <section className="detail-section">
-        <h2>연결</h2>
+        <h2>연결 {neighbors.length}</h2>
         <div className="connection-list">
           {neighbors.length === 0 && <p className="archive-muted">아직 공개된 연결이 없습니다.</p>}
           {neighbors.map(({ node, edge }, index) => (
@@ -174,10 +351,50 @@ function DetailPanel({
 
 export function ArchiveApp() {
   const [selectedId, setSelectedId] = useState('char-jinwoo')
+  const [graphRootId, setGraphRootId] = useState('char-jinwoo')
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<'all' | ArchiveNodeType>('all')
+  const [recentIds, setRecentIds] = useState<string[]>([])
 
   const selected = nodeById.get(selectedId) ?? archiveNodes[0]
+  const graphRoot = nodeById.get(graphRootId) ?? selected
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(RECENT_KEY) ?? '[]')
+      if (Array.isArray(saved)) {
+        setRecentIds(saved.filter((id): id is string => typeof id === 'string' && nodeById.has(id)).slice(0, 7))
+      }
+    } catch {
+      setRecentIds([])
+    }
+  }, [])
+
+  function rememberNode(id: string) {
+    setRecentIds((current) => {
+      const next = [id, ...current.filter((item) => item !== id)].slice(0, 7)
+      try {
+        window.localStorage.setItem(RECENT_KEY, JSON.stringify(next))
+      } catch {
+        // localStorage가 막혀도 탐색 자체는 계속 동작한다.
+      }
+      return next
+    })
+  }
+
+  function selectNode(id: string, reroot = false) {
+    if (!nodeById.has(id)) return
+    setSelectedId(id)
+    if (reroot) setGraphRootId(id)
+    rememberNode(id)
+  }
+
+  function focusRoot(id: string) {
+    if (!nodeById.has(id)) return
+    setSelectedId(id)
+    setGraphRootId(id)
+    rememberNode(id)
+  }
 
   const filteredNodes = useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -199,13 +416,17 @@ export function ArchiveApp() {
     .map((id) => nodeById.get(id))
     .filter((node): node is ArchiveNode => Boolean(node))
 
+  const recentNodes = recentIds
+    .map((id) => nodeById.get(id))
+    .filter((node): node is ArchiveNode => Boolean(node))
+
   return (
     <main className="archive-shell">
       <header className="archive-header">
         <div>
           <p className="archive-kicker">SURVIVAL DIARY · {archiveMeta.worldline}</p>
           <h1>{archiveMeta.title}</h1>
-          <p className="archive-header-copy">플레이하면서 발견한 세계를 읽고, 연결을 따라 들어가는 기록 열람기.</p>
+          <p className="archive-header-copy">플레이하면서 발견한 세계를 읽고, 연결을 펼쳐가며 탐색하는 기록 열람기.</p>
         </div>
         <div className="archive-header-actions">
           <span className="archive-exit archive-exit-static">READ ONLY</span>
@@ -245,6 +466,20 @@ export function ArchiveApp() {
         </nav>
       </section>
 
+      {recentNodes.length > 0 && (
+        <section className="recent-strip" aria-label="최근 본 항목">
+          <span>최근 본 항목</span>
+          <div>
+            {recentNodes.map((node) => (
+              <button key={node.id} onClick={() => selectNode(node.id, true)}>
+                <span className={'type-dot type-dot-' + node.type} />
+                {node.label}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className="archive-layout">
         <aside className="archive-panel result-panel">
           <div className="panel-heading">
@@ -259,7 +494,7 @@ export function ArchiveApp() {
               <button
                 key={node.id}
                 className={selected.id === node.id ? 'selected' : ''}
-                onClick={() => setSelectedId(node.id)}
+                onClick={() => selectNode(node.id, true)}
               >
                 <span className={'type-dot type-dot-' + node.type} />
                 <span>
@@ -272,23 +507,33 @@ export function ArchiveApp() {
           </div>
         </aside>
 
-        <div className="archive-main-column">
-          <GraphExplorer selected={selected} onSelect={setSelectedId} />
-          <DetailPanel selected={selected} onSelect={setSelectedId} />
-        </div>
+        <GraphExplorer
+          root={graphRoot}
+          selected={selected}
+          onSelect={(id) => selectNode(id)}
+          onFocusRoot={focusRoot}
+        />
+
+        <DetailPanel
+          selected={selected}
+          graphRootId={graphRoot.id}
+          onSelect={(id) => selectNode(id)}
+          onFocusRoot={focusRoot}
+        />
       </section>
 
       <section className="archive-section-grid">
         <section className="archive-panel timeline-panel">
           <div className="panel-heading">
             <div>
-              <p className="archive-eyebrow">TIMELINE</p>
+              <p className="archive-eyebrow">TIMELINE · NEWEST FIRST</p>
               <h2>최근 주요 사건</h2>
             </div>
+            <span className="timeline-order">최신순</span>
           </div>
           <div className="timeline-list">
             {timeline.map((event) => (
-              <button key={event.id} onClick={() => setSelectedId(event.id)}>
+              <button key={event.id} onClick={() => selectNode(event.id, true)}>
                 <span>{event.subtitle}</span>
                 <strong>{event.label}</strong>
                 <p>{event.summary}</p>
@@ -321,7 +566,7 @@ export function ArchiveApp() {
 
       <footer className="archive-footer">
         <p>Archive policy: {archiveMeta.visibility} · {archiveMeta.syncPolicy}</p>
-        <p>읽기 전용 V1 · 숨은 플롯과 GM 전용 상태는 표시하지 않습니다.</p>
+        <p>읽기 전용 V2 · 숨은 플롯과 GM 전용 상태는 표시하지 않습니다.</p>
       </footer>
     </main>
   )
