@@ -168,12 +168,10 @@ ChatGPT 채팅방은 Archive 저장단위가 아니다.
 방을 옮기더라도 Archive continuity는 `worldline / chronicle / season / session_id / source` 기준으로 이어진다.
 
 AFTERFALL의 세션 운영 규칙은:
-`worldlines/AFTERFALL/PLAY_SESSION_PROTOCOL_V1.md`
+`worldlines/AFTERFALL/PLAY_SESSION_PROTOCOL_V2.md`
 를 따른다.
 
-새 원문은 `survival_rpg.transcript_messages`에 먼저 append-only로 보관할 수
-있다. 이 저장은 Archive publication이나 Canon 확정이 아니며, 실행 절차와
-보안 경계는 `docs/RAW_ROLLING_CAPTURE_V1.md`를 따른다.
+새 원문은 `survival_rpg.transcript_sessions` + `survival_rpg.transcript_messages`에 append-only로 보관한다. AFTERFALL 실제 플레이에서는 `PLAY_SESSION_PROTOCOL_V2.md`의 tool-enforced capture bridge가 새 방 시작, USER 입력, GM 공개 출력, 방 종료를 연결한다. 이 저장은 Archive publication이나 Canon 확정이 아니며, 보안 경계와 DB 계약은 `docs/RAW_ROLLING_CAPTURE_V1.md`를 따른다.
 
 ## 10. Transcript Publication Rule
 
@@ -232,3 +230,12 @@ Archive의 최상위 정보모델은 단일 Worldline이 아니다.
   이용해 USER/GM 대사로 재구성하지 않는다.
 - 공개 원문은 Raw Archive 정책의 금지 항목을 다시 포함하지 않으며, 정적
   Archive frontend는 Supabase에 직접 연결하지 않는다.
+
+
+## 13. Automatic reconciliation status
+
+- Daily reconciliation task: **04:20 KST / enabled**
+- Active Chronicle: **C03 AFTERFALL / 서진우**
+- Past Chronicle publication: **C01 한준호 / C02 STRONGHOLD 박도현**
+- Live capture health check: gameplay advancement without corresponding AFTERFALL RAW rows is a reconciliation warning; zero new rows with no new play is normal.
+- Routine safe changes may be published through branch → PR → CI/Preview → squash merge → Production verification.
