@@ -1,0 +1,34 @@
+{
+  "archive_type": "RAW_OPENING_RECOVERY_AUDIT",
+  "chronicle": "Chronicle 03",
+  "worldline": "AFTERFALL",
+  "season": "S01",
+  "protagonist": "서진우",
+  "status": "MISSING",
+  "audited_on": "2026-09-26",
+  "source_constraint": "Only verbatim public USER/GM text directly accessible in the current ChatGPT room",
+  "intended_start": "《생존일기》 AFTERFALL 새 RPG 시작... or actual earliest visible USER message",
+  "recovered_user_count": 0,
+  "recovered_gm_count": 0,
+  "part_count": 0,
+  "existing_boundary": {
+    "path": "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_001.md",
+    "first_user_lines": [
+      "4",
+      "1",
+      "결국 어디를 가든지 간에 거기서 생산할 수 있는 자원이 압도적으로 좋지 않다면..."
+    ]
+  },
+  "gaps": [
+    "S01 opening through the point immediately before existing PART_C03_001 is not verbatim-accessible in the current context"
+  ],
+  "overlap": {
+    "found": false,
+    "duplicate_message_count": 0,
+    "note": "No recovered opening message reaches the existing PART_C03_001 boundary"
+  },
+  "reconstruction_used": false,
+  "redaction": "NONE",
+  "existing_part_files_modified": false,
+  "raw_boot_input": false
+}
