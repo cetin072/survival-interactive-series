@@ -1,0 +1,49 @@
+{
+  "chronicle": "02",
+  "worldline": "STRONGHOLD",
+  "protagonist": "박도현",
+  "season": null,
+  "season_note": "continuous chronology / no separate season id assigned",
+  "source": "current ChatGPT room",
+  "session_id": "SESSION_20260925_CURRENT_ROOM",
+  "cutoff": "immediately before the first AFTERFALL archive request in this room",
+  "completeness": "PARTIAL",
+  "verified_start": "USER: ㄱ",
+  "verified_end": "GM public meta block reporting PR #73 STRONGHOLD closeout merge complete and NEXT_ROOM_BOOT_2032_01.md ready",
+  "last_gameplay_user": "ㄱ",
+  "last_gameplay_gm_visible_end": "지난 여름부터 자신이 보고 있던 문제가 다시 다른",
+  "counts": {
+    "user_messages": 9,
+    "gm_assistant_public_blocks": 28,
+    "total_public_blocks": 37,
+    "parts": 4,
+    "redactions": 0
+  },
+  "parts": [
+    "PART_001.md",
+    "PART_002.md",
+    "PART_003.md",
+    "PART_004.md"
+  ],
+  "missing_ranges": [
+    "[원문 확인 불가 구간] before the first directly visible USER message in this room context",
+    "[원문 확인 불가 구간] at the location currently represented as Skipped 1 message after the second ㄱ; role/content not inferred",
+    "Possible continuation after the currently visible truncated 2032-01-17 GM output is not directly verifiable and is not reconstructed"
+  ],
+  "overlap": {
+    "status": "NO_DIRECT_CHRONOLOGICAL_OVERLAP_WITH_EXISTING_LOOSE_RAW",
+    "existing_raw_starts": "2032-03",
+    "this_session_gameplay_range": "2031-12-13 through 2032-01-17",
+    "deduplication": "deferred to separate consolidation if ever needed"
+  },
+  "safety": {
+    "system_prompt_included": false,
+    "developer_instructions_included": false,
+    "private_reasoning_included": false,
+    "tool_calls_or_results_included": false,
+    "gm_only_future_plan_included": false,
+    "secret_included": false,
+    "unrelated_personal_data_redacted": false
+  },
+  "source_policy": "Only directly visible public USER and GM/ASSISTANT text. No reconstruction from memory, summary, checkpoint, Canon, state, or tool output."
+}
