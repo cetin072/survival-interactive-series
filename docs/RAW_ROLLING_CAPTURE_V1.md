@@ -97,3 +97,26 @@ them until acknowledgement/retry completes.
 - The connected Supabase migration ledger records this migration under the same
   version and name. The verification script inserts only inside a transaction,
   proves UPDATE rejection, and rolls back.
+
+
+## 2026-09-25 operational proof
+
+A rollback-only connected-database proof exercised the deployed lifecycle API end to end:
+
+1. open one C03 / AFTERFALL / S02 session;
+2. append USER order 0;
+3. append GM order 1;
+4. retry the USER append with the same idempotency key and payload;
+5. reject a skipped message order;
+6. reject a C02 / STRONGHOLD identity against the C03 session;
+7. close the session;
+8. reject a new append after close;
+9. roll the transaction back and verify zero test residue.
+
+This proves the database contract is operational. It does **not** prove that the
+ChatGPT product conversation runtime automatically calls the adapter on every
+message. At present, that product-level hook is **NOT YET AUTOMATIC** from this
+repository alone. A trusted caller must invoke the session API during play (for
+example, an authorized GM/tool workflow). Do not describe the system as
+"automatic live capture" until real play produces non-test rows without a
+manual archive/backfill step.
