@@ -25,6 +25,12 @@ export function messagesFromRaw(content: string): RawMessage[] {
   })
 }
 
+export function selectInitialTranscriptPart(parts: TranscriptPart[], routedPartId?: string, savedPartId?: string) {
+  return parts.find((part) => part.id === routedPartId)
+    ?? parts.find((part) => part.id === savedPartId)
+    ?? parts[0]
+}
+
 function MessageBody({ content }: { content: string }) {
   const blocks: Array<{ kind: 'heading' | 'text'; value: string }> = []
   let lines: string[] = []
@@ -54,7 +60,11 @@ function TranscriptBody({ part }: { part: TranscriptPart }) {
 export function RawTranscriptReader({ chronicleId, initialPartId, onPartChange, onOpenNode, onOpenExplorer }: { chronicleId: ChronicleId; initialPartId?: string; onPartChange: (partId: string) => void; onOpenNode: (id: string) => void; onOpenExplorer: () => void }) {
   const chronicle = getChronicle(chronicleId)
   const chronicleParts = useMemo(() => transcriptPartsFor(chronicleId), [chronicleId])
-  const initialPart = chronicleParts.find((part) => part.id === initialPartId) ?? chronicleParts[0]
+  const initialPart = useMemo(() => {
+    let savedPartId: string | undefined
+    try { savedPartId = (JSON.parse(window.localStorage.getItem(progressKey(chronicleId)) ?? '{}') as { partId?: string }).partId } catch { /* storage is optional */ }
+    return selectInitialTranscriptPart(chronicleParts, initialPartId, savedPartId)
+  }, [chronicleId, chronicleParts, initialPartId])
   const [seasonId, setSeasonId] = useState(initialPart?.seasonId ?? 'S01')
   const [selectedId, setSelectedId] = useState(initialPart?.id ?? '')
   const [progress, setProgress] = useState(0)
@@ -66,17 +76,12 @@ export function RawTranscriptReader({ chronicleId, initialPartId, onPartChange, 
   const next = globalIndex >= 0 && globalIndex < chronicleParts.length - 1 ? chronicleParts[globalIndex + 1] : null
 
   useEffect(() => {
-    try {
-      const routedPart = chronicleParts.find((part) => part.id === initialPartId)
-      const saved = JSON.parse(window.localStorage.getItem(progressKey(chronicleId)) ?? '{}') as { partId?: string; scrollY?: number }
-      const selectedPart = routedPart ?? chronicleParts.find((part) => part.id === saved.partId) ?? chronicleParts[0]
-      if (selectedPart) {
-        setSelectedId(selectedPart.id)
-        setSeasonId(selectedPart.seasonId)
-        requestAnimationFrame(() => window.scrollTo({ top: routedPart ? 0 : saved.scrollY ?? 0 }))
-      }
-    } catch { /* storage is optional */ }
-  }, [chronicleId, chronicleParts, initialPartId])
+    const routedPart = chronicleParts.find((part) => part.id === initialPartId)
+    if (!routedPart || routedPart.id === selectedId) return
+    setSelectedId(routedPart.id)
+    setSeasonId(routedPart.seasonId)
+    window.scrollTo({ top: 0 })
+  }, [chronicleParts, initialPartId, selectedId])
 
   useEffect(() => {
     if (!selected) return
