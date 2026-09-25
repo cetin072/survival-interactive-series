@@ -1,0 +1,83 @@
+{
+  "chronicle_id": "C02-STRONGHOLD",
+  "worldline_id": "STRONGHOLD",
+  "protagonist": "박도현",
+  "archive_class": "COLD_RAW",
+  "overall_status": "PARTIAL",
+  "complete": false,
+  "source_policy": "Only directly verified public USER/GM/ASSISTANT text. No reconstruction from Canon, summaries, checkpoints, memory, hidden state, or tools.",
+  "sessions": [
+    {
+      "id": "SESSION_2031_02_TO_2031_03_ROOM_20260925",
+      "source_pr": 96,
+      "story_range": "2031-02 ~ opening of 2031-03 wildfire arc",
+      "user_messages": 11,
+      "assistant_public_blocks": 20,
+      "total_public_blocks": 31,
+      "parts": 5,
+      "status": "PARTIAL",
+      "overlap": "NONE_WITH_EXISTING_FLAT_RAW"
+    },
+    {
+      "id": "SESSION_20260925_CURRENT_ROOM",
+      "source_pr": 97,
+      "story_range": "2031-12-13 ~ visible portion of 2032-01-17",
+      "user_messages": 9,
+      "assistant_public_blocks": 28,
+      "total_public_blocks": 37,
+      "parts": 4,
+      "status": "PARTIAL",
+      "overlap": "NONE_WITH_EXISTING_FLAT_RAW"
+    },
+    {
+      "id": "SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925",
+      "source_pr": 98,
+      "story_range": "2032 spring ~ summer",
+      "user_messages": 11,
+      "assistant_public_blocks": 31,
+      "total_public_blocks": 42,
+      "parts": 6,
+      "status": "PARTIAL",
+      "overlap": "PARTIAL_USER_OVERLAP_WITH_RAW_2032_03_TO_2032_09_PARTIAL_01"
+    },
+    {
+      "id": "SESSION_C02_20260925_ROOM_01",
+      "source_pr": 99,
+      "story_range": "2032-09 ~ 2038-04",
+      "user_messages": 11,
+      "assistant_public_blocks": 19,
+      "total_public_blocks": 30,
+      "parts": 5,
+      "status": "PARTIAL",
+      "overlap": "PARTIAL_USER_OVERLAP_WITH_RAW_2032_09_TO_2038_04_PARTIAL_01"
+    },
+    {
+      "id": "SESSION_20260925_2039_CURRENT_ROOM",
+      "source_pr": 100,
+      "story_range": "2039-01-19 ~ 2039-10-20",
+      "user_messages": 17,
+      "assistant_public_blocks": 18,
+      "total_public_blocks": 35,
+      "parts": 4,
+      "status": "PARTIAL",
+      "overlap": "PARTIAL_USER_OVERLAP_WITH_RAW_2038_05_TO_2039_12_PARTIAL_01"
+    }
+  ],
+  "aggregate_visible_blocks": {
+    "user_messages": 59,
+    "assistant_public_blocks": 116,
+    "total_public_blocks": 175,
+    "note": "Raw count across five preserved source rooms before cross-session/legacy deduplication. Repeated short USER inputs remain source facts and are not removed."
+  },
+  "legacy_partial_files": [
+    "RAW_2032_03_TO_2032_09_PARTIAL_01.md",
+    "RAW_2032_09_TO_2038_04_PARTIAL_01.md",
+    "RAW_2038_05_TO_2039_12_PARTIAL_01.md"
+  ],
+  "missing_ranges": [
+    "All exact conversation before each session's directly visible start.",
+    "Known intra-room missing/truncated points are retained in each session manifest.",
+    "2031-03 ~ 2031-12 remains without a newly recovered complete source-room transcript in this consolidation."
+  ],
+  "consolidation_policy": "Preserve every source-room session independently; do not overwrite or deduplicate away source provenance. Legacy USER-heavy partial files remain alongside richer source-room sessions."
+}
