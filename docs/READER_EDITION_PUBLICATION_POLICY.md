@@ -10,16 +10,26 @@ a system for rewriting Canon as a novel.
 - C03 uses `worldlines/AFTERFALL/**` or its durable Archive transcript namespace.
 - Every chapter records source references and a transform version. No Chronicle
   may fill a gap with another Chronicle's material.
+- Every verified RAW part is inventoried as included or omitted with a reason.
+  `sourceRefs` identify the durable canonical source; `archiveSourceRefs` identify
+  the exact Archive copy read, and SHA-256 source hashes make the selection auditable.
 
 ## Deterministic selection contract
 
-The publisher parses public RAW messages, discards USER blocks and operational
-assistant metadata, and selects GM public prose in original order. From a GM
-block it may remove only a trailing Choice Gate: a player prompt with multiple
-action options. Narrative numbered lists, headings, dialogue, spelling, and
-paragraph order remain exactly as sourced.
+The publisher supports `##` and `###` role headers, bare or numbered (`USER 001`,
+`GM 001`, `GM 001-A`, `GM 001-B`) and descriptive suffixes. It discards USER
+blocks and structurally labelled operational metadata, then selects GM public
+prose in original order. A GM block is classified as narrative, design meta, or
+operational meta; an ambiguous block is retained. From a GM block it may remove
+only a trailing Choice Gate with both an explicit choice cue and multiple action
+options. Narrative numbered lists, headings, dialogue, spelling, and paragraph
+order remain exactly as sourced.
 
 Verified GM prose is never summarized, rewritten, reordered, or supplemented.
+Markdown is stored unchanged and rendered safely as Markdown in the Reader; it
+is never flattened into rewritten plain text. A too-long chapter is split at a
+source/event boundary rather than shortened. A `VERIFIED_GM_NARRATIVE` chapter
+with no source, no GM block, or an empty body is a generator failure.
 Chapter titles and boundaries are editorial metadata. A bridge is allowed only
 for a confirmed PLAYER_SAFE Canon fact, is limited to 1–3 sentences, and is
 stored as `EDITORIAL_CANON_BRIDGE`, never as verified GM text.

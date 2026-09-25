@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "reader:build": "node ../scripts/build-reader-edition.mjs",
+    "reader:check": "node ../scripts/check-reader-edition.mjs"
   },
   "dependencies": {
     "react": "19.2.8",
