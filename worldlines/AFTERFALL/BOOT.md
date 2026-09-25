@@ -22,11 +22,12 @@ Status: **AUTHORITATIVE**
 9. `SAVE_SCHEMA_V1.md`
 10. `GM_CONTEXT_V1.md`
 11. `PLAY_SESSION_PROTOCOL_V3.md`
-12. `CURRENT_STATE.json`
-13. CURRENT_STATE가 지정한 최신 season checkpoint
-14. Supabase `check_runtime_consistency('AFTERFALL')`
-15. `PLAY_SESSION_PROTOCOL_V3.md`에 따라 Live RAW capture session을 확인/개설
-16. 장면 관련 인물만 지정해 `get_scene_context('AFTERFALL', ...)`
+12. `LIVE_TURN_FAST_PATH_V1.md`
+13. `CURRENT_STATE.json`
+14. CURRENT_STATE가 지정한 최신 season checkpoint
+15. Supabase `check_runtime_consistency('AFTERFALL')`
+16. `PLAY_SESSION_PROTOCOL_V3.md`에 따라 Live RAW capture session을 확인/개설
+17. 장면 관련 인물만 지정해 `get_scene_context('AFTERFALL', ...)`
 
 새 채팅에서 worldline identity가 애매하면 repository root의 `SURVIVAL_DIARY_IP_BIBLE.md`와 `WORLDLINE_ROUTER.md`를 먼저 확인한다.
 
@@ -62,9 +63,10 @@ Save status가 `PREPLAY_READY`이면:
 - 플레이어 선택과 무관한 강제 손실 목록
 
 ## 5. 턴 처리
-0. 플레이 모드가 활성화된 USER 입력과 최종 GM 공개문을 `PLAY_SESSION_PROTOCOL_V3.md`의 atomic turn-pair 규칙으로 **한 번에 저장한 뒤** GM 문장을 출력한다.
-1. 새 장면/큰 전환이면 `check_runtime_consistency` 확인
-2. 장면 관련 인물만 골라 `get_scene_context` 로드
+`LIVE_TURN_FAST_PATH_V1.md`가 normal turn의 authoritative call budget이다.
+
+1. 새 room, 새 장면, 큰 전환, 큰 시간점프 또는 오류 의심일 때만 `check_runtime_consistency` 확인
+2. 새 장면이거나 stable context가 바뀐 경우에만 장면 관련 인물로 `get_scene_context` 로드
 3. 큰 시간점프/날짜경계면 World Tick checklist 확인
 4. 플레이어 행동 의미 잠금
 5. 현재 상태에서 결과 판정

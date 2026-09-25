@@ -57,5 +57,6 @@
     "first_live_trial": "INCOMPLETE: v2 stored one GM row and zero USER rows; session closed without reconstruction.",
     "next_validation": "Start a fresh capture session and verify at least two exact USER→GM pairs with contiguous orders 0..3."
   },
-  "long_range_direction": "worldlines/AFTERFALL/APOCALYPSE_LONG_RANGE_DIRECTION_V1.md"
+  "long_range_direction": "worldlines/AFTERFALL/APOCALYPSE_LONG_RANGE_DIRECTION_V1.md",
+  "live_turn_fast_path": "worldlines/AFTERFALL/LIVE_TURN_FAST_PATH_V1.md"
 }

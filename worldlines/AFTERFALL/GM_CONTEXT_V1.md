@@ -407,3 +407,11 @@ GitHub Canon 승격 조건:
 - **Deep history:** 필요한 경우에만 `scenes → events` 순서로 조회
 - 라이브 장면 입력에 제작 메타를 섞지 않는 것이 우선이며, 매 출력마다 별도 금지어 검사를 돌리지 않는다.
 - 과거 사건을 현재 장면에 사용할 때는 사실만 회수한다. 저장소의 시즌명·이벤트 분류명·기획 문구를 장면 문장으로 복사하지 않는다.
+
+## Same-scene reuse
+
+같은 scene에서 등장인물·큰 Pressure·의미 있는 runtime delta가 변하지 않았다면,
+직전 `get_scene_context()`의 stable 부분을 다음 turn에도 사용한다. 매 turn마다
+full Save, 모든 Character, 전체 Event 또는 `get_gm_context()`를 다시 조립하지
+않는다. 새 scene, 참여인물 변경, 큰 시간점프, 중요한 mutation, 오류/재연결에서는
+context를 다시 읽는다. 세부 호출 순서는 `LIVE_TURN_FAST_PATH_V1.md`를 따른다.
