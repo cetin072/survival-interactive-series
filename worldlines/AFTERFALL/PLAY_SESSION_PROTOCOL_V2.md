@@ -11,7 +11,7 @@ Database API: `survival_rpg.open_public_transcript_session`,
 ## Purpose
 
 Every newly played, PLAYER_SAFE AFTERFALL USER/GM message is captured before
-Canon condensation. This protocol does not retroactively fabricate any missing
+Canon condensation whenever the authorized capture tool path is available. This protocol does not retroactively fabricate any missing
 historical dialogue, and it does not publish a captured row automatically.
 
 The identity is fixed for this worldline:
@@ -25,9 +25,7 @@ or message.
 
 ## Trusted capture boundary
 
-Only a trusted server-side capture adapter may call the database API using its
-server-held `service_role`. Browser code, Archive static assets, prompts,
-logs, and Git commits must never contain that credential.
+Only a trusted server-side capture adapter or an authorized Supabase connector/tool path may call the database API. The model must never receive, print, or persist a `service_role` credential. Browser code, Archive static assets, prompts, logs, and Git commits must never contain that credential.
 
 The adapter must reject rather than capture:
 
@@ -39,6 +37,72 @@ The adapter must reject rather than capture:
 The database verifies the exact UTF-8 SHA-256 of each submitted message and
 stores only public-safe rows. It is append-only; a correction is a later
 annotation/publication decision, never an edit of the original row.
+
+
+## ChatGPT GM automatic capture bridge
+
+For the ChatGPT play surface, this protocol is **operational**, not advisory.
+
+When actual AFTERFALL play is active and an authorized Supabase tool/connector is available, the GM must perform the following hidden tool actions without asking the player to save manually.
+
+### A. Room boot
+
+Before the first in-game public scene of a new chat room:
+
+1. finish the normal identity / CURRENT_STATE / checkpoint / runtime consistency checks;
+2. inspect `survival_rpg.transcript_sessions` for an `OPEN` C03 / AFTERFALL session;
+3. if an old OPEN session remains from a previous room that did not close cleanly, close it with a safe note such as `auto-closed at next room boot`; do not rewrite its messages;
+4. generate a fresh session UUID for this room and call `open_public_transcript_session`;
+5. retain the returned `session_id` and current `last_message_order` for this room.
+
+Only one room should be treated as the live AFTERFALL play surface at a time. Returning to an older room starts a new capture session rather than appending to a closed one.
+
+### B. USER capture
+
+For every actual gameplay USER message:
+
+- capture the exact user-visible message, including short inputs such as `ㄱ`, numbers, free actions, corrections, and gameplay feedback;
+- do this **before** producing the next GM scene;
+- store role `USER`;
+- use the current session and the next contiguous message order;
+- retain the exact payload until acknowledgement.
+
+Planning/development/archive-maintenance conversation outside actual play is not gameplay RAW and must not be inserted.
+
+### C. GM capture
+
+For every actual gameplay GM public response:
+
+1. compose the exact final user-visible response in private working state;
+2. perform the PLAYER_SAFE boundary check;
+3. append that exact string with role `GM` (or `ASSISTANT_PUBLIC_META` only when the public block is genuinely operational meta within the play session);
+4. only after successful acknowledgement, emit **the same string** to the user.
+
+Do not store a summary and then output a different response. The stored content and public response must be verbatim-identical.
+
+### D. Retry / uncertain acknowledgement
+
+Normal successful writes should be invisible to the player.
+
+If a capture call errors:
+
+1. retry with the same payload and idempotency identity when available;
+2. before any retry after an ambiguous acknowledgement, inspect the latest rows for that session so a successful first write is not duplicated;
+3. never renumber already acknowledged messages.
+
+After two failed attempts, do not claim the recorder succeeded. Gameplay may continue, but emit one short operational warning and preserve the current room as the recovery source for later backfill.
+
+### E. Room close
+
+When the player asks to move rooms, ends an episode, or closes the season:
+
+1. capture the final public USER/GM messages;
+2. close the current transcript session;
+3. write the final session UUID / last message order into the handoff or checkpoint metadata when a handoff is being created;
+4. then perform GitHub cold-archive promotion at the normal checkpoint/episode cadence.
+
+The player should never need to type a separate save command for routine RAW preservation.
+
 
 ## Open → append → close
 
