@@ -1,0 +1,58 @@
+{
+  "chronicle": "02",
+  "worldline": "STRONGHOLD",
+  "protagonist": "박도현",
+  "formal_numeric_season": null,
+  "season_arc": "2032-09 to 2038-04 record/identity overlap, world restructuring, independence, Base B resolution, rear-land purchase closeout",
+  "source": "current ChatGPT room",
+  "session_id": "SESSION_C02_20260925_ROOM_01",
+  "cutoff": "Immediately before the later mistaken AFTERFALL archive request beginning '이 채팅방은 《생존일기》 Chronicle 03 / AFTERFALL / 서진우...'",
+  "verified_start": {
+    "role": "USER",
+    "text": "3"
+  },
+  "last_gameplay_user": "1 + request to close/archive/feedback/repair before the new season",
+  "last_gameplay_gm": "2038-04 rear-land purchase closeout and arc-ending public response",
+  "verified_end": {
+    "user": "지시문 만들어줘",
+    "assistant": "complete public STRONGHOLD next-season boot instruction"
+  },
+  "counts": {
+    "user_messages": 11,
+    "gm_assistant_public_blocks": 19,
+    "total_public_blocks": 30,
+    "parts": 5,
+    "redactions": 0
+  },
+  "part_list": [
+    "PART_001.md",
+    "PART_002.md",
+    "PART_003.md",
+    "PART_004.md",
+    "PART_005.md"
+  ],
+  "missing_ranges": [
+    "[원문 확인 불가 구간 — 이 방에서 현재 직접 확인 가능한 첫 USER 메시지 이전]"
+  ],
+  "middle_gap_in_verified_span": false,
+  "overlap": {
+    "status": "PARTIAL_USER_SIDE_OVERLAP_GM_BACKFILL",
+    "legacy_file": "../RAW_2032_09_TO_2038_04_PARTIAL_01.md",
+    "notes": "Legacy flat RAW contains several exact USER inputs from this span but explicitly lacks GM/ASSISTANT public transcript. Repeated short choices such as ㄱ prevent safe one-to-one occurrence deduplication without a complete source export. Preserve both; consolidate later."
+  },
+  "redaction": {
+    "count": 0,
+    "status": "NONE"
+  },
+  "completeness": "PARTIAL",
+  "source_policy": "Only directly visible public USER/GM/ASSISTANT text is stored. Missing dialogue is not reconstructed from memory, summaries, checkpoints, Canon, state files, prior RAW, or tools.",
+  "excluded": {
+    "system_prompt": true,
+    "developer_instructions": true,
+    "private_reasoning": true,
+    "tool_calls_results": true,
+    "hidden_state": true,
+    "gm_only_future_plans": true,
+    "later_archive_operation_conversation": true
+  }
+}
