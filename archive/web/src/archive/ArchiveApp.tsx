@@ -21,12 +21,12 @@ const typeLabel: Record<ArchiveNodeType, string> = {
 }
 
 const typeOrder: ArchiveNodeType[] = ['character', 'location', 'event', 'reference']
-const nodeById = new Map(archiveNodes.map((node) => [node.id, node]))
+export const nodeById = new Map(archiveNodes.map((node) => [node.id, node]))
 const RECENT_KEY = 'survival-diary-archive:recent'
 const MAX_GRAPH_NODES = 28
 const MAX_GRAPH_DEPTH = 3
-const GRAPH_WIDTH = 920
-const GRAPH_HEIGHT = 660
+const GRAPH_WIDTH = 1200
+const GRAPH_HEIGHT = 720
 
 type ArchiveView = 'story' | 'archive' | 'past'
 
@@ -61,9 +61,9 @@ type Neighbor = {
   edge: ArchiveEdge
 }
 
-type GraphTypeVisibility = Record<ArchiveNodeType, boolean>
+export type GraphTypeVisibility = Record<ArchiveNodeType, boolean>
 
-function getNeighbors(id: string): Neighbor[] {
+export function getNeighbors(id: string): Neighbor[] {
   return archiveEdges.flatMap((edge) => {
     if (edge.from === id) {
       const node = nodeById.get(edge.to)
@@ -81,7 +81,7 @@ function shorten(label: string, limit = 9) {
   return label.length > limit ? label.slice(0, limit) + '…' : label
 }
 
-function buildVisibleGraph(
+export function buildVisibleGraph(
   rootId: string,
   expandedIds: string[],
   typeVisibility: GraphTypeVisibility,
@@ -120,9 +120,9 @@ function buildVisibleGraph(
   return { visibleIds: Array.from(visibleIds), depths, visibleEdges }
 }
 
-function buildPositions(visibleIds: string[], depths: Map<string, number>) {
-  const centerX = 460
-  const centerY = 330
+export function buildPositions(visibleIds: string[], depths: Map<string, number>) {
+  const centerX = 600
+  const centerY = 360
   const positions = new Map<string, { x: number; y: number }>()
   const byDepth = new Map<number, string[]>()
 
@@ -137,7 +137,7 @@ function buildPositions(visibleIds: string[], depths: Map<string, number>) {
 
   for (const [depth, ids] of byDepth.entries()) {
     if (depth === 0) continue
-    const radius = depth === 1 ? 175 : depth === 2 ? 270 : 315
+    const radius = depth === 1 ? 255 : depth === 2 ? 400 : 505
     const offset = -Math.PI / 2 + depth * 0.22
     ids.forEach((id, index) => {
       const angle = offset + (Math.PI * 2 * index) / Math.max(ids.length, 1)
@@ -243,7 +243,7 @@ function GraphExplorer({
             {typeLabel[type]}
           </button>
         ))}
-        <p>클릭: 펼치기/접기 · 더블클릭: 중심 이동 · 확대/축소 가능</p>
+          <p>클릭: 펼치기/접기 · 더블클릭: 중심 이동 · 화면 크기에 맞춰 넓게 탐색</p>
       </div>
 
       <div className="graph-canvas">
@@ -283,7 +283,7 @@ function GraphExplorer({
             const isRoot = node.id === root.id
             const isSelected = node.id === selected.id
             const isExpanded = expanded.has(node.id) || isRoot
-            const radius = isRoot ? 42 : isSelected ? 34 : 28
+            const radius = isRoot ? 58 : isSelected ? 44 : 36
             const expandable = getNeighbors(node.id).some(({ node: neighbor }) => typeVisibility[neighbor.type])
 
             return (

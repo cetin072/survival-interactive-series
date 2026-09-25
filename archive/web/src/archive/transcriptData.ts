@@ -11,6 +11,24 @@ import c01S02Part1 from '../../../content/transcripts/C01-HAN-JUNHO/S02/PART_001
 import c02Fragment2032 from '../../../content/transcripts/C02-STRONGHOLD/FRAGMENTS/RAW_2032_03_TO_2032_09_PARTIAL_01.md?raw'
 import c02Fragment2038 from '../../../content/transcripts/C02-STRONGHOLD/FRAGMENTS/RAW_2032_09_TO_2038_04_PARTIAL_01.md?raw'
 import c02Fragment2039 from '../../../content/transcripts/C02-STRONGHOLD/FRAGMENTS/RAW_2038_05_TO_2039_12_PARTIAL_01.md?raw'
+import c03S01Part1 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_001.md?raw'
+import c03S01Part2 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_002.md?raw'
+import c03S01Part3 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_003.md?raw'
+import c03S01Part4 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_004.md?raw'
+import c03S01Part5 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_005.md?raw'
+import c03S01Part6 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_006.md?raw'
+import c03S01Part7 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_007.md?raw'
+import c03S01Part8 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_008.md?raw'
+import c03S01Part9 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_009.md?raw'
+import c03S01Part10 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_010.md?raw'
+import c03S02Session1Part1 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_001/PART_001.md?raw'
+import c03S02Session1Part2 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_001/PART_002.md?raw'
+import c03S02Session1Part3 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_001/PART_003.md?raw'
+import c03S02Session1Part4 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_001/PART_004.md?raw'
+import c03S02Session2Part1 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_002/PART_001.md?raw'
+import c03S02Session2Part2 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_002/PART_002.md?raw'
+import c03S02Session2Part3 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_002/PART_003.md?raw'
+import c03S02Session2Part4 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_002/PART_004.md?raw'
 
 export type ChronicleId = string
 export type TranscriptStatus = 'verified_transcript' | 'verified_fragment' | 'missing_transcript'
@@ -34,6 +52,7 @@ export type TranscriptPart = {
   chronicleId: ChronicleId
   worldlineId: string
   seasonId: string
+  sessionId?: string
   number: number
   title: string
   range: string
@@ -48,7 +67,7 @@ export type TranscriptPart = {
 export const chronicles: Chronicle[] = [
   { id: 'C01-HAN-JUNHO', ipId: 'survival-diary', label: 'C01 · 한준호', protagonist: '한준호', worldlineId: 'CANON-V2', isActive: false, transcriptStatus: 'partial', sourceRoot: 'seasons_v2', availabilityNote: 'S01 원문 9개와 S02 후반부 1개가 검증되어 있습니다. S02 초반은 원문 미확보입니다.' },
   { id: 'C02-STRONGHOLD', ipId: 'survival-diary', label: 'C02 · 박도현', protagonist: '박도현', worldlineId: 'STRONGHOLD', isActive: false, transcriptStatus: 'partial', sourceRoot: 'worldlines/STRONGHOLD', availabilityNote: '세 시기의 USER 공개 원문 일부가 검증되어 있습니다. GM 공개 장면과 나머지 구간은 BACKFILL REQUIRED입니다.' },
-  { id: 'C03-AFTERFALL', ipId: 'survival-diary', label: 'C03 AFTERFALL · 서진우', protagonist: '서진우', worldlineId: 'AFTERFALL', isActive: true, transcriptStatus: 'backfill_required', sourceRoot: 'worldlines/AFTERFALL', availabilityNote: '현재 생존기의 S01 공개 원문은 BACKFILL REQUIRED 상태입니다. 정본 요약은 원문과 분리해 표시합니다.' },
+  { id: 'C03-AFTERFALL', ipId: 'survival-diary', label: 'C03 AFTERFALL · 서진우', protagonist: '서진우', worldlineId: 'AFTERFALL', isActive: true, transcriptStatus: 'partial', sourceRoot: 'worldlines/AFTERFALL', availabilityNote: 'S01의 검증 원문과 S02의 서로 다른 두 세션을 읽을 수 있습니다. 원문 미확보·부분 구간은 정본과 분리해 표시합니다.' },
 ]
 
 export function partitionChronicles(registry: Chronicle[] = chronicles) {
@@ -67,6 +86,7 @@ export function getChronicle(id: ChronicleId) {
 
 const c01 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' | 'relatedNodeIds'>): TranscriptPart => ({ ...part, ipId: 'survival-diary', chronicleId: 'C01-HAN-JUNHO', worldlineId: 'CANON-V2', relatedNodeIds: [] })
 const c02 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' | 'relatedNodeIds'>): TranscriptPart => ({ ...part, ipId: 'survival-diary', chronicleId: 'C02-STRONGHOLD', worldlineId: 'STRONGHOLD', relatedNodeIds: [] })
+const c03 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' | 'relatedNodeIds'>): TranscriptPart => ({ ...part, ipId: 'survival-diary', chronicleId: 'C03-AFTERFALL', worldlineId: 'AFTERFALL', relatedNodeIds: [] })
 
 export const transcriptParts: TranscriptPart[] = [
   c01({ id: 'c01-s01-001', seasonId: 'S01', number: 1, title: '부팅과 첫 장면', range: 'Canon v2 부팅 → 19:01 농로 위기', status: 'verified_transcript', source: 'seasons_v2/S01/raw_transcript/PART_001.md', sourceVerified: true, content: c01S01Part1 }),
@@ -83,7 +103,27 @@ export const transcriptParts: TranscriptPart[] = [
   c02({ id: 'c02-2032-03-fragment', seasonId: '2032-03~09', number: 1, title: '산업단지 사고 이후', range: '2032-03 → 2032-09 · USER 공개 입력 일부', status: 'verified_fragment', source: 'worldlines/STRONGHOLD/raw_transcript/RAW_2032_03_TO_2032_09_PARTIAL_01.md', sourceVerified: true, content: c02Fragment2032, contentFormat: 'raw_fragment' }),
   c02({ id: 'c02-2032-09-fragment', seasonId: '2032-09~2038-04', number: 1, title: '기록·신원 붕괴 이후', range: '2032-09 → 2038-04 · USER 공개 입력 일부', status: 'verified_fragment', source: 'worldlines/STRONGHOLD/raw_transcript/RAW_2032_09_TO_2038_04_PARTIAL_01.md', sourceVerified: true, content: c02Fragment2038, contentFormat: 'raw_fragment' }),
   c02({ id: 'c02-2038-05-fragment', seasonId: '2038-05~2039-12', number: 1, title: '이상 일사와 기록현실', range: '2038-05 → 2039-12 · USER 공개 입력·종료 피드백 일부', status: 'verified_fragment', source: 'worldlines/STRONGHOLD/raw_transcript/RAW_2038_05_TO_2039_12_PARTIAL_01.md', sourceVerified: true, content: c02Fragment2039, contentFormat: 'raw_fragment' }),
-  { id: 'c03-s01-missing', ipId: 'survival-diary', chronicleId: 'C03-AFTERFALL', worldlineId: 'AFTERFALL', seasonId: 'S01', number: 0, title: 'Season 1 공개 원문', range: 'C03 AFTERFALL · S01', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/INDEX.md', sourceVerified: false, relatedNodeIds: [] },
+  c03({ id: 'c03-s01-missing-before', seasonId: 'S01', number: 0, title: '직접 확인 전 구간', range: 'S01 · 직접 확인 가능한 첫 USER 메시지 이전', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/INDEX.md', sourceVerified: true }),
+  c03({ id: 'c03-s01-001', seasonId: 'S01', number: 1, title: '두 거점 연합시험', range: '직접확인 시작점 → 두 거점 연합시험 최종평가 진입', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_001.md', sourceVerified: true, content: c03S01Part1 }),
+  c03({ id: 'c03-s01-002', seasonId: 'S01', number: 2, title: '외부 신뢰망', range: '정식 두 거점 연합 → 북쪽 의원 외부관찰', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_002.md', sourceVerified: true, content: c03S01Part2 }),
+  c03({ id: 'c03-s01-003', seasonId: 'S01', number: 3, title: '교환망과 정찰', range: '북쪽 의원 첫 접촉 → 백운생활관 정찰', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_003.md', sourceVerified: true, content: c03S01Part3 }),
+  c03({ id: 'c03-s01-004', seasonId: 'S01', number: 4, title: '백운 불개입', range: '백운 이탈자 → 동천교·한지수·송대근', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_004.md', sourceVerified: true, content: c03S01Part4 }),
+  c03({ id: 'c03-s01-005', seasonId: 'S01', number: 5, title: '겨울 전 갈무리', range: '본진 복귀 → 겨울 전 갈무리 회의', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_005.md', sourceVerified: true, content: c03S01Part5 }),
+  c03({ id: 'c03-s01-006', seasonId: 'S01', number: 6, title: '시즌 1 복기', range: '시즌 1 종료 선언 → 전체 복기', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_006.md', sourceVerified: true, content: c03S01Part6 }),
+  c03({ id: 'c03-s01-007', seasonId: 'S01', number: 7, title: '공개 피드백', range: 'NPC 오프스크린 관계 → 시즌 2 강도 피드백', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_007.md', sourceVerified: true, content: c03S01Part7 }),
+  c03({ id: 'c03-s01-008', seasonId: 'S01', number: 8, title: '스포일러 지적', range: '스포일러 지적 + 첫 GM 답변; 후속 GM 1건 미확보', status: 'verified_fragment', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_008.md', sourceVerified: true, content: c03S01Part8, contentFormat: 'raw_fragment' }),
+  c03({ id: 'c03-s01-009', seasonId: 'S01', number: 9, title: '시즌 종료 저장', range: '시즌 종료 저장 요청 → 공개 저장 진행 업데이트', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_009.md', sourceVerified: true, content: c03S01Part9 }),
+  c03({ id: 'c03-s01-010', seasonId: 'S01', number: 10, title: '저장 완료 공개 보고', range: '시즌 종료 저장 완료 공개 보고', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_010.md', sourceVerified: true, content: c03S01Part10 }),
+  c03({ id: 'c03-s02-session-001-gap', seasonId: 'S02', sessionId: 'SESSION_001', number: 0, title: '세션 001 직접 확인 전 구간', range: '2026-11-22 industrial-fire response 이전', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/SOURCE_INDEX.md', sourceVerified: true }),
+  c03({ id: 'c03-s02-session-001-001', seasonId: 'S02', sessionId: 'SESSION_001', number: 1, title: '세션 001 · PART 001', range: '2026-11-22 industrial-fire response 이후', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_001.md', sourceVerified: true, content: c03S02Session1Part1 }),
+  c03({ id: 'c03-s02-session-001-002', seasonId: 'S02', sessionId: 'SESSION_001', number: 2, title: '세션 001 · PART 002', range: 'SESSION_001 · 직접 검증된 공개 원문', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_002.md', sourceVerified: true, content: c03S02Session1Part2 }),
+  c03({ id: 'c03-s02-session-001-003', seasonId: 'S02', sessionId: 'SESSION_001', number: 3, title: '세션 001 · PART 003', range: 'SESSION_001 · 직접 검증된 공개 원문', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_003.md', sourceVerified: true, content: c03S02Session1Part3 }),
+  c03({ id: 'c03-s02-session-001-004', seasonId: 'S02', sessionId: 'SESSION_001', number: 4, title: '세션 001 · PART 004', range: 'archive-request cutoff 직전', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_004.md', sourceVerified: true, content: c03S02Session1Part4 }),
+  c03({ id: 'c03-s02-session-002-gap', seasonId: 'S02', sessionId: 'SESSION_002', number: 0, title: '세션 002 직접 확인 전 구간', range: '2027-01-04 first-winter discussion 이전', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/SOURCE_INDEX.md', sourceVerified: true }),
+  c03({ id: 'c03-s02-session-002-001', seasonId: 'S02', sessionId: 'SESSION_002', number: 1, title: '세션 002 · PART 001', range: '2027-01-04 first-winter discussion 이후', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/PART_001.md', sourceVerified: true, content: c03S02Session2Part1 }),
+  c03({ id: 'c03-s02-session-002-002', seasonId: 'S02', sessionId: 'SESSION_002', number: 2, title: '세션 002 · PART 002', range: 'SESSION_002 · 직접 검증된 공개 원문', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/PART_002.md', sourceVerified: true, content: c03S02Session2Part2 }),
+  c03({ id: 'c03-s02-session-002-003', seasonId: 'S02', sessionId: 'SESSION_002', number: 3, title: '세션 002 · PART 003', range: 'SESSION_002 · 직접 검증된 공개 원문', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/PART_003.md', sourceVerified: true, content: c03S02Session2Part3 }),
+  c03({ id: 'c03-s02-session-002-004', seasonId: 'S02', sessionId: 'SESSION_002', number: 4, title: '세션 002 · PART 004', range: 'archive-request cutoff 직전', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/PART_004.md', sourceVerified: true, content: c03S02Session2Part4 }),
 ]
 
 export function transcriptPartsFor(chronicleId: ChronicleId) { return transcriptParts.filter((part) => part.chronicleId === chronicleId) }

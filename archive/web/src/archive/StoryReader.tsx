@@ -15,10 +15,10 @@ function InlineMarkdown({ text }: { text: string }) {
   })}</>
 }
 
-function messagesFromRaw(content: string): RawMessage[] {
-  const sections = content.split(/\n(?=## (?:USER|GM|ASSISTANT — 운영 메타)\s*$)/m)
+export function messagesFromRaw(content: string): RawMessage[] {
+  const sections = content.split(/\n(?=#{2,3} (?:USER|GM|ASSISTANT — 운영 메타)\s*$)/m)
   return sections.flatMap((section) => {
-    const match = section.match(/^## (USER|GM|ASSISTANT — 운영 메타)\s*\n([\s\S]*)$/)
+    const match = section.match(/^#{2,3} (USER|GM|ASSISTANT — 운영 메타)\s*\n([\s\S]*)$/)
     if (!match) return []
     const [, sourceRole, message] = match
     return [{ role: sourceRole === 'USER' ? 'player' : sourceRole === 'GM' ? 'gm' : 'system_public', label: sourceRole === 'USER' ? '플레이어의 선택' : sourceRole === 'GM' ? 'GM 공개 장면' : '공개 운영 기록', content: message.trim() }]
@@ -99,7 +99,7 @@ export function StoryReader({ chronicleId, initialPartId, onPartChange, onOpenNo
       <button className="reader-home" onClick={() => openPart(chronicleParts[0])}>처음부터 읽기</button>
       <button className="reader-explorer-link" onClick={onOpenExplorer}>세계 탐색으로 돌아가기</button>
       <div className="reader-season-tabs" role="tablist" aria-label="시즌 선택">{seasonIds.map((id) => <button key={id} className={seasonId === id ? 'active' : ''} onClick={() => openPart(chronicleParts.find((part) => part.seasonId === id) ?? chronicleParts[0])}>{id}</button>)}</div>
-      <nav className="reader-part-list" aria-label="원문 목차">{parts.map((part) => <button key={part.id} className={selected.id === part.id ? 'selected' : ''} onClick={() => openPart(part)}><span>{part.status === 'verified_transcript' ? '원문' : part.status === 'verified_fragment' ? '일부' : '미확보'}</span><strong>{part.number ? `PART ${String(part.number).padStart(3, '0')}` : 'GAP'}</strong><small>{part.title}</small></button>)}</nav>
+      <nav className="reader-part-list" aria-label="원문 목차">{parts.map((part) => <button key={part.id} className={selected.id === part.id ? 'selected' : ''} onClick={() => openPart(part)}><span>{part.status === 'verified_transcript' ? '원문' : part.status === 'verified_fragment' ? '일부' : '미확보'}</span><strong>{part.sessionId ? part.sessionId + ' · ' : ''}{part.number ? `PART ${String(part.number).padStart(3, '0')}` : 'GAP'}</strong><small>{part.title}</small></button>)}</nav>
     </aside>
     <article className="transcript-reader">
       <header className="reader-header"><div><p className="archive-eyebrow">{selected.seasonId} · {chronicle.label} · {selected.status === 'verified_transcript' ? 'VERIFIED TRANSCRIPT' : selected.status === 'verified_fragment' ? 'VERIFIED FRAGMENT' : 'MISSING TRANSCRIPT'}</p><h1>{selected.title}</h1><p>{selected.range}</p></div><div className="reader-progress" aria-label={'읽기 진행률 ' + progress + '%'}><strong>{progress}%</strong><span><i style={{ width: progress + '%' }} /></span></div></header>
