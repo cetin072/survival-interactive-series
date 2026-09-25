@@ -1,18 +1,20 @@
 import { chronicleBooks, chaptersForChronicle, type ChronicleBook } from './storyData'
+import { chronicleRegistry } from './chronicleRegistry'
 
 export function StoryLibrary({ onOpenBook }: { onOpenBook: (chronicleId: ChronicleBook['chronicleId']) => void }) {
-  const active = chronicleBooks.filter((book) => book.active)
-  const past = chronicleBooks.filter((book) => !book.active)
+  const active = chronicleBooks.filter((book) => chronicleRegistry.find((item) => item.id === book.chronicleId)?.active)
+  const past = chronicleBooks.filter((book) => !chronicleRegistry.find((item) => item.id === book.chronicleId)?.active)
   const shelf = (books: ChronicleBook[]) => <div className="book-shelf">
     {books.map((book) => {
       const chapters = chaptersForChronicle(book.chronicleId)
-      const seasons = new Set(chapters.map((chapter) => chapter.seasonId))
+      const seasons = new Set(chapters.map((chapter) => chapter.seasonId).filter(Boolean))
+      const parts = new Set(chapters.map((chapter) => chapter.partId).filter(Boolean))
       return <article className="book-card" key={book.chronicleId}>
-        <p className="archive-eyebrow">{book.active ? '현재 생존기 · 연재중' : '지난 생존기'}</p>
+        <p className="archive-eyebrow">{chronicleRegistry.find((item) => item.id === book.chronicleId)?.active ? '현재 생존기 · 연재중' : '지난 생존기'}</p>
         <h2>{book.title}</h2>
         <p className="book-subtitle">{book.subtitle}</p>
         <p>{book.description}</p>
-        <dl><div><dt>Chronicle</dt><dd>{book.chronicleId.slice(0, 3)}</dd></div><div><dt>Worldline</dt><dd>{book.worldlineId}</dd></div><div><dt>구성</dt><dd>{seasons.size} Season · {chapters.length} Chapter</dd></div></dl>
+        <dl><div><dt>Chronicle</dt><dd>{book.chronicleId.slice(0, 3)}</dd></div><div><dt>Worldline</dt><dd>{book.worldlineId}</dd></div><div><dt>구성</dt><dd>{parts.size ? `${parts.size} Part · ` : seasons.size ? `${seasons.size} Season · ` : ''}{chapters.length} Chapter</dd></div></dl>
         <button className="primary" onClick={() => onOpenBook(book.chronicleId)}>이야기 읽기</button>
       </article>
     })}
