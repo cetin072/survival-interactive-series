@@ -8,6 +8,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { createElement } from 'react'
 import { SafeMarkdown } from './SafeMarkdown'
 import { assertReaderManifest } from './readerManifestContract'
+import { archiveNodes } from './archiveData'
 
 describe('Reader Edition V1.1', () => {
   it('keeps RAW outside the two-item primary navigation', () => {
@@ -55,6 +56,26 @@ describe('Reader Edition V1.1', () => {
     expect(body).not.toMatch(/(?:^|\n)#{2,3}\s*(?:USER|GM|ASSISTANT_PUBLIC_META)/m)
     expect(body.match(/(?:^|\n)#{1,4}\s*(?:선택|행동)\s*\r?\n(?:\r?\n)*(?:\*\*)?(?:1\.|A\.)/m)?.[0]).toBeUndefined()
   })
+  it('uses event titles rather than repeated source-bucket labels', () => {
+    for (const chronicleId of ['C01-HAN-JUNHO', 'C02-STRONGHOLD', 'C03-AFTERFALL'] as const) {
+      const titles = chaptersForChronicle(chronicleId).map((chapter) => chapter.title)
+      expect(new Set(titles).size).toBe(titles.length)
+      expect(titles).not.toContain('두 거점의 기록')
+    }
+  })
+  it('keeps only resolvable, chapter-specific C03 Story to Wiki links', () => {
+    const nodeIds = new Set(archiveNodes.map((node) => node.id))
+    const c03 = chaptersForChronicle('C03-AFTERFALL')
+    expect(c03.every((chapter) => chapter.relatedNodeIds.every((id) => nodeIds.has(id)))).toBe(true)
+    expect(c03.find((chapter) => chapter.title === '외곽 주민복지관')?.relatedNodeIds).toEqual(['char-jinwoo', 'char-hajin', 'char-hayoung', 'char-yujin', 'loc-shelter'])
+    expect(c03.find((chapter) => chapter.title === '서쪽 화재선')?.relatedNodeIds).toEqual(['char-jinwoo', 'char-taehoon', 'event-fireline'])
+  })
+  it('removes known obvious archive reports while retaining ambiguous scene prose', () => {
+    const body = readerChapters.map((chapter) => chapter.body).join('\n')
+    expect(body).not.toContain('플레이어에게 보여주면 안 되는 PD용 설계안')
+    expect(body).not.toContain('filecite')
+    expect(body).toContain('진우가 지도를 한참 보다가 말을 꺼낸다')
+  })
   it('marks C02 grouping as parts rather than invented seasons', () => {
     expect(chaptersForChronicle('C02-STRONGHOLD').every((chapter) => !chapter.seasonId && Boolean(chapter.partId))).toBe(true)
   })
@@ -66,7 +87,7 @@ describe('Reader Edition V1.1', () => {
   })
   it('rejects a stale or incomplete generated manifest before it reaches the Reader', () => {
     expect(() => assertReaderManifest({ chronicleId: 'C99', transformVersion: 'old', coverage: { verifiedRawParts: 1, scanned: 1 }, chapters: [] })).toThrow('Unsupported Reader manifest')
-    expect(() => assertReaderManifest({ chronicleId: 'C99', transformVersion: 'reader-selection-v1.1.0', coverage: { verifiedRawParts: 2, scanned: 1 }, chapters: [] })).toThrow('Incomplete RAW coverage audit')
+    expect(() => assertReaderManifest({ chronicleId: 'C99', transformVersion: 'reader-selection-v1.2.0', coverage: { verifiedRawParts: 2, scanned: 1 }, chapters: [] })).toThrow('Incomplete RAW coverage audit')
   })
   it('renders safe Markdown as semantic elements rather than literal markers', () => {
     const html = renderToStaticMarkup(createElement(SafeMarkdown, { body: '## 2027년 1월 18일\n\n진우가 문을 열었다.\n\n> “가자.”\n\n**눈이 멎었다.**\n\n---\n\n다음 장면.' }))
