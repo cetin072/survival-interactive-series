@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { messagesFromRaw } from './StoryReader'
+import { messagesFromRaw } from './RawTranscriptReader'
 import { transcriptPartsFor } from './transcriptData'
 
 describe('raw transcript reader', () => {

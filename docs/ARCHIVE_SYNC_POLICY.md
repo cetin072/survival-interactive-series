@@ -4,6 +4,39 @@ Status: ACTIVE
 Worldline: AFTERFALL  
 Purpose: 플레이를 방해하지 않으면서 플레이어가 이미 발견한 세계를 읽기 전용 아카이브로 축적한다.
 
+> **Reader Edition V1 amendment (2026-09-25).** This amendment supersedes
+> earlier descriptions of the public navigation, Archive reader, and Explorer
+> detail layout where they conflict. The retained sections below remain the
+> operational safety policy for capture, PLAYER_SAFE review, and Chronicle
+> isolation.
+
+## Reader Edition V1 public structure
+
+The public product has three distinct layers:
+
+1. **World Explorer** — search, index, relationship graph, and long Wiki
+   articles for the active public worldline.
+2. **Reader Edition** — a bookshelf and web-novel reader for independent
+   C01 한준호, C02 박도현, and C03 서진우 chronicles.
+3. **RAW Vault** — preserved USER ↔ GM public transcripts, reachable only
+   from the footer as `기록 원문 보관소`.
+
+Primary navigation contains only `세계 탐색` and `이야기 읽기`. RAW does not
+appear in the primary navigation, Explorer hero, Wiki CTA, or book cards.
+Older `?view=reader&chronicle=…&part=…` links remain a RAW Vault equivalent;
+`?view=past` opens the bookshelf.
+
+Reader Edition is a separate publication layer. It may preserve verified GM
+narrative, omit USER input, remove choice gates, and make minimal
+PLAYER_SAFE Canon transitions. It must never build a story chapter by hiding
+USER nodes in a RAW DOM, invent dialogue/events, expose GM-only material, or
+mix Chronicle namespaces. Source provenance is retained in data but is not a
+reader-facing badge.
+
+Explorer articles contain exactly: 기본 정보, 개요, 주요 행적 · 기록, 핵심 관계,
+and 관련 이야기 · 참조. Timeline, source/transcript, Canon-summary, recent-event,
+and world-pressure dashboard surfaces are not public Explorer sections.
+
 ## 1. 역할 분리
 
 - ChatGPT / GM: 게임 진행, 정본 판정, 에피소드 종료 시 공개 아카이브 동기화
