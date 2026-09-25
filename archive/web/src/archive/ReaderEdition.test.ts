@@ -39,6 +39,10 @@ describe('Reader Edition V1.1', () => {
     expect(removeTrailingChoiceGate('장면.\n\n진우의 판단\n\n1. 지금 간다\n2. 하루 기다린다\n3. 민호에게 연락한다\n4. 자유행동')).toBe('장면.')
     expect(removeTrailingChoiceGate('장면.\n\n어떻게 할까?\nA. 북쪽\nB. 남쪽')).toBe('장면.')
   })
+  it('excludes an explicit design discussion but retains the following dated scene', () => {
+    const raw = '## GM\n좋아. 네 판단을 전략논의로 가져간다.\n\n## GM\n## 10월 23일 20:10\n진우가 문을 열었다.'
+    expect(extractReaderNarrative(raw)).toBe('## 10월 23일 20:10\n진우가 문을 열었다.')
+  })
   it('does not remove narrative numeric lists, headings, dialogue, or order', () => {
     for (const gm of ['현재 물자:\n\n1. 물 20L\n2. 연료 3통\n3. 식량 4일분', '순서는 이랬다.\n\n1. 환자 안정화.\n2. 병원 수용 확인.\n3. 차량 출발.', '1월 3일\n2번 거점\n3명이 남았다.']) expect(removeTrailingChoiceGate(gm)).toBe(gm)
   })
