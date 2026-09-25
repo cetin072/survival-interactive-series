@@ -163,3 +163,31 @@ RAW가 COMPLETE가 아니면 그 사실을 숨기지 않는다.
 - 이 범위는 **COMPLETE로 간주하지 않는다.**
 - 원 채팅/export 접근 시 누락구간을 문자 그대로 backfill한다. 요약/기억으로 재창작하지 않는다.
 - 시즌 자체는 아카이브/상태/피드백 기준으로 정상 종료되었으며 RAW backfill을 다음 플레이 시작 조건으로 만들지 않는다.
+
+
+## 7. 2026-09-25 원 채팅방 백필 세션 통합
+
+Status: **PARTIAL / VERIFIED SOURCE-ROOM BACKFILL / NOT BOOT INPUT**
+
+원 채팅방에서 현재 직접 확인 가능한 공개 USER↔GM/ASSISTANT 원문을 다섯 개의 독립 Session으로 보존했다.
+기존 USER 중심의 flat RAW 파일은 삭제하지 않고, 더 풍부한 방 단위 원문과 함께 provenance를 유지한다.
+
+| Session | 스토리 범위 | USER | GM/ASSISTANT 공개블록 | PART | 판정 |
+| --- | --- | ---: | ---: | ---: | --- |
+| `SESSION_2031_02_TO_2031_03_ROOM_20260925` | 2031-02 ~ 2031-03 산불장 진입 | 11 | 20 | 5 | PARTIAL |
+| `SESSION_20260925_CURRENT_ROOM` | 2031-12-13 ~ 2032-01-17 가시구간 | 9 | 28 | 4 | PARTIAL |
+| `SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925` | 2032 봄~여름 | 11 | 31 | 6 | PARTIAL |
+| `SESSION_C02_20260925_ROOM_01` | 2032-09 ~ 2038-04 | 11 | 19 | 5 | PARTIAL |
+| `SESSION_20260925_2039_CURRENT_ROOM` | 2039-01-19 ~ 2039-10-20 | 17 | 18 | 4 | PARTIAL |
+
+직접 보존된 다섯 source-room 합계는 USER 59 / GM·ASSISTANT 공개블록 116 / 총 175블록이다.
+이 숫자는 기존 flat RAW와의 중복을 제거한 수치가 아니며, 짧은 입력 반복도 원 source-room의 실제 기록으로 그대로 보존한다.
+
+### 읽기/검증 원칙
+
+- 각 Session의 `INDEX.md`와 `MANIFEST.json`이 해당 방의 정확한 시작·끝·누락구간을 정의한다.
+- 기존 `RAW_2032_03_TO_2032_09_PARTIAL_01.md`, `RAW_2032_09_TO_2038_04_PARTIAL_01.md`, `RAW_2038_05_TO_2039_12_PARTIAL_01.md`은 삭제하지 않는다.
+- 겹치는 USER 입력은 provenance 보존을 위해 자동 dedup하지 않는다.
+- GM 공개원문이 새 Session에서 확보된 경우에도 기존 partial 파일을 과거 기록으로 유지한다.
+- 전체 STRONGHOLD RAW는 여전히 **PARTIAL / BACKFILL REQUIRED**다.
+- 통합 상태는 `MANIFEST.json`을 함께 본다.

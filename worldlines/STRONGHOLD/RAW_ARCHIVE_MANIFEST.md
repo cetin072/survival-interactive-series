@@ -58,3 +58,20 @@ RAW는 `실제 플레이가 어떻게 살아 있었는가`, Canon/State는 `무�
 - 현실 디브리프: `REALITY_SURVIVAL_DEBRIEF_2038_05_TO_2039_12.md`
 - 누락 원인: 시즌 중 의무 Rolling RAW가 실제 실행되지 않음.
 - 처리: 누락분을 요약으로 복원하지 않고 원 채팅/export 접근 시에만 backfill. 다음 시즌 시작은 차단하지 않음.
+
+
+## 2026-09-25 source-room backfill consolidation
+
+다섯 개 원 채팅방에서 현재 직접 검증 가능한 공개 원문을 Session 단위로 추가 보존했다.
+
+- 2031-02 ~ 2031-03: PARTIAL source-room RAW
+- 2031-12 ~ 2032-01: PARTIAL source-room RAW
+- 2032 봄~여름: PARTIAL source-room RAW
+- 2032-09 ~ 2038-04: PARTIAL source-room RAW
+- 2039-01 ~ 2039-10: PARTIAL source-room RAW
+
+통합 인덱스: `raw_transcript/INDEX.md`  
+통합 메타: `raw_transcript/MANIFEST.json`
+
+기존 flat partial RAW는 provenance를 위해 유지한다. 새 Session이 더 많은 GM/ASSISTANT 공개원문을 포함하더라도 기존 파일을 덮어쓰지 않는다.
+정확한 앞부분이 없는 방은 계속 `[원문 확인 불가 구간]`으로 남기며 COMPLETE로 승격하지 않는다.

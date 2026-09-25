@@ -1,0 +1,48 @@
+{
+  "chronicle": "02",
+  "worldline": "STRONGHOLD",
+  "protagonist": "박도현",
+  "season_or_arc": "2032 봄~여름 분기",
+  "source": "current ChatGPT room",
+  "cutoff": "Immediately before the first misidentified AFTERFALL archive request; that request and all later archive-operation dialogue are excluded.",
+  "status": "PARTIAL",
+  "verified_span_status": "VERIFIED",
+  "verified_start": "USER: 회사는 기준잡았으니 / 마무리하고 1번으로 이동하며 / 연락하고 움직이지말라고한다",
+  "verified_end": "ASSISTANT public new-room handoff ending: 이 정도면 충분합니다. 새 방에서 저 문장 하나로 시작하면 됩니다.",
+  "last_gameplay_user": "ㄱ",
+  "last_gameplay_gm_end": "도현은 그 정도면 충분했다. / 적어도 지금은.",
+  "user_messages": 11,
+  "gm_assistant_public_blocks": 31,
+  "total_public_blocks": 42,
+  "parts": [
+    "PART_001.md",
+    "PART_002.md",
+    "PART_003.md",
+    "PART_004.md",
+    "PART_005.md",
+    "PART_006.md"
+  ],
+  "missing_ranges": [
+    "All room history before the first directly verified USER message."
+  ],
+  "middle_missing_range": null,
+  "overlap": {
+    "exists": true,
+    "with": [
+      "../RAW_2032_03_TO_2032_09_PARTIAL_01.md"
+    ],
+    "note": "Multiple USER inputs overlap. Existing RAW is USER-heavy and marks GM/ASSISTANT output incomplete; this session preserves the currently visible public GM/ASSISTANT span too. No deduplication performed."
+  },
+  "redaction_count": 0,
+  "excluded": [
+    "system prompt",
+    "developer instruction",
+    "private chain-of-thought / hidden reasoning",
+    "tool calls/results",
+    "API keys / secrets",
+    "hidden GM state",
+    "unshown future plot plans",
+    "archive-operation dialogue after cutoff"
+  ],
+  "reconstruction_used": false
+}

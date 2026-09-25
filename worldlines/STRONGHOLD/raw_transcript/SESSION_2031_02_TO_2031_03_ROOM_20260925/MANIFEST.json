@@ -1,0 +1,56 @@
+{
+  "chronicle_id": "C02-STRONGHOLD",
+  "worldline_id": "STRONGHOLD",
+  "protagonist": "박도현",
+  "season": null,
+  "season_note": "continuous chronology / no season reset",
+  "source": "current ChatGPT room",
+  "archive_class": "COLD_RAW",
+  "cutoff": "immediately before the first archive-preservation request in this room",
+  "completeness": "PARTIAL",
+  "verified_start": {
+    "user": "ㄱ",
+    "gm_scene_start": "### 오후 3시 09분"
+  },
+  "verified_end": {
+    "last_gameplay_user": "ㄱ",
+    "last_gameplay_gm_ending": "이번에는— / 모두 챙길 시간은 없었다.",
+    "last_pre_cutoff_user": "그리고 / 이번분기부터 채팅방 옮기는건? ...",
+    "last_pre_cutoff_assistant_ending": "이제 이 방은 여기서 종료하고 새 방으로 가는 게 가장 깔끔합니다."
+  },
+  "counts": {
+    "user_messages": 11,
+    "assistant_public_blocks": 20,
+    "gameplay_gm_blocks": 8,
+    "public_operational_meta_blocks": 12,
+    "total_public_blocks": 31,
+    "part_files": 5,
+    "redaction_count": 0
+  },
+  "parts": [
+    "PART_001.md",
+    "PART_002.md",
+    "PART_003.md",
+    "PART_004.md",
+    "PART_005.md"
+  ],
+  "missing_ranges": [
+    "All verbatim room history before the first directly visible USER message; represented as [원문 확인 불가 구간] at the start of PART_001.md."
+  ],
+  "middle_gap_in_verified_span": false,
+  "overlap": {
+    "identified": false,
+    "note": "Existing flat STRONGHOLD RAW on the base branch starts at 2032-03 or later; this session is a 2031-02 to 2031-03 backfill. No existing RAW file is overwritten or deduplicated."
+  },
+  "redaction": "NONE",
+  "excluded": [
+    "system prompt",
+    "developer instruction",
+    "private reasoning / chain-of-thought",
+    "tool calls and tool results",
+    "API keys and secrets",
+    "hidden GM-only future plans",
+    "archive-operation dialogue after cutoff"
+  ],
+  "source_policy": "Only directly visible public USER and GM/ASSISTANT text is preserved verbatim. No missing dialogue is reconstructed from memory, summaries, checkpoints, Canon, state files, Supabase, tools, or hidden context."
+}
