@@ -156,11 +156,13 @@ function GraphExplorer({
   selected,
   onSelect,
   onFocusRoot,
+  onGoToDetail,
 }: {
   root: ArchiveNode
   selected: ArchiveNode
   onSelect: (id: string) => void
   onFocusRoot: (id: string) => void
+  onGoToDetail: () => void
 }) {
   const [expandedIds, setExpandedIds] = useState<string[]>([root.id])
   const [zoom, setZoom] = useState(1)
@@ -334,71 +336,79 @@ function GraphExplorer({
         {selected.id !== root.id && (
           <button onClick={() => onFocusRoot(selected.id)}>이 노드를 중심으로 보기</button>
         )}
+        <button className="graph-read-button" onClick={onGoToDetail}>본문으로 이동 ↓</button>
       </div>
     </section>
   )
 }
 
-function DetailPanel({
+function statusFor(node: ArchiveNode) {
+  return node.meta?.상태 ?? (node.type === 'event' ? '기록 완료' : 'PUBLIC RECORD')
+}
+
+function affiliationFor(node: ArchiveNode) {
+  return node.meta?.소속 ?? node.meta?.거점 ?? node.meta?.겨울역할 ?? node.meta?.관계 ?? '공개 기록 기준 미분류'
+}
+
+function hasFinalConsonant(value: string) {
+  const code = value.charCodeAt(value.length - 1)
+  return code >= 0xac00 && code <= 0xd7a3 && (code - 0xac00) % 28 !== 0
+}
+
+function relatedEventsFor(node: ArchiveNode) {
+  const direct = getNeighbors(node.id).filter(({ node: neighbor }) => neighbor.type === 'event').map(({ node: neighbor }) => neighbor)
+  const nearby = getNeighbors(node.id).flatMap(({ node: neighbor }) => getNeighbors(neighbor.id))
+    .filter(({ node: neighbor }) => neighbor.type === 'event').map(({ node: neighbor }) => neighbor)
+  return Array.from(new Map([...direct, ...nearby].map((event) => [event.id, event])).values())
+    .sort((a, b) => eventOrder.indexOf(a.id) - eventOrder.indexOf(b.id))
+}
+
+function relatedLocationsFor(node: ArchiveNode) {
+  return Array.from(new Map(
+    getNeighbors(node.id).filter(({ node: neighbor }) => neighbor.type === 'location')
+      .map(({ node: neighbor }) => [neighbor.id, neighbor]),
+  ).values())
+}
+
+function DetailArticle({
   selected,
   graphRootId,
   onSelect,
   onFocusRoot,
+  onOpenReader,
 }: {
   selected: ArchiveNode
   graphRootId: string
   onSelect: (id: string) => void
   onFocusRoot: (id: string) => void
+  onOpenReader: (chronicleId: ChronicleId, partId?: string) => void
 }) {
   const neighbors = getNeighbors(selected.id)
+  const events = relatedEventsFor(selected)
+  const locations = relatedLocationsFor(selected)
+  const transcriptParts = transcriptPartsFor(activeChronicle.id)
+    .filter((part) => part.status !== 'missing_transcript')
+    .filter((part) => part.relatedNodeIds.length === 0 || part.relatedNodeIds.includes(selected.id))
+    .slice(0, 4)
 
   return (
-    <article className="archive-panel detail-panel">
-      <div className="detail-topline">
-        <div className="detail-type">{typeLabel[selected.type]}</div>
-        {selected.id !== graphRootId && (
-          <button className="detail-focus-button" onClick={() => onFocusRoot(selected.id)}>
-            그래프 중심
-          </button>
-        )}
-      </div>
-      <h1>{selected.label}</h1>
-      <p className="detail-subtitle">{selected.subtitle}</p>
-      <p className="detail-summary">{selected.summary}</p>
-
-      {selected.meta && (
-        <dl className="detail-meta">
-          {Object.entries(selected.meta).map(([key, value]) => (
-            <div key={key}>
-              <dt>{key}</dt>
-              <dd>{value}</dd>
-            </div>
-          ))}
-        </dl>
-      )}
-
-      <div className="tag-row">
-        {selected.tags.map((tag) => <span key={tag}>{tag}</span>)}
-      </div>
-
-      <section className="detail-section">
-        <h2>연결 {neighbors.length}</h2>
-        <div className="connection-list">
-          {neighbors.length === 0 && <p className="archive-muted">아직 공개된 연결이 없습니다.</p>}
-          {neighbors.map(({ node, edge }, index) => (
-            <button key={node.id + edge.label + index} onClick={() => onSelect(node.id)}>
-              <span>{node.label}</span>
-              <small>{edge.label}</small>
-            </button>
-          ))}
+    <article className="archive-detail" id="archive-detail" aria-labelledby="archive-detail-title">
+      <header className="archive-detail-header">
+        <div><p className="archive-eyebrow">ARCHIVE ENTRY · {typeLabel[selected.type]} · {activeChronicle.worldlineId}</p><h1 id="archive-detail-title">{selected.label}</h1><p>{selected.subtitle}</p></div>
+        <div className="detail-header-actions">
+          {selected.id !== graphRootId && <button className="detail-focus-button" onClick={() => onFocusRoot(selected.id)}>그래프 중심으로</button>}
+          <button className="detail-reader-button" onClick={() => onOpenReader(activeChronicle.id, transcriptParts[0]?.id)}>원문 보기 →</button>
         </div>
-      </section>
-
-      <section className="detail-section source-section">
-        <h2>출처</h2>
-        <p>{selected.source}</p>
-        <small>PLAYER_SAFE snapshot · GM-only / hidden state 제외</small>
-      </section>
+      </header>
+      <nav className="detail-toc" aria-label={selected.label + ' 본문 목차'}><a href="#detail-basics">기본 정보</a><a href="#detail-overview">개요</a><a href="#detail-relations">핵심 관계</a><a href="#detail-events">주요 사건</a><a href="#detail-locations">관련 장소</a><a href="#detail-sources">원문·출처</a><a href="#detail-timeline">연표</a><a href="#detail-canon">정본 요약</a></nav>
+      <section className="detail-section" id="detail-basics"><h2>기본 정보</h2><dl className="detail-meta detail-meta-wide"><div><dt>이름</dt><dd>{selected.label}</dd></div><div><dt>타입</dt><dd>{typeLabel[selected.type]}</dd></div><div><dt>상태</dt><dd>{statusFor(selected)}</dd></div><div><dt>소속 / 위치</dt><dd>{affiliationFor(selected)}</dd></div><div><dt>Chronicle</dt><dd>{activeChronicle.label}</dd></div><div><dt>Season</dt><dd>{archiveMeta.season}</dd></div></dl><div className="tag-row">{selected.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></section>
+      <section className="detail-section detail-prose" id="detail-overview"><h2>개요</h2><p>{selected.label}{hasFinalConsonant(selected.label) ? '은' : '는'} {selected.subtitle}로 기록된 {typeLabel[selected.type]} 항목이다. {selected.summary}</p><p>이 문서는 그래프에서 보인 연결을 읽을 수 있는 공개 아카이브로 풀어 쓴 것이다. 현재 상태와 관계는 PLAYER_SAFE 범위에서만 정리하며, 원문에 없는 대사나 미래 전개는 보태지 않는다.</p></section>
+      <section className="detail-section" id="detail-relations"><h2>핵심 관계 <span>{neighbors.length}</span></h2><div className="relationship-list">{neighbors.length === 0 && <p className="archive-muted">현재 공개된 직접 연결이 없습니다.</p>}{neighbors.map(({ node, edge }, index) => <article key={node.id + edge.label + index}><div><span className={'type-dot type-dot-' + node.type} /><strong>{node.label}</strong><small>{typeLabel[node.type]} · {node.subtitle}</small></div><p><b>{edge.label}</b> · 현재 {statusFor(node)}</p><button onClick={() => onSelect(node.id)}>{node.label} 선택</button></article>)}</div></section>
+      <section className="detail-section" id="detail-events"><h2>주요 사건</h2><div className="archive-entry-list">{events.length === 0 && <p className="archive-muted">직접 연결된 공개 사건이 아직 없습니다.</p>}{events.map((event) => <button key={event.id} onClick={() => onSelect(event.id)}><span>{event.subtitle}</span><strong>{event.label}</strong><p>{event.summary}</p></button>)}</div></section>
+      <section className="detail-section" id="detail-locations"><h2>관련 장소</h2><div className="archive-entry-list compact">{locations.length === 0 && <p className="archive-muted">공개된 직접 장소 연결이 없습니다.</p>}{locations.map((location) => <button key={location.id} onClick={() => onSelect(location.id)}><strong>{location.label}</strong><p>{location.subtitle} · {location.summary}</p></button>)}</div></section>
+      <section className="detail-section" id="detail-sources"><h2>원문 등장 기록 · 출처</h2><div className="source-records">{transcriptParts.map((part) => <article key={part.id}><div><strong>{part.seasonId}{part.sessionId ? ' · ' + part.sessionId : ''} · {part.title}</strong><span>{part.range}</span></div><button onClick={() => onOpenReader(activeChronicle.id, part.id)}>원문 바로가기 →</button></article>)}</div><p className="detail-source-note">정본 출처: {selected.source} · PLAYER_SAFE snapshot만 표시하며 GM-only / hidden state는 제외합니다.</p></section>
+      <section className="detail-section" id="detail-timeline"><h2>연표</h2><ol className="detail-timeline"><li><time>기록 등록</time><div><strong>{activeChronicle.label} · {archiveMeta.season}</strong><p>{selected.label}{hasFinalConsonant(selected.label) ? '이' : '가'} 공개 아카이브 항목으로 정리됐다.</p></div></li>{events.slice(0, 4).map((event) => <li key={event.id}><time>{event.subtitle}</time><div><strong>{event.label}</strong><p>{event.summary}</p></div></li>)}<li><time>최근 상태</time><div><strong>{statusFor(selected)}</strong><p>{selected.summary}</p></div></li></ol></section>
+      <section className="detail-section canon-summary" id="detail-canon"><p className="archive-eyebrow">CANON SUMMARY · NOT RAW TRANSCRIPT</p><h2>정본 요약</h2><p>{selected.summary}</p><p>이 요약은 공개 정본을 읽기 좋게 정리한 것이다. 실제 대화 원문과 같은 기록으로 취급하지 않으며, 원문에 없는 구간을 추정으로 채우지 않는다.</p></section>
     </article>
   )
 }
@@ -656,15 +666,11 @@ export function ArchiveApp() {
           selected={selected}
           onSelect={(id) => selectNode(id)}
           onFocusRoot={focusRoot}
-        />
-
-        <DetailPanel
-          selected={selected}
-          graphRootId={graphRoot.id}
-          onSelect={(id) => selectNode(id)}
-          onFocusRoot={focusRoot}
+          onGoToDetail={() => document.getElementById('archive-detail')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
         />
       </section>
+
+      <DetailArticle selected={selected} graphRootId={graphRoot.id} onSelect={(id) => selectNode(id)} onFocusRoot={focusRoot} onOpenReader={openReader} />
 
       <section className="archive-section-grid">
         <section className="archive-panel timeline-panel">
