@@ -233,3 +233,35 @@ Default-branch database contract:
 - `supabase/migrations/20260925044647_public_transcript_turn_pair_api_v1.sql`
 - `supabase/tests/public_transcript_turn_pair_api_v1_verification.sql`
 - `docs/RAW_ROLLING_CAPTURE_V1.md`
+
+
+## 13. Capture / publication cadence
+
+Live RAW capture and Archive publication are intentionally separated.
+
+### Every gameplay turn
+- store the exact USER→GM pair in Supabase with `append_public_transcript_turn(...)`;
+- do not create a GitHub commit or Netlify deploy for routine turns;
+- do not interrupt the player with save/archive progress messages.
+
+### Important irreversible branch point
+A major irreversible event may trigger early promotion before the daily batch when useful, for example:
+- core character joins/leaves/dies;
+- base gained/lost/destroyed;
+- major faction or relationship state becomes durable;
+- episode/season closes;
+- a large event changes future operating rules.
+
+This is an Archive/Canon promotion decision, not a change to RAW capture.
+
+### Daily batch
+Routine accumulated PLAYER_SAFE material waits for the daily Archive reconciliation at **04:30 KST**. The batch may:
+- audit capture health;
+- promote verified transcript spans;
+- reconcile Canon/Scene/entity/relationship changes;
+- create one GitHub branch/PR;
+- validate and publish to Netlify.
+
+If nothing material changed, create no commit or deploy.
+
+> **Per turn: preserve. 04:30: reconcile and publish. Important branch: optionally promote early.**
