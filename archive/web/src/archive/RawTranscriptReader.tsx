@@ -51,7 +51,7 @@ function TranscriptBody({ part }: { part: TranscriptPart }) {
   return <div className="transcript-flow">{messagesFromRaw(part.content ?? '').map((message, index) => <section key={index} className={'transcript-message transcript-' + message.role}><p className="transcript-role">{message.label}</p><MessageBody content={message.content} /></section>)}</div>
 }
 
-export function StoryReader({ chronicleId, initialPartId, onPartChange, onOpenNode, onOpenExplorer }: { chronicleId: ChronicleId; initialPartId?: string; onPartChange: (partId: string) => void; onOpenNode: (id: string) => void; onOpenExplorer: () => void }) {
+export function RawTranscriptReader({ chronicleId, initialPartId, onPartChange, onOpenNode, onOpenExplorer }: { chronicleId: ChronicleId; initialPartId?: string; onPartChange: (partId: string) => void; onOpenNode: (id: string) => void; onOpenExplorer: () => void }) {
   const chronicle = getChronicle(chronicleId)
   const chronicleParts = useMemo(() => transcriptPartsFor(chronicleId), [chronicleId])
   const initialPart = chronicleParts.find((part) => part.id === initialPartId) ?? chronicleParts[0]
@@ -87,7 +87,10 @@ export function StoryReader({ chronicleId, initialPartId, onPartChange, onOpenNo
     }
     saveProgress(); onPartChange(selected.id); window.addEventListener('scroll', saveProgress, { passive: true })
     return () => window.removeEventListener('scroll', saveProgress)
-  }, [chronicleId, selected?.id, onPartChange])
+  // Route persistence should follow the selected transcript, not the parent
+  // callback identity (ArchiveApp supplies an inline route writer).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chronicleId, selected?.id])
 
   function openPart(part: TranscriptPart) { setSelectedId(part.id); setSeasonId(part.seasonId); window.scrollTo({ top: 0, behavior: 'smooth' }) }
   if (!selected) return null
