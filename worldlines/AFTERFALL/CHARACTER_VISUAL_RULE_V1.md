@@ -127,3 +127,18 @@ AFTERFALL의 중요 인물은 기능성 NPC가 아니라, 플레이어가 얼굴
 
 다만 외모 묘사만 길게 늘여 장면 속도를 죽이지 않는다.
 기본 목표는 **2~5문장 안에서 기억 가능한 사람을 만드는 것**이다.
+
+## 10. Existing character visual backfill
+
+새 인물만 대상이 아니다. 이미 반복 등장하는 인물이라도
+`survival_rpg.characters.known_facts.appearance_anchor`가 없다면, 다음 의미 있는
+high-resolution 재등장을 visual backfill 기회로 사용한다.
+
+- 현재 장면에 이미 로드된 인물만 판단한다. 전 인물 목록을 매 turn 감사하지 않는다.
+- 얼굴·체형·머리·옷·목소리·분위기·기억나는 특징 중 장면에 자연스러운 2~5문장만
+  보여준다.
+- 장면 뒤 해당 인물 카드에 `appearance_anchor`와 필요한 `presence`만 저장한다.
+- 이미 확정된 baseline(키/체형/얼굴/머리/특징)은 사건·시간의 이유 없이 다시 만들거나
+  바꾸지 않는다. 부상·흉터·노화·위생·장비·헤어 변화는 `visual_changes`로 남긴다.
+- Archive publication은 04:30 batch에서 이 PLAYER_SAFE anchor를 정적 snapshot으로
+  반영한다. visual backfill은 live turn에 Archive/GitHub/Netlify 호출을 추가하지 않는다.

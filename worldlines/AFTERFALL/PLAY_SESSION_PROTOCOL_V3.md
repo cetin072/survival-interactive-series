@@ -119,7 +119,9 @@ Do **not** emit the final response yet.
 ### Step C — write one atomic pair
 Immediately before emitting the response:
 
-1. read the current session's `last_message_order`;
+1. use the last acknowledged `message_order` retained for the current healthy room/session;
+   re-read it only after reconnect, room movement, ambiguous acknowledgement, idempotency retry,
+   or suspected session corruption;
 2. set `p_user_message_order = last_message_order + 1`;
 3. generate one stable USER idempotency UUID;
 4. generate one distinct stable GM idempotency UUID;
@@ -137,6 +139,10 @@ GM   = p_user_message_order + 1
 inside one database statement.
 
 If the GM half fails, the USER half must not remain committed.
+
+For the full normal-turn call budget and same-scene context reuse rule, follow
+`LIVE_TURN_FAST_PATH_V1.md`. GitHub, Archive, Reader and Netlify work are not
+normal-turn work.
 
 ### Step D — emit verbatim
 Only after the turn-pair call succeeds, emit **the exact same GM string** that

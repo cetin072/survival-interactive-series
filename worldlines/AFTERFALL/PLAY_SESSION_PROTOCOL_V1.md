@@ -4,6 +4,10 @@ Status: **AUTHORITATIVE OPERATING POLICY**
 Chronicle: **03 / AFTERFALL / 서진우**  
 Purpose: ChatGPT 채팅방이 늘어나도 게임 상태·정본·공개 원문이 끊기지 않게 한다.
 
+> 정상 live USER→GM capture의 세부 규칙은 `PLAY_SESSION_PROTOCOL_V3.md`와
+> `LIVE_TURN_FAST_PATH_V1.md`가 이 문서보다 우선한다. 이 문서는 room continuity,
+> source boundaries와 failure-safe 원칙을 계속 정의한다.
+
 ## 1. 핵심 원칙
 
 > **채팅방은 세이브가 아니다. 채팅방은 게임 화면이다.**
