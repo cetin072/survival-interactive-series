@@ -1,0 +1,42 @@
+{
+  "chronicle": "03",
+  "worldline": "AFTERFALL",
+  "protagonist": "서진우",
+  "season": 2,
+  "source": "current ChatGPT room",
+  "cutoff": "immediately before the archive request that initiated this session audit",
+  "verified_start": null,
+  "verified_end": null,
+  "visible_foreign_room_audit": {
+    "identity_observed": "C02 / STRONGHOLD / 박도현",
+    "first_directly_visible_user": "3",
+    "last_actual_gameplay_user": "1\n\n그리고\n새로운 분기가 시작되는거면\n한번 끊고\n\n아카이빙하고\n피드백하고\n보수한다음\n\n새시즌을하자",
+    "last_actual_gameplay_gm_summary": "Closes the 2038-04 Park Dohyun / STRONGHOLD arc after the rear-land purchase, then transitions into post-arc archival/feedback meta.",
+    "user_messages": 10,
+    "gm_public_blocks": 18
+  },
+  "archived_afterfall_counts": {
+    "user": 0,
+    "gm": 0,
+    "total": 0
+  },
+  "part_list": [],
+  "missing_range": [
+    "[원문 확인 불가 구간] Chronicle 03 / AFTERFALL / 서진우 Season 2 verbatim public transcript is not directly accessible in the current conversation context."
+  ],
+  "overlap": {
+    "status": "NOT_APPLICABLE",
+    "reason": "No AFTERFALL transcript content was copied in this identity-audit session."
+  },
+  "redaction_count": 0,
+  "completeness": "MISSING",
+  "safety": {
+    "system_prompt_saved": false,
+    "developer_instruction_saved": false,
+    "private_reasoning_saved": false,
+    "tool_calls_or_results_saved": false,
+    "gm_only_future_saved": false,
+    "secret_saved": false,
+    "foreign_worldline_raw_saved": false
+  }
+}
