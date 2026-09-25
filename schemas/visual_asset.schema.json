@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://survival-interactive-series.local/schemas/visual_asset.schema.json",
+  "title": "Visual Asset",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "worldline_id",
+    "asset_id",
+    "asset_type",
+    "status",
+    "visibility",
+    "title",
+    "style_version",
+    "source",
+    "brief"
+  ],
+  "properties": {
+    "worldline_id": { "type": "string", "minLength": 1 },
+    "asset_id": { "type": "string", "minLength": 1 },
+    "asset_type": {
+      "enum": ["WORLD_MAP", "LOCATION", "CHARACTER", "EVENT"]
+    },
+    "status": {
+      "enum": [
+        "CANDIDATE",
+        "WAITING_CANON",
+        "READY",
+        "GENERATING",
+        "GENERATED",
+        "PUBLISHED",
+        "REJECTED",
+        "SUPERSEDED",
+        "ERROR"
+      ]
+    },
+    "visibility": {
+      "enum": ["PUBLIC_ARCHIVE", "PLAYER_ARCHIVE", "CORE_PRIVATE"]
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "style_version": { "type": "string", "minLength": 1 },
+    "source": { "type": "object" },
+    "brief": { "type": "object" },
+    "prompt_snapshot": { "type": ["string", "null"] },
+    "provider": { "type": ["string", "null"] },
+    "provider_model": { "type": ["string", "null"] },
+    "provider_asset_id": { "type": ["string", "null"] },
+    "object_path": { "type": ["string", "null"] },
+    "image_url": { "type": ["string", "null"] },
+    "generation_meta": { "type": "object" },
+    "error_text": { "type": ["string", "null"] },
+    "published_at": { "type": ["string", "null"], "format": "date-time" }
+  }
+}
