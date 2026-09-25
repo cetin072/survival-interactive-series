@@ -43,6 +43,10 @@ describe('Reader Edition V1.1', () => {
     const raw = '## GM\n좋아. 네 판단을 전략논의로 가져간다.\n\n## GM\n## 10월 23일 20:10\n진우가 문을 열었다.'
     expect(extractReaderNarrative(raw)).toBe('## 10월 23일 20:10\n진우가 문을 열었다.')
   })
+  it('excludes isolated GM planning replies without deleting a scene block', () => {
+    const raw = '## GM\n좋아. 이건 거점 하나 옮길까 수준이 아니라, 7명이 두 거점을 어떻게 운영할지 정하는 문제다.\n\n## GM\n네 명 내부 회의의 핵심은 우리가 연합체가 되는 게 맞는가다.\n\n## GM\n## 10월 24일 17:35\n진우는 네 사람을 다시 모았다.'
+    expect(extractReaderNarrative(raw)).toBe('## 10월 24일 17:35\n진우는 네 사람을 다시 모았다.')
+  })
   it('does not remove narrative numeric lists, headings, dialogue, or order', () => {
     for (const gm of ['현재 물자:\n\n1. 물 20L\n2. 연료 3통\n3. 식량 4일분', '순서는 이랬다.\n\n1. 환자 안정화.\n2. 병원 수용 확인.\n3. 차량 출발.', '1월 3일\n2번 거점\n3명이 남았다.']) expect(removeTrailingChoiceGate(gm)).toBe(gm)
   })
