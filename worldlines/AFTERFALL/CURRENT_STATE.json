@@ -27,7 +27,7 @@
   },
   "season": 2,
   "phase": "S02_ACTIVE_FRACTURE",
-  "game_time_anchor": "2027-01-16 07:30",
+  "game_time_anchor": "2027-02-07 13:40",
   "current_checkpoint": "worldlines/AFTERFALL/seasons/S02/CURRENT_CHECKPOINT_2027-01-14.md",
   "season_start_handoff": "worldlines/AFTERFALL/seasons/S02/START_HANDOFF.md",
   "character_bible": "worldlines/AFTERFALL/CHARACTER_BIBLE.md",
@@ -36,15 +36,15 @@
   "previous_archive": "worldlines/AFTERFALL/seasons/S01/ARC_ARCHIVE.md",
   "raw_policy": "S01 RAW is BACKFILL REQUIRED and must not be reconstructed from memory.",
   "spoiler_policy": "Do not reveal future season 2 plot, losses, relationship changes, collapse trigger, or disaster mechanism before they occur in play.",
-  "note": "Winter long arc active. Jinwoo and Taehun stayed one night at North Yuseong Agritech and helped harden its core greenhouse, well, generator, and living zone after outer greenhouse losses. Long-range apocalypse direction now governs the winter-to-spring transition.",
+  "note": "2027-02-07 continuity correction applied. Distance/grid work and limited expert-advice search remain valid; the military-base / barracks / command interpretation is superseded. The active question is whether the growing third hub should expand or relocate into a larger habitable building, whether the core four should eventually move their daily living zone forward, and whether the northwest training center should become a rear survival fallback.",
   "gm_context_rules": "worldlines/AFTERFALL/GM_CONTEXT_V1.md",
-  "save_version_anchor": 215,
-  "current_scene": "S02_AGRITECH_ONE_NIGHT_HARDENING",
+  "save_version_anchor": 244,
+  "current_scene": "S02_BASE_RECONFIGURATION_CORE_MEETING",
   "active_arc": "WINTER_LONG_ARC_V2",
   "winter_arc_plan": "worldlines/AFTERFALL/seasons/S02/WINTER_LONG_ARC_V2.md",
   "play_session_protocol": "worldlines/AFTERFALL/PLAY_SESSION_PROTOCOL_V3.md",
   "live_transcript_capture": {
-    "status": "ACTIVE_RETRY_REQUIRED",
+    "status": "ACTIVE_V3",
     "mode": "CHATGPT_TOOL_ENFORCED_ATOMIC_TURN_PAIR",
     "storage": "survival_rpg.transcript_sessions + survival_rpg.transcript_messages",
     "open_function": "survival_rpg.open_public_transcript_session",
@@ -58,5 +58,15 @@
     "next_validation": "Start a fresh capture session and verify at least two exact USER→GM pairs with contiguous orders 0..3."
   },
   "long_range_direction": "worldlines/AFTERFALL/APOCALYPSE_LONG_RANGE_DIRECTION_V1.md",
-  "live_turn_fast_path": "worldlines/AFTERFALL/LIVE_TURN_FAST_PATH_V1.md"
+  "live_turn_fast_path": "worldlines/AFTERFALL/LIVE_TURN_FAST_PATH_V1.md",
+  "continuity_correction": {
+    "status": "ACTIVE",
+    "superseded_scene": "S02_SECURITY_LAYER_MAP_AND_OPS_SITE_REVIEW",
+    "retained": [
+      "WORLD_MAP_GRID_V1 distances and coordinates",
+      "limited expert-advice search",
+      "geographic centrality facts"
+    ],
+    "active_purpose": "THIRD_HUB_RELOCATION_AND_LIVING_BASE_RECONFIGURATION"
+  }
 }
