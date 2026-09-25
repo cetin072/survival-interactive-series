@@ -1,0 +1,74 @@
+{
+  "chronicle": "Chronicle 03",
+  "worldline": "AFTERFALL",
+  "protagonist": "서진우",
+  "season": "S02",
+  "archive_class": "COLD RAW",
+  "overall_status": "PARTIAL",
+  "source_policy": "Only directly visible public USER↔GM text from the current chat context; no reconstruction from memory, summaries, checkpoints, Canon, or runtime state.",
+  "branch": "archive/afterfall-chronicle03-s02-room-20260925",
+  "base_branch": "worldline/afterfall-rpg",
+  "snapshot": {
+    "start_status": "VERIFIED",
+    "start_excerpt": "보고만 있어야하나? 우리 연합과 지인뿐만아니라 이 지역에는 사람들이 있고, 정부의 지원은 없더라도, 해당 시설들에게 연락을 할수는 있지않나,",
+    "end_status": "VERIFIED",
+    "end_excerpt": "확인되지 않은 내용을 원문처럼 만들지 마라.",
+    "cutoff_rule": "Archive-operation assistant replies after the preservation-request USER message are outside this snapshot."
+  },
+  "counts": {
+    "user_messages": 31,
+    "gm_public_blocks": 89,
+    "total_public_blocks": 120
+  },
+  "parts": [
+    {
+      "file": "PART_001.md",
+      "status": "VERIFIED",
+      "user_messages": 10,
+      "gm_public_blocks": 30
+    },
+    {
+      "file": "PART_002.md",
+      "status": "VERIFIED",
+      "user_messages": 5,
+      "gm_public_blocks": 16
+    },
+    {
+      "file": "PART_003.md",
+      "status": "VERIFIED",
+      "user_messages": 8,
+      "gm_public_blocks": 26
+    },
+    {
+      "file": "PART_004.md",
+      "status": "VERIFIED",
+      "user_messages": 8,
+      "gm_public_blocks": 17
+    }
+  ],
+  "gaps": [
+    {
+      "status": "MISSING",
+      "marker": "[원문 확인 불가 구간]",
+      "description": "All verbatim conversation before the first captured USER message is unavailable in the current directly accessible chat context."
+    }
+  ],
+  "public_dialogue_redaction": "NONE",
+  "excluded_nonpublic": [
+    "system prompts",
+    "developer instructions",
+    "private reasoning",
+    "tool calls/results",
+    "hidden memory/citation metadata",
+    "GM-only future plans/secrets"
+  ],
+  "attachments": [
+    {
+      "type": "image",
+      "count": 1,
+      "binary_archived": false,
+      "note": "Current transcript image marker retained in text; binary image not duplicated."
+    }
+  ],
+  "complete": false
+}
