@@ -1,0 +1,33 @@
+{
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "protagonist": "서진우",
+  "overall_status": "PARTIAL",
+  "source_root": "worldlines/AFTERFALL",
+  "seasons": {
+    "S01": {
+      "status": "PARTIAL",
+      "source_pr": 86,
+      "source_merge_commit": "2ce22f78a143e0091596ceaf58bb12542e80cca5",
+      "verified": {
+        "user_messages": 39,
+        "gm_public_messages": 86,
+        "parts": ["PART_C03_001.md", "PART_C03_002.md", "PART_C03_003.md", "PART_C03_004.md", "PART_C03_005.md", "PART_C03_006.md", "PART_C03_007.md", "PART_C03_009.md", "PART_C03_010.md"]
+      },
+      "partial": ["PART_C03_008.md"],
+      "missing": ["All verbatim dialogue before the directly verified start.", "One directly verified GM meta reply following PART_C03_008."],
+      "index": "seasons/S01/raw_transcript/INDEX.md"
+    },
+    "S02": {
+      "status": "PARTIAL",
+      "sessions": ["SESSION_001", "SESSION_002"],
+      "verified_user_messages": 44,
+      "verified_gm_public_blocks": 105,
+      "missing": ["Each source room's pre-capture dialogue."],
+      "index": "seasons/S02/raw_transcript/INDEX.md",
+      "manifest": "seasons/S02/raw_transcript/MANIFEST.json"
+    }
+  },
+  "publication": "A separate PLAYER_SAFE review is required before any C03 raw text is copied to the main Archive publication namespace.",
+  "complete": false
+}

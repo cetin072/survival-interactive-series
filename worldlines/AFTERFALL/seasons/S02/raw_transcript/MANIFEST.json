@@ -1,0 +1,44 @@
+{
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "protagonist": "서진우",
+  "season_id": "S02",
+  "archive_class": "COLD_RAW",
+  "overall_status": "PARTIAL",
+  "sessions": [
+    {
+      "session_id": "SESSION_001",
+      "source_pr": 84,
+      "source_branch": "archive/afterfall-chronicle03-s02-room-20260925",
+      "source_commit": "793b17e05f4ae3a3d84189ebaff7a86c6b04d0ab",
+      "status": "PARTIAL",
+      "verified_range": "2026-11-22 industrial-fire response through archive-request cutoff",
+      "user_messages": 31,
+      "gm_public_blocks": 89,
+      "missing": "All verbatim conversation before the first directly visible USER message in this source room.",
+      "source_index": "SESSION_001/SOURCE_INDEX.md",
+      "source_manifest": "SESSION_001/SOURCE_MANIFEST.json"
+    },
+    {
+      "session_id": "SESSION_002",
+      "source_pr": 83,
+      "source_branch": "archive/afterfall-s02-raw-room-20260925",
+      "source_commit": "1d94a48282ed9baa51ec8a799d7f0a029e9bc283",
+      "status": "PARTIAL",
+      "verified_range": "2027-01-04 first-winter discussion through archive-request cutoff",
+      "user_messages": 13,
+      "gm_public_blocks": 16,
+      "missing": "All verbatim conversation before the first directly visible USER message in this source room.",
+      "source_index": "SESSION_002/SOURCE_INDEX.md"
+    }
+  ],
+  "overlap_decision": {
+    "classification": "SEPARATE_SESSIONS_WITH_SHARED_PUBLIC_INPUTS",
+    "exact_user_values_shared": 2,
+    "exact_user_records_shared": 3,
+    "exact_gm_blocks_shared": 0,
+    "action": "Preserve both sessions without overwriting or cross-session deduplication."
+  },
+  "source_policy": "Only directly verified public USER/GM text; no transcript reconstruction from Canon, checkpoint, summary, memory, system/developer text, private reasoning, or tool output.",
+  "complete": false
+}
