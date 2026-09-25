@@ -1,15 +1,17 @@
 # C03 서진우 / AFTERFALL — Historical Transcript Manifest
 
-Chronicle: **C03 서진우 / AFTERFALL**  
-Primary source root: `worldlines/AFTERFALL/**`  
-Audited source ref: `origin/worldline/afterfall-rpg` at `251d825`  
-Public safety: no historical raw file was promoted from Canon, checkpoint, event,
-or session material.
+Chronicle: **C03 서진우 / AFTERFALL**
+Primary source root: `worldlines/AFTERFALL/**`
+Audited source ref: `origin/worldline/afterfall-rpg` at `4b82d5d`
+Public safety: only directly verified public USER/GM text was copied. No Canon,
+checkpoint, event, state, or summary material is presented as dialogue.
 
 | Season / range | Verification | Source | Notes |
 | --- | --- | --- | --- |
-| S01, start → close | `MISSING_TRANSCRIPT` | `worldlines/AFTERFALL/seasons/S01/raw_transcript/INDEX.md` (`05a3308`) | The index explicitly marks all available context as BACKFILL REQUIRED. Git history contains the index only, not a public USER/GM part. |
-| S02, current checkpoint range | `MISSING_TRANSCRIPT` | `worldlines/AFTERFALL/seasons/S02/CURRENT_CHECKPOINT*.md` | Checkpoints are state records, not raw transcript. No `raw_transcript` source was found in the audited branch/history. |
+| S01, directly visible span | `PARTIAL` | `worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_001.md` … `010.md` | 39 USER and 86 pushed GM messages. The pre-capture span and one later GM reply remain explicit gaps; PART 008 is a verified fragment. |
+| S02, SESSION_001 | `PARTIAL` | `worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/` | 31 USER / 89 GM public blocks, from the industrial-fire response to the source cutoff. |
+| S02, SESSION_002 | `PARTIAL` | `worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/` | 13 USER / 16 GM public blocks, from the first-winter discussion to the source cutoff. |
 
-The C03 Reader may show a separately marked Canon summary, but never a reconstructed
-USER/GM dialogue. Future exact exports belong in this namespace only.
+S02 session namespaces are retained separately. Their small exact USER overlap
+does not justify deduplication, and no GM public block overlaps. The Reader may
+show a separately marked Canon summary, but never reconstructed USER/GM dialogue.
