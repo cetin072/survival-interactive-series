@@ -97,8 +97,7 @@ Archive는 PLAYER_SAFE만 표시한다.
 - 이미 플레이에서 확인된 인물 정보
 - 현재 공개된 관계와 소속
 - 이미 방문/확인한 장소
-- Canon 사건 요약
-- 공개 World Pressure
+  - Canon 사건 요약
 - 플레이어가 이미 획득한 지속 사실
 - Creative Reference임이 명확한 참고자료
 
@@ -127,13 +126,21 @@ Long-term source:
 
 ## 5. 웹 구조
 
-V1:
-- 통합검색
-- 인물 / 지역 / 사건 / 자료 분류
-- Wiki형 상세 패널
-- 선택 노드의 1-hop 관계 그래프
-- 주요 사건 Timeline
-- 공개 World Pressure
+PUBLIC:
+- World Explorer
+- Reader Edition
+- Footer-only RAW Vault
+
+TURN:
+- Supabase append-only RAW only
+
+DAILY 04:30:
+- RAW audit, GM prose publication, Wiki reconciliation, one PR/deploy
+
+Reader excludes USER, explicit design/operational metadata, and conservative
+Choice Gates; all remaining verified public GM prose is preserved. Numbered
+narrative lists remain. This policy supersedes the former public Timeline and
+World Pressure dashboard description.
 
 원칙:
 - 3D 그래프보다 2D 관계 탐색을 우선한다.

@@ -21,7 +21,7 @@ describe('Chronicle-isolated public transcript catalog', () => {
   })
 
   it('publishes only verified C03 raw while retaining every known gap and session boundary', () => {
-    expect(activeChronicle).toMatchObject({ id: 'C03-AFTERFALL', isActive: true, transcriptStatus: 'partial' })
+    expect(activeChronicle).toMatchObject({ id: 'C03-AFTERFALL', active: true, transcriptStatus: 'partial' })
     const c03 = transcriptPartsFor('C03-AFTERFALL')
     expect(c03).toHaveLength(21)
     expect(c03.filter((part) => part.status === 'verified_transcript')).toHaveLength(17)
@@ -42,13 +42,13 @@ describe('Chronicle-isolated public transcript catalog', () => {
 
   it('derives current and past shelves from the registry instead of a fixed Chronicle id', () => {
     const promotedRegistry = [
-      ...chronicles.map((chronicle) => ({ ...chronicle, isActive: false })),
-      { ...activeChronicle, id: 'C04-NEW', label: 'C04 NEW · 신규 주인공', worldlineId: 'NEW', protagonist: '신규 주인공', isActive: true },
+      ...chronicles.map((chronicle) => ({ ...chronicle, active: false })),
+      { ...activeChronicle, id: 'C04-NEW', label: 'C04 NEW · 신규 주인공', worldlineId: 'NEW', protagonist: '신규 주인공', active: true },
     ]
     const partition = partitionChronicles(promotedRegistry)
     expect(partition.active.id).toBe('C04-NEW')
     expect(partition.past.map((chronicle) => chronicle.id)).toContain('C03-AFTERFALL')
-    expect(() => partitionChronicles(promotedRegistry.map((chronicle) => ({ ...chronicle, isActive: true })))).toThrow('exactly one active')
+    expect(() => partitionChronicles(promotedRegistry.map((chronicle) => ({ ...chronicle, active: true })))).toThrow('exactly one active')
   })
 
   it('does not attach C01 transcript records to C03 graph entities', () => {

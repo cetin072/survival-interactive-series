@@ -35,21 +35,9 @@ import c03S02Session2Part2 from '../../../content/transcripts/C03-AFTERFALL/S02/
 import c03S02Session2Part3 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_002/PART_003.md?raw'
 import c03S02Session2Part4 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_002/PART_004.md?raw'
 
-export type ChronicleId = string
+import { activeChronicle, chronicleRegistry, getChronicle, partitionChronicles, type Chronicle, type ChronicleId, type ChronicleTranscriptStatus } from './chronicleRegistry'
+export { activeChronicle, getChronicle, partitionChronicles, type Chronicle, type ChronicleId, type ChronicleTranscriptStatus }
 export type TranscriptStatus = 'verified_transcript' | 'verified_fragment' | 'missing_transcript'
-export type ChronicleTranscriptStatus = 'available' | 'partial' | 'backfill_required'
-
-export type Chronicle = {
-  id: ChronicleId
-  ipId: 'survival-diary'
-  label: string
-  protagonist: string
-  worldlineId: string
-  isActive: boolean
-  transcriptStatus: ChronicleTranscriptStatus
-  sourceRoot: string
-  availabilityNote: string
-}
 
 export type TranscriptPart = {
   id: string
@@ -69,25 +57,7 @@ export type TranscriptPart = {
   contentFormat?: 'conversation' | 'raw_fragment'
 }
 
-export const chronicles: Chronicle[] = [
-  { id: 'C01-HAN-JUNHO', ipId: 'survival-diary', label: 'C01 · 한준호', protagonist: '한준호', worldlineId: 'CANON-V2', isActive: false, transcriptStatus: 'partial', sourceRoot: 'seasons_v2', availabilityNote: 'S01 원문 9개와 S02 후반부 1개가 검증되어 있습니다. S02 초반은 원문 미확보입니다.' },
-  { id: 'C02-STRONGHOLD', ipId: 'survival-diary', label: 'C02 · 박도현', protagonist: '박도현', worldlineId: 'STRONGHOLD', isActive: false, transcriptStatus: 'partial', sourceRoot: 'worldlines/STRONGHOLD', availabilityNote: '다섯 개 원 채팅방에서 USER 59개와 GM/ASSISTANT 공개블록 116개가 추가 복구되었습니다. 각 방의 앞부분·누락구간은 PARTIAL/BACKFILL REQUIRED로 그대로 표시합니다.' },
-  { id: 'C03-AFTERFALL', ipId: 'survival-diary', label: 'C03 AFTERFALL · 서진우', protagonist: '서진우', worldlineId: 'AFTERFALL', isActive: true, transcriptStatus: 'partial', sourceRoot: 'worldlines/AFTERFALL', availabilityNote: 'S01의 검증 원문과 S02의 서로 다른 두 세션을 읽을 수 있습니다. 원문 미확보·부분 구간은 정본과 분리해 표시합니다.' },
-]
-
-export function partitionChronicles(registry: Chronicle[] = chronicles) {
-  const active = registry.filter((chronicle) => chronicle.isActive)
-  if (active.length !== 1) throw new Error('Chronicle registry must have exactly one active record.')
-  return { active: active[0], past: registry.filter((chronicle) => !chronicle.isActive) }
-}
-
-export const { active: activeChronicle, past: pastChronicles } = partitionChronicles()
-
-export function getChronicle(id: ChronicleId) {
-  const chronicle = chronicles.find((item) => item.id === id)
-  if (!chronicle) throw new Error('Unknown Chronicle: ' + id)
-  return chronicle
-}
+export const chronicles = chronicleRegistry
 
 const c01 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' | 'relatedNodeIds'>): TranscriptPart => ({ ...part, ipId: 'survival-diary', chronicleId: 'C01-HAN-JUNHO', worldlineId: 'CANON-V2', relatedNodeIds: [] })
 const c02 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' | 'relatedNodeIds'>): TranscriptPart => ({ ...part, ipId: 'survival-diary', chronicleId: 'C02-STRONGHOLD', worldlineId: 'STRONGHOLD', relatedNodeIds: [] })

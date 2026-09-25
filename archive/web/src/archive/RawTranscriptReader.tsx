@@ -98,7 +98,7 @@ export function RawTranscriptReader({ chronicleId, initialPartId, onPartChange, 
   const showCanonicalSummary = chronicle.worldlineId === archiveMeta.worldline
   return <section className="reader-page">
     <aside className="reader-toc">
-      <p className="archive-eyebrow">{chronicle.label}</p><h2>{chronicle.isActive ? '현재 생존기' : '지난 생존기'} 원문</h2><p>{chronicle.availabilityNote}</p>
+      <p className="archive-eyebrow">{chronicle.label}</p><h2>{chronicle.active ? '현재 생존기' : '지난 생존기'} 원문</h2><p>{chronicle.availabilityNote}</p>
       <button className="reader-home" onClick={() => openPart(chronicleParts[0])}>처음부터 읽기</button>
       <button className="reader-explorer-link" onClick={onOpenExplorer}>세계 탐색으로 돌아가기</button>
       <div className="reader-season-tabs" role="tablist" aria-label="시즌 선택">{seasonIds.map((id) => <button key={id} className={seasonId === id ? 'active' : ''} onClick={() => openPart(chronicleParts.find((part) => part.seasonId === id) ?? chronicleParts[0])}>{id}</button>)}</div>
