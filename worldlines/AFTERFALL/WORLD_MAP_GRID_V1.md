@@ -87,14 +87,14 @@ Shortest nominal-route distances under ordinary degraded conditions:
 | 북유성 실증단지 | 북쪽 연료장 | 4.6 |
 | 북쪽 연료장 | 산림교육원 | 5.0 |
 
-## 6. Security / operations-site geometry
+## 6. Living-network reconfiguration geometry
 
-For the three current strategic bases:
+For the three currently important living / production / public-service nodes:
 - 북서 실습센터
 - 북유성 실증단지
 - 외곽 제3거점
 
-the equal-response geometric center falls roughly around **(-1.9, +3.7)**.
+the geometric center of the three anchors falls roughly around **(-1.9, +3.7)**.
 
 The previously known **폐쇄 체육시설** at approx **(-1.8, +3.3)** sits close to that center.
 
@@ -103,48 +103,59 @@ Approx nominal route distances from 폐쇄 체육시설:
 - to 북유성 실증단지: 5.0 km
 - to 제3거점: 4.2 km
 
-This makes it a strong **candidate** for:
-- rapid-response staging
-- vehicle / tool reserve
-- training
-- radio relay
-- limited defensive reserve
-- temporary incident-command use
+This is a **distance fact, not a role assignment**.
 
-It should NOT automatically become a permanent barracks or public military headquarters.
-Risks:
-- large building heating cost
-- multiple entrances
-- visibility / route-pattern exposure
-- possible prior scavenger claims
-- repeated traffic could help outsiders infer rear-base directions
+The central location makes the building worth re-checking as one possible candidate for:
+- expansion / relocation of the current public third-hub functions
+- larger exchange, lodging and logistics space
+- vehicle loading / unloading
+- separated visitor and resident zones
+- a future front-side living node if utilities and habitability prove sufficient
 
-## 7. Candidate-building comparison
+Military usefulness is only one secondary evaluation factor. It must not be promoted automatically into a barracks, military headquarters, operations base or command center.
 
-### A. 폐쇄 체육시설 — current best geometric candidate
+## 7. Candidate-building evaluation
+
+All large-building candidates are evaluated primarily by whether people can **actually live and work there for a long time**.
+
+Core criteria:
+- distance to the two major living / production bases
+- road access and reliability
+- movement of people and goods
+- vehicle loading / unloading
+- lodging and daily living space
+- heating / water / power
+- separation of visitors from internal living areas
+- controllable entrances and ordinary defensive common sense
+- long-term habitability and maintenance cost
+
+### A. 폐쇄 체육시설 — strong geometric candidate, habitability unverified
 Pros:
-- near-equal reach to all three bases
-- large parking / vehicle staging
+- near-equal reach to the three current nodes
+- large parking and loading space
 - machinery room and utility spaces already known
+- enough interior volume to separate public and private functions
 - not itself a natural road chokepoint
-- can be operated in only one wing
 
 Cons:
 - poor whole-building heating efficiency
-- several entrances / large perimeter
+- several entrances and a large perimeter
 - known scavenging history
-- repeated rear-base traffic can create triangulation risk
+- water / power / insulation condition still requires direct inspection
+- repeated rear-base traffic can reveal route patterns
 
-### B. 폐교 — rear-defense candidate, not network center
+### B. 폐교 — rear-side fallback candidate
 Pros:
 - small-room segmentation
 - fence / yard
-- close to rear withdrawal route
+- close to a known withdrawal route
+- easier to zone living / storage rooms than a single large hall
 
 Cons:
-- too close to hidden northwest base
+- too close to the hidden northwest base
 - occupation may compromise an escape axis
-- weak reach to agritech and public hub
+- weak reach to agritech and the public hub
+- utility condition and winter habitability are unverified
 
 ### C. 서쪽 창고군 / industrial large-building axis
 Pros:
@@ -156,7 +167,22 @@ Cons:
 - fire-damaged / ownership-disputed environment
 - far from agritech
 - tied too strongly to one approach axis
-- poor as balanced three-base response point
+- likely weak for ordinary residential comfort without major conversion
+
+### Continuity guard — 2027-02-07
+The prior interpretation that a central large building should become a military response base is **SUPERSEDED**.
+
+Retained:
+- distance / coordinate / road model
+- the geographic centrality of 폐쇄 체육시설
+- the idea of asking experienced military / police / field-control people for limited advice on access, withdrawal, building security and emergency movement
+
+Not retained:
+- militia formation
+- barracks / military headquarters
+- operations-base network
+- military command structure
+- automatic military use of 폐쇄 체육시설
 
 ## 8. Map-security rule
 
@@ -167,7 +193,7 @@ Public-facing maps and ordinary third-hub ledgers must NOT contain exact coordin
 
 Use separate:
 - PUBLIC MAP: third hub, bridge, roads, market/service nodes
-- TRUSTED OPERATIONS MAP: response distances and candidate staging points
+- TRUSTED ROUTE MAP: route distances, candidate buildings and verified access constraints
 - CORE MAP: exact rear-base anchors and concealed routes
 
 ## 9. Maintenance
