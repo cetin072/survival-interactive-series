@@ -75,3 +75,15 @@ button { cursor: pointer; }
 .archive-entry-list { display: grid; border-top: 1px solid #e9e9ec; }.archive-entry-list button { padding: 16px 4px; border: 0; border-bottom: 1px solid #e9e9ec; background: transparent; color: #2c2c32; text-align: left; }.archive-entry-list button:hover { background: #fafafa; }.archive-entry-list span { display: block; color: #77777f; font-size: 13px; }.archive-entry-list strong { display: block; margin-top: 4px; font-size: 17px; }.archive-entry-list p { max-width: 720px; margin: 7px 0 0; color: #63636b; font-size: 15px; line-height: 1.65; }.archive-entry-list.compact strong { margin-top: 0; }
 .source-records { display: grid; gap: 10px; }.source-records article { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 7px 18px; padding: 15px; border: 1px solid #e2e2e6; border-radius: 9px; }.source-records strong, .source-records span { display: block; }.source-records span, .detail-source-note { color: #72727a; font-size: 14px; line-height: 1.55; }.detail-source-note { margin: 14px 0 0; font-size: 13px; }.detail-timeline { display: grid; margin: 0; padding: 0; list-style: none; }.detail-timeline li { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-top: 1px solid #e9e9ec; }.detail-timeline time { color: #74747d; font-size: 13px; }.detail-timeline p { margin: 6px 0 0; color: #66666e; font-size: 15px; line-height: 1.65; }.archive-detail .canon-summary { margin-top: 12px; padding: 28px; border: 1px solid #dedee3; border-radius: 10px; background: #f7f7f8; }.archive-detail .canon-summary > p:not(.archive-eyebrow) { max-width: 720px; margin: 10px 0 0; color: #595961; font-size: 16px; line-height: 1.75; }
 @media (max-width: 860px) { .archive-detail { margin: 20px -16px 0; padding: 28px 16px 42px; }.archive-detail-header { display: block; }.detail-header-actions { justify-content: start; margin-top: 16px; }.detail-meta-wide { grid-template-columns: 1fr; }.relationship-list article, .source-records article { grid-template-columns: 1fr; }.relationship-list button, .source-records button { justify-self: start; }.detail-timeline li { grid-template-columns: 1fr; gap: 5px; }.detail-toc { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 3px; }.detail-toc a { white-space: nowrap; }.archive-detail .detail-section { padding: 25px 0; } }
+
+
+/* V7: denser article reading blocks for the Archive's wiki layer. */
+.article-section-list { display: grid; gap: 22px; }
+.article-section-block { padding: 20px 0; border-top: 1px solid #ececee; }
+.article-section-block:first-child { border-top: 0; padding-top: 0; }
+.article-section-block h3 { margin: 0 0 10px; color: #2b2b31; font-size: 19px; letter-spacing: -.03em; }
+.article-section-block p { max-width: 760px; margin: 0 0 12px; color: #4c4c54; font-size: 16px; line-height: 1.78; word-break: keep-all; }
+.article-section-block ul { display: grid; gap: 7px; margin: 14px 0 0; padding-left: 22px; color: #55555d; font-size: 15px; line-height: 1.65; }
+@media (max-width: 600px) {
+  .article-section-block p { font-size: 16px; line-height: 1.72; }
+}
