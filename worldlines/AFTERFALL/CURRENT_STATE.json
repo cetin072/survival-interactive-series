@@ -42,5 +42,15 @@
   "current_scene": "WINTER_EXTRACTION_AFTER_MINGYU_RELOCATION",
   "active_arc": "WINTER_LONG_ARC_V2",
   "winter_arc_plan": "worldlines/AFTERFALL/seasons/S02/WINTER_LONG_ARC_V2.md",
-  "play_session_protocol": "worldlines/AFTERFALL/PLAY_SESSION_PROTOCOL_V1.md"
+  "play_session_protocol": "worldlines/AFTERFALL/PLAY_SESSION_PROTOCOL_V2.md",
+  "live_transcript_capture": {
+    "status": "ACTIVE",
+    "mode": "CHATGPT_TOOL_ENFORCED",
+    "storage": "survival_rpg.transcript_sessions + survival_rpg.transcript_messages",
+    "open_function": "survival_rpg.open_public_transcript_session",
+    "append_function": "survival_rpg.append_public_transcript_message",
+    "close_function": "survival_rpg.close_public_transcript_session",
+    "policy": "Capture exact PLAYER_SAFE USER/GM public messages during actual AFTERFALL play; exclude system/developer/tools/private reasoning/GM-only future material.",
+    "product_boundary": "Requires a trusted Supabase tool/connector call from the GM runtime; do not claim automatic capture if that tool path is unavailable."
+  }
 }
