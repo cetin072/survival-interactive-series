@@ -1,0 +1,38 @@
+{
+  "chronicle": "02",
+  "worldline": "STRONGHOLD",
+  "protagonist": "박도현",
+  "archive_class": "COLD_RAW",
+  "overall_status": "PARTIAL",
+  "source_policy": "Only directly verified public USER/GM text; no reconstruction from memory, summaries, checkpoints, Canon, state, tools, private reasoning, or hidden plans.",
+  "legacy_partial_assets": [
+    {
+      "path": "RAW_2032_03_TO_2032_09_PARTIAL_01.md",
+      "status": "PARTIAL"
+    },
+    {
+      "path": "RAW_2032_09_TO_2038_04_PARTIAL_01.md",
+      "status": "PARTIAL"
+    },
+    {
+      "path": "RAW_2038_05_TO_2039_12_PARTIAL_01.md",
+      "status": "PARTIAL"
+    }
+  ],
+  "sessions": [
+    {
+      "session_id": "SESSION_20260925_CURRENT_ROOM",
+      "source": "current ChatGPT room",
+      "status": "PARTIAL",
+      "verified_gameplay_range": "2031-12-13 through currently visible portion of 2032-01-17",
+      "user_messages": 9,
+      "gm_assistant_public_blocks": 28,
+      "part_count": 4,
+      "missing_ranges": 3,
+      "redaction_count": 0,
+      "index": "SESSION_20260925_CURRENT_ROOM/INDEX.md",
+      "manifest": "SESSION_20260925_CURRENT_ROOM/MANIFEST.json"
+    }
+  ],
+  "complete": false
+}
