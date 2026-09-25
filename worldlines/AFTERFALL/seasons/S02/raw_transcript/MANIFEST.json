@@ -30,6 +30,24 @@
       "gm_public_blocks": 16,
       "missing": "All verbatim conversation before the first directly visible USER message in this source room.",
       "source_index": "SESSION_002/SOURCE_INDEX.md"
+    },
+    {
+      "session_id": "SESSION_003",
+      "source_pr": null,
+      "source_branch": "archive/afterfall-c03-s02-session-003-missing-20260925",
+      "source_commit": null,
+      "status": "MISSING",
+      "verified_range": null,
+      "user_messages": 0,
+      "gm_public_blocks": 0,
+      "visible_foreign_worldline_user_messages_before_cutoff": 12,
+      "visible_foreign_worldline_gm_public_blocks_before_cutoff": 21,
+      "missing": "Entire requested AFTERFALL / 서진우 / S02 transcript span is not directly visible in the current room context.",
+      "foreign_worldline_exclusion": "Visible pre-cutoff public conversation is 박도현 / STRONGHOLD and was excluded under the no-cross-Chronicle rule.",
+      "source_index": "SESSION_003/SOURCE_INDEX.md",
+      "source_manifest": "SESSION_003/SOURCE_MANIFEST.json",
+      "parts": ["SESSION_003/PART_001.md"],
+      "redaction_count": 0
     }
   ],
   "overlap_decision": {
@@ -37,7 +55,7 @@
     "exact_user_values_shared": 2,
     "exact_user_records_shared": 3,
     "exact_gm_blocks_shared": 0,
-    "action": "Preserve both sessions without overwriting or cross-session deduplication."
+    "action": "Preserve verified sessions without overwriting or cross-session deduplication. SESSION_003 contains no eligible transcript content, so no overlap comparison is possible for it."
   },
   "source_policy": "Only directly verified public USER/GM text; no transcript reconstruction from Canon, checkpoint, summary, memory, system/developer text, private reasoning, or tool output.",
   "complete": false
