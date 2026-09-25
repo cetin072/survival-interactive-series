@@ -21,11 +21,12 @@ Status: **AUTHORITATIVE**
 8. `NARRATIVE_PACING_ESCALATION_V1.md`
 9. `SAVE_SCHEMA_V1.md`
 10. `GM_CONTEXT_V1.md`
-11. `PLAY_SESSION_PROTOCOL_V1.md`
+11. `PLAY_SESSION_PROTOCOL_V2.md`
 12. `CURRENT_STATE.json`
 13. CURRENT_STATE가 지정한 최신 season checkpoint
 14. Supabase `check_runtime_consistency('AFTERFALL')`
-15. 장면 관련 인물만 지정해 `get_scene_context('AFTERFALL', ...)`
+15. `PLAY_SESSION_PROTOCOL_V2.md`에 따라 Live RAW capture session을 확인/개설
+16. 장면 관련 인물만 지정해 `get_scene_context('AFTERFALL', ...)`
 
 새 채팅에서 worldline identity가 애매하면 repository root의 `SURVIVAL_DIARY_IP_BIBLE.md`와 `WORLDLINE_ROUTER.md`를 먼저 확인한다.
 
@@ -61,6 +62,7 @@ Save status가 `PREPLAY_READY`이면:
 - 플레이어 선택과 무관한 강제 손실 목록
 
 ## 5. 턴 처리
+0. 플레이 모드가 활성화된 USER 공개 입력을 `PLAY_SESSION_PROTOCOL_V2.md`에 따라 RAW에 먼저 append한다.
 1. 새 장면/큰 전환이면 `check_runtime_consistency` 확인
 2. 장면 관련 인물만 골라 `get_scene_context` 로드
 3. 큰 시간점프/날짜경계면 World Tick checklist 확인
@@ -68,7 +70,10 @@ Save status가 `PREPLAY_READY`이면:
 5. 현재 상태에서 결과 판정
 6. 4~6개 의미 있는 비트까지 자연 진행
 7. 중요 Delta만 Save / Pressure / Character / Clock / Scene / Event 중 필요한 층에 갱신
-8. 전략적 Choice Gate에서 다시 플레이어에게 반환
+8. 사용자에게 보낼 최종 GM 공개문을 확정한 뒤 **동일 문자열을 RAW에 append하고 그 문자열을 그대로 출력**한다.
+9. 전략적 Choice Gate에서 다시 플레이어에게 반환
+
+RAW capture tool call과 DB 메타는 정상 플레이 출력에 노출하지 않는다. 저장 실패가 두 차례 재시도 뒤에도 지속될 때만 짧은 운영 경고를 남기며, 성공한 척하지 않는다.
 
 전체 Save JSON과 과거 Events를 기본 입력처럼 매 턴 읽지 않는다.
 
@@ -108,7 +113,7 @@ Save status가 `PREPLAY_READY`이면:
 - 관계 NPC가 메인 목표를 대체하거나 이동 목적지를 자동 생성하지 않는다.
 
 ## 9. 저장/아카이브
-- 채팅방은 세이브가 아니라 플레이 화면이다. 방 이동·세션 원문·재개 규칙은 `PLAY_SESSION_PROTOCOL_V1.md`를 따른다.
+- 채팅방은 세이브가 아니라 플레이 화면이다. 방 이동·세션 원문·재개 규칙과 자동 RAW capture는 `PLAY_SESSION_PROTOCOL_V2.md`를 따른다.
 실시간 hot Save: Supabase `saves`.
 현재 캐릭터 카드: `characters`.
 현재 Pressure: `world_pressures`.
