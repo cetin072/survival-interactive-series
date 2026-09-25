@@ -1,0 +1,21 @@
+{
+  "chronicle": "03",
+  "worldline": "AFTERFALL",
+  "protagonist": "서진우",
+  "season": "2",
+  "source": "current ChatGPT room",
+  "status": "MISSING",
+  "verified_start": null,
+  "verified_end": null,
+  "eligible_user_messages": 0,
+  "eligible_gm_public_blocks": 0,
+  "visible_foreign_worldline_user_messages_before_cutoff": 12,
+  "visible_foreign_worldline_gm_public_blocks_before_cutoff": 21,
+  "parts": ["PART_001.md"],
+  "missing_range": "Entire requested AFTERFALL / 서진우 / Season 2 transcript span is not directly visible in the current room context.",
+  "foreign_worldline_exclusion": "Visible pre-cutoff conversation is 박도현 / STRONGHOLD and was excluded to prevent Chronicle mixing.",
+  "overlap": "Not evaluated against transcript content because no eligible AFTERFALL raw text is visible in this room.",
+  "redaction_count": 0,
+  "cutoff_rule": "Archive request and all later archive-operation conversation excluded.",
+  "reconstruction_used": false
+}
