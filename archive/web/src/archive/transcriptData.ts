@@ -11,6 +11,11 @@ import c01S02Part1 from '../../../content/transcripts/C01-HAN-JUNHO/S02/PART_001
 import c02Fragment2032 from '../../../content/transcripts/C02-STRONGHOLD/FRAGMENTS/RAW_2032_03_TO_2032_09_PARTIAL_01.md?raw'
 import c02Fragment2038 from '../../../content/transcripts/C02-STRONGHOLD/FRAGMENTS/RAW_2032_09_TO_2038_04_PARTIAL_01.md?raw'
 import c02Fragment2039 from '../../../content/transcripts/C02-STRONGHOLD/FRAGMENTS/RAW_2038_05_TO_2039_12_PARTIAL_01.md?raw'
+
+const c02SessionRaw = import.meta.glob(
+  '../../../content/transcripts/C02-STRONGHOLD/SESSIONS/**/PART_*.md',
+  { eager: true, query: '?raw', import: 'default' },
+) as Record<string, string>
 import c03S01Part1 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_001.md?raw'
 import c03S01Part2 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_002.md?raw'
 import c03S01Part3 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_003.md?raw'
@@ -66,7 +71,7 @@ export type TranscriptPart = {
 
 export const chronicles: Chronicle[] = [
   { id: 'C01-HAN-JUNHO', ipId: 'survival-diary', label: 'C01 · 한준호', protagonist: '한준호', worldlineId: 'CANON-V2', isActive: false, transcriptStatus: 'partial', sourceRoot: 'seasons_v2', availabilityNote: 'S01 원문 9개와 S02 후반부 1개가 검증되어 있습니다. S02 초반은 원문 미확보입니다.' },
-  { id: 'C02-STRONGHOLD', ipId: 'survival-diary', label: 'C02 · 박도현', protagonist: '박도현', worldlineId: 'STRONGHOLD', isActive: false, transcriptStatus: 'partial', sourceRoot: 'worldlines/STRONGHOLD', availabilityNote: '세 시기의 USER 공개 원문 일부가 검증되어 있습니다. GM 공개 장면과 나머지 구간은 BACKFILL REQUIRED입니다.' },
+  { id: 'C02-STRONGHOLD', ipId: 'survival-diary', label: 'C02 · 박도현', protagonist: '박도현', worldlineId: 'STRONGHOLD', isActive: false, transcriptStatus: 'partial', sourceRoot: 'worldlines/STRONGHOLD', availabilityNote: '다섯 개 원 채팅방에서 USER 59개와 GM/ASSISTANT 공개블록 116개가 추가 복구되었습니다. 각 방의 앞부분·누락구간은 PARTIAL/BACKFILL REQUIRED로 그대로 표시합니다.' },
   { id: 'C03-AFTERFALL', ipId: 'survival-diary', label: 'C03 AFTERFALL · 서진우', protagonist: '서진우', worldlineId: 'AFTERFALL', isActive: true, transcriptStatus: 'partial', sourceRoot: 'worldlines/AFTERFALL', availabilityNote: 'S01의 검증 원문과 S02의 서로 다른 두 세션을 읽을 수 있습니다. 원문 미확보·부분 구간은 정본과 분리해 표시합니다.' },
 ]
 
@@ -88,6 +93,98 @@ const c01 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' |
 const c02 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' | 'relatedNodeIds'>): TranscriptPart => ({ ...part, ipId: 'survival-diary', chronicleId: 'C02-STRONGHOLD', worldlineId: 'STRONGHOLD', relatedNodeIds: [] })
 const c03 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' | 'relatedNodeIds'>): TranscriptPart => ({ ...part, ipId: 'survival-diary', chronicleId: 'C03-AFTERFALL', worldlineId: 'AFTERFALL', relatedNodeIds: [] })
 
+
+type C02SessionCatalog = {
+  sessionId: string
+  seasonId: string
+  title: string
+  range: string
+  parts: number
+  sourceRoot: string
+}
+
+const c02SessionCatalog: C02SessionCatalog[] = [
+  {
+    sessionId: 'SESSION_2031_02_TO_2031_03_ROOM_20260925',
+    seasonId: '2031-02~03',
+    title: '정전·침입 이후와 산불장 진입',
+    range: '2031-02 → 2031-03 산불장 진입 · 현재 보이는 공개 원문',
+    parts: 5,
+    sourceRoot: 'worldlines/STRONGHOLD/raw_transcript/SESSION_2031_02_TO_2031_03_ROOM_20260925',
+  },
+  {
+    sessionId: 'SESSION_20260925_CURRENT_ROOM',
+    seasonId: '2031-12~2032-01',
+    title: '산불 후일담과 다음 국면',
+    range: '2031-12-13 → 2032-01-17 가시구간 · 현재 보이는 공개 원문',
+    parts: 4,
+    sourceRoot: 'worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_CURRENT_ROOM',
+  },
+  {
+    sessionId: 'SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925',
+    seasonId: '2032-봄~여름',
+    title: '회사·지역망·폐목장 운영',
+    range: '2032 봄 → 여름 · 현재 보이는 공개 원문',
+    parts: 6,
+    sourceRoot: 'worldlines/STRONGHOLD/raw_transcript/SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925',
+  },
+  {
+    sessionId: 'SESSION_C02_20260925_ROOM_01',
+    seasonId: '2032-09~2038-04',
+    title: '기록·신원 붕괴와 장기 재편',
+    range: '2032-09 → 2038-04 · 현재 보이는 공개 원문',
+    parts: 5,
+    sourceRoot: 'worldlines/STRONGHOLD/raw_transcript/SESSION_C02_20260925_ROOM_01',
+  },
+  {
+    sessionId: 'SESSION_20260925_2039_CURRENT_ROOM',
+    seasonId: '2039-01~10',
+    title: '야간·지하사회와 기록현실',
+    range: '2039-01-19 → 2039-10-20 · 현재 보이는 공개 원문',
+    parts: 4,
+    sourceRoot: 'worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_2039_CURRENT_ROOM',
+  },
+]
+
+function c02SessionContent(sessionId: string, partNumber: number) {
+  const partName = 'PART_' + String(partNumber).padStart(3, '0') + '.md'
+  const key = '../../../content/transcripts/C02-STRONGHOLD/SESSIONS/' + sessionId + '/' + partName
+  const content = c02SessionRaw[key]
+  if (typeof content !== 'string' || content.trim().length === 0) {
+    throw new Error('Missing C02 Archive session RAW: ' + key)
+  }
+  return content
+}
+
+const c02RecoveredSessionParts: TranscriptPart[] = c02SessionCatalog.flatMap((session) => [
+  c02({
+    id: 'c02-' + session.sessionId.toLowerCase().replace(/_/g, '-') + '-gap',
+    seasonId: session.seasonId,
+    sessionId: session.sessionId,
+    number: 0,
+    title: session.title + ' · 직접 확인 전 구간',
+    range: '이 source room의 첫 직접 확인 USER 메시지 이전',
+    status: 'missing_transcript',
+    source: session.sourceRoot + '/INDEX.md',
+    sourceVerified: true,
+  }),
+  ...Array.from({ length: session.parts }, (_, index) => {
+    const partNumber = index + 1
+    return c02({
+      id: 'c02-' + session.sessionId.toLowerCase().replace(/_/g, '-') + '-' + String(partNumber).padStart(3, '0'),
+      seasonId: session.seasonId,
+      sessionId: session.sessionId,
+      number: partNumber,
+      title: session.title + ' · PART ' + String(partNumber).padStart(3, '0'),
+      range: session.range,
+      status: 'verified_transcript',
+      source: session.sourceRoot + '/PART_' + String(partNumber).padStart(3, '0') + '.md',
+      sourceVerified: true,
+      content: c02SessionContent(session.sessionId, partNumber),
+    })
+  }),
+])
+
 export const transcriptParts: TranscriptPart[] = [
   c01({ id: 'c01-s01-001', seasonId: 'S01', number: 1, title: '부팅과 첫 장면', range: 'Canon v2 부팅 → 19:01 농로 위기', status: 'verified_transcript', source: 'seasons_v2/S01/raw_transcript/PART_001.md', sourceVerified: true, content: c01S01Part1 }),
   c01({ id: 'c01-s01-002', seasonId: 'S01', number: 2, title: '후퇴와 합류', range: '정호 후퇴 → 학교 대피소 → 남쪽 분산 제안', status: 'verified_transcript', source: 'seasons_v2/S01/raw_transcript/PART_002.md', sourceVerified: true, content: c01S01Part2 }),
@@ -100,6 +197,7 @@ export const transcriptParts: TranscriptPart[] = [
   c01({ id: 'c01-s01-009', seasonId: 'S01', number: 9, title: '첫해의 끝', range: '지역 생활서비스 → S01 종료', status: 'verified_transcript', source: 'seasons_v2/S01/raw_transcript/PART_009.md', sourceVerified: true, content: c01S01Part9 }),
   c01({ id: 'c01-s02-missing', seasonId: 'S02', number: 0, title: '시즌 초반~선택 54', range: 'S02 시작 → SEASON 02 · 54 선택지', status: 'missing_transcript', source: 'seasons_v2/S02/raw_transcript/INDEX.md', sourceVerified: true }),
   c01({ id: 'c01-s02-001', seasonId: 'S02', number: 1, title: '선택 54 이후', range: '도심 아파트 정리 → S02 종료 결정', status: 'verified_transcript', source: 'seasons_v2/S02/raw_transcript/PART_001.md', sourceVerified: true, content: c01S02Part1 }),
+  ...c02RecoveredSessionParts,
   c02({ id: 'c02-2032-03-fragment', seasonId: '2032-03~09', number: 1, title: '산업단지 사고 이후', range: '2032-03 → 2032-09 · USER 공개 입력 일부', status: 'verified_fragment', source: 'worldlines/STRONGHOLD/raw_transcript/RAW_2032_03_TO_2032_09_PARTIAL_01.md', sourceVerified: true, content: c02Fragment2032, contentFormat: 'raw_fragment' }),
   c02({ id: 'c02-2032-09-fragment', seasonId: '2032-09~2038-04', number: 1, title: '기록·신원 붕괴 이후', range: '2032-09 → 2038-04 · USER 공개 입력 일부', status: 'verified_fragment', source: 'worldlines/STRONGHOLD/raw_transcript/RAW_2032_09_TO_2038_04_PARTIAL_01.md', sourceVerified: true, content: c02Fragment2038, contentFormat: 'raw_fragment' }),
   c02({ id: 'c02-2038-05-fragment', seasonId: '2038-05~2039-12', number: 1, title: '이상 일사와 기록현실', range: '2038-05 → 2039-12 · USER 공개 입력·종료 피드백 일부', status: 'verified_fragment', source: 'worldlines/STRONGHOLD/raw_transcript/RAW_2038_05_TO_2039_12_PARTIAL_01.md', sourceVerified: true, content: c02Fragment2039, contentFormat: 'raw_fragment' }),

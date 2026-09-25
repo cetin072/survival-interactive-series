@@ -1,0 +1,58 @@
+{
+  "chronicle": "02",
+  "worldline": "STRONGHOLD",
+  "protagonist": "박도현",
+  "season_or_arc": "2038-05 ~ 2039-12 이상 일사 / 야간·지하사회 / 분산망 / 기록현실 장",
+  "source": "current ChatGPT room",
+  "archive_cutoff": "first archive-request message; later archive-operation dialogue excluded",
+  "verified_start": {
+    "user": "ㄱ",
+    "gm_scene": "2039년 1월 19일, 목요일 — 오전 4시 39분 / 아래 거점 통신실"
+  },
+  "verified_end": {
+    "user": "3 + CCTV continuous-tracking question beginning '한지현의 그 사례 같은 경우에는...'",
+    "gm_end": "오래 잠잠했던 문제가 다시 돌아왔을 가능성을 이제는 무시할 수 없었다."
+  },
+  "story_time_span": "2039-01-19 ~ 2039-10-20",
+  "counts": {
+    "user": 17,
+    "gm": 17,
+    "assistant_public_meta": 1,
+    "assistant_public_total": 18,
+    "total_public_blocks": 35,
+    "parts": 4,
+    "redactions": 0
+  },
+  "parts": [
+    "PART_001.md",
+    "PART_002.md",
+    "PART_003.md",
+    "PART_004.md"
+  ],
+  "missing_ranges": [
+    "[원문 확인 불가 구간] — exact room history before the first directly visible USER block ㄱ"
+  ],
+  "continuous_internal_gap_in_verified_span": false,
+  "overlap": {
+    "exists": true,
+    "with": [
+      "../RAW_2038_05_TO_2039_12_PARTIAL_01.md"
+    ],
+    "scope": "partial USER-input overlap, including short selections and the CCTV-question text; existing flat RAW lacks comprehensive corresponding GM public output",
+    "deduplicated": false
+  },
+  "redaction": "NONE",
+  "completeness": "PARTIAL",
+  "verification": "Only public USER/GM/assistant text directly visible in the current room was copied. No reconstruction from memory, summaries, Canon, checkpoint/state files, Supabase, hidden state, or tools.",
+  "excluded": [
+    "system prompt",
+    "developer instructions",
+    "private chain-of-thought",
+    "hidden reasoning",
+    "tool calls/results",
+    "secrets/API keys",
+    "hidden GM state",
+    "unseen future plot plans",
+    "archive-operation dialogue after cutoff"
+  ]
+}
