@@ -50,7 +50,7 @@ export function ArchiveApp() {
     {route.view === 'archive' && <ExplorerView initialNodeId={route.nodeId} onOpenStory={(chapterId) => openBook('C03-AFTERFALL', chapterId)} />}
     {route.view === 'story' && <StoryLibrary onOpenBook={(chronicleId) => openBook(chronicleId)} />}
     {route.view === 'book' && <StoryBookReader chronicleId={route.chronicleId as ReaderChapter['chronicleId']} initialChapterId={route.chapterId} onChapterChange={(chapterId) => open({ ...route, chapterId }, true)} onOpenNode={(nodeId) => open({ view: 'archive', chronicleId: activeChronicle.id, nodeId })} onBack={() => open({ view: 'story', chronicleId: activeChronicle.id })} />}
-    {route.view === 'raw' && <RawTranscriptReader chronicleId={rawChronicle.id} initialPartId={route.partId} onPartChange={(partId) => open({ view: 'raw', chronicleId: rawChronicle.id, partId }, true)} onOpenNode={(nodeId) => open({ view: 'archive', chronicleId: activeChronicle.id, nodeId })} onOpenExplorer={() => open({ view: 'archive', chronicleId: activeChronicle.id })} />}
+    {route.view === 'raw' && <RawTranscriptReader key={rawChronicle.id} chronicleId={rawChronicle.id} initialPartId={route.partId} onPartChange={(partId) => writeRoute({ view: 'raw', chronicleId: rawChronicle.id, partId }, true)} onOpenNode={(nodeId) => open({ view: 'archive', chronicleId: activeChronicle.id, nodeId })} onOpenExplorer={() => open({ view: 'archive', chronicleId: activeChronicle.id })} />}
     <footer className="archive-footer"><p>읽기 정책 · 공개된 이야기와 세계 기록은 실제 확인된 자료를 바탕으로 편집됩니다.</p><button onClick={() => open({ view: 'raw', chronicleId: activeChronicle.id })}>기록 원문 보관소</button></footer>
   </main>
 }
