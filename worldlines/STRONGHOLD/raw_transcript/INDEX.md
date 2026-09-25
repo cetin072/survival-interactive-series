@@ -111,9 +111,40 @@ RAW와 별개로 다음을 만든다.
 
 현재 RAW:
 - `RAW_2032_09_TO_2038_04_PARTIAL_01.md`
+- `SESSION_C02_20260925_ROOM_01/PART_001.md` ~ `PART_005.md`
 
-현재 파일은 USER 입력은 보존돼 있으나 GM/ASSISTANT 공개 원문 전체가 빠져 있으므로 **완전 아카이빙으로 간주하지 않는다.**
-이 구간은 원 채팅/export 접근이 가능할 때 backfill한다.
+`RAW_2032_09_TO_2038_04_PARTIAL_01.md`는 USER 입력 중심의 legacy flat archive이며 GM/ASSISTANT 공개 원문 전체가 빠져 있다.
+`SESSION_C02_20260925_ROOM_01`은 현재 ChatGPT 방에서 직접 확인 가능한 후반 구간을 USER+GM/ASSISTANT 공개 출력까지 함께 보존한 session-aware backfill이다.
+
+Session audit:
+- Chronicle: C02
+- Protagonist: 박도현
+- Source: current ChatGPT room
+- Verified start: USER `3`
+- Verified post-arc end: USER `지시문 만들어줘` + 해당 ASSISTANT 공개 답변
+- USER: 11
+- GM/ASSISTANT public blocks: 19
+- Completeness: PARTIAL — 첫 직접 확인 USER 이전 원문은 `[원문 확인 불가 구간]`
+- Overlap: legacy flat RAW와 USER 일부 겹침. 삭제/덮어쓰기 없이 유지, consolidation은 별도 단계.
+
+### F. 2038-05 ~ 2039-12 이상 일사 / 야간·지하사회 / 분산망 / 기록현실 장
+**RAW PARTIAL / BACKFILL REQUIRED**
+
+운영용 요약:
+- `../ROOM_ARCHIVE_2038_05_TO_2039_12.md`
+- `../FEEDBACK_2038_05_TO_2039_12.md`
+- `../LEDGER_APPEND_2038_05_TO_2039_12.md`
+- `../REALITY_SURVIVAL_DEBRIEF_2038_05_TO_2039_12.md`
+
+현재 RAW:
+- `RAW_2038_05_TO_2039_12_PARTIAL_01.md`
+
+중요:
+- 시즌 시작 지침에는 Rolling RAW가 의무였지만 실제 플레이 중 자동 flush가 수행되지 않았다.
+- 현재 PART는 일부 USER 원문 중심이며 대부분의 GM/ASSISTANT 공개 원문과 일부 USER 입력이 빠져 있다.
+- 이 범위는 **COMPLETE로 간주하지 않는다.**
+- 원 채팅/export 접근 시 누락구간을 문자 그대로 backfill한다. 요약/기억으로 재창작하지 않는다.
+- 시즌 자체는 아카이브/상태/피드백 기준으로 정상 종료되었으며 RAW backfill을 다음 플레이 시작 조건으로 만들지 않는다.
 
 ## 5. 시즌 종료 자동 루틴
 
@@ -143,23 +174,3 @@ RAW가 COMPLETE가 아니면 그 사실을 숨기지 않는다.
 - Canon 근거 재확인
 
 > **원문은 충분히 저장하고, 플레이 때는 가볍게 읽는다.**
-
-
-### F. 2038-05 ~ 2039-12 이상 일사 / 야간·지하사회 / 분산망 / 기록현실 장
-**RAW PARTIAL / BACKFILL REQUIRED**
-
-운영용 요약:
-- `../ROOM_ARCHIVE_2038_05_TO_2039_12.md`
-- `../FEEDBACK_2038_05_TO_2039_12.md`
-- `../LEDGER_APPEND_2038_05_TO_2039_12.md`
-- `../REALITY_SURVIVAL_DEBRIEF_2038_05_TO_2039_12.md`
-
-현재 RAW:
-- `RAW_2038_05_TO_2039_12_PARTIAL_01.md`
-
-중요:
-- 시즌 시작 지침에는 Rolling RAW가 의무였지만 실제 플레이 중 자동 flush가 수행되지 않았다.
-- 현재 PART는 일부 USER 원문 중심이며 대부분의 GM/ASSISTANT 공개 원문과 일부 USER 입력이 빠져 있다.
-- 이 범위는 **COMPLETE로 간주하지 않는다.**
-- 원 채팅/export 접근 시 누락구간을 문자 그대로 backfill한다. 요약/기억으로 재창작하지 않는다.
-- 시즌 자체는 아카이브/상태/피드백 기준으로 정상 종료되었으며 RAW backfill을 다음 플레이 시작 조건으로 만들지 않는다.
