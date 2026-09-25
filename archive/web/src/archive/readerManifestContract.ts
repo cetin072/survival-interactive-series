@@ -1,4 +1,4 @@
-export const readerManifestTransformVersion = 'reader-selection-v1.1.0'
+export const readerManifestTransformVersion = 'reader-selection-v1.2.0'
 
 type MinimumReaderManifest = { chronicleId: string; transformVersion: string; coverage?: { verifiedRawParts: number; scanned: number }; chapters: { id: string; body: string; sourceRefs: string[]; archiveSourceRefs: string[] }[] }
 

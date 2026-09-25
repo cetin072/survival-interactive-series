@@ -1,4 +1,4 @@
-# Reader Edition Publication Policy V1.1
+# Reader Edition Publication Policy V1.2
 
 Reader Edition is a selection layer over verified public gameplay records, not
 a system for rewriting Canon as a novel.
@@ -34,6 +34,22 @@ Chapter titles and boundaries are editorial metadata. A bridge is allowed only
 for a confirmed PLAYER_SAFE Canon fact, is limited to 1–3 sentences, and is
 stored as `EDITORIAL_CANON_BRIDGE`, never as verified GM text.
 
+## Editorial map and meta overrides
+
+`archive/scripts/reader-editorial-map.mjs` is the small, explicit publication
+map for chapter boundaries, titles, Story-to-Wiki links, and historical
+exceptions. It may select contiguous source ranges at a verified scene marker
+or exclude an entire source only when it is plainly operational/design material.
+Every override records a reason in generated publication metadata. It never
+modifies a RAW file.
+
+The decision order is deliberately conservative: clear narrative publishes,
+clear meta is excluded, and an ambiguous or mixed block is retained unless a
+precise scene boundary makes the exclusion safe. A perfect meta classifier is
+not a prerequisite for daily publication. Long chapters are split at a real
+scene/event boundary, never shortened; titles and TOC labels describe the
+events actually present in the selected prose.
+
 ## Publication format
 
 `archive/content/stories/<Chronicle>/BOOK.json` is the frontend content
@@ -45,10 +61,17 @@ component change.
 
 1. Check new Supabase RAW pairs and capture health.
 2. Decide whether durable GitHub RAW promotion is needed.
-3. Extract verified GM text; exclude USER, operational metadata, and Choice Gates.
-4. Attach it to an existing chapter or create manifest metadata for a new chapter.
+3. Extract verified GM text; exclude USER, obvious operational/design metadata,
+   and conservative Choice Gates. Preserve ambiguous prose.
+4. Update the editorial map: attach prose to its current event chapter or add a
+   new event-boundary chapter and TOC title.
 5. Reconcile PLAYER_SAFE Explorer changes when necessary.
 6. Use one branch, PR, CI, Preview, squash merge, and Production verification.
 
 The batch never summarizes play into new prose. Its normal Story update is
 **GM original text plus chapter/table-of-contents editing**.
+
+Automation handoff text: per-turn is Supabase RAW only; the 04:30 batch audits
+capture health, promotes durable RAW when needed, preserves GM prose while
+excluding USER/obvious meta/Choice Gates, updates Reader chapters and Wiki,
+then uses one PR, CI/Preview, squash merge, and Production verification.

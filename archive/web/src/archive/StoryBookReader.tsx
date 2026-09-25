@@ -42,13 +42,16 @@ export function StoryBookReader({ chronicleId, initialChapterId, onChapterChange
 
   const openChapter = (chapter: ReaderChapter) => { setChapterId(chapter.id); onChapterChange(chapter.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }
   if (!selected) return null
-  const groups = Array.from(new Set(chapters.map((chapter) => chapter.seasonId ?? chapter.partId ?? '기록')))
+  const groups = Array.from(new Set(chapters.map((chapter) => chapter.seasonId ?? chapter.partId ?? '기록'))).map((id) => {
+    const chapter = chapters.find((item) => (item.seasonId ?? item.partId ?? '기록') === id)
+    return { id, label: chapter?.arcLabel ? `${id} · ${chapter.arcLabel}` : id }
+  })
   const previous = chapters[index - 1]
   const next = chapters[index + 1]
 
   return <section className="book-reader" aria-label={book.title + ' reader'}>
     <aside className="book-toc"><button className="text-button" onClick={onBack}>← 책장</button><p className="archive-eyebrow">{book.title}</p><h2>목차</h2>
-      {groups.map((group) => <section key={group}><h3>{group}</h3>{chapters.filter((chapter) => (chapter.seasonId ?? chapter.partId ?? '기록') === group).map((chapter) => <button className={chapter.id === selected.id ? 'selected' : ''} key={chapter.id} onClick={() => openChapter(chapter)}><span>제{chapter.chapterNumber}장</span>{chapter.title}</button>)}</section>)}
+      {groups.map((group) => <section key={group.id}><h3>{group.label}</h3>{chapters.filter((chapter) => (chapter.seasonId ?? chapter.partId ?? '기록') === group.id).map((chapter) => <button className={chapter.id === selected.id ? 'selected' : ''} key={chapter.id} onClick={() => openChapter(chapter)}><span>제{chapter.chapterNumber}장</span>{chapter.title}</button>)}</section>)}
     </aside>
     <article className="book-prose">
       <header><p className="archive-eyebrow">{selected.dateLabel} · 제{selected.chapterNumber}장</p><h1>{selected.title}</h1><p>{selected.subtitle}</p><div className="reader-progress" aria-label={'읽기 진행률 ' + progress + '%'}><strong>{progress}%</strong><span><i style={{ width: progress + '%' }} /></span></div></header>

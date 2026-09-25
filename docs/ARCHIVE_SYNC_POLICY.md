@@ -305,12 +305,13 @@ Archive의 최상위 정보모델은 단일 Worldline이 아니다.
 ### Daily batch — 04:30 KST
 그 외 누적 변화는 매일 04:30 KST에 한 번 모아서:
 1. RAW capture health 점검
-2. PLAYER_SAFE transcript 후보 정리
-3. Canon/Scene/인물/관계/장소 변화 정합성 확인
-4. 필요 시 하나의 feature branch / PR로 배치
-5. CI / Preview
-6. squash merge
-7. Production 확인
+2. durable RAW promotion 필요 여부 확인
+3. Reader GM prose publication: USER·명백한 운영/기획 메타·명백한 Choice Gate를 제외하고, 애매한 prose는 손상 위험이 있으면 보존
+4. 사건 경계 Chapter/TOC 및 PLAYER_SAFE Wiki 변화 정합성 확인
+5. 필요 시 하나의 feature branch / PR로 배치
+6. CI / Preview
+7. squash merge
+8. Production 확인
 
 변화가 없으면 commit/deploy를 만들지 않는다.
 
