@@ -126,3 +126,37 @@ GitHub PART에 verbatim으로 실제 push된 메시지:
 이 디렉터리는 정상 시즌 부팅에서 읽지 않는다.
 
 각색·특정 장면 복원·대사 검증·Canon 근거 재확인이 필요할 때만 필요한 PART를 선택적으로 읽는다.
+
+
+## 10. Opening Recovery Audit — 2026-09-26
+
+별도 namespace:
+`OPENING_RECOVERY/`
+
+감사 결과:
+- **S01 opening: MISSING**
+- 새로 확보한 opening USER: **0**
+- 새로 확보한 opening GM: **0**
+- Recovery PART: **0**
+- 기존 `PART_C03_001.md`과 overlap: **없음**
+- 기존 PART 파일 수정/renumber: **없음**
+
+현재 직접 verbatim으로 접근 가능한 가장 이른 메시지는 여전히 `PART_C03_001.md`의 첫 USER 입력:
+
+> `4`  
+> `1`  
+> `결국 어디를 가든지 간에 거기서 생산할 수 있는 자원이 압도적으로 좋지 않다면...`
+
+그 이전의 캐릭터 생성·서진우 선택·최초 재난·병원·초기 이동·초기 인물 접촉·거점 형성은 이번 감사에서도 정확한 원문으로 회수되지 않았다.
+
+해당 구간은 계속:
+
+`[원문 확인 불가 구간]`
+
+으로 취급한다.
+
+세부 감사 기록:
+- `OPENING_RECOVERY/INDEX.md`
+- `OPENING_RECOVERY/MANIFEST.json`
+
+정확한 원문 소스가 확보되기 전에는 COMPLETE나 VERIFIED_FRAGMENT로 올리지 않는다.
