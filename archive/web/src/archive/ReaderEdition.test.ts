@@ -7,6 +7,7 @@ import { extractReaderNarrative, parseRoleHeader, removeTrailingChoiceGate } fro
 import { renderToStaticMarkup } from 'react-dom/server'
 import { createElement } from 'react'
 import { SafeMarkdown } from './SafeMarkdown'
+import { assertReaderManifest } from './readerManifestContract'
 
 describe('Reader Edition V1.1', () => {
   it('keeps RAW outside the two-item primary navigation', () => {
@@ -54,6 +55,10 @@ describe('Reader Edition V1.1', () => {
     expect(books.size).toBe(3)
     expect(chaptersForChronicle('C03-AFTERFALL').some((chapter) => chapter.body.includes('첫겨울'))).toBe(true)
     expect(readerChapters.every((chapter) => chapter.body.trim().length > 0 && chapter.sourceRefs.length > 0 && chapter.archiveSourceRefs.length > 0)).toBe(true)
+  })
+  it('rejects a stale or incomplete generated manifest before it reaches the Reader', () => {
+    expect(() => assertReaderManifest({ chronicleId: 'C99', transformVersion: 'old', coverage: { verifiedRawParts: 1, scanned: 1 }, chapters: [] })).toThrow('Unsupported Reader manifest')
+    expect(() => assertReaderManifest({ chronicleId: 'C99', transformVersion: 'reader-selection-v1.1.0', coverage: { verifiedRawParts: 2, scanned: 1 }, chapters: [] })).toThrow('Incomplete RAW coverage audit')
   })
   it('renders safe Markdown as semantic elements rather than literal markers', () => {
     const html = renderToStaticMarkup(createElement(SafeMarkdown, { body: '## 2027년 1월 18일\n\n진우가 문을 열었다.\n\n> “가자.”\n\n**눈이 멎었다.**\n\n---\n\n다음 장면.' }))

@@ -1,4 +1,5 @@
 import { chronicleRegistry, type ChronicleId } from './chronicleRegistry'
+import { assertReaderManifest } from './readerManifestContract'
 
 export type ReaderSourceKind = 'VERIFIED_GM_NARRATIVE' | 'EDITORIAL_CANON_BRIDGE'
 export type ReaderChapter = {
@@ -14,7 +15,7 @@ export type ChronicleBook = {
 type BookFile = Omit<ChronicleBook, 'chronicleId'> & { chronicleId: ChronicleId; chapters: Omit<ReaderChapter, 'chronicleId'>[] }
 
 const manifests = import.meta.glob('../../../content/stories/*/BOOK.json', { eager: true, import: 'default' }) as Record<string, BookFile>
-const files = Object.values(manifests)
+const files = Object.values(manifests).map(assertReaderManifest)
 export const chronicleBooks: ChronicleBook[] = chronicleRegistry.filter((item) => item.readerAvailable).map((registry) => {
   const book = files.find((file) => file.chronicleId === registry.id)
   if (!book) throw new Error('Reader manifest missing for ' + registry.id)
