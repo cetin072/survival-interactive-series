@@ -1,0 +1,38 @@
+{
+  "chronicle": "03",
+  "worldline": "AFTERFALL",
+  "protagonist": "서진우",
+  "season": 2,
+  "source": "current ChatGPT room",
+  "verified_start": null,
+  "verified_end": null,
+  "user_count": 0,
+  "gm_public_block_count": 0,
+  "total_eligible_blocks": 0,
+  "parts": [
+    "PART_001.md"
+  ],
+  "missing_range": "[원문 확인 불가 구간] — entire requested AFTERFALL / 서진우 / Season 2 transcript span is not directly available in the current room context",
+  "visible_foreign_worldline_audit": {
+    "worldline": "STRONGHOLD",
+    "protagonist": "박도현",
+    "first_directly_visible_user": "ㄱ",
+    "last_gameplay_user_begins": "3\n한지현의 그 사례 같은 경우에는...",
+    "last_gameplay_gm_ends": "오래 잠잠했던 문제가 다시 돌아왔을 가능성을 이제는 무시할 수 없었다.",
+    "user_messages": 18,
+    "assistant_public_blocks": 19,
+    "middle_missing_gap": false,
+    "history_missing_before_verified_start": true,
+    "excluded_from_raw": true
+  },
+  "redaction_count": 0,
+  "redaction": "NONE",
+  "overlap": {
+    "eligible_transcript_overlap": "NOT_APPLICABLE",
+    "existing_base_sessions": ["SESSION_001", "SESSION_002"],
+    "open_session_prs_observed": ["SESSION_003 / PR #89", "SESSION_004 / PR #91"]
+  },
+  "completeness": "MISSING",
+  "cutoff_rule": "archive request and all subsequent storage-operation dialogue excluded",
+  "reconstruction_used": false
+}
