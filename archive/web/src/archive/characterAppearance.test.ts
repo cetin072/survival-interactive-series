@@ -23,6 +23,19 @@ describe('character appearance publication', () => {
     }
   })
 
+  it('publishes confirmed Supabase anchors for Han Mira and Park Minho', () => {
+    const mira = archiveNodes.find((node) => node.id === 'char-mira')!
+    const minho = archiveNodes.find((node) => node.id === 'char-minho')!
+
+    expect(confirmedAppearanceFor(mira)?.publicDescription).toContain('스포츠시계')
+    expect(characterAppearanceByNodeId['char-mira'].visual.distinctive).toEqual(['연한 흙자국이 밴 작업셔츠', '손목의 낡은 스포츠시계'])
+    expect(characterAppearanceByNodeId['char-mira'].sourceRefs).toContain('survival_rpg.characters.known_facts.appearance_anchor')
+
+    expect(confirmedAppearanceFor(minho)?.publicDescription).toContain('관자놀이')
+    expect(characterAppearanceByNodeId['char-minho'].visual.height).toBe('180cm 안팎')
+    expect(characterAppearanceByNodeId['char-minho'].visual.distinctive).toEqual(['오른쪽 관자놀이의 오래된 흉터'])
+  })
+
   it('does not fabricate missing appearances and records them for future backfill', () => {
     const characterIds = archiveNodes.filter((node) => node.type === 'character').map((node) => node.id).sort()
     expect(Object.keys(characterAppearanceByNodeId).sort()).toEqual(characterIds)
@@ -33,5 +46,17 @@ describe('character appearance publication', () => {
       expect(anchor.sourceRefs).toEqual([])
       expect(anchor.auditNote).toContain('외형 앵커')
     }
+  })
+
+  it('accounts for every character in the visual-backfill audit', () => {
+    expect(characterAppearanceAudit.confirmed).toHaveLength(12)
+    expect(characterAppearanceAudit.visualBackfillNeeded.sort()).toEqual([
+      'char-cheolsu',
+      'char-hajin',
+      'char-jaemin',
+      'char-kyunghee',
+      'char-mingyu',
+      'char-seongho',
+    ])
   })
 })
