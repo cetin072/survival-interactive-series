@@ -253,22 +253,27 @@ function GraphExplorer({
             const to = positions.get(edge.to)
             if (!from || !to) return null
             const selectedEdge = edge.from === selected.id || edge.to === selected.id
-            const showLabel = graph.visibleEdges.length <= 10 || selectedEdge
+            const rootEdge = edge.from === root.id || edge.to === root.id
+            // The initial root has many connections. Keeping all their labels visible
+            // turns the small viewport into a text cloud, so label only the focused
+            // branch after the reader selects a non-root node.
+            const showLabel = selected.id !== root.id && rootEdge && selectedEdge
             const lineX = (from.x + to.x) / 2
             const lineY = (from.y + to.y) / 2
 
             return (
               <g key={edge.from + edge.to + edge.label + index}>
                 <line
-                  className={'graph-edge' + (selectedEdge ? ' selected-edge' : '')}
+                  className={'graph-edge' + (rootEdge ? ' root-edge' : '') + (selectedEdge ? ' selected-edge' : '')}
                   x1={from.x}
                   y1={from.y}
                   x2={to.x}
                   y2={to.y}
+                  vectorEffect="non-scaling-stroke"
                 />
                 <title>{edge.label}</title>
                 {showLabel && (
-                  <text className="graph-edge-label" x={lineX} y={lineY - 5} textAnchor="middle">
+                  <text className="graph-edge-label" x={lineX} y={lineY - 14} textAnchor="middle">
                     {shorten(edge.label, 11)}
                   </text>
                 )}
@@ -306,7 +311,7 @@ function GraphExplorer({
                 }}
               >
                 <title>{node.label + ' · ' + node.subtitle}</title>
-                <circle r={radius} />
+                <circle r={radius} vectorEffect="non-scaling-stroke" />
                 <text y={isRoot ? -4 : 3} textAnchor="middle">{shorten(node.label, isRoot ? 11 : 8)}</text>
                 {isRoot && <text className="graph-node-type" y="15" textAnchor="middle">{typeLabel[node.type]}</text>}
                 {!isRoot && expandable && (
