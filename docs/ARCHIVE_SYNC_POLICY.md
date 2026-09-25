@@ -142,6 +142,24 @@ Choice Gates; all remaining verified public GM prose is preserved. Numbered
 narrative lists remain. This policy supersedes the former public Timeline and
 World Pressure dashboard description.
 
+### Character appearance publication
+
+Character appearance is a first-class PLAYER_SAFE Archive fact. For a
+`character` node, a confirmed `known_facts.appearance_anchor` is published as
+a compact `외형` row inside **기본 정보**—never as a new Explorer section.
+The public text is a 1–3 sentence description; the publication snapshot keeps
+the structured age, height, build, face, hair, style, distinctive traits,
+Canon attractiveness, presence, and voice fields with its source references
+for future illustration/IP work.
+
+Only facts already described in verified public RAW or existing public Canon
+are promoted. A character without that evidence is recorded internally as
+`visual-backfill-needed`, has no public placeholder, and receives an anchor
+only during a later meaningful public appearance. Baseline body, face, hair,
+and distinctive traits are stable after confirmation; later changes require a
+public in-world cause. The 04:30 batch audits these anchors alongside the
+normal Wiki reconciliation.
+
 원칙:
 - 3D 그래프보다 2D 관계 탐색을 우선한다.
 - 전체 그래프를 한 번에 보여주지 않고 선택 노드 주변부터 펼친다.

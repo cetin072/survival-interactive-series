@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { archiveEdges, archiveMeta, archiveNodes, type ArchiveEdge, type ArchiveNode, type ArchiveNodeType } from './archiveData'
 import { archiveArticleByNodeId } from './archiveArticleData'
+import { confirmedAppearanceFor } from './characterAppearance'
 import { chapterForNode } from './storyData'
 
 const typeLabel: Record<ArchiveNodeType, string> = { character: '인물', location: '지역', event: '사건', reference: '자료' }
@@ -17,6 +18,17 @@ export function getNeighbors(id: string): Neighbor[] {
     const node = edge.from === id ? nodeById.get(edge.to) : edge.to === id ? nodeById.get(edge.from) : undefined
     return node ? [{ node, edge }] : []
   })
+}
+
+export function basicInfoRows(node: ArchiveNode) {
+  const appearance = confirmedAppearanceFor(node)
+  return [
+    { label: '이름', value: node.label },
+    { label: '타입', value: typeLabel[node.type] },
+    { label: '역할', value: node.subtitle },
+    { label: '현재 공개 상태', value: node.meta?.상태 ?? '공개 기록' },
+    ...(appearance ? [{ label: '외형', value: appearance.publicDescription!, appearance: true }] : []),
+  ]
 }
 
 export function buildVisibleGraph(rootId: string, expandedIds: string[], typeVisibility: GraphTypeVisibility) {
@@ -56,10 +68,10 @@ function GraphExplorer({ root, selected, onSelect, onFocus }: { root: ArchiveNod
 }
 
 function DetailArticle({ selected, onSelect, onOpenStory }: { selected: ArchiveNode; onSelect: (id: string) => void; onOpenStory: (chapterId: string) => void }) {
-  const article = archiveArticleByNodeId[selected.id]; const neighbors = getNeighbors(selected.id); const chapter = chapterForNode(selected.id)
+  const article = archiveArticleByNodeId[selected.id]; const neighbors = getNeighbors(selected.id); const chapter = chapterForNode(selected.id); const basics = basicInfoRows(selected)
   return <article className="archive-detail" id="archive-detail"><header className="archive-detail-header"><div><p className="archive-eyebrow">선택된 기록 · {typeLabel[selected.type]}</p><h1>{selected.label}</h1><p>{selected.subtitle}</p></div></header>
     <nav className="detail-toc" aria-label={selected.label + ' 목차'}><a href="#detail-basics">기본 정보</a><a href="#detail-overview">개요</a><a href="#detail-history">주요 행적 · 기록</a><a href="#detail-relations">핵심 관계</a><a href="#detail-stories">관련 이야기 · 참조</a></nav>
-    <section className="detail-section" id="detail-basics"><h2>기본 정보</h2><dl className="detail-meta detail-meta-wide"><div><dt>이름</dt><dd>{selected.label}</dd></div><div><dt>타입</dt><dd>{typeLabel[selected.type]}</dd></div><div><dt>역할</dt><dd>{selected.subtitle}</dd></div><div><dt>현재 공개 상태</dt><dd>{selected.meta?.상태 ?? '공개 기록'}</dd></div></dl></section>
+    <section className="detail-section" id="detail-basics"><h2>기본 정보</h2><dl className="detail-meta detail-meta-wide">{basics.map((item) => <div className={item.appearance ? 'detail-appearance' : undefined} key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl></section>
     <section className="detail-section detail-prose" id="detail-overview"><h2>개요</h2>{(article?.lead ?? [selected.summary]).map((paragraph, index) => <p key={index}>{paragraph}</p>)}</section>
     <section className="detail-section" id="detail-history"><h2>주요 행적 · 기록</h2>{article?.sections?.length ? <div className="article-section-list">{article.sections.map((section) => <section className="article-section-block" key={section.id}><h3>{section.title}</h3>{section.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</section>)}</div> : <p className="archive-muted">현재 공개 기록에서 이 항목의 장문 행적을 정리하고 있습니다.</p>}</section>
     <section className="detail-section" id="detail-relations"><h2>핵심 관계</h2><div className="relationship-list">{neighbors.map(({ node, edge }) => <article key={node.id + edge.label}><div><span className={'type-dot type-dot-' + node.type} /><strong>{node.label}</strong><small>{typeLabel[node.type]} · {node.subtitle}</small></div><p>{edge.label}</p><button onClick={() => onSelect(node.id)}>열기</button></article>)}</div></section>
