@@ -16,10 +16,12 @@ Status: **PARTIAL / COLD ARCHIVE / NOT BOOT INPUT**
 | --- | --- | --- | ---: | ---: | --- |
 | `SESSION_001` | PR #84 / `archive/afterfall-chronicle03-s02-room-20260925` | 2026-11-22 industrial-fire response through the archive-request cutoff | 31 | 89 | VERIFIED span, PARTIAL room |
 | `SESSION_002` | PR #83 / `archive/afterfall-s02-raw-room-20260925` | 2027-01-04 first-winter discussion through the archive-request cutoff | 13 | 16 | VERIFIED span, PARTIAL room |
+| `SESSION_003` | current ChatGPT room / `archive/afterfall-c03-s02-session-003-missing-20260925` | NONE — requested AFTERFALL/서진우 transcript is not directly visible in this room context | 0 | 0 | MISSING |
 
-The directory number is chronological within S02, not a claim that either
-source room was complete. Each session keeps its original `SOURCE_INDEX.md`
-(and, where supplied, `SOURCE_MANIFEST.json`) beside byte-preserved PART files.
+The directory number is chronological within S02 archive registration, not a
+claim that every source room is complete. Each session keeps its source audit
+(and, where supplied, a source manifest) beside byte-preserved PART files or a
+missing-transcript sentinel.
 
 ## Overlap decision
 
@@ -36,13 +38,19 @@ They are therefore preserved as separate ChatGPT sessions. No PART content is
 overwritten or deduplicated across sessions; a repeated public input remains a
 fact of its originating room.
 
+`SESSION_003` has no eligible AFTERFALL raw text to compare. The currently
+visible pre-cutoff conversation belongs to 박도현 / STRONGHOLD and is excluded
+entirely by the no-cross-Chronicle rule rather than treated as overlap.
+
 ## Coverage and gaps
 
 - `SESSION_001`: everything before its first directly visible USER turn is
   `MISSING_TRANSCRIPT`.
 - `SESSION_002`: everything before its first directly visible USER turn is
   `MISSING_TRANSCRIPT`.
-- The archive-operation replies after each source's preservation request are
+- `SESSION_003`: the entire requested AFTERFALL / 서진우 / S02 transcript span
+  is currently unavailable; only a `[원문 확인 불가 구간]` sentinel is stored.
+- Archive-operation replies after each source's preservation request are
   outside that source's stated cutoff, not reconstructed as a missing play turn.
 
 The complete S02 history remains **PARTIAL**. Future backfill requires an
@@ -53,5 +61,6 @@ source.
 
 1. `SESSION_001/PART_001.md` through `PART_004.md`
 2. `SESSION_002/PART_001.md` through `PART_004.md`
+3. `SESSION_003/PART_001.md` — missing-transcript sentinel only
 
 This cold archive is not a normal game boot input.
