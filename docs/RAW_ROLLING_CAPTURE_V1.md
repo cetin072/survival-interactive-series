@@ -3,7 +3,7 @@
 Status: ACTIVE
 Migration: `20260924173125_rolling_raw_capture_v1`
 Storage: `survival_rpg.transcript_sessions` + `survival_rpg.transcript_messages`
-Write API: migration `20260925003736_public_transcript_capture_session_api_v1`
+Write API: migrations `20260925003736_public_transcript_capture_session_api_v1` + `20260925044647_public_transcript_turn_pair_api_v1`
 
 ## Purpose and scope
 
@@ -47,9 +47,13 @@ The trusted service uses only these callable database functions (all are
 - `open_public_transcript_session(...)` creates an `OPEN` session or returns
   the existing session only when every opening field matches exactly.
 - `append_public_transcript_message(...)` verifies exact UTF-8 SHA-256,
-  serializes the session, and accepts only the next `message_order`. A retry
-  with the same stable key and identical payload returns the original row;
-  any mismatch fails without overwriting it.
+  serializes the session, and accepts only the next `message_order`. It remains
+  the low-level message primitive and recovery/meta path.
+- `append_public_transcript_turn(...)` is the preferred LIVE gameplay path. It
+  appends one exact USER message and the exact GM reply in a single database
+  statement as adjacent orders. If the GM half fails, the USER half rolls back
+  with it; an exact retry returns the same pair through the underlying stable
+  idempotency keys.
 - `close_public_transcript_session(...)` records the final runtime context and
   closes the session idempotently. New messages are rejected afterward, while
   completed append retries remain readable to the trusted service.
@@ -66,13 +70,17 @@ them until acknowledgement/retry completes.
 2. Before every flush, redact or reject secrets, personal information, hidden
    GM state, future spoilers, and non-public tool context. Compute the content
    SHA-256 after that review.
-3. Append the completed USER/GM/public-meta message using
-   `append_public_transcript_message`. A retry reuses the same key and payload.
-4. On session close, flush every acknowledged message in ascending
+3. For normal gameplay, compose the final GM reply and atomically persist the
+   exact USER input + exact GM output with `append_public_transcript_turn`
+   immediately before emitting the GM response. Allocate adjacent orders
+   `USER = n`, `GM = n+1`. A retry reuses both stable keys and both exact payloads.
+4. Use `append_public_transcript_message` only for deliberate public-meta or
+   recovery cases that are not a normal USER→GM turn.
+5. On session close, flush every acknowledged message in ascending
    `message_order`, call `close_public_transcript_session` with final runtime
    context, record the close in the Runtime/session handoff, and start a new
    UUID for the next session. Never reopen a closed session to renumber it.
-5. Archive publication remains a separate PLAYER_SAFE review step. Raw capture
+6. Archive publication remains a separate PLAYER_SAFE review step. Raw capture
    alone does not make a message Canon or publish it on Netlify.
 
 ## Security and immutability
@@ -94,6 +102,8 @@ them until acknowledgement/retry completes.
 - Rollback-only database check: `supabase/tests/rolling_raw_capture_v1_verification.sql`
 - Session API mirror: `supabase/migrations/20260925003736_public_transcript_capture_session_api_v1.sql`
 - Session API rollback check: `supabase/tests/public_transcript_capture_session_api_v1_verification.sql`
+- Atomic turn-pair API mirror: `supabase/migrations/20260925044647_public_transcript_turn_pair_api_v1.sql`
+- Atomic turn-pair rollback check: `supabase/tests/public_transcript_turn_pair_api_v1_verification.sql`
 - The connected Supabase migration ledger records this migration under the same
   version and name. The verification script inserts only inside a transaction,
   proves UPDATE rejection, and rolls back.
@@ -120,3 +130,34 @@ repository alone. A trusted caller must invoke the session API during play (for
 example, an authorized GM/tool workflow). Do not describe the system as
 "automatic live capture" until real play produces non-test rows without a
 manual archive/backfill step.
+
+
+## First live trial finding — 2026-09-25
+
+The first real AFTERFALL play trial exposed an important integration failure:
+
+- one C03 / AFTERFALL / S02 session opened successfully;
+- the runtime advanced from save 215 to 216;
+- one GM public message was captured at `message_order = 0`;
+- **zero USER messages were captured**.
+
+That session was closed as **capture incomplete** instead of pretending the
+transcript was valid. Its missing USER text was not reconstructed from runtime,
+Canon, memory, or the stored GM response.
+
+Root cause at the contract level: the v2 operating protocol allowed separate
+message appends, so a model/tool workflow could remember the GM append while
+skipping the USER append. The v3 fix makes a normal gameplay turn one atomic
+database action:
+
+```text
+exact USER input
++ exact final GM public output
+→ append_public_transcript_turn(...)
+→ USER order n + GM order n+1 commit together
+→ emit the same GM string
+```
+
+This removes the half-turn persistence failure mode. A new live play session
+must still be verified after deployment before the recorder is considered
+fully proven in production.
