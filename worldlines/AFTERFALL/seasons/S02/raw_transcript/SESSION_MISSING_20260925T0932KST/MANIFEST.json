@@ -1,0 +1,42 @@
+{
+  "chronicle": "03",
+  "worldline": "AFTERFALL",
+  "protagonist": "서진우",
+  "season": 2,
+  "source": "current ChatGPT room",
+  "cutoff": "immediately before the archive request that initiated this session audit",
+  "verified_start": null,
+  "verified_end": null,
+  "visible_foreign_room_audit": {
+    "first_directly_visible_user": "ㄱ",
+    "last_directly_visible_user": "최신기록 한번더 확인하고\n병합할 자료 피드백 한후\n병합해도되면 바로 진행해버려",
+    "last_directly_visible_gm_summary": "Public GM output reports STRONGHOLD PR #73 merge completion and NEXT_ROOM_BOOT_2032_01 continuation.",
+    "identity_observed": "C02 / STRONGHOLD / 박도현",
+    "user_messages": 10,
+    "gm_public_blocks": 28
+  },
+  "archived_afterfall_counts": {
+    "user": 0,
+    "gm": 0,
+    "total": 0
+  },
+  "part_list": [],
+  "missing_range": [
+    "[원문 확인 불가 구간] Chronicle 03 / AFTERFALL / 서진우 Season 2 verbatim public transcript is not directly accessible in the current conversation context."
+  ],
+  "overlap": {
+    "status": "NOT_APPLICABLE",
+    "reason": "No AFTERFALL transcript content was copied in this identity-audit session."
+  },
+  "redaction_count": 0,
+  "completeness": "MISSING",
+  "safety": {
+    "system_prompt_saved": false,
+    "developer_instruction_saved": false,
+    "private_reasoning_saved": false,
+    "tool_calls_or_results_saved": false,
+    "gm_only_future_saved": false,
+    "secret_saved": false,
+    "foreign_worldline_raw_saved": false
+  }
+}
