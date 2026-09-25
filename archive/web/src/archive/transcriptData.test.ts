@@ -58,11 +58,16 @@ describe('Chronicle-isolated public transcript catalog', () => {
     expect(c01.flatMap((part) => part.relatedNodeIds).some((id) => c03EntityIds.has(id))).toBe(false)
   })
 
-  it('publishes C02 literal USER fragments without promoting them to complete transcript', () => {
+  it('publishes recovered C02 source-room transcripts while keeping gaps and legacy fragments explicit', () => {
     const c02 = transcriptPartsFor('C02-STRONGHOLD')
     expect(chronicles.find((chronicle) => chronicle.id === 'C02-STRONGHOLD')).toMatchObject({ transcriptStatus: 'partial' })
-    expect(c02).toHaveLength(3)
-    expect(c02.every((part) => part.status === 'verified_fragment' && part.source.startsWith('worldlines/STRONGHOLD/raw_transcript/') && part.contentFormat === 'raw_fragment' && Boolean(part.content?.trim()))).toBe(true)
+    expect(c02).toHaveLength(32)
+    expect(c02.filter((part) => part.status === 'verified_transcript')).toHaveLength(24)
+    expect(c02.filter((part) => part.status === 'missing_transcript')).toHaveLength(5)
+    expect(c02.filter((part) => part.status === 'verified_fragment')).toHaveLength(3)
+    expect(new Set(c02.filter((part) => part.status === 'verified_transcript').map((part) => part.sessionId)).size).toBe(5)
+    expect(c02.filter((part) => part.status === 'verified_transcript').every((part) => part.source.startsWith('worldlines/STRONGHOLD/raw_transcript/SESSION_') && Boolean(part.content?.trim()))).toBe(true)
+    expect(c02.filter((part) => part.status === 'verified_fragment').every((part) => part.contentFormat === 'raw_fragment' && Boolean(part.content?.trim()))).toBe(true)
     expect(c02.every((part) => part.relatedNodeIds.length === 0)).toBe(true)
   })
 })
