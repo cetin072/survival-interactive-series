@@ -83,12 +83,20 @@ RAW와 별개로 다음을 만든다.
 - `../ROOM_ARCHIVE_2031_02_TO_2031_03.md`
 
 ### C. 2031-03 ~ 2032-01 산불 및 후일담 장
-**RAW 미완료 / BACKFILL REQUIRED**
+**RAW PARTIAL / BACKFILL REQUIRED**
 
 운영용 요약:
 - `../ROOM_ARCHIVE_2031_03_TO_2032_01.md`
 - `../FEEDBACK_2031_WILDFIRE_ARC.md`
 - `../LEDGER_APPEND_2031_03_TO_2032_01.md`
+
+현재 직접 검증한 Session:
+- `SESSION_20260925_CURRENT_ROOM/INDEX.md`
+- `SESSION_20260925_CURRENT_ROOM/MANIFEST.json`
+- `SESSION_20260925_CURRENT_ROOM/PART_001.md` ~ `PART_004.md`
+
+이 Session은 현재 방에서 직접 보이는 2031-12-13 ~ 2032-01-17 플레이와 이어지는 공개 메타/피드백/아카이빙 대화를 보존한다.
+방 앞부분과 중간 `Skipped 1 message` 구간이 직접 확인 불가이므로 COMPLETE가 아니다.
 
 ### D. 2032-03 ~ 2032-09 산업단지 사고·폐목장·광역정전 장
 **RAW PARTIAL / BACKFILL REQUIRED**
@@ -143,7 +151,6 @@ RAW가 COMPLETE가 아니면 그 사실을 숨기지 않는다.
 - Canon 근거 재확인
 
 > **원문은 충분히 저장하고, 플레이 때는 가볍게 읽는다.**
-
 
 ### F. 2038-05 ~ 2039-12 이상 일사 / 야간·지하사회 / 분산망 / 기록현실 장
 **RAW PARTIAL / BACKFILL REQUIRED**
