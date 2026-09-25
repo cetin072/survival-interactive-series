@@ -24,11 +24,12 @@ Archive는 **이벤트 기반 + 일일 정합성 보정**으로 운영한다.
 3. 주요 인물·관계·장소·거점 상태가 변할 때
 4. 새로운 PLAYER_SAFE 공개 transcript 구간이 확보될 때
 
-매 대사/매 턴마다 Netlify를 재배포하지 않는다.
-플레이 세션 중 누적된 공개 변화는 의미 있는 장면/에피소드 경계에서 묶어 반영한다.
+매 대사/매 턴마다 GitHub commit / PR / Netlify 재배포를 하지 않는다.
+매 턴에는 Supabase append-only RAW 안전저장만 수행한다.
+플레이 세션 중 누적된 공개 변화는 **중요한 되돌릴 수 없는 분기점**에서는 조기 승격할 수 있고, 그 외에는 04:30 일일 배치에서 한꺼번에 반영한다.
 
 ### B. 일일 정합성 보정
-매일 **04:20 KST**를 기본 보정 시각으로 사용한다.
+매일 **04:30 KST**를 기본 보정 시각으로 사용한다.
 
 점검 대상:
 - Supabase Runtime ↔ GitHub Canon ↔ Archive snapshot 불일치
@@ -168,10 +169,10 @@ ChatGPT 채팅방은 Archive 저장단위가 아니다.
 방을 옮기더라도 Archive continuity는 `worldline / chronicle / season / session_id / source` 기준으로 이어진다.
 
 AFTERFALL의 세션 운영 규칙은:
-`worldlines/AFTERFALL/PLAY_SESSION_PROTOCOL_V2.md`
+`worldlines/AFTERFALL/PLAY_SESSION_PROTOCOL_V3.md`
 를 따른다.
 
-새 원문은 `survival_rpg.transcript_sessions` + `survival_rpg.transcript_messages`에 append-only로 보관한다. AFTERFALL 실제 플레이에서는 `PLAY_SESSION_PROTOCOL_V2.md`의 tool-enforced capture bridge가 새 방 시작, USER 입력, GM 공개 출력, 방 종료를 연결한다. 이 저장은 Archive publication이나 Canon 확정이 아니며, 보안 경계와 DB 계약은 `docs/RAW_ROLLING_CAPTURE_V1.md`를 따른다.
+새 원문은 `survival_rpg.transcript_sessions` + `survival_rpg.transcript_messages`에 append-only로 즉시 보관한다. AFTERFALL 실제 플레이에서는 `PLAY_SESSION_PROTOCOL_V3.md`의 atomic USER→GM turn-pair capture를 사용한다. **이 per-turn Supabase 기록은 유실 방지용 안전버퍼이며 GitHub/Archive publication과 분리한다.** GitHub/Netlify 반영은 중요한 분기점 또는 04:30 일일 배치에서만 수행한다. 이 저장은 Canon 확정이 아니며, 보안 경계와 DB 계약은 `docs/RAW_ROLLING_CAPTURE_V1.md`를 따른다.
 
 ## 10. Transcript Publication Rule
 
@@ -234,8 +235,43 @@ Archive의 최상위 정보모델은 단일 Worldline이 아니다.
 
 ## 13. Automatic reconciliation status
 
-- Daily reconciliation task: **04:20 KST / enabled**
+- Daily reconciliation task: **04:30 KST / enabled**
 - Active Chronicle: **C03 AFTERFALL / 서진우**
 - Past Chronicle publication: **C01 한준호 / C02 STRONGHOLD 박도현**
 - Live capture health check: gameplay advancement without corresponding AFTERFALL RAW rows is a reconciliation warning; zero new rows with no new play is normal.
 - Routine safe changes may be published through branch → PR → CI/Preview → squash merge → Production verification.
+
+
+## 14. Capture vs Publication Cadence
+
+원문 보존과 공개 출판은 서로 다른 작업이다.
+
+### Per-turn — Supabase RAW only
+- 실제 AFTERFALL 플레이의 USER→GM 공개 턴은 즉시 Supabase append-only RAW에 저장한다.
+- 목적은 원문 유실 방지다.
+- 이 단계에서는 GitHub commit, PR, Archive article 재생성, Netlify deploy를 하지 않는다.
+- 정상 플레이 턴은 `append_public_transcript_turn(...)` 한 번으로 USER+GM을 원자적으로 기록한다.
+
+### Important branch — optional early promotion
+다음과 같은 되돌리기 어려운 변화는 04:30 이전에도 조기 Archive 승격 후보가 될 수 있다.
+- 주요 인물 합류/이탈/사망
+- 거점 획득/상실/파괴
+- 장기 관계나 세력구도의 확정적 변화
+- 시즌/에피소드 종료
+- 이후 플레이의 기준을 바꾸는 대형 사건
+
+단, 중요 분기점이라도 매 턴 자동 배포하는 것은 아니다.
+
+### Daily batch — 04:30 KST
+그 외 누적 변화는 매일 04:30 KST에 한 번 모아서:
+1. RAW capture health 점검
+2. PLAYER_SAFE transcript 후보 정리
+3. Canon/Scene/인물/관계/장소 변화 정합성 확인
+4. 필요 시 하나의 feature branch / PR로 배치
+5. CI / Preview
+6. squash merge
+7. Production 확인
+
+변화가 없으면 commit/deploy를 만들지 않는다.
+
+> 운영 원칙: **매 턴은 가볍게 보존하고, 출판은 묶어서 한다.**
