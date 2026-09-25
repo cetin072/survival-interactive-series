@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { primaryNavigationLabels } from './ArchiveApp'
 import { chronicleRegistry, partitionChronicles } from './chronicleRegistry'
-import { chaptersForChronicle, readerChapters } from './storyData'
+import { chaptersForChronicle, chronicleBooks, readerChapters } from './storyData'
 // @ts-expect-error Node-owned shared publisher module has no browser declaration.
 import { extractReaderNarrative, parseRoleHeader, removeTrailingChoiceGate } from '../../../scripts/lib/reader-transform.mjs'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -84,6 +84,9 @@ describe('Reader Edition V1.1', () => {
     expect(books.size).toBe(3)
     expect(chaptersForChronicle('C03-AFTERFALL').some((chapter) => chapter.body.includes('첫겨울'))).toBe(true)
     expect(readerChapters.every((chapter) => chapter.body.trim().length > 0 && chapter.sourceRefs.length > 0 && chapter.archiveSourceRefs.length > 0)).toBe(true)
+  })
+  it('keeps the unrecovered C03 opening explicit without fabricating a replacement', () => {
+    expect(chronicleBooks.find((book) => book.chronicleId === 'C03-AFTERFALL')?.beginningStatus).toBe('MISSING_BEGINNING')
   })
   it('rejects a stale or incomplete generated manifest before it reaches the Reader', () => {
     expect(() => assertReaderManifest({ chronicleId: 'C99', transformVersion: 'old', coverage: { verifiedRawParts: 1, scanned: 1 }, chapters: [] })).toThrow('Unsupported Reader manifest')

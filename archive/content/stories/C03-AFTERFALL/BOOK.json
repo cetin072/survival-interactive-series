@@ -6,6 +6,7 @@
   "protagonist": "서진우",
   "worldlineId": "AFTERFALL",
   "sourceRoot": "worldlines/AFTERFALL",
+  "beginningStatus": "MISSING_BEGINNING",
   "transformVersion": "reader-selection-v1.2.0",
   "coverage": {
     "verifiedRawParts": 18,
