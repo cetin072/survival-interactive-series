@@ -47,6 +47,10 @@ jobs:
         run: node --test ../scripts/lib/publication-graph.test.mjs
       - name: Verify public graph baseline and isolated fact-to-graph integration
         run: node --experimental-strip-types ../scripts/check-graph-batch.mjs
+      - name: Test visual candidate and brief compiler
+        run: node --test ../scripts/lib/visual-compiler.test.mjs
+      - name: Verify public appearance-to-brief and isolated visual catalog integration
+        run: node --experimental-strip-types ../scripts/check-visual-batch.mjs
       - name: Install
         run: npm ci
       - name: Test
