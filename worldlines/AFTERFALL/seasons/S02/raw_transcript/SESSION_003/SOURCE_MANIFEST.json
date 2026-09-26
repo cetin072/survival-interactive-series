@@ -17,6 +17,15 @@
   "closed_at": "2026-09-25 04:45:28.914736+00",
   "starting_game_time": "2027-01-16 07:30",
   "closing_game_time": "2027-01-16 09:28",
+  "session_range": {
+    "start": "2027-01-16 07:30",
+    "end": "2027-01-16 09:28"
+  },
+  "captured_message_range": {
+    "start": "2027-01-16 09:28",
+    "end": "2027-01-16 09:28"
+  },
+  "coverage_basis": "captured_message_range",
   "starting_save_version": 215,
   "closing_save_version": 216,
   "starting_scene_id": "S02_AGRITECH_ONE_NIGHT_HARDENING",

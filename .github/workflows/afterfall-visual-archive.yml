@@ -1,4 +1,4 @@
-name: Validate AFTERFALL visual archive
+name: Validate AFTERFALL visual archive and closeout metadata
 
 on:
   pull_request:
@@ -9,6 +9,13 @@ on:
       - "worldlines/AFTERFALL/VISUAL_AUTOMATION_V1.md"
       - "worldlines/AFTERFALL/sql/afterfall_visual_archive_v1.sql"
       - "worldlines/AFTERFALL/sql/afterfall_visual_map_ready_2027_03_23.sql"
+      - "worldlines/AFTERFALL/CURRENT_STATE.json"
+      - "worldlines/AFTERFALL/PERSISTENT_CANON.md"
+      - "worldlines/AFTERFALL/seasons/S02/END_STATE.json"
+      - "worldlines/AFTERFALL/seasons/S02/PLAYTHROUGH_CANON.md"
+      - "worldlines/AFTERFALL/seasons/S02/raw_transcript/**"
+      - "worldlines/AFTERFALL/seasons/S03/START_STATE.json"
+      - "tools/validate_afterfall_s02_closeout.py"
       - ".github/workflows/afterfall-visual-archive.yml"
   push:
     branches:
@@ -19,6 +26,13 @@ on:
       - "schemas/visual_asset.schema.json"
       - "worldlines/AFTERFALL/VISUAL_AUTOMATION_V1.md"
       - "worldlines/AFTERFALL/sql/**"
+      - "worldlines/AFTERFALL/CURRENT_STATE.json"
+      - "worldlines/AFTERFALL/PERSISTENT_CANON.md"
+      - "worldlines/AFTERFALL/seasons/S02/END_STATE.json"
+      - "worldlines/AFTERFALL/seasons/S02/PLAYTHROUGH_CANON.md"
+      - "worldlines/AFTERFALL/seasons/S02/raw_transcript/**"
+      - "worldlines/AFTERFALL/seasons/S03/START_STATE.json"
+      - "tools/validate_afterfall_s02_closeout.py"
       - ".github/workflows/afterfall-visual-archive.yml"
 
 permissions:
@@ -36,3 +50,19 @@ jobs:
         run: python -m py_compile tools/afterfall_visual_archive.py tools/test_afterfall_visual_archive.py
       - name: Test
         run: PYTHONPATH=tools python -m unittest -v tools/test_afterfall_visual_archive.py
+
+  closeout-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate JSON and AFTERFALL S02 closeout metadata
+        run: python tools/validate_afterfall_s02_closeout.py
+      - name: Install existing state-validator dependency
+        run: pip install jsonschema
+      - name: Validate existing survival state contracts
+        run: |
+          python tools/validate_state.py
+          python tools/validate_presentation_boot.py

@@ -2,7 +2,11 @@
 
 Status: **HISTORICAL S02 START HANDOFF — NOT CURRENT RESUME**  
 Previous season: S01 COMPLETE  
-Start source of truth: Supabase `survival_rpg.saves` row `AFTERFALL` + `worldlines/AFTERFALL/PERSISTENT_CANON.md`\n\nCurrent continuation moved to: `worldlines/AFTERFALL/seasons/S02/CURRENT_CHECKPOINT.md`\n이 문서는 2026-11-20 시즌2 시작 시점의 역사자료다. 현재 재개점으로 사용하지 않는다.
+Start source of truth: Supabase `survival_rpg.saves` row `AFTERFALL` + `worldlines/AFTERFALL/PERSISTENT_CANON.md`
+
+Current continuation source of truth: `worldlines/AFTERFALL/CURRENT_STATE.json` → `current_checkpoint`.
+
+이 문서는 2026-11-20 시즌2 시작 시점의 역사자료다. 현재 재개점으로 사용하지 않는다.
 
 ## 0. 플레이어 스포일러 금지
 

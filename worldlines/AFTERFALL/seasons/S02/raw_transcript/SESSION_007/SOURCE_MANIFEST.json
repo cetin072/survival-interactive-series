@@ -17,6 +17,15 @@
   "closed_at": "2026-09-25 16:04:28.824768+00",
   "starting_game_time": "2027-02-06 17:40",
   "closing_game_time": "2027-02-07 13:40",
+  "session_range": {
+    "start": "2027-02-06 17:40",
+    "end": "2027-02-07 13:40"
+  },
+  "captured_message_range": {
+    "start": "2027-02-06 21:15",
+    "end": "2027-02-07 13:40"
+  },
+  "coverage_basis": "captured_message_range",
   "starting_save_version": 238,
   "closing_save_version": 243,
   "starting_scene_id": "S02_THIRD_HUB_SLEEP_AND_BAEGUN_OUTFLOW",

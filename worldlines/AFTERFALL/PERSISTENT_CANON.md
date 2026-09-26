@@ -1,8 +1,8 @@
-# AFTERFALL — Persistent Canon after Season 1
+# AFTERFALL — Persistent Canon
 
-Status: **AUTHORITATIVE CARRYOVER**  
-As of: **2026-11-20**  
-Source: S01 approved play + Supabase AFTERFALL runtime
+Status: **AUTHORITATIVE CARRYOVER**
+As of: **2027-03-23**
+Source: S01 + S02 approved play + Supabase AFTERFALL runtime
 
 이 문서는 다음 시즌으로 승계되는 지속 사실만 기록한다.
 일회성 장면·임시 수량·향후 플롯은 넣지 않는다.

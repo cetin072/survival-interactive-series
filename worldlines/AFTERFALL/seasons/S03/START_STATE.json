@@ -2,7 +2,7 @@
   "worldline": "AFTERFALL",
   "chronicle": "C03",
   "season": 3,
-  "status": "PREPLAY_READY",
+  "status": "READY_FOR_SEASON_START",
   "starts_after": {
     "season": 2,
     "game_time": "2027-03-23 17:50",
