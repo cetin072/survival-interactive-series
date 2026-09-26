@@ -31,6 +31,14 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: archive/web/package-lock.json
+      - name: Test offline publication planning
+        run: node --test ../scripts/lib/publication-plan.test.mjs
+      - name: Verify deterministic S02 dry-run (no external services)
+        run: |
+          node ../scripts/dry-run-publication.mjs --demo-s02 --source-revision "$GITHUB_SHA" > "$RUNNER_TEMP/publication-first.json"
+          node ../scripts/dry-run-publication.mjs --demo-s02 --source-revision "$GITHUB_SHA" > "$RUNNER_TEMP/publication-second.json"
+          cmp "$RUNNER_TEMP/publication-first.json" "$RUNNER_TEMP/publication-second.json"
+          node --input-type=module -e 'import { readFileSync } from "node:fs"; import assert from "node:assert/strict"; const p=JSON.parse(readFileSync(process.env.RUNNER_TEMP+"/publication-first.json","utf8")); assert.equal(p.mode,"DRY_RUN_ONLY"); assert.equal(p.snapshot.source_save_version,253); assert.equal(p.summary.reader_input_spans,5); assert.equal(p.summary.paired_turns,34); assert.equal(p.summary.rolling_captured_messages,70); assert.equal(p.summary.preserved_fragments,2); assert.equal(p.summary.external_calls,0); assert.equal(p.summary.records_written,0); console.log(JSON.stringify(p.summary));'
       - name: Install
         run: npm ci
       - name: Test
