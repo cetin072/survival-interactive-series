@@ -18,12 +18,18 @@ Status: **AUTHORITATIVE LIVE PLAY OPERATING RULE**
 3. 같은 scene의 안정된 컨텍스트를 이미 가지고 있으면 재조립하지 않는다.
    새 장면이거나 등장인물·큰 Pressure·의미 있는 runtime delta가 바뀐 경우에만
    장면 관련 인물만 지정해 `get_scene_context()`를 읽는다.
-4. GM이 현재 장면을 판정하고 최종 공개 답변을 확정한다.
-5. player/body, 핵심 자원·장비, 파티·거점·차량·세력·주요 관계, 현재 scene,
+4. **이미 로드된 활성 Pressure를 장면 판정에 먼저 적용한다.** 이동·외부인 도착·
+   거래·구조·차량운행 같은 행동이 현재 제약과 모순되지 않는지 확인한다.
+   서브플롯이나 카메라가 바뀌었다는 이유만으로 Pressure를 완화하지 않는다.
+   예외적인 통과는 이미 확립된 조건·준비·비용이 있을 때만 허용하고, 모순이
+   해소되지 않았으면 정착된 사실처럼 서술하지 않는다. 이 체크를 위해 normal
+   turn마다 별도 DB 호출을 추가하지 않고 현재 scene context의 Pressure를 사용한다.
+5. GM이 현재 장면을 판정하고 최종 공개 답변을 확정한다.
+6. player/body, 핵심 자원·장비, 파티·거점·차량·세력·주요 관계, 현재 scene,
    durable quest, 중요한 Pressure/Clock 중 실제로 변한 항목만 갱신한다.
-6. 정확한 USER input과 **확정된 동일한 GM output**을
+7. 정확한 USER input과 **확정된 동일한 GM output**을
    `append_public_transcript_turn(...)` 한 번으로 원자 저장한다.
-7. 해당 GM 문자열을 플레이어에게 출력한다.
+8. 해당 GM 문자열을 플레이어에게 출력한다.
 
 평범한 대사, 몇 분 이동, 반복 정비, 자동 상쇄되는 일상소비, 상태를 바꾸지
 않는 정보 확인은 Save/Scene/Event/Pressure/Clock을 전부 갱신하지 않는다.
