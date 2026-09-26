@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { prepareVisualPublication } from './run-visual-publication.mjs'
+import { prepareVisualPublication, APPROVED_S02_APPEARANCE_REF } from './run-visual-publication.mjs'
 import { snapshotFromPublishedS02 } from './dry-run-publication.mjs'
 import { legacyPublicAppearance, planVisualSelection, visualByteHash } from './lib/visual-compiler.mjs'
 import { POLICY } from './lib/publication-plan.mjs'
@@ -14,6 +14,13 @@ const root = resolve(import.meta.dirname, '..', '..')
 const command = (exe, args, cwd = root) => execFileSync(exe, args, { cwd, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] })
 const head = command('git', ['rev-parse', 'HEAD']).trim()
 const snapshot = snapshotFromPublishedS02(JSON.parse(await readFile(resolve(root, 'archive/content/transcripts/C03-AFTERFALL/S02/MANIFEST.json'))), head)
+const approvedBytes = await readFile(resolve(root, APPROVED_S02_APPEARANCE_REF))
+const approvedInput = JSON.parse(approvedBytes)
+assert.equal(approvedInput.records.length, 18)
+for (const record of approvedInput.records) {
+  assert.deepEqual(record.visual, characterAppearanceByNodeId[record.node_id].visual)
+  assert.equal(record.status, characterAppearanceByNodeId[record.node_id].status)
+}
 const initial = await prepareVisualPublication(snapshot), repeat = await prepareVisualPublication(snapshot)
 assert.ok(initial.candidateBytes.equals(repeat.candidateBytes))
 assert.equal(initial.report.point_count, 34)
@@ -22,7 +29,7 @@ assert.equal(initial.report.by_type.LOCATION, 10)
 assert.equal(initial.report.by_type.MAP, 0)
 assert.equal(initial.report.skipped, 4)
 const portraits = initial.catalog.points.filter((p) => p.point_type === 'CHARACTER')
-// The explicit #140 completion changed the published baseline, not the compiler's readiness gate.
+// The explicit #140 completion changed approved input, not the compiler's readiness gate.
 assert.equal(portraits.filter((p) => p.status === 'READY').length, 18)
 assert.equal(portraits.filter((p) => p.status === 'WAITING_CANON').length, 0)
 for (const p of portraits.filter((p) => p.status === 'READY')) {
@@ -30,6 +37,7 @@ for (const p of portraits.filter((p) => p.status === 'READY')) {
   for (const [key, value] of Object.entries(p.brief.canon_facts.appearance)) assert.deepEqual(value, appearance.visual[key])
   assert.equal(Object.hasOwn(p.brief.canon_facts.appearance, 'voice'), false)
   assert.equal(Object.hasOwn(p.brief, 'provenance'), false)
+  assert.ok(p.source_refs.some((source) => source.source_ref === APPROVED_S02_APPEARANCE_REF && source.source_sha256 === visualByteHash(approvedBytes)))
 }
 assert.equal(portraits.find((p) => p.subject_id === 'char-hajin').brief.canon_facts.appearance.gender, '여성')
 assert.equal(portraits.find((p) => p.subject_id === 'char-jisu').brief.canon_facts.appearance.height, '168cm쯤')
@@ -76,6 +84,7 @@ try {
   // Publicly approved synthetic sources prove new environment and map-layers work. Not real Canon.
   const factsRef = 'archive/content/public-facts/C03-AFTERFALL/S99/TEST_VISUAL.json'
   const mapRef = 'archive/content/public-maps/C03-AFTERFALL/S99/TEST_MAP.json'
+  const appearancesRef = 'archive/content/public-facts/C03-AFTERFALL/S99/TEST_APPEARANCES.json'
   const publicNamespace = { chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', visibility: 'PUBLIC_ARCHIVE' }
   const boundary = { save_version: 999, game_time: '2099-01-01 10:00' }
   const facts = { version: 'public-graph-facts-v1', ...publicNamespace, season_id: 'S99', anchor: boundary,
@@ -85,15 +94,19 @@ try {
   await mkdir(resolve(copy, mapRef, '..'), { recursive: true })
   await writeFile(resolve(copy, factsRef), JSON.stringify(facts, null, 2) + '\n')
   await writeFile(resolve(copy, mapRef), JSON.stringify(publicMap, null, 2) + '\n')
+  await writeFile(resolve(copy, appearancesRef), approvedBytes)
   const commit = (paths) => {
     command('git', ['add', ...paths], copy)
     command('git', ['-c', 'user.name=Visual test', '-c', 'user.email=visual-test@example.invalid', 'commit', '--no-verify', '-qm', 'Synthetic visual fixture; local test only'], copy)
   }
-  commit([factsRef, mapRef])
+  commit([factsRef, mapRef, appearancesRef])
   const laterSnapshot = { version: 'publication-snapshot-v1', ...publicNamespace, season_id: 'S99', source_revision: command('git', ['rev-parse', 'HEAD'], copy).trim(), source_save_version: boundary.save_version, source_game_time: boundary.game_time, source_checkpoint: 'worldlines/AFTERFALL/seasons/S99/END_CHECKPOINT_2099-01-01.md', coverage_status: 'PARTIAL', sources: [] }
   const snapshotFile = join(temporary, 'snapshot.json')
   await writeFile(snapshotFile, JSON.stringify(laterSnapshot))
-  const args = ['--snapshot', snapshotFile, '--facts', factsRef, '--map', mapRef, '--apply']
+  // Outside the specifically reviewed S02 decision, no dated input means fail closed.
+  assert.throws(() => run(['--snapshot', snapshotFile, '--facts', factsRef, '--map', mapRef, '--apply']))
+  assert.ok(initial.candidateBytes.equals(await readFile(outputPath)))
+  const args = ['--snapshot', snapshotFile, '--facts', factsRef, '--appearances', appearancesRef, '--map', mapRef, '--apply']
   const later = run(args)
   assert.equal(later.point_count, 36)
   assert.equal(later.by_type.MAP, 1)
@@ -116,6 +129,7 @@ try {
   console.log(JSON.stringify({ real_visual_catalog: initial.report,
     sample_character_brief: firstPortrait.brief,
     current_public_appearance_fields_preserved: true, deterministic_double_compile: true,
+    explicitly_dated_appearance_input: true, unreviewed_baseline_fails_closed: true,
     synthetic_environment_and_map: true, repeat_noop: true, unchanged_portrait_not_regenerated: true,
     stale_batch_does_not_overwrite: true, private_map_rejected_preserving_output: true,
     original_books_and_public_sources_unchanged: true, actual_images_generated: 0, production_writes: 0 }))
