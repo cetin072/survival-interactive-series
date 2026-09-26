@@ -178,7 +178,8 @@ Save / CURRENT_STATE가 S02 ACTIVE 또는 이후 진행상태이면 PREPLAY 캐�
 
 현재 S02에서는:
 - `seasons/S02/START_HANDOFF.md` = 시즌 시작 역사자료
-- `seasons/S02/CURRENT_CHECKPOINT.md` = 현재 재개용 overlay
+- `CURRENT_STATE.json`의 `current_checkpoint` = 유일한 현재 재개용 overlay
+- `seasons/S02/CURRENT_CHECKPOINT.md` 및 dated checkpoint = 보존된 역사 snapshot이며, `CURRENT_STATE.json`이 지정하지 않는 한 부팅 입력이 아니다
 
 S01 `raw_transcript/`는 정상 부팅 입력이 아니다.
 S01 `ARC_ARCHIVE.md`와 `FEEDBACK.md`는 세부 검증이 필요할 때만 선택적으로 읽는다.
