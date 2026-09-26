@@ -293,7 +293,7 @@ Archive의 최상위 정보모델은 단일 Worldline이 아니다.
 
 ## 13. Automatic reconciliation status
 
-- Daily reconciliation task: **04:30 KST / enabled**
+- Daily reconciliation task policy: **04:30 KST / configured but currently disabled**
 - Active Chronicle: **C03 AFTERFALL / 서진우**
 - Past Chronicle publication: **C01 한준호 / C02 STRONGHOLD 박도현**
 - Live capture health check: gameplay advancement without corresponding AFTERFALL RAW rows is a reconciliation warning; zero new rows with no new play is normal.
