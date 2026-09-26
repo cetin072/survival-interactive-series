@@ -19,6 +19,7 @@ test('changed receipt binding or digest and success inflation fail closed', asyn
   const original = await observations()
   for (const changed of [
     { ...original, accepted_portraits: 1 },
+    { ...original, source_revision: 'f'.repeat(40) },
     { ...original, receipts: [{ ...original.receipts[0], point_id: `point-${'f'.repeat(64)}` }, original.receipts[1]] },
     { ...original, receipts: [original.receipts[0], { ...original.receipts[1], accepted_as_completed_asset: true }] },
     { ...original, receipts: [original.receipts[0], original.receipts[0]] },
