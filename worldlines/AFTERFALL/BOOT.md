@@ -176,9 +176,11 @@ Save / CURRENT_STATE가 S02 ACTIVE 또는 이후 진행상태이면 PREPLAY 캐�
 7. Supabase `check_runtime_consistency('AFTERFALL')`
 8. 장면 관련 인물만 지정한 `get_scene_context`
 
-현재 S02에서는:
-- `seasons/S02/START_HANDOFF.md` = 시즌 시작 역사자료
-- `seasons/S02/CURRENT_CHECKPOINT.md` = 현재 재개용 overlay
+현재 진행 season에서는:
+- season의 `START_HANDOFF.md` = 시즌 시작 역사자료
+- `CURRENT_STATE.json`의 `current_checkpoint` = 유일한 현재 재개용 overlay
+- 이름이 `CURRENT_CHECKPOINT.md`이거나 dated checkpoint여도 `CURRENT_STATE.json`이 지정하지 않으면 역사 snapshot으로 취급
+- season이 COMPLETE이고 다음 season이 아직 시작되지 않았다면 종료 checkpoint를 기준으로 연속성만 복구하고, 다음 시즌의 미확정 사건을 임의로 확정하지 않는다
 
 S01 `raw_transcript/`는 정상 부팅 입력이 아니다.
 S01 `ARC_ARCHIVE.md`와 `FEEDBACK.md`는 세부 검증이 필요할 때만 선택적으로 읽는다.
