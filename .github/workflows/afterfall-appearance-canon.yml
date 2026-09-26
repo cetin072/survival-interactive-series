@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Validate appearance-only canon and source accounting
         run: |
           python - <<'PY'
@@ -39,5 +41,7 @@ jobs:
           assert '흉터' not in json.dumps(people['박재민']['appearance_anchor'], ensure_ascii=False)
           print('PASS: 7 anchors, complete field provenance, recovered Hajin identity, no invented Jaemin scar')
           PY
-      - name: Check authored whitespace
-        run: git show --format= --check HEAD
+      - name: Check proposed changes only (never reformat historical RAW)
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: git diff --check "$BASE_SHA" HEAD
