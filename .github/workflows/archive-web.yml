@@ -33,6 +33,8 @@ jobs:
           cache-dependency-path: archive/web/package-lock.json
       - name: Test offline publication planning
         run: node --test ../scripts/lib/publication-plan.test.mjs
+      - name: Test immutable open-session publication segments
+        run: node --test ../scripts/lib/publication-segment.test.mjs
       - name: Verify deterministic S02 dry-run (no external services)
         run: |
           node ../scripts/dry-run-publication.mjs --demo-s02 --source-revision "$GITHUB_SHA" > "$RUNNER_TEMP/publication-first.json"
