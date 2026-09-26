@@ -6,7 +6,7 @@ Start source of truth: Supabase `survival_rpg.saves` row `AFTERFALL` + `worldlin
 
 Current continuation source of truth: `worldlines/AFTERFALL/CURRENT_STATE.json` → `current_checkpoint`.
 
-이 문서는 2026-11-20 시즌2 시작 시점의 역사자료다. 현재 재개점으로 사용하지 않는다.
+이 문서는 2026-11-20 S01 종료 직후의 S02 시작 준비 시점 역사자료다. 실제 S02 Canon opening은 2026-11-21이며, 현재 재개점으로 사용하지 않는다.
 
 ## 0. 플레이어 스포일러 금지
 
