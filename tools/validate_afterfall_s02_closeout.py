@@ -112,6 +112,68 @@ def validate_pairing(
     validation.check(valid_hashes, f"{session_id} stored hashes follow USER→GM pairs")
 
 
+def validate_index_against_manifest(
+    validation: Validation, sessions: list[dict[str, Any]]
+) -> None:
+    index_text = (RAW / "INDEX.md").read_text(encoding="utf-8")
+    rows: dict[str, dict[str, str]] = {}
+    pattern = re.compile(
+        r"^\| `(SESSION_00[3-9])` \| Supabase rolling RAW \| "
+        r"([^|]+?) \| (\d+) \| (\d+) \| ([^|]+?) \|$"
+    )
+    for line in index_text.splitlines():
+        match = pattern.match(line.strip())
+        if not match:
+            continue
+        session_id, captured_range, user_count, gm_count, verdict = match.groups()
+        rows[session_id] = {
+            "captured_range": captured_range.strip(),
+            "user_count": user_count,
+            "gm_count": gm_count,
+            "verdict": verdict.strip(),
+        }
+
+    expected_sessions = {
+        entry["session_id"]: entry
+        for entry in sessions
+        if isinstance(entry, dict)
+        and re.fullmatch(r"SESSION_00[3-9]", str(entry.get("session_id")))
+    }
+    validation.check(
+        set(rows) == set(expected_sessions),
+        "S02 RAW INDEX lists SESSION_003~009 exactly once",
+    )
+
+    for session_id, entry in expected_sessions.items():
+        row = rows.get(session_id)
+        if row is None:
+            continue
+        captured = entry.get("captured_message_range", {})
+        if isinstance(captured, dict):
+            start = captured.get("start")
+            end = captured.get("end")
+            expected_range = f"{start} → {end}"
+            validation.check(
+                row["captured_range"] == expected_range,
+                f"{session_id} INDEX captured range matches MANIFEST",
+            )
+
+        validation.check(
+            row["user_count"] == str(entry.get("user_messages"))
+            and row["gm_count"] == str(entry.get("gm_public_blocks")),
+            f"{session_id} INDEX USER/GM counts match MANIFEST",
+        )
+        expected_verdict = (
+            "VERIFIED DB span"
+            if entry.get("atomic_pairing_complete") is True
+            else "PARTIAL capture / incomplete pair"
+        )
+        validation.check(
+            row["verdict"] == expected_verdict,
+            f"{session_id} INDEX verdict matches pairing state",
+        )
+
+
 def validate_transcript_metadata(validation: Validation) -> None:
     manifest = load_json(RAW / "MANIFEST.json")
     sessions = manifest.get("sessions")
@@ -121,6 +183,7 @@ def validate_transcript_metadata(validation: Validation) -> None:
 
     session_ids = [entry.get("session_id") for entry in sessions if isinstance(entry, dict)]
     validation.check(len(session_ids) == len(set(session_ids)), "S02 raw manifest has no duplicate session_id")
+    validate_index_against_manifest(validation, sessions)
 
     for entry in sessions:
         if not isinstance(entry, dict) or not re.fullmatch(r"SESSION_00[3-9]", str(entry.get("session_id"))):
