@@ -31,5 +31,7 @@ jobs:
         run: npm ci
       - name: Test
         run: npm test
+      - name: Verify Reader publication
+        run: npm run reader:check
       - name: Build
         run: npm run build
