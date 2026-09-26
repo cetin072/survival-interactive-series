@@ -13,6 +13,10 @@ const root = resolve(import.meta.dirname, '..', '..')
 const appearanceRef = 'archive/web/src/archive/characterAppearance.ts'
 const outputRef = 'archive/content/visuals/C03-AFTERFALL/VISUALS.json'
 const baselineAppearanceBlob = '74beacb2424ad2b6d39fdbf4761fdfb99032df85'
+// Explicit editorial approval #140, not an inference from mutable UI or later gameplay.
+// The timestamped public input is verified against the durable decision and DB receipt.
+// Its save/time identifies the unchanged S02 subject baseline, not a newly invented event.
+export const APPROVED_S02_APPEARANCE_REF = 'archive/content/public-facts/C03-AFTERFALL/S02/APPEARANCES_APPROVED_20260926.json'
 const demand = (v, code) => { if (!v) throw new Error(code) }
 const git = (...args) => execFileSync('git', args, { cwd: root, maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] })
 const currentHead = () => git('rev-parse', 'HEAD').toString().trim()
@@ -38,9 +42,12 @@ export async function prepareVisualPublication(snapshot, { factsRef = null, appe
   const batch = createBatch(snapshot), sha = currentHead()
   demand(batch.snapshot.source_revision === sha, 'VISUAL_SNAPSHOT_CHECKOUT_MISMATCH')
   const preparedGraph = await prepareGraphPublication(snapshot, factsRef)
+  // Only this reviewed S02 editorial decision has a default. Other snapshots
+  // still require an explicit dated appearance input when the legacy UI drifts.
+  const reviewedAppearanceRef = appearancesRef ?? (snapshot.season_id === 'S02' ? APPROVED_S02_APPEARANCE_REF : null)
   let appearances
-  if (appearancesRef) {
-    const loaded = approvedJSON(sha, appearancesRef, 'public-facts', snapshot.season_id)
+  if (reviewedAppearanceRef) {
+    const loaded = approvedJSON(sha, reviewedAppearanceRef, 'public-facts', snapshot.season_id)
     demand(Array.isArray(loaded.data.records), 'MISSING_APPEARANCE_RECORDS')
     appearances = { ...loaded.data, records: loaded.data.records.map((item) => {
       demand(!Object.hasOwn(item, 'evidence'), 'CALLER_APPEARANCE_EVIDENCE_REJECTED')
