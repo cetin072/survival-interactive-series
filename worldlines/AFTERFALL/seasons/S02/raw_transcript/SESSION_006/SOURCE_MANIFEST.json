@@ -17,6 +17,15 @@
   "closed_at": "2026-09-25 15:15:39.771911+00",
   "starting_game_time": "2027-01-21 18:10",
   "closing_game_time": "2027-02-05 22:10",
+  "session_range": {
+    "start": "2027-01-21 18:10",
+    "end": "2027-02-05 22:10"
+  },
+  "captured_message_range": {
+    "start": "2027-01-21 18:10",
+    "end": "2027-02-05 22:10"
+  },
+  "coverage_basis": "captured_message_range",
   "starting_save_version": 220,
   "closing_save_version": 237,
   "starting_scene_id": "S02_FUEL_YARD_TRADE_TEST",

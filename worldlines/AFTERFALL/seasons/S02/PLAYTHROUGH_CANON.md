@@ -3,7 +3,7 @@
 Status: **AUTHORITATIVE SEASON CANON**
 Chronicle: **C03 / 서진우**
 Worldline: **AFTERFALL**
-Season range: **2026-11-22 ~ 2027-03-23**
+Season range: **2026-11-21 ~ 2027-03-23**
 End anchor: **2027-03-23 17:50 / Supabase save 253**
 
 이 문서는 시즌2에서 실제로 발생한 사건만 압축한다. 미래 시즌의 정답·적대성·손실·관계 결과는 포함하지 않는다.

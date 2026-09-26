@@ -17,6 +17,15 @@
   "closed_at": "2026-09-25 04:54:38.116016+00",
   "starting_game_time": "2027-01-16 09:28",
   "closing_game_time": null,
+  "session_range": {
+    "start": "2027-01-16 09:28",
+    "end": null
+  },
+  "captured_message_range": {
+    "start": "2027-01-16 09:28",
+    "end": "2027-01-16 09:28"
+  },
+  "coverage_basis": "captured_message_range",
   "starting_save_version": 216,
   "closing_save_version": 217,
   "starting_scene_id": "S02_NORTH_ROUTE_MIGRATION_RECONFIGURATION",
