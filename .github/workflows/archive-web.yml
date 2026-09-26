@@ -53,6 +53,8 @@ jobs:
         run: node --experimental-strip-types ../scripts/check-visual-batch.mjs
       - name: Verify pinned public visual catalog consumed by website
         run: node ../scripts/check-site-visual-catalog.mjs
+      - name: Test same-origin site asset manifest and file gate
+        run: node --test ../scripts/lib/site-asset-contract.test.mjs
       - name: Test local image POC request and quarantine receipts
         run: node --test ../scripts/lib/image-poc-exchange.test.mjs
       - name: Verify real portrait request without image execution
