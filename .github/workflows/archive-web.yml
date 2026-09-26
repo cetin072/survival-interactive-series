@@ -51,6 +51,10 @@ jobs:
         run: node --test ../scripts/lib/visual-compiler.test.mjs
       - name: Verify public appearance-to-brief and isolated visual catalog integration
         run: node --experimental-strip-types ../scripts/check-visual-batch.mjs
+      - name: Test local image POC request and quarantine receipts
+        run: node --test ../scripts/lib/image-poc-exchange.test.mjs
+      - name: Verify real portrait request without image execution
+        run: node --experimental-strip-types ../scripts/prepare-image-poc.mjs --check
       - name: Install
         run: npm ci
       - name: Test
