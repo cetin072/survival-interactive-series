@@ -1,21 +1,21 @@
 import type { ArchiveNode } from './archiveData'
+import approvedBackfill from '../../../content/characters/C03-AFTERFALL/APPEARANCE_BACKFILL_V1.json' with { type: 'json' }
 
 export type AppearanceStatus = 'confirmed' | 'visual-backfill-needed'
 
 /**
- * Static publication snapshot of AFTERFALL visual Canon.
- *
- * Confirmed Supabase entries preserve every public field from
- * `survival_rpg.characters.known_facts.appearance_anchor`; the only editorial
- * addition is `publicDescription`, a compact reader-facing rendering of those
- * same facts. `visual-backfill-needed` is internal publication state and is
- * deliberately never rendered for readers.
+ * Static publication of existing visual Canon and explicit user-approved
+ * completion (#140). Recovered and newly established fields are distinguished;
+ * new Canon is never represented as recovered historical RAW. The approved JSON
+ * is a byte-preserved copy of the worldline appearance decision, not runtime UI
+ * invention. Other established anchors remain unchanged.
  */
 export type CharacterAppearanceAnchor = {
   status: AppearanceStatus
   publicDescription?: string
   sourceRefs: string[]
   visual: {
+    gender?: string
     apparentAge?: string
     height?: string
     build?: string
@@ -27,11 +27,43 @@ export type CharacterAppearanceAnchor = {
     presence?: string
     voice?: string
   }
+  provenance?: {
+    decisionId: string
+    approvedOn: string
+    origin: string
+    recoveredFields: string[]
+    newFields: string[]
+  }
   auditNote?: string
 }
 
 const supabaseAppearanceSource = 'survival_rpg.characters.known_facts.appearance_anchor'
-const firstAppearanceSource = 'archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_004.md'
+const visualKeys: Record<string, string> = {
+  gender: 'gender', apparent_age: 'apparentAge', height: 'height', build: 'build',
+  face: 'face', hair: 'hair', style: 'style', distinctive: 'distinctive',
+  attractiveness: 'attractiveness', voice: 'voice',
+}
+
+function approved(nodeId: string): CharacterAppearanceAnchor {
+  const entry = approvedBackfill.characters.find((item) => item.node_id === nodeId)
+  if (!entry || !approvedBackfill.not_a_game_event || !approvedBackfill.historical_raw_unchanged) {
+    throw new Error('Missing or invalid approved appearance: ' + nodeId)
+  }
+  const visual = Object.fromEntries(Object.entries(entry.appearance_anchor).map(([key, value]) => {
+    if (!visualKeys[key]) throw new Error('Unmapped appearance field: ' + key)
+    return [visualKeys[key], value]
+  })) as CharacterAppearanceAnchor['visual']
+  return {
+    status: 'confirmed', publicDescription: entry.public_description, visual,
+    sourceRefs: Array.from(new Set([approvedBackfill.canon_path, supabaseAppearanceSource, ...entry.provenance.source_refs])),
+    provenance: {
+      decisionId: approvedBackfill.decision_id, approvedOn: approvedBackfill.approved_on,
+      origin: entry.provenance.origin, recoveredFields: entry.provenance.recovered_fields,
+      newFields: entry.provenance.new_fields,
+    },
+    auditNote: entry.provenance.note,
+  }
+}
 
 const supabase = (publicDescription: string, visual: CharacterAppearanceAnchor['visual']): CharacterAppearanceAnchor => ({
   status: 'confirmed',
@@ -85,27 +117,13 @@ export const characterAppearanceByNodeId: Record<string, CharacterAppearanceAnch
     '30대 후반. 180cm 안팎의 단단한 체형에 햇볕에 그을린 피부와 각진 턱을 지녔다. 짧게 밀어 올린 검은 머리와 오른쪽 관자놀이의 오래된 흉터가 눈에 띄며, 목소리는 거칠지만 전달이 빠르다.',
     { apparentAge: '30대 후반', height: '180cm 안팎', build: '단단한 체형', face: '햇볕에 그을린 피부와 각진 턱', hair: '짧게 밀어 올린 검은 머리', distinctive: ['오른쪽 관자놀이의 오래된 흉터'], voice: '거칠지만 전달이 빠름' },
   ),
-  'char-jisu': {
-    status: 'confirmed',
-    publicDescription: '30대 중후반. 168cm쯤의 길고 탄탄한 체형에 햇볕에 살짝 그을린 피부를 지녔다. 턱 아래 길이의 검은 머리를 귀 뒤로 넘기고, 작업복과 등산화 차림으로 현장을 지킨다.',
-    sourceRefs: [firstAppearanceSource],
-    visual: { apparentAge: '30대 중후반', height: '168cm쯤', build: '길고 탄탄한 체형', face: '길고 선명한 눈매', hair: '귀 뒤로 넘긴 턱 아래 길이의 검은 머리', style: '작업복 바지와 두꺼운 등산화', distinctive: ['장갑', '작은 몽키스패너'], attractiveness: '꾸민 흔적 없이도 선명한 이목구비', voice: '낮고 맑은 목소리' },
-  },
-  'char-hajin': missingAppearance(),
-  'char-mingyu': missingAppearance(),
-  'char-kyunghee': missingAppearance(),
-  'char-seongho': missingAppearance(),
-  'char-cheolsu': missingAppearance(),
-  'char-jaemin': missingAppearance(),
-}
-
-function missingAppearance(): CharacterAppearanceAnchor {
-  return {
-    status: 'visual-backfill-needed',
-    sourceRefs: [],
-    visual: {},
-    auditNote: '현재 공개된 verified RAW와 Canon에서 안정적인 외형 앵커를 찾지 못했다. 다음 의미 있는 공개 장면에서 자연스럽게 확정한다.',
-  }
+  'char-jisu': approved('char-jisu'),
+  'char-hajin': approved('char-hajin'),
+  'char-mingyu': approved('char-mingyu'),
+  'char-kyunghee': approved('char-kyunghee'),
+  'char-seongho': approved('char-seongho'),
+  'char-cheolsu': approved('char-cheolsu'),
+  'char-jaemin': approved('char-jaemin'),
 }
 
 export function confirmedAppearanceFor(node: ArchiveNode): CharacterAppearanceAnchor | undefined {

@@ -1,0 +1,27 @@
+{
+  "version": "public-appearance-v1",
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "visibility": "PUBLIC_ARCHIVE",
+  "anchor": { "save_version": 253, "game_time": "2027-03-23 17:50" },
+  "records": [
+    { "node_id": "char-jinwoo", "status": "confirmed", "visual": { "apparentAge": "30대 초반", "height": "176cm", "build": "군살 없는 체형, 반듯한 자세", "face": "깨끗한 얼굴선과 피곤할 때 짙어지는 눈 밑 그림자", "hair": "자연스럽게 내려오는 검은 앞머리", "distinctive": ["침착한 시선", "정돈된 인상"], "voice": "낮고 차분하며 위급한 순간에는 짧고 단호함" } },
+    { "node_id": "char-seojin", "status": "confirmed", "visual": { "apparentAge": "30대 초반", "height": "평균보다 약간 큰 편", "build": "마른 체형", "face": "날카롭지 않지만 집중하면 눈매가 또렷해짐", "hair": "턱선 위로 정리한 짙은 갈색 단발", "distinctive": ["왼쪽 귀 뒤로 머리를 넘기는 버릇"], "voice": "빠르지 않고 명확함" } },
+    { "node_id": "char-eunchae", "status": "confirmed", "visual": { "apparentAge": "30대 중반", "height": "보통", "build": "마른 편", "face": "단정한 인상과 얇은 입매", "hair": "검은 머리를 낮게 묶음", "distinctive": ["금속테 안경", "목걸이형 출입카드"], "voice": "또렷하고 사무적" } },
+    { "node_id": "char-taehoon", "status": "confirmed", "visual": { "apparentAge": "40대 초반", "height": "175cm 안팎", "build": "작고 단단한 체형", "face": "각진 얼굴과 햇볕에 거칠어진 피부", "hair": "짧게 친 검은 머리에 옆머리 새치", "distinctive": ["낡은 남색 작업조끼", "거친 손"], "voice": "낮고 건조함" } },
+    { "node_id": "char-hayoung", "status": "confirmed", "visual": { "apparentAge": "30대 초반", "height": "160cm대 중반", "build": "군살 없이 단단한 체형", "face": "선명한 눈매와 또렷한 이목구비, 웃을 때 한쪽 볼에 얕은 보조개", "hair": "긴 검은 머리를 목 뒤에서 대충 묶음", "style": "소매를 걷은 실용적인 작업복과 앞치마가 자연스러운 사람", "attractiveness": "화려한 미인형보다는 단정하고 건강한 인상이 오래 남는 매력적인 외모", "voice": "맑지만 피곤하면 낮아지는 목소리" } },
+    { "node_id": "char-yujin", "status": "confirmed", "visual": { "apparentAge": "30대 중반", "height": "160cm 안팎", "build": "가늘고 마른 체형", "face": "부드러운 타원형 얼굴, 크고 차분한 눈, 피곤할수록 창백해 보이는 피부", "hair": "어깨 아래까지 오는 짙은 갈색 머리를 낮게 하나로 묶음", "style": "밝은색 셔츠 위에 오래된 카디건과 작업바지를 겹쳐 입는 편", "attractiveness": "눈에 확 띄는 화려함보다는 가까이 볼수록 부드럽고 편안한 인상을 주는 여성", "voice": "작고 조용하지만 또렷한 목소리" } },
+    { "node_id": "char-sehoon", "status": "confirmed", "visual": { "apparentAge": "40대 중반", "height": "170cm대 초반", "build": "마른 근육질", "face": "광대가 도드라지고 눈가가 깊게 패인 얼굴", "hair": "짧게 자른 검은 머리와 넓어진 이마", "distinctive": ["회색 작업점퍼", "왼손 검지의 오래된 흉터"] } },
+    { "node_id": "char-doyoon", "status": "confirmed", "visual": { "apparentAge": "30대 후반", "height": "178cm 안팎", "build": "어깨가 넓고 다부진 체형", "face": "둥근 턱선과 피곤한 눈", "hair": "짧은 스포츠형 머리", "distinctive": ["낡은 방수 작업바지", "항상 접어 넣은 면장갑"] } },
+    { "node_id": "char-hyerin", "status": "confirmed", "visual": { "apparentAge": "40대 초반", "height": "160cm대 중반", "build": "마른 편", "hair": "검은 머리를 짧게 묶음", "distinctive": ["짙은 남색 수술복", "왼쪽 손목의 오래된 아날로그 시계"], "voice": "낮고 건조하지만 명확함" } },
+    { "node_id": "char-mira", "status": "confirmed", "visual": { "apparentAge": "30대 중반", "height": "평균보다 약간 큰 편", "build": "마르고 단단한 체형", "face": "선명한 눈매와 햇볕에 살짝 그을린 피부", "hair": "검은 머리를 뒤로 단단히 묶음", "distinctive": ["연한 흙자국이 밴 작업셔츠", "손목의 낡은 스포츠시계"], "voice": "낮고 빠르지 않음" } },
+    { "node_id": "char-minho", "status": "confirmed", "visual": { "apparentAge": "30대 후반", "height": "180cm 안팎", "build": "단단한 체형", "face": "햇볕에 그을린 피부와 각진 턱", "hair": "짧게 밀어 올린 검은 머리", "distinctive": ["오른쪽 관자놀이의 오래된 흉터"], "voice": "거칠지만 전달이 빠름" } },
+    { "node_id": "char-hajin", "status": "confirmed", "visual": { "gender": "여성", "apparentAge": "30대 중반", "height": "평균 정도", "build": "가늘지만 어깨와 자세가 반듯한 체형", "face": "길지 않은 타원형 얼굴에 곧은 눈썹과 차분한 눈매", "hair": "귀를 드러내는 짧은 검은 단발, 앞머리는 옆으로 넘김", "style": "형광 안전조끼와 기름 묻은 작업장갑", "distinctive": ["접힌 시설도면"], "voice": "압박받는 현장에서도 흔들리지 않는 목소리" } },
+    { "node_id": "char-mingyu", "status": "confirmed", "visual": { "gender": "남성", "apparentAge": "30대 후반", "height": "평균 정도", "build": "마르고 어깨가 약간 굽은 체형", "face": "좁은 얼굴과 도드라진 광대, 눈꺼풀이 살짝 처진 눈", "hair": "옆머리는 짧고 윗머리는 손으로 쓸어넘길 만큼 남긴 검은 머리", "style": "색 바랜 회색 작업점퍼와 무릎이 닳은 작업바지", "distinctive": ["작은 공구가방", "낡은 테스터기"], "voice": "크지 않고 약간 잠긴 목소리" } },
+    { "node_id": "char-kyunghee", "status": "confirmed", "visual": { "gender": "여성", "apparentAge": "40대 초반", "height": "평균보다 약간 작은 편", "build": "몸통과 팔이 적당히 단단한 체형", "face": "둥근 광대와 부드럽게 내려오는 눈꼬리, 웃을 때 깊어지는 눈가 주름", "hair": "짙은 갈색 머리를 목덜미에서 둥글게 말아 고정함", "style": "빛바랜 올리브색 재킷과 옷깃 안에 둘러 넣은 얇은 목수건", "voice": "빠르지 않은 말투" } },
+    { "node_id": "char-seongho", "status": "confirmed", "visual": { "gender": "남성", "apparentAge": "40대 초중반", "height": "크지 않은 편", "build": "목과 어깨가 두껍고 몸이 단단한 체형", "face": "햇볕에 그을린 각진 얼굴, 굵은 눈썹과 넓은 코", "hair": "짧게 자른 검은 머리", "style": "작업용 점퍼 위에 형광 안전조끼", "voice": "낮고 짧게 끊어 말하는 목소리" } },
+    { "node_id": "char-cheolsu", "status": "confirmed", "visual": { "gender": "남성", "apparentAge": "50대", "height": "평균 정도", "build": "상체가 두텁고 손마디가 굵은 체형", "face": "넓은 턱과 굵은 코, 깊게 접힌 눈가", "hair": "숱이 조금 성긴 짧은 머리에 새치가 섞임", "style": "작업복 위에 낡은 패딩조끼", "voice": "낮고 거칠며 말끝에 약간 쇳소리가 섞이는 목소리" } },
+    { "node_id": "char-jaemin", "status": "confirmed", "visual": { "gender": "남성", "apparentAge": "20대 후반", "height": "큰 편", "build": "팔다리가 길고 가벼운 마른 체형", "face": "볼살이 적고 턱선이 부드러운 얼굴, 짙은 눈썹과 큰 눈", "hair": "눈썹 가까이 내려오는 검은 앞머리", "style": "남색 후드 상의 위에 낡은 짧은 재킷", "voice": "중간 높이의 맑은 목소리" } },
+    { "node_id": "char-jisu", "status": "confirmed", "visual": { "face": "길고 선명한 눈매와 반듯한 코선", "hair": "귀 뒤로 넘긴 턱 아래 길이의 검은 머리", "build": "군살 없이 길고 탄탄한 체형", "style": "작업복 바지와 두꺼운 등산화", "voice": "낮고 맑은 목소리", "height": "168cm쯤", "distinctive": ["허리에 건 장갑", "작은 몽키스패너"], "apparentAge": "30대 중후반", "attractiveness": "꾸민 흔적은 거의 없지만 첫눈에 꽤 매력적인 얼굴" } }
+  ]
+}
