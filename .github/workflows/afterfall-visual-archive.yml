@@ -16,6 +16,9 @@ on:
       - "worldlines/AFTERFALL/seasons/S02/raw_transcript/**"
       - "worldlines/AFTERFALL/seasons/S03/START_STATE.json"
       - "tools/validate_afterfall_s02_closeout.py"
+      - "tools/afterfall_capture_sync.py"
+      - "tools/test_afterfall_capture_sync.py"
+      - "docs/AFTERFALL_CAPTURE_SYNC_V1.md"
       - ".github/workflows/afterfall-visual-archive.yml"
   push:
     branches:
@@ -33,6 +36,9 @@ on:
       - "worldlines/AFTERFALL/seasons/S02/raw_transcript/**"
       - "worldlines/AFTERFALL/seasons/S03/START_STATE.json"
       - "tools/validate_afterfall_s02_closeout.py"
+      - "tools/afterfall_capture_sync.py"
+      - "tools/test_afterfall_capture_sync.py"
+      - "docs/AFTERFALL_CAPTURE_SYNC_V1.md"
       - ".github/workflows/afterfall-visual-archive.yml"
 
 permissions:
@@ -66,3 +72,15 @@ jobs:
         run: |
           python tools/validate_state.py
           python tools/validate_presentation_boot.py
+
+  capture-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile metadata-only capture audit
+        run: python -m py_compile tools/afterfall_capture_sync.py tools/test_afterfall_capture_sync.py
+      - name: Test capture linkage and no-auto-promotion guards
+        run: python -m unittest -v tools.test_afterfall_capture_sync
