@@ -5,7 +5,7 @@ import { mkdtemp, readFile, writeFile, readdir, rm, symlink } from 'node:fs/prom
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { approvedSeasonCatalog } from './approved-reader-sources.mjs'
-import { appendAutomaticChapters, checkAppendOnlyEdition } from './reader-auto.mjs'
+import { appendAutomaticChapters, checkAppendOnlyEdition, selectTextBatchCatalog } from './reader-auto.mjs'
 import { replaceBookAtomically } from './atomic-book.mjs'
 import { extractReaderNarrative } from './reader-transform.mjs'
 
@@ -82,3 +82,7 @@ test('concurrent modification during preparation is not overwritten', async () =
 test('an existing lock is not stolen or removed', async () => disk(async (file) => { await writeFile(`${file}.publication-lock`, 'OTHER'); await assert.rejects(replaceBookAtomically(file, 'OLD_COMPLETE_BOOK', 'NEW')); assert.equal(await readFile(`${file}.publication-lock`, 'utf8'), 'OTHER') }))
 test('book symlink is rejected', async () => disk(async (file, dir) => { const link = join(dir, 'LINK.json'); await symlink(file, link); await assert.rejects(replaceBookAtomically(link, 'OLD_COMPLETE_BOOK', 'NEW')) }))
 test('raw sentinel and another Chronicle stay untouched', async () => disk(async (file, dir) => { await writeFile(join(dir, 'RAW.md'), 'EXACT_RAW'); await writeFile(join(dir, 'C02.json'), 'OTHER_CHRONICLE'); await replaceBookAtomically(file, 'OLD_COMPLETE_BOOK', 'NEW'); assert.equal(await readFile(join(dir, 'RAW.md'), 'utf8'), 'EXACT_RAW'); assert.equal(await readFile(join(dir, 'C02.json'), 'utf8'), 'OTHER_CHRONICLE') }))
+
+test('past batch defers later unpublished input rather than publishing it', async () => { const { item } = await automatic(); assert.deepEqual(selectTextBatchCatalog([item], { chapters: [] }, { sources: [], source_game_time: '2027-03-23 17:50' }), []) })
+test('past batch retains newer already-published source without changing it', async () => { const { item, chapters } = await automatic(); assert.deepEqual(selectTextBatchCatalog([item], { chapters }, { sources: [], source_game_time: '2027-03-23 17:50' }), [item]) })
+test('new input within a batch still must not exceed its time boundary', async () => { const { item } = await automatic(); assert.throws(() => selectTextBatchCatalog([item], { chapters: [] }, { source_game_time: '2027-03-23 17:50', sources: [{ atomic_pairing_complete: true, source_ref: item.autoPublication.sourceManifestRef, captured_message_range: item.autoPublication.capturedRange }] })) })

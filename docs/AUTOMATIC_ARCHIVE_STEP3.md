@@ -27,7 +27,7 @@ Every automatic chapter retains source/Archive refs, raw content hashes, session
 
 ## Frozen batch and safe application
 
-`run-reader-publication.mjs` reuses Step 2 `createBatch` / `planPublication`. It requires the snapshot's exact checkout SHA and verifies each source-entry digest against that Git revision. Reader source bytes come from pinned Git objects, not arbitrary network paths. Source manifests/hashes and the batch time boundary are verified. New chapters must belong to the batch's paired public source refs.
+`run-reader-publication.mjs` reuses Step 2 `createBatch` / `planPublication`. It requires the snapshot's exact checkout SHA and verifies each source-entry digest against that Git revision. Reader source bytes come from pinned Git objects, not arbitrary network paths. Source manifests/hashes and the batch time boundary are verified. New chapters must belong to the batch's paired public source refs. Later unprocessed sources outside that batch are deferred; later chapters already in the committed book are retained unchanged. Rechecking historical S02 after a newer season is published must neither fail merely due to time progression nor roll the newer edition back.
 
 The runner regenerates one target Chronicle only. It checks that every existing chapter remains in place and byte-equivalent at the data level. An old chapter deletion, edit, reorder, unapproved addition or source outside the frozen batch rejects the update. Intentional corrections/backfills that reorder a published edition require a separately reviewed operation.
 
@@ -52,7 +52,7 @@ node archive/scripts/run-reader-publication.mjs --snapshot /path/snapshot.json -
 
 ## Verification
 
-- 47 new Node unit tests: source visibility, namespace, ranges, hashes, role/pair order, inventory, fragments, deterministic chapter generation, existing text protection, atomic update, no-op, stale lock, I/O failure, concurrent edit and untouched RAW/other-Chronicle sentinels.
+- 50 new Node unit tests: source visibility, namespace, ranges, hashes, role/pair order, inventory, fragments, deterministic chapter generation, existing text protection, atomic update, no-op, stale lock, I/O failure, concurrent edit and untouched RAW/other-Chronicle sentinels.
 - Existing Step 2 tests and Archive tests remain required.
 - Real repository books are rebuilt and compared with committed BOOK.json without modifying the originals.
 - Real S02 batch is executed twice and must produce identical metadata reports and NOOP.

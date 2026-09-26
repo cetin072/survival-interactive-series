@@ -6,7 +6,7 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { createBatch, fingerprint, planPublication } from './lib/publication-plan.mjs'
 import { snapshotFromPublishedS02 } from './dry-run-publication.mjs'
-import { checkAppendOnlyEdition } from './lib/reader-auto.mjs'
+import { checkAppendOnlyEdition, selectTextBatchCatalog } from './lib/reader-auto.mjs'
 import { replaceBookAtomically } from './lib/atomic-book.mjs'
 
 const root = resolve(import.meta.dirname, '..', '..')
@@ -45,16 +45,16 @@ export async function prepareTextPublication(input) {
   // Dynamic imports keep this runner out of the game's turn path. No gameplay modules imported.
   const { rawCatalog } = await import('./reader-source-catalog.mjs')
   const { makeBooks } = await import('./build-reader-edition.mjs')
-  const catalog = rawCatalog[snapshot.chronicle_id]
+  const bookPath = `archive/content/stories/${snapshot.chronicle_id}/BOOK.json`
+  const baselineBytes = readPinned(bookPath)
+  const previous = JSON.parse(baselineBytes)
+  const allParts = rawCatalog[snapshot.chronicle_id]
+  const catalog = selectTextBatchCatalog(allParts, previous, snapshot)
   for (const part of catalog) {
     if (!part.autoPublication) continue
     const proof = part.autoPublication
     demand(hash(readPinned(proof.sourceManifestRef)) === proof.sourceManifestSha256, 'SOURCE_MANIFEST_CHANGED')
-    demand(proof.capturedRange.end <= snapshot.source_game_time, 'SOURCE_AFTER_BATCH_BOUNDARY')
   }
-  const bookPath = `archive/content/stories/${snapshot.chronicle_id}/BOOK.json`
-  const baselineBytes = readPinned(bookPath)
-  const previous = JSON.parse(baselineBytes)
   const [candidate] = await makeBooks({ readSource: async (path) => readPinned(path), catalogs: { [snapshot.chronicle_id]: catalog } })
   const allowed = new Set(snapshot.sources.filter((s) => s.atomic_pairing_complete === true).map((s) => s.source_ref))
   const additions = checkAppendOnlyEdition(previous, candidate, allowed)
@@ -75,6 +75,7 @@ export async function prepareTextPublication(input) {
     report: { mode: 'LOCAL_READER_BATCH', batch_id: batch.batch_id, source_revision: head,
       source_save_version: snapshot.source_save_version, source_game_time: snapshot.source_game_time,
       reader_status: equal(actualBytes, candidateBytes) ? 'NOOP' : 'READY_TO_UPDATE_LOCAL_BOOK',
+      deferred_source_parts: allParts.length - catalog.length,
       prior_chapters: previous.chapters.length, generated_chapters: candidate.chapters.length, added_chapters: additions.length,
       source_receipts: sourceReceipts, book_sha256: hash(candidateBytes),
       site_publications: 0, external_calls: 0, database_writes: 0, images_generated: 0, files_written: 0 },

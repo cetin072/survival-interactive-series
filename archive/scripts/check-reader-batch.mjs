@@ -47,6 +47,9 @@ try {
   const snapshot = { version: 'publication-snapshot-v1', chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', season_id: 'S99', visibility: 'PUBLIC_ARCHIVE', source_revision: command('git', ['rev-parse', 'HEAD'], copy).trim(), source_save_version: 999, source_game_time: range.end, source_checkpoint: 'worldlines/AFTERFALL/seasons/S99/END_CHECKPOINT_2099-01-01.md', coverage_status: 'PARTIAL', sources: [{ session_id: entry.session_id, source_ref: `${relative}/SOURCE_MANIFEST.json`, source_digest: fingerprint(entry), visibility: 'PUBLIC_ARCHIVE', capture_quality: entry.capture_quality, atomic_pairing_complete: true, captured_message_range: range, user_messages: 1, gm_public_blocks: 1 }] }
   const snapshotFile = join(temporary, 'snapshot.json')
   await writeFile(snapshotFile, JSON.stringify(snapshot))
+  const pastBefore = JSON.parse(command('node', ['archive/scripts/run-reader-publication.mjs', '--demo-s02', '--check'], copy))
+  assert.equal(pastBefore.reader_status, 'NOOP')
+  assert.equal(pastBefore.deferred_source_parts, 1)
   const args = ['archive/scripts/run-reader-publication.mjs', '--snapshot', snapshotFile, '--apply']
   const updated = JSON.parse(command('node', args, copy))
   assert.equal(updated.reader_status, 'UPDATED_LOCAL_BOOK')
@@ -60,9 +63,17 @@ try {
   assert.equal(JSON.parse(command('node', args, copy)).reader_status, 'NOOP')
   assert.equal(await readFile(resolve(copy, relative, 'PART_001.md'), 'utf8'), raw)
   assert.equal(command('git', ['diff', '--name-only'], copy).trim(), 'archive/content/stories/C03-AFTERFALL/BOOK.json')
+  // Committing a newer edition must not make historical S02 checks fail or roll it back.
+  command('git', ['add', 'archive/content/stories/C03-AFTERFALL/BOOK.json'], copy)
+  command('git', ['-c', 'user.name=Reader test', '-c', 'user.email=reader-test@example.invalid', 'commit', '--no-verify', '-qm', 'Synthetic Reader result; local test only'], copy)
+  const pastAfter = JSON.parse(command('node', ['archive/scripts/run-reader-publication.mjs', '--demo-s02', '--check'], copy))
+  assert.equal(pastAfter.reader_status, 'NOOP')
+  assert.equal(pastAfter.generated_chapters, parsed.chapters.length)
+  snapshot.source_revision = command('git', ['rev-parse', 'HEAD'], copy).trim()
+  await writeFile(snapshotFile, JSON.stringify(snapshot))
   // Corrupt source and failed attempts must preserve the successfully built book.
   await writeFile(resolve(copy, relative, 'PART_001.md'), raw + '\nCORRUPTED\n')
   assert.throws(() => command('node', args, copy))
   assert.equal(await readFile(bookFile, 'utf8'), changedBook)
-  console.log(JSON.stringify({ real_books_unchanged: books.map((b) => ({ chronicle: b.chronicleId, chapters: b.chapters.length })), real_s02_reader_batch: report, synthetic_append: 'PASS', synthetic_repeat_noop: 'PASS', corrupted_source_retains_book: 'PASS' }))
+  console.log(JSON.stringify({ real_books_unchanged: books.map((b) => ({ chronicle: b.chronicleId, chapters: b.chapters.length })), real_s02_reader_batch: report, historical_batch_after_newer_publication: 'PASS', synthetic_append: 'PASS', synthetic_repeat_noop: 'PASS', corrupted_source_retains_book: 'PASS' }))
 } finally { await rm(temporary, { recursive: true, force: true }) }

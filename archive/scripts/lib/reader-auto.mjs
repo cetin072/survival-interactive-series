@@ -48,3 +48,23 @@ export function checkAppendOnlyEdition(previous, next, allowedSourceRefs) {
   }
   return additions
 }
+
+/** Scope only new additions to this batch; later already-published chapters are retained. */
+export function selectTextBatchCatalog(catalog, previous, snapshot) {
+  const allowed = new Map(snapshot.sources.filter((s) => s.atomic_pairing_complete === true).map((s) => [s.source_ref, s]))
+  const existing = new Set([
+    ...previous.chapters.flatMap((c) => c.archiveSourceRefs ?? []),
+    ...(previous.coverage?.omitted ?? []).map((s) => s.archiveSourceRef),
+  ])
+  return catalog.filter((part) => {
+    const proof = part.autoPublication
+    if (!proof) return true
+    const source = allowed.get(proof.sourceManifestRef)
+    if (source) {
+      if (proof.capturedRange.start !== source.captured_message_range.start || proof.capturedRange.end !== source.captured_message_range.end || proof.capturedRange.end > snapshot.source_game_time) throw new Error('SOURCE_AFTER_BATCH_BOUNDARY')
+      return true
+    }
+    // Retention is not fresh publication. checkAppendOnlyEdition still rejects every edit.
+    return existing.has(part.archivePath)
+  })
+}
