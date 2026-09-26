@@ -34,11 +34,12 @@ Suggested travel model:
 
 | Node | X km | Y km | Confidence | Notes |
 |---|---:|---:|---|---|
-| 외곽 제3거점 | 0.0 | 0.0 | HIGH | public forward service / exchange hub |
+| 외곽 제3거점 | 0.0 | 0.0 | HIGH | public forward gateway / advance buffer; lean vetted staff |
 | 서림대학교 북서 실습센터 | -5.8 | 2.0 | MEDIUM | hidden rear base; exact public location remains secret |
 | 북유성 농업기술 실증단지 | 1.8 | 5.8 | MEDIUM | production / well / seed base |
 | 서쪽길 관리거점 | -4.8 | -1.8 | MEDIUM | west-road maintenance axis |
-| 폐쇄 체육시설 | -1.8 | 3.3 | MEDIUM | previously visited for public-water control parts; large-building candidate |
+| 폐쇄 직업훈련원 | -0.7 | 1.9 | MEDIUM | active primary residence of the core four; limited semi-private visibility |
+| 폐쇄 체육시설 | -1.8 | 3.3 | HIGH | active central guild / work / logistics hub |
 | 동천교 | 5.1 | 1.6 | MEDIUM | natural chokepoint |
 | 북쪽 의원 | 5.3 | 2.7 | LOW-MEDIUM | clinic / medical contact axis |
 | 북쪽 연료장 | 5.8 | 4.7 | MEDIUM | north of Dongcheon Bridge / old logistics-fuel area |
@@ -55,6 +56,10 @@ Suggested travel model:
 | 제3거점 | 북유성 실증단지 | 7.0 | direct service / outer road route |
 | 북서 실습센터 | 북유성 실증단지 | 9.5 | two-base mutual-support route |
 | 제3거점 | 폐쇄 체육시설 | 4.2 | mixed public / service road |
+| 제3거점 | 폐쇄 직업훈련원 | 2.5 | short front-living connector |
+| 폐쇄 직업훈련원 | 폐쇄 체육시설 | 2.3 | residence-to-work connector |
+| 폐쇄 직업훈련원 | 북서 실습센터 | 6.3 | controlled rear connector |
+| 폐쇄 직업훈련원 | 북유성 실증단지 | 5.8 | front-residence to production connector |
 | 폐쇄 체육시설 | 북서 실습센터 | 4.8 | rear-side access; security-sensitive |
 | 폐쇄 체육시설 | 북유성 실증단지 | 5.0 | farm/service-road access |
 | 제3거점 | 서쪽길 관리거점 | 5.8 | west movement axis |
@@ -87,102 +92,141 @@ Shortest nominal-route distances under ordinary degraded conditions:
 | 북유성 실증단지 | 북쪽 연료장 | 4.6 |
 | 북쪽 연료장 | 산림교육원 | 5.0 |
 
-## 6. Living-network reconfiguration geometry
+## 6. Five-node operating geometry — active as of 2027-02-24
 
-For the three currently important living / production / public-service nodes:
-- 북서 실습센터
-- 북유성 실증단지
-- 외곽 제3거점
+The living network now uses five durable functional nodes.
 
-the geometric center of the three anchors falls roughly around **(-1.9, +3.7)**.
+### Front cluster
 
-The previously known **폐쇄 체육시설** at approx **(-1.8, +3.3)** sits close to that center.
+#### 1) 외곽 제3거점 — public forward gateway / advance buffer
+Coordinate: **(0.0, 0.0)**
 
-Approx nominal route distances from 폐쇄 체육시설:
+Route position:
+- 서쪽길 관리거점: 5.8 km
+- 동천교: 6.0 km
+- 폐쇄 직업훈련원: 2.5 km
+- 폐쇄 체육시설: 4.2 km
+
+Primary role:
+- first contact
+- individual case intake
+- short waiting / limited short stay
+- basic medical triage
+- low-value logistics
+- public information intake
+- buffer before visitors move deeper into the front cluster
+
+Operating model:
+- only a small vetted staff remains on routine duty;
+- core guild operations moved inward to 폐쇄 체육시설.
+
+Hidden contingency overlay:
+- known only to 서진우 and 장태훈;
+- uses the node's forward position for early warning, communication fallback, retreat guidance and delay/buffer functions;
+- this does **not** make it a public military base, militia headquarters, barracks or attack-force node.
+
+#### 2) 폐쇄 직업훈련원 — primary front residence
+Coordinate: **(-0.7, +1.9)**
+
+Nominal routes:
+- to 외곽 제3거점: 2.5 km
+- to 폐쇄 체육시설: 2.3 km
+- to 북서 실습센터: 6.3 km
+- to 북유성 실증단지: 5.8 km
+
+Primary role:
+- core four's main home
+- sleeping / meals / hygiene / recovery / private life
+- limited semi-private location policy
+
+Security rule:
+- the building's existence is not itself a secret;
+- the core four's actual residence pattern, rear connectors and exact operating routine are restricted.
+
+#### 3) 폐쇄 체육시설 — central guild / work / logistics hub
+Coordinate: **(-1.8, +3.3)**
+
+Nominal routes:
+- to 외곽 제3거점: 4.2 km
+- to 폐쇄 직업훈련원: 2.3 km
 - to 북서 실습센터: 4.8 km
 - to 북유성 실증단지: 5.0 km
-- to 제3거점: 4.2 km
 
-This is a **distance fact, not a role assignment**.
+Primary role:
+- guild brokerage / matching
+- larger trade
+- vehicle staging and loading
+- warehouse and sorting
+- offices / shared workspaces
+- day-market scale public activity
 
-The central location makes the building worth re-checking as one possible candidate for:
-- expansion / relocation of the current public third-hub functions
-- larger exchange, lodging and logistics space
-- vehicle loading / unloading
-- separated visitor and resident zones
-- a future front-side living node if utilities and habitability prove sufficient
+Current infrastructure:
+- side/admin wing heated with installed salvaged wood-boiler system;
+- liquid fuel is backup / freeze protection rather than primary heat;
+- the main hall remains suited to unheated bulk use rather than whole-building residential heating.
 
-Military usefulness is only one secondary evaluation factor. It must not be promoted automatically into a barracks, military headquarters, operations base or command center.
+The core four **live** at 폐쇄 직업훈련원 but use 폐쇄 체육시설 as their principal shared **workplace**.
 
-## 7. Candidate-building evaluation
+### Rear cluster
 
-All large-building candidates are evaluated primarily by whether people can **actually live and work there for a long time**.
+#### 4) 서림대학교 북서 실습센터 — shared hidden fallback bunker
+Coordinate: **(-5.8, +2.0)**
 
-Core criteria:
-- distance to the two major living / production bases
-- road access and reliability
-- movement of people and goods
-- vehicle loading / unloading
-- lodging and daily living space
-- heating / water / power
-- separation of visitors from internal living areas
-- controllable entrances and ordinary defensive common sense
-- long-term habitability and maintenance cost
+Role:
+- hidden retreat
+- emergency sleeping
+- medical reserve
+- long reserve stock
+- important records
+- spare fuel / parts
+- continuity point if front living nodes fail
 
-### A. 폐쇄 체육시설 — strong geometric candidate, habitability unverified
-Pros:
-- near-equal reach to the three current nodes
-- large parking and loading space
-- machinery room and utility spaces already known
-- enough interior volume to separate public and private functions
-- not itself a natural road chokepoint
+Governance:
+- shared by the seven-person alliance without property merger;
+- common emergency zone plus sealed core-four and agritech reserve zones;
+- normally unmanned / dormant.
 
-Cons:
-- poor whole-building heating efficiency
-- several entrances and a large perimeter
-- known scavenging history
-- water / power / insulation condition still requires direct inspection
-- repeated rear-base traffic can reveal route patterns
+Maintenance:
+- facility is checked every 48 hours under current great-cold conditions;
+- front-core side and agritech side alternate;
+- each group therefore visits approximately once every 96 hours;
+- any anomaly, weather red condition, leak, power or battery warning shortens the next check.
 
-### B. 폐교 — rear-side fallback candidate
-Pros:
-- small-room segmentation
-- fence / yard
-- close to a known withdrawal route
-- easier to zone living / storage rooms than a single large hall
+#### 5) 북유성 농업기술 실증단지 — production / water / seed core
+Coordinate: **(+1.8, +5.8)**
 
-Cons:
-- too close to the hidden northwest base
-- occupation may compromise an escape axis
-- weak reach to agritech and the public hub
-- utility condition and winter habitability are unverified
+Role:
+- well / water
+- seed
+- protected production
+- long-term food-production continuity
 
-### C. 서쪽 창고군 / industrial large-building axis
-Pros:
-- vehicle access
-- storage volume
-- close to west-road logistics
+It remains operationally independent and is not converted into a public distribution base.
 
-Cons:
-- fire-damaged / ownership-disputed environment
-- far from agritech
-- tied too strongly to one approach axis
-- likely weak for ordinary residential comfort without major conversion
+## 7. Role logic
 
-### Continuity guard — 2027-02-07
-The prior interpretation that a central large building should become a military response base is **SUPERSEDED**.
+The five-node network is a **functional split**, not five duplicated headquarters.
 
-Retained:
-- distance / coordinate / road model
-- the geographic centrality of 폐쇄 체육시설
-- the idea of asking experienced military / police / field-control people for limited advice on access, withdrawal, building security and emergency movement
+- outer gateway catches problems early;
+- vocational center provides stable daily living;
+- sports complex concentrates work, trade and logistics;
+- northwest training center preserves hidden continuity;
+- agritech preserves production and water.
 
-Not retained:
-- militia formation
-- barracks / military headquarters
-- operations-base network
-- military command structure
-- automatic military use of 폐쇄 체육시설
+The front-side structure is deliberately layered:
+**public gateway → semi-private home / central work hub → hidden rear continuity nodes**.
+
+This structure should be the basis of **AF-MAP-001 — 서림 생활권 지도** unless later Canon changes the topology.
+
+### Continuity guard
+The 2027-02-07 correction remains active:
+- no automatic militia formation;
+- no public military headquarters;
+- no barracks network;
+- no attack-force organization.
+
+Later player choice added one narrow exception:
+- the old public third hub has a **private defensive contingency layer** known only to 서진우 and 장태훈, focused on early warning, communication, retreat guidance and buffering.
 
 ## 8. Map-security rule
 
