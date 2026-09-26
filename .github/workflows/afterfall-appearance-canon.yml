@@ -1,0 +1,43 @@
+name: Validate AFTERFALL appearance canon
+on:
+  pull_request:
+    paths:
+      - 'worldlines/AFTERFALL/CHARACTER_APPEARANCE_BACKFILL_V1.json'
+      - 'worldlines/AFTERFALL/CHARACTER_VISUAL_RULE_V1.md'
+      - '.github/workflows/afterfall-appearance-canon.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate appearance-only canon and source accounting
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('worldlines/AFTERFALL/CHARACTER_APPEARANCE_BACKFILL_V1.json')
+          d = json.loads(p.read_text())
+          assert d['worldline_id'] == 'AFTERFALL' and d['historical_raw_unchanged'] and d['not_a_game_event']
+          people = {c['character_id']: c for c in d['characters']}
+          assert len(people) == len(d['characters']) == 7
+          assert people['문하진']['appearance_anchor']['gender'] == '여성'
+          assert people['문하진']['appearance_anchor']['apparent_age'] == '30대 중반'
+          assert people['한지수']['provenance']['new_fields'] == []
+          allowed = {'gender','apparent_age','height','build','face','hair','style','distinctive','voice','attractiveness'}
+          for c in people.values():
+              a, v = c['appearance_anchor'], c['provenance']
+              old, new = set(v['recovered_fields']), set(v['new_fields'])
+              assert not old & new and old | new == set(a)
+              assert set(a) <= allowed and len(a) >= 7
+              assert len(c['public_description']) > 40
+              assert v['source_refs'] and v['evidence']
+              for source in v['source_refs']:
+                  if source.startswith('worldlines/'):
+                      assert Path(source.split('#')[0]).is_file(), source
+          assert '흉터' not in json.dumps(people['박재민']['appearance_anchor'], ensure_ascii=False)
+          print('PASS: 7 anchors, complete field provenance, recovered Hajin identity, no invented Jaemin scar')
+          PY
+      - name: Check authored whitespace
+        run: git show --format= --check HEAD
