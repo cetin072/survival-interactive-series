@@ -5,7 +5,7 @@ import { getChronicle, transcriptPartsFor, type ChronicleId, type TranscriptPart
 import { rawProgressKey, selectReaderItem } from './readerNavigation'
 import { useReaderPosition } from './useReaderPosition'
 // @ts-expect-error Shared pure Markdown parser has no TypeScript declaration.
-import { splitRoleBlocks } from '../../../scripts/lib/reader-transform.mjs'
+import { parseRoleHeader } from '../../../scripts/lib/reader-transform.mjs'
 
 const archiveNodeById = new Map(archiveNodes.map((node) => [node.id, node]))
 type RawMessage = { role: 'player' | 'gm' | 'system_public'; label: string; content: string }
@@ -19,13 +19,19 @@ function InlineMarkdown({ text }: { text: string }) {
 }
 
 export function messagesFromRaw(content: string): RawMessage[] {
-  // The same parser already used by Reader publication supports numbered,
-  // suffixed and bare historical headers. No source text is rewritten.
-  const blocks = splitRoleBlocks(content) as Array<{ header: { role: string }; body: string }>
-  return blocks.map(({ header, body }) => ({
-    role: header.role === 'USER' ? 'player' : header.role === 'GM' ? 'gm' : 'system_public',
-    label: header.role === 'USER' ? '플레이어의 선택' : header.role === 'GM' ? 'GM 공개 장면' : '공개 운영 기록',
-    content: body,
+  // Recognize historical headers one line at a time. A cross-line whitespace
+  // match would swallow a numeric USER choice as though it were a header ID.
+  // This is presentation-only; the publication transformer and RAW stay intact.
+  const lines = content.split(/\r?\n/)
+  const marks: Array<{ role: string; line: number }> = []
+  lines.forEach((line, index) => {
+    const header = parseRoleHeader(line) as { role: string } | null
+    if (header) marks.push({ role: header.role, line: index })
+  })
+  return marks.map((mark, index) => ({
+    role: mark.role === 'USER' ? 'player' : mark.role === 'GM' ? 'gm' : 'system_public',
+    label: mark.role === 'USER' ? '플레이어의 선택' : mark.role === 'GM' ? 'GM 공개 장면' : '공개 운영 기록',
+    content: lines.slice(mark.line + 1, marks[index + 1]?.line ?? lines.length).join('\n').trim(),
   }))
 }
 
