@@ -1,9 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { archiveMeta, archiveNodes } from './archiveData'
 import { seasonSummaries } from './storyData'
 import { getChronicle, transcriptPartsFor, type ChronicleId, type TranscriptPart } from './transcriptData'
+import { rawProgressKey, selectReaderItem } from './readerNavigation'
+import { useReaderPosition } from './useReaderPosition'
+// @ts-expect-error Shared pure Markdown parser has no TypeScript declaration.
+import { splitRoleBlocks } from '../../../scripts/lib/reader-transform.mjs'
 
-const progressKey = (chronicleId: ChronicleId) => 'survival-diary-archive:reader-progress:v5:' + chronicleId
 const archiveNodeById = new Map(archiveNodes.map((node) => [node.id, node]))
 type RawMessage = { role: 'player' | 'gm' | 'system_public'; label: string; content: string }
 
@@ -16,19 +19,18 @@ function InlineMarkdown({ text }: { text: string }) {
 }
 
 export function messagesFromRaw(content: string): RawMessage[] {
-  const sections = content.split(/\n(?=#{2,3} (?:USER|GM|ASSISTANT — 운영 메타)\s*$)/m)
-  return sections.flatMap((section) => {
-    const match = section.match(/^#{2,3} (USER|GM|ASSISTANT — 운영 메타)\s*\n([\s\S]*)$/)
-    if (!match) return []
-    const [, sourceRole, message] = match
-    return [{ role: sourceRole === 'USER' ? 'player' : sourceRole === 'GM' ? 'gm' : 'system_public', label: sourceRole === 'USER' ? '플레이어의 선택' : sourceRole === 'GM' ? 'GM 공개 장면' : '공개 운영 기록', content: message.trim() }]
-  })
+  // The same parser already used by Reader publication supports numbered,
+  // suffixed and bare historical headers. No source text is rewritten.
+  const blocks = splitRoleBlocks(content) as Array<{ header: { role: string }; body: string }>
+  return blocks.map(({ header, body }) => ({
+    role: header.role === 'USER' ? 'player' : header.role === 'GM' ? 'gm' : 'system_public',
+    label: header.role === 'USER' ? '플레이어의 선택' : header.role === 'GM' ? 'GM 공개 장면' : '공개 운영 기록',
+    content: body,
+  }))
 }
 
 export function selectInitialTranscriptPart(parts: TranscriptPart[], routedPartId?: string, savedPartId?: string) {
-  return parts.find((part) => part.id === routedPartId)
-    ?? parts.find((part) => part.id === savedPartId)
-    ?? parts[0]
+  return selectReaderItem(parts, routedPartId, savedPartId)
 }
 
 function MessageBody({ content }: { content: string }) {
@@ -52,53 +54,35 @@ function MessageBody({ content }: { content: string }) {
 }
 
 function TranscriptBody({ part }: { part: TranscriptPart }) {
+  const messages = useMemo(() => messagesFromRaw(part.content ?? ''), [part.content])
   if (part.status === 'missing_transcript') return <section className="missing-transcript" aria-label="원문 미확보 구간"><p className="reader-status">MISSING TRANSCRIPT</p><h2>이 구간의 공개 원문은 아직 아카이브에 백필되지 않았습니다.</h2><p>정본 요약·체크포인트·운영 기록을 실제 USER/GM 대화로 재구성하지 않습니다.</p><p className="reader-source">기록 위치: {part.source}</p></section>
   if (part.status === 'verified_fragment') return <section className="transcript-fragment" aria-label="검증된 원문 조각"><p className="reader-status">VERIFIED FRAGMENT · 현재 확인된 원문 일부</p><p>이 출처에서 문자 그대로 확인된 공개 기록만 보입니다. 누락된 GM 장면과 구간은 채우지 않았습니다.</p><pre>{part.content}</pre></section>
-  return <div className="transcript-flow">{messagesFromRaw(part.content ?? '').map((message, index) => <section key={index} className={'transcript-message transcript-' + message.role}><p className="transcript-role">{message.label}</p><MessageBody content={message.content} /></section>)}</div>
+  if (!messages.length) return <section className="transcript-fragment" aria-label="원문 그대로 보기"><p>대화 구분을 인식하지 못해 보존된 원문을 그대로 표시합니다.</p><pre>{part.content}</pre></section>
+  return <div className="transcript-flow">{messages.map((message, index) => <section key={index} className={'transcript-message transcript-' + message.role}><p className="transcript-role">{message.label}</p><MessageBody content={message.content} /></section>)}</div>
 }
 
 export function RawTranscriptReader({ chronicleId, initialPartId, onPartChange, onOpenNode, onOpenExplorer }: { chronicleId: ChronicleId; initialPartId?: string; onPartChange: (partId: string) => void; onOpenNode: (id: string) => void; onOpenExplorer: () => void }) {
   const chronicle = getChronicle(chronicleId)
   const chronicleParts = useMemo(() => transcriptPartsFor(chronicleId), [chronicleId])
-  const initialPart = useMemo(() => {
-    let savedPartId: string | undefined
-    try { savedPartId = (JSON.parse(window.localStorage.getItem(progressKey(chronicleId)) ?? '{}') as { partId?: string }).partId } catch { /* storage is optional */ }
-    return selectInitialTranscriptPart(chronicleParts, initialPartId, savedPartId)
-  }, [chronicleId, chronicleParts, initialPartId])
-  const [seasonId, setSeasonId] = useState(initialPart?.seasonId ?? 'S01')
-  const [selectedId, setSelectedId] = useState(initialPart?.id ?? '')
-  const [progress, setProgress] = useState(0)
+  const selected = selectInitialTranscriptPart(chronicleParts, initialPartId)
+  const seasonId = selected?.seasonId ?? 'S01'
   const parts = chronicleParts.filter((part) => part.seasonId === seasonId)
   const seasonIds = Array.from(new Set(chronicleParts.map((part) => part.seasonId)))
-  const selected = chronicleParts.find((part) => part.id === selectedId) ?? chronicleParts[0]
   const globalIndex = selected ? chronicleParts.findIndex((part) => part.id === selected.id) : -1
   const previous = globalIndex > 0 ? chronicleParts[globalIndex - 1] : null
   const next = globalIndex >= 0 && globalIndex < chronicleParts.length - 1 ? chronicleParts[globalIndex + 1] : null
-
-  useEffect(() => {
-    const routedPart = chronicleParts.find((part) => part.id === initialPartId)
-    if (!routedPart || routedPart.id === selectedId) return
-    setSelectedId(routedPart.id)
-    setSeasonId(routedPart.seasonId)
-    window.scrollTo({ top: 0 })
-  }, [chronicleParts, initialPartId, selectedId])
+  const { articleRef, progress, scrollToStart } = useReaderPosition(selected?.id)
 
   useEffect(() => {
     if (!selected) return
-    const saveProgress = () => {
-      const maximum = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
-      setProgress(Math.round((window.scrollY / maximum) * 100))
-      try { window.localStorage.setItem(progressKey(chronicleId), JSON.stringify({ partId: selected.id, scrollY: window.scrollY })) } catch { /* no-op */ }
-    }
-    saveProgress(); onPartChange(selected.id); window.addEventListener('scroll', saveProgress, { passive: true })
-    return () => window.removeEventListener('scroll', saveProgress)
-  // Route persistence should follow the selected transcript, not the parent
-  // callback identity (ArchiveApp supplies an inline route writer).
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    try { window.localStorage.setItem(rawProgressKey(chronicleId), JSON.stringify({ partId: selected.id })) } catch { /* optional bookmark */ }
   }, [chronicleId, selected?.id])
 
-  function openPart(part: TranscriptPart) { setSelectedId(part.id); setSeasonId(part.seasonId); window.scrollTo({ top: 0, behavior: 'smooth' }) }
-  if (!selected) return null
+  function openPart(part: TranscriptPart) {
+    if (part.id === selected?.id) scrollToStart()
+    else onPartChange(part.id)
+  }
+  if (!selected) return <section className="reader-page"><p role="status">아직 공개된 원문이 없습니다.</p><button onClick={onOpenExplorer}>세계 탐색으로 돌아가기</button></section>
 
   const showCanonicalSummary = chronicle.worldlineId === archiveMeta.worldline
   return <section className="reader-page">
@@ -106,10 +90,10 @@ export function RawTranscriptReader({ chronicleId, initialPartId, onPartChange, 
       <p className="archive-eyebrow">{chronicle.label}</p><h2>{chronicle.active ? '현재 생존기' : '지난 생존기'} 원문</h2><p>{chronicle.availabilityNote}</p>
       <button className="reader-home" onClick={() => openPart(chronicleParts[0])}>처음부터 읽기</button>
       <button className="reader-explorer-link" onClick={onOpenExplorer}>세계 탐색으로 돌아가기</button>
-      <div className="reader-season-tabs" role="tablist" aria-label="시즌 선택">{seasonIds.map((id) => <button key={id} className={seasonId === id ? 'active' : ''} onClick={() => openPart(chronicleParts.find((part) => part.seasonId === id) ?? chronicleParts[0])}>{id}</button>)}</div>
-      <nav className="reader-part-list" aria-label="원문 목차">{parts.map((part) => <button key={part.id} className={selected.id === part.id ? 'selected' : ''} onClick={() => openPart(part)}><span>{part.status === 'verified_transcript' ? '원문' : part.status === 'verified_fragment' ? '일부' : '미확보'}</span><strong>{part.sessionId ? part.sessionId + ' · ' : ''}{part.number ? `PART ${String(part.number).padStart(3, '0')}` : 'GAP'}</strong><small>{part.title}</small></button>)}</nav>
+      <div className="reader-season-tabs" role="tablist" aria-label="시즌 선택">{seasonIds.map((id) => <button key={id} role="tab" aria-selected={seasonId === id} className={seasonId === id ? 'active' : ''} onClick={() => openPart(chronicleParts.find((part) => part.seasonId === id) ?? chronicleParts[0])}>{id}</button>)}</div>
+      <nav className="reader-part-list" aria-label="원문 목차">{parts.map((part) => <button key={part.id} className={selected.id === part.id ? 'selected' : ''} aria-current={selected.id === part.id ? 'page' : undefined} data-part-id={part.id} onClick={() => openPart(part)}><span>{part.status === 'verified_transcript' ? '원문' : part.status === 'verified_fragment' ? '일부' : '미확보'}</span><strong>{part.sessionId ? part.sessionId + ' · ' : ''}{part.number ? `PART ${String(part.number).padStart(3, '0')}` : 'GAP'}</strong><small>{part.title}</small></button>)}</nav>
     </aside>
-    <article className="transcript-reader">
+    <article className="transcript-reader" ref={articleRef} data-part-id={selected.id}>
       <header className="reader-header"><div><p className="archive-eyebrow">{selected.seasonId} · {chronicle.label} · {selected.status === 'verified_transcript' ? 'VERIFIED TRANSCRIPT' : selected.status === 'verified_fragment' ? 'VERIFIED FRAGMENT' : 'MISSING TRANSCRIPT'}</p><h1>{selected.title}</h1><p>{selected.range}</p></div><div className="reader-progress" aria-label={'읽기 진행률 ' + progress + '%'}><strong>{progress}%</strong><span><i style={{ width: progress + '%' }} /></span></div></header>
       <aside className="reader-integrity-note"><strong>{selected.status === 'verified_transcript' ? '검증 원문' : selected.status === 'verified_fragment' ? '검증된 원문 일부' : '원문 미확보'}</strong><p>{selected.status === 'verified_transcript' ? '실제 USER/GM 공개 메시지의 순서와 내용을 보존합니다. 표시 형식만 읽기 쉽게 바꿉니다.' : selected.status === 'verified_fragment' ? '실제 공개 텍스트가 확인된 일부만 보존합니다. 빠진 USER/GM 원문은 보완하지 않습니다.' : '이 빈 구간은 정본 요약이나 이벤트 기록으로 대사를 만들지 않습니다.'}</p><small>Source · {selected.source}</small></aside>
       <TranscriptBody part={selected} />

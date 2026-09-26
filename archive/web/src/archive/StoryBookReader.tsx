@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { archiveNodes } from './archiveData'
 import { chaptersForChronicle, chronicleBooks, type ReaderChapter } from './storyData'
 import type { ChronicleId } from './chronicleRegistry'
 import { SafeMarkdown } from './SafeMarkdown'
+import { selectReaderItem, storyProgressKey } from './readerNavigation'
+import { useReaderPosition } from './useReaderPosition'
 
 const nodeById = new Map(archiveNodes.map((node) => [node.id, node]))
-const progressKey = (chronicleId: string) => 'survival-diary-archive:story-progress:v1:' + chronicleId
 
 export function StoryBookReader({ chronicleId, initialChapterId, onChapterChange, onOpenNode, onBack }: {
   chronicleId: ChronicleId
@@ -16,32 +17,21 @@ export function StoryBookReader({ chronicleId, initialChapterId, onChapterChange
 }) {
   const book = chronicleBooks.find((item) => item.chronicleId === chronicleId)!
   const chapters = useMemo(() => chaptersForChronicle(chronicleId), [chronicleId])
-  const [chapterId, setChapterId] = useState(initialChapterId ?? chapters[0]?.id)
-  const [progress, setProgress] = useState(0)
-  const selected = chapters.find((chapter) => chapter.id === chapterId) ?? chapters[0]
+  const selected = selectReaderItem(chapters, initialChapterId)
   const index = chapters.findIndex((chapter) => chapter.id === selected?.id)
+  const { articleRef, progress, scrollToStart } = useReaderPosition(selected?.id)
 
   useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem(progressKey(chronicleId))
-      const restored = saved && chapters.some((chapter) => chapter.id === saved) ? saved : initialChapterId
-      setChapterId(restored && chapters.some((chapter) => chapter.id === restored) ? restored : chapters[0]?.id)
-    } catch { setChapterId(initialChapterId ?? chapters[0]?.id) }
-  }, [chronicleId, initialChapterId, chapters])
-
-  useEffect(() => {
-    if (!selected) return
-    try { window.localStorage.setItem(progressKey(chronicleId), selected.id) } catch { /* optional storage */ }
-    const updateProgress = () => {
-      const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
-      setProgress(Math.round((window.scrollY / max) * 100))
+    if (selected) {
+      try { window.localStorage.setItem(storyProgressKey(chronicleId), selected.id) } catch { /* optional bookmark */ }
     }
-    updateProgress(); window.addEventListener('scroll', updateProgress, { passive: true })
-    return () => window.removeEventListener('scroll', updateProgress)
   }, [chronicleId, selected?.id])
 
-  const openChapter = (chapter: ReaderChapter) => { setChapterId(chapter.id); onChapterChange(chapter.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }
-  if (!selected) return null
+  const openChapter = (chapter: ReaderChapter) => {
+    if (chapter.id === selected?.id) scrollToStart()
+    else onChapterChange(chapter.id)
+  }
+  if (!selected) return <section className="book-reader"><p role="status">아직 공개된 장이 없습니다.</p><button onClick={onBack}>← 책장</button></section>
   const groups = Array.from(new Set(chapters.map((chapter) => chapter.seasonId ?? chapter.partId ?? '기록'))).map((id) => {
     const chapter = chapters.find((item) => (item.seasonId ?? item.partId ?? '기록') === id)
     return { id, label: chapter?.arcLabel ? `${id} · ${chapter.arcLabel}` : id }
@@ -51,9 +41,9 @@ export function StoryBookReader({ chronicleId, initialChapterId, onChapterChange
 
   return <section className="book-reader" aria-label={book.title + ' reader'}>
     <aside className="book-toc"><button className="text-button" onClick={onBack}>← 책장</button><p className="archive-eyebrow">{book.title}</p><h2>목차</h2>
-      {groups.map((group) => <section key={group.id}><h3>{group.label}</h3>{chapters.filter((chapter) => (chapter.seasonId ?? chapter.partId ?? '기록') === group.id).map((chapter) => <button className={chapter.id === selected.id ? 'selected' : ''} key={chapter.id} onClick={() => openChapter(chapter)}><span>제{chapter.chapterNumber}장</span>{chapter.title}</button>)}</section>)}
+      {groups.map((group) => <section key={group.id}><h3>{group.label}</h3>{chapters.filter((chapter) => (chapter.seasonId ?? chapter.partId ?? '기록') === group.id).map((chapter) => <button className={chapter.id === selected.id ? 'selected' : ''} aria-current={chapter.id === selected.id ? 'page' : undefined} data-chapter-id={chapter.id} key={chapter.id} onClick={() => openChapter(chapter)}><span>제{chapter.chapterNumber}장</span>{chapter.title}</button>)}</section>)}
     </aside>
-    <article className="book-prose">
+    <article className="book-prose" ref={articleRef} data-chapter-id={selected.id}>
       <header><p className="archive-eyebrow">{selected.dateLabel} · 제{selected.chapterNumber}장</p><h1>{selected.title}</h1><p>{selected.subtitle}</p><div className="reader-progress" aria-label={'읽기 진행률 ' + progress + '%'}><strong>{progress}%</strong><span><i style={{ width: progress + '%' }} /></span></div></header>
       {book.beginningStatus === 'MISSING_BEGINNING' && <aside className="reader-integrity-note"><strong>초기 기록 복구 중</strong><p>현재 공개본은 확보된 첫 검증 장면부터 시작합니다.</p></aside>}
       <div className="reader-body"><SafeMarkdown body={selected.body} /></div>
