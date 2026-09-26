@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto'
 import { artDirection, VISUAL_STYLE } from './visual-style.mjs'
 
 const NS = { chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', visibility: 'PUBLIC_ARCHIVE' }
-const visualFields = ['apparentAge', 'height', 'build', 'face', 'hair', 'style', 'distinctive', 'attractiveness', 'presence']
+const visualFields = ['gender', 'apparentAge', 'height', 'build', 'face', 'hair', 'style', 'distinctive', 'attractiveness', 'presence']
 const sufficientFields = ['apparentAge', 'height', 'build', 'face', 'hair', 'style', 'distinctive']
 const object = (v) => v !== null && typeof v === 'object' && !Array.isArray(v) && Object.getPrototypeOf(v) === Object.prototype
 const demand = (v, code) => { if (!v) throw new Error(code) }
@@ -83,7 +83,19 @@ function appearanceInput(input, boundary, nodes) {
 export function legacyPublicAppearance(anchors, sourceHash) {
   demand(object(anchors) && hashOK(sourceHash), 'INVALID_APPEARANCE_MODULE')
   const records = Object.entries(anchors).map(([node_id, value]) => {
-    keys(value, ['status', 'publicDescription', 'sourceRefs', 'visual', 'auditNote'])
+    keys(value, ['status', 'publicDescription', 'sourceRefs', 'visual', 'auditNote', 'provenance'])
+    if (value.provenance !== undefined) {
+      const p = value.provenance
+      keys(p, ['decisionId', 'approvedOn', 'origin', 'recoveredFields', 'newFields'])
+      demand(str(p.decisionId, 100) && time(p.approvedOn + ' 00:00')
+        && ['RECOVERED_EXISTING_CANON', 'RECOVERED_AND_GM_COMPLETED', 'GM_AUTHORED_WITH_USER_APPROVAL'].includes(p.origin), 'INVALID_APPEARANCE_PROVENANCE')
+      const sourceKeys = [...visualFields.map((key) => key === 'apparentAge' ? 'apparent_age' : key), 'voice']
+      demand([p.recoveredFields, p.newFields].every((fields) => Array.isArray(fields) && fields.every((key) => sourceKeys.includes(key))), 'INVALID_APPEARANCE_PROVENANCE')
+      const all = [...p.recoveredFields, ...p.newFields]
+      demand(new Set(all).size === all.length
+        && JSON.stringify([...all].sort()) === JSON.stringify(Object.keys(value.visual).map((key) => key === 'apparentAge' ? 'apparent_age' : key).sort()), 'INVALID_APPEARANCE_PROVENANCE')
+    }
+    // Approval metadata, notes and runtime pointers are not image instructions.
     return { node_id, status: value.status, visual: structuredClone(value.visual),
       evidence: { source_ref: 'archive/web/src/archive/characterAppearance.ts', source_sha256: sourceHash, pointer: `/characters/${node_id}` } }
   })
@@ -141,7 +153,7 @@ function makePoint(node, appearance) {
 function mapPoint(input, boundary) {
   if (input === null) return null
   keys(input, ['asset_id', 'visibility', 'anchor', 'public_projection_sha256', 'evidence'])
-  demand(input.asset_id === 'AF-MAP-001' && input.visibility === 'PUBLIC_ARCHIVE', 'NON_PUBLIC_MAP_ASSET')
+  demand(input.asset_id === 'AF-MAP-001' && input.visibility === NS.visibility, 'NON_PUBLIC_MAP_ASSET')
   notFuture(input.anchor, boundary); evidence(input.evidence)
   demand(input.evidence.source_ref.startsWith('archive/content/public-maps/C03-AFTERFALL/')
     && hashOK(input.public_projection_sha256), 'MISSING_PUBLIC_MAP_PROJECTION')
