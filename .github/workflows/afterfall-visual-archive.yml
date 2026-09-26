@@ -1,0 +1,38 @@
+name: Validate AFTERFALL visual archive
+
+on:
+  pull_request:
+    paths:
+      - "tools/afterfall_visual_archive.py"
+      - "tools/test_afterfall_visual_archive.py"
+      - "schemas/visual_asset.schema.json"
+      - "worldlines/AFTERFALL/VISUAL_AUTOMATION_V1.md"
+      - "worldlines/AFTERFALL/sql/afterfall_visual_archive_v1.sql"
+      - "worldlines/AFTERFALL/sql/afterfall_visual_map_ready_2027_03_23.sql"
+      - ".github/workflows/afterfall-visual-archive.yml"
+  push:
+    branches:
+      - "worldline/afterfall-rpg"
+    paths:
+      - "tools/afterfall_visual_archive.py"
+      - "tools/test_afterfall_visual_archive.py"
+      - "schemas/visual_asset.schema.json"
+      - "worldlines/AFTERFALL/VISUAL_AUTOMATION_V1.md"
+      - "worldlines/AFTERFALL/sql/**"
+      - ".github/workflows/afterfall-visual-archive.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  visual-archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile
+        run: python -m py_compile tools/afterfall_visual_archive.py tools/test_afterfall_visual_archive.py
+      - name: Test
+        run: PYTHONPATH=tools python -m unittest -v tools/test_afterfall_visual_archive.py
