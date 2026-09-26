@@ -63,13 +63,13 @@ This cold archive is not a normal game boot input.
 
 | Session | Source | Captured game-time range | USER | GM | Verdict |
 | --- | --- | --- | ---: | ---: | --- |
-| `SESSION_003` | Supabase rolling RAW | 2027-01-16 07:30 → 2027-01-16 09:28 | 0 | 1 | PARTIAL capture / incomplete pair |
-| `SESSION_004` | Supabase rolling RAW | 2027-01-16 09:28 → unknown | 1 | 0 | PARTIAL capture / incomplete pair |
+| `SESSION_003` | Supabase rolling RAW | 2027-01-16 09:28 → 2027-01-16 09:28 | 0 | 1 | PARTIAL capture / incomplete pair |
+| `SESSION_004` | Supabase rolling RAW | 2027-01-16 09:28 → 2027-01-16 09:28 | 1 | 0 | PARTIAL capture / incomplete pair |
 | `SESSION_005` | Supabase rolling RAW | 2027-01-16 10:18 → 2027-01-21 18:10 | 3 | 3 | VERIFIED DB span |
 | `SESSION_006` | Supabase rolling RAW | 2027-01-21 18:10 → 2027-02-05 22:10 | 17 | 17 | VERIFIED DB span |
-| `SESSION_007` | Supabase rolling RAW | 2027-02-06 17:40 → 2027-02-07 13:40 | 3 | 3 | PARTIAL capture / incomplete pair |
-| `SESSION_008` | Supabase rolling RAW | 2027-02-07 13:40 → 2027-02-07 13:40 | 1 | 1 | PARTIAL capture / incomplete pair |
-| `SESSION_009` | Supabase rolling RAW | 2027-02-07 13:40 → 2027-03-23 17:50 | 10 | 10 | PARTIAL capture / incomplete pair |
+| `SESSION_007` | Supabase rolling RAW | 2027-02-06 21:15 → 2027-02-07 13:40 | 3 | 3 | VERIFIED DB span |
+| `SESSION_008` | Supabase rolling RAW | 2027-02-07 13:40 → 2027-02-07 13:40 | 1 | 1 | VERIFIED DB span |
+| `SESSION_009` | Supabase rolling RAW | 2027-02-07 13:40 → 2027-03-23 17:50 | 10 | 10 | VERIFIED DB span |
 
 - `SESSION_003`과 `SESSION_004`는 atomic turn-pair 도입 초기의 불완전 캡처를 그대로 보존한다.
 - `SESSION_005`~`SESSION_009`는 저장된 범위에서 연속 USER→GM pair가 검증되었다.
