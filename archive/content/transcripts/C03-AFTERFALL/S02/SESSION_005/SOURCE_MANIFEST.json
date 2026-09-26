@@ -17,6 +17,15 @@
   "closed_at": "2026-09-25 05:35:47.489005+00",
   "starting_game_time": "2027-01-16 10:18",
   "closing_game_time": "2027-01-21 18:10",
+  "session_range": {
+    "start": "2027-01-16 10:18",
+    "end": "2027-01-21 18:10"
+  },
+  "captured_message_range": {
+    "start": "2027-01-16 10:18",
+    "end": "2027-01-21 18:10"
+  },
+  "coverage_basis": "captured_message_range",
   "starting_save_version": 217,
   "closing_save_version": 220,
   "starting_scene_id": "S02_REGIONAL_NETWORK_BUFFER",

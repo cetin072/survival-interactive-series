@@ -17,6 +17,15 @@
   "closed_at": "2026-09-26 02:44:01.092643+00",
   "starting_game_time": "2027-02-07 13:40",
   "closing_game_time": "2027-03-23 17:50",
+  "session_range": {
+    "start": "2027-02-07 13:40",
+    "end": "2027-03-23 17:50"
+  },
+  "captured_message_range": {
+    "start": "2027-02-07 13:40",
+    "end": "2027-03-23 17:50"
+  },
+  "coverage_basis": "captured_message_range",
   "starting_save_version": 244,
   "closing_save_version": 253,
   "starting_scene_id": "S02_BASE_RECONFIGURATION_CORE_MEETING",

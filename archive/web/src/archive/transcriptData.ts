@@ -65,8 +65,19 @@ const c03 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' |
 
 type C03S02Session = {
   session_id: string
-  verified_range: string
+  verified_range?: string
+  captured_message_range?: {
+    start?: string
+    end?: string
+  }
   capture_quality?: string
+}
+
+function c03S02DisplayRange(session: C03S02Session) {
+  const captured = session.captured_message_range
+  if (captured?.start && captured.end) return `${captured.start} → ${captured.end}`
+  if (session.verified_range) return session.verified_range
+  return '공개 원문 범위 미상'
 }
 
 const c03S02Manifest = Object.values(c03S02Manifests)[0] as { sessions: C03S02Session[] }
@@ -86,7 +97,7 @@ const c03S02TranscriptParts: TranscriptPart[] = Object.entries(c03S02Raw)
       sessionId,
       number: Number(partNumber),
       title: `${sessionId} · PART ${partNumber}${incomplete ? ' · 불완전 캡처' : ''}`,
-      range: session.verified_range,
+      range: c03S02DisplayRange(session),
       status: incomplete ? 'verified_fragment' : 'verified_transcript',
       source: `worldlines/AFTERFALL/seasons/S02/raw_transcript/${sessionId}/${partFile}`,
       sourceVerified: true,
