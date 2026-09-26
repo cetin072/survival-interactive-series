@@ -1,0 +1,214 @@
+{
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "protagonist": "서진우",
+  "season_id": "S02",
+  "session_id": "SESSION_006",
+  "source_type": "SUPABASE_ROLLING_RAW",
+  "source_session_uuid": "5ec92846-b221-45fd-8889-643698c1b6e9",
+  "source_tables": [
+    "survival_rpg.transcript_sessions",
+    "survival_rpg.transcript_messages"
+  ],
+  "status": "PARTIAL",
+  "capture_quality": "VERIFIED_CONTIGUOUS_TURN_PAIRS",
+  "public_safe_only": true,
+  "opened_at": "2026-09-25 05:35:47.489005+00",
+  "closed_at": "2026-09-25 15:15:39.771911+00",
+  "starting_game_time": "2027-01-21 18:10",
+  "closing_game_time": "2027-02-05 22:10",
+  "starting_save_version": 220,
+  "closing_save_version": 237,
+  "starting_scene_id": "S02_FUEL_YARD_TRADE_TEST",
+  "closing_scene_id": "S02_AGRITECH_HYBRID_RECOVERY_EXECUTION",
+  "counts": {
+    "user": 17,
+    "gm": 17,
+    "assistant_public_meta": 0,
+    "total": 34
+  },
+  "message_order": {
+    "min": 0,
+    "max": 33,
+    "contiguous": true
+  },
+  "atomic_pairing_complete": true,
+  "parts": [
+    "PART_001.md",
+    "PART_002.md",
+    "PART_003.md"
+  ],
+  "content_sha256": [
+    {
+      "message_order": 0,
+      "role": "USER",
+      "sha256": "405ae8ad0ee8487e1343a147fcd93f6c6dfe0dd296a82ccae29f4d41e5c8a544"
+    },
+    {
+      "message_order": 1,
+      "role": "GM",
+      "sha256": "635074dfe04a1d22d8374261846051d9ff382fa7bc47f26c100078ce94d7988e"
+    },
+    {
+      "message_order": 2,
+      "role": "USER",
+      "sha256": "34dd903254ad2a65ec5788e5d551087e80a689b5f781fa689cab71d3382150a5"
+    },
+    {
+      "message_order": 3,
+      "role": "GM",
+      "sha256": "83bfa7c51cf023632c97d6ec772ed7c1e0933e19f9142243205f4c2643dfa605"
+    },
+    {
+      "message_order": 4,
+      "role": "USER",
+      "sha256": "a2680aacc3c85c878db17439058d95e837b66ee1a85cbaa6f032a697258662d2"
+    },
+    {
+      "message_order": 5,
+      "role": "GM",
+      "sha256": "8a60842e55d6d9c0dfb4a99af42578962a87d862ac2f0c5fb2c8b71e1b6d0b9a"
+    },
+    {
+      "message_order": 6,
+      "role": "USER",
+      "sha256": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d"
+    },
+    {
+      "message_order": 7,
+      "role": "GM",
+      "sha256": "ad2bfeb8328e4ab3bb6ce1a799341d53ede85db62f2f700f3057e16a5c144adc"
+    },
+    {
+      "message_order": 8,
+      "role": "USER",
+      "sha256": "c3d3214ba4646c1c52571c825035e86491059f05fb49d7056ecaab502aa7b5e5"
+    },
+    {
+      "message_order": 9,
+      "role": "GM",
+      "sha256": "af83dfef0775dec14d6f33ec4ab83c4d46974256854a7b29b296efd130b03e1c"
+    },
+    {
+      "message_order": 10,
+      "role": "USER",
+      "sha256": "8396b3ee3344d535366a702933a5e02c8777425e002067528311d22773554032"
+    },
+    {
+      "message_order": 11,
+      "role": "GM",
+      "sha256": "523e406ceabd9c5f43205daf2034835724cc257a3ef8bd2c6ba661d5c4e137a6"
+    },
+    {
+      "message_order": 12,
+      "role": "USER",
+      "sha256": "9dc847b4b8b3160e575042434cd621eaf5ae6c76a4446b45ede51c6de6727bcc"
+    },
+    {
+      "message_order": 13,
+      "role": "GM",
+      "sha256": "6d98f81dd56e12175cf28654be5bf44d8ab832cad30427f0f33ed1d23dd677b9"
+    },
+    {
+      "message_order": 14,
+      "role": "USER",
+      "sha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a"
+    },
+    {
+      "message_order": 15,
+      "role": "GM",
+      "sha256": "b294994a13b75e3795f7123e1cd53b4d5594f796249abbef060e4ab263cf7aed"
+    },
+    {
+      "message_order": 16,
+      "role": "USER",
+      "sha256": "e3ac152e3131b416fd5395d86f69ba1b6f15e56c58542fdbbd742ea786f490df"
+    },
+    {
+      "message_order": 17,
+      "role": "GM",
+      "sha256": "e83068123b31e39915692f7eca96772a6b5df1a47d4bf79ffe4b7a1c790b447b"
+    },
+    {
+      "message_order": 18,
+      "role": "USER",
+      "sha256": "3baaaa891fd4a811d323f94dae5379d775428025e23ba32f276a5cfd0e36d491"
+    },
+    {
+      "message_order": 19,
+      "role": "GM",
+      "sha256": "4ba3de5645bd60bd936e397826e34a7e3e0b8a32616e20d6b87aa0265796b914"
+    },
+    {
+      "message_order": 20,
+      "role": "USER",
+      "sha256": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d"
+    },
+    {
+      "message_order": 21,
+      "role": "GM",
+      "sha256": "f99f0804fce4b148e6dad00b1b4b4bc3010b58aaedbdb6e6c188ae0c0609ba1e"
+    },
+    {
+      "message_order": 22,
+      "role": "USER",
+      "sha256": "02749e23e775eaa458f8168fa4acdf70b926d753f3655f335033b4b7080736e2"
+    },
+    {
+      "message_order": 23,
+      "role": "GM",
+      "sha256": "8a2072116d3316b16a8a66c8c6a62455cab3812729f85f7c43df75d39d1e40ba"
+    },
+    {
+      "message_order": 24,
+      "role": "USER",
+      "sha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"
+    },
+    {
+      "message_order": 25,
+      "role": "GM",
+      "sha256": "b95c143fe3fc356df8b52760ffc9f524d7383d08f156ce42231b3dc1361412da"
+    },
+    {
+      "message_order": 26,
+      "role": "USER",
+      "sha256": "72c227cdceb71869ec5735ceab83e2dc554aab1cd366977ab42440bc4e8a81ea"
+    },
+    {
+      "message_order": 27,
+      "role": "GM",
+      "sha256": "0dcceb6b27fdacc1294906c36f9c6a5e41906ad68ca12dabd3cb349ad57721d5"
+    },
+    {
+      "message_order": 28,
+      "role": "USER",
+      "sha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"
+    },
+    {
+      "message_order": 29,
+      "role": "GM",
+      "sha256": "e4f880f03c6fb2a76ccd14818cd7b45207390987b5d57c344fc47ef5297fc937"
+    },
+    {
+      "message_order": 30,
+      "role": "USER",
+      "sha256": "78e3c2238570656d8f7c832d9f75937cbc102215f800d73dddcdc8a07c8dd067"
+    },
+    {
+      "message_order": 31,
+      "role": "GM",
+      "sha256": "9e6c8fffbf910c3bd23b7e5145654d2338a868218eb2b238f3d4a6179ba17fab"
+    },
+    {
+      "message_order": 32,
+      "role": "USER",
+      "sha256": "b6ec14a12722f7ddfb7163b6c331d563cde8fe9e7f5d63dbe1973acd56c75b2b"
+    },
+    {
+      "message_order": 33,
+      "role": "GM",
+      "sha256": "e208f87dd3918f601244d43b45a734b9361c280fd391ec7b7038ac7211c4a2b1"
+    }
+  ],
+  "source_policy": "Only public_safe rows already stored by trusted rolling RAW capture. No reconstruction from Canon, checkpoint, summary, memory, hidden state, private reasoning, or tool output."
+}
