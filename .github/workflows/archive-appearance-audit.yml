@@ -1,18 +1,75 @@
-name: Audit character appearance sources
+name: Validate Archive character appearances
 on:
   pull_request:
     paths:
-      - 'archive/scripts/audit-character-appearance-sources.py'
+      - 'archive/content/characters/**'
+      - 'archive/web/src/archive/characterAppearance*'
+      - 'archive/web/src/archive/ExplorerView.tsx'
+      - 'archive/scripts/*character-appearance*.py'
+      - '.github/workflows/archive-appearance-audit.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'archive/content/characters/**'
+      - 'archive/web/src/archive/characterAppearance*'
+      - 'archive/web/src/archive/ExplorerView.tsx'
+      - 'archive/scripts/*character-appearance*.py'
       - '.github/workflows/archive-appearance-audit.yml'
 permissions:
   contents: read
+concurrency:
+  group: archive-appearance-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  sources:
+  appearance:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Fetch authoritative character sources
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: archive/web/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch authoritative appearance and RAW sources
         run: git fetch origin worldline/afterfall-rpg:refs/remotes/origin/worldline/afterfall-rpg
-      - name: Read-only source candidates (not automatic canon)
-        run: python archive/scripts/audit-character-appearance-sources.py --ref origin/worldline/afterfall-rpg
+      - name: Validate durable canon copy and observed Supabase readback
+        run: python archive/scripts/check-character-appearance.py --parity-only
+      - name: Verify authored changes, never reformat preserved RAW
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: git diff --check "$BASE_SHA" HEAD
+      - name: Test and build the real application
+        working-directory: archive/web
+        env:
+          ARCHIVE_AFTERFALL_SOURCE_REF: origin/worldline/afterfall-rpg
+        run: |
+          npm ci
+          npm test
+          npm run build:verified
+      - name: Install isolated browser tooling
+        run: |
+          python -m pip install playwright==1.55.0
+          python -m playwright install --with-deps chromium
+      - name: Check all 18 rendered appearances at four viewport widths
+        run: python archive/scripts/check-character-appearance.py
+      - name: Verify exact Preview assets and all 18 profiles
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: python archive/scripts/check-character-appearance.py --url https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app --wait-assets
+      - name: Verify exact Production assets and all 18 profiles
+        if: github.event_name == 'push'
+        run: python archive/scripts/check-character-appearance.py --url https://survival-diary-archive.netlify.app --wait-assets
+      - name: Preserve mobile appearance screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: appearance-mobile-${{ github.run_id }}
+          path: archive/appearance-qa/*.png
+          if-no-files-found: ignore
+          retention-days: 7
