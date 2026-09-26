@@ -26,9 +26,9 @@
     "job": "응급실 간호사"
   },
   "season": 2,
-  "phase": "S02_ACTIVE_FRACTURE",
-  "game_time_anchor": "2027-02-24 19:00",
-  "current_checkpoint": "worldlines/AFTERFALL/seasons/S02/CURRENT_CHECKPOINT_2027-01-14.md",
+  "phase": "S02_COMPLETE_SPRING_GATE",
+  "game_time_anchor": "2027-03-23 17:50",
+  "current_checkpoint": "worldlines/AFTERFALL/seasons/S02/END_CHECKPOINT_2027-03-23.md",
   "season_start_handoff": "worldlines/AFTERFALL/seasons/S02/START_HANDOFF.md",
   "character_bible": "worldlines/AFTERFALL/CHARACTER_BIBLE.md",
   "world_bible": "worldlines/AFTERFALL/WORLD_BIBLE.md",
@@ -36,11 +36,11 @@
   "previous_archive": "worldlines/AFTERFALL/seasons/S01/ARC_ARCHIVE.md",
   "raw_policy": "S01 RAW is BACKFILL REQUIRED and must not be reconstructed from memory.",
   "spoiler_policy": "Do not reveal future season 2 plot, losses, relationship changes, collapse trigger, or disaster mechanism before they occur in play.",
-  "note": "Five-node operating model active. Core four live at the vocational training center and work primarily at the sports complex guild hub. The old public third hub remains as a lean forward gateway/buffer. Northwest training center is the shared hidden bunker for the seven-person alliance; agritech remains production/water/seed core. Jinwoo and Taehun alone maintain a non-public contingency layer at the old third hub for early warning, communications, retreat guidance and buffering; this is not a public military base or militia structure.",
+  "note": "Season 2 complete. Winter isolation arc ended in early spring. Five-node operating model is stable: old third hub = public forward gateway with Jinwoo/Taehun-only private preparedness layer; sports complex = central guild/work/logistics hub; vocational training center = core-four home; northwest training center = shared hidden bunker for the seven-person alliance; agritech = production/water/seed core. Baegun no longer functions as one community. North fuel yard and west-road local order strengthened. Finale signal: an organized convoy from outside the known eastern network reached the Dongcheon edge asking for the large market and road authority. Season 3 has not started.",
   "gm_context_rules": "worldlines/AFTERFALL/GM_CONTEXT_V1.md",
-  "save_version_anchor": 250,
-  "current_scene": "S02_RESIDENCE_VISIBILITY_AND_PRIVATE_CONTINGENCY",
-  "active_arc": "WINTER_LONG_ARC_V2",
+  "save_version_anchor": 253,
+  "current_scene": "S02_SEASON_FINALE_SPRING_REVEALS_RECONFIGURED_WORLD",
+  "active_arc": "S02_COMPLETE",
   "winter_arc_plan": "worldlines/AFTERFALL/seasons/S02/WINTER_LONG_ARC_V2.md",
   "play_session_protocol": "worldlines/AFTERFALL/PLAY_SESSION_PROTOCOL_V3.md",
   "live_transcript_capture": {
@@ -67,14 +67,21 @@
       "limited expert-advice search",
       "geographic centrality facts"
     ],
-    "active_purpose": "FIVE_NODE_OPERATING_MODEL"
+    "active_purpose": "FIVE_NODE_OPERATING_MODEL_STABLE"
   },
   "five_node_model": {
-    "status": "ACTIVE",
+    "status": "STABLE_AT_S02_END",
     "old_third_hub": "PUBLIC_FORWARD_GATEWAY_ADVANCE_NODE",
     "sports_complex": "CENTRAL_GUILD_WORK_LOGISTICS_HUB",
     "vocational_training_center": "CORE_FOUR_PRIMARY_RESIDENCE",
     "nw_training_center": "SHARED_HIDDEN_FALLBACK_BUNKER",
     "agritech": "PRODUCTION_WATER_SEED_CORE"
+  },
+  "season2_end": {
+    "status": "COMPLETE",
+    "game_time": "2027-03-23 17:50",
+    "end_checkpoint": "worldlines/AFTERFALL/seasons/S02/END_CHECKPOINT_2027-03-23.md",
+    "finale_signal": "ORGANIZED_EXTERNAL_CONVOY_AT_DONGCHEON_EDGE",
+    "season3_started": false
   }
 }
