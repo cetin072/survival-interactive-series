@@ -9,6 +9,7 @@ import { prepareGraphPublication } from './run-graph-publication.mjs'
 import { prepareVisualPublication } from './run-visual-publication.mjs'
 import { assembleArchiveRun } from './lib/archive-orchestration.mjs'
 import { planFromAttemptLedger } from './lib/attempt-ledger.mjs'
+import { auditHistoricalImageObservations } from './lib/historical-image-observations.mjs'
 
 const root = resolve(import.meta.dirname, '..', '..')
 const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
@@ -16,6 +17,7 @@ const allowed = new Set(['--snapshot', '--facts', '--appearances', '--map', '--l
 
 export async function checkArchivePipeline(args) {
   if (args.length < 2 || args.at(-1) !== '--check') throw new Error('READ_ONLY_MODE_REQUIRED')
+  const historicalPoc = auditHistoricalImageObservations(JSON.parse(git('show', 'HEAD:docs/AUTOMATIC_ARCHIVE_STEP6_OBSERVATIONS.json')))
   let snapshot, factsRef = null, appearancesRef = null, mapRef = null, ledgerRef = null
   if (args[0] === '--demo-s02' && (args.length === 2 || args.length === 4 && args[1] === '--ledger')) {
     const sha = git('rev-parse', 'HEAD')
@@ -39,7 +41,7 @@ export async function checkArchivePipeline(args) {
     ledgerRef = flags.get('--ledger') ?? null
   }
   const reader = await prepareTextPublication(snapshot)
-  if (reader.report.reader_status !== 'NOOP') return assembleArchiveRun({ reader: reader.report })
+  if (reader.report.reader_status !== 'NOOP') return { ...assembleArchiveRun({ reader: reader.report }), historical_poc: historicalPoc }
   const graph = await prepareGraphPublication(snapshot, factsRef)
   const visual = await prepareVisualPublication(snapshot, { factsRef, appearancesRef, mapRef })
   let attemptPlan = null
@@ -48,7 +50,8 @@ export async function checkArchivePipeline(args) {
     if (!stat.isFile() || stat.size > 1_000_000) throw new Error('INVALID_ATTEMPT_LEDGER_FILE')
     attemptPlan = planFromAttemptLedger(visual.catalog, JSON.parse(await readFile(path, 'utf8')))
   }
-  return assembleArchiveRun({ reader: reader.report, graph: graph.report, visual: visual.report, attemptPlan })
+  return { ...assembleArchiveRun({ reader: reader.report, graph: graph.report, visual: visual.report, attemptPlan }),
+    historical_poc: historicalPoc }
 }
 
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {

@@ -59,6 +59,8 @@ jobs:
         run: node --test ../scripts/lib/archive-orchestration.test.mjs
       - name: Test bounded image attempt journal and local write gate
         run: node --test ../scripts/lib/attempt-ledger.test.mjs
+      - name: Audit historical quarantined image observations
+        run: node --test ../scripts/lib/historical-image-observations.test.mjs
       - name: Verify real public Reader to graph to visual dry-run
         run: node --experimental-strip-types ../scripts/check-archive-pipeline.mjs --demo-s02 --check
       - name: Verify pinned S02 attempt ledger without execution
