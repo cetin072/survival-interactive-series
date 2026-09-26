@@ -348,18 +348,32 @@ VisualAsset READY
 `AF-MAP-001 — AFTERFALL / 서림 생활권 지도`
 
 현재 상태:
-`WAITING_CANON`
+`READY`
 
-이유:
-- 거리 모델은 이미 존재함.
-- 그러나 제3거점 확장 이전 / 전면 2거점 / 후방 실습센터 역할 재편이 플레이에서 아직 최종 확정 전.
-- 몇 턴 뒤 실제 거점 배치가 Canon으로 확정되면 첫 지도 제작 시점으로 승격한다.
+Canon readiness 확인 시점:
+- S02 종료 정본: **2027-03-23 / save 253**
+- `WORLD_MAP_GRID_V1.md`의 five-node operating model: **STABLE_AT_S02_END**
+- 외곽 제3거점 = 공개 전초/관문/완충 노드
+- 폐쇄 직업훈련원 = 핵심 4인 주생활거점
+- 폐쇄 체육시설 = 길드/업무/물류 중심
+- 북서 실습센터 = 7인 연합 공동 은닉 fallback bunker
+- 북유성 실증단지 = 생산/물/종자 핵심
+- PUBLIC / TRUSTED / CORE 지도 보안 레이어 규칙 확정
 
-지도 확정 후:
-1. `WORLD_MAP_GRID_V1.md` 업데이트
-2. 공개/비공개 layer 확인
-3. map manifest 생성
-4. 첫 대표 비주얼 생성
+따라서 WORLD_MAP READY gate의 네 조건은 모두 충족됐다:
+1. `third_hub_expansion_settled = true`
+2. `front_living_structure_settled = true`
+3. `northwest_fallback_role_settled = true`
+4. `public_security_layer_settled = true`
+
+READY는 **생성 가능 상태**를 뜻할 뿐 자동 생성 승인을 뜻하지 않는다.
+외부 유료 provider, Storage bucket, 비용 정책은 아직 연결하지 않는다.
+
+다음 단계:
+1. deterministic PUBLIC map topology/manifest 생성
+2. provider-free placeholder 또는 로컬 renderer로 지도 골격 검증
+3. Human Decision 후 generation provider 선택
+4. 대표 비주얼 생성
 5. 아카이브 대문 배치
 
 ## 14. User workload target
@@ -386,12 +400,13 @@ VisualAsset READY
 - Issue #121로 추적
 - 기존 source data 재사용 확정
 
-### Phase 2
-- 최소 DB schema / RLS
-- WORLD_MAP 최초 pending asset
-- manifest read contract
+### Phase 2 — complete
+- 최소 DB schema / RLS 적용
+- `AF-MAP-001` registry 생성
+- S02 종료 Canon 기준 `WAITING_CANON → READY` 승격
+- manifest read contract 확정
 
-### Phase 3
+### Phase 3 — next
 - provider 선택
 - generation worker
 - object storage
