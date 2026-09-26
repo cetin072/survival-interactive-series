@@ -4,6 +4,7 @@ import { dirname, resolve } from 'node:path'
 import { extractReaderNarrative } from './lib/reader-transform.mjs'
 import { bookMetadata, rawCatalog } from './reader-source-catalog.mjs'
 import { editorialOverrides, editorialPlan } from './reader-editorial-map.mjs'
+import { appendAutomaticChapters } from './lib/reader-auto.mjs'
 
 const root = resolve(import.meta.dirname, '..', '..')
 const transformVersion = 'reader-selection-v1.2.0'
@@ -22,16 +23,22 @@ function makeChapters(chronicleId, parts) {
     if (!body) throw new Error(`${chronicleId} chapter ${index + 1} is not a non-empty VERIFIED_GM_NARRATIVE chapter`)
     return { id: `${chronicleId.toLowerCase()}-chapter-${String(index + 1).padStart(2, '0')}`, chapterNumber: index + 1, title: plan.title, subtitle: `공개 기록 ${new Set(selected.map(({ part }) => part.archivePath)).size}건`, dateLabel: plan.dateLabel, ...(plan.seasonId ? { seasonId: plan.seasonId } : { partId: plan.partId }), arcLabel: plan.arcLabel, sourceKind: 'VERIFIED_GM_NARRATIVE', sourceRefs: selected.map(({ part }) => part.canonicalRef), archiveSourceRefs: selected.map(({ part }) => part.archivePath), sourceHashes: selected.map(({ part }) => part.sourceHash), supportingRefs: [], transformVersion, relatedNodeIds: plan.relatedNodeIds, body }
   })
-  for (const part of parts) { const covered = (ranges.get(part.archivePath) ?? []).sort((a, b) => a.start - b.start); if (!covered.length || covered[0].start !== 0 || covered.at(-1).end !== part.readerBody.length || covered.some((range, index) => index > 0 && range.start !== covered[index - 1].end)) throw new Error(`Editorial coverage gap in ${part.archivePath}`) }
-  return chapters
+  for (const part of parts) {
+    const covered = (ranges.get(part.archivePath) ?? []).sort((a, b) => a.start - b.start)
+    if (!covered.length && part.autoPublication) continue
+    if (!covered.length || covered[0].start !== 0 || covered.at(-1).end !== part.readerBody.length || covered.some((range, index) => index > 0 && range.start !== covered[index - 1].end)) throw new Error(`Editorial coverage gap in ${part.archivePath}`)
+  }
+  return appendAutomaticChapters(chronicleId, parts, chapters, new Set(ranges.keys()))
 }
 
-export async function makeBooks() {
+export async function makeBooks({ readSource = (path) => readFile(resolve(root, path)), catalogs = rawCatalog } = {}) {
   const books = []
-  for (const [chronicleId, catalog] of Object.entries(rawCatalog)) {
+  for (const [chronicleId, catalog] of Object.entries(catalogs)) {
     const included = [], omitted = [], editorialExclusions = []
     for (const item of catalog) {
-      const raw = normalizeEol(await readFile(resolve(root, item.archivePath), 'utf8'))
+      const bytes = await readSource(item.archivePath)
+      if (item.autoPublication && hash(bytes) !== item.autoPublication.rawSha256) throw new Error('AUTOMATIC_RAW_HASH_CHANGED')
+      const raw = normalizeEol(bytes.toString('utf8'))
       const selected = extractReaderNarrative(raw, { details: true })
       const overrideReason = editorialOverrides.exclude[item.archivePath]
       if (overrideReason) { omitted.push({ sourceRef: item.canonicalRef, archiveSourceRef: item.archivePath, reason: overrideReason }); editorialExclusions.push({ sourceRef: item.canonicalRef, archiveSourceRef: item.archivePath, reason: overrideReason }); continue }
