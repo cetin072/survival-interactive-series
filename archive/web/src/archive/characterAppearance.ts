@@ -1,5 +1,5 @@
 import type { ArchiveNode } from './archiveData'
-import approvedBackfill from '../../../content/characters/C03-AFTERFALL/APPEARANCE_BACKFILL_V1.json'
+import approvedBackfill from '../../../content/characters/C03-AFTERFALL/APPEARANCE_BACKFILL_V1.json' with { type: 'json' }
 
 export type AppearanceStatus = 'confirmed' | 'visual-backfill-needed'
 
