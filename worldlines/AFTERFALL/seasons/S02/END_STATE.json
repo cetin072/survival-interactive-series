@@ -1,0 +1,48 @@
+{
+  "worldline": "AFTERFALL",
+  "chronicle": "C03",
+  "protagonist": "서진우",
+  "season": 2,
+  "status": "COMPLETE",
+  "game_time": "2027-03-23 17:50",
+  "save_version": 253,
+  "world_phase": "FRACTURE",
+  "core_four": {
+    "members": [
+      "서진우",
+      "윤서진",
+      "최은채",
+      "장태훈"
+    ],
+    "primary_residence": "VOCATIONAL_TRAINING_CENTER",
+    "primary_workspace": "SPORTS_COMPLEX_GUILD_HUB"
+  },
+  "five_node_model": {
+    "PUBLIC_FORWARD_WELFARE_CENTER": "PUBLIC_FORWARD_GATEWAY_ADVANCE_NODE",
+    "SPORTS_COMPLEX_GUILD_HUB": "CENTRAL_GUILD_WORK_LOGISTICS_HUB",
+    "VOCATIONAL_TRAINING_CENTER": "CORE_FOUR_PRIMARY_RESIDENCE",
+    "NW_TRAINING_CENTER": "SHARED_HIDDEN_FALLBACK_BUNKER",
+    "NORTH_AGRITECH": "PRODUCTION_WATER_SEED_CORE"
+  },
+  "persistent_world_changes": [
+    "대혹한 종료 후 봄형 이동·거래 압력으로 전환",
+    "백운생활관 공동체 기능 사실상 종료",
+    "북쪽 연료장 지역질서 강화",
+    "서쪽길 관리조 영향력 확대",
+    "폐쇄 체육시설 정기시장 정착"
+  ],
+  "finale_signal": {
+    "location": "동천교 외곽",
+    "vehicles": 9,
+    "estimated_people": "30~40명",
+    "description": "현재 알려진 동쪽 생활권 바깥에서 온 동일 표식의 조직된 이동집단",
+    "first_questions": [
+      "큰 시장 위치",
+      "지역 도로 관리주체"
+    ],
+    "hostility": "UNDETERMINED"
+  },
+  "season3_started": false,
+  "raw_archive_status": "PARTIAL_WITH_ROLLING_CAPTURE_EXTENSION",
+  "source_checkpoint": "END_CHECKPOINT_2027-03-23.md"
+}
