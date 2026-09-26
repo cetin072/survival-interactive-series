@@ -53,6 +53,8 @@ jobs:
         run: node --experimental-strip-types ../scripts/check-visual-batch.mjs
       - name: Test local image POC request and quarantine receipts
         run: node --test ../scripts/lib/image-poc-exchange.test.mjs
+      - name: Test reviewed local image handoff and disabled ingest plan
+        run: node --test ../scripts/lib/accepted-image-handoff.test.mjs
       - name: Verify real portrait request without image execution
         run: node --experimental-strip-types ../scripts/prepare-image-poc.mjs --check
       - name: Install

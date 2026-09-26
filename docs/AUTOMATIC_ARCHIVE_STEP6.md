@@ -1,6 +1,8 @@
 # Automatic Archive Publication — Step 6 / 10: native image POC
 
 Status: POC REVIEWED WITH BLOCKER — NOT AN OPERATIONAL IMAGE PIPELINE
+
+2026-09-27 follow-up: Step 7 handoff code now accepts only a separately reviewed, hash-bound local image candidate. The two recorded outputs remain quarantined; accepted real images remain **0**. The new passing tests use synthetic pixels and do not change the experiment verdict. No further native image call was made because the zero-added-cost allowance for an additional run has not been verified.
 Base audited: `5c1a0c59eae96a535c9e5f94d973308f52f8e7b6` (includes #138 and #139).
 
 ## Actual experiment result
