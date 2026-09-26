@@ -8,6 +8,7 @@ import { editorialOverrides, editorialPlan } from './reader-editorial-map.mjs'
 const root = resolve(import.meta.dirname, '..', '..')
 const transformVersion = 'reader-selection-v1.2.0'
 const hash = (text) => createHash('sha256').update(text).digest('hex')
+const normalizeEol = (text) => text.replace(/\r\n/g, '\n')
 const output = (...parts) => resolve(root, 'archive', 'content', 'stories', ...parts)
 function anchor(text, marker, path) { const index = text.indexOf(marker); if (index < 0) throw new Error(`Editorial anchor missing in ${path}: ${marker}`); return index }
 function editedBody(part) { let body = part.selected.body; const before = editorialOverrides.trimBefore[part.archivePath]; if (before) body = body.slice(anchor(body, before, part.archivePath)); const after = editorialOverrides.trimAfter[part.archivePath]; return after ? body.slice(0, anchor(body, after, part.archivePath)).trim() : body.trim() }
@@ -30,7 +31,7 @@ export async function makeBooks() {
   for (const [chronicleId, catalog] of Object.entries(rawCatalog)) {
     const included = [], omitted = [], editorialExclusions = []
     for (const item of catalog) {
-      const raw = await readFile(resolve(root, item.archivePath), 'utf8')
+      const raw = normalizeEol(await readFile(resolve(root, item.archivePath), 'utf8'))
       const selected = extractReaderNarrative(raw, { details: true })
       const overrideReason = editorialOverrides.exclude[item.archivePath]
       if (overrideReason) { omitted.push({ sourceRef: item.canonicalRef, archiveSourceRef: item.archivePath, reason: overrideReason }); editorialExclusions.push({ sourceRef: item.canonicalRef, archiveSourceRef: item.archivePath, reason: overrideReason }); continue }
