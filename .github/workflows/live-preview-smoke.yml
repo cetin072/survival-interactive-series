@@ -1,0 +1,77 @@
+name: Live preview GM smoke
+
+# Paid live-AI verification is deliberately opt-in.
+# Bump engine/web/public/live-smoke-marker.txt in the latest head commit only
+# when a real provider smoke is wanted.
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'engine/web/public/live-smoke-marker.txt'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 2
+
+      - name: Check whether this head commit explicitly requested paid smoke
+        id: gate
+        run: |
+          if git diff --name-only HEAD^ HEAD | grep -qx 'engine/web/public/live-smoke-marker.txt'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Paid live smoke explicitly requested by marker change."
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "No marker change in latest head commit; skipping all paid AI calls."
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.run == 'true'
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: engine/web/package-lock.json
+
+      - name: Install web dependencies
+        if: steps.gate.outputs.run == 'true'
+        working-directory: engine/web
+        run: npm ci
+
+      - name: Wait for matching Deploy Preview
+        if: steps.gate.outputs.run == 'true'
+        env:
+          PREVIEW_URL: https://deploy-preview-67--survival-zero-ai-test.netlify.app
+        run: |
+          EXPECTED_MARKER="$(tr -d '\r\n' < engine/web/public/live-smoke-marker.txt)"
+          echo "Expected marker: $EXPECTED_MARKER"
+          for i in $(seq 1 36); do
+            marker="$(curl -fsS --max-time 10 "$PREVIEW_URL/live-smoke-marker.txt" 2>/dev/null || true)"
+            if [ "$marker" = "$EXPECTED_MARKER" ]; then
+              echo "Matching Deploy Preview is live."
+              exit 0
+            fi
+            echo "Waiting for Deploy Preview ($i/36)..."
+            sleep 10
+          done
+          echo "Deploy Preview marker did not become available in time."
+          exit 1
+
+      - name: Run paid live GM smoke
+        if: steps.gate.outputs.run == 'true'
+        working-directory: engine/web
+        env:
+          PREVIEW_URL: https://deploy-preview-67--survival-zero-ai-test.netlify.app
+        run: |
+          marker="$(tr -d '\r\n' < public/live-smoke-marker.txt)"
+          if [[ "$marker" == full-* ]]; then
+            export SMOKE_MODE=full
+          else
+            export SMOKE_MODE=quick
+          fi
+          echo "Live smoke mode: $SMOKE_MODE"
+          npx --yes tsx@4.20.6 scripts/livePreviewSmoke.ts

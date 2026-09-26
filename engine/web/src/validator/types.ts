@@ -29,6 +29,11 @@ export type ResourceChange = {
   to: string
 }
 
+export type BaseCapabilityChange = {
+  base_id: string
+  add: string
+}
+
 export type WorldChange = {
   key: string
   from: JsonValue | undefined
@@ -39,6 +44,7 @@ export type StateChangeProposal = {
   time_delta_min: number
   moves: LocationMove[]
   resource_changes: ResourceChange[]
+  base_capability_changes?: BaseCapabilityChange[]
   world_changes: WorldChange[]
 }
 

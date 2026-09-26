@@ -1,4 +1,4 @@
-export type Choice = { id: number; label: string }
+export type Choice = { id: number; label: string; description?: string }
 
 export type LogEntry = {
   id: number
