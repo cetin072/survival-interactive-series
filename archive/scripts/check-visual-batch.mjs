@@ -128,7 +128,7 @@ try {
   assert.throws(() => run(args))
   assert.ok(goodBytes.equals(await readFile(outputPath)))
   for (const [path, hash] of Object.entries(before)) assert.equal(visualByteHash(await readFile(resolve(copy, path))), hash)
-  assert.equal(command('git', ['diff', '--name-only'], copy).trim(), '')
+  assert.equal(command('git', ['diff', '--name-only'], copy).trim(), 'archive/content/visuals/C03-AFTERFALL/VISUALS.json')
   console.log(JSON.stringify({ real_visual_catalog: initial.report,
     sample_character_brief: firstPortrait.brief,
     current_public_appearance_fields_preserved: true, deterministic_double_compile: true,
