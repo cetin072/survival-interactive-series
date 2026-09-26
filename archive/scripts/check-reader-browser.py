@@ -206,16 +206,16 @@ def probe_original(browser, url: str):
     context = browser.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
     page = context.new_page()
     page.goto(query_url(url, view='story', chronicle='C01-HAN-JUNHO'))
-    expect(page.locator('.book-prose h1')).to_be_visible()
-    original = page.locator('.book-prose h1').inner_text()
+    expect(page.locator('.book-prose > header h1')).to_be_visible()
+    original = page.locator('.book-prose > header h1').inner_text()
     target = page.locator('.book-toc section button').nth(1)
     tap(target, True)
     page.wait_for_timeout(500)
-    after_first = page.locator('.book-prose h1').inner_text()
+    after_first = page.locator('.book-prose > header h1').inner_text()
     assert after_first == original, 'Original first-tap regression not reproduced'
     tap(target, True)
     page.wait_for_timeout(300)
-    assert page.locator('.book-prose h1').inner_text() != original, 'Original second-tap behavior differs'
+    assert page.locator('.book-prose > header h1').inner_text() != original, 'Original second-tap behavior differs'
     report('original production regression reproduced: first tap reverts, second tap works', url=url)
     context.close()
 
@@ -261,9 +261,9 @@ def main():
             blocked.add_init_script("Object.defineProperty(window, 'localStorage', { get() { throw new DOMException('blocked', 'SecurityError'); } });")
             page = blocked.new_page()
             page.goto(query_url(base, view='story', chronicle='C01-HAN-JUNHO', chapter='invalid'))
-            expect(page.locator('.book-prose h1')).to_have_text(BOOKS['C01-HAN-JUNHO']['chapters'][0]['title'])
+            expect(page.locator('.book-prose > header h1')).to_have_text(BOOKS['C01-HAN-JUNHO']['chapters'][0]['title'])
             tap(page.locator('.book-toc section button').nth(1), True)
-            expect(page.locator('.book-prose h1')).to_have_text(BOOKS['C01-HAN-JUNHO']['chapters'][1]['title'])
+            expect(page.locator('.book-prose > header h1')).to_have_text(BOOKS['C01-HAN-JUNHO']['chapters'][1]['title'])
             page.goto(query_url(base, view='raw', chronicle='C03-AFTERFALL', part='invalid'))
             expect(page.locator('.reader-page')).to_be_visible()
             report('blocked localStorage and invalid links remain navigable')
