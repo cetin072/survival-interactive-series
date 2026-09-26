@@ -73,10 +73,13 @@ try {
   const run = (args) => JSON.parse(command('node', ['--experimental-strip-types', 'archive/scripts/run-visual-publication.mjs', ...args], copy))
   const before = {}
   for (const path of ['archive/content/stories/C01-HAN-JUNHO/BOOK.json', 'archive/content/stories/C02-STRONGHOLD/BOOK.json', 'archive/content/stories/C03-AFTERFALL/BOOK.json', 'archive/web/src/archive/archiveData.ts', 'archive/web/src/archive/characterAppearance.ts']) before[path] = visualByteHash(await readFile(resolve(copy, path)))
+  // The website now commits a pinned catalog. Remove it only in this disposable
+  // clone so the original create-then-repeat atomic writer path is still tested.
+  const outputPath = resolve(copy, 'archive/content/visuals/C03-AFTERFALL/VISUALS.json')
+  await rm(outputPath, { force: true })
   const first = run(['--demo-s02', '--apply'])
   assert.equal(first.status, 'UPDATED_LOCAL_VISUAL_CATALOG')
   assert.equal(first.files_written, 1)
-  const outputPath = resolve(copy, 'archive/content/visuals/C03-AFTERFALL/VISUALS.json')
   assert.ok(initial.candidateBytes.equals(await readFile(outputPath)))
   assert.equal(run(['--demo-s02', '--apply']).status, 'NOOP')
   assert.equal(command('git', ['diff', '--name-only'], copy).trim(), '')
