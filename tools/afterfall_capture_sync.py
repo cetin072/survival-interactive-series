@@ -145,8 +145,6 @@ def audit(snapshot: Any) -> dict[str, Any]:
         return {"status": "NEEDS_GM_REVIEW", "reason": "TURN_STATE_LINK_CONFLICT", "publication_allowed": False}
     if session["turns"] and session["turns"][-1]["gm"]["save_version"] != database["save_version"]:
         return {"status": "NEEDS_GM_REVIEW", "reason": "SAVE_TRANSCRIPT_HEAD_MISMATCH", "publication_allowed": False}
-    if session["turns"] and session["turns"][-1]["gm"]["save_version"] != database["save_version"]:
-        return {"status": "NEEDS_GM_REVIEW", "reason": "SAVE_TRANSCRIPT_HEAD_MISMATCH", "publication_allowed": False}
     if (repository["season"] != database["season"]
             or session["season_id"] != f"S{database['season']:02d}"
             or repository["save_version_anchor"] != database["save_version"]):
