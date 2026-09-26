@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "decision_id": "AF-APPEARANCE-20260926-140",
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "approved_on": "2026-09-26",
+  "approval": "User explicitly authorized source-first recovery and GM establishment of missing appearance now; Issue #140.",
+  "not_a_game_event": true,
+  "historical_raw_unchanged": true,
+  "source_ref": "64911fd1a51b3d9c66841a3a589b96b26964c9ec",
+  "canon_path": "worldlines/AFTERFALL/CHARACTER_APPEARANCE_BACKFILL_V1.json",
+  "scope": "Six missing appearance anchors plus publication recovery for Han Jisu. Other established anchors remain unchanged. New fields are a present editorial canon decision, not reconstructed historical dialogue.",
+  "characters": [
+    {
+      "character_id": "문하진",
+      "node_id": "char-hajin",
+      "appearance_anchor": {
+        "gender": "여성",
+        "apparent_age": "30대 중반",
+        "height": "평균 정도",
+        "build": "가늘지만 어깨와 자세가 반듯한 체형",
+        "face": "길지 않은 타원형 얼굴에 곧은 눈썹과 차분한 눈매",
+        "hair": "귀를 드러내는 짧은 검은 단발, 앞머리는 옆으로 넘김",
+        "style": "형광 안전조끼와 기름 묻은 작업장갑",
+        "distinctive": ["접힌 시설도면"],
+        "voice": "압박받는 현장에서도 흔들리지 않는 목소리"
+      },
+      "public_description": "30대 중반 여성. 평균 정도의 키에 가늘고 반듯한 체형이며, 짧은 검은 단발과 곧은 눈썹이 단정한 인상을 만든다. 형광 안전조끼와 작업장갑, 접힌 시설도면이 익숙한 차림이고, 사람들 앞에서 말할 때 목소리가 쉽게 흔들리지 않는다.",
+      "provenance": {
+        "origin": "RECOVERED_AND_GM_COMPLETED",
+        "recovered_fields": ["gender", "apparent_age", "style", "distinctive", "voice"],
+        "new_fields": ["height", "build", "face", "hair"],
+        "source_refs": ["worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_002.md#L1160-L1340"],
+        "evidence": ["시설도면을 든 30대 중반 여성이 펌프를 점검하고, 같은 장면에서 문하진이라고 이름을 밝힌다."],
+        "note": "여성·나이대는 신규 설정이 아니라 최초 공개 등장 복구다. 겨울 중 피로와 체중 감소는 영구 외형으로 고정하지 않는다."
+      }
+    },
+    {
+      "character_id": "정민규",
+      "node_id": "char-mingyu",
+      "appearance_anchor": {
+        "gender": "남성",
+        "apparent_age": "30대 후반",
+        "height": "평균 정도",
+        "build": "마르고 어깨가 약간 굽은 체형",
+        "face": "좁은 얼굴과 도드라진 광대, 눈꺼풀이 살짝 처진 눈",
+        "hair": "옆머리는 짧고 윗머리는 손으로 쓸어넘길 만큼 남긴 검은 머리",
+        "style": "색 바랜 회색 작업점퍼와 무릎이 닳은 작업바지",
+        "distinctive": ["작은 공구가방", "낡은 테스터기"],
+        "voice": "크지 않고 약간 잠긴 목소리"
+      },
+      "public_description": "30대 후반 남성. 평균 정도의 키에 마르고 어깨가 약간 굽었으며, 좁은 얼굴과 도드라진 광대가 눈에 남는다. 검은 윗머리를 쓸어넘기고 색 바랜 회색 작업점퍼를 입으며, 작은 공구가방과 낡은 테스터기를 챙긴다. 목소리는 크지 않고 약간 잠겨 있다.",
+      "provenance": {
+        "origin": "RECOVERED_AND_GM_COMPLETED",
+        "recovered_fields": ["gender", "apparent_age", "distinctive"],
+        "new_fields": ["height", "build", "face", "hair", "style", "voice"],
+        "source_refs": ["worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_004.md#L141-L248"],
+        "evidence": ["30대 후반 남성, 배낭과 작은 공구가방·전선·낡은 테스터기를 가진 사람으로 등장한 뒤 정민규라고 소개된다."],
+        "note": "첫 장면의 피곤한 말투는 당시 상태다. 얼굴·머리·체형·평상복·목소리의 안정 특징은 이번 승인으로 보완했다."
+      }
+    },
+    {
+      "character_id": "최경희",
+      "node_id": "char-kyunghee",
+      "appearance_anchor": {
+        "gender": "여성",
+        "apparent_age": "40대 초반",
+        "height": "평균보다 약간 작은 편",
+        "build": "몸통과 팔이 적당히 단단한 체형",
+        "face": "둥근 광대와 부드럽게 내려오는 눈꼬리, 웃을 때 깊어지는 눈가 주름",
+        "hair": "짙은 갈색 머리를 목덜미에서 둥글게 말아 고정함",
+        "style": "빛바랜 올리브색 재킷과 옷깃 안에 둘러 넣은 얇은 목수건",
+        "voice": "빠르지 않은 말투"
+      },
+      "public_description": "40대 초반 여성. 평균보다 약간 작은 키에 단단한 체형으로, 둥근 광대와 웃을 때 깊어지는 눈가 주름이 부드러운 인상을 남긴다. 짙은 갈색 머리를 목덜미에서 말아 고정하고 올리브색 재킷과 얇은 목수건을 걸친다. 말은 빠르지 않다.",
+      "provenance": {
+        "origin": "RECOVERED_AND_GM_COMPLETED",
+        "recovered_fields": ["gender", "apparent_age", "voice"],
+        "new_fields": ["height", "build", "face", "hair", "style"],
+        "source_refs": ["worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_003.md#L1369-L1422"],
+        "evidence": ["40대 초반쯤의 여성, 빠르지 않은 말투로 묘사된 인물이 최경희라고 이름을 밝힌다."],
+        "note": "부근에서 치료받는 40대 남성이나 물자를 가져온 젊은 남자의 특징은 최경희에게 귀속하지 않는다."
+      }
+    },
+    {
+      "character_id": "김성호",
+      "node_id": "char-seongho",
+      "appearance_anchor": {
+        "gender": "남성",
+        "apparent_age": "40대 초중반",
+        "height": "크지 않은 편",
+        "build": "목과 어깨가 두껍고 몸이 단단한 체형",
+        "face": "햇볕에 그을린 각진 얼굴, 굵은 눈썹과 넓은 코",
+        "hair": "짧게 자른 검은 머리",
+        "style": "작업용 점퍼 위에 형광 안전조끼",
+        "voice": "낮고 짧게 끊어 말하는 목소리"
+      },
+      "public_description": "40대 초중반 남성. 키는 크지 않지만 목과 어깨가 두껍고 몸이 단단하다. 햇볕에 그을린 각진 얼굴과 굵은 눈썹, 짧은 검은 머리에 작업점퍼와 형광 안전조끼를 걸친다. 목소리는 낮고 말을 짧게 끊는다.",
+      "provenance": {
+        "origin": "GM_AUTHORED_WITH_USER_APPROVAL",
+        "recovered_fields": [],
+        "new_fields": ["gender", "apparent_age", "height", "build", "face", "hair", "style", "voice"],
+        "source_refs": ["worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_003.md#L1980-L2070"],
+        "evidence": ["김성호의 이름과 서쪽길 접촉 역할은 공개 원문에 존재한다. 확인된 이름별 기록에는 안정 외형이 충분하지 않다."],
+        "note": "S01 PART_C03_002 09:18의 익명 안전조끼 남성과 동일인인지 단정하지 않는다. 그 외형과 충돌하지 않는 디자인을 이번 사용자 승인으로 김성호의 기준 외형에 명시적으로 채택한다. 과거 원문 복구로 표시하지 않는다."
+      }
+    },
+    {
+      "character_id": "배철수",
+      "node_id": "char-cheolsu",
+      "appearance_anchor": {
+        "gender": "남성",
+        "apparent_age": "50대",
+        "height": "평균 정도",
+        "build": "상체가 두텁고 손마디가 굵은 체형",
+        "face": "넓은 턱과 굵은 코, 깊게 접힌 눈가",
+        "hair": "숱이 조금 성긴 짧은 머리에 새치가 섞임",
+        "style": "작업복 위에 낡은 패딩조끼",
+        "voice": "낮고 거칠며 말끝에 약간 쇳소리가 섞이는 목소리"
+      },
+      "public_description": "50대 남성. 상체가 두텁고 손마디가 굵으며, 넓은 턱과 깊게 접힌 눈가가 눈에 띈다. 새치가 섞인 짧은 머리에 작업복과 낡은 패딩조끼를 입고, 낮고 거친 목소리로 말한다.",
+      "provenance": {
+        "origin": "RECOVERED_AND_GM_COMPLETED",
+        "recovered_fields": ["gender", "apparent_age", "style"],
+        "new_fields": ["height", "build", "face", "hair", "voice"],
+        "source_refs": ["worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_002.md#L1565-L1618", "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_002.md#L1806-L1859"],
+        "evidence": ["50대 남성·작업복 위 낡은 패딩조끼로 먼저 등장하고 같은 접촉 장면 뒤에서 자신을 배철수라고 밝힌다."],
+        "note": "함께 있는 문하진이나 젊은 동행자의 외형과 구분했다. 첫 접촉의 도구를 전투 전문성으로 해석하지 않는다."
+      }
+    },
+    {
+      "character_id": "박재민",
+      "node_id": "char-jaemin",
+      "appearance_anchor": {
+        "gender": "남성",
+        "apparent_age": "20대 후반",
+        "height": "큰 편",
+        "build": "팔다리가 길고 가벼운 마른 체형",
+        "face": "볼살이 적고 턱선이 부드러운 얼굴, 짙은 눈썹과 큰 눈",
+        "hair": "눈썹 가까이 내려오는 검은 앞머리",
+        "style": "남색 후드 상의 위에 낡은 짧은 재킷",
+        "voice": "중간 높이의 맑은 목소리"
+      },
+      "public_description": "20대 후반 남성. 키가 큰 편이고 팔다리가 길며, 볼살이 적고 부드러운 턱선에 짙은 눈썹과 큰 눈이 눈에 띈다. 검은 앞머리를 자연스럽게 내리고 남색 후드 위에 짧은 재킷을 걸친다. 목소리는 중간 높이로 맑다.",
+      "provenance": {
+        "origin": "RECOVERED_AND_GM_COMPLETED",
+        "recovered_fields": ["gender", "apparent_age"],
+        "new_fields": ["height", "build", "face", "hair", "style", "voice"],
+        "source_refs": ["worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_002.md#L1565-L1618", "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_002.md#L1806-L1859", "worldlines/AFTERFALL/CHARACTER_BIBLE.md"],
+        "evidence": ["배철수 뒤의 20대 후반 남성이 재민으로 소개된다. 성을 포함한 박재민 신원은 승인된 Character Bible 및 runtime과 일치한다."],
+        "note": "당시 왼손 부상은 역사적 관찰이지 현재 부상이나 영구 흉터의 증거가 아니다. 이번 외형에도 흉터를 만들어 넣지 않는다. 배철수와의 가족관계는 설정하지 않는다."
+      }
+    },
+    {
+      "character_id": "한지수",
+      "node_id": "char-jisu",
+      "appearance_anchor": {
+        "face": "길고 선명한 눈매와 반듯한 코선",
+        "hair": "귀 뒤로 넘긴 턱 아래 길이의 검은 머리",
+        "build": "군살 없이 길고 탄탄한 체형",
+        "style": "작업복 바지와 두꺼운 등산화",
+        "voice": "낮고 맑은 목소리",
+        "height": "168cm쯤",
+        "distinctive": ["허리에 건 장갑", "작은 몽키스패너"],
+        "apparent_age": "30대 중후반",
+        "attractiveness": "꾸민 흔적은 거의 없지만 첫눈에 꽤 매력적인 얼굴"
+      },
+      "public_description": "30대 중후반. 168cm쯤의 군살 없이 길고 탄탄한 체형에 햇볕에 살짝 그을린 피부를 지녔다. 턱 아래 길이의 검은 머리를 귀 뒤로 넘겼으며, 길고 선명한 눈매와 반듯한 코선이 매력적인 인상을 남긴다. 작업복 바지와 두꺼운 등산화 차림에 장갑과 작은 몽키스패너를 허리에 걸고, 낮고 맑은 목소리로 말한다.",
+      "provenance": {
+        "origin": "RECOVERED_EXISTING_CANON",
+        "recovered_fields": ["face", "hair", "build", "style", "voice", "height", "distinctive", "apparent_age", "attractiveness"],
+        "new_fields": [],
+        "source_refs": ["survival_rpg.characters.known_facts.appearance_anchor", "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_004.md#L1919-L1972"],
+        "evidence": ["동천교 첫 소개의 외형과 현행 Supabase anchor가 이미 일치한다. 이번 작업은 줄어 있던 Archive 표시를 복구하는 것이다."],
+        "note": "Supabase의 기존 한지수 anchor는 변경하지 않는다. 그을린 피부 표현도 첫 공개 원문에서 복구했다."
+      }
+    }
+  ]
+}
