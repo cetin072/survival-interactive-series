@@ -142,3 +142,25 @@ high-resolution 재등장을 visual backfill 기회로 사용한다.
   바꾸지 않는다. 부상·흉터·노화·위생·장비·헤어 변화는 `visual_changes`로 남긴다.
 - Archive publication은 04:30 batch에서 이 PLAYER_SAFE anchor를 정적 snapshot으로
   반영한다. visual backfill은 live turn에 Archive/GitHub/Netlify 호출을 추가하지 않는다.
+
+## 11. Explicit user-approved completion — 2026-09-26 / #140
+
+사용자가 기존 기록 우선 복구와 미설정 외형의 즉시 GM 확정을 명시적으로 승인한
+경우에는 다음 등장까지 기다리지 않고 비플레이 편집 작업으로 보완할 수 있다.
+이는 §10의 제한적인 승인 예외이며, 자동으로 과거 사실을 만들어내라는 허가가 아니다.
+
+이번 승인 기록: `CHARACTER_APPEARANCE_BACKFILL_V1.json`.
+- 문하진·정민규·최경희·배철수·박재민: 실제 최초 등장으로 성별·나이대·복장 등
+  확인되는 필드를 복구하고, 비어 있는 필드만 현재 GM 설정으로 완성한다.
+- 김성호: 이름과 역할은 기존 Canon이다. 익명 도로관리 인물과 동일인이라고
+  단정하지 않고, 충돌하지 않는 기준 외형을 이번 승인으로 확정한다.
+- 한지수: 기존 Supabase/RAW 외형을 Archive에서 빠짐없이 표시한다. 재창작하지 않는다.
+
+복구 필드와 신규 필드, 근거 경로, 승인일을 분리한다. 임시 부상·겨울 피로를
+영구 흉터나 영구 체형으로 바꾸지 않는다. 외형 확정으로 성격·호감·소속·관계·미래 사건을
+함께 만들지 않는다. 기존 RAW/BOOK/Save의 시간이나 사건을 소급 수정하지 않는다.
+
+현재 정본 저장 위치는 `survival_rpg.characters.known_facts.appearance_anchor`이며,
+`appearance_provenance`와 위 GitHub JSON에 출처를 남긴다. 일반 게임 save에 인물
+외형 전체를 중복 적재하지 않는다. 이후 GM은 이 baseline을 유지하고,
+Archive는 승인된 JSON과 같은 필드로 `기본 정보 → 외형`을 출판한다.
