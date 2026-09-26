@@ -1,0 +1,50 @@
+{
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "protagonist": "서진우",
+  "season_id": "S02",
+  "session_id": "SESSION_008",
+  "source_type": "SUPABASE_ROLLING_RAW",
+  "source_session_uuid": "6d7b61bd-31e1-4973-9fb3-b09ecd4f5531",
+  "source_tables": [
+    "survival_rpg.transcript_sessions",
+    "survival_rpg.transcript_messages"
+  ],
+  "status": "PARTIAL",
+  "capture_quality": "VERIFIED_CONTIGUOUS_TURN_PAIRS",
+  "public_safe_only": true,
+  "opened_at": "2026-09-25 17:34:53.181849+00",
+  "closed_at": "2026-09-25 17:47:36.082143+00",
+  "starting_game_time": "2027-02-07 13:40",
+  "closing_game_time": "2027-02-07 13:40",
+  "starting_save_version": 243,
+  "closing_save_version": 244,
+  "starting_scene_id": "S02_SECURITY_LAYER_MAP_AND_OPS_SITE_REVIEW",
+  "closing_scene_id": "S02_BASE_RECONFIGURATION_CORE_MEETING",
+  "counts": {
+    "user": 1,
+    "gm": 1,
+    "total": 2
+  },
+  "message_order": {
+    "min": 0,
+    "max": 1,
+    "contiguous": true
+  },
+  "atomic_pairing_complete": true,
+  "parts": [
+    "PART_001.md"
+  ],
+  "content_sha256": [
+    {
+      "message_order": 0,
+      "role": "USER",
+      "sha256": "bec79fedb007a600afb6b5723d4e9b9c09b735506e97ef83af6cf85f7a005f5a"
+    },
+    {
+      "message_order": 1,
+      "role": "GM",
+      "sha256": "5b780b705751d7029dec0d2b7ba135084067e41fec4948e6d1f4352272110e78"
+    }
+  ]
+}

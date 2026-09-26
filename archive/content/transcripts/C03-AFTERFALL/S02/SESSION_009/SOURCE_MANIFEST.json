@@ -1,0 +1,141 @@
+{
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "protagonist": "서진우",
+  "season_id": "S02",
+  "session_id": "SESSION_009",
+  "source_type": "SUPABASE_ROLLING_RAW",
+  "source_session_uuid": "53e2bcbf-ec73-4943-9a79-1239cf11f310",
+  "source_tables": [
+    "survival_rpg.transcript_sessions",
+    "survival_rpg.transcript_messages"
+  ],
+  "status": "PARTIAL",
+  "capture_quality": "VERIFIED_CONTIGUOUS_TURN_PAIRS",
+  "public_safe_only": true,
+  "opened_at": "2026-09-25 17:49:48.233102+00",
+  "closed_at": "2026-09-26 02:44:01.092643+00",
+  "starting_game_time": "2027-02-07 13:40",
+  "closing_game_time": "2027-03-23 17:50",
+  "starting_save_version": 244,
+  "closing_save_version": 253,
+  "starting_scene_id": "S02_BASE_RECONFIGURATION_CORE_MEETING",
+  "closing_scene_id": "S02_SEASON_FINALE_SPRING_REVEALS_RECONFIGURED_WORLD",
+  "counts": {
+    "user": 10,
+    "gm": 10,
+    "total": 20
+  },
+  "message_order": {
+    "min": 0,
+    "max": 19,
+    "contiguous": true
+  },
+  "atomic_pairing_complete": true,
+  "parts": [
+    "PART_001.md",
+    "PART_002.md"
+  ],
+  "content_sha256": [
+    {
+      "message_order": 0,
+      "role": "USER",
+      "sha256": "7d3af2780e60ffa4ada909a14bb8af22a964d0279c42a77ce50c83faeb0455f5"
+    },
+    {
+      "message_order": 1,
+      "role": "GM",
+      "sha256": "e42b788f40f87eb7b82007c43bdb970f182d45fbd99f81db030bc16ce1dd22dc"
+    },
+    {
+      "message_order": 2,
+      "role": "USER",
+      "sha256": "a09bbc27ebee07e2d2afd651255c544994b37caba72e3dd2318dcf0bf1ab063b"
+    },
+    {
+      "message_order": 3,
+      "role": "GM",
+      "sha256": "44e93716b2845a7d031873b3a771452632461daccf9f9cb372a8990b4d3aa1a0"
+    },
+    {
+      "message_order": 4,
+      "role": "USER",
+      "sha256": "67497b776854008d38c2340e14925a64b36686230bccaa777db68f644196015f"
+    },
+    {
+      "message_order": 5,
+      "role": "GM",
+      "sha256": "a8fc697c6d83e211c89a8e53af1d3f4505f0256f1560cd838ae83ac05c14cd3e"
+    },
+    {
+      "message_order": 6,
+      "role": "USER",
+      "sha256": "af1ac5b2a9b5990b611187d35f2df72da5308ba3b2806bffb633d6c2dd10cb90"
+    },
+    {
+      "message_order": 7,
+      "role": "GM",
+      "sha256": "4c7bb223394d513e232f0b7ff30ee8ebbd1a85e56e23a3fe53ed484c90f59e7e"
+    },
+    {
+      "message_order": 8,
+      "role": "USER",
+      "sha256": "4c4cc921f00355567456624f442fbedacca53f7e4a949d0bb1bf6addef6dab31"
+    },
+    {
+      "message_order": 9,
+      "role": "GM",
+      "sha256": "db53f0c8200ed3edcc97f4cb49941543fafa88b65ec39e5e30e6a5e31c2c84b5"
+    },
+    {
+      "message_order": 10,
+      "role": "USER",
+      "sha256": "9460bf62a30bffc9536edadd2934bfe3616938e36219e51c6e38b42ec9dce87e"
+    },
+    {
+      "message_order": 11,
+      "role": "GM",
+      "sha256": "23854c80257c7f179a4f6f27861dd2994d1716be3cd1f44ee6aace0a3fdb0165"
+    },
+    {
+      "message_order": 12,
+      "role": "USER",
+      "sha256": "71c108e630d762066617db532feb4ab9a6c82a42ac40b1ea7aa2d2978d4ca018"
+    },
+    {
+      "message_order": 13,
+      "role": "GM",
+      "sha256": "a536594ff47c2a9e1b9aa048aea800ae16a9358d9dbeaf225426c9ea0467fd51"
+    },
+    {
+      "message_order": 14,
+      "role": "USER",
+      "sha256": "fcae0b0f80045e9a25c6d1a52cf03370e9992654f8e00b2a49bda476a6029156"
+    },
+    {
+      "message_order": 15,
+      "role": "GM",
+      "sha256": "2000b91ada02b1292dc4babae2ae05f0a99fb8ccc7ab6524bfa0289add7aeaa4"
+    },
+    {
+      "message_order": 16,
+      "role": "USER",
+      "sha256": "71115d7acb7fb082e4fff191ecf9701cefc9ff59aa2c0ef58441c1980f3d9820"
+    },
+    {
+      "message_order": 17,
+      "role": "GM",
+      "sha256": "9570bc035df99946a2499b83956f865dc3c523b5f66120c59442ee10592eed22"
+    },
+    {
+      "message_order": 18,
+      "role": "USER",
+      "sha256": "542aba8e21f357edc636a33d12eadab47aaf89e706689c0389bbfda0832e1bc3"
+    },
+    {
+      "message_order": 19,
+      "role": "GM",
+      "sha256": "b5bc5957646df14044e3e7338bc8bd0112c14c3718d1d0cb16bb4ca257dba148"
+    }
+  ]
+}

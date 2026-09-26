@@ -20,9 +20,9 @@ export type ArchiveEdge = {
 export const archiveMeta = {
   title: '생존일기 ARCHIVE',
   worldline: 'AFTERFALL',
-  season: 'S02',
-  gameTime: '2027-01-03 19:43',
-  saveVersion: '210',
+  season: 'S02 COMPLETE',
+  gameTime: '2027-03-23 17:50',
+  saveVersion: '253',
   visibility: 'PLAYER_SAFE',
   syncPolicy: 'Episode / major event / season closeout',
 }
@@ -215,9 +215,9 @@ const locations: ArchiveNode[] = [
     id: 'loc-nw-center',
     label: '서림대학교 북서 실습센터',
     type: 'location',
-    subtitle: '은닉 생활·의료·비축·후방복원 거점',
-    summary: '핵심 4인의 생활 거점. 위치 노출을 최소화하며 최소 발전·급수, 의료, 비축, 비상철수 기능을 유지한다.',
-    tags: ['거점', '핵심 4인', '은닉', '의료'],
+    subtitle: '제한 공개 지원 거점',
+    summary: '의료와 생활 지원을 잇는 제한 공개 거점이다. 현재 상주·접근·위치와 운영 세부는 공개 기록에 싣지 않는다.',
+    tags: ['거점', '제한공개', '의료', '지원'],
     source: 'PERSISTENT_CANON.md / Supabase scenes',
   },
   {
@@ -231,11 +231,11 @@ const locations: ArchiveNode[] = [
   },
   {
     id: 'loc-shelter',
-    label: '두 번째 공공대피시설',
+    label: '외곽 주민복지관',
     type: 'location',
-    subtitle: '공개 생활망',
-    summary: '전기·급수·화장실·접근성을 살려 가동한 공개 대피시설. 신하영·최유진이 생활운영의 신뢰 가능한 접점으로 자리잡았다.',
-    tags: ['공공', '대피시설', '생활망'],
+    subtitle: '공개 전진기지·생활망',
+    summary: '전기·급수·화장실·접근성을 살려 가동한 공개 생활시설. 신하영·최유진이 생활운영의 신뢰 가능한 접점으로 자리잡았다.',
+    tags: ['공공', '주민복지관', '생활망'],
     source: 'Supabase scene S02_SECOND_SHELTER',
   },
   {
@@ -287,10 +287,19 @@ const locations: ArchiveNode[] = [
     id: 'loc-baekun',
     label: '백운생활관',
     type: 'location',
-    subtitle: '20명대 집단 · 내부 갈등',
-    summary: '배급·차량·수색 권한을 둘러싼 내부 갈등이 있었고 일부 기술·생활 인력이 자발적으로 이탈했다. 진우 측은 내부정치 불개입 원칙을 유지한다.',
-    tags: ['집단', '백운', '불개입'],
+    subtitle: '해산된 생활권',
+    summary: '과거의 대형 생활권. 배급·차량·수색 권한 갈등 뒤 인력 이탈이 이어졌고, 현재는 해산된 것으로 정리한다.',
+    tags: ['집단', '백운', '해산'],
     source: 'PERSISTENT_CANON.md / S01 ARC_ARCHIVE.md',
+  },
+  {
+    id: 'loc-sports-complex',
+    label: '폐쇄 체육시설',
+    type: 'location',
+    subtitle: '공개 작업·물류·정기시장 거점',
+    summary: '공개 작업과 물류, 교환이 이어지는 생활망 노드다. 접근·재고·운영 인력의 세부는 공개 기록에 싣지 않는다.',
+    tags: ['공개', '작업', '물류', '정기시장'],
+    source: 'Supabase survival_rpg.saves / S02 RAW transcript',
   },
 ]
 
@@ -339,6 +348,15 @@ const events: ArchiveNode[] = [
     summary: '두 거점 내부는 비교적 안정적이지만 외부 생활세계의 이동·교환·정보·회복 능력이 서서히 약화되고 있다는 관찰이 쌓였다.',
     tags: ['S02', '겨울', '생활망', '고립'],
     source: 'Supabase scene S02_LIVING_NETWORK_PATTERN_RECOGNITION',
+  },
+  {
+    id: 'event-s02-finale',
+    label: '봄 전환과 동천교 외곽 신호',
+    type: 'event',
+    subtitle: '2027-03-23 17:50',
+    summary: '대혹한 뒤 이동과 교환의 압박이 이어지는 가운데, 동천교 외곽에서 정체가 확정되지 않은 차량 행렬이 관측됐다. 의도와 후속 관계는 미결 상태다.',
+    tags: ['S02', '봄전환', '동천교', '미결'],
+    source: 'S02 END_CHECKPOINT_2027-03-23.md / S02 RAW transcript',
   },
 ]
 
@@ -403,10 +421,6 @@ export const archiveEdges: ArchiveEdge[] = [
   { from: 'char-mira', to: 'char-doyoon', label: '실증단지 동료' },
   { from: 'char-taehoon', to: 'char-mira', label: '시설·생산 협력' },
 
-  { from: 'char-jinwoo', to: 'loc-nw-center', label: '생활 거점' },
-  { from: 'char-seojin', to: 'loc-nw-center', label: '생활 거점' },
-  { from: 'char-eunchae', to: 'loc-nw-center', label: '생활 거점' },
-  { from: 'char-taehoon', to: 'loc-nw-center', label: '현장관리' },
   { from: 'char-mira', to: 'loc-agri', label: '생산 거점' },
   { from: 'char-sehoon', to: 'loc-agri', label: '시설직' },
   { from: 'char-doyoon', to: 'loc-agri', label: '시설직' },
@@ -421,6 +435,7 @@ export const archiveEdges: ArchiveEdge[] = [
   { from: 'char-yujin', to: 'loc-baekun', label: '과거 생활권' },
   { from: 'char-mingyu', to: 'loc-baekun', label: '과거 생활권' },
   { from: 'loc-nw-center', to: 'loc-agri', label: '두 거점 연합' },
+  { from: 'loc-shelter', to: 'loc-sports-complex', label: '생활망 연결' },
 
   { from: 'event-fireline', to: 'loc-agri', label: '주요 피해지역' },
   { from: 'event-fireline', to: 'char-jinwoo', label: '참여' },
@@ -445,6 +460,8 @@ export const archiveEdges: ArchiveEdge[] = [
   { from: 'event-network-decay', to: 'char-eunchae', label: '관찰' },
   { from: 'event-network-decay', to: 'char-taehoon', label: '관찰' },
   { from: 'event-network-decay', to: 'char-mira', label: '관찰' },
+  { from: 'event-s02-finale', to: 'loc-bridge', label: '관측 지점' },
+  { from: 'event-s02-finale', to: 'loc-sports-complex', label: '생활망 압박' },
 
   { from: 'ref-character-bible', to: 'char-hayoung', label: '설정 출처' },
   { from: 'ref-character-bible', to: 'char-yujin', label: '설정 출처' },
@@ -466,6 +483,7 @@ export const pressureSnapshot = [
 ]
 
 export const eventOrder = [
+  'event-s02-finale',
   'event-network-decay',
   'event-winter-council',
   'event-wide-area',

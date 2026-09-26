@@ -1,0 +1,47 @@
+{
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "protagonist": "서진우",
+  "season_id": "S02",
+  "session_id": "SESSION_003",
+  "source_type": "SUPABASE_ROLLING_RAW",
+  "source_session_uuid": "4728081b-faa4-4d59-a461-2ac20239b751",
+  "source_tables": [
+    "survival_rpg.transcript_sessions",
+    "survival_rpg.transcript_messages"
+  ],
+  "status": "PARTIAL",
+  "capture_quality": "PARTIAL_CAPTURE_INCOMPLETE_PAIRING",
+  "public_safe_only": true,
+  "opened_at": "2026-09-25 04:32:55.193616+00",
+  "closed_at": "2026-09-25 04:45:28.914736+00",
+  "starting_game_time": "2027-01-16 07:30",
+  "closing_game_time": "2027-01-16 09:28",
+  "starting_save_version": 215,
+  "closing_save_version": 216,
+  "starting_scene_id": "S02_AGRITECH_ONE_NIGHT_HARDENING",
+  "closing_scene_id": "S02_NORTH_ROUTE_MIGRATION_RECONFIGURATION",
+  "counts": {
+    "user": 0,
+    "gm": 1,
+    "assistant_public_meta": 0,
+    "total": 1
+  },
+  "message_order": {
+    "min": 0,
+    "max": 0,
+    "contiguous": true
+  },
+  "atomic_pairing_complete": false,
+  "parts": [
+    "PART_001.md"
+  ],
+  "content_sha256": [
+    {
+      "message_order": 0,
+      "role": "GM",
+      "sha256": "3e2ac21c7b9bc530e91f330d74b6b764912c4262ef5cedb5016d410deec8d9c0"
+    }
+  ],
+  "source_policy": "Only public_safe rows already stored by trusted rolling RAW capture. No reconstruction from Canon, checkpoint, summary, memory, hidden state, private reasoning, or tool output."
+}
