@@ -1,0 +1,25 @@
+{
+  "worldline": "AFTERFALL",
+  "chronicle": "C03",
+  "season": 3,
+  "status": "PREPLAY_READY",
+  "starts_after": {
+    "season": 2,
+    "game_time": "2027-03-23 17:50",
+    "save_version": 253,
+    "checkpoint": "worldlines/AFTERFALL/seasons/S02/END_CHECKPOINT_2027-03-23.md"
+  },
+  "protagonist": "서진우",
+  "core_four": [
+    "서진우",
+    "윤서진",
+    "최은채",
+    "장태훈"
+  ],
+  "primary_residence": "VOCATIONAL_TRAINING_CENTER",
+  "primary_workspace": "SPORTS_COMPLEX_GUILD_HUB",
+  "five_node_model_status": "STABLE_AT_S02_END",
+  "observed_open_signal": "ORGANIZED_EXTERNAL_CONVOY_AT_DONGCHEON_EDGE",
+  "convoy_hostility": "UNDETERMINED",
+  "future_plot": "UNDEFINED"
+}

@@ -1,0 +1,72 @@
+{
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "protagonist": "서진우",
+  "season_id": "S02",
+  "session_id": "SESSION_005",
+  "source_type": "SUPABASE_ROLLING_RAW",
+  "source_session_uuid": "5998b89f-7151-4169-b132-5c316d15a252",
+  "source_tables": [
+    "survival_rpg.transcript_sessions",
+    "survival_rpg.transcript_messages"
+  ],
+  "status": "PARTIAL",
+  "capture_quality": "VERIFIED_CONTIGUOUS_TURN_PAIRS",
+  "public_safe_only": true,
+  "opened_at": "2026-09-25 04:54:55.441055+00",
+  "closed_at": "2026-09-25 05:35:47.489005+00",
+  "starting_game_time": "2027-01-16 10:18",
+  "closing_game_time": "2027-01-21 18:10",
+  "starting_save_version": 217,
+  "closing_save_version": 220,
+  "starting_scene_id": "S02_REGIONAL_NETWORK_BUFFER",
+  "closing_scene_id": "S02_FUEL_YARD_TRADE_TEST",
+  "counts": {
+    "user": 3,
+    "gm": 3,
+    "assistant_public_meta": 0,
+    "total": 6
+  },
+  "message_order": {
+    "min": 0,
+    "max": 5,
+    "contiguous": true
+  },
+  "atomic_pairing_complete": true,
+  "parts": [
+    "PART_001.md"
+  ],
+  "content_sha256": [
+    {
+      "message_order": 0,
+      "role": "USER",
+      "sha256": "70172a404dad257a92956f72c75d1e00abc38cb358590118626e7fb0655f6962"
+    },
+    {
+      "message_order": 1,
+      "role": "GM",
+      "sha256": "4a16e459c421d761c6bcb0492246cc447dc846b1810c2ec391f3414828e09007"
+    },
+    {
+      "message_order": 2,
+      "role": "USER",
+      "sha256": "d7a5a31e219df306fcbbbb1b3b05f25f82aa2bede853584425e4cf6d51389094"
+    },
+    {
+      "message_order": 3,
+      "role": "GM",
+      "sha256": "b8862e434154a7bc3a1eebface4cdf4c178294de2805f84f22159ac16105d425"
+    },
+    {
+      "message_order": 4,
+      "role": "USER",
+      "sha256": "82706db27f004571f9a04dc10a464852aad0d3fa587522c666b15833b422d739"
+    },
+    {
+      "message_order": 5,
+      "role": "GM",
+      "sha256": "635074dfe04a1d22d8374261846051d9ff382fa7bc47f26c100078ce94d7988e"
+    }
+  ],
+  "source_policy": "Only public_safe rows already stored by trusted rolling RAW capture. No reconstruction from Canon, checkpoint, summary, memory, hidden state, private reasoning, or tool output."
+}
