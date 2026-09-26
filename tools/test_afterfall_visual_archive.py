@@ -99,6 +99,19 @@ class AfterfallVisualArchiveTests(unittest.TestCase):
         map_asset = published_asset("AF-MAP-001", "PLAYER_ARCHIVE", asset_type="WORLD_MAP", status="WAITING_CANON")
         self.assertEqual(apply_ready_gate(map_asset)["status"], "WAITING_CANON")
 
+    def test_first_map_promotes_when_all_explicit_gates_pass(self):
+        map_asset = published_asset("AF-MAP-001", "PLAYER_ARCHIVE", asset_type="WORLD_MAP", status="WAITING_CANON")
+        promoted = apply_ready_gate(
+            map_asset,
+            map_canon={
+                "third_hub_expansion_settled": True,
+                "front_living_structure_settled": True,
+                "northwest_fallback_role_settled": True,
+                "public_security_layer_settled": True,
+            },
+        )
+        self.assertEqual(promoted["status"], "READY")
+
     def test_map_topology_is_separate_from_visual_brief(self):
         contract = split_map_rendering_contract({"nodes": [{"x": 0, "y": 0}], "edges": [{"distance": 7.2}]}, {})
         self.assertIn("nodes", contract["deterministic_topology"])
