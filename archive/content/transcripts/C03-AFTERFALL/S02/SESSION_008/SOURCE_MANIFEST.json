@@ -17,6 +17,15 @@
   "closed_at": "2026-09-25 17:47:36.082143+00",
   "starting_game_time": "2027-02-07 13:40",
   "closing_game_time": "2027-02-07 13:40",
+  "session_range": {
+    "start": "2027-02-07 13:40",
+    "end": "2027-02-07 13:40"
+  },
+  "captured_message_range": {
+    "start": "2027-02-07 13:40",
+    "end": "2027-02-07 13:40"
+  },
+  "coverage_basis": "captured_message_range",
   "starting_save_version": 243,
   "closing_save_version": 244,
   "starting_scene_id": "S02_SECURITY_LAYER_MAP_AND_OPS_SITE_REVIEW",

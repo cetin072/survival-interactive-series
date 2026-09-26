@@ -1,11 +1,13 @@
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { makeBooks } from './build-reader-edition.mjs'
+import { validateAfterfallS02Publication } from './check-afterfall-s02-publication.mjs'
 
 const root = resolve(import.meta.dirname, '..', '..')
 const normalizeEol = (text) => text.replace(/\r\n/g, '\n')
 const archiveNodeSource = await readFile(resolve(root, 'archive', 'web', 'src', 'archive', 'archiveData.ts'), 'utf8')
 const archiveNodeIds = new Set([...archiveNodeSource.matchAll(/id:\s*'([^']+)'/g)].map((match) => match[1]))
+await validateAfterfallS02Publication({ sourceRef: process.env.ARCHIVE_AFTERFALL_SOURCE_REF })
 for (const book of await makeBooks()) {
   const file = resolve(root, 'archive', 'content', 'stories', book.chronicleId, 'BOOK.json')
   const saved = await readFile(file, 'utf8')

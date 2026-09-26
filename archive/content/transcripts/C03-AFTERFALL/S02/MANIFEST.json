@@ -37,7 +37,15 @@
       "source_session_uuid": "4728081b-faa4-4d59-a461-2ac20239b751",
       "status": "PARTIAL",
       "capture_quality": "PARTIAL_CAPTURE_INCOMPLETE_PAIRING",
-      "verified_range": "2027-01-16 07:30 → 2027-01-16 09:28",
+      "session_range": {
+        "start": "2027-01-16 07:30",
+        "end": "2027-01-16 09:28"
+      },
+      "captured_message_range": {
+        "start": "2027-01-16 09:28",
+        "end": "2027-01-16 09:28"
+      },
+      "coverage_basis": "captured_message_range",
       "user_messages": 0,
       "gm_public_blocks": 1,
       "assistant_public_meta": 0,
@@ -52,7 +60,15 @@
       "source_session_uuid": "f43f1b72-5fc3-4188-926d-866d4e065adc",
       "status": "PARTIAL",
       "capture_quality": "PARTIAL_CAPTURE_INCOMPLETE_PAIRING",
-      "verified_range": "2027-01-16 09:28 → unknown",
+      "session_range": {
+        "start": "2027-01-16 09:28",
+        "end": null
+      },
+      "captured_message_range": {
+        "start": "2027-01-16 09:28",
+        "end": "2027-01-16 09:28"
+      },
+      "coverage_basis": "captured_message_range",
       "user_messages": 1,
       "gm_public_blocks": 0,
       "assistant_public_meta": 0,
@@ -67,12 +83,20 @@
       "source_session_uuid": "5998b89f-7151-4169-b132-5c316d15a252",
       "status": "PARTIAL",
       "capture_quality": "VERIFIED_CONTIGUOUS_TURN_PAIRS",
-      "verified_range": "2027-01-16 10:18 → 2027-01-21 18:10",
+      "session_range": {
+        "start": "2027-01-16 10:18",
+        "end": "2027-01-21 18:10"
+      },
+      "captured_message_range": {
+        "start": "2027-01-16 10:18",
+        "end": "2027-01-21 18:10"
+      },
+      "coverage_basis": "captured_message_range",
       "user_messages": 3,
       "gm_public_blocks": 3,
       "assistant_public_meta": 0,
       "atomic_pairing_complete": true,
-      "missing": "Only the exact Supabase rolling-capture span is verified; conversation outside stored rows is not inferred.",
+      "missing": "Only the exact stored Supabase capture span is verified; conversation outside stored rows is not inferred or reconstructed.",
       "source_index": "SESSION_005/SOURCE_INDEX.md",
       "source_manifest": "SESSION_005/SOURCE_MANIFEST.json"
     },
@@ -82,12 +106,20 @@
       "source_session_uuid": "5ec92846-b221-45fd-8889-643698c1b6e9",
       "status": "PARTIAL",
       "capture_quality": "VERIFIED_CONTIGUOUS_TURN_PAIRS",
-      "verified_range": "2027-01-21 18:10 → 2027-02-05 22:10",
+      "session_range": {
+        "start": "2027-01-21 18:10",
+        "end": "2027-02-05 22:10"
+      },
+      "captured_message_range": {
+        "start": "2027-01-21 18:10",
+        "end": "2027-02-05 22:10"
+      },
+      "coverage_basis": "captured_message_range",
       "user_messages": 17,
       "gm_public_blocks": 17,
       "assistant_public_meta": 0,
       "atomic_pairing_complete": true,
-      "missing": "Only the exact Supabase rolling-capture span is verified; conversation outside stored rows is not inferred.",
+      "missing": "Only the exact stored Supabase capture span is verified; conversation outside stored rows is not inferred or reconstructed.",
       "source_index": "SESSION_006/SOURCE_INDEX.md",
       "source_manifest": "SESSION_006/SOURCE_MANIFEST.json"
     },
@@ -97,12 +129,20 @@
       "source_session_uuid": "76cb43c7-f233-46a2-923f-d7a4a0c8e91b",
       "status": "PARTIAL",
       "capture_quality": "VERIFIED_CONTIGUOUS_TURN_PAIRS",
-      "verified_range": "2027-02-06 17:40 → 2027-02-07 13:40",
+      "session_range": {
+        "start": "2027-02-06 17:40",
+        "end": "2027-02-07 13:40"
+      },
+      "captured_message_range": {
+        "start": "2027-02-06 21:15",
+        "end": "2027-02-07 13:40"
+      },
+      "coverage_basis": "captured_message_range",
       "user_messages": 3,
       "gm_public_blocks": 3,
       "assistant_public_meta": 0,
       "atomic_pairing_complete": true,
-      "missing": "Capture is incomplete for at least one USER→GM pair; missing counterpart text is not reconstructed.",
+      "missing": "Only the exact stored Supabase capture span is verified; conversation outside stored rows is not inferred or reconstructed.",
       "source_index": "SESSION_007/SOURCE_INDEX.md",
       "source_manifest": "SESSION_007/SOURCE_MANIFEST.json"
     },
@@ -112,12 +152,20 @@
       "source_session_uuid": "6d7b61bd-31e1-4973-9fb3-b09ecd4f5531",
       "status": "PARTIAL",
       "capture_quality": "VERIFIED_CONTIGUOUS_TURN_PAIRS",
-      "verified_range": "2027-02-07 13:40 → 2027-02-07 13:40",
+      "session_range": {
+        "start": "2027-02-07 13:40",
+        "end": "2027-02-07 13:40"
+      },
+      "captured_message_range": {
+        "start": "2027-02-07 13:40",
+        "end": "2027-02-07 13:40"
+      },
+      "coverage_basis": "captured_message_range",
       "user_messages": 1,
       "gm_public_blocks": 1,
       "assistant_public_meta": 0,
       "atomic_pairing_complete": true,
-      "missing": "Capture is incomplete for at least one USER→GM pair; missing counterpart text is not reconstructed.",
+      "missing": "Only the exact stored Supabase capture span is verified; conversation outside stored rows is not inferred or reconstructed.",
       "source_index": "SESSION_008/SOURCE_INDEX.md",
       "source_manifest": "SESSION_008/SOURCE_MANIFEST.json"
     },
@@ -127,12 +175,20 @@
       "source_session_uuid": "53e2bcbf-ec73-4943-9a79-1239cf11f310",
       "status": "PARTIAL",
       "capture_quality": "VERIFIED_CONTIGUOUS_TURN_PAIRS",
-      "verified_range": "2027-02-07 13:40 → 2027-03-23 17:50",
+      "session_range": {
+        "start": "2027-02-07 13:40",
+        "end": "2027-03-23 17:50"
+      },
+      "captured_message_range": {
+        "start": "2027-02-07 13:40",
+        "end": "2027-03-23 17:50"
+      },
+      "coverage_basis": "captured_message_range",
       "user_messages": 10,
       "gm_public_blocks": 10,
       "assistant_public_meta": 0,
       "atomic_pairing_complete": true,
-      "missing": "Capture is incomplete for at least one USER→GM pair; missing counterpart text is not reconstructed.",
+      "missing": "Only the exact stored Supabase capture span is verified; conversation outside stored rows is not inferred or reconstructed.",
       "source_index": "SESSION_009/SOURCE_INDEX.md",
       "source_manifest": "SESSION_009/SOURCE_MANIFEST.json"
     }

@@ -39,6 +39,10 @@ describe('Chronicle-isolated public transcript catalog', () => {
       'SESSION_001', 'SESSION_002', 'SESSION_003', 'SESSION_004', 'SESSION_005',
       'SESSION_006', 'SESSION_007', 'SESSION_008', 'SESSION_009',
     ]))
+    expect(c03.find((part) => part.sessionId === 'SESSION_001' && part.number === 1)?.range).toBe('2026-11-22 industrial-fire response through archive-request cutoff')
+    expect(c03.find((part) => part.sessionId === 'SESSION_003')?.range).toBe('2027-01-16 09:28 → 2027-01-16 09:28')
+    expect(c03.find((part) => part.sessionId === 'SESSION_007')?.range).toBe('2027-02-06 21:15 → 2027-02-07 13:40')
+    expect(c03.filter((part) => ['SESSION_005', 'SESSION_006', 'SESSION_007', 'SESSION_008', 'SESSION_009'].includes(part.sessionId ?? '')).every((part) => part.status === 'verified_transcript')).toBe(true)
     expect(c03.filter((part) => part.status !== 'missing_transcript').every((part) => Boolean(part.content?.trim()))).toBe(true)
   })
 

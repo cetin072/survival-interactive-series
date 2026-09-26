@@ -4,12 +4,16 @@ on:
   pull_request:
     paths:
       - 'archive/web/**'
+      - 'archive/content/**'
+      - 'archive/scripts/**'
       - '.github/workflows/archive-web.yml'
   push:
     branches:
       - main
     paths:
       - 'archive/web/**'
+      - 'archive/content/**'
+      - 'archive/scripts/**'
       - '.github/workflows/archive-web.yml'
 
 jobs:
@@ -31,7 +35,11 @@ jobs:
         run: npm ci
       - name: Test
         run: npm test
+      - name: Fetch AFTERFALL source for RAW integrity comparison
+        run: git fetch origin worldline/afterfall-rpg:refs/remotes/origin/worldline/afterfall-rpg
       - name: Verify Reader publication
         run: npm run reader:check
+        env:
+          ARCHIVE_AFTERFALL_SOURCE_REF: origin/worldline/afterfall-rpg
       - name: Build
         run: npm run build
