@@ -26,14 +26,14 @@ import c03S01Part7 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03
 import c03S01Part8 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_008.md?raw'
 import c03S01Part9 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_009.md?raw'
 import c03S01Part10 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_010.md?raw'
-import c03S02Session1Part1 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_001/PART_001.md?raw'
-import c03S02Session1Part2 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_001/PART_002.md?raw'
-import c03S02Session1Part3 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_001/PART_003.md?raw'
-import c03S02Session1Part4 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_001/PART_004.md?raw'
-import c03S02Session2Part1 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_002/PART_001.md?raw'
-import c03S02Session2Part2 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_002/PART_002.md?raw'
-import c03S02Session2Part3 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_002/PART_003.md?raw'
-import c03S02Session2Part4 from '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_002/PART_004.md?raw'
+const c03S02Raw = import.meta.glob(
+  '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_*/PART_*.md',
+  { eager: true, query: '?raw', import: 'default' },
+) as Record<string, string>
+const c03S02Manifests = import.meta.glob(
+  '../../../content/transcripts/C03-AFTERFALL/S02/MANIFEST.json',
+  { eager: true, import: 'default' },
+) as Record<string, unknown>
 
 import { activeChronicle, chronicleRegistry, getChronicle, partitionChronicles, type Chronicle, type ChronicleId, type ChronicleTranscriptStatus } from './chronicleRegistry'
 export { activeChronicle, getChronicle, partitionChronicles, type Chronicle, type ChronicleId, type ChronicleTranscriptStatus }
@@ -62,6 +62,37 @@ export const chronicles = chronicleRegistry
 const c01 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' | 'relatedNodeIds'>): TranscriptPart => ({ ...part, ipId: 'survival-diary', chronicleId: 'C01-HAN-JUNHO', worldlineId: 'CANON-V2', relatedNodeIds: [] })
 const c02 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' | 'relatedNodeIds'>): TranscriptPart => ({ ...part, ipId: 'survival-diary', chronicleId: 'C02-STRONGHOLD', worldlineId: 'STRONGHOLD', relatedNodeIds: [] })
 const c03 = (part: Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' | 'relatedNodeIds'>): TranscriptPart => ({ ...part, ipId: 'survival-diary', chronicleId: 'C03-AFTERFALL', worldlineId: 'AFTERFALL', relatedNodeIds: [] })
+
+type C03S02Session = {
+  session_id: string
+  verified_range: string
+  capture_quality?: string
+}
+
+const c03S02Manifest = Object.values(c03S02Manifests)[0] as { sessions: C03S02Session[] }
+const c03S02Sessions = new Map(c03S02Manifest.sessions.map((session) => [session.session_id, session]))
+const c03S02TranscriptParts: TranscriptPart[] = Object.entries(c03S02Raw)
+  .sort(([left], [right]) => left.localeCompare(right))
+  .map(([path, content]) => {
+    const match = path.match(/S02\/(SESSION_\d{3})\/(PART_(\d{3})\.md)$/)
+    if (!match) throw new Error('Unexpected C03 S02 Archive transcript path: ' + path)
+    const [, sessionId, partFile, partNumber] = match
+    const session = c03S02Sessions.get(sessionId)
+    if (!session) throw new Error('C03 S02 Archive part has no manifest session: ' + path)
+    const incomplete = session.capture_quality === 'PARTIAL_CAPTURE_INCOMPLETE_PAIRING'
+    return c03({
+      id: `c03-s02-${sessionId.toLowerCase().replace(/_/g, '-')}-${partNumber}`,
+      seasonId: 'S02',
+      sessionId,
+      number: Number(partNumber),
+      title: `${sessionId} · PART ${partNumber}${incomplete ? ' · 불완전 캡처' : ''}`,
+      range: session.verified_range,
+      status: incomplete ? 'verified_fragment' : 'verified_transcript',
+      source: `worldlines/AFTERFALL/seasons/S02/raw_transcript/${sessionId}/${partFile}`,
+      sourceVerified: true,
+      content,
+    })
+  })
 
 
 type C02SessionCatalog = {
@@ -183,15 +214,8 @@ export const transcriptParts: TranscriptPart[] = [
   c03({ id: 'c03-s01-009', seasonId: 'S01', number: 9, title: '시즌 종료 저장', range: '시즌 종료 저장 요청 → 공개 저장 진행 업데이트', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_009.md', sourceVerified: true, content: c03S01Part9 }),
   c03({ id: 'c03-s01-010', seasonId: 'S01', number: 10, title: '저장 완료 공개 보고', range: '시즌 종료 저장 완료 공개 보고', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_010.md', sourceVerified: true, content: c03S01Part10 }),
   c03({ id: 'c03-s02-session-001-gap', seasonId: 'S02', sessionId: 'SESSION_001', number: 0, title: '세션 001 직접 확인 전 구간', range: '2026-11-22 industrial-fire response 이전', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/SOURCE_INDEX.md', sourceVerified: true }),
-  c03({ id: 'c03-s02-session-001-001', seasonId: 'S02', sessionId: 'SESSION_001', number: 1, title: '세션 001 · PART 001', range: '2026-11-22 industrial-fire response 이후', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_001.md', sourceVerified: true, content: c03S02Session1Part1 }),
-  c03({ id: 'c03-s02-session-001-002', seasonId: 'S02', sessionId: 'SESSION_001', number: 2, title: '세션 001 · PART 002', range: 'SESSION_001 · 직접 검증된 공개 원문', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_002.md', sourceVerified: true, content: c03S02Session1Part2 }),
-  c03({ id: 'c03-s02-session-001-003', seasonId: 'S02', sessionId: 'SESSION_001', number: 3, title: '세션 001 · PART 003', range: 'SESSION_001 · 직접 검증된 공개 원문', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_003.md', sourceVerified: true, content: c03S02Session1Part3 }),
-  c03({ id: 'c03-s02-session-001-004', seasonId: 'S02', sessionId: 'SESSION_001', number: 4, title: '세션 001 · PART 004', range: 'archive-request cutoff 직전', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_004.md', sourceVerified: true, content: c03S02Session1Part4 }),
   c03({ id: 'c03-s02-session-002-gap', seasonId: 'S02', sessionId: 'SESSION_002', number: 0, title: '세션 002 직접 확인 전 구간', range: '2027-01-04 first-winter discussion 이전', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/SOURCE_INDEX.md', sourceVerified: true }),
-  c03({ id: 'c03-s02-session-002-001', seasonId: 'S02', sessionId: 'SESSION_002', number: 1, title: '세션 002 · PART 001', range: '2027-01-04 first-winter discussion 이후', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/PART_001.md', sourceVerified: true, content: c03S02Session2Part1 }),
-  c03({ id: 'c03-s02-session-002-002', seasonId: 'S02', sessionId: 'SESSION_002', number: 2, title: '세션 002 · PART 002', range: 'SESSION_002 · 직접 검증된 공개 원문', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/PART_002.md', sourceVerified: true, content: c03S02Session2Part2 }),
-  c03({ id: 'c03-s02-session-002-003', seasonId: 'S02', sessionId: 'SESSION_002', number: 3, title: '세션 002 · PART 003', range: 'SESSION_002 · 직접 검증된 공개 원문', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/PART_003.md', sourceVerified: true, content: c03S02Session2Part3 }),
-  c03({ id: 'c03-s02-session-002-004', seasonId: 'S02', sessionId: 'SESSION_002', number: 4, title: '세션 002 · PART 004', range: 'archive-request cutoff 직전', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/PART_004.md', sourceVerified: true, content: c03S02Session2Part4 }),
+  ...c03S02TranscriptParts,
 ]
 
 export function transcriptPartsFor(chronicleId: ChronicleId) { return transcriptParts.filter((part) => part.chronicleId === chronicleId) }

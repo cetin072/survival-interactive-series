@@ -1,0 +1,70 @@
+{
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "protagonist": "서진우",
+  "season_id": "S02",
+  "session_id": "SESSION_007",
+  "source_type": "SUPABASE_ROLLING_RAW",
+  "source_session_uuid": "76cb43c7-f233-46a2-923f-d7a4a0c8e91b",
+  "source_tables": [
+    "survival_rpg.transcript_sessions",
+    "survival_rpg.transcript_messages"
+  ],
+  "status": "PARTIAL",
+  "capture_quality": "VERIFIED_CONTIGUOUS_TURN_PAIRS",
+  "public_safe_only": true,
+  "opened_at": "2026-09-25 15:15:39.771911+00",
+  "closed_at": "2026-09-25 16:04:28.824768+00",
+  "starting_game_time": "2027-02-06 17:40",
+  "closing_game_time": "2027-02-07 13:40",
+  "starting_save_version": 238,
+  "closing_save_version": 243,
+  "starting_scene_id": "S02_THIRD_HUB_SLEEP_AND_BAEGUN_OUTFLOW",
+  "closing_scene_id": "S02_SECURITY_LAYER_MAP_AND_OPS_SITE_REVIEW",
+  "counts": {
+    "user": 3,
+    "gm": 3,
+    "total": 6
+  },
+  "message_order": {
+    "min": 0,
+    "max": 5,
+    "contiguous": true
+  },
+  "atomic_pairing_complete": true,
+  "parts": [
+    "PART_001.md"
+  ],
+  "content_sha256": [
+    {
+      "message_order": 0,
+      "role": "USER",
+      "sha256": "b66b729a7f8bcdaa1ff8043c1fa6935f7d7d86143377315afd440f24e43df61b"
+    },
+    {
+      "message_order": 1,
+      "role": "GM",
+      "sha256": "a8a73be8e93e7ba379d5e7546c7b1fe1b113e0878e2efeb7c52566fa33c9a49d"
+    },
+    {
+      "message_order": 2,
+      "role": "USER",
+      "sha256": "0fe149475fd682c39491dbbc5ea1731a56f2f4b7fabb5ea24229f47ed8c27d81"
+    },
+    {
+      "message_order": 3,
+      "role": "GM",
+      "sha256": "c809b99765974552fb45909713e691bb95138b60d4f70790f5f675c3beca0ad4"
+    },
+    {
+      "message_order": 4,
+      "role": "USER",
+      "sha256": "62f27d44bf9d6892cdb7781977660a8423591945afd79231a8de49b3ed889d91"
+    },
+    {
+      "message_order": 5,
+      "role": "GM",
+      "sha256": "e7a522f968aa011189dfb8040806d1c3580a1742c821e93537564b7cb49e796e"
+    }
+  ]
+}

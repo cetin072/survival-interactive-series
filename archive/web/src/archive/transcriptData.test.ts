@@ -23,20 +23,22 @@ describe('Chronicle-isolated public transcript catalog', () => {
   it('publishes only verified C03 raw while retaining every known gap and session boundary', () => {
     expect(activeChronicle).toMatchObject({ id: 'C03-AFTERFALL', active: true, transcriptStatus: 'partial' })
     const c03 = transcriptPartsFor('C03-AFTERFALL')
-    expect(c03).toHaveLength(21)
-    expect(c03.filter((part) => part.status === 'verified_transcript')).toHaveLength(17)
+    expect(c03).toHaveLength(31)
+    expect(c03.filter((part) => part.status === 'verified_transcript')).toHaveLength(25)
     expect(c03.filter((part) => part.status === 'verified_fragment')).toMatchObject([
       { id: 'c03-s01-008', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_008.md' },
+      { sessionId: 'SESSION_003', status: 'verified_fragment' },
+      { sessionId: 'SESSION_004', status: 'verified_fragment' },
     ])
     expect(c03.filter((part) => part.status === 'missing_transcript').map((part) => part.id)).toEqual([
       'c03-s01-missing-before',
       'c03-s02-session-001-gap',
       'c03-s02-session-002-gap',
     ])
-    expect(c03.filter((part) => part.seasonId === 'S02').map((part) => part.sessionId)).toEqual([
-      'SESSION_001', 'SESSION_001', 'SESSION_001', 'SESSION_001', 'SESSION_001',
-      'SESSION_002', 'SESSION_002', 'SESSION_002', 'SESSION_002', 'SESSION_002',
-    ])
+    expect(new Set(c03.filter((part) => part.seasonId === 'S02').map((part) => part.sessionId))).toEqual(new Set([
+      'SESSION_001', 'SESSION_002', 'SESSION_003', 'SESSION_004', 'SESSION_005',
+      'SESSION_006', 'SESSION_007', 'SESSION_008', 'SESSION_009',
+    ]))
     expect(c03.filter((part) => part.status !== 'missing_transcript').every((part) => Boolean(part.content?.trim()))).toBe(true)
   })
 

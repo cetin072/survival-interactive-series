@@ -1,0 +1,47 @@
+{
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "protagonist": "서진우",
+  "season_id": "S02",
+  "session_id": "SESSION_004",
+  "source_type": "SUPABASE_ROLLING_RAW",
+  "source_session_uuid": "f43f1b72-5fc3-4188-926d-866d4e065adc",
+  "source_tables": [
+    "survival_rpg.transcript_sessions",
+    "survival_rpg.transcript_messages"
+  ],
+  "status": "PARTIAL",
+  "capture_quality": "PARTIAL_CAPTURE_INCOMPLETE_PAIRING",
+  "public_safe_only": true,
+  "opened_at": "2026-09-25 04:51:57.609939+00",
+  "closed_at": "2026-09-25 04:54:38.116016+00",
+  "starting_game_time": "2027-01-16 09:28",
+  "closing_game_time": null,
+  "starting_save_version": 216,
+  "closing_save_version": 217,
+  "starting_scene_id": "S02_NORTH_ROUTE_MIGRATION_RECONFIGURATION",
+  "closing_scene_id": "S02_REGIONAL_NETWORK_BUFFER",
+  "counts": {
+    "user": 1,
+    "gm": 0,
+    "assistant_public_meta": 0,
+    "total": 1
+  },
+  "message_order": {
+    "min": 0,
+    "max": 0,
+    "contiguous": true
+  },
+  "atomic_pairing_complete": false,
+  "parts": [
+    "PART_001.md"
+  ],
+  "content_sha256": [
+    {
+      "message_order": 0,
+      "role": "USER",
+      "sha256": "ee70e31980745cf2df1eb706985fda02e39cd321db2230ce710c9b7911d1bc31"
+    }
+  ],
+  "source_policy": "Only public_safe rows already stored by trusted rolling RAW capture. No reconstruction from Canon, checkpoint, summary, memory, hidden state, private reasoning, or tool output."
+}

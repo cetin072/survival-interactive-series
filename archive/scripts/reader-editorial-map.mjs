@@ -69,5 +69,13 @@ export const editorialPlan = {
     { title: '공공대피시설', seasonId: 'S02', arcLabel: '화재선과 첫겨울', dateLabel: 'S02', sources: [source(c03s2('SESSION_002', 2))], relatedNodeIds: ['char-jinwoo', 'char-hajin', 'loc-shelter', 'event-shelter'] },
     { title: '일곱 명의 원칙', seasonId: 'S02', arcLabel: '화재선과 첫겨울', dateLabel: 'S02', sources: [source(c03s2('SESSION_002', 3))], relatedNodeIds: ['char-jinwoo', 'loc-nw-center'] },
     { title: '외곽 주민복지관', seasonId: 'S02', arcLabel: '화재선과 첫겨울', dateLabel: 'S02', sources: [source(c03s2('SESSION_002', 4))], relatedNodeIds: ['char-jinwoo', 'char-hajin', 'char-hayoung', 'char-yujin', 'loc-shelter'] },
+    { title: '복지관의 두 축', seasonId: 'S02', arcLabel: '겨울 생활망', dateLabel: '2027-01', sources: [source(c03s2('SESSION_005', 1))], relatedNodeIds: ['char-jinwoo', 'char-hajin', 'char-hayoung'] },
+    { title: '연료장과 길의 규칙', seasonId: 'S02', arcLabel: '겨울 생활망', dateLabel: '2027-01', sources: [source(c03s2('SESSION_006', 1))], relatedNodeIds: ['char-jinwoo', 'loc-bridge', 'loc-west-road'] },
+    { title: '열세 사람의 밤', seasonId: 'S02', arcLabel: '대혹한', dateLabel: '2027-01', sources: [source(c03s2('SESSION_006', 2))], relatedNodeIds: ['char-jinwoo', 'char-hajin'] },
+    { title: '얼어붙은 관정', seasonId: 'S02', arcLabel: '대혹한', dateLabel: '2027-02', sources: [source(c03s2('SESSION_006', 3))], relatedNodeIds: ['char-jinwoo', 'char-taehoon', 'loc-agri'] },
+    { title: '백운 밖의 잠자리', seasonId: 'S02', arcLabel: '대혹한', dateLabel: '2027-02', sources: [source(c03s2('SESSION_007', 1))], relatedNodeIds: ['char-hayoung', 'char-yujin', 'loc-baekun'] },
+    { title: '다섯 거점의 선택', seasonId: 'S02', arcLabel: '거점 재편', dateLabel: '2027-02', sources: [source(c03s2('SESSION_008', 1))], relatedNodeIds: ['char-jinwoo', 'char-eunchae', 'char-taehoon'] },
+    { title: '체육시설의 낮', seasonId: 'S02', arcLabel: '거점 재편', dateLabel: '2027-03', sources: [source(c03s2('SESSION_009', 1))], relatedNodeIds: ['char-jinwoo', 'char-seojin', 'char-eunchae', 'char-taehoon'] },
+    { title: '동천교 바깥의 차량들', seasonId: 'S02', arcLabel: '봄 전환', dateLabel: '2027-03-23', sources: [source(c03s2('SESSION_009', 2))], relatedNodeIds: ['char-jinwoo', 'loc-bridge'] },
   ],
 }
