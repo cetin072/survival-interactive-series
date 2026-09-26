@@ -6,7 +6,7 @@ import { resolve, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { prepareVisualPublication } from './run-visual-publication.mjs'
 import { snapshotFromPublishedS02 } from './dry-run-publication.mjs'
-import { planVisualSelection, visualByteHash } from './lib/visual-compiler.mjs'
+import { legacyPublicAppearance, planVisualSelection, visualByteHash } from './lib/visual-compiler.mjs'
 import { POLICY } from './lib/publication-plan.mjs'
 import { characterAppearanceByNodeId } from '../web/src/archive/characterAppearance.ts'
 
@@ -22,11 +22,26 @@ assert.equal(initial.report.by_type.LOCATION, 10)
 assert.equal(initial.report.by_type.MAP, 0)
 assert.equal(initial.report.skipped, 4)
 const portraits = initial.catalog.points.filter((p) => p.point_type === 'CHARACTER')
-assert.equal(portraits.filter((p) => p.status === 'READY').length, 12)
-assert.equal(portraits.filter((p) => p.status === 'WAITING_CANON').length, 6)
+// The explicit #140 completion changed the published baseline, not the compiler's readiness gate.
+assert.equal(portraits.filter((p) => p.status === 'READY').length, 18)
+assert.equal(portraits.filter((p) => p.status === 'WAITING_CANON').length, 0)
 for (const p of portraits.filter((p) => p.status === 'READY')) {
   const appearance = characterAppearanceByNodeId[p.subject_id]
   for (const [key, value] of Object.entries(p.brief.canon_facts.appearance)) assert.deepEqual(value, appearance.visual[key])
+  assert.equal(Object.hasOwn(p.brief.canon_facts.appearance, 'voice'), false)
+  assert.equal(Object.hasOwn(p.brief, 'provenance'), false)
+}
+assert.equal(portraits.find((p) => p.subject_id === 'char-hajin').brief.canon_facts.appearance.gender, '여성')
+assert.equal(portraits.find((p) => p.subject_id === 'char-jisu').brief.canon_facts.appearance.height, '168cm쯤')
+for (const mutate of [
+  (p) => { p.hidden_state = 'not permitted' },
+  (p) => { p.origin = 'UNAPPROVED' },
+  (p) => { p.newFields = ['unknown_hidden_field'] },
+  (p) => { p.recoveredFields = [...p.recoveredFields, p.newFields[0]] },
+]) {
+  const bad = structuredClone(characterAppearanceByNodeId)
+  mutate(bad['char-hajin'].provenance)
+  assert.throws(() => legacyPublicAppearance(bad, 'a'.repeat(64)))
 }
 assert.equal(initial.report.selection.selected_point_ids.length, 3)
 assert.equal(initial.report.selection.execution_enabled, false)
