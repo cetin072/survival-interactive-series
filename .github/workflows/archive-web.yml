@@ -57,8 +57,12 @@ jobs:
         run: node --experimental-strip-types ../scripts/prepare-image-poc.mjs --check
       - name: Test read-only archive stage accounting
         run: node --test ../scripts/lib/archive-orchestration.test.mjs
+      - name: Test bounded image attempt ledger planning
+        run: node --test ../scripts/lib/attempt-ledger.test.mjs
       - name: Verify real public Reader to graph to visual dry-run
         run: node --experimental-strip-types ../scripts/check-archive-pipeline.mjs --demo-s02 --check
+      - name: Verify pinned S02 attempt ledger without execution
+        run: node --experimental-strip-types ../scripts/check-archive-pipeline.mjs --demo-s02 --ledger ../content/visuals/C03-AFTERFALL/ATTEMPTS_S02.json --check
       - name: Install
         run: npm ci
       - name: Test

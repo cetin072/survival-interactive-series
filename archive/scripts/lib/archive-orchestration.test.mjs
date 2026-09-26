@@ -32,3 +32,14 @@ test('mismatched batch or an execution flag cannot be reported as a dry-run', ()
   assert.throws(() => assembleArchiveRun({ reader: reader(), graph: graph(), visual: { ...visual(), provider_calls: 1 } }))
   assert.throws(() => assembleArchiveRun({ reader: { ...reader(), files_written: 1 } }))
 })
+test('a validated ledger plan replaces raw candidates but never authorizes execution', () => {
+  const attemptPlan = { mode: 'LEDGER_PLAN_ONLY', catalog_sha256: 'd'.repeat(64),
+    selected_point_ids: ['point-after-reservation'], reserved: 1, failed: 0,
+    quarantined: 0, retry_exhausted: 0, execution_enabled: false,
+    provider_calls: 0, images_generated: 0, storage_uploads: 0 }
+  const result = assembleArchiveRun({ reader: reader(), graph: graph(), visual: visual(), attemptPlan })
+  assert.deepEqual(result.selected_point_ids, ['point-after-reservation'])
+  assert.equal(result.attempt_ledger.status, 'VALIDATED_LOCAL_PLAN')
+  assert.throws(() => assembleArchiveRun({ reader: reader(), graph: graph(), visual: visual(),
+    attemptPlan: { ...attemptPlan, provider_calls: 1 } }), /ATTEMPT_LEDGER_EXECUTION_NOT_DISABLED/)
+})
