@@ -101,7 +101,7 @@
       "user_messages": 3,
       "gm_public_blocks": 3,
       "assistant_public_meta": 0,
-      "atomic_pairing_complete": false,
+      "atomic_pairing_complete": true,
       "missing": "Capture is incomplete for at least one USER→GM pair; missing counterpart text is not reconstructed.",
       "source_index": "SESSION_007/SOURCE_INDEX.md",
       "source_manifest": "SESSION_007/SOURCE_MANIFEST.json"
@@ -116,7 +116,7 @@
       "user_messages": 1,
       "gm_public_blocks": 1,
       "assistant_public_meta": 0,
-      "atomic_pairing_complete": false,
+      "atomic_pairing_complete": true,
       "missing": "Capture is incomplete for at least one USER→GM pair; missing counterpart text is not reconstructed.",
       "source_index": "SESSION_008/SOURCE_INDEX.md",
       "source_manifest": "SESSION_008/SOURCE_MANIFEST.json"
@@ -131,7 +131,7 @@
       "user_messages": 10,
       "gm_public_blocks": 10,
       "assistant_public_meta": 0,
-      "atomic_pairing_complete": false,
+      "atomic_pairing_complete": true,
       "missing": "Capture is incomplete for at least one USER→GM pair; missing counterpart text is not reconstructed.",
       "source_index": "SESSION_009/SOURCE_INDEX.md",
       "source_manifest": "SESSION_009/SOURCE_MANIFEST.json"

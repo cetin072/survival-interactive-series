@@ -6,6 +6,10 @@
   "session_id": "SESSION_008",
   "source_type": "SUPABASE_ROLLING_RAW",
   "source_session_uuid": "6d7b61bd-31e1-4973-9fb3-b09ecd4f5531",
+  "source_tables": [
+    "survival_rpg.transcript_sessions",
+    "survival_rpg.transcript_messages"
+  ],
   "status": "PARTIAL",
   "capture_quality": "VERIFIED_CONTIGUOUS_TURN_PAIRS",
   "public_safe_only": true,
@@ -22,6 +26,12 @@
     "gm": 1,
     "total": 2
   },
+  "message_order": {
+    "min": 0,
+    "max": 1,
+    "contiguous": true
+  },
+  "atomic_pairing_complete": true,
   "parts": [
     "PART_001.md"
   ],
