@@ -120,6 +120,8 @@ jobs:
         run: node --experimental-strip-types ../scripts/check-graph-batch.mjs
       - name: Verify one-snapshot Reader Graph Visual preparation
         run: node --experimental-strip-types --test ../scripts/prepare-unified-publication.test.mjs
+      - name: Verify atomic local unified edition proposal and replay
+        run: node --experimental-strip-types ../scripts/check-unified-ref.mjs
       - name: Test visual candidate and brief compiler
         run: node --test ../scripts/lib/visual-compiler.test.mjs
       - name: Verify public appearance-to-brief and isolated visual catalog integration
