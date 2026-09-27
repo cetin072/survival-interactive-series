@@ -28,6 +28,7 @@ const assets = [
 for (const [key, entry] of Object.entries(bundlerManifest)) {
   if (!key.includes('/content/stories/') || !key.includes('BOOK.json')) continue
   const bytes = await readFile(resolve(distRoot, entry.file))
+  demand(!bytes.includes(0x0d), 'NONCANONICAL_BOOK_LINE_ENDINGS')
   const book = JSON.parse(bytes.toString('utf8'))
   demand(['C01-HAN-JUNHO', 'C02-STRONGHOLD', 'C03-AFTERFALL'].includes(book.chronicleId), 'UNKNOWN_BOOK_CHRONICLE')
   assets.push({ kind: 'book', chronicle_id: book.chronicleId, path: entry.file, sha256: hash(bytes), byte_length: bytes.byteLength })
