@@ -88,8 +88,8 @@ export function sealPublicationSegment(input) {
     demand(outcome.outcome === 'NO_STATE_CHANGE'
       ? outcome.user_save_version === outcome.gm_save_version
       : outcome.gm_save_version > outcome.user_save_version, 'TURN_OUTCOME_VERSION_CONFLICT')
-    demand(previousGmSaveVersion === null || outcome.user_save_version >= previousGmSaveVersion,
-      'CROSS_TURN_SAVE_VERSION_ROLLBACK')
+    demand(previousGmSaveVersion === null || outcome.user_save_version === previousGmSaveVersion,
+      'CROSS_TURN_SAVE_VERSION_DISCONTINUITY')
     previousGmSaveVersion = outcome.gm_save_version
   }
 
