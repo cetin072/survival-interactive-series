@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MIGRATION = ROOT / "supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql"
 CONTINUITY_MIGRATION = ROOT / "supabase/migrations/20260927042720_afterfall_turn_state_continuity_v1.sql"
 INTEGRITY_MIGRATION = ROOT / "supabase/migrations/20260927103011_afterfall_turn_link_message_integrity_v1.sql"
-LIVE_LINK_REQUIRED_MIGRATION = ROOT / "supabase/migrations/20260928000500_afterfall_live_link_required_v1.sql"
+LIVE_LINK_REQUIRED_MIGRATION = ROOT / "supabase/migrations/20260927154303_afterfall_live_link_required_v1.sql"
 
 
 class TurnStateLinkMigrationTests(unittest.TestCase):
