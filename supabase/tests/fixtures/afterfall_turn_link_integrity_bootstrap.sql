@@ -59,3 +59,4 @@ grant usage on schema survival_rpg to service_role;
 grant select on survival_rpg.saves, survival_rpg.transcript_sessions,
   survival_rpg.transcript_messages to service_role;
 grant update on survival_rpg.saves to service_role;
+grant select, insert on survival_rpg.transcript_turn_state_links to service_role;
