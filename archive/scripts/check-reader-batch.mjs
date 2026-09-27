@@ -58,6 +58,26 @@ try {
   assert.equal(derived.reader_status, 'READY_TO_UPDATE_LOCAL_BOOK')
   assert.equal(derived.added_chapters, 1)
   assert.equal(derived.source_save_version, 999)
+  const fixtureHead = command('git', ['rev-parse', 'HEAD'], copy).trim()
+  const proposalRef = 'refs/heads/codex/archive-publication-reader-test'
+  command('git', ['branch', 'codex/archive-publication-reader-test', fixtureHead], copy)
+  const proposalScript = `import { readFileSync } from 'node:fs';
+import { commitReaderBookProposal } from './archive/scripts/lib/atomic-reader-book-git.mjs';
+const snapshot = JSON.parse(readFileSync(process.argv[1], 'utf8'));
+const result = await commitReaderBookProposal(snapshot, {
+  repoRoot: process.cwd(), ref: '${proposalRef}',
+  authorizeCommit: async () => true,
+});
+process.stdout.write(JSON.stringify(result));`
+  const originalBook = await readFile(resolve(copy, 'archive/content/stories/C03-AFTERFALL/BOOK.json'))
+  const proposal = JSON.parse(command('node', ['--input-type=module', '-e', proposalScript, snapshotFile], copy))
+  assert.equal(proposal.status, 'LOCAL_READER_PROPOSAL_COMMITTED')
+  assert.equal(proposal.added_chapters, 1)
+  assert.equal(proposal.checkout_files_written, 0)
+  assert.equal(command('git', ['rev-parse', 'HEAD'], copy).trim(), fixtureHead)
+  assert.equal(command('git', ['rev-parse', proposalRef], copy).trim(), proposal.commit)
+  assert.deepEqual(await readFile(resolve(copy, 'archive/content/stories/C03-AFTERFALL/BOOK.json')), originalBook)
+  assert.throws(() => command('node', ['--input-type=module', '-e', proposalScript, snapshotFile], copy))
   const args = ['archive/scripts/run-reader-publication.mjs', '--snapshot', snapshotFile, '--apply']
   const updated = JSON.parse(command('node', args, copy))
   assert.equal(updated.reader_status, 'UPDATED_LOCAL_BOOK')
@@ -65,6 +85,7 @@ try {
   assert.equal(updated.files_written, 1)
   const bookFile = resolve(copy, 'archive/content/stories/C03-AFTERFALL/BOOK.json')
   const changedBook = await readFile(bookFile, 'utf8')
+  assert.equal(command('git', ['show', `${proposal.commit}:archive/content/stories/C03-AFTERFALL/BOOK.json`], copy), changedBook)
   const parsed = JSON.parse(changedBook)
   assert.deepEqual(parsed.chapters.slice(0, -1), books.find((b) => b.chronicleId === 'C03-AFTERFALL').chapters)
   assert.equal(parsed.chapters.at(-1).body, '## 2099년 1월 1일 10:00\n\nTEST_GM_PROSE')
@@ -83,5 +104,5 @@ try {
   await writeFile(resolve(copy, relative, 'PART_001.md'), raw + '\nCORRUPTED\n')
   assert.throws(() => command('node', args, copy))
   assert.equal(await readFile(bookFile, 'utf8'), changedBook)
-  console.log(JSON.stringify({ real_books_unchanged: books.map((b) => ({ chronicle: b.chronicleId, chapters: b.chapters.length })), real_s02_reader_batch: report, historical_batch_after_newer_publication: 'PASS', synthetic_append: 'PASS', synthetic_repeat_noop: 'PASS', corrupted_source_retains_book: 'PASS' }))
+  console.log(JSON.stringify({ real_books_unchanged: books.map((b) => ({ chronicle: b.chronicleId, chapters: b.chapters.length })), real_s02_reader_batch: report, historical_batch_after_newer_publication: 'PASS', synthetic_local_git_proposal: 'PASS', synthetic_append: 'PASS', synthetic_repeat_noop: 'PASS', corrupted_source_retains_book: 'PASS' }))
 } finally { await rm(temporary, { recursive: true, force: true }) }
