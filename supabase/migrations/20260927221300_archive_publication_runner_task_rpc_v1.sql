@@ -5,9 +5,9 @@ begin;
 do $$
 begin
   if not exists (
-    select 1 from pg_authid
+    select 1 from pg_roles
      where rolname = 'archive_publication_runner'
-       and rolcanlogin and rolpassword is null and not rolsuper
+       and rolcanlogin and not rolsuper
        and not rolinherit and not rolbypassrls
        and not rolcreatedb and not rolcreaterole
   ) or exists (
