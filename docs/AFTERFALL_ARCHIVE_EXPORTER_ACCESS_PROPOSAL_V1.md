@@ -28,3 +28,53 @@ These policies restrict the source reader; they cannot confer publication approv
 4. Obtain separate approval for any standing public-text policy and for publication. A successful restricted read changes neither the Source Manifest nor the site.
 
 No role or policy is created by this document. Applying the security boundary needs the project owner's approval under `AGENTS.md`; the subsequent migration and staging evidence should be reviewed before any production activation.
+
+## Proposed SQL for migration review (do not execute from this document)
+
+The deployed staging catalog was inspected read-only on 2026-09-27: the three source tables have RLS enabled and forced, have no SELECT policies, and `archive_exporter` does not exist. A read-only `EXPLAIN` parsed the message/link visibility expression without reading any bodies. The link table comes from the separate #148 branch; its migration must be integrated before this SQL can become a migration. Database name, default privileges, callable functions, and pooler login behavior must be reviewed at application time. This proposal is intentionally outside `supabase/migrations`.
+
+```sql
+create role archive_exporter login nosuperuser noinherit nocreatedb
+  nocreaterole noreplication nobypassrls password null;
+alter role archive_exporter set default_transaction_read_only = on;
+alter role archive_exporter set statement_timeout = '10s';
+alter role archive_exporter set search_path = pg_catalog, survival_rpg;
+
+grant connect on database postgres to archive_exporter;
+grant usage on schema survival_rpg to archive_exporter;
+grant select (id, worldline_id, chronicle_id, season_id, status,
+  last_message_order)
+  on survival_rpg.transcript_sessions to archive_exporter;
+grant select (id, idempotency_key, worldline_id, chronicle_id, season_id,
+  session_id, turn_no, message_order, role, content, content_sha256,
+  save_version, public_safe, source_type, game_time)
+  on survival_rpg.transcript_messages to archive_exporter;
+grant select (worldline_id, chronicle_id, season_id, session_id, turn_no,
+  user_message_id, gm_message_id, outcome, user_save_version,
+  gm_save_version, linked_save_version)
+  on survival_rpg.transcript_turn_state_links to archive_exporter;
+
+create policy archive_exporter_read_sessions
+  on survival_rpg.transcript_sessions for select to archive_exporter
+  using (worldline_id = 'AFTERFALL' and chronicle_id = 'C03');
+create policy archive_exporter_read_links
+  on survival_rpg.transcript_turn_state_links for select to archive_exporter
+  using (worldline_id = 'AFTERFALL' and chronicle_id = 'C03');
+create policy archive_exporter_read_messages
+  on survival_rpg.transcript_messages for select to archive_exporter
+  using (
+    worldline_id = 'AFTERFALL' and chronicle_id = 'C03'
+    and public_safe is true
+    and exists (
+      select 1 from survival_rpg.transcript_turn_state_links as l
+      where l.worldline_id = transcript_messages.worldline_id
+        and l.chronicle_id = transcript_messages.chronicle_id
+        and l.season_id = transcript_messages.season_id
+        and l.session_id = transcript_messages.session_id
+        and (l.user_message_id = transcript_messages.id
+          or l.gm_message_id = transcript_messages.id)
+    )
+  );
+```
+
+The SQL gives the private exporter read access to linked source rows, **not** public visibility. The final migration needs a privilege audit for permissions inherited from `PUBLIC` and callable `SECURITY DEFINER` functions as well as a rollback plan. In staging, test the policies with the dedicated login, including negative cases, before provisioning a production secret. No password is embedded in this proposal.
