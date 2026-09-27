@@ -253,6 +253,34 @@ process.stdout.write(JSON.stringify(result));`
   assert.ok(afterReservation.requests.every((item) => item.request_id !== reserved.request_id))
   assert.throws(() => command('node', reserveArgs, copy))
   assert.equal(command('git', ['rev-parse', driverRef], copy).trim(), reserved.commit)
+  const closeRef = 'refs/heads/codex/archive-publication-close-test'
+  command('git', ['branch', 'codex/archive-publication-close-test', reserved.commit], copy)
+  const closeScript = (state, attemptId, authorized = true) =>
+    `import { commitAttemptTerminalFromPublicRef } from './archive/scripts/lib/attempt-public-ref.mjs';
+const result = await commitAttemptTerminalFromPublicRef({ repoRoot: process.cwd(),
+  ref: '${closeRef}', seasonId: 'S99', checkpointRef: '${checkpointRef}',
+  attemptId: '${attemptId}', state: '${state}',
+  evidenceRef: 'docs/AUTOMATIC_ARCHIVE_STEP6_OBSERVATIONS.json',
+  ${authorized ? 'authorizeCommit: async () => true' : ''} });
+process.stdout.write(JSON.stringify(result));`
+  const closeArgs = (script) => ['--experimental-strip-types', '--input-type=module', '-e', script]
+  assert.throws(() => command('node', closeArgs(closeScript('ACCEPTED', reserved.attempt_id)), copy))
+  assert.throws(() => command('node', closeArgs(closeScript('QUARANTINED', reserved.attempt_id, false)), copy))
+  assert.throws(() => command('node', closeArgs(closeScript('QUARANTINED', `attempt-${sha('UNKNOWN')}`)), copy))
+  assert.equal(command('git', ['rev-parse', closeRef], copy).trim(), reserved.commit)
+  const closed = JSON.parse(command('node', closeArgs(closeScript('QUARANTINED', reserved.attempt_id)), copy))
+  assert.equal(closed.status, 'LOCAL_IMAGE_ATTEMPT_CLOSED_NO_ASSET')
+  assert.equal(closed.state, 'QUARANTINED')
+  assert.equal(closed.provider_calls, 0)
+  assert.throws(() => command('node', closeArgs(closeScript('FAILED', reserved.attempt_id)), copy))
+  assert.equal(command('git', ['rev-parse', closeRef], copy).trim(), closed.commit)
+  const closedJournal = JSON.parse(command('git', ['show', `${closed.commit}:${closed.journal_path}`], copy))
+  assert.deepEqual(closedJournal.events.map((event) => event.state), ['RESERVED', 'QUARANTINED'])
+  const closedRequestScript = driverRequestScript.replaceAll(driverRef, closeRef)
+  const afterClosure = JSON.parse(command('node', closeArgs(closedRequestScript), copy))
+  assert.equal(afterClosure.attempt_plan.quarantined, 1)
+  assert.equal(afterClosure.attempt_plan.reserved, 0)
+  assert.ok(afterClosure.requests.some((item) => item.point_id === reserved.point_id))
   const resumedAfterReservation = JSON.parse(command('node', [
     '--experimental-strip-types', '--input-type=module', '-e', driverScript(true)], copy))
   assert.deepEqual(resumedAfterReservation.stages_advanced, [])

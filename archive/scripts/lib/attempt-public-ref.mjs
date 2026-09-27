@@ -93,3 +93,51 @@ export async function commitAttemptReservationFromPublicRef(options = {}) {
     database_writes: 0, storage_uploads: 0, site_publications: 0,
     zero_added_cost_proven: false }
 }
+
+/** Close a reserved local proposal after an external observation, without accepting an asset. */
+export async function commitAttemptTerminalFromPublicRef(options = {}) {
+  demand(typeof options.authorizeCommit === 'function',
+    'ATTEMPT_TERMINAL_COMMIT_DISABLED')
+  demand(options.attemptLedger === undefined && options.dailyHistory == null,
+    'EXTERNAL_ATTEMPT_HISTORY_NOT_ALLOWED_FOR_COMMIT')
+  demand(['FAILED', 'QUARANTINED'].includes(options.state),
+    'ATTEMPT_TERMINAL_STATE_INVALID')
+  const { inspected, requests, catalog, path, exists } = await context(options)
+  demand(exists && requests.attempt_history === 'LOCAL_REF_PINNED_NOT_AUTHENTICATED',
+    'COMMITTED_ATTEMPT_JOURNAL_REQUIRED')
+  const ledger = JSON.parse((await inspected.read(path)).toString('utf8'))
+  const reservation = ledger.events.find((event) =>
+    event.attempt_id === options.attemptId && event.state === 'RESERVED')
+  demand(reservation && !ledger.events.some((event) =>
+    event.attempt_id === options.attemptId && event.state !== 'RESERVED'),
+  'ACTIVE_ATTEMPT_RESERVATION_REQUIRED')
+  const event = makeAttemptEvent({
+    attempt_id: reservation.attempt_id, request_id: reservation.request_id,
+    point_id: reservation.point_id, generation_key: reservation.generation_key,
+    state: options.state, evidence_ref: options.evidenceRef,
+    previous_event_sha256: ledger.events.at(-1)?.event_sha256 ?? null,
+  })
+  const next = { ...ledger, events: [...ledger.events, event] }
+  const plan = planFromAttemptLedger(catalog, next)
+  demand(plan.execution_enabled === false, 'ATTEMPT_EXECUTION_NOT_ALLOWED')
+  demand(await options.authorizeCommit({ ref: inspected.ref,
+    baseCommit: inspected.base, seasonId: inspected.seasonId,
+    catalogSha256: catalog.content_sha256, journalPath: path,
+    requestId: event.request_id, pointId: event.point_id,
+    generationKey: event.generation_key, attemptId: event.attempt_id,
+    state: event.state, evidenceRef: event.evidence_ref }) === true,
+  'ATTEMPT_TERMINAL_NOT_AUTHORIZED')
+  const commit = await commitLocalProposalFiles({ repoRoot: inspected.root,
+    ref: inspected.ref, baseCommit: inspected.base,
+    files: new Map([[path, Buffer.from(JSON.stringify(next, null, 2) + '\n')]]),
+    subject: `Close image attempt ${inspected.seasonId}`,
+    gitBinary: inspected.gitBinary })
+  return { status: 'LOCAL_IMAGE_ATTEMPT_CLOSED_NO_ASSET',
+    ref: inspected.ref, base_commit: inspected.base, commit,
+    journal_path: path, attempt_id: event.attempt_id,
+    request_id: event.request_id, state: event.state,
+    evidence_ref: event.evidence_ref,
+    checkout_files_written: 0, provider_calls: 0, remote_pushes: 0,
+    database_writes: 0, storage_uploads: 0, site_publications: 0,
+    zero_added_cost_proven: false }
+}
