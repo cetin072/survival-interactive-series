@@ -93,13 +93,23 @@ def selected_book(page, chapter: dict, chronicle: str):
     expect(page.locator('.book-prose > header h1')).to_have_text(chapter['title'])
     expect(page.locator('.book-toc [aria-current="page"]')).to_have_count(1)
     expect(page.locator('.book-toc [aria-current="page"]')).to_have_attribute('data-chapter-id', chapter['id'])
-    page.wait_for_function('([key,id]) => { try { return localStorage.getItem(key) === id } catch { return true } }', arg=['survival-diary-archive:story-progress:v1:' + chronicle, chapter['id']])
+    progress_key = 'survival-diary-archive:story-progress:v1:' + chronicle
+    deadline = time.monotonic() + 5
+    while time.monotonic() < deadline:
+        try:
+            if page.evaluate('(key) => localStorage.getItem(key)', progress_key) == chapter['id']:
+                break
+        except Exception:
+            # Storage access is intentionally optional in this product.
+            break
+        page.wait_for_timeout(50)
+    else:
+        raise AssertionError('Selected chapter was not saved to browser progress')
     assert parse_qs(urlparse(page.url).query).get('chapter') == [chapter['id']]
     # Check again after effects/animation frames: transient selection is not success.
     page.wait_for_timeout(180)
     assert page.locator('.book-prose').get_attribute('data-chapter-id') == chapter['id'], 'Chapter bounced after one tap'
-    page.wait_for_function("document.querySelector('.reader-body')?.innerText.length > 30")
-    assert len(page.locator('.reader-body').inner_text()) > 30
+    expect(page.locator('.reader-body')).to_have_text(re.compile(r'.{31,}', re.S))
     no_overflow(page)
 
 
