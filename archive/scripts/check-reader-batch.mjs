@@ -216,6 +216,57 @@ process.stdout.write(JSON.stringify(result));`
   assert.deepEqual(repeated.stages_advanced, [])
   assert.deepEqual(repeated.requests, resumed.requests)
   assert.equal(repeated.source_revision, resumed.source_revision)
+  const journalScript = `import { commitEmptyAttemptJournalFromPublicRef } from './archive/scripts/lib/attempt-public-ref.mjs';
+const result = await commitEmptyAttemptJournalFromPublicRef({ repoRoot: process.cwd(),
+  ref: '${driverRef}', seasonId: 'S99', checkpointRef: '${checkpointRef}',
+  authorizeCommit: async () => true });
+process.stdout.write(JSON.stringify(result));`
+  const journalArgs = ['--experimental-strip-types', '--input-type=module', '-e', journalScript]
+  assert.throws(() => command('node', ['--experimental-strip-types', '--input-type=module',
+    '-e', journalScript.replace('authorizeCommit: async () => true', '')], copy))
+  assert.equal(command('git', ['rev-parse', driverRef], copy).trim(), resumed.source_revision)
+  const initialized = JSON.parse(command('node', journalArgs, copy))
+  assert.equal(initialized.status, 'LOCAL_EMPTY_ATTEMPT_JOURNAL_COMMITTED')
+  assert.equal(initialized.provider_calls, 0)
+  const committedJournal = JSON.parse(command('git', ['show',
+    `${initialized.commit}:${initialized.journal_path}`], copy))
+  assert.deepEqual(committedJournal.events, [])
+  const driverRequestScript = `import { prepareImageRequestsFromPublicRef } from './archive/scripts/lib/image-request-public-ref.mjs';
+const result = await prepareImageRequestsFromPublicRef({ repoRoot: process.cwd(),
+  ref: '${driverRef}', seasonId: 'S99', checkpointRef: '${checkpointRef}' });
+process.stdout.write(JSON.stringify(result));`
+  const driverRequestArgs = ['--experimental-strip-types', '--input-type=module', '-e', driverRequestScript]
+  const pinnedRequests = JSON.parse(command('node', driverRequestArgs, copy))
+  assert.equal(pinnedRequests.attempt_history, 'LOCAL_REF_PINNED_NOT_AUTHENTICATED')
+  assert.deepEqual(pinnedRequests.requests, resumed.requests)
+  const reserveScript = `import { commitAttemptReservationFromPublicRef } from './archive/scripts/lib/attempt-public-ref.mjs';
+const result = await commitAttemptReservationFromPublicRef({ repoRoot: process.cwd(),
+  ref: '${driverRef}', seasonId: 'S99', checkpointRef: '${checkpointRef}',
+  requestId: '${pinnedRequests.requests[0].request_id}', authorizeCommit: async () => true });
+process.stdout.write(JSON.stringify(result));`
+  const reserveArgs = ['--experimental-strip-types', '--input-type=module', '-e', reserveScript]
+  const reserved = JSON.parse(command('node', reserveArgs, copy))
+  assert.equal(reserved.status, 'LOCAL_IMAGE_ATTEMPT_RESERVED_NO_EXECUTION')
+  assert.equal(reserved.provider_calls, 0)
+  const afterReservation = JSON.parse(command('node', driverRequestArgs, copy))
+  assert.equal(afterReservation.requests.length, 2)
+  assert.ok(afterReservation.requests.every((item) => item.request_id !== reserved.request_id))
+  assert.throws(() => command('node', reserveArgs, copy))
+  assert.equal(command('git', ['rev-parse', driverRef], copy).trim(), reserved.commit)
+  const resumedAfterReservation = JSON.parse(command('node', [
+    '--experimental-strip-types', '--input-type=module', '-e', driverScript(true)], copy))
+  assert.deepEqual(resumedAfterReservation.stages_advanced, [])
+  assert.deepEqual(resumedAfterReservation.requests, afterReservation.requests)
+  command('git', ['checkout', '--detach', reserved.commit], copy)
+  await writeFile(resolve(copy, initialized.journal_path),
+    JSON.stringify({ ...committedJournal, events: [] }, null, 2) + '\n')
+  command('git', ['add', initialized.journal_path], copy)
+  command('git', ['-c', 'user.name=Reader test', '-c', 'user.email=reader-test@example.invalid',
+    'commit', '--no-verify', '-qm', 'Tampered local attempt history; synthetic test only'], copy)
+  const tamperedCommit = command('git', ['rev-parse', 'HEAD'], copy).trim()
+  command('git', ['update-ref', driverRef, tamperedCommit, reserved.commit], copy)
+  command('git', ['checkout', '--detach', `${fixtureHead}^`], copy)
+  assert.throws(() => command('node', driverRequestArgs, copy))
   // Advancing the ref with an unrelated allowed transcript path leaves the
   // already-verified visual brief and its request identities unchanged.
   command('git', ['checkout', '--detach', visualResult.commit], copy)
