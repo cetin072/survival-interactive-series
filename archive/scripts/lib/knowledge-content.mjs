@@ -16,12 +16,12 @@ const readerBookRef = 'archive/content/stories/C03-AFTERFALL/BOOK.json'
 
 async function verifiedReaderReference(item, base, label) {
   fail(item.source_kind === 'PUBLIC_READER' && item.reader_book_ref === readerBookRef && /^[a-f0-9]{64}$/.test(item.reader_book_sha256), `${label} Reader identity`)
-  fail(nonempty(item.reader_chapter_id) && Array.isArray(item.source_refs) && item.source_refs.length > 0 && Array.isArray(item.source_hashes) && item.source_hashes.length === item.source_refs.length && item.source_hashes.every((hash) => /^[a-f0-9]{64}$/.test(hash)), `${label} Reader fields`)
+  fail(nonempty(item.reader_chapter_id) && /^[a-f0-9]{64}$/.test(item.reader_chapter_sha256) && Array.isArray(item.source_refs) && item.source_refs.length > 0 && Array.isArray(item.source_hashes) && item.source_hashes.length === item.source_refs.length && item.source_hashes.every((hash) => /^[a-f0-9]{64}$/.test(hash)), `${label} Reader fields`)
   const bytes = await readFile(join(base, item.reader_book_ref))
-  fail(createHash('sha256').update(bytes).digest('hex') === item.reader_book_sha256, `${label} Reader book changed`)
   const book = JSON.parse(bytes.toString('utf8'))
   const chapter = book.chapters.find((entry) => entry.id === item.reader_chapter_id)
   fail(chapter?.sourceKind === 'VERIFIED_GM_NARRATIVE' && chapter.body?.trim(), `${label} Reader chapter missing`)
+  fail(createHash('sha256').update(JSON.stringify(chapter)).digest('hex') === item.reader_chapter_sha256, `${label} Reader chapter changed`)
   fail(JSON.stringify(item.source_refs) === JSON.stringify(chapter.sourceRefs) && JSON.stringify(item.source_hashes) === JSON.stringify(chapter.sourceHashes), `${label} Reader provenance mismatch`)
 }
 

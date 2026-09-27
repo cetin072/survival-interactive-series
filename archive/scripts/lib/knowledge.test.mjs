@@ -93,7 +93,7 @@ test('golden fixtures satisfy content contract and policy gate', async () => {
   assert.equal(publicationEligibility(brief, { ...evidence, conflicts: ['unresolved'] }, data.config), 'HOLD')
   assert.equal(publicationEligibility({ ...brief, risk_domains: ['WATER_PURIFICATION'] }, evidence, data.config), 'HUMAN_REVIEW')
 })
-test('Reader backfill is pinned to verified public book and chapter metadata', async () => {
+test('Reader backfill is pinned to verified public chapter and source metadata', async () => {
   const data = await loadKnowledge(root)
   const candidate = data.candidates.find((item) => item.id === 'KC-community-reserve-tracking')
   assert.equal(candidate.source_kind, 'PUBLIC_READER')
