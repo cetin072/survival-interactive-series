@@ -3,14 +3,14 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { validateVisualCatalog } from './lib/visual-compiler.mjs'
-import { validateSiteAssets, reconcileSiteAssets } from './lib/site-asset-contract.mjs'
+import { validateSiteAssetInventory, reconcileSiteAssets } from './lib/site-asset-contract.mjs'
 
 const file = resolve(import.meta.dirname, '../content/visuals/C03-AFTERFALL/VISUALS.json')
 const catalog = JSON.parse(await readFile(file, 'utf8'))
 validateVisualCatalog(catalog)
 const assets = JSON.parse(await readFile(resolve(import.meta.dirname, '../content/visuals/C03-AFTERFALL/SITE_ASSETS.json'), 'utf8'))
 const publicRoot = resolve(import.meta.dirname, '../web/public')
-const site = await validateSiteAssets(assets, catalog, publicRoot)
+const site = await validateSiteAssetInventory(assets, catalog, publicRoot)
 const currentReconciliation = await reconcileSiteAssets(assets, catalog, catalog, publicRoot)
 assert.deepEqual(currentReconciliation.manifest, assets)
 assert.equal(currentReconciliation.files_written, 0)

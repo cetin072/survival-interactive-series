@@ -6,7 +6,7 @@ import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { deflateSync } from 'node:zlib'
 import { visualDigest } from './visual-compiler.mjs'
-import { validateSiteAssets, reconcileSiteAssets } from './site-asset-contract.mjs'
+import { validateSiteAssets, validateSiteAssetInventory, reconcileSiteAssets } from './site-asset-contract.mjs'
 
 // Generated test bytes only; no model image, real acceptance or publication.
 function crc(bytes) { let c = 0xffffffff; for (const n of bytes) { c ^= n; for (let b = 0; b < 8; b++) c = (c >>> 1) ^ ((c & 1) ? 0xedb88320 : 0) }; return (c ^ 0xffffffff) >>> 0 }
@@ -33,6 +33,7 @@ async function fixture(fn) {
 test('empty committed manifest is valid but proves zero assets', async () => {
   const empty = JSON.parse(await readFile(new URL('../../content/visuals/C03-AFTERFALL/SITE_ASSETS.json', import.meta.url), 'utf8'))
   assert.equal((await validateSiteAssets(empty, catalog, join(tmpdir(), 'unused-public-root'))).site_assets, 0)
+  assert.equal((await validateSiteAssetInventory(empty, catalog, join(tmpdir(), 'unused-public-root'))).unreferenced_files, 0)
 })
 test('synthetic local PNG can satisfy the site-ready contract only by exact bytes and current point', async () => fixture(async ({ root, asset }) => {
   const result = await validateSiteAssets(manifest([asset]), catalog, root)
@@ -82,4 +83,8 @@ test('reconciliation rejects unverified old assets and regressed catalogs', asyn
   const newerManifest = seal({ ...priorBody, visual_catalog_sha256: newer.content_sha256 })
   await assert.rejects(reconcileSiteAssets(newerManifest, newer, catalog, root), /SITE_ASSET_CATALOG_REGRESSION/)
   await assert.rejects(reconcileSiteAssets({ ...prior, content_sha256: '0'.repeat(64) }, catalog, catalog, root))
+}))
+test('build inventory refuses static PNGs omitted from the validated manifest', async () => fixture(async ({ root, asset }) => {
+  assert.equal((await validateSiteAssetInventory(manifest([asset]), catalog, root)).site_assets, 1)
+  await assert.rejects(validateSiteAssetInventory(manifest([]), catalog, root), /UNREFERENCED_PUBLIC_VISUAL_ASSET/)
 }))

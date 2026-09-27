@@ -1,6 +1,6 @@
 /** Build-time contract for reviewed, optimized, same-origin archive images. */
 import { createHash } from 'node:crypto'
-import { lstat, readFile } from 'node:fs/promises'
+import { lstat, readFile, readdir } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { inspectPng } from './image-poc-exchange.mjs'
 import { validateVisualCatalog, visualDigest } from './visual-compiler.mjs'
@@ -46,6 +46,25 @@ export async function validateSiteAssets(manifest, catalog, publicRoot) {
   }
   return { manifest_sha256: content_sha256, site_assets: manifest.assets.length, provider_calls: 0,
     storage_uploads: 0, site_publications: 0 }
+}
+
+/** Build gate: an omitted image must not remain reachable as an unlisted static file. */
+export async function validateSiteAssetInventory(manifest, catalog, publicRoot) {
+  const verified = await validateSiteAssets(manifest, catalog, publicRoot)
+  const expected = new Set(manifest.assets.map((asset) => `${asset.sha256}.png`))
+  const root = resolve(publicRoot), directory = join(root, 'visual-assets')
+  let entries
+  try {
+    demand((await lstat(root)).isDirectory(), 'SITE_PUBLIC_ROOT_INVALID')
+    demand((await lstat(directory)).isDirectory(), 'SITE_VISUAL_DIRECTORY_INVALID')
+    entries = await readdir(directory, { withFileTypes: true })
+  } catch (error) {
+    if (error.code === 'ENOENT' && expected.size === 0) return { ...verified, unreferenced_files: 0 }
+    throw error
+  }
+  demand(entries.length === expected.size && entries.every((entry) => entry.isFile() && expected.has(entry.name)),
+    'UNREFERENCED_PUBLIC_VISUAL_ASSET')
+  return { ...verified, unreferenced_files: 0 }
 }
 
 /** Rebind an already verified site manifest to a newer public catalog in memory only. */
