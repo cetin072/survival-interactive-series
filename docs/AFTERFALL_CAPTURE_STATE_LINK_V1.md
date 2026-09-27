@@ -53,7 +53,7 @@ own authenticated integration and end-to-end evidence.
 
 ## Adjacent-turn save-version continuity
 
-Migration `20260927000000_afterfall_turn_state_continuity_v1.sql` adds a
+Migration `20260927042720_afterfall_turn_state_continuity_v1.sql` adds a
 `BEFORE INSERT` trigger without editing or re-running the already-applied v1
 migration. When an adjacent linked turn exists, the new USER save version must
 equal that prior turn's GM save version. An already-inserted successor is also
