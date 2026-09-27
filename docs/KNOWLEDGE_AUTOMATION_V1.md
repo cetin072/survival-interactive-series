@@ -18,9 +18,9 @@ V1 최초 활성화 때 **기존에 공개 승인을 받은 입력만** `node ar
 
 ## BRIEF·Evidence와 게시 자격
 
-`knowledge/content/briefs`는 공개 필드만 가진 구조화 콘텐츠입니다. `knowledge/content/evidence`는 claim마다 출처 ID, 적용 문맥과 한계를 기록하며 공개 웹으로 복사되지 않습니다. `risk_domains`는 Worker가 의미 검토 중 선언합니다. 의료, 약물, 전문 응급처치, 식수 정화, 발전기, 연소/일산화탄소, 전기, 구조, 방공호/건축 안전과 기타 중대한 피해 가능성은 `AUTO_LOW_RISK` 금지입니다. 코드는 선언된 위험 분류와 근거 계약을 확인할 뿐 실제 사실의 참을 판정하지 않습니다. 위험 분류를 잘못 선언하면 코드만으로 교정할 수 없으므로 semantic QA와 PR 검토가 중요합니다.
+`knowledge/content/briefs`는 공개 필드만 가진 구조화 콘텐츠입니다. `knowledge/content/evidence`는 claim마다 출처 ID, 적용 문맥과 한계를 기록하며 공개 웹으로 복사되지 않습니다. `risk_domains`는 Worker가 의미 검토 중 선언하며 허용값은 일반 준비 `GENERAL_PREPAREDNESS`, 식품 보관 `FOOD_STORAGE`, 연락 `COMMUNICATION`, 대피 `EVACUATION`, 의료 `MEDICAL`, 약물 `MEDICATION`, 전문 응급처치 `FIRST_AID_PROCEDURE`, 식수 정화 `WATER_PURIFICATION`, 발전기 `GENERATOR`, 연소/일산화탄소 `COMBUSTION_CO`, 전기 `ELECTRICAL`, 구조 `RESCUE`, 방공호/건축 안전 `SHELTER_STRUCTURAL`, 기타 중대한 피해 가능성 `OTHER_SEVERE_HARM`으로 제한합니다. 알 수 없는 값은 검증 오류입니다. 고위험 domain은 `AUTO_LOW_RISK` 금지입니다. 코드는 선언된 위험 분류와 근거 계약을 확인할 뿐 실제 사실의 참을 판정하지 않습니다. 위험 분류를 잘못 선언하면 코드만으로 교정할 수 없으므로 semantic QA와 PR 검토가 중요합니다.
 
-`publicationEligibility`는 `BRIEF + LOW + AUTO_LOW_RISK + PASS + READY`와 완전한 근거, 해결되지 않은 충돌 없음, 저작권 상태 `CLEAR`, 확인된 관계만 있는지 확인합니다. 결과는 `AUTO_PUBLISH_ELIGIBLE`, `HUMAN_REVIEW`, `HOLD` 중 하나입니다. `AUTO_PUBLISH_ELIGIBLE`도 V1의 `publication_mode=PR_ONLY`에서 **PR 후보**일 뿐 자동 병합이나 Production 게시 허가가 아닙니다. `GUIDE`와 고위험 글은 자동 자격이 없습니다. 검사 실패는 게시 중단입니다.
+`publicationEligibility`는 `BRIEF + LOW + AUTO_LOW_RISK + PASS`와 완전한 근거, 해결되지 않은 충돌 없음, 저작권 상태 `CLEAR`, 확인된 관계만 있는지 확인합니다. 결과는 `AUTO_PUBLISH_ELIGIBLE`, `HUMAN_REVIEW`, `HOLD` 중 하나입니다. 자동 글의 상태 전이는 `DRAFT/HOLD → READY → PUBLISHED`이며, `READY`와 `PUBLISHED` 모두 동일한 게시 자격 계약을 통과해야 합니다. **`PUBLISHED`는 publication gate를 우회하는 privileged state가 아닙니다.** 자동 글을 `PUBLISHED`로 직접 기록해도 검증 실패 시 정적 생성이 중단됩니다. 기존 `HUMAN_APPROVED + PUBLISHED` 글은 별도 편집 승인 경로를 유지합니다. `AUTO_PUBLISH_ELIGIBLE`도 V1의 `publication_mode=PR_ONLY`에서 **PR 후보**일 뿐 자동 병합이나 Production 게시 허가가 아닙니다. `GUIDE`와 고위험 글은 자동 자격이 없습니다. 검사 실패는 게시 중단입니다.
 
 ## 정적 사이트
 

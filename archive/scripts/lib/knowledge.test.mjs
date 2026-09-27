@@ -79,7 +79,11 @@ test('malformed approved source fails closed', async () => {
 test('golden fixtures satisfy content contract and policy gate', async () => {
   const data = await loadKnowledge(root)
   assert.equal(await validateKnowledge(data), true)
-  for (const brief of data.briefs) assert.equal(publicationEligibility(brief, data.evidence.get(brief.id), data.config), 'HUMAN_REVIEW')
+  for (const brief of data.briefs) {
+    assert.equal(brief.status, 'PUBLISHED')
+    assert.equal(brief.publication_policy, 'HUMAN_APPROVED')
+    assert.equal(publicationEligibility(brief, data.evidence.get(brief.id), data.config), 'HUMAN_REVIEW')
+  }
   const brief = { ...data.briefs[0], id: 'K-999', slug: 'test-only', status: 'READY', publication_policy: 'AUTO_LOW_RISK' }
   const evidence = data.evidence.get('K-002')
   assert.equal(publicationEligibility(brief, evidence, data.config), 'AUTO_PUBLISH_ELIGIBLE')
@@ -88,6 +92,31 @@ test('golden fixtures satisfy content contract and policy gate', async () => {
   assert.equal(publicationEligibility(brief, null, data.config), 'HOLD')
   assert.equal(publicationEligibility(brief, { ...evidence, conflicts: ['unresolved'] }, data.config), 'HOLD')
   assert.equal(publicationEligibility({ ...brief, risk_domains: ['WATER_PURIFICATION'] }, evidence, data.config), 'HUMAN_REVIEW')
+})
+test('AUTO_LOW_RISK READY and PUBLISHED must pass the same publication gate', async () => {
+  const data = await loadKnowledge(root)
+  const auto = { ...data.briefs[0], publication_policy: 'AUTO_LOW_RISK' }
+  const withAuto = (patch = {}, evidence = data.evidence) => ({
+    ...data, briefs: [{ ...auto, ...patch }, ...data.briefs.slice(1)], evidence,
+  })
+  const pack = data.evidence.get(auto.id)
+
+  assert.equal(publicationEligibility({ ...auto, status: 'READY' }, pack, data.config), 'AUTO_PUBLISH_ELIGIBLE')
+  assert.equal(await validateKnowledge(withAuto({ status: 'READY' })), true)
+  assert.equal(publicationEligibility({ ...auto, status: 'PUBLISHED' }, pack, data.config), 'AUTO_PUBLISH_ELIGIBLE')
+  assert.equal(await validateKnowledge(withAuto({ status: 'PUBLISHED' })), true)
+
+  const missingEvidence = new Map(data.evidence)
+  missingEvidence.delete(auto.id)
+  await assert.rejects(validateKnowledge(withAuto({ status: 'PUBLISHED' }, missingEvidence)), /evidence/)
+
+  const conflictedEvidence = new Map(data.evidence)
+  conflictedEvidence.set(auto.id, { ...pack, conflicts: ['unresolved'] })
+  await assert.rejects(validateKnowledge(withAuto({ status: 'PUBLISHED' }, conflictedEvidence)), /publication eligibility/)
+  await assert.rejects(validateKnowledge(withAuto({ status: 'PUBLISHED', risk_domains: ['WATER_PURIFICATION'] })), /publication eligibility/)
+  await assert.rejects(validateKnowledge(withAuto({ status: 'PUBLISHED', risk_level: 'HIGH' })), /publication eligibility/)
+  await assert.rejects(validateKnowledge(withAuto({ status: 'PUBLISHED', risk_domains: ['WATER_PURIFCATION'] })), /risk domains/)
+  await assert.rejects(validateKnowledge(withAuto({ status: 'READY', risk_domains: ['UNCLASSIFIED'] })), /risk domains/)
 })
 test('duplicate identity, broken relations and missing downloads fail validation', async () => {
   const data = await loadKnowledge(root)

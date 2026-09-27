@@ -8,7 +8,9 @@ const fail = (condition, message) => { if (!condition) throw new Error(`KNOWLEDG
 const nonempty = (value) => typeof value === 'string' && value.trim().length > 0
 const date = (value) => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value))
 const localPath = (value) => typeof value === 'string' && /^\/knowledge\/[a-z0-9/-]+\.(xlsx|pdf|csv)$/.test(value) && !value.includes('..')
+const lowRiskDomains = new Set(['GENERAL_PREPAREDNESS', 'FOOD_STORAGE', 'COMMUNICATION', 'EVACUATION'])
 const highRiskDomains = new Set(['MEDICAL', 'MEDICATION', 'FIRST_AID_PROCEDURE', 'WATER_PURIFICATION', 'GENERATOR', 'COMBUSTION_CO', 'ELECTRICAL', 'RESCUE', 'SHELTER_STRUCTURAL', 'OTHER_SEVERE_HARM'])
+const allowedRiskDomains = new Set([...lowRiskDomains, ...highRiskDomains])
 
 export async function loadKnowledge(base = root) {
   const dir = join(base, 'knowledge/content')
@@ -56,7 +58,7 @@ export async function validateKnowledge(data) {
     fail(brief.content_type === 'BRIEF' && topicIds.has(brief.topic_id), `${brief.id} type/topic`)
     for (const field of ['title', 'summary', 'meta_description', 'lead', 'label', 'scope', 'basis', 'footer']) fail(nonempty(brief[field]), `${brief.id} ${field}`)
     fail(['LOW', 'HIGH'].includes(brief.risk_level) && ['HUMAN_APPROVED', 'AUTO_LOW_RISK'].includes(brief.publication_policy), `${brief.id} policy`)
-    fail(Array.isArray(brief.risk_domains) && brief.risk_domains.length > 0 && brief.risk_domains.every(nonempty), `${brief.id} risk domains`)
+    fail(Array.isArray(brief.risk_domains) && brief.risk_domains.length > 0 && brief.risk_domains.every((domain) => allowedRiskDomains.has(domain)), `${brief.id} risk domains`)
     fail(['PASS', 'REVIEW', 'HOLD'].includes(brief.semantic_qa_status) && ['PUBLISHED', 'READY', 'HOLD', 'DRAFT'].includes(brief.status), `${brief.id} status`)
     fail(date(brief.source_checked_at) && date(brief.published_at) && date(brief.updated_at), `${brief.id} dates`)
     fail(brief.updated_at >= brief.published_at && typeof brief.ai_assisted === 'boolean' && nonempty(brief.editorial_note), `${brief.id} provenance`)
@@ -89,7 +91,9 @@ export async function validateKnowledge(data) {
     fail(pack?.brief_id === brief.id && pack.question === brief.title && Array.isArray(pack.claims) && pack.claims.length > 0, `${brief.id} evidence`)
     fail(Array.isArray(pack.conflicts) && Array.isArray(pack.unknowns) && Array.isArray(pack.risk_notes) && nonempty(pack.story_source_status), `${brief.id} evidence fields`)
     for (const claim of pack.claims) fail(nonempty(claim.claim) && Array.isArray(claim.source_ids) && claim.source_ids.length > 0 && claim.source_ids.every((id) => sourceIds.has(id)) && nonempty(claim.context) && nonempty(claim.limitation), `${brief.id} claim`)
-    if (brief.status === 'READY' && brief.publication_policy === 'AUTO_LOW_RISK') fail(publicationEligibility(brief, pack, config) === 'AUTO_PUBLISH_ELIGIBLE', `${brief.id} publication eligibility`)
+    if (brief.publication_policy === 'AUTO_LOW_RISK' && ['READY', 'PUBLISHED'].includes(brief.status)) {
+      fail(publicationEligibility(brief, pack, config) === 'AUTO_PUBLISH_ELIGIBLE', `${brief.id} publication eligibility`)
+    }
   }
   for (const topic of topics) fail(topic.brief_ids.every((id) => ids.has(id) && briefs.find((b) => b.id === id).topic_id === topic.id), `topic ${topic.id} brief refs`)
   for (const topic of topics) fail(topic.guide_id == null || guideIds.has(topic.guide_id), `topic ${topic.id} guide ref`)
@@ -111,7 +115,7 @@ export function publicationEligibility(brief, pack, config) {
   if (!pack || !Array.isArray(pack.claims) || !pack.claims.length || !brief.sources?.length || !brief.source_checked_at) return 'HOLD'
   if (pack.conflicts?.length || pack.unknowns?.length || pack.copyright_status !== 'CLEAR' || pack.story_source_status === 'UNCLEAR') return 'HOLD'
   if (brief.content_type !== 'BRIEF' || brief.risk_level !== 'LOW' || brief.publication_policy !== 'AUTO_LOW_RISK') return 'HUMAN_REVIEW'
-  if (!Array.isArray(brief.risk_domains) || brief.risk_domains.length === 0 || brief.risk_domains.some((domain) => highRiskDomains.has(domain))) return 'HUMAN_REVIEW'
-  if (brief.semantic_qa_status !== 'PASS' || brief.status !== 'READY') return 'HUMAN_REVIEW'
+  if (!Array.isArray(brief.risk_domains) || brief.risk_domains.length === 0 || brief.risk_domains.some((domain) => !lowRiskDomains.has(domain))) return 'HUMAN_REVIEW'
+  if (brief.semantic_qa_status !== 'PASS' || !['READY', 'PUBLISHED'].includes(brief.status)) return 'HUMAN_REVIEW'
   return 'AUTO_PUBLISH_ELIGIBLE'
 }
