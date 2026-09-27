@@ -83,6 +83,62 @@ begin
 end;
 $$;
 
+-- Test-only readers let service_role exercise the RPCs without direct table grants.
+create function survival_rpg.archive_publication_test_daily_run_matches(
+  p_scheduled_date date,
+  p_owner text,
+  p_token uuid,
+  p_receipt jsonb,
+  p_finished_at timestamptz,
+  p_event_count bigint,
+  p_batch_count bigint
+)
+returns boolean
+language sql
+security definer
+set search_path = pg_catalog, survival_rpg
+as $$
+  select exists (
+    select 1 from survival_rpg.archive_publication_daily_runs r
+     where r.scheduled_date = p_scheduled_date
+       and r.status = 'CLAIMED'
+       and r.lease_owner = p_owner
+       and r.lease_token = p_token
+       and r.receipt = p_receipt
+       and r.finished_at is not distinct from p_finished_at
+  )
+  and (select count(*) from survival_rpg.archive_publication_daily_run_events e
+        where e.scheduled_date = p_scheduled_date) = p_event_count
+  and (select count(*) from survival_rpg.archive_publication_run_batches b
+        where b.scheduled_date = p_scheduled_date) = p_batch_count;
+$$;
+
+create function survival_rpg.archive_publication_test_task_matches(
+  p_task_id text,
+  p_status text,
+  p_receipt jsonb,
+  p_event_count bigint
+)
+returns boolean
+language sql
+security definer
+set search_path = pg_catalog, survival_rpg
+as $$
+  select exists (
+    select 1 from survival_rpg.archive_publication_tasks t
+     where t.task_id = p_task_id
+       and t.status = p_status
+       and t.receipt = p_receipt
+  )
+  and (select count(*) from survival_rpg.archive_publication_task_events e
+        where e.task_id = p_task_id) = p_event_count;
+$$;
+
+revoke all on function survival_rpg.archive_publication_test_daily_run_matches(date,text,uuid,jsonb,timestamptz,bigint,bigint) from public, anon, authenticated, service_role;
+revoke all on function survival_rpg.archive_publication_test_task_matches(text,text,jsonb,bigint) from public, anon, authenticated, service_role;
+grant execute on function survival_rpg.archive_publication_test_daily_run_matches(date,text,uuid,jsonb,timestamptz,bigint,bigint) to service_role;
+grant execute on function survival_rpg.archive_publication_test_task_matches(text,text,jsonb,bigint) to service_role;
+
 set local role service_role;
 
 do $$
@@ -103,9 +159,42 @@ begin
 
   select * into strict v_task
     from survival_rpg.claim_archive_publication_daily_run(v_schedule, 'ci-runner-b', 300);
-  if v_task.out_claimed or v_task.out_lease_token <> v_run.out_lease_token
-     or v_task.out_claim_version <> v_run.out_claim_version then
-    raise exception 'LIVE_DAILY_RUN_LEASE_STOLEN';
+  if v_task.out_claimed or v_task.out_lease_token is not null
+     or v_task.out_claim_version is not null or v_task.out_lease_expires_at is not null then
+    raise exception 'FAILED_DAILY_RUN_CLAIM_EXPOSED_LEASE';
+  end if;
+
+  begin
+    perform survival_rpg.renew_archive_publication_daily_run_lease(
+      v_schedule, v_task.out_claim_version, v_task.out_lease_token, 300
+    );
+    raise exception 'FAILED_DAILY_RUN_CLAIM_RENEWED_ACTIVE_LEASE';
+  exception when sqlstate '22023' then
+    null;
+  end;
+  begin
+    perform survival_rpg.link_archive_publication_run_batch(
+      v_schedule, v_task.out_claim_version, v_task.out_lease_token,
+      'batch-' || repeat('8', 64), 'plan-' || repeat('9', 64)
+    );
+    raise exception 'FAILED_DAILY_RUN_CLAIM_LINKED_BATCH';
+  exception when sqlstate '22023' then
+    null;
+  end;
+
+  begin
+    perform survival_rpg.finish_archive_publication_daily_run(
+      v_schedule, v_task.out_claim_version, v_task.out_lease_token,
+      'NOOP', '{"result":"NOOP"}'::jsonb, null, null
+    );
+    raise exception 'FAILED_DAILY_RUN_CLAIM_FINISHED_ACTIVE_LEASE';
+  exception when sqlstate '22023' then
+    null;
+  end;
+  if not survival_rpg.archive_publication_test_daily_run_matches(
+    v_schedule, 'ci-runner-a', v_run.out_lease_token, '{}'::jsonb, null, 1, 0
+  ) then
+    raise exception 'FAILED_DAILY_RUN_CLAIM_MUTATED_ACTIVE_LEASE';
   end if;
 
   if not survival_rpg.renew_archive_publication_daily_run_lease(
@@ -173,6 +262,37 @@ begin
   if v_task.out_task_id <> 'task-' || repeat('1', 64) or v_task.out_attempt_count <> 1 then
     raise exception 'TASK_CLAIM_FAILED';
   end if;
+
+  begin
+    perform survival_rpg.finish_archive_publication_task(
+      v_task.out_task_id, null::bigint, null::uuid, 'NOOP', '{"result":"NOOP"}'::jsonb, null, null
+    );
+    raise exception 'NULL_TASK_LEASE_IDENTITY_BOTH_ACCEPTED';
+  exception when sqlstate '55000' then
+    null;
+  end;
+  begin
+    perform survival_rpg.finish_archive_publication_task(
+      v_task.out_task_id, null::bigint, v_task.out_lease_token, 'NOOP', '{"result":"NOOP"}'::jsonb, null, null
+    );
+    raise exception 'NULL_TASK_CLAIM_VERSION_ACCEPTED';
+  exception when sqlstate '55000' then
+    null;
+  end;
+  begin
+    perform survival_rpg.finish_archive_publication_task(
+      v_task.out_task_id, v_task.out_claim_version, null::uuid, 'NOOP', '{"result":"NOOP"}'::jsonb, null, null
+    );
+    raise exception 'NULL_TASK_LEASE_TOKEN_ACCEPTED';
+  exception when sqlstate '55000' then
+    null;
+  end;
+  if not survival_rpg.archive_publication_test_task_matches(
+    v_task.out_task_id, 'CLAIMED', '{}'::jsonb, 2
+  ) then
+    raise exception 'INVALID_TASK_LEASE_IDENTITY_MUTATED_TASK';
+  end if;
+
   v_finished := survival_rpg.finish_archive_publication_task(
     v_task.out_task_id, v_task.out_claim_version, v_task.out_lease_token,
     'NOOP', '{"result":"NOOP"}'::jsonb, null, null
@@ -182,6 +302,8 @@ end;
 $$;
 
 reset role;
+drop function survival_rpg.archive_publication_test_daily_run_matches(date,text,uuid,jsonb,timestamptz,bigint,bigint);
+drop function survival_rpg.archive_publication_test_task_matches(text,text,jsonb,bigint);
 
 -- The transaction rolls back all synthetic rows; only catalog structure is exercised.
 rollback;
