@@ -27,12 +27,6 @@ begin
 end;
 $$;
 
-grant execute on function survival_rpg.renew_archive_publication_daily_run_lease(date,bigint,uuid,integer)
-  to archive_publication_runner;
-grant execute on function survival_rpg.enqueue_archive_publication_task(text,text,text,text,text,text,text,text)
-  to archive_publication_runner;
-grant execute on function survival_rpg.link_archive_publication_run_batch(date,bigint,uuid,text,text)
-  to archive_publication_runner;
 -- The generic claim chooses any pending task. A text runner must claim only
 -- its deterministic task ID, so another publication lane cannot lose attempts.
 -- Staging postgres is non-superuser. Restore SET/CREATE only within this
@@ -40,6 +34,14 @@ grant execute on function survival_rpg.link_archive_publication_run_batch(date,b
 grant archive_runner_internal to postgres with set true, inherit false;
 grant create on schema survival_rpg to archive_runner_internal;
 set role archive_runner_internal;
+-- The ledger RPCs are owned by this role. Staging postgres is not their owner,
+-- so grant and revoke their EXECUTE privileges before resetting the role.
+grant execute on function survival_rpg.renew_archive_publication_daily_run_lease(date,bigint,uuid,integer)
+  to archive_publication_runner;
+grant execute on function survival_rpg.enqueue_archive_publication_task(text,text,text,text,text,text,text,text)
+  to archive_publication_runner;
+grant execute on function survival_rpg.link_archive_publication_run_batch(date,bigint,uuid,text,text)
+  to archive_publication_runner;
 create or replace function survival_rpg.claim_archive_publication_task_by_id(
   p_task_id text, p_worker_id text, p_lease_seconds integer default 300
 )
@@ -101,11 +103,6 @@ end;
 $$;
 revoke all on function survival_rpg.claim_archive_publication_task_by_id(text,text,integer)
   from public, anon, authenticated, service_role;
-reset role;
-revoke create on schema survival_rpg from archive_runner_internal;
--- Preserve only Supabase's pre-existing ADMIN-only grant. A GRANT issued by
--- postgres creates a second grantor row even after SET is switched off.
-revoke archive_runner_internal from postgres granted by postgres;
 revoke all on function survival_rpg.claim_archive_publication_task(text,integer)
   from archive_publication_runner;
 grant execute on function survival_rpg.claim_archive_publication_task_by_id(text,text,integer)
@@ -114,7 +111,11 @@ grant execute on function survival_rpg.renew_archive_publication_task_lease(text
   to archive_publication_runner;
 grant execute on function survival_rpg.finish_archive_publication_task(text,bigint,uuid,text,jsonb,text,integer)
   to archive_publication_runner;
-
+reset role;
+revoke create on schema survival_rpg from archive_runner_internal;
+-- Preserve only Supabase's pre-existing ADMIN-only grant. A GRANT issued by
+-- postgres creates a second grantor row even after SET is switched off.
+revoke archive_runner_internal from postgres granted by postgres;
 do $$
 begin
   if exists (
