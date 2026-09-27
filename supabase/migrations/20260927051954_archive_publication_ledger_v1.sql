@@ -146,6 +146,8 @@ create table survival_rpg.archive_publication_daily_run_events (
 );
 
 create index archive_publication_daily_run_events_date_idx
+  on survival_rpg.archive_publication_daily_run_events (scheduled_date, occurred_at, event_id);
+
 create table survival_rpg.archive_publication_run_batches (
   scheduled_date date not null references survival_rpg.archive_publication_daily_runs(scheduled_date) on delete restrict,
   batch_id text not null check (batch_id ~ '^batch-[0-9a-f]{64}$'),
@@ -156,7 +158,6 @@ create table survival_rpg.archive_publication_run_batches (
 
 create index archive_publication_run_batches_batch_idx
   on survival_rpg.archive_publication_run_batches (batch_id, scheduled_date);
-  on survival_rpg.archive_publication_daily_run_events (scheduled_date, occurred_at, event_id);
 alter table survival_rpg.archive_publication_daily_runs enable row level security;
 alter table survival_rpg.archive_publication_daily_runs force row level security;
 alter table survival_rpg.archive_publication_daily_run_events enable row level security;
