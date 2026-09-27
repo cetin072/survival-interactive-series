@@ -134,6 +134,8 @@ export function planPendingSegment(candidate, partBytes, existing, reservedSessi
     candidate_id: candidate.candidate_id, publication_allowed: false, files_written: 0 }
   demand(candidate.source_message_order.start > latestSameSessionEnd,
     'BACKFILL_REQUIRES_REVIEW')
+  demand(candidate.source_message_order.start === latestSameSessionEnd + 1,
+    'SOURCE_ORDER_GAP_REQUIRES_REVIEW')
   demand(maxSession < 999, 'SESSION_ID_SPACE_EXHAUSTED')
   const sessionId = `SESSION_${String(maxSession + 1).padStart(3, '0')}`
   const prefix = `archive/content/transcripts/C03-AFTERFALL/${candidate.season_id}/${sessionId}`

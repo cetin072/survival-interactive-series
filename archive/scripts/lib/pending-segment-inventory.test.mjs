@@ -93,9 +93,16 @@ test('changed sealed bytes, overlapping source range and backfill fail closed', 
   assert.throws(() => planPendingSegment(conflicting.candidate, conflicting.partBytes, inventory),
     /SOURCE_RANGE_COLLISION/)
   const later = materialized(2)
-  const laterInventory = [recorded(planPendingSegment(later.candidate, later.partBytes, []))]
+  const laterInventory = [{ ...inventory[0], session_id: 'SESSION_002',
+    source_message_order: { start: 2, end: 3 }, segment_id: later.candidate.segment_id,
+    candidate_id: later.candidate.candidate_id, part_sha256: later.candidate.part_sha256 }]
   assert.throws(() => planPendingSegment(first.candidate, first.partBytes, laterInventory),
     /BACKFILL_REQUIRES_REVIEW/)
+  const gap = materialized(4)
+  assert.throws(() => planPendingSegment(gap.candidate, gap.partBytes, inventory),
+    /SOURCE_ORDER_GAP_REQUIRES_REVIEW/)
+  assert.throws(() => planPendingSegment(later.candidate, later.partBytes, []),
+    /SOURCE_ORDER_GAP_REQUIRES_REVIEW/)
 })
 test('different source sessions are not deduplicated by repeated text', () => {
   const first = materialized()
