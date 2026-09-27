@@ -11,8 +11,8 @@ import { assertReaderManifest } from './readerManifestContract'
 import { archiveNodes } from './archiveData'
 
 describe('Reader Edition V1.1', () => {
-  it('keeps RAW outside the two-item primary navigation', () => {
-    expect(primaryNavigationLabels).toEqual(['세계 탐색', '이야기 읽기'])
+  it('keeps RAW outside the primary navigation while exposing Survival Knowledge', () => {
+    expect(primaryNavigationLabels).toEqual(['세계 탐색', '이야기 읽기', '생존 지식'])
   })
   it('has one registry and switches current shelf without Story code changes', () => {
     expect(partitionChronicles().active.id).toBe('C03-AFTERFALL')
