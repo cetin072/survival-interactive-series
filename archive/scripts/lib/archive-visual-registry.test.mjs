@@ -70,11 +70,14 @@ test('fake candidate, approval, storage receipt and duplicate candidate binding 
   assert.throws(() => planArchiveVisualRegistry({ ...input,
     existingRows: [{ ...planned.row, asset_id: 'AF-CHAR-DIFFERENT' }] }),
   /REGISTRY_EXISTING_ASSET_CONFLICT/)
+  assert.throws(() => planArchiveVisualRegistry({ ...input,
+    existingRows: [planned.row, { ...planned.row, asset_id: 'AF-CHAR-DIFFERENT' }] }),
+  /REGISTRY_EXISTING_ASSET_CONFLICT/)
 })
 test('private PostgREST insert is read back and a rerun reuses its exact row', async () => {
   const rows = [], calls = []
-  const fetchImpl = async (_url, request) => {
-    calls.push(request.method)
+  const fetchImpl = async (url, request) => {
+    calls.push({ method: request.method, url })
     if (request.method === 'GET') return Response.json(rows)
     rows.push(JSON.parse(request.body))
     return new Response(null, { status: 201 })
@@ -84,7 +87,12 @@ test('private PostgREST insert is read back and a rerun reuses its exact row', a
   assert.equal((await insertPrivateVisualRegistry(args)).status, 'PRIVATE_ASSET_INSERTED')
   assert.equal((await insertPrivateVisualRegistry(args)).status, 'EXISTING_PRIVATE_ASSET_REUSED')
   assert.equal(rows.length, 1)
-  assert.deepEqual(calls, ['GET', 'POST', 'GET', 'GET'])
+  assert.deepEqual(calls.map((call) => call.method),
+    ['GET', 'GET', 'POST', 'GET', 'GET', 'GET', 'GET'])
+  assert.ok(calls.filter((call) => call.method === 'GET')
+    .every((call) => !call.url.includes('limit=1000')))
+  assert.ok(calls.some((call) => call.url.includes('asset_id=eq.')))
+  assert.ok(calls.some((call) => call.url.includes('source=cs.')))
   assert.equal(rows[0].visibility, 'CORE_PRIVATE')
 })
 test('lost insert response reconciles the private row without a second POST', async () => {
@@ -98,5 +106,5 @@ test('lost insert response reconciles the private row without a second POST', as
   const result = await insertPrivateVisualRegistry({ ...input,
     baseUrl: 'https://example.supabase.co', serviceKey: 'synthetic-test-service-key-12345', fetchImpl })
   assert.equal(result.status, 'INSERT_RESPONSE_LOST_ROW_VERIFIED')
-  assert.deepEqual(calls, ['GET', 'POST', 'GET'])
+  assert.deepEqual(calls, ['GET', 'GET', 'POST', 'GET', 'GET'])
 })

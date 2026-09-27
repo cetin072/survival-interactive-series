@@ -30,10 +30,12 @@ export function planArchiveVisualRegistry({ catalog, observation, approval, orig
     generation_meta: { source_sha256: expected.file.sha256,
       approval_source_ref: approval.source_ref, storage_verified: true,
       provider_result_id: null, unattended_generation_proven: false } }
-  const conflict = existingRows.find((item) => item.worldline_id === row.worldline_id
+  const conflicts = existingRows.filter((item) => item.worldline_id === row.worldline_id
     && (item.asset_id === row.asset_id || item.source?.candidate_id === candidate.candidate_id))
-  if (conflict) {
-    const existingBody = Object.fromEntries(Object.keys(row).map((key) => [key, conflict[key]]))
+  if (conflicts.length) {
+    demand(conflicts.length === 1, 'REGISTRY_EXISTING_ASSET_CONFLICT')
+    const existingBody = Object.fromEntries(Object.keys(row)
+      .map((key) => [key, conflicts[0][key]]))
     demand(pocDigest(existingBody) === pocDigest(row), 'REGISTRY_EXISTING_ASSET_CONFLICT')
     return { status: 'EXISTING_PRIVATE_ASSET_REUSED', row, database_writes: 0,
       public_assets: 0, site_publications: 0 }
@@ -69,12 +71,27 @@ export async function insertPrivateVisualRegistry({ baseUrl, serviceKey, fetchIm
   const headers = { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`,
     'Accept-Profile': 'survival_rpg' }
   const readRows = async () => {
-    const response = await fetchImpl(`${url}?select=*&worldline_id=eq.AFTERFALL&limit=1000`,
-      { method: 'GET', headers, cache: 'no-store' })
-    demand(response.ok, 'REGISTRY_READ_FAILED')
-    const rows = await response.json()
-    demand(Array.isArray(rows) && rows.length < 1000, 'REGISTRY_SCAN_INCOMPLETE')
-    return rows
+    const planned = planArchiveVisualRegistry(input)
+    const common = { select: '*', worldline_id: 'eq.AFTERFALL', limit: '2' }
+    const filters = [
+      { asset_id: `eq.${planned.row.asset_id}` },
+      { source: `cs.${JSON.stringify({ candidate_id: input.candidate.candidate_id })}` },
+    ]
+    const found = new Map()
+    for (const filter of filters) {
+      const params = new URLSearchParams({ ...common, ...filter })
+      const response = await fetchImpl(`${url}?${params}`, {
+        method: 'GET', headers, cache: 'no-store' })
+      demand(response.ok, 'REGISTRY_READ_FAILED')
+      const rows = await response.json()
+      demand(Array.isArray(rows) && rows.length <= 2,
+        'REGISTRY_READ_INVALID')
+      for (const row of rows) {
+        demand(row && typeof row.asset_id === 'string', 'REGISTRY_READ_INVALID')
+        found.set(row.asset_id, row)
+      }
+    }
+    return [...found.values()]
   }
   const before = planArchiveVisualRegistry({ ...input, existingRows: await readRows() })
   if (before.status === 'EXISTING_PRIVATE_ASSET_REUSED')
