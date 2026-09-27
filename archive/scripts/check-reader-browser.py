@@ -211,6 +211,9 @@ def audit_extra(page, base: str, width: int):
     selected_raw(page, 'c03-s02-session-009-002')
     assert len(page.locator('.transcript-flow').inner_text()) > 100
     tap(page.get_by_role('tab', name='S01', exact=True), mobile)
+    selected_raw(page, 'c03-s01-opening-001')
+    expect(page.locator('.transcript-flow')).to_contain_text('서림대학교병원 응급의료센터')
+    page.goto(query_url(base, view='raw', chronicle='C03-AFTERFALL', part='c03-s01-missing-before'))
     expect(page.locator('.missing-transcript')).to_be_visible()
     page.goto(query_url(base, view='raw', chronicle='C03-AFTERFALL', part='c03-s01-008'))
     expect(page.locator('.transcript-fragment pre')).to_be_visible()
