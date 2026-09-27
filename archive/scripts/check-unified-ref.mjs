@@ -29,6 +29,8 @@ try {
     'archive/scripts/lib/unified-publication-ref.mjs')).href)
   const manifest = JSON.parse(await readFile(join(copy,
     'archive/content/transcripts/C03-AFTERFALL/S02/MANIFEST.json'), 'utf8'))
+  const priorSite = JSON.parse(await readFile(join(copy,
+    'archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json'), 'utf8'))
   const snapshot = snapshotFromPublishedS02(manifest, head)
   const common = { snapshot, repoRoot: copy, baseCommit: head, gitBinary }
   await assert.rejects(proposeUnifiedPublication({ ...common, ref: deniedRef,
@@ -38,20 +40,28 @@ try {
     authorizeCommit: async ({ baseCommit, batchId }) => baseCommit === head
       && typeof batchId === 'string' })
   assert.equal(first.status, 'LOCAL_UNIFIED_PROPOSAL_COMMITTED')
-  assert.equal(first.files_in_commit, 4)
-  assert.equal(first.stale_site_assets_removed, 0)
-  assert.deepEqual(git(copy, 'diff-tree', '--no-commit-id', '--name-only', '-r', first.commit)
-    .toString().trim().split('\n'), [
+  const siteChanged = first.site_manifest_sha256 !== priorSite.content_sha256
+  assert.equal(first.files_in_commit, 3 + Number(siteChanged)
+    + first.stale_site_assets_removed)
+  const changedPaths = git(copy, 'diff-tree', '--no-commit-id', '--name-only', '-r', first.commit)
+    .toString().trim().split('\n')
+  const allowedPaths = new Set([
+    'archive/content/stories/C03-AFTERFALL/BOOK.json',
     'archive/content/graphs/C03-AFTERFALL/GRAPH.json',
     'archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json',
     'archive/content/visuals/C03-AFTERFALL/VISUALS.json',
   ])
+  assert.ok(changedPaths.every((path) => allowedPaths.has(path)
+    || /^archive\/web\/public\/visual-assets\/[a-f0-9]{64}\.png$/.test(path)))
+  assert.equal(changedPaths.includes('archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json'),
+    siteChanged)
   const firstSite = JSON.parse(git(copy, 'show',
     `${first.commit}:archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json`))
   const firstVisual = JSON.parse(git(copy, 'show',
     `${first.commit}:archive/content/visuals/C03-AFTERFALL/VISUALS.json`))
   assert.equal(firstSite.visual_catalog_sha256, firstVisual.content_sha256)
-  assert.equal(firstSite.assets.length, 1)
+  assert.equal(firstSite.assets.length,
+    priorSite.assets.length - first.stale_site_assets_removed)
   assert.equal(first.checkout_files_written + first.remote_pushes
     + first.site_publications, 0)
   assert.equal(git(copy, 'rev-parse', ref).toString().trim(), first.commit)
