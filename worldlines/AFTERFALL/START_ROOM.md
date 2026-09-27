@@ -46,7 +46,8 @@ Save status가 `ACTIVE`이면:
 - Character / World Bible과 `GM_CONTEXT_V1.md`를 적용한다.
 - consistency 결과가 깨끗한지 먼저 확인한다.
 - `PLAY_SESSION_PROTOCOL_V3.md`에 따라 이전 방의 OPEN capture session이 남아 있으면 안전하게 닫고, **이 새 채팅방용 새 capture session을 먼저 연다.**
-- 이후 모든 실제 USER→GM 플레이 턴을 `append_public_transcript_turn(...)`으로 atomic pair 저장한다. USER와 GM을 따로 쓰지 않는다.
+- 이후 모든 실제 USER→GM 플레이 턴을 `append_public_transcript_turn_with_state_link(...)`으로
+  실제 save outcome/version과 함께 atomic pair 저장한다. USER와 GM을 따로 쓰지 않는다.
 - 현재 장면의 등장인물을 추려 `get_scene_context`를 우선 읽는다.
 - `get_gm_context`는 감사·디버깅·기획 점검이 필요할 때만 사용한다.
 - 과거 세부가 필요할 때만 scenes → events 순으로 내려간다.

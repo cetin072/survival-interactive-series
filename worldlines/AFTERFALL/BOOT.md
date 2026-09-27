@@ -73,7 +73,10 @@ Save status가 `PREPLAY_READY`이면:
 6. 4~6개 의미 있는 비트까지 자연 진행
 7. 중요 Delta만 Save / Pressure / Character / Clock / Scene / Event 중 필요한 층에 갱신
 8. 사용자에게 보낼 최종 GM 공개문을 확정한다.
-9. exact USER + exact GM 문자열을 `append_public_transcript_turn(...)`으로 인접 순서에 원자적으로 저장한다.
+9. exact USER + exact GM 문자열 및 실제 save outcome/version을
+   `append_public_transcript_turn_with_state_link(...)`으로 인접 순서에
+   원자적으로 저장한다. 이 호출이 실패하면 정확한 RAW fallback은 허용하되
+   해당 turn을 state-unlinked로 격리한다.
 10. 저장 성공 후 **동일한 GM 문자열을 그대로 출력**하고 전략적 Choice Gate에서 플레이어에게 반환
 
 RAW capture tool call과 DB 메타는 정상 플레이 출력에 노출하지 않는다. 저장 실패가 두 차례 재시도 뒤에도 지속될 때만 짧은 운영 경고를 남기며, 성공한 척하지 않는다.

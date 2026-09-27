@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_MARKERS = {
     "worldlines/AFTERFALL/LIVE_TURN_FAST_PATH_V1.md": (
         "get_scene_context()",
-        "append_public_transcript_turn(...)",
+        "append_public_transcript_turn_with_state_link(...)",
         "`get_gm_context()`",
         "GitHub, Archive publication, Reader build,\nNetlify deploy는 normal turn path에 넣지 않는다.",
         "save-before-emit",
@@ -22,7 +22,11 @@ REQUIRED_MARKERS = {
     "worldlines/AFTERFALL/BOOT.md": (
         "LIVE_TURN_FAST_PATH_V1.md",
         "check_runtime_consistency",
-        "append_public_transcript_turn(...)",
+        "append_public_transcript_turn_with_state_link(...)",
+    ),
+    "worldlines/AFTERFALL/NEXT_CHAT_PROMPT.md": (
+        "`append_public_transcript_turn_with_state_link`",
+        "state-unlinked",
     ),
     "worldlines/AFTERFALL/GM_CONTEXT_V1.md": (
         "## Same-scene reuse",
