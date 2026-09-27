@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MIGRATION = ROOT / "supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql"
 CONTINUITY_MIGRATION = ROOT / "supabase/migrations/20260927042720_afterfall_turn_state_continuity_v1.sql"
 INTEGRITY_MIGRATION = ROOT / "supabase/migrations/20260927103011_afterfall_turn_link_message_integrity_v1.sql"
+LIVE_LINK_REQUIRED_MIGRATION = ROOT / "supabase/migrations/20260928000500_afterfall_live_link_required_v1.sql"
 
 
 class TurnStateLinkMigrationTests(unittest.TestCase):
@@ -109,6 +110,22 @@ class TurnStateLinkMigrationTests(unittest.TestCase):
         self.assertNotRegex(sql, r"\b(update|delete)\s+survival_rpg\.(saves|transcript_messages|transcript_turn_state_links)\b")
         self.assertEqual(sql.count("grant execute on function"), 1)
         self.assertIn("from public, anon, authenticated", sql)
+
+    def test_live_afterfall_rows_fail_closed_without_state_link(self) -> None:
+        sql = LIVE_LINK_REQUIRED_MIGRATION.read_text(encoding="utf-8").lower()
+        self.assertIn("create or replace function survival_rpg.enforce_afterfall_live_message_link()", sql)
+        self.assertIn("security invoker", sql)
+        self.assertIn("set search_path = pg_catalog, survival_rpg", sql)
+        self.assertIn("new.worldline_id is distinct from 'afterfall'", sql)
+        self.assertIn("new.chronicle_id is distinct from 'c03'", sql)
+        self.assertIn("new.source_type is distinct from 'live'", sql)
+        self.assertIn("new.role not in ('user', 'gm')", sql)
+        self.assertIn("from survival_rpg.transcript_turn_state_links as l", sql)
+        self.assertIn("create constraint trigger afterfall_live_message_requires_state_link", sql)
+        self.assertIn("deferrable initially deferred", sql)
+        self.assertIn("after insert on survival_rpg.transcript_messages", sql)
+        self.assertNotRegex(sql, r"\b(update|delete)\s+survival_rpg\.(saves|transcript_messages|transcript_turn_state_links)\b")
+
 
 
 if __name__ == "__main__":
