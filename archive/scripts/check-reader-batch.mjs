@@ -70,6 +70,13 @@ try {
   const checkoutOnlySeason = resolve(copy, 'archive/content/transcripts/C03-AFTERFALL/S98')
   await mkdir(checkoutOnlySeason, { recursive: true })
   await writeFile(resolve(checkoutOnlySeason, 'MANIFEST.json'), '{ malformed checkout-only manifest')
+  const progressScript = `import { inspectPublicRefProgress } from './archive/scripts/lib/public-ref-progress.mjs';
+const result = await inspectPublicRefProgress({ repoRoot: process.cwd(),
+  ref: '${refSource}', seasonId: 'S99', checkpointRef: '${checkpointRef}' });
+process.stdout.write(JSON.stringify(result));`
+  const progressArgs = ['--experimental-strip-types', '--input-type=module', '-e', progressScript]
+  const progress = () => JSON.parse(command('node', progressArgs, copy))
+  assert.equal(progress().next_stage, 'READER')
   const refScript = `import { commitReaderFromPublicRef } from './archive/scripts/lib/reader-public-ref.mjs';
 const result = await commitReaderFromPublicRef({ repoRoot: process.cwd(),
   ref: '${refSource}', seasonId: 'S99', checkpointRef: '${checkpointRef}',
@@ -78,6 +85,7 @@ process.stdout.write(JSON.stringify(result));`
   const refResult = JSON.parse(command('node', ['--input-type=module', '-e', refScript], copy))
   assert.equal(refResult.status, 'LOCAL_READER_PROPOSAL_COMMITTED')
   assert.equal(refResult.added_chapters, 1)
+  assert.equal(progress().next_stage, 'GRAPH')
   assert.equal(command('git', ['rev-parse', refSource], copy).trim(), refResult.commit)
   assert.equal(command('git', ['rev-parse', 'HEAD'], copy).trim(),
     command('git', ['rev-parse', `${fixtureHead}^`], copy).trim())
@@ -93,6 +101,7 @@ process.stdout.write(JSON.stringify(result));`
   assert.equal(graphResult.status, 'LOCAL_GRAPH_PROPOSAL_COMMITTED')
   assert.equal(graphResult.nodes_added, 0)
   assert.equal(graphResult.relations_added, 0)
+  assert.equal(progress().next_stage, 'VISUAL')
   assert.equal(command('git', ['rev-parse', refSource], copy).trim(), graphResult.commit)
   assert.deepEqual(await readFile(resolve(copy, 'archive/content/stories/C03-AFTERFALL/BOOK.json')), beforeRefBook)
   const proposedGraph = JSON.parse(command('git', ['show',
@@ -112,6 +121,11 @@ process.stdout.write(JSON.stringify(result));`
   assert.equal(visualResult.status, 'LOCAL_VISUAL_PROPOSAL_COMMITTED')
   assert.equal(visualResult.point_count, 34)
   assert.equal(visualResult.provider_calls, 0)
+  const finalProgress = progress()
+  assert.equal(finalProgress.next_stage, 'IMAGE_REVIEW')
+  assert.equal(finalProgress.requests.length, 3)
+  assert.equal(finalProgress.execution_enabled, false)
+  assert.equal(finalProgress.zero_added_cost_proven, false)
   assert.equal(visualResult.execution_enabled, false)
   assert.equal(command('git', ['rev-parse', refSource], copy).trim(), visualResult.commit)
   const proposedVisual = JSON.parse(command('git', ['show',
