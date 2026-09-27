@@ -12,7 +12,10 @@ import { replaceBookAtomically } from './lib/atomic-book.mjs'
 
 const root = resolve(import.meta.dirname, '..', '..')
 const hash = (v) => createHash('sha256').update(v).digest('hex')
-const equal = (a, b) => Buffer.from(a).equals(Buffer.from(b))
+// Git stores LF while Windows checkouts may use CRLF. Compare the same text,
+// without accepting any other mutation or JSON reformatting.
+const equal = (a, b) => Buffer.from(a).toString('utf8').replace(/\r\n/g, '\n')
+  === Buffer.from(b).toString('utf8').replace(/\r\n/g, '\n')
 const demand = (c, code) => { if (!c) throw new Error(code) }
 function git(...args) { return execFileSync('git', args, { cwd: root, maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] }) }
 function pinnedReader(revision) {

@@ -118,6 +118,8 @@ jobs:
         run: node --test ../scripts/lib/publication-graph.test.mjs
       - name: Verify public graph baseline and isolated fact-to-graph integration
         run: node --experimental-strip-types ../scripts/check-graph-batch.mjs
+      - name: Verify one-snapshot Reader Graph Visual preparation
+        run: node --experimental-strip-types --test ../scripts/prepare-unified-publication.test.mjs
       - name: Test visual candidate and brief compiler
         run: node --test ../scripts/lib/visual-compiler.test.mjs
       - name: Verify public appearance-to-brief and isolated visual catalog integration

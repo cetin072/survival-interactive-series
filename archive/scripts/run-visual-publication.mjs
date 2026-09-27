@@ -18,6 +18,8 @@ const baselineAppearanceBlob = '74beacb2424ad2b6d39fdbf4761fdfb99032df85'
 // Its save/time identifies the unchanged S02 subject baseline, not a newly invented event.
 export const APPROVED_S02_APPEARANCE_REF = 'archive/content/public-facts/C03-AFTERFALL/S02/APPEARANCES_APPROVED_20260926.json'
 const demand = (v, code) => { if (!v) throw new Error(code) }
+const sameText = (a, b) => Buffer.from(a).toString('utf8').replace(/\r\n/g, '\n')
+  === Buffer.from(b).toString('utf8').replace(/\r\n/g, '\n')
 const git = (...args) => execFileSync('git', args, { cwd: root, maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] })
 const currentHead = () => git('rev-parse', 'HEAD').toString().trim()
 function pinned(sha, path) {
@@ -38,10 +40,11 @@ function approvedJSON(sha, path, section, season) {
   demand(bytes.length <= 2_000_000, 'VISUAL_INPUT_TOO_LARGE')
   return { data: JSON.parse(bytes), evidence: { source_ref: path, source_sha256: visualByteHash(bytes) } }
 }
-export async function prepareVisualPublication(snapshot, { factsRef = null, appearancesRef = null, mapRef = null } = {}) {
+export async function prepareVisualPublication(snapshot, { factsRef = null, appearancesRef = null,
+  mapRef = null, readerCandidateBytes = null } = {}) {
   const batch = createBatch(snapshot), sha = currentHead()
   demand(batch.snapshot.source_revision === sha, 'VISUAL_SNAPSHOT_CHECKOUT_MISMATCH')
-  const preparedGraph = await prepareGraphPublication(snapshot, factsRef)
+  const preparedGraph = await prepareGraphPublication(snapshot, factsRef, { readerCandidateBytes })
   // Only this reviewed S02 editorial decision has a default. Other snapshots
   // still require an explicit dated appearance input when the legacy UI drifts.
   const reviewedAppearanceRef = appearancesRef ?? (snapshot.season_id === 'S02' ? APPROVED_S02_APPEARANCE_REF : null)
@@ -57,7 +60,8 @@ export async function prepareVisualPublication(snapshot, { factsRef = null, appe
     // No future modification of the TS snapshot may masquerade as save-253 appearance Canon.
     demand(git('rev-parse', `${sha}:${appearanceRef}`).toString().trim() === baselineAppearanceBlob, 'APPEARANCE_BASELINE_CHANGED_USE_DATED_PUBLIC_INPUT')
     const bytes = pinned(sha, appearanceRef)
-    demand((await lstat(resolve(root, appearanceRef))).isFile() && bytes.equals(await readFile(resolve(root, appearanceRef))), 'APPEARANCE_CHECKOUT_CHANGED')
+    demand((await lstat(resolve(root, appearanceRef))).isFile() && sameText(bytes,
+      await readFile(resolve(root, appearanceRef))), 'APPEARANCE_CHECKOUT_CHANGED')
     const module = await import(pathToFileURL(resolve(root, appearanceRef)).href)
     appearances = legacyPublicAppearance(module.characterAppearanceByNodeId, visualByteHash(bytes))
   }
@@ -77,7 +81,9 @@ export async function prepareVisualPublication(snapshot, { factsRef = null, appe
   const candidateBytes = Buffer.from(visualBytes(catalog))
   return { catalog, actualBytes, candidateBytes, report: {
     mode: 'LOCAL_VISUAL_BRIEF_COMPILER', batch_id: batch.batch_id, source_revision: sha,
-    source_save_version: catalog.anchor.save_version, status: actualBytes?.equals(candidateBytes) ? 'NOOP' : 'READY_TO_UPDATE_LOCAL_VISUAL_CATALOG',
+    source_save_version: catalog.anchor.save_version, status: actualBytes && sameText(actualBytes, candidateBytes) ? 'NOOP' : 'READY_TO_UPDATE_LOCAL_VISUAL_CATALOG',
+    reader_sha256: preparedGraph.report.reader_sha256,
+    graph_sha256: preparedGraph.report.graph_sha256,
     point_count: catalog.points.length, by_type: Object.fromEntries(['CHARACTER', 'LOCATION', 'EVENT', 'ENVIRONMENT', 'MAP'].map((t) => [t, catalog.points.filter((p) => p.point_type === t).length])),
     skipped: catalog.skipped.length, map_gate: catalog.map_gate, selection: planVisualSelection(catalog),
     catalog_sha256: catalog.content_sha256, files_written: 0, provider_calls: 0, database_writes: 0, site_publications: 0,
