@@ -1,4 +1,10 @@
 -- Forward correction for the installed publication ledger. Do not replay the original migration.
+-- The connected staging role cannot replace functions owned by the non-login
+-- internal role after its SET membership and schema CREATE rights were removed.
+-- Temporarily restore those rights in this atomic migration, then revoke them.
+grant archive_runner_internal to postgres with set true, inherit false;
+grant create on schema survival_rpg to archive_runner_internal;
+set role archive_runner_internal;
 
 create or replace function survival_rpg.finish_archive_publication_task(
   p_task_id text,
@@ -384,3 +390,6 @@ revoke all on function survival_rpg.claim_archive_publication_task(text,integer)
 grant execute on function survival_rpg.claim_archive_publication_task(text,integer) to service_role;
 revoke all on function survival_rpg.renew_archive_publication_task_lease(text,bigint,uuid,integer) from public, anon, authenticated;
 grant execute on function survival_rpg.renew_archive_publication_task_lease(text,bigint,uuid,integer) to service_role;
+reset role;
+revoke create on schema survival_rpg from archive_runner_internal;
+grant archive_runner_internal to postgres with set false, inherit false;
