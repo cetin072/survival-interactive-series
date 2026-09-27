@@ -59,6 +59,10 @@ jobs:
         run: node --test ../scripts/lib/publication-plan.test.mjs
       - name: Test immutable open-session publication segments
         run: node --test ../scripts/lib/publication-segment.test.mjs
+      - name: Test sealed-segment RAW materialization without publication
+        run: node --test ../scripts/lib/publication-segment-materialize.test.mjs
+      - name: Test linked capture admission without database access
+        run: node --test ../scripts/lib/linked-capture-admission.test.mjs
       - name: Verify deterministic S02 dry-run (no external services)
         run: |
           node ../scripts/dry-run-publication.mjs --demo-s02 --source-revision "$GITHUB_SHA" > "$RUNNER_TEMP/publication-first.json"
