@@ -13,10 +13,10 @@ const recoveryManifest = JSON.parse(await readFile(resolve(recoveryRoot, 'SOURCE
 const recoverySnapshotBytes = await readFile(resolve(recoveryRoot, 'SOURCE_PUBLIC_MESSAGES.json'))
 const recoverySnapshot = JSON.parse(recoverySnapshotBytes.toString('utf8'))
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex')
-if (sha256(recoverySnapshotBytes) !== recoveryManifest.snapshotSha256 || recoverySnapshot.messages.length !== recoveryManifest.publicMessageCount || recoveryManifest.storySceneCount !== 56) throw new Error('Shared-chat source snapshot changed')
+if (sha256(normalizeEol(recoverySnapshotBytes.toString('utf8'))) !== recoveryManifest.snapshotSha256 || recoverySnapshot.messages.length !== recoveryManifest.publicMessageCount || recoveryManifest.storySceneCount !== 56) throw new Error('Shared-chat source snapshot changed')
 for (const part of recoveryManifest.parts) {
   const bytes = await readFile(resolve(recoveryRoot, part.file))
-  if (sha256(bytes) !== part.sha256) throw new Error(`Shared-chat RAW changed: ${part.file}`)
+  if (sha256(normalizeEol(bytes.toString('utf8'))) !== part.sha256) throw new Error(`Shared-chat RAW changed: ${part.file}`)
   const content = normalizeEol(bytes.toString('utf8'))
   for (const message of recoverySnapshot.messages.filter((item) => item.linearIndex >= part.firstLinearIndex && item.linearIndex <= part.lastLinearIndex)) {
     if (!content.includes(message.content)) throw new Error(`Shared-chat message ${message.linearIndex} lost from ${part.file}`)
