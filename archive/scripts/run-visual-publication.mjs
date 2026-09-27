@@ -7,6 +7,7 @@ import { createBatch } from './lib/publication-plan.mjs'
 import { snapshotFromPublishedS02 } from './dry-run-publication.mjs'
 import { prepareGraphPublication } from './run-graph-publication.mjs'
 import { writeGraphAtomically } from './lib/atomic-graph.mjs'
+import { graphHash } from './lib/publication-graph.mjs'
 import { compileVisualCatalog, legacyPublicAppearance, planVisualSelection, validateVisualCatalog, visualBytes, visualByteHash } from './lib/visual-compiler.mjs'
 
 const root = resolve(import.meta.dirname, '..', '..')
@@ -38,10 +39,15 @@ function approvedJSON(sha, path, section, season) {
   demand(bytes.length <= 2_000_000, 'VISUAL_INPUT_TOO_LARGE')
   return { data: JSON.parse(bytes), evidence: { source_ref: path, source_sha256: visualByteHash(bytes) } }
 }
-export async function prepareVisualPublication(snapshot, { factsRef = null, appearancesRef = null, mapRef = null } = {}) {
+export async function prepareVisualPublication(snapshot, { factsRef = null, appearancesRef = null, mapRef = null, preparedGraph = null } = {}) {
   const batch = createBatch(snapshot), sha = currentHead()
   demand(batch.snapshot.source_revision === sha, 'VISUAL_SNAPSHOT_CHECKOUT_MISMATCH')
-  const preparedGraph = await prepareGraphPublication(snapshot, factsRef)
+  const graphInput = preparedGraph ?? await prepareGraphPublication(snapshot, factsRef)
+  demand(graphInput.report?.batch_id === batch.batch_id && graphInput.report?.source_revision === sha
+    && graphInput.report?.files_written === 0 && graphInput.report?.book_sha256, 'INVALID_VISUAL_GRAPH_HANDOFF')
+  const { content_sha256, ...graphBody } = graphInput.graph ?? {}
+  demand(content_sha256 === graphInput.report.graph_sha256 && graphHash(graphBody) === content_sha256,
+    'INVALID_VISUAL_GRAPH_CONTENT')
   // Only this reviewed S02 editorial decision has a default. Other snapshots
   // still require an explicit dated appearance input when the legacy UI drifts.
   const reviewedAppearanceRef = appearancesRef ?? (snapshot.season_id === 'S02' ? APPROVED_S02_APPEARANCE_REF : null)
@@ -67,7 +73,7 @@ export async function prepareVisualPublication(snapshot, { factsRef = null, appe
     demand(!Object.hasOwn(loaded.data, 'evidence'), 'CALLER_MAP_EVIDENCE_REJECTED')
     publicMap = { ...loaded.data, evidence: { ...loaded.evidence, pointer: '/map' } }
   }
-  const catalog = compileVisualCatalog({ batch, graph: preparedGraph.graph, appearances, publicMap })
+  const catalog = compileVisualCatalog({ batch, graph: graphInput.graph, appearances, publicMap })
   validateVisualCatalog(catalog)
   const actualBytes = await existingOutput()
   if (actualBytes) {
@@ -80,7 +86,8 @@ export async function prepareVisualPublication(snapshot, { factsRef = null, appe
     source_save_version: catalog.anchor.save_version, status: actualBytes?.equals(candidateBytes) ? 'NOOP' : 'READY_TO_UPDATE_LOCAL_VISUAL_CATALOG',
     point_count: catalog.points.length, by_type: Object.fromEntries(['CHARACTER', 'LOCATION', 'EVENT', 'ENVIRONMENT', 'MAP'].map((t) => [t, catalog.points.filter((p) => p.point_type === t).length])),
     skipped: catalog.skipped.length, map_gate: catalog.map_gate, selection: planVisualSelection(catalog),
-    catalog_sha256: catalog.content_sha256, files_written: 0, provider_calls: 0, database_writes: 0, site_publications: 0,
+    catalog_sha256: catalog.content_sha256, reader_candidate_only: graphInput.report.reader_candidate_only,
+    graph_sha256: graphInput.report.graph_sha256, files_written: 0, provider_calls: 0, database_writes: 0, site_publications: 0,
   } }
 }
 export async function runVisualCli(args) {
