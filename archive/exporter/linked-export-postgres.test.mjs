@@ -4,6 +4,7 @@ import assert from 'node:assert/strict'
 import pg from 'pg'
 import { discoverLinkedRanges } from '../scripts/lib/linked-export-discovery.mjs'
 import { readLinkedRange } from '../scripts/lib/linked-export-runner.mjs'
+import { checkLinkedExportBatch } from '../scripts/lib/linked-export-batch.mjs'
 
 const connectionString = process.env.ARCHIVE_TEST_EXPORT_DATABASE_URL
 if (!connectionString) throw new Error('ISOLATED_EXPORT_TEST_DATABASE_REQUIRED')
@@ -29,5 +30,12 @@ test('restricted real login discovers and reads only the synthetic linked range'
     assert.equal(admitted.report.transaction_snapshot_verified, true)
     assert.equal(admitted.report.publication_allowed, false)
     assert.ok(admitted.partBytes.length > 0)
+    const first = await checkLinkedExportBatch(client)
+    const replay = await checkLinkedExportBatch(client)
+    assert.deepEqual(first, replay)
+    assert.equal(first.status, 'PENDING_PUBLIC_APPROVAL')
+    assert.equal(first.ranges_verified, 1)
+    assert.equal(first.pairs_verified, 1)
+    assert.equal(first.database_writes + first.files_written + first.site_publications, 0)
   } finally { await client.end() }
 })
