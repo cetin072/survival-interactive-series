@@ -56,7 +56,9 @@
     "low_level_append_function": "survival_rpg.append_public_transcript_message",
     "protocol_version": 3,
     "first_live_trial": "INCOMPLETE: v2 stored one GM row and zero USER rows; session closed without reconstruction.",
-    "next_validation": "S03 LIVE RAW turns 1-16 remain unlinked by design. Verify the game-room caller reads this S03 checkpoint, writes the next real state outcome to the authoritative save, and stores one new exact USER→GM pair via the linked RPC. Do not retro-link existing RAW."
+    "next_validation": "S03 LIVE RAW turns 1-16 remain intentionally unlinked. The authoritative save is S03/save 254. On the next real gameplay turn, call the linked RPC first and verify one new exact USER→GM pair plus state link. Do not retro-link existing RAW; use RECOVERY only after a genuine linked-call failure.",
+    "raw_fallback_source_type": "RECOVERY",
+    "live_guard": "New AFTERFALL/C03 LIVE USER/GM rows must have a state link before commit; legacy LIVE pair writes fail closed."
   },
   "long_range_direction": "worldlines/AFTERFALL/APOCALYPSE_LONG_RANGE_DIRECTION_V1.md",
   "live_turn_fast_path": "worldlines/AFTERFALL/LIVE_TURN_FAST_PATH_V1.md",
