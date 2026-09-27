@@ -1,0 +1,35 @@
+{
+  "version": "afterfall-user-upload-opening-recovery-v1",
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "season_id": "S01",
+  "protagonist": "서진우",
+  "archive_class": "COLD_RAW_RECOVERY",
+  "visibility": "PUBLIC_ARCHIVE",
+  "status": "VERIFIED_PARTIAL_OPENING_RECOVERY",
+  "source": {
+    "kind": "USER_UPLOADED_DOCX",
+    "filename": "《생존일기》 AFTERFALL 새 RPG 시작.docx",
+    "sha256": "a33fb0c67c2e4a768f918aed7f9871a29a2f895dbf2f41a46ba4fb69efc7b052",
+    "bytes": 17901,
+    "pages": 31
+  },
+  "extraction": {
+    "user_messages": 3,
+    "gm_public_messages": 3,
+    "ui_processing_markers_omitted": [
+      "37s 동안 처리함",
+      "1m 2s 동안 처리함",
+      "41s 동안 처리함"
+    ],
+    "embedded_images": "TEXT_SCREENSHOT_DUPLICATES_NOT_REEXTRACTED_AS_MESSAGES",
+    "raw_file": "PART_OPENING_001.md",
+    "raw_sha256": "3fc7dc4a96d43d9344b62551e89cf6de699532afeb7a75ea74d3eaa7a2ad7421",
+    "first_game_time": "2026-09-18 13:42",
+    "last_game_time": "2026-09-18 14:12"
+  },
+  "canon_policy": {
+    "promote_to_canon": false,
+    "reason": "Historical RAW recovery may contain setup/background later superseded by approved Canon; preserve verbatim and review separately."
+  }
+}
