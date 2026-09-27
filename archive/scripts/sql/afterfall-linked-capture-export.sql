@@ -21,6 +21,7 @@ with scope as materialized (
     and s.season_id = m.season_id
   where m.message_order between $2::integer and $3::integer
     and m.public_safe is true
+    and octet_length(m.content) <= 200000
 ), selected_links as materialized (
   select l.turn_no, l.user_message_id, l.gm_message_id, l.outcome,
     l.user_save_version, l.gm_save_version, l.linked_save_version
@@ -57,4 +58,10 @@ select jsonb_build_object(
     'gm_save_version', l.gm_save_version,
     'linked_save_version', l.linked_save_version
   ) order by l.turn_no), '[]'::jsonb) from selected_links as l)
-) as linked_capture_export;
+) as linked_capture_export
+where $2::integer >= 0 and $2::integer % 2 = 0
+  and $3::integer >= $2::integer and $3::integer % 2 = 1
+  and $3::integer - $2::integer + 1 <= 10000
+  and (select count(*) from selected_messages) = $3::integer - $2::integer + 1
+  and (select coalesce(sum(octet_length(m.content)), 0) from selected_messages as m) <= 2000000
+  and (select count(*) from selected_links) = ($3::integer - $2::integer + 1) / 2;
