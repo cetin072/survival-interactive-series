@@ -174,7 +174,7 @@ def audit(snapshot: Any) -> dict[str, Any]:
             elif turn["outcome"] == "APPLIED" and linked_gm_version <= linked_user_version:
                 state_link_errors = True
             elif (previous_gm_save_version is not None
-                    and linked_user_version < previous_gm_save_version):
+                    and linked_user_version != previous_gm_save_version):
                 state_link_errors = True
             else:
                 previous_gm_save_version = linked_gm_version
