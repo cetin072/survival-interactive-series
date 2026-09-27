@@ -140,9 +140,9 @@ Immediately before emitting the response:
    The older `append_public_transcript_turn(...)` is not a valid `LIVE` writer for
    AFTERFALL. It may be used only after a technical linked-call failure, with the
    exact same public pair and `source_type='RECOVERY'`. That pair must be reported
-   as state-unlinked and quarantined from state-derived publication. Missing or
-   stale authoritative save state is a runtime reconciliation failure, not
-   permission to silently select the legacy API for normal play.
+   as state-unlinked and quarantined from state-derived publication.
+   Missing or stale authoritative save state is a runtime reconciliation failure,
+   not permission to silently select the legacy API for normal play.
 9. the database has a deferred guard for AFTERFALL/C03 `LIVE` USER/GM rows: a
    transaction cannot commit unless those new rows belong to a state-link. This
    makes accidental legacy `LIVE` capture fail closed instead of silently
