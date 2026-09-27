@@ -122,6 +122,24 @@ export async function proposeStagingSiteAsset({ repoRoot, ref, baseCommit,
     execution_code_uploads: 0, database_writes: 0 }
 }
 
+/** First-POC path for operator-held readback evidence; it is not a remote runner read. */
+export async function proposeEvidenceSiteAsset({ readbackPath, registryPath, python = 'python',
+  repoRoot, ref, baseCommit, authorizeCommit, gitBinary } = {}) {
+  demand(typeof authorizeCommit === 'function', 'SITE_REF_COMMIT_DISABLED')
+  const [readback, registry] = await Promise.all([readFile(resolve(readbackPath)),
+    readFile(resolve(registryPath), 'utf8').then(JSON.parse)])
+  const verified = await prepareSiteAssetHandoff({ registry,
+    downloadOriginal: async () => readback,
+    deriveFromOriginal: (bytes) => pinnedDerivativeCheck(bytes, python) })
+  const proposal = await commitSiteAssetFromPublicRef({ repoRoot, ref, baseCommit,
+    prepared: verified.prepared, derivativeBytes: verified.derivativeBytes,
+    authorizeCommit, gitBinary })
+  return { ...proposal, evidence_source: 'OPERATOR_HELD_LOCAL_READBACK',
+    remote_readback_proven: false, source_sha256: verified.report.source_sha256,
+    derivative_sha256: verified.report.derivative_sha256,
+    execution_code_uploads: 0, database_writes: 0 }
+}
+
 export async function runSiteAssetHandoff(args, environment = process.env) {
   if (args.length === 1 && args[0] === '--verify-staging')
     return verifyStagingSiteAsset({ baseUrl: environment.ARCHIVE_SUPABASE_URL,
