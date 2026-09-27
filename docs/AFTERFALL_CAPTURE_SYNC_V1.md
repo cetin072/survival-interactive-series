@@ -30,10 +30,12 @@ Before a captured pair can enter publication, an audit input must establish:
   continuity anchor.
 
 The metadata-only auditor in `tools/afterfall_capture_sync.py` rejects raw text,
-save payloads, hidden state and extra fields. It never repairs a save, changes
-`CURRENT_STATE.json`, closes a session or grants publication approval. A
-`CAPTURE_SYNCED` result means only that the supplied metadata is internally
-consistent; a separate visibility/provenance gate is still required.
+save payloads, hidden state and extra fields. It requires the persisted
+`transcript_turn_state_links` entry to match the exact USER/GM row IDs and
+versions. It never repairs a save, changes `CURRENT_STATE.json`, closes a
+session or grants publication approval. A `CAPTURE_METADATA_CONSISTENT` result
+means only that supplied metadata and its state link are internally consistent;
+a separate visibility/provenance gate is still required.
 
 Run its synthetic tests with:
 
@@ -58,10 +60,13 @@ bodies or hidden GM state and did not write to Supabase.
 
 ## Remaining runtime integration
 
-The live capture path must be upgraded at its trusted caller and database
-boundary to persist the state outcome/version with the atomic pair. A
-versioned database migration and its live staging verification are still
-required; this PR does not apply a migration. A least-privilege exporter for
-approved public fields and an actual runner identity must then be tested before
-scheduled publication is enabled. Until those are in place, missing linkage is
-quarantined rather than guessed.
+The additive state-link migration in
+`supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql`
+is installed in the connected staging project and defines a version-checked
+pair writer. Current catalog/ACL checks pass, and the link table contains no
+rows; no play data was written to test it. The game-room caller has not been
+verified to invoke the new RPC. Even after the migration is installed, it does
+not update authoritative save state or prove semantic outcome truth. A
+least-privilege exporter for approved public fields and an actual runner
+identity must then be tested before scheduled publication is enabled. Until
+those are in place, missing linkage is quarantined rather than guessed.

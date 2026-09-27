@@ -7,19 +7,31 @@ from uuid import uuid4
 
 from tools.afterfall_capture_sync import audit
 
+SESSION_ID = "00000000-0000-4000-8000-000000000001"
 
-def message(order: int, save_version: int | None, game_time: str) -> dict:
+
+def message(order: int, save_version: int | None, game_time: str, turn_no: int = 1) -> dict:
     return {
+        "message_id": str(uuid4()),
+        "worldline_id": "AFTERFALL",
+        "chronicle_id": "C03",
+        "season_id": "S03",
+        "session_id": SESSION_ID,
+        "turn_no": turn_no,
         "message_order": order,
+        "role": "USER" if order % 2 == 0 else "GM",
         "idempotency_key": str(uuid4()),
         "content_sha256": "a" * 64,
         "save_version": save_version,
         "public_safe": True,
+        "source_type": "LIVE",
         "game_time": game_time,
     }
 
 
 def snapshot() -> dict:
+    user = message(0, 253, "2027-03-24 16:30")
+    gm = message(1, 253, "2027-03-24 17:10")
     return {
         "version": "afterfall-capture-sync-audit-v1",
         "repository": {
@@ -29,11 +41,14 @@ def snapshot() -> dict:
         "database": {"worldline_id": "AFTERFALL", "season": 3, "save_version": 253,
                      "game_time": "2027-03-24 17:10"},
         "session": {
-            "chronicle_id": "C03", "worldline_id": "AFTERFALL", "season_id": "S03",
+            "session_id": SESSION_ID, "chronicle_id": "C03", "worldline_id": "AFTERFALL", "season_id": "S03",
             "status": "OPEN", "last_message_order": 1,
-            "turns": [{"turn_no": 1, "outcome": "NO_STATE_CHANGE",
-                       "user": message(0, 253, "2027-03-24 16:30"),
-                       "gm": message(1, 253, "2027-03-24 17:10")}],
+            "turns": [{"turn_no": 1, "outcome": "NO_STATE_CHANGE", "user": user, "gm": gm,
+                       "state_link": {"session_id": SESSION_ID, "worldline_id": "AFTERFALL",
+                                      "chronicle_id": "C03", "season_id": "S03",
+                                      "user_message_id": user["message_id"], "gm_message_id": gm["message_id"],
+                                      "outcome": "NO_STATE_CHANGE", "user_save_version": 253,
+                                      "gm_save_version": 253, "linked_save_version": 253}}],
         },
     }
 
@@ -41,7 +56,7 @@ def snapshot() -> dict:
 class CaptureSyncAuditTests(unittest.TestCase):
     def test_synchronized_capture_never_claims_publication(self) -> None:
         result = audit(snapshot())
-        self.assertEqual(result["status"], "CAPTURE_SYNCED")
+        self.assertEqual(result["status"], "CAPTURE_METADATA_CONSISTENT")
         self.assertFalse(result["publication_allowed"])
 
     def test_missing_save_link_quarantines_turn(self) -> None:
@@ -49,8 +64,43 @@ class CaptureSyncAuditTests(unittest.TestCase):
         data["session"]["turns"][0]["gm"]["save_version"] = None
         result = audit(data)
         self.assertEqual((result["status"], result["reason"]),
-                         ("NEEDS_GM_REVIEW", "TURN_STATE_LINK_MISSING"))
+                         ("NEEDS_GM_REVIEW", "TURN_STATE_LINK_CONFLICT"))
         self.assertFalse(result["publication_allowed"])
+
+    def test_missing_turn_link_record_quarantines_complete_raw_pair(self) -> None:
+        data = snapshot()
+        data["session"]["turns"][0]["state_link"] = None
+        data["session"]["turns"][0]["outcome"] = None
+        result = audit(data)
+        self.assertEqual((result["status"], result["reason"]),
+                         ("NEEDS_GM_REVIEW", "TURN_STATE_LINK_MISSING"))
+
+    def test_link_for_a_different_message_pair_is_rejected_for_review(self) -> None:
+        data = snapshot()
+        data["session"]["turns"][0]["state_link"]["user_message_id"] = str(uuid4())
+        result = audit(data)
+        self.assertEqual((result["status"], result["reason"]),
+                         ("NEEDS_GM_REVIEW", "TURN_STATE_LINK_CONFLICT"))
+
+    def test_skipped_turn_number_and_reversed_roles_are_rejected(self) -> None:
+        data = snapshot()
+        user = message(2, 253, "2027-03-24 17:10", 3)
+        gm = message(3, 253, "2027-03-24 17:10", 3)
+        data["session"]["last_message_order"] = 3
+        data["session"]["turns"].append({
+            "turn_no": 3, "outcome": "NO_STATE_CHANGE", "user": user, "gm": gm,
+            "state_link": {"session_id": SESSION_ID, "worldline_id": "AFTERFALL",
+                           "chronicle_id": "C03", "season_id": "S03",
+                           "user_message_id": user["message_id"], "gm_message_id": gm["message_id"],
+                           "outcome": "NO_STATE_CHANGE", "user_save_version": 253,
+                           "gm_save_version": 253, "linked_save_version": 253},
+        })
+        with self.assertRaisesRegex(ValueError, "DUPLICATE_OR_SKIPPED_TURN"):
+            audit(data)
+        data = snapshot()
+        data["session"]["turns"][0]["gm"]["role"] = "USER"
+        with self.assertRaisesRegex(ValueError, "TURN_PAIR_ROLE_MISMATCH"):
+            audit(data)
 
     def test_branch_and_database_season_drift_needs_review(self) -> None:
         data = snapshot()

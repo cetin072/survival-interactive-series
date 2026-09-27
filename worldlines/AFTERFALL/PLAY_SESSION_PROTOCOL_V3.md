@@ -6,6 +6,7 @@ Supersedes: `PLAY_SESSION_PROTOCOL_V2.md` for live transcript capture
 Database API:
 - `survival_rpg.open_public_transcript_session`
 - `survival_rpg.append_public_transcript_turn`
+- `survival_rpg.append_public_transcript_turn_with_state_link` — state-linked live turn API
 - `survival_rpg.append_public_transcript_message` — recovery/meta primitive only
 - `survival_rpg.close_public_transcript_session`
 
@@ -127,7 +128,14 @@ Immediately before emitting the response:
 4. generate one distinct stable GM idempotency UUID;
 5. compute lowercase SHA-256 for the exact USER text;
 6. compute lowercase SHA-256 for the exact final GM text;
-7. call `append_public_transcript_turn(...)`.
+7. when a current authoritative save version is available, call
+   `append_public_transcript_turn_with_state_link(...)` with non-null USER/GM
+   versions and the explicit `APPLIED` or `NO_STATE_CHANGE` outcome. This API
+   locks and checks the current save head, then commits the exact pair and its
+   state-version link in one transaction. It does not mutate the save itself.
+   The older `append_public_transcript_turn(...)` remains a RAW-preservation
+   fallback if the linked API is unavailable or rejects the link; that pair
+   must be reported as unlinked and quarantined from publication.
 
 The database commits:
 
@@ -180,8 +188,8 @@ meta procedure at a safe boundary rather than corrupting pair ordering.
 
 If `append_public_transcript_turn` errors:
 
-1. retry with the exact same USER text, GM text, message order, hashes, and both
-   idempotency UUIDs;
+1. retry the same API with the exact same USER text, GM text, message order,
+   hashes, outcome, versions and both idempotency UUIDs;
 2. after ambiguous network acknowledgement, inspect the session tail before
    generating new keys;
 3. never renumber acknowledged rows.
@@ -246,7 +254,8 @@ Default-branch database contract:
 Live RAW capture and Archive publication are intentionally separated.
 
 ### Every gameplay turn
-- store the exact USER→GM pair in Supabase with `append_public_transcript_turn(...)`;
+- store the exact USER→GM pair and state-version link in Supabase with
+  `append_public_transcript_turn_with_state_link(...)`;
 - do not create a GitHub commit or Netlify deploy for routine turns;
 - do not interrupt the player with save/archive progress messages.
 

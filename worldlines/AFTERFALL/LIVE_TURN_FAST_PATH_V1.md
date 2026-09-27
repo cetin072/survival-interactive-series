@@ -27,8 +27,10 @@ Status: **AUTHORITATIVE LIVE PLAY OPERATING RULE**
 5. GM이 현재 장면을 판정하고 최종 공개 답변을 확정한다.
 6. player/body, 핵심 자원·장비, 파티·거점·차량·세력·주요 관계, 현재 scene,
    durable quest, 중요한 Pressure/Clock 중 실제로 변한 항목만 갱신한다.
-7. 정확한 USER input과 **확정된 동일한 GM output**을
-   `append_public_transcript_turn(...)` 한 번으로 원자 저장한다.
+7. 정확한 USER input과 **확정된 동일한 GM output**을 현재 save version과
+   명시적 outcome에 연결해 `append_public_transcript_turn_with_state_link(...)`
+   한 번으로 원자 저장한다. 이 함수는 save를 변경하지 않고, 실제 current
+   save head를 확인한 뒤 transcript pair와 state link를 함께 commit한다.
 8. 해당 GM 문자열을 플레이어에게 출력한다.
 
 평범한 대사, 몇 분 이동, 반복 정비, 자동 상쇄되는 일상소비, 상태를 바꾸지
@@ -40,7 +42,7 @@ Status: **AUTHORITATIVE LIVE PLAY OPERATING RULE**
 | --- | --- |
 | 새 scene 또는 안정 컨텍스트가 없을 때 | 관련 인물만 포함한 `get_scene_context()` 1회 |
 | meaningful runtime delta가 있을 때 | 필요한 runtime mutation 0~1회 |
-| 정상 USER→GM turn | `append_public_transcript_turn(...)` 1회 |
+| 정상 USER→GM turn | `append_public_transcript_turn_with_state_link(...)` 1회 |
 
 세션이 정상 OPEN이고 마지막 append acknowledgement가 명확하면 session discovery와
 last-message-order 조회를 반복하지 않는다. reconnect, room 이동, acknowledgement
@@ -66,6 +68,8 @@ Netlify deploy는 normal turn path에 넣지 않는다.
 - USER/GM pair는 같은 database statement에서 인접 order로 commit한다.
 - exact UTF-8 SHA-256, stable idempotency keys, session ordering, rollback와
   save-before-emit을 유지한다.
+- linked API가 거부되거나 호출할 수 없을 때만 legacy pair API로 정확한 RAW를
+  보존할 수 있다. 이 경우 state link가 없는 범위는 `NEEDS_GM_REVIEW`로 격리한다.
 - append acknowledgement가 모호하면 출력 전에 재시도/확인한다. 실패한 반쪽을
   기억이나 Canon으로 복구하지 않는다.
 

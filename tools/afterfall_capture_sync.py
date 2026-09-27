@@ -27,10 +27,18 @@ REPOSITORY_KEYS = {
 }
 DATABASE_KEYS = {"worldline_id", "season", "save_version", "game_time"}
 SESSION_KEYS = {
-    "chronicle_id", "worldline_id", "season_id", "status", "last_message_order", "turns"
+    "session_id", "chronicle_id", "worldline_id", "season_id", "status", "last_message_order", "turns"
 }
-TURN_KEYS = {"turn_no", "outcome", "user", "gm"}
-MESSAGE_KEYS = {"message_order", "idempotency_key", "content_sha256", "save_version", "public_safe", "game_time"}
+TURN_KEYS = {"turn_no", "outcome", "user", "gm", "state_link"}
+STATE_LINK_KEYS = {
+    "session_id", "worldline_id", "chronicle_id", "season_id", "user_message_id",
+    "gm_message_id", "outcome", "user_save_version", "gm_save_version", "linked_save_version",
+}
+MESSAGE_KEYS = {
+    "message_id", "worldline_id", "chronicle_id", "season_id", "session_id", "turn_no",
+    "message_order", "role", "idempotency_key", "content_sha256", "save_version",
+    "public_safe", "source_type", "game_time",
+}
 GAME_TIME = re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$")
 
 
@@ -58,6 +66,9 @@ def valid_game_time(value: Any) -> bool:
 
 def validate_message(message: Any) -> None:
     exact_keys(message, MESSAGE_KEYS, "INVALID_MESSAGE_METADATA")
+    require(isinstance(message["message_id"], str) and UUID.fullmatch(message["message_id"]),
+            "INVALID_MESSAGE_ID")
+    require(isinstance(message["role"], str) and message["role"] in {"USER", "GM"}, "INVALID_MESSAGE_ROLE")
     require(isinstance(message["message_order"], int) and not isinstance(message["message_order"], bool)
             and message["message_order"] >= 0,
             "INVALID_MESSAGE_ORDER")
@@ -68,6 +79,8 @@ def validate_message(message: Any) -> None:
     require(message["save_version"] is None or positive_int(message["save_version"]),
             "INVALID_MESSAGE_SAVE_VERSION")
     require(message["public_safe"] is True, "NON_PUBLIC_SAFE_CAPTURE")
+    require(isinstance(message["source_type"], str)
+            and message["source_type"] in {"LIVE", "RECOVERY"}, "INVALID_SOURCE_TYPE")
     require(valid_game_time(message["game_time"]), "INVALID_MESSAGE_GAME_TIME")
 
 
@@ -85,6 +98,8 @@ def audit(snapshot: Any) -> dict[str, Any]:
             "WORLDLINE_IDENTITY_MISMATCH")
     require(session["chronicle_id"] == "C03" and session["worldline_id"] == "AFTERFALL",
             "SESSION_NAMESPACE_MISMATCH")
+    require(isinstance(session["session_id"], str) and UUID.fullmatch(session["session_id"]),
+            "INVALID_SESSION_ID")
     require(isinstance(repository["season"], int) and repository["season"] > 0,
             "INVALID_REPOSITORY_SEASON")
     require(isinstance(database["season"], int) and database["season"] > 0,
@@ -93,13 +108,15 @@ def audit(snapshot: Any) -> dict[str, Any]:
     require(positive_int(database["save_version"]), "INVALID_DATABASE_SAVE_VERSION")
     require(valid_game_time(repository["game_time_anchor"]), "INVALID_REPOSITORY_GAME_TIME")
     require(valid_game_time(database["game_time"]), "INVALID_DATABASE_GAME_TIME")
-    require(session["status"] in {"OPEN", "CLOSED"}, "INVALID_SESSION_STATUS")
+    require(isinstance(session["status"], str)
+            and session["status"] in {"OPEN", "CLOSED"}, "INVALID_SESSION_STATUS")
     require(isinstance(session["last_message_order"], int) and session["last_message_order"] >= -1,
             "INVALID_LAST_MESSAGE_ORDER")
     require(isinstance(session["turns"], list), "INVALID_TURN_INVENTORY")
 
     orders: list[int] = []
     seen_idempotency: set[str] = set()
+    seen_message_ids: set[str] = set()
     unlinked_state = False
     state_link_errors = False
     previous_turn: int | None = None
@@ -107,23 +124,54 @@ def audit(snapshot: Any) -> dict[str, Any]:
         exact_keys(turn, TURN_KEYS, "INVALID_TURN_METADATA")
         require(isinstance(turn["turn_no"], int) and not isinstance(turn["turn_no"], bool)
                 and turn["turn_no"] >= 0, "INVALID_TURN_NUMBER")
-        require(previous_turn is None or turn["turn_no"] > previous_turn, "DUPLICATE_OR_REVERSED_TURN")
+        require(previous_turn is None or turn["turn_no"] == previous_turn + 1, "DUPLICATE_OR_SKIPPED_TURN")
         previous_turn = turn["turn_no"]
-        require(turn["outcome"] in {"APPLIED", "NO_STATE_CHANGE"}, "MISSING_STATE_OUTCOME")
         validate_message(turn["user"])
         validate_message(turn["gm"])
         user, gm = turn["user"], turn["gm"]
+        for message in (user, gm):
+            require(message["worldline_id"] == session["worldline_id"]
+                    and message["chronicle_id"] == session["chronicle_id"]
+                    and message["season_id"] == session["season_id"]
+                    and message["session_id"] == session["session_id"]
+                    and message["turn_no"] == turn["turn_no"], "MESSAGE_NAMESPACE_OR_TURN_MISMATCH")
+        require(user["role"] == "USER" and gm["role"] == "GM", "TURN_PAIR_ROLE_MISMATCH")
         orders.extend([user["message_order"], gm["message_order"]])
         for key in (user["idempotency_key"], gm["idempotency_key"]):
             require(key not in seen_idempotency, "DUPLICATE_IDEMPOTENCY_KEY")
             seen_idempotency.add(key)
+        for message_id in (user["message_id"], gm["message_id"]):
+            require(message_id not in seen_message_ids, "DUPLICATE_MESSAGE_ID")
+            seen_message_ids.add(message_id)
         require(gm["message_order"] == user["message_order"] + 1, "TURN_PAIR_ORDER_GAP")
-        if user["save_version"] is None or gm["save_version"] is None:
+        link = turn["state_link"]
+        if (link is None or not isinstance(turn["outcome"], str)
+                or turn["outcome"] not in {"APPLIED", "NO_STATE_CHANGE"}):
             unlinked_state = True
-        elif turn["outcome"] == "NO_STATE_CHANGE" and user["save_version"] != gm["save_version"]:
-            state_link_errors = True
-        elif turn["outcome"] == "APPLIED" and gm["save_version"] <= user["save_version"]:
-            state_link_errors = True
+        else:
+            exact_keys(link, STATE_LINK_KEYS, "INVALID_TURN_STATE_LINK")
+            if (link["session_id"] != session["session_id"]
+                    or link["worldline_id"] != session["worldline_id"]
+                    or link["chronicle_id"] != session["chronicle_id"]
+                    or link["season_id"] != session["season_id"]):
+                state_link_errors = True
+            linked_user_version = link["user_save_version"]
+            linked_gm_version = link["gm_save_version"]
+            linked_head = link["linked_save_version"]
+            if (link["user_message_id"] != user["message_id"]
+                    or link["gm_message_id"] != gm["message_id"]
+                    or link["outcome"] != turn["outcome"]
+                    or not positive_int(linked_user_version)
+                    or not positive_int(linked_gm_version)
+                    or not positive_int(linked_head)
+                    or user["save_version"] != linked_user_version
+                    or gm["save_version"] != linked_gm_version
+                    or linked_head != linked_gm_version):
+                state_link_errors = True
+            elif turn["outcome"] == "NO_STATE_CHANGE" and linked_user_version != linked_gm_version:
+                state_link_errors = True
+            elif turn["outcome"] == "APPLIED" and linked_gm_version <= linked_user_version:
+                state_link_errors = True
 
     orders.sort()
     require(orders == list(range(session["last_message_order"] + 1)), "SESSION_ORDER_GAP_OR_TAIL_MISMATCH")
@@ -151,7 +199,7 @@ def audit(snapshot: Any) -> dict[str, Any]:
         return {"status": "NEEDS_GM_REVIEW", "reason": "CANON_DATABASE_CAPTURE_DRIFT", "publication_allowed": False}
 
     # A synchronized capture is still not a public approval or an Archive publication.
-    return {"status": "CAPTURE_SYNCED", "reason": "METADATA_CONSISTENT", "publication_allowed": False}
+    return {"status": "CAPTURE_METADATA_CONSISTENT", "reason": "METADATA_CONSISTENT", "publication_allowed": False}
 
 
 def main() -> int:
