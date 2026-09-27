@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MIGRATION = ROOT / "supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql"
+CONTINUITY_MIGRATION = ROOT / "supabase/migrations/20260927000000_afterfall_turn_state_continuity_v1.sql"
 
 
 class TurnStateLinkMigrationTests(unittest.TestCase):
@@ -55,6 +56,21 @@ class TurnStateLinkMigrationTests(unittest.TestCase):
         self.assertIn("does not mutate save state", self.sql)
         self.assertNotRegex(self.sql, r"\bupdate\s+survival_rpg\.saves\b")
 
+    def test_additive_continuity_trigger_checks_both_adjacent_turns(self) -> None:
+        sql = CONTINUITY_MIGRATION.read_text(encoding="utf-8").lower()
+        self.assertIn("create function survival_rpg.enforce_afterfall_turn_state_continuity()", sql)
+        self.assertIn("set search_path = pg_catalog, survival_rpg", sql)
+        self.assertIn("security invoker", sql)
+        self.assertIn("l.turn_no = new.turn_no - 1", sql)
+        self.assertIn("new.user_save_version is distinct from v_previous_gm_save_version", sql)
+        self.assertIn("l.turn_no = new.turn_no + 1", sql)
+        self.assertIn("v_next_user_save_version is distinct from new.gm_save_version", sql)
+        self.assertIn("before insert on survival_rpg.transcript_turn_state_links", sql)
+        self.assertNotIn("drop ", sql)
+        self.assertNotRegex(sql, r"\b(update|delete)\s+survival_rpg\.(saves|transcript_messages|transcript_turn_state_links)\b")
+        self.assertNotIn("grant execute", sql)
+
 
 if __name__ == "__main__":
     unittest.main()
+
