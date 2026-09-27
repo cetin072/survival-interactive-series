@@ -21,7 +21,7 @@ on:
       - "tools/test_afterfall_turn_state_link_sql.py"
       - "supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql"
       - "supabase/migrations/20260927042720_afterfall_turn_state_continuity_v1.sql"
-      - "supabase/migrations/20260927095300_afterfall_turn_link_message_integrity_v1.sql"
+      - "supabase/migrations/20260927103011_afterfall_turn_link_message_integrity_v1.sql"
       - "supabase/tests/afterfall_atomic_turn_state_link_v1_verification.sql"
       - "supabase/tests/afterfall_turn_state_continuity_v1_verification.sql"
       - "supabase/tests/afterfall_turn_link_message_integrity_v1_verification.sql"
@@ -54,7 +54,7 @@ on:
       - "tools/test_afterfall_turn_state_link_sql.py"
       - "supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql"
       - "supabase/migrations/20260927042720_afterfall_turn_state_continuity_v1.sql"
-      - "supabase/migrations/20260927095300_afterfall_turn_link_message_integrity_v1.sql"
+      - "supabase/migrations/20260927103011_afterfall_turn_link_message_integrity_v1.sql"
       - "supabase/tests/afterfall_atomic_turn_state_link_v1_verification.sql"
       - "supabase/tests/afterfall_turn_state_continuity_v1_verification.sql"
       - "supabase/tests/afterfall_turn_link_message_integrity_v1_verification.sql"
@@ -148,7 +148,7 @@ jobs:
       - name: Apply the installed continuity migration unchanged
         run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260927042720_afterfall_turn_state_continuity_v1.sql
       - name: Apply additive message and save-head guard
-        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260927095300_afterfall_turn_link_message_integrity_v1.sql
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260927103011_afterfall_turn_link_message_integrity_v1.sql
       - name: Verify linked pair acceptance and unsafe-link rejection
         run: psql -v ON_ERROR_STOP=1 -f supabase/tests/afterfall_turn_link_message_integrity_v1_verification.sql
 

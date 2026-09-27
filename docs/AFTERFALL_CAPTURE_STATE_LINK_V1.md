@@ -65,7 +65,7 @@ across an existing unlinked RAW gap, update old rows, or approve publication.
 
 ## Additive message and save-head integrity upgrade
 
-Migration `20260927095300_afterfall_turn_link_message_integrity_v1.sql` uses
+Migration `20260927103011_afterfall_turn_link_message_integrity_v1.sql` uses
 `CREATE OR REPLACE FUNCTION` to strengthen the installed trigger function. It
 does not edit or rerun `20260927042720_afterfall_turn_state_continuity_v1.sql`
 and does not recreate the trigger. It also replaces the installed invoker RPC
@@ -86,9 +86,11 @@ save versions match the link; and that their message orders are consecutive.
 Adjacent linked turns must continue both save versions and message order,
 including when an insertion is attempted out of order.
 
-The installed staging migration list confirms `20260927042720` is applied.
-The `20260927095300` integrity upgrade is code-only and has not been applied.
-Neither migration changes existing transcript rows. The current S03 session
-still has zero state links and remains quarantined; a live game-room caller
-has not been observed.
+The installed staging migration list confirms `20260927042720` and
+`20260927103011` are applied. Effective ACL checks confirm the capture RPC
+remains SECURITY INVOKER, the lock helper is executable only by `service_role`,
+and the role still has no direct `saves` SELECT/UPDATE or transcript/link UPDATE.
+The link ledger still contains zero rows. No transcript or save rows were
+changed, and the current S03 session remains quarantined; a live game-room
+caller has not been observed.
 
