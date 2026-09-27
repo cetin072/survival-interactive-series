@@ -48,10 +48,16 @@ jobs:
         run: node --test ../scripts/lib/publication-segment.test.mjs
       - name: Test sealed-segment RAW materialization without publication
         run: node --test ../scripts/lib/publication-segment-materialize.test.mjs
+      - name: Test pending segment inventory and replay safety
+        run: node --test ../scripts/lib/pending-segment-inventory.test.mjs
       - name: Test linked capture admission without database access
         run: node --test ../scripts/lib/linked-capture-admission.test.mjs
       - name: Test restricted read-only export session without database access
         run: node --test ../scripts/lib/linked-export-runner.test.mjs
+      - name: Test Git-pinned season inventory without database access
+        run: node --test ../exporter/pinned-inventory.test.mjs
+      - name: Test inventory derived from pinned public season manifests
+        run: node --test ../exporter/published-season-inventory.test.mjs ../exporter/published-season-git.test.mjs
       - name: Verify deterministic S02 dry-run (no external services)
         run: |
           node ../scripts/dry-run-publication.mjs --demo-s02 --source-revision "$GITHUB_SHA" > "$RUNNER_TEMP/publication-first.json"

@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
+import { mkdtemp, readFile, rmdir, unlink, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import test from 'node:test'
 import { readLinkedRange } from './linked-export-runner.mjs'
 import { runLinkedExportCli } from '../../exporter/check-linked-export.mjs'
@@ -93,4 +96,75 @@ test('CLI prints only bounded metadata and rejects broad or insecure connection 
     `${url}?sslmode=disable`,
     'postgresql://archive_exporter:secret@localhost/postgres',
   ]) await assert.rejects(runLinkedExportCli(args, { connectionString: bad, ClientClass: FakeClient }))
+})
+test('opt-in inventory check links restricted read to a pending proposal without writing text', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'archive-pending-inventory-'))
+  const path = join(directory, 'inventory.json')
+  const inventory = { version: 'pending-segment-inventory-v1',
+    chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', season_id: 'S03',
+    segments: [], reserved_session_ids: ['SESSION_009'] }
+  const args = ['--session', sessionId, '--start', '0', '--end', '1', '--check', '--inventory', path]
+  const connectionString = 'postgresql://archive_exporter:secret@db.example.supabase.co:5432/postgres'
+  try {
+    await writeFile(path, JSON.stringify(inventory))
+    const output = await runLinkedExportCli(args, { connectionString, ClientClass: FakeClient })
+    const value = JSON.parse(output)
+    assert.equal(value.mode, 'READ_ONLY_UNAPPROVED_SEGMENT_PLAN')
+    assert.equal(value.status, 'PENDING_PUBLIC_APPROVAL')
+    assert.equal(value.session_id, 'SESSION_010')
+    assert.equal(value.inventory_authenticated, false)
+    assert.equal(value.inventory_git_pinned, false)
+    assert.equal(value.publication_allowed, false)
+    assert.equal(value.files_written, 0)
+    assert.ok(!output.includes('SYNTHETIC_GM'))
+    assert.ok(!output.includes('secret'))
+    assert.deepEqual(JSON.parse(await readFile(path, 'utf8')), inventory)
+    assert.equal(FakeClient.last.calls.at(-1), 'COMMIT')
+    assert.equal(FakeClient.last.ended, true)
+    const commit = 'a'.repeat(40)
+    const pinned = JSON.parse(await runLinkedExportCli(
+      [...args, '--inventory-commit', commit], {
+        connectionString, ClientClass: FakeClient,
+        readPinned: async () => ({ inventory, inventory_commit: commit,
+          inventory_sha256: hash(JSON.stringify(inventory)) }),
+      }))
+    assert.equal(pinned.inventory_git_pinned, true)
+    assert.equal(pinned.inventory_authenticated, false)
+    assert.equal(pinned.inventory_commit, commit)
+    assert.equal(pinned.publication_allowed, false)
+    const fromPublished = JSON.parse(await runLinkedExportCli(
+      [...args.slice(0, 7), '--published-season', 'S03', '--inventory-commit', commit], {
+        connectionString, ClientClass: FakeClient,
+        readPublished: async (season, revision) => {
+          assert.equal(season, 'S03'); assert.equal(revision, commit)
+          return { inventory, inventory_commit: commit,
+            inventory_sha256: hash(JSON.stringify(inventory)) }
+        },
+      }))
+    assert.equal(fromPublished.inventory_source, 'PUBLISHED_SEASON_MANIFESTS')
+    assert.equal(fromPublished.inventory_git_pinned, true)
+    assert.equal(fromPublished.inventory_authenticated, false)
+    assert.equal(fromPublished.publication_allowed, false)
+    await assert.rejects(runLinkedExportCli(
+      [...args.slice(0, 7), '--published-season', 'S03', '--inventory-commit', commit], {
+        connectionString, ClientClass: FakeClient,
+        readPublished: async () => ({ inventory: { ...inventory, season_id: 'S02' },
+          inventory_commit: commit, inventory_sha256: hash('other') }),
+      }), /PUBLISHED_SEASON_MISMATCH/)
+    await assert.rejects(runLinkedExportCli([...args, '--inventory-commit', 'bad'],
+      { connectionString, ClientClass: FakeClient }), /INVALID_INVENTORY_COMMIT/)
+    await assert.rejects(runLinkedExportCli([...args.slice(0, -1), 'relative.json'],
+      { connectionString, ClientClass: FakeClient }), /ABSOLUTE_INVENTORY_PATH_REQUIRED/)
+    const priorClient = FakeClient.last
+    await writeFile(path, JSON.stringify({ ...inventory, unexpected: 'PRIVATE' }))
+    await assert.rejects(runLinkedExportCli(args, { connectionString, ClientClass: FakeClient }),
+      /INVALID_INVENTORY_ENVELOPE/)
+    assert.equal(FakeClient.last, priorClient)
+    await writeFile(path, JSON.stringify({ ...inventory, season_id: 'S02' }))
+    await assert.rejects(runLinkedExportCli(args, { connectionString, ClientClass: FakeClient }),
+      /INVENTORY_SEASON_MISMATCH/)
+  } finally {
+    await unlink(path)
+    await rmdir(directory)
+  }
 })
