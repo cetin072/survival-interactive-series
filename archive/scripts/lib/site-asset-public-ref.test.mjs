@@ -19,7 +19,7 @@ const prepared = { status: 'SITE_ASSET_PREPARED_NOT_PUBLISHED',
   derivative_sha256: published.assets[0].sha256 }
 const ref = 'refs/heads/codex/archive-publication-image-test'
 
-async function repository() {
+async function repository({ unlistedFile = false } = {}) {
   const root = await mkdtemp(join(tmpdir(), 'archive-site-commit-test-'))
   git(root, 'init', '-b', 'main')
   const directory = join(root, 'archive/content/visuals/C03-AFTERFALL')
@@ -30,7 +30,12 @@ async function repository() {
   await writeFile(join(directory, 'VISUALS.json'), JSON.stringify(catalog, null, 2) + '\n')
   await writeFile(join(directory, 'SITE_ASSETS.json'), JSON.stringify({ ...body,
     content_sha256: visualDigest(body) }, null, 2) + '\n')
-  git(root, 'add', 'archive/content/visuals')
+  if (unlistedFile) {
+    const publicDirectory = join(root, 'archive/web/public/visual-assets')
+    await mkdir(publicDirectory, { recursive: true })
+    await writeFile(join(publicDirectory, 'stale.png'), derivative)
+  }
+  git(root, 'add', 'archive')
   git(root, '-c', 'user.name=Site Test', '-c', 'user.email=site@example.invalid',
     'commit', '-m', 'Baseline')
   const baseCommit = git(root, 'rev-parse', 'HEAD')
@@ -77,5 +82,15 @@ test('rejected approval, altered derivative and stale base leave proposal ref un
     await assert.rejects(commitSiteAssetFromPublicRef({ ...input,
       authorizeCommit: async () => true }), /SITE_REF_BASE_MOVED/)
     assert.equal(git(root, 'rev-parse', ref), first.commit)
+  } finally { await rm(root, { recursive: true, force: true }) }
+})
+
+test('a public PNG omitted from the pinned manifest blocks the proposal', async () => {
+  const { root, baseCommit } = await repository({ unlistedFile: true })
+  try {
+    await assert.rejects(commitSiteAssetFromPublicRef({ repoRoot: root, ref,
+      baseCommit, prepared, derivativeBytes: derivative, gitBinary,
+      authorizeCommit: async () => true }), /SITE_REF_UNLISTED_PUBLIC_IMAGE/)
+    assert.equal(git(root, 'rev-parse', ref), baseCommit)
   } finally { await rm(root, { recursive: true, force: true }) }
 })

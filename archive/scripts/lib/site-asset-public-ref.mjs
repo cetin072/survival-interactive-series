@@ -36,6 +36,20 @@ export async function commitSiteAssetFromPublicRef({ repoRoot, ref, baseCommit, 
   const catalog = JSON.parse(catalogBytes.toString('utf8'))
   const manifest = JSON.parse(manifestBytes.toString('utf8'))
   validateVisualCatalog(catalog)
+  demand(Array.isArray(manifest.assets), 'SITE_REF_MANIFEST_INVALID')
+  const tree = (await git(gitBinary, root, ['ls-tree', '-r', baseCommit,
+    '--', `${publicPrefix}/visual-assets`])).toString('utf8').trim()
+  const actualPaths = tree ? tree.split('\n').map((line) => {
+    const match = /^100644 blob [a-f0-9]{40}\t(.+)$/.exec(line)
+    demand(match, 'SITE_REF_PUBLIC_FILE_MODE_INVALID')
+    return match[1]
+  }).sort() : []
+  const listedPaths = manifest.assets.map((asset) => {
+    demand(pathName.test(asset.public_path), 'SITE_REF_PRIOR_PATH_INVALID')
+    return `${publicPrefix}${asset.public_path}`
+  }).sort()
+  demand(JSON.stringify(actualPaths) === JSON.stringify(listedPaths),
+    'SITE_REF_UNLISTED_PUBLIC_IMAGE')
   const file = inspectPng(derivativeBytes)
   demand(pathName.test(prepared.asset.public_path)
     && prepared.asset.public_path === `/visual-assets/${file.sha256}.png`
@@ -48,7 +62,6 @@ export async function commitSiteAssetFromPublicRef({ repoRoot, ref, baseCommit, 
     const publicRoot = join(temp, 'public')
     await mkdir(join(publicRoot, 'visual-assets'), { recursive: true })
     for (const asset of manifest.assets ?? []) {
-      demand(pathName.test(asset.public_path), 'SITE_REF_PRIOR_PATH_INVALID')
       const bytes = await read(`${publicPrefix}${asset.public_path}`)
       await writeFile(join(publicRoot, asset.public_path.slice(1)), bytes, { flag: 'wx' })
     }
