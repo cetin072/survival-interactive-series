@@ -13,17 +13,20 @@ import { auditHistoricalImageObservations } from './lib/historical-image-observa
 
 const root = resolve(import.meta.dirname, '..', '..')
 const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
-const allowed = new Set(['--snapshot', '--facts', '--appearances', '--map', '--ledger'])
+const allowed = new Set(['--snapshot', '--facts', '--appearances', '--map', '--ledger', '--daily-history'])
 
 export async function checkArchivePipeline(args) {
   if (args.length < 2 || args.at(-1) !== '--check') throw new Error('READ_ONLY_MODE_REQUIRED')
   const historicalPoc = auditHistoricalImageObservations(JSON.parse(git('show', 'HEAD:docs/AUTOMATIC_ARCHIVE_STEP6_OBSERVATIONS.json')))
-  let snapshot, factsRef = null, appearancesRef = null, mapRef = null, ledgerRef = null
-  if (args[0] === '--demo-s02' && (args.length === 2 || args.length === 4 && args[1] === '--ledger')) {
+  let snapshot, factsRef = null, appearancesRef = null, mapRef = null, ledgerRef = null, dailyRef = null
+  if (args[0] === '--demo-s02' && (args.length === 2
+    || args.length === 4 && args[1] === '--ledger'
+    || args.length === 6 && args[1] === '--ledger' && args[3] === '--daily-history')) {
     const sha = git('rev-parse', 'HEAD')
     const manifest = JSON.parse(git('show', `${sha}:archive/content/transcripts/C03-AFTERFALL/S02/MANIFEST.json`))
     snapshot = snapshotFromPublishedS02(manifest, sha)
-    ledgerRef = args.length === 4 ? args[2] : null
+    ledgerRef = args.length >= 4 ? args[2] : null
+    dailyRef = args.length === 6 ? args[4] : null
   } else {
     if ((args.length - 1) % 2 !== 0) throw new Error('INVALID_PIPELINE_FLAGS')
     const flags = new Map()
@@ -39,7 +42,9 @@ export async function checkArchivePipeline(args) {
     appearancesRef = flags.get('--appearances') ?? null
     mapRef = flags.get('--map') ?? null
     ledgerRef = flags.get('--ledger') ?? null
+    dailyRef = flags.get('--daily-history') ?? null
   }
+  if (dailyRef !== null && ledgerRef === null) throw new Error('DAILY_HISTORY_REQUIRES_ATTEMPT_LEDGER')
   const reader = await prepareTextPublication(snapshot)
   if (reader.report.reader_status !== 'NOOP') return { ...assembleArchiveRun({ reader: reader.report }), historical_poc: historicalPoc }
   const graph = await prepareGraphPublication(snapshot, factsRef)
@@ -48,7 +53,13 @@ export async function checkArchivePipeline(args) {
   if (ledgerRef !== null) {
     const path = resolve(ledgerRef), stat = await lstat(path)
     if (!stat.isFile() || stat.size > 1_000_000) throw new Error('INVALID_ATTEMPT_LEDGER_FILE')
-    attemptPlan = planFromAttemptLedger(visual.catalog, JSON.parse(await readFile(path, 'utf8')))
+    let dailyHistory = null
+    if (dailyRef !== null) {
+      const dailyPath = resolve(dailyRef), dailyStat = await lstat(dailyPath)
+      if (!dailyStat.isFile() || dailyStat.size > 1_000_000) throw new Error('INVALID_DAILY_HISTORY_FILE')
+      dailyHistory = JSON.parse(await readFile(dailyPath, 'utf8'))
+    }
+    attemptPlan = planFromAttemptLedger(visual.catalog, JSON.parse(await readFile(path, 'utf8')), { dailyHistory })
   }
   return { ...assembleArchiveRun({ reader: reader.report, graph: graph.report, visual: visual.report, attemptPlan }),
     historical_poc: historicalPoc }

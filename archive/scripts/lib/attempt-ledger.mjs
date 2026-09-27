@@ -3,6 +3,7 @@ import { readFile, lstat } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { validateVisualCatalog, visualDigest } from './visual-compiler.mjs'
 import { writeGraphAtomically } from './atomic-graph.mjs'
+import { POLICY } from './publication-plan.mjs'
 
 const demand = (value, code) => { if (!value) throw new Error(code) }
 const object = (value) => value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -12,6 +13,37 @@ const exact = (value, names, code) => demand(object(value)
 const hash = (value, prefix) => typeof value === 'string'
   && new RegExp(`^${prefix}[a-f0-9]{64}$`).test(value)
 const fields = ['attempt_id', 'request_id', 'point_id', 'generation_key', 'state', 'evidence_ref', 'previous_event_sha256']
+const utcInstant = (value) => typeof value === 'string' && !Number.isNaN(Date.parse(value))
+  && new Date(value).toISOString() === value
+
+/** Computation only: the caller must establish completeness and authenticity of the cross-batch history. */
+export function planDailyAttemptBudget(ledger, history) {
+  exact(history, ['version', 'chronicle_id', 'worldline_id', 'visibility', 'as_of', 'window_hours', 'reservations'],
+    'INVALID_DAILY_HISTORY')
+  demand(history.version === 'archive-daily-attempt-history-v1'
+    && history.chronicle_id === ledger.chronicle_id && history.worldline_id === ledger.worldline_id
+    && history.visibility === 'PUBLIC_ARCHIVE' && history.window_hours === 24
+    && utcInstant(history.as_of) && Array.isArray(history.reservations)
+    && history.reservations.length <= 10000, 'DAILY_HISTORY_SCOPE_INVALID')
+  const now = Date.parse(history.as_of), start = now - 24 * 60 * 60 * 1000
+  const seen = new Set(), included = new Set()
+  let used = 0
+  for (const item of history.reservations) {
+    exact(item, ['attempt_id', 'batch_id', 'reserved_at'], 'INVALID_DAILY_RESERVATION')
+    demand(hash(item.attempt_id, 'attempt-') && hash(item.batch_id, 'batch-')
+      && utcInstant(item.reserved_at) && !seen.has(item.attempt_id), 'INVALID_DAILY_RESERVATION')
+    seen.add(item.attempt_id)
+    const at = Date.parse(item.reserved_at)
+    demand(at <= now, 'FUTURE_DAILY_RESERVATION')
+    if (at >= start) used++
+    included.add(item.attempt_id)
+  }
+  const current = ledger.events.filter((event) => event.state === 'RESERVED')
+  demand(current.every((event) => included.has(event.attempt_id)), 'CURRENT_RESERVATION_MISSING_FROM_DAILY_HISTORY')
+  return { status: 'INPUT_VALIDATED_NOT_AUTHENTICATED', window_hours: 24, as_of: history.as_of,
+    reservations_in_window: used, remaining: Math.max(0, POLICY.daily_attempt_limit - used),
+    history_complete_proven: false, execution_enabled: false }
+}
 
 /** Hashes event contents and the prior event, giving each append a stable identity. */
 export function makeAttemptEvent(data) {
@@ -20,7 +52,7 @@ export function makeAttemptEvent(data) {
 }
 
 /** The journal only suppresses duplicate planning. No state means GENERATED or accepted. */
-export function planFromAttemptLedger(catalog, ledger) {
+export function planFromAttemptLedger(catalog, ledger, { dailyHistory = null } = {}) {
   validateVisualCatalog(catalog)
   exact(ledger, ['version', 'chronicle_id', 'worldline_id', 'visibility', 'catalog_sha256', 'events'], 'INVALID_ATTEMPT_LEDGER')
   demand(ledger.version === 'archive-image-attempt-ledger-v2'
@@ -60,9 +92,14 @@ export function planFromAttemptLedger(catalog, ledger) {
   const eligible = catalog.points.filter((point) => point.status === 'READY'
     && !(byPoint.get(point.point_id) ?? []).some((item) => item.state === 'RESERVED')
     && (byPoint.get(point.point_id)?.length ?? 0) < 3)
+  const daily = dailyHistory === null
+    ? { status: 'HISTORY_NOT_SUPPLIED', remaining: null, history_complete_proven: false, execution_enabled: false }
+    : planDailyAttemptBudget(ledger, dailyHistory)
+  const available = Math.min(Math.max(0, POLICY.batch_attempt_limit - reservations), daily.remaining ?? POLICY.batch_attempt_limit)
   return {
     mode: 'LEDGER_PLAN_ONLY', catalog_sha256: catalog.content_sha256,
-    selected_point_ids: eligible.slice(0, Math.max(0, 3 - reservations)).map((point) => point.point_id),
+    selected_point_ids: eligible.slice(0, available).map((point) => point.point_id),
+    daily_budget: daily,
     reserved: records.filter((item) => item.state === 'RESERVED').length,
     failed: records.filter((item) => item.state === 'FAILED').length,
     quarantined: records.filter((item) => item.state === 'QUARANTINED').length,

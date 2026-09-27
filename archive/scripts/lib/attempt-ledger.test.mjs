@@ -31,12 +31,43 @@ const event = (point, i, state = 'RESERVED', previous_event_sha256 = null) => ma
   point_id: point.point_id, generation_key: point.generation_key, state,
   evidence_ref: state === 'RESERVED' ? null : 'docs/AUTOMATIC_ARCHIVE_STEP6_OBSERVATIONS.json', previous_event_sha256,
 })
+const daily = (reservations = []) => ({ version: 'archive-daily-attempt-history-v1', ...ns,
+  as_of: '2026-09-27T12:00:00.000Z', window_hours: 24, reservations })
+const dailyItem = (digit, reserved_at = '2026-09-27T08:00:00.000Z') => ({
+  attempt_id: `attempt-${String(digit).repeat(64)}`, batch_id: `batch-${'d'.repeat(64)}`, reserved_at })
 
 test('empty journal selects at most three with zero execution', () => {
   const value = catalog(), plan = planFromAttemptLedger(value, empty(value))
   assert.equal(plan.selected_point_ids.length, 3)
+  assert.equal(plan.daily_budget.status, 'HISTORY_NOT_SUPPLIED')
   assert.equal(plan.provider_calls, 0)
   assert.equal(plan.execution_enabled, false)
+})
+test('cross-batch 24-hour reservations constrain planning without authorizing execution', () => {
+  const value = catalog(), ledger = empty(value)
+  const five = daily([1, 2, 3, 4, 5].map((n) => dailyItem(n)))
+  const oneLeft = planFromAttemptLedger(value, ledger, { dailyHistory: five })
+  assert.equal(oneLeft.selected_point_ids.length, 1)
+  assert.equal(oneLeft.daily_budget.remaining, 1)
+  assert.equal(oneLeft.daily_budget.history_complete_proven, false)
+  assert.equal(oneLeft.execution_enabled, false)
+  const six = planFromAttemptLedger(value, ledger, { dailyHistory: daily([...five.reservations, dailyItem(6)]) })
+  assert.deepEqual(six.selected_point_ids, [])
+  assert.equal(six.daily_budget.remaining, 0)
+  const old = planFromAttemptLedger(value, ledger, { dailyHistory: daily([dailyItem(7, '2026-09-26T11:59:59.000Z')]) })
+  assert.equal(old.daily_budget.remaining, 6)
+})
+test('daily view rejects missing current reservations, duplicates and future timestamps', () => {
+  const value = catalog(), ledger = empty(value), point = value.points[0]
+  ledger.events.push(event(point, 1))
+  assert.throws(() => planFromAttemptLedger(value, ledger, { dailyHistory: daily() }),
+    /CURRENT_RESERVATION_MISSING_FROM_DAILY_HISTORY/)
+  const one = daily([dailyItem(1)])
+  assert.equal(planFromAttemptLedger(value, ledger, { dailyHistory: one }).daily_budget.remaining, 5)
+  assert.throws(() => planFromAttemptLedger(value, ledger, { dailyHistory: daily([dailyItem(1), dailyItem(1)]) }),
+    /INVALID_DAILY_RESERVATION/)
+  assert.throws(() => planFromAttemptLedger(value, ledger, { dailyHistory: daily([dailyItem(1, '2026-09-27T12:00:00.001Z')]) }),
+    /FUTURE_DAILY_RESERVATION/)
 })
 test('reservation holds one generation key and consumes one batch slot', () => {
   const value = catalog(), ledger = empty(value), point = value.points[0]

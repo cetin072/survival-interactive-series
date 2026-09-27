@@ -17,6 +17,7 @@ test('the read-only plan keeps downstream image, storage and cost unproven', () 
   assert.equal(result.stages.visual.ready_briefs, 30)
   assert.equal(result.stages.image.accepted_images, 0)
   assert.equal(result.stages.cost.added_cost_proven_zero, false)
+  assert.equal(result.daily_budget.status, 'NOT_SUPPLIED')
   assert.equal(result.storage_uploads, 0)
 })
 test('an uncommitted Reader candidate blocks graph and visual claims', () => {
@@ -40,6 +41,9 @@ test('a validated ledger plan replaces raw candidates but never authorizes execu
   const result = assembleArchiveRun({ reader: reader(), graph: graph(), visual: visual(), attemptPlan })
   assert.deepEqual(result.selected_point_ids, ['point-after-reservation'])
   assert.equal(result.attempt_ledger.status, 'VALIDATED_LOCAL_PLAN')
+  assert.equal(result.daily_budget.history_complete_proven, false)
   assert.throws(() => assembleArchiveRun({ reader: reader(), graph: graph(), visual: visual(),
     attemptPlan: { ...attemptPlan, provider_calls: 1 } }), /ATTEMPT_LEDGER_EXECUTION_NOT_DISABLED/)
+  assert.throws(() => assembleArchiveRun({ reader: reader(), graph: graph(), visual: visual(),
+    attemptPlan: { ...attemptPlan, daily_budget: { execution_enabled: true } } }), /ATTEMPT_LEDGER_EXECUTION_NOT_DISABLED/)
 })

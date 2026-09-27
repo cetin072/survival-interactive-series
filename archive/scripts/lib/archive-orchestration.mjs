@@ -17,7 +17,8 @@ export function assembleArchiveRun({ reader, graph = null, visual = null, attemp
     'PIPELINE_BATCH_MISMATCH')
     if (attemptPlan !== null) demand(attemptPlan.mode === 'LEDGER_PLAN_ONLY'
       && attemptPlan.catalog_sha256 === visual.catalog_sha256 && attemptPlan.execution_enabled === false
-      && attemptPlan.provider_calls === 0 && attemptPlan.images_generated === 0 && attemptPlan.storage_uploads === 0,
+      && attemptPlan.provider_calls === 0 && attemptPlan.images_generated === 0 && attemptPlan.storage_uploads === 0
+      && (attemptPlan.daily_budget === undefined || attemptPlan.daily_budget.execution_enabled === false),
     'ATTEMPT_LEDGER_EXECUTION_NOT_DISABLED')
   }
   return {
@@ -40,6 +41,8 @@ export function assembleArchiveRun({ reader, graph = null, visual = null, attemp
     attempt_ledger: attemptPlan === null ? { status: 'NOT_SUPPLIED', reserved: 0, failed: 0, quarantined: 0 }
       : { status: 'VALIDATED_LOCAL_PLAN', reserved: attemptPlan.reserved, failed: attemptPlan.failed,
         quarantined: attemptPlan.quarantined, retry_exhausted: attemptPlan.retry_exhausted },
+    daily_budget: attemptPlan?.daily_budget ?? { status: 'NOT_SUPPLIED', remaining: null,
+      history_complete_proven: false, execution_enabled: false },
     selected_point_ids: attemptPlan?.selected_point_ids ?? visual?.selection.selected_point_ids ?? [],
     file_writes: 0, provider_calls: 0, database_writes: 0, storage_uploads: 0, site_publications: 0,
   }

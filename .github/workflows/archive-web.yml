@@ -65,6 +65,23 @@ jobs:
         run: node --experimental-strip-types ../scripts/check-archive-pipeline.mjs --demo-s02 --check
       - name: Verify pinned S02 attempt ledger without execution
         run: node --experimental-strip-types ../scripts/check-archive-pipeline.mjs --demo-s02 --ledger ../content/visuals/C03-AFTERFALL/ATTEMPTS_S02.json --check
+      - name: Verify synthetic cross-batch daily ceiling in read-only S02 pipeline
+        run: |
+          node --input-type=module <<'NODE'
+          import { writeFileSync } from 'node:fs'
+          const history = {
+            version: 'archive-daily-attempt-history-v1', chronicle_id: 'C03-AFTERFALL',
+            worldline_id: 'AFTERFALL', visibility: 'PUBLIC_ARCHIVE',
+            as_of: '2026-09-27T12:00:00.000Z', window_hours: 24,
+            reservations: [1, 2, 3, 4, 5].map((n) => ({
+              attempt_id: `attempt-${String(n).repeat(64)}`, batch_id: `batch-${'d'.repeat(64)}`,
+              reserved_at: '2026-09-27T08:00:00.000Z',
+            })),
+          }
+          writeFileSync(process.env.RUNNER_TEMP + '/archive-synthetic-daily.json', JSON.stringify(history))
+          NODE
+          node --experimental-strip-types ../scripts/check-archive-pipeline.mjs --demo-s02 --ledger ../content/visuals/C03-AFTERFALL/ATTEMPTS_S02.json --daily-history "$RUNNER_TEMP/archive-synthetic-daily.json" --check > "$RUNNER_TEMP/archive-daily-plan.json"
+          node --input-type=module -e 'import { readFileSync } from "node:fs"; import assert from "node:assert/strict"; const p=JSON.parse(readFileSync(process.env.RUNNER_TEMP+"/archive-daily-plan.json","utf8")); assert.equal(p.daily_budget.remaining,1); assert.equal(p.daily_budget.history_complete_proven,false); assert.equal(p.selected_point_ids.length,1); assert.equal(p.provider_calls,0);'
       - name: Install
         run: npm ci
       - name: Test
