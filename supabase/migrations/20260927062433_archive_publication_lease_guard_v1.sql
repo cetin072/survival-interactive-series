@@ -371,4 +371,3 @@ revoke all on function survival_rpg.finish_archive_publication_daily_run(date,bi
 grant execute on function survival_rpg.finish_archive_publication_daily_run(date,bigint,uuid,text,jsonb,text,integer) to service_role;
 revoke all on function survival_rpg.link_archive_publication_run_batch(date,bigint,uuid,text,text) from public, anon, authenticated;
 grant execute on function survival_rpg.link_archive_publication_run_batch(date,bigint,uuid,text,text) to service_role;
-
