@@ -16,7 +16,7 @@ REQUIRED_MARKERS = {
     ),
     "worldlines/AFTERFALL/PLAY_SESSION_PROTOCOL_V3.md": (
         "exact USER text",
-        "stable USER idempotency UUID",
+        "generate fresh USER/GM idempotency UUIDs",
         "append_public_transcript_turn(..., source_type='LIVE')",
         "State linkage is useful evidence",
     ),
