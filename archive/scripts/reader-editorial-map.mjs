@@ -5,6 +5,7 @@
 const c01 = (number) => `seasons_v2/${number === 10 ? 'S02' : 'S01'}/raw_transcript/PART_${String(number === 10 ? 1 : number).padStart(3, '0')}.md`
 const c02 = (session, number) => `archive/content/transcripts/C02-STRONGHOLD/SESSIONS/${session}/PART_${String(number).padStart(3, '0')}.md`
 const c03s1 = (number) => `archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_${String(number).padStart(3, '0')}.md`
+const c03Opening = 'archive/content/transcripts/C03-AFTERFALL/S01/OPENING_RECOVERY/PART_OPENING_001.md'
 const c03s2 = (session, number) => `archive/content/transcripts/C03-AFTERFALL/S02/${session}/PART_${String(number).padStart(3, '0')}.md`
 const source = (path, range = {}) => ({ path, ...range })
 
@@ -25,6 +26,8 @@ export const editorialOverrides = {
     [c02('SESSION_C02_20260925_ROOM_01', 4)]: '# 이번 아크 종료',
   },
   trimBefore: {
+    // Character creation stays in RAW; the Reader begins at the first played scene.
+    [c03Opening]: '# S1 — 균열',
     // Four GM blocks of explicit bug-discussion precede this verified scene.
     [c03s2('SESSION_001', 2)]: '## 2026년 11월 22일 16:31',
   },
@@ -53,6 +56,7 @@ export const editorialPlan = {
     { title: '여름 이후', partId: 'PART IV', arcLabel: '야간의 기록', dateLabel: 'PART IV', sources: [source(c02('SESSION_20260925_2039_CURRENT_ROOM', 4))], relatedNodeIds: [] },
   ],
   'C03-AFTERFALL': [
+    { id: 'c03-afterfall-opening-01', chapterNumber: 0, title: '균열', seasonId: 'S01', arcLabel: '복구된 시작 장면', dateLabel: '2026-09-18 13:42', sources: [source(c03Opening)], relatedNodeIds: [] },
     { title: '두 번째 거점', seasonId: 'S01', arcLabel: '두 거점과 외곽', dateLabel: 'S01', sources: [source(c03s1(1))], relatedNodeIds: ['char-jinwoo', 'loc-nw-center', 'loc-agri'] },
     { title: '정식 연합체', seasonId: 'S01', arcLabel: '두 거점과 외곽', dateLabel: 'S01', sources: [source(c03s1(2), { before: '## 11월 2일 08:05' })], relatedNodeIds: ['char-jinwoo', 'loc-agri'] },
     { title: '폐쇄된 체육시설', seasonId: 'S01', arcLabel: '두 거점과 외곽', dateLabel: 'S01', sources: [source(c03s1(2), { from: '## 11월 2일 08:05' })], relatedNodeIds: ['char-jinwoo', 'loc-contact'] },

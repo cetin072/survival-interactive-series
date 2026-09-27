@@ -116,6 +116,12 @@ function views(nodes, relations, book, bookSource, currentAnchor) {
     demand(typeof chapter.id === 'string' && chapter.id.startsWith('c03-afterfall-') && !seen.has(chapter.id), 'INVALID_CHAPTER_ID')
     seen.add(chapter.id)
     demand(chapter.sourceKind === 'VERIFIED_GM_NARRATIVE' && typeof chapter.body === 'string' && text(chapter.title, 200), 'INVALID_PUBLIC_CHAPTER')
+    if (chapter.id === 'c03-afterfall-opening-01') {
+      // The recovered historical scene is Reader evidence, not current graph facts.
+      const openingRef = 'archive/content/transcripts/C03-AFTERFALL/S01/OPENING_RECOVERY/PART_OPENING_001.md'
+      demand(!chapter.publicationProvenance && chapter.sourceRefs?.length === 1 && chapter.sourceRefs[0] === openingRef && chapter.archiveSourceRefs?.length === 1 && chapter.archiveSourceRefs[0] === openingRef && Array.isArray(chapter.relatedNodeIds) && chapter.relatedNodeIds.length === 0, 'INVALID_HISTORICAL_OPENING')
+      continue
+    }
     if (chapter.publicationProvenance) {
       demand(chapter.publicationProvenance.visibility === 'PUBLIC_ARCHIVE' && time(chapter.publicationProvenance.capturedRange?.end), 'NON_PUBLIC_CHAPTER')
       if (chapter.publicationProvenance.capturedRange.end > currentAnchor.game_time) continue
