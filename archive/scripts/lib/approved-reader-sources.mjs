@@ -4,6 +4,8 @@ import { splitRoleBlocks } from './reader-transform.mjs'
 const hash = (v) => createHash('sha256').update(v).digest('hex')
 const demand = (c) => { if (!c) throw new Error('INVALID_APPROVED_READER_SOURCE') }
 const digest = (v) => typeof v === 'string' && /^[a-f0-9]{64}$/.test(v)
+const uuid = (v) => typeof v === 'string'
+  && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v)
 function validTime(v) {
   if (typeof v !== 'string' || !/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(v)) return false
   const d = new Date(v.replace(' ', 'T') + ':00Z')
@@ -18,6 +20,7 @@ export async function approvedSeasonCatalog(manifest, seasonId, { read, listPart
   demand(manifest.archive_class === 'COLD_RAW' && Array.isArray(manifest.sessions))
   demand(new Set(manifest.sessions.map((s) => s.session_id)).size === manifest.sessions.length)
   const result = []
+  const nextSegmentOrder = new Map(), segmentIds = new Set(), candidateIds = new Set()
   for (const session of manifest.sessions) {
     demand(/^SESSION_\d{3}$/.test(session.session_id))
     if (session.visibility !== 'PUBLIC_ARCHIVE') continue
@@ -30,7 +33,33 @@ export async function approvedSeasonCatalog(manifest, seasonId, { read, listPart
     const manifestBytes = await read(sourceManifestRef)
     const source = JSON.parse(manifestBytes.toString('utf8'))
     demand(source.chronicle_id === manifest.chronicle_id && source.worldline_id === manifest.worldline_id && source.season_id === seasonId && source.session_id === session.session_id)
-    demand(source.visibility === 'PUBLIC_ARCHIVE' && source.public_safe_only === true && source.closed_at)
+    demand(source.visibility === 'PUBLIC_ARCHIVE' && source.public_safe_only === true)
+    const segmented = Object.hasOwn(session, 'segment_id') || Object.hasOwn(source, 'segment_id')
+    if (segmented) {
+      const order = source.source_message_order
+      demand(source.source_type === 'SUPABASE_ROLLING_RAW'
+        && source.segment_status === 'SEALED' && source.publication_allowed === true
+        && ['OPEN', 'CLOSED'].includes(source.source_session_status)
+        && (source.source_session_status !== 'OPEN' || !source.closed_at)
+        && typeof source.approval_provenance_ref === 'string'
+        && /^[-A-Za-z0-9_./:#]{1,300}$/.test(source.approval_provenance_ref)
+        && uuid(source.source_session_uuid)
+        && /^segment-[a-f0-9]{64}$/.test(source.segment_id)
+        && /^candidate-[a-f0-9]{64}$/.test(source.candidate_id)
+        && digest(source.source_digest)
+        && Number.isSafeInteger(source.source_save_version) && source.source_save_version > 0
+        && source.source_session_uuid === session.source_session_uuid
+        && source.segment_id === session.segment_id
+        && source.candidate_id === session.candidate_id
+        && Number.isSafeInteger(order?.start) && order.start >= 0 && order.start % 2 === 0
+        && Number.isSafeInteger(order?.end) && order.end >= order.start && order.end % 2 === 1
+        && order.start === session.source_message_order?.start
+        && order.end === session.source_message_order?.end
+        && order.start === (nextSegmentOrder.get(source.source_session_uuid) ?? 0)
+        && !segmentIds.has(source.segment_id) && !candidateIds.has(source.candidate_id))
+      nextSegmentOrder.set(source.source_session_uuid, order.end + 1)
+      segmentIds.add(source.segment_id); candidateIds.add(source.candidate_id)
+    } else demand(source.closed_at)
     demand(source.atomic_pairing_complete === true && source.capture_quality === session.capture_quality)
     const range = source.captured_message_range
     demand(source.coverage_basis === 'captured_message_range' && session.coverage_basis === 'captured_message_range')
@@ -39,10 +68,12 @@ export async function approvedSeasonCatalog(manifest, seasonId, { read, listPart
     const counts = source.counts
     demand(Number.isSafeInteger(counts?.user) && counts.user > 0 && counts.user === counts.gm && counts.total === 2 * counts.user)
     demand(session.user_messages === counts.user && session.gm_public_blocks === counts.gm && (counts.assistant_public_meta ?? 0) === 0)
+    if (segmented) demand(source.source_message_order.end - source.source_message_order.start + 1 === counts.total)
     demand(Array.isArray(source.content_sha256) && source.content_sha256.length === counts.total)
     demand(source.content_sha256.every((h, i) => h.message_order === i && h.role === (i % 2 ? 'GM' : 'USER') && digest(h.sha256)))
     demand(source.message_order?.min === 0 && source.message_order?.max === counts.total - 1 && source.message_order.contiguous === true)
     demand(Array.isArray(source.parts) && source.parts.length > 0 && new Set(source.parts).size === source.parts.length)
+    if (segmented) demand(source.parts.length === 1 && source.parts[0] === 'PART_001.md')
     demand(source.parts.every((name) => /^PART_\d{3}\.md$/.test(name)))
     demand(JSON.stringify([...source.parts].sort()) === JSON.stringify((await listParts(prefix)).sort()))
     demand(source.parts_sha256 && JSON.stringify(Object.keys(source.parts_sha256).sort()) === JSON.stringify([...source.parts].sort()))
@@ -56,7 +87,11 @@ export async function approvedSeasonCatalog(manifest, seasonId, { read, listPart
         archivePath, canonicalRef: `worldlines/AFTERFALL/seasons/${seasonId}/raw_transcript/${session.session_id}/${part}`,
         group: seasonId, title: '공개 플레이 기록',
         autoPublication: { visibility: 'PUBLIC_ARCHIVE', sessionId: session.session_id, part, sourceManifestRef,
-          sourceManifestSha256: hash(manifestBytes), rawSha256: hash(bytes), capturedRange: { ...range } },
+          sourceManifestSha256: hash(manifestBytes), rawSha256: hash(bytes), capturedRange: { ...range },
+          ...(segmented ? { segmentId: source.segment_id, candidateId: source.candidate_id,
+            sourceSessionUuid: source.source_session_uuid,
+            sourceMessageOrder: { ...source.source_message_order },
+            approvalProvenanceRef: source.approval_provenance_ref } : {}) },
       })
     }
     demand(roles.length === counts.total && roles.every((header, i) => header.role === (i % 2 ? 'GM' : 'USER') && Number(header.messageLabel) === i))

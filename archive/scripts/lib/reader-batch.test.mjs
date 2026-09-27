@@ -22,6 +22,22 @@ function fixture() {
     listParts: async () => ['PART_001.md'] }
   return { prefix, raw, range, session, manifest, source, io }
 }
+function segmentFixture() {
+  const f = fixture()
+  const id = '0'.repeat(63) + '1'
+  const sourceSessionUuid = '00000000-0000-4000-8000-000000000001'
+  Object.assign(f.session, { source_session_uuid: sourceSessionUuid,
+    source_message_order: { start: 0, end: 1 }, segment_id: `segment-${id}`,
+    candidate_id: `candidate-${id}` })
+  Object.assign(f.source, { source_type: 'SUPABASE_ROLLING_RAW',
+    source_session_uuid: sourceSessionUuid, source_session_status: 'OPEN',
+    source_message_order: { start: 0, end: 1 }, segment_id: f.session.segment_id,
+    candidate_id: f.session.candidate_id, source_digest: id, source_save_version: 999,
+    segment_status: 'SEALED', publication_allowed: true,
+    approval_provenance_ref: 'OWNER_APPROVAL:synthetic-test-only' })
+  delete f.source.closed_at
+  return f
+}
 async function catalog(f) { return approvedSeasonCatalog(f.manifest, 'S99', f.io) }
 async function automatic(f = fixture()) {
   const [item] = await catalog(f)
@@ -31,6 +47,58 @@ async function automatic(f = fixture()) {
 async function rejects(edit) { const f = fixture(); edit(f); await assert.rejects(catalog(f)) }
 
 test('approved closed source becomes a hash-bound catalog item', async () => { const f = fixture(); const [p] = await catalog(f); assert.equal(p.autoPublication.rawSha256, hash(f.raw)); assert.equal(p.autoPublication.sourceManifestRef, `${f.prefix}/SOURCE_MANIFEST.json`) })
+test('approved sealed segment from an OPEN source becomes a hash-bound catalog item', async () => {
+  const f = segmentFixture(); const [p] = await catalog(f)
+  assert.equal(p.autoPublication.segmentId, f.session.segment_id)
+  assert.equal(p.autoPublication.sourceMessageOrder.end, 1)
+  assert.equal(p.autoPublication.rawSha256, hash(f.raw))
+  assert.equal(f.source.closed_at, undefined)
+  const { chapters } = await automatic(f)
+  assert.equal(chapters.length, 1)
+  assert.equal(chapters[0].publicationProvenance.segmentId, f.session.segment_id)
+  assert.doesNotMatch(chapters[0].body, /TEST_INPUT|TEST_A|TEST_B/)
+})
+test('pending or inconsistent sealed segment remains outside Reader', async () => {
+  for (const edit of [
+    (f) => { f.source.visibility = 'PENDING_PUBLIC_APPROVAL' },
+    (f) => { f.source.publication_allowed = false },
+    (f) => { f.source.approval_provenance_ref = null },
+    (f) => { f.source.segment_status = 'PENDING' },
+    (f) => { f.source.segment_id = `segment-${'2'.repeat(64)}` },
+    (f) => { f.source.candidate_id = `candidate-${'2'.repeat(64)}` },
+    (f) => { f.source.source_message_order.end = 3 },
+    (f) => { f.source.source_message_order.start = 2; f.source.source_message_order.end = 3;
+      f.session.source_message_order = { start: 2, end: 3 } },
+    (f) => { f.source.closed_at = '2099-01-01' },
+    (f) => { f.source.parts.push('PART_002.md') },
+    (f) => { delete f.session.segment_id },
+  ]) {
+    const f = segmentFixture(); edit(f)
+    await assert.rejects(catalog(f))
+  }
+})
+test('sequential sealed segments from one OPEN source are accepted without a gap', async () => {
+  const first = segmentFixture(), second = segmentFixture()
+  second.session.session_id = 'SESSION_002'
+  second.session.source_manifest = 'SESSION_002/SOURCE_MANIFEST.json'
+  second.session.source_message_order = { start: 2, end: 3 }
+  second.session.segment_id = `segment-${'2'.repeat(64)}`
+  second.session.candidate_id = `candidate-${'2'.repeat(64)}`
+  Object.assign(second.source, { session_id: 'SESSION_002',
+    source_message_order: { start: 2, end: 3 },
+    segment_id: second.session.segment_id, candidate_id: second.session.candidate_id })
+  first.manifest.sessions.push(second.session)
+  const secondPrefix = first.prefix.replace('SESSION_001', 'SESSION_002')
+  first.io.read = async (path) => path === `${first.prefix}/SOURCE_MANIFEST.json`
+    ? Buffer.from(JSON.stringify(first.source))
+    : path === `${secondPrefix}/SOURCE_MANIFEST.json`
+      ? Buffer.from(JSON.stringify(second.source)) : first.raw
+  const parts = await catalog(first)
+  assert.equal(parts.length, 2)
+  assert.deepEqual(parts.map((p) => p.autoPublication.sourceMessageOrder.start), [0, 2])
+  first.manifest.sessions.reverse()
+  await assert.rejects(catalog(first))
+})
 for (const visibility of [undefined, 'PLAYER_ARCHIVE', 'CORE_PRIVATE']) test(`unapproved season ${visibility} is never read`, async () => { const f = fixture(); f.manifest.visibility = visibility; f.io.read = async () => { throw Error('MUST_NOT_READ') }; assert.deepEqual(await catalog(f), []) })
 test('unapproved session is withheld', async () => { const f = fixture(); f.session.visibility = 'PLAYER_ARCHIVE'; assert.deepEqual(await catalog(f), []) })
 test('fragment is kept out of automatic prose', async () => { const f = fixture(); f.session.capture_quality = 'PARTIAL_CAPTURE_INCOMPLETE_PAIRING'; f.session.atomic_pairing_complete = false; assert.deepEqual(await catalog(f), []) })
