@@ -77,6 +77,8 @@ jobs:
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927103011_afterfall_turn_link_message_integrity_v1.sql
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927123458_archive_exporter_reader_v1.sql
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_exporter_reader_v1_verification.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927215800_archive_daily_runner_login_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_daily_runner_login_v1_verification.sql
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -100,6 +102,16 @@ jobs:
         run: |
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --command "ALTER ROLE archive_exporter PASSWORD 'ci_fixture_only';"
           node --test linked-export-postgres.test.mjs
+      - name: Verify one-shot daily runner against isolated PostgreSQL
+        working-directory: archive/exporter
+        env:
+          PGPASSWORD: postgres
+          ARCHIVE_TEST_EXPORT_DATABASE_URL: postgresql://archive_exporter:ci_fixture_only@localhost:5432/archive_test
+          ARCHIVE_TEST_RUNNER_DATABASE_URL: postgresql://archive_publication_runner:ci_fixture_only@localhost:5432/archive_test
+          ARCHIVE_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/archive_test
+        run: |
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --command "ALTER ROLE archive_publication_runner PASSWORD 'ci_fixture_only';"
+          node --test daily-noop-postgres.test.mjs
       - name: Setup pinned image transformer
         uses: actions/setup-python@v5
         with:
