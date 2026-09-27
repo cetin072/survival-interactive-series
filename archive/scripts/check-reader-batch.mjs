@@ -117,6 +117,20 @@ process.stdout.write(JSON.stringify(result));`
   assert.deepEqual(await readFile(resolve(copy, 'archive/content/stories/C03-AFTERFALL/BOOK.json')), beforeRefBook)
   assert.throws(() => command('node', [
     '--experimental-strip-types', '--input-type=module', '-e', visualScript], copy))
+  const requestScript = `import { prepareImageRequestsFromPublicRef } from './archive/scripts/lib/image-request-public-ref.mjs';
+const result = await prepareImageRequestsFromPublicRef({ repoRoot: process.cwd(),
+  ref: '${refSource}', seasonId: 'S99', checkpointRef: '${checkpointRef}' });
+process.stdout.write(JSON.stringify(result));`
+  const imageRequestArgs = ['--experimental-strip-types', '--input-type=module', '-e', requestScript]
+  const requestPlan = JSON.parse(command('node', imageRequestArgs, copy))
+  assert.equal(requestPlan.status, 'IMAGE_REQUESTS_PREPARED_NO_EXECUTION')
+  assert.equal(requestPlan.requests.length, 3)
+  assert.equal(requestPlan.requests[0].subject_id, 'char-jinwoo')
+  assert.equal(requestPlan.requests[0].execution_authorized, false)
+  assert.equal(requestPlan.provider_calls, 0)
+  assert.equal(requestPlan.zero_added_cost_proven, false)
+  assert.deepEqual(JSON.parse(command('node', imageRequestArgs, copy)), requestPlan)
+  assert.equal(command('git', ['rev-parse', refSource], copy).trim(), visualResult.commit)
   command('git', ['checkout', '--detach', fixtureHead], copy)
   const proposalRef = 'refs/heads/codex/archive-publication-reader-test'
   command('git', ['branch', 'codex/archive-publication-reader-test', fixtureHead], copy)
@@ -164,5 +178,5 @@ process.stdout.write(JSON.stringify(result));`
   await writeFile(resolve(copy, relative, 'PART_001.md'), raw + '\nCORRUPTED\n')
   assert.throws(() => command('node', args, copy))
   assert.equal(await readFile(bookFile, 'utf8'), changedBook)
-  console.log(JSON.stringify({ real_books_unchanged: books.map((b) => ({ chronicle: b.chronicleId, chapters: b.chapters.length })), real_s02_reader_batch: report, historical_batch_after_newer_publication: 'PASS', synthetic_ref_pinned_reader_proposal: 'PASS', synthetic_ref_pinned_graph_relink: 'PASS', synthetic_ref_pinned_visual_catalog: 'PASS', synthetic_local_git_proposal: 'PASS', synthetic_append: 'PASS', synthetic_repeat_noop: 'PASS', corrupted_source_retains_book: 'PASS' }))
+  console.log(JSON.stringify({ real_books_unchanged: books.map((b) => ({ chronicle: b.chronicleId, chapters: b.chapters.length })), real_s02_reader_batch: report, historical_batch_after_newer_publication: 'PASS', synthetic_ref_pinned_reader_proposal: 'PASS', synthetic_ref_pinned_graph_relink: 'PASS', synthetic_ref_pinned_visual_catalog: 'PASS', synthetic_ref_pinned_image_request: 'PASS', synthetic_local_git_proposal: 'PASS', synthetic_append: 'PASS', synthetic_repeat_noop: 'PASS', corrupted_source_retains_book: 'PASS' }))
 } finally { await rm(temporary, { recursive: true, force: true }) }
