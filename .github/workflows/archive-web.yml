@@ -61,6 +61,20 @@ jobs:
           psql --host localhost --username supabase_admin --dbname archive_test --set ON_ERROR_STOP=1 --command "ALTER ROLE postgres SUPERUSER;"
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_publication_ledger_v1_verification.sql
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_publication_lease_guard_v1_verification.sql
+      - name: Verify restricted linked-source exporter against PostgreSQL 17
+        working-directory: .
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --command "CREATE TABLE survival_rpg.saves (worldline_id text PRIMARY KEY, save_version integer NOT NULL);"
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260924173125_rolling_raw_capture_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260925003736_public_transcript_capture_session_api_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260925044647_public_transcript_turn_pair_api_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927042720_afterfall_turn_state_continuity_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927103011_afterfall_turn_link_message_integrity_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927121600_archive_exporter_reader_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_exporter_reader_v1_verification.sql
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
