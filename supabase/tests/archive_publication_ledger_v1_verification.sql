@@ -17,6 +17,14 @@ begin
   if has_schema_privilege('archive_runner_internal', 'survival_rpg', 'CREATE') then
     raise exception 'INTERNAL_ROLE_SCHEMA_CREATE_NOT_REVOKED';
   end if;
+  if exists (
+    select 1 from pg_catalog.pg_auth_members m
+     where m.roleid = 'archive_runner_internal'::regrole
+       and m.member = 'postgres'::regrole
+       and (m.admin_option or m.inherit_option or m.set_option)
+  ) then
+    raise exception 'POSTGRES_INTERNAL_ROLE_OPTIONS_REMAIN';
+  end if;
 
   if not (select relrowsecurity and relforcerowsecurity
             from pg_catalog.pg_class
@@ -32,6 +40,15 @@ begin
             from pg_catalog.pg_class
            where oid = 'survival_rpg.archive_publication_run_batches'::regclass) then
     raise exception 'RUN_BATCH_TABLE_RLS_NOT_FORCED';
+  end if;
+  if not exists (
+    select 1 from pg_catalog.pg_index i
+    join pg_catalog.pg_class idx on idx.oid = i.indexrelid
+    where i.indrelid = 'survival_rpg.archive_publication_task_events'::regclass
+      and idx.relname = 'archive_publication_task_events_task_idx'
+      and i.indisvalid
+  ) then
+    raise exception 'TASK_EVENT_FK_INDEX_MISSING';
   end if;
 
   if has_table_privilege('anon', 'survival_rpg.archive_publication_tasks', 'SELECT')
