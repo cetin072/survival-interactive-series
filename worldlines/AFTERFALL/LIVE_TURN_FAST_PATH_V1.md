@@ -31,14 +31,11 @@ Status: **AUTHORITATIVE LIVE PLAY OPERATING RULE**
 5. GM이 현재 장면을 판정하고 최종 공개 답변을 확정한다.
 6. player/body, 핵심 자원·장비, 파티·거점·차량·세력·주요 관계, 현재 scene,
    durable quest, 중요한 Pressure/Clock 중 실제로 변한 항목만 갱신한다.
-7. 정확한 USER input과 **확정된 동일한 GM output**을 현재 save version과
-   명시적 outcome에 연결해 `append_public_transcript_turn_with_state_link(...)`
-   한 번으로 원자 저장한다. 이 함수는 save를 변경하지 않고, 실제 current
-   save head를 확인한 뒤 transcript pair와 state link를 함께 commit한다.
-   `CURRENT_STATE.json`의 `live_transcript_capture.append_function`이 이
-   linked RPC를 가리키는지 확인한다. 기술적 호출 실패에만 기존 RAW RPC를
-   안전 보존용으로 사용하고, 그 턴을 state-unlinked로 격리한다.
-8. 해당 GM 문자열을 플레이어에게 출력한다.
+7. 정확한 USER input과 **확정된 동일한 GM output**은 한 번의 transcript pair 호출로 보존한다.
+   - 평범한 대화·이동·정보확인·반복 운영처럼 durable state를 바꾸지 않는 턴은 `append_public_transcript_turn(...)`만 호출한다.
+   - 이미 gameplay 때문에 의미 있는 runtime mutation을 저장한 턴은 그때 확보한 실제 version/outcome을 사용해 `append_public_transcript_turn_with_state_link(...)`를 호출한다.
+   - Archive를 위해 별도 save reconciliation이나 추가 state mutation을 만들지 않는다.
+8. RAW 호출이 한 번 실패하면 같은 payload로 한 번만 빠르게 재시도한다. 그래도 실패하면 Archive 때문에 플레이어를 더 기다리게 하지 말고 동일 GM 문자열을 출력한다. 보이는 채팅방의 exact pair는 room-close/daily recovery source로 남긴다.
 
 평범한 대사, 몇 분 이동, 반복 정비, 자동 상쇄되는 일상소비, 상태를 바꾸지
 않는 정보 확인은 Save/Scene/Event/Pressure/Clock을 전부 갱신하지 않는다.
@@ -49,7 +46,8 @@ Status: **AUTHORITATIVE LIVE PLAY OPERATING RULE**
 | --- | --- |
 | 새 scene 또는 안정 컨텍스트가 없을 때 | 관련 인물만 포함한 `get_scene_context()` 1회 |
 | meaningful runtime delta가 있을 때 | 필요한 runtime mutation 0~1회 |
-| 정상 USER→GM turn | `append_public_transcript_turn_with_state_link(...)` 1회 |
+| routine USER→GM turn | `append_public_transcript_turn(...)` 1회 |
+| meaningful runtime mutation turn | 해당 mutation 0~1회 + `append_public_transcript_turn_with_state_link(...)` 1회 |
 
 세션이 정상 OPEN이고 마지막 append acknowledgement가 명확하면 session discovery와
 last-message-order 조회를 반복하지 않는다. reconnect, room 이동, acknowledgement
@@ -75,10 +73,9 @@ Netlify deploy는 normal turn path에 넣지 않는다.
 - USER/GM pair는 같은 database statement에서 인접 order로 commit한다.
 - exact UTF-8 SHA-256, stable idempotency keys, session ordering, rollback와
   save-before-emit을 유지한다.
-- linked API가 거부되거나 호출할 수 없을 때만 legacy pair API로 정확한 RAW를
-  보존할 수 있다. 이 경우 state link가 없는 범위는 `NEEDS_GM_REVIEW`로 격리한다.
-- append acknowledgement가 모호하면 출력 전에 재시도/확인한다. 실패한 반쪽을
-  기억이나 Canon으로 복구하지 않는다.
+- routine turn의 기본은 빠른 atomic RAW pair다. state link가 없는 RAW도 역사 원문으로 보존할 수 있지만, 그것만으로 현재 Canon/Graph 사실을 승격하지 않는다.
+- meaningful state mutation turn은 실제 version/outcome이 이미 있을 때 linked pair를 남긴다.
+- append acknowledgement가 모호하면 같은 payload로 한 번 재시도한다. Archive 실패를 이유로 normal turn을 장시간 막지 않으며, 누락 원문을 기억이나 Canon으로 재구성하지 않는다.
 
 ## Visual backfill is not a sweep
 
@@ -88,6 +85,4 @@ Netlify deploy는 normal turn path에 넣지 않는다.
 
 ## Operational boundary
 
-RAW durable publication, Reader/Wiki/Graph/appearance snapshot, GitHub PR와
-Netlify는 04:30 batch가 담당한다. 중요한 되돌릴 수 없는 변화는 예외적으로
-조기 publication 후보가 될 수 있지만, 이를 normal turn을 막는 동기으로 쓰지 않는다.
+RAW durable publication, Reader/Wiki/Graph/appearance snapshot, 일러스트 queue, 지식 후보, GitHub PR와 Netlify는 04:30 batch가 담당한다. 중요한 되돌릴 수 없는 변화는 예외적으로 checkpoint/state-link/조기 publication 후보가 될 수 있지만, 이를 normal turn을 막는 동기로 쓰지 않는다.
