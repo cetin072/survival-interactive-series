@@ -6,5 +6,13 @@
     "guide_id": null,
     "tools": [],
     "story_refs": []
+  },
+  {
+    "id": "community-emergency-resource-management",
+    "title": "공동체 비상자원 관리",
+    "brief_ids": ["K-004"],
+    "guide_id": null,
+    "tools": [],
+    "story_refs": ["afterfall-two-site-reserve"]
   }
 ]

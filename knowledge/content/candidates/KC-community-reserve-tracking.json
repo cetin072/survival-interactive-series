@@ -1,0 +1,14 @@
+{
+  "id": "KC-community-reserve-tracking",
+  "question": "공동체의 비상 물자를 여러 거점에 나눠 둘 때 무엇을 정하고 기록해야 하는가",
+  "topic_id": "community-emergency-resource-management",
+  "status": "BRIEF_PROPOSED",
+  "disposition_note": "검증된 공개 Reader의 두 거점 공동비상재고 장면에서 질문을 만들었습니다. 공개 Reader 책과 chapter의 해시·원문 참조를 확인했고, FEMA NIMS의 조직 자원관리 지침으로 관리 절차를 교차 확인했습니다. household kit 수량이나 분산 비율을 권고하지 않습니다.",
+  "brief_id": "K-004",
+  "source_kind": "PUBLIC_READER",
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "reader_book_sha256": "f7a72dbfef942213c2a58a5e243634d61cc5a153bf43f2037e204612d27787f5",
+  "reader_chapter_id": "c03-afterfall-chapter-02",
+  "source_refs": ["worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_002.md"],
+  "source_hashes": ["59b1e81c56e0de115a6748bb8ec8bae63a27c33c89fad95c4391ce17ade65e0e"]
+}

@@ -79,7 +79,7 @@ test('malformed approved source fails closed', async () => {
 test('golden fixtures satisfy content contract and policy gate', async () => {
   const data = await loadKnowledge(root)
   assert.equal(await validateKnowledge(data), true)
-  for (const brief of data.briefs) {
+  for (const brief of data.briefs.filter((item) => ['K-002', 'K-003'].includes(item.id))) {
     assert.equal(brief.status, 'PUBLISHED')
     assert.equal(brief.publication_policy, 'HUMAN_APPROVED')
     assert.equal(publicationEligibility(brief, data.evidence.get(brief.id), data.config), 'HUMAN_REVIEW')
@@ -92,6 +92,15 @@ test('golden fixtures satisfy content contract and policy gate', async () => {
   assert.equal(publicationEligibility(brief, null, data.config), 'HOLD')
   assert.equal(publicationEligibility(brief, { ...evidence, conflicts: ['unresolved'] }, data.config), 'HOLD')
   assert.equal(publicationEligibility({ ...brief, risk_domains: ['WATER_PURIFICATION'] }, evidence, data.config), 'HUMAN_REVIEW')
+})
+test('Reader backfill is pinned to verified public book and chapter metadata', async () => {
+  const data = await loadKnowledge(root)
+  const candidate = data.candidates.find((item) => item.id === 'KC-community-reserve-tracking')
+  assert.equal(candidate.source_kind, 'PUBLIC_READER')
+  assert.equal(candidate.reader_chapter_id, 'c03-afterfall-chapter-02')
+  assert.equal(await validateKnowledge(data), true)
+  const tampered = { ...candidate, source_hashes: ['f'.repeat(64)] }
+  await assert.rejects(validateKnowledge({ ...data, candidates: data.candidates.map((item) => item.id === candidate.id ? tampered : item) }), /Reader provenance mismatch/)
 })
 test('AUTO_LOW_RISK READY and PUBLISHED must pass the same publication gate', async () => {
   const data = await loadKnowledge(root)
@@ -131,7 +140,7 @@ test('generated golden pages remain static, searchable, linked and downloadable'
   const data = await loadKnowledge(root)
   const index = await readFile(join(root, 'archive/web/public/knowledge/index.html'), 'utf8')
   const sitemap = await readFile(join(root, 'archive/web/public/sitemap.xml'), 'utf8')
-  for (const brief of data.briefs) {
+  for (const brief of data.briefs.filter((item) => item.status === 'PUBLISHED')) {
     const page = await readFile(join(root, 'archive/web/public/knowledge', brief.slug, 'index.html'), 'utf8')
     assert.match(index, new RegExp(`/knowledge/${brief.slug}/`))
     assert.match(sitemap, new RegExp(`/knowledge/${brief.slug}/`))

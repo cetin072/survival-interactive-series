@@ -1,5 +1,6 @@
 import { readdir, readFile, stat } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
+import { createHash } from 'node:crypto'
 
 export const root = resolve(import.meta.dirname, '../../..')
 const content = join(root, 'knowledge/content')
@@ -11,6 +12,18 @@ const localPath = (value) => typeof value === 'string' && /^\/knowledge\/[a-z0-9
 const lowRiskDomains = new Set(['GENERAL_PREPAREDNESS', 'FOOD_STORAGE', 'COMMUNICATION', 'EVACUATION'])
 const highRiskDomains = new Set(['MEDICAL', 'MEDICATION', 'FIRST_AID_PROCEDURE', 'WATER_PURIFICATION', 'GENERATOR', 'COMBUSTION_CO', 'ELECTRICAL', 'RESCUE', 'SHELTER_STRUCTURAL', 'OTHER_SEVERE_HARM'])
 const allowedRiskDomains = new Set([...lowRiskDomains, ...highRiskDomains])
+const readerBookRef = 'archive/content/stories/C03-AFTERFALL/BOOK.json'
+
+async function verifiedReaderReference(item, base, label) {
+  fail(item.source_kind === 'PUBLIC_READER' && item.reader_book_ref === readerBookRef && /^[a-f0-9]{64}$/.test(item.reader_book_sha256), `${label} Reader identity`)
+  fail(nonempty(item.reader_chapter_id) && Array.isArray(item.source_refs) && item.source_refs.length > 0 && Array.isArray(item.source_hashes) && item.source_hashes.length === item.source_refs.length && item.source_hashes.every((hash) => /^[a-f0-9]{64}$/.test(hash)), `${label} Reader fields`)
+  const bytes = await readFile(join(base, item.reader_book_ref))
+  fail(createHash('sha256').update(bytes).digest('hex') === item.reader_book_sha256, `${label} Reader book changed`)
+  const book = JSON.parse(bytes.toString('utf8'))
+  const chapter = book.chapters.find((entry) => entry.id === item.reader_chapter_id)
+  fail(chapter?.sourceKind === 'VERIFIED_GM_NARRATIVE' && chapter.body?.trim(), `${label} Reader chapter missing`)
+  fail(JSON.stringify(item.source_refs) === JSON.stringify(chapter.sourceRefs) && JSON.stringify(item.source_hashes) === JSON.stringify(chapter.sourceHashes), `${label} Reader provenance mismatch`)
+}
 
 export async function loadKnowledge(base = root) {
   const dir = join(base, 'knowledge/content')
@@ -40,7 +53,9 @@ export async function validateKnowledge(data) {
     guideIds.add(guide.id)
   }
   for (const story of stories) {
-    fail(nonempty(story.id) && !storyIds.has(story.id) && nonempty(story.title) && /^\/[^/]/.test(story.path) && story.verified === true && /^archive\/content\/transcripts\/C03-AFTERFALL\//.test(story.source_manifest_ref), 'invalid story registry')
+    fail(nonempty(story.id) && !storyIds.has(story.id) && nonempty(story.title) && /^\/[^/]/.test(story.path) && story.verified === true, 'invalid story registry')
+    if (story.source_kind === 'PUBLIC_READER') await verifiedReaderReference(story, base, `${story.id} story`)
+    else fail(/^archive\/content\/transcripts\/C03-AFTERFALL\//.test(story.source_manifest_ref), 'invalid story registry source')
     storyIds.add(story.id)
   }
   for (const topic of topics) {
@@ -102,7 +117,8 @@ export async function validateKnowledge(data) {
     fail(/^KC-[A-Za-z0-9-]+$/.test(candidate.id) && !candidateIds.has(candidate.id), `duplicate or invalid candidate ${candidate.id}`)
     candidateIds.add(candidate.id)
     fail(nonempty(candidate.question) && topicIds.has(candidate.topic_id), `${candidate.id} question/topic`)
-    fail(/^archive\/content\/transcripts\/C03-AFTERFALL\/S\d{2,3}\/SESSION_\d{3}\/SOURCE_MANIFEST\.json$/.test(candidate.source_manifest_ref) && /^[a-f0-9]{64}$/.test(candidate.source_manifest_sha256), `${candidate.id} public source identity`)
+    if (candidate.source_kind === 'PUBLIC_READER') await verifiedReaderReference(candidate, base, candidate.id)
+    else fail(/^archive\/content\/transcripts\/C03-AFTERFALL\/S\d{2,3}\/SESSION_\d{3}\/SOURCE_MANIFEST\.json$/.test(candidate.source_manifest_ref) && /^[a-f0-9]{64}$/.test(candidate.source_manifest_sha256), `${candidate.id} public source identity`)
     fail(['DISCOVERED', 'HOLD', 'HUMAN_REVIEW', 'BRIEF_PROPOSED'].includes(candidate.status) && nonempty(candidate.disposition_note), `${candidate.id} disposition`)
     fail(candidate.brief_id == null || ids.has(candidate.brief_id), `${candidate.id} brief ref`)
   }
