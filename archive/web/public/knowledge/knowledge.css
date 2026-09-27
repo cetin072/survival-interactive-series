@@ -55,3 +55,6 @@ a { color: inherit; }
   .article-shell { padding-top: 34px; }
   .article-section p, .article-section li { font-size: 17px; line-height: 1.82; }
 }
+.download-button { display: inline-flex; align-items: center; margin-top: 4px; padding: 12px 15px; border-radius: 8px; background: #202023; color: #fff; font-size: 15px; font-weight: 750; text-decoration: none; }
+.download-button:hover { background: #000; }
+.download-note { margin-top: 12px !important; color: #6d6d75 !important; font-family: inherit !important; font-size: 14px !important; line-height: 1.65 !important; }
