@@ -9,6 +9,7 @@ import io
 import json
 import os
 from pathlib import Path
+from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from PIL import Image
@@ -79,15 +80,31 @@ def storage_readback():
     request = Request(f"{url}/storage/v1/object/authenticated/{ASSET['storage_bucket']}/{path}",
                       headers={"apikey": key, "Authorization": f"Bearer {key}"})
     opener = build_opener(NoRedirect)
-    with opener.open(request, timeout=30) as response:
-        fail_if(response.status != 200, "STORAGE_READBACK_FAILED")
-        original = response.read(20 * 1024 * 1024 + 1)
+    try:
+        with opener.open(request, timeout=30) as response:
+            fail_if(response.status != 200, "STORAGE_READBACK_FAILED")
+            original = response.read(20 * 1024 * 1024 + 1)
+    except HTTPError as error:
+        code = ({401: "STORAGE_AUTH_FAILED", 403: "STORAGE_AUTH_FAILED",
+                 404: "STORAGE_OBJECT_NOT_FOUND"}.get(error.code)
+                or f"STORAGE_HTTP_ERROR_{error.code}")
+        raise ValueError(code) from None
+    except URLError:
+        raise ValueError("STORAGE_NETWORK_ERROR") from None
     registry_request = Request(
         f"{url}/rest/v1/visual_assets?select=asset_id,worldline_id,asset_type,status,visibility,style_version,object_path,source,generation_meta&asset_id=eq.{ASSET['registry_asset_id']}",
         headers={"apikey": key, "Authorization": f"Bearer {key}", "Accept-Profile": "survival_rpg"})
-    with opener.open(registry_request, timeout=30) as response:
-        fail_if(response.status != 200, "REGISTRY_READBACK_FAILED")
-        rows = json.load(response)
+    try:
+        with opener.open(registry_request, timeout=30) as response:
+            fail_if(response.status != 200, "REGISTRY_READBACK_FAILED")
+            rows = json.load(response)
+    except HTTPError as error:
+        code = ({401: "REGISTRY_AUTH_FAILED", 403: "REGISTRY_AUTH_FAILED",
+                 404: "REGISTRY_ENDPOINT_NOT_FOUND"}.get(error.code)
+                or f"REGISTRY_HTTP_ERROR_{error.code}")
+        raise ValueError(code) from None
+    except URLError:
+        raise ValueError("REGISTRY_NETWORK_ERROR") from None
     fail_if(not isinstance(rows, list) or len(rows) != 1, "REGISTRY_ROW_MISSING")
     row = rows[0]
     source = row.get("source") or {}
