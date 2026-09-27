@@ -24,6 +24,10 @@ REQUIRED_MARKERS = {
         "check_runtime_consistency",
         "append_public_transcript_turn_with_state_link(...)",
     ),
+    "worldlines/AFTERFALL/NEXT_CHAT_PROMPT.md": (
+        "`append_public_transcript_turn_with_state_link`",
+        "state-unlinked",
+    ),
     "worldlines/AFTERFALL/GM_CONTEXT_V1.md": (
         "## Same-scene reuse",
         "full Save, 모든 Character, 전체 Event 또는 `get_gm_context()`를 다시 조립하지",
