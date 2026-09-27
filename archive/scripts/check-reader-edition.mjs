@@ -43,6 +43,10 @@ for (const book of await makeBooks()) {
   const saved = await readFile(file, 'utf8')
   const expected = JSON.stringify(book, null, 2) + '\n'
   if (normalizeEol(saved) !== expected) throw new Error(`Generated Reader manifest is stale: ${book.chronicleId}. Run npm run reader:build.`)
+  const indexFile = resolve(root, 'archive', 'content', 'stories', book.chronicleId, 'BOOK.index.json')
+  const indexSaved = await readFile(indexFile, 'utf8')
+  const indexExpected = JSON.stringify({ ...book, chapters: book.chapters.map(({ body, ...chapter }) => chapter) }, null, 2) + '\n'
+  if (normalizeEol(indexSaved) !== indexExpected) throw new Error(`Generated Reader index is stale: ${book.chronicleId}. Run npm run reader:build.`)
   if (book.coverage.included + book.coverage.omitted.length !== book.coverage.verifiedRawParts) throw new Error(`Incomplete Reader coverage accounting: ${book.chronicleId}`)
   for (const chapter of book.chapters) {
     if (!chapter.body.trim() || !chapter.sourceRefs.length || !chapter.archiveSourceRefs.length) throw new Error(`Invalid verified chapter: ${chapter.id}`)

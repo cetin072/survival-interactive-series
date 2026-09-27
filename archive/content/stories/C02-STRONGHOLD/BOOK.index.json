@@ -1,0 +1,345 @@
+{
+  "chronicleId": "C02-STRONGHOLD",
+  "title": "박도현의 생존기",
+  "subtitle": "거점을 지키며 이어진 기록",
+  "description": "현재 확보된 공개 GM 기록을 순서대로 엮은 이야기.",
+  "protagonist": "박도현",
+  "worldlineId": "STRONGHOLD",
+  "sourceRoot": "worldlines/STRONGHOLD",
+  "transformVersion": "reader-selection-v1.2.0",
+  "coverage": {
+    "verifiedRawParts": 24,
+    "scanned": 24,
+    "eligibleGmProse": 13,
+    "included": 13,
+    "omitted": [
+      {
+        "sourceRef": "worldlines/STRONGHOLD/raw_transcript/SESSION_2031_02_TO_2031_03_ROOM_20260925/PART_003.md",
+        "archiveSourceRef": "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_2031_02_TO_2031_03_ROOM_20260925/PART_003.md",
+        "reason": "operational_meta_or_no_eligible_gm_prose"
+      },
+      {
+        "sourceRef": "worldlines/STRONGHOLD/raw_transcript/SESSION_2031_02_TO_2031_03_ROOM_20260925/PART_004.md",
+        "archiveSourceRef": "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_2031_02_TO_2031_03_ROOM_20260925/PART_004.md",
+        "reason": "operational_meta_or_no_eligible_gm_prose"
+      },
+      {
+        "sourceRef": "worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_CURRENT_ROOM/PART_002.md",
+        "archiveSourceRef": "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_20260925_CURRENT_ROOM/PART_002.md",
+        "reason": "design_feedback_only"
+      },
+      {
+        "sourceRef": "worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_CURRENT_ROOM/PART_003.md",
+        "archiveSourceRef": "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_20260925_CURRENT_ROOM/PART_003.md",
+        "reason": "operational_meta_only"
+      },
+      {
+        "sourceRef": "worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_CURRENT_ROOM/PART_004.md",
+        "archiveSourceRef": "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_20260925_CURRENT_ROOM/PART_004.md",
+        "reason": "operational_meta_only"
+      },
+      {
+        "sourceRef": "worldlines/STRONGHOLD/raw_transcript/SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925/PART_002.md",
+        "archiveSourceRef": "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925/PART_002.md",
+        "reason": "operational_meta_or_no_eligible_gm_prose"
+      },
+      {
+        "sourceRef": "worldlines/STRONGHOLD/raw_transcript/SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925/PART_003.md",
+        "archiveSourceRef": "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925/PART_003.md",
+        "reason": "operational_meta_or_no_eligible_gm_prose"
+      },
+      {
+        "sourceRef": "worldlines/STRONGHOLD/raw_transcript/SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925/PART_004.md",
+        "archiveSourceRef": "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925/PART_004.md",
+        "reason": "operational_meta_or_no_eligible_gm_prose"
+      },
+      {
+        "sourceRef": "worldlines/STRONGHOLD/raw_transcript/SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925/PART_005.md",
+        "archiveSourceRef": "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925/PART_005.md",
+        "reason": "operational_meta_or_no_eligible_gm_prose"
+      },
+      {
+        "sourceRef": "worldlines/STRONGHOLD/raw_transcript/SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925/PART_006.md",
+        "archiveSourceRef": "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925/PART_006.md",
+        "reason": "operational_meta_or_no_eligible_gm_prose"
+      },
+      {
+        "sourceRef": "worldlines/STRONGHOLD/raw_transcript/SESSION_C02_20260925_ROOM_01/PART_005.md",
+        "archiveSourceRef": "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_C02_20260925_ROOM_01/PART_005.md",
+        "reason": "operational_meta_or_no_eligible_gm_prose"
+      }
+    ]
+  },
+  "editorialExclusions": [
+    {
+      "sourceRef": "worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_CURRENT_ROOM/PART_002.md",
+      "archiveSourceRef": "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_20260925_CURRENT_ROOM/PART_002.md",
+      "reason": "design_feedback_only"
+    },
+    {
+      "sourceRef": "worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_CURRENT_ROOM/PART_003.md",
+      "archiveSourceRef": "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_20260925_CURRENT_ROOM/PART_003.md",
+      "reason": "operational_meta_only"
+    },
+    {
+      "sourceRef": "worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_CURRENT_ROOM/PART_004.md",
+      "archiveSourceRef": "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_20260925_CURRENT_ROOM/PART_004.md",
+      "reason": "operational_meta_only"
+    },
+    {
+      "sourceRef": "worldlines/STRONGHOLD/raw_transcript/SESSION_C02_20260925_ROOM_01/PART_004.md",
+      "archiveSourceRef": "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_C02_20260925_ROOM_01/PART_004.md",
+      "reason": "trailing_operational_meta"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "c02-stronghold-chapter-01",
+      "chapterNumber": 1,
+      "title": "사라진 번호판",
+      "subtitle": "공개 기록 2건",
+      "dateLabel": "PART I",
+      "partId": "PART I",
+      "arcLabel": "산불장",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/STRONGHOLD/raw_transcript/SESSION_2031_02_TO_2031_03_ROOM_20260925/PART_001.md",
+        "worldlines/STRONGHOLD/raw_transcript/SESSION_2031_02_TO_2031_03_ROOM_20260925/PART_002.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_2031_02_TO_2031_03_ROOM_20260925/PART_001.md",
+        "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_2031_02_TO_2031_03_ROOM_20260925/PART_002.md"
+      ],
+      "sourceHashes": [
+        "ea0989372e72622554440965fd3f130ac5c0257b41fc9260c22a1e4c12417f10",
+        "fcab069d26a3e991f53f2d3a329f5f1fa627be8bc310ede5d5056c5e9b19124b"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c02-stronghold-chapter-02",
+      "chapterNumber": 2,
+      "title": "마산의 야적장",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "PART I",
+      "partId": "PART I",
+      "arcLabel": "산불장",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/STRONGHOLD/raw_transcript/SESSION_2031_02_TO_2031_03_ROOM_20260925/PART_005.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_2031_02_TO_2031_03_ROOM_20260925/PART_005.md"
+      ],
+      "sourceHashes": [
+        "7065c349dfe397f0b7c5f7037eea8dbb37d0194a0b0546bea032291d75b49add"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c02-stronghold-chapter-03",
+      "chapterNumber": 3,
+      "title": "산불 이후",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "PART II",
+      "partId": "PART II",
+      "arcLabel": "재편의 계절",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_CURRENT_ROOM/PART_001.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_20260925_CURRENT_ROOM/PART_001.md"
+      ],
+      "sourceHashes": [
+        "4682f4536b43bae98ff14ebad38aa055b69ed8bc067673569965bdaf91ab50d6"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c02-stronghold-chapter-04",
+      "chapterNumber": 4,
+      "title": "도시 외곽",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "PART II",
+      "partId": "PART II",
+      "arcLabel": "재편의 계절",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/STRONGHOLD/raw_transcript/SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925/PART_001.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_C02_2032_SPRING_SUMMER_ROOM_20260925/PART_001.md"
+      ],
+      "sourceHashes": [
+        "e39fbb7b8af24b6d7146921e4da87a5c36f9cba191cbf719fad65cfb780400f3"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c02-stronghold-chapter-05",
+      "chapterNumber": 5,
+      "title": "다시 짓는 거점",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "PART III",
+      "partId": "PART III",
+      "arcLabel": "거점의 확장",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/STRONGHOLD/raw_transcript/SESSION_C02_20260925_ROOM_01/PART_001.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_C02_20260925_ROOM_01/PART_001.md"
+      ],
+      "sourceHashes": [
+        "ff0d713854574ac1c909ef3cf29470f086063fdeb0efc9e7812bca1ef29a11fc"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c02-stronghold-chapter-06",
+      "chapterNumber": 6,
+      "title": "투자와 확장",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "PART III",
+      "partId": "PART III",
+      "arcLabel": "거점의 확장",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/STRONGHOLD/raw_transcript/SESSION_C02_20260925_ROOM_01/PART_002.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_C02_20260925_ROOM_01/PART_002.md"
+      ],
+      "sourceHashes": [
+        "042d5c7d48cacd1009f62d17c66aedb7308bc16fb2b4625741a1be137d16c643"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c02-stronghold-chapter-07",
+      "chapterNumber": 7,
+      "title": "북서권의 약속",
+      "subtitle": "공개 기록 2건",
+      "dateLabel": "PART III",
+      "partId": "PART III",
+      "arcLabel": "거점의 확장",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/STRONGHOLD/raw_transcript/SESSION_C02_20260925_ROOM_01/PART_003.md",
+        "worldlines/STRONGHOLD/raw_transcript/SESSION_C02_20260925_ROOM_01/PART_004.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_C02_20260925_ROOM_01/PART_003.md",
+        "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_C02_20260925_ROOM_01/PART_004.md"
+      ],
+      "sourceHashes": [
+        "e74260a8c7c0f3769013cdc7379afd6fdba1ce7ae1dd0d867e0ed4d97fb44473",
+        "26742d760bc4e3c1bd6bb8dc4ca8c0109e000c3c3a465990dec9e6f16fa4aabf"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c02-stronghold-chapter-08",
+      "chapterNumber": 8,
+      "title": "아래 거점",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "PART IV",
+      "partId": "PART IV",
+      "arcLabel": "야간의 기록",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_2039_CURRENT_ROOM/PART_001.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_20260925_2039_CURRENT_ROOM/PART_001.md"
+      ],
+      "sourceHashes": [
+        "91441202840f07d70474212a8bd07e5ac525951902136ee28fe5519fe7597c06"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c02-stronghold-chapter-09",
+      "chapterNumber": 9,
+      "title": "겨울의 야간",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "PART IV",
+      "partId": "PART IV",
+      "arcLabel": "야간의 기록",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_2039_CURRENT_ROOM/PART_002.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_20260925_2039_CURRENT_ROOM/PART_002.md"
+      ],
+      "sourceHashes": [
+        "debe1d7de5485e5972171aa788db52c84681aecabfaceacde5f5a620ad7b8bae"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c02-stronghold-chapter-10",
+      "chapterNumber": 10,
+      "title": "봄의 경계",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "PART IV",
+      "partId": "PART IV",
+      "arcLabel": "야간의 기록",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_2039_CURRENT_ROOM/PART_003.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_20260925_2039_CURRENT_ROOM/PART_003.md"
+      ],
+      "sourceHashes": [
+        "09c51466ecaf070e0fcc1e4ed64ee4b9760e92a7e37f689a9f3179da8fb6ddb3"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c02-stronghold-chapter-11",
+      "chapterNumber": 11,
+      "title": "여름 이후",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "PART IV",
+      "partId": "PART IV",
+      "arcLabel": "야간의 기록",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_2039_CURRENT_ROOM/PART_004.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_20260925_2039_CURRENT_ROOM/PART_004.md"
+      ],
+      "sourceHashes": [
+        "ba3b66fe48241308a2432444be4eaa851f03fdf921a5f4db0c247d8afe2793e6"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    }
+  ]
+}

@@ -4,8 +4,7 @@ import { transcriptPartsFor } from './transcriptData'
 
 describe('raw transcript reader', () => {
   it('renders both historical ## headers and C03 S02 ### headers as public messages', () => {
-    const c03SessionOne = transcriptPartsFor('C03-AFTERFALL').find((part) => part.id === 'c03-s02-session-001-001')
-    const messages = messagesFromRaw(c03SessionOne?.content ?? '')
+    const messages = messagesFromRaw('## USER\n첫 번째 선택\n### GM\n첫 장면\n### USER\n두 번째 선택\n### GM\n다음 장면')
 
     expect(messages[0]).toMatchObject({ role: 'player', label: '플레이어의 선택' })
     expect(messages.filter((message) => message.role === 'gm').length).toBeGreaterThan(1)

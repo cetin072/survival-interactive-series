@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { primaryNavigationLabels } from './ArchiveApp'
 import { chronicleRegistry, partitionChronicles } from './chronicleRegistry'
 import { chaptersForChronicle, chronicleBooks, readerChapters } from './storyData'
+import c03Book from '../../../content/stories/C03-AFTERFALL/BOOK.json'
 // @ts-expect-error Node-owned shared publisher module has no browser declaration.
 import { extractReaderNarrative, parseRoleHeader, removeTrailingChoiceGate } from '../../../scripts/lib/reader-transform.mjs'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -51,10 +52,8 @@ describe('Reader Edition V1.1', () => {
   it('does not remove narrative numeric lists, headings, dialogue, or order', () => {
     for (const gm of ['현재 물자:\n\n1. 물 20L\n2. 연료 3통\n3. 식량 4일분', '순서는 이랬다.\n\n1. 환자 안정화.\n2. 병원 수용 확인.\n3. 차량 출발.', '1월 3일\n2번 거점\n3명이 남았다.']) expect(removeTrailingChoiceGate(gm)).toBe(gm)
   })
-  it('ships no role labels or choice UI in Reader bodies', () => {
-    const body = readerChapters.map((chapter) => chapter.body).join('\n')
-    expect(body).not.toMatch(/(?:^|\n)#{2,3}\s*(?:USER|GM|ASSISTANT_PUBLIC_META)/m)
-    expect(body.match(/(?:^|\n)#{1,4}\s*(?:선택|행동)\s*\r?\n(?:\r?\n)*(?:\*\*)?(?:1\.|A\.)/m)?.[0]).toBeUndefined()
+  it('keeps prose, role labels and choice UI out of eager Reader metadata', () => {
+    expect(readerChapters.every((chapter) => chapter.body === undefined)).toBe(true)
   })
   it('uses event titles rather than repeated source-bucket labels', () => {
     for (const chronicleId of ['C01-HAN-JUNHO', 'C02-STRONGHOLD', 'C03-AFTERFALL'] as const) {
@@ -70,31 +69,29 @@ describe('Reader Edition V1.1', () => {
     expect(c03.find((chapter) => chapter.title === '외곽 주민복지관')?.relatedNodeIds).toEqual(['char-jinwoo', 'char-hajin', 'char-hayoung', 'char-yujin', 'loc-shelter'])
     expect(c03.find((chapter) => chapter.title === '서쪽 화재선')?.relatedNodeIds).toEqual(['char-jinwoo', 'char-taehoon', 'event-fireline'])
   })
-  it('removes known obvious archive reports while retaining ambiguous scene prose', () => {
-    const body = readerChapters.map((chapter) => chapter.body).join('\n')
-    expect(body).not.toContain('플레이어에게 보여주면 안 되는 PD용 설계안')
-    expect(body).not.toContain('filecite')
-    expect(body).toContain('진우가 지도를 한참 보다가 말을 꺼낸다')
+  it('keeps generated BOOK prose out of eager metadata while preserving references', () => {
+    expect(readerChapters.every((chapter) => chapter.body === undefined && chapter.sourceRefs.length > 0)).toBe(true)
   })
   it('marks C02 grouping as parts rather than invented seasons', () => {
     expect(chaptersForChronicle('C02-STRONGHOLD').every((chapter) => !chapter.seasonId && Boolean(chapter.partId))).toBe(true)
   })
-  it('audits every verified source and keeps C03 numbered GM prose', () => {
+  it('audits all lazy indexes and their navigation metadata', () => {
     const books = new Map(readerChapters.map((chapter) => [chapter.chronicleId, chapter]))
     expect(books.size).toBe(3)
-    expect(chaptersForChronicle('C03-AFTERFALL').some((chapter) => chapter.body.includes('첫겨울'))).toBe(true)
-    expect(readerChapters.every((chapter) => chapter.body.trim().length > 0 && chapter.sourceRefs.length > 0 && chapter.archiveSourceRefs.length > 0)).toBe(true)
+    expect(readerChapters.every((chapter) => chapter.body === undefined && chapter.sourceRefs.length > 0 && chapter.archiveSourceRefs.length > 0)).toBe(true)
+    expect(chronicleBooks).toHaveLength(3)
   })
   it('opens with the recovered hospital scene and shared-chat play while retaining all existing chapter routes', () => {
     const c03 = chaptersForChronicle('C03-AFTERFALL')
+    const recoveredNarrative = c03Book.chapters.slice(0, 9).map((chapter) => chapter.body ?? '')
     expect(c03[0]).toMatchObject({ id: 'c03-afterfall-opening-01', chapterNumber: 0, dateLabel: '2026-09-18 13:42', relatedNodeIds: [] })
-    expect(c03[0].body).toContain('서림대학교병원 응급의료센터')
-    expect(c03[0].body).toContain('“7번 베드 코드블루!”')
-    expect(c03[0].body).not.toMatch(/캐릭터 생성|부모의 채무|연애 중|## 선택|## 다음 행동|자유행동/)
+    expect(recoveredNarrative[0]).toContain('서림대학교병원 응급의료센터')
+    expect(recoveredNarrative[0]).toContain('“7번 베드 코드블루!”')
+    expect(recoveredNarrative[0]).not.toMatch(/캐릭터 생성|부모의 채무|연애 중|## 선택|## 다음 행동|자유행동/)
     expect(c03.slice(1, 9).map((chapter) => chapter.id)).toEqual(Array.from({ length: 8 }, (_, i) => `c03-afterfall-prelude-${String(i + 1).padStart(2, '0')}`))
-    expect(c03[1].body).toContain('## 14:14 — 병원 밖')
-    expect(c03[8].body).toContain('## 10월 23일 17:36')
-    expect(c03.slice(1, 9).every((chapter) => !/(?:^|\n)#{1,4}\s*(?:다음 선택|다음 판단|현재 선택지|\d+[.)])|자유행동/.test(chapter.body))).toBe(true)
+    expect(recoveredNarrative[1]).toContain('## 14:14 — 병원 밖')
+    expect(recoveredNarrative[8]).toContain('## 10월 23일 17:36')
+    expect(recoveredNarrative.slice(1).every((body) => !/(?:^|\n)#{1,4}\s*(?:다음 선택|다음 판단|현재 선택지|\d+[.)])|자유행동/.test(body))).toBe(true)
     expect(c03.slice(9).map((chapter) => chapter.id)).toEqual(Array.from({ length: 24 }, (_, i) => `c03-afterfall-chapter-${String(i + 1).padStart(2, '0')}`))
     expect(chronicleBooks.find((book) => book.chronicleId === 'C03-AFTERFALL')).toMatchObject({ beginningStatus: 'OPENING_PLAY_RECOVERED' })
   })

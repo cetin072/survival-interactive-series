@@ -6,6 +6,7 @@ is isolated test data. Install playwright==1.55.0 and its Chromium browser first
 from __future__ import annotations
 import argparse
 import functools
+import hashlib
 import http.server
 import json
 import os
@@ -42,6 +43,7 @@ def asset_names(html: str) -> set[str]:
 def wait_for_deploy(url: str):
     expected = asset_names((DIST / 'index.html').read_text(encoding='utf-8'))
     assert expected, 'No local production JS/CSS asset fingerprints'
+    expected_manifest = json.loads((DIST / 'archive-release-manifest.json').read_text(encoding='utf-8'))
     deadline = time.monotonic() + 240
     last = ''
     while time.monotonic() < deadline:
@@ -51,7 +53,16 @@ def wait_for_deploy(url: str):
                 for asset in actual:
                     with urllib.request.urlopen(url.rstrip('/') + asset, timeout=20) as response:
                         assert response.status == 200
+                with urllib.request.urlopen(url.rstrip('/') + '/archive-release-manifest.json', timeout=20) as response:
+                    deployed_manifest = json.loads(response.read().decode('utf-8'))
+                assert deployed_manifest == expected_manifest, 'Deployed content release manifest differs from the tested build'
+                for entry in expected_manifest['assets']:
+                    with urllib.request.urlopen(url.rstrip('/') + '/' + entry['path'], timeout=20) as response:
+                        content = response.read()
+                    assert len(content) == entry['byte_length'], f"Deployed asset size mismatch: {entry['path']}"
+                    assert hashlib.sha256(content).hexdigest() == entry['sha256'], f"Deployed asset hash mismatch: {entry['path']}"
                 report('deployed JS/CSS matches tested build', url=url, assets=sorted(actual))
+                report('deployed BOOK/graph/character assets match release hashes', url=url, manifest=expected_manifest)
                 return
             last = f'assets still differ: {sorted(actual)}'
         except Exception as error:
@@ -82,12 +93,23 @@ def selected_book(page, chapter: dict, chronicle: str):
     expect(page.locator('.book-prose > header h1')).to_have_text(chapter['title'])
     expect(page.locator('.book-toc [aria-current="page"]')).to_have_count(1)
     expect(page.locator('.book-toc [aria-current="page"]')).to_have_attribute('data-chapter-id', chapter['id'])
-    page.wait_for_function('([key,id]) => { try { return localStorage.getItem(key) === id } catch { return true } }', arg=['survival-diary-archive:story-progress:v1:' + chronicle, chapter['id']])
+    progress_key = 'survival-diary-archive:story-progress:v1:' + chronicle
+    deadline = time.monotonic() + 5
+    while time.monotonic() < deadline:
+        try:
+            if page.evaluate('(key) => localStorage.getItem(key)', progress_key) == chapter['id']:
+                break
+        except Exception:
+            # Storage access is intentionally optional in this product.
+            break
+        page.wait_for_timeout(50)
+    else:
+        raise AssertionError('Selected chapter was not saved to browser progress')
     assert parse_qs(urlparse(page.url).query).get('chapter') == [chapter['id']]
     # Check again after effects/animation frames: transient selection is not success.
     page.wait_for_timeout(180)
     assert page.locator('.book-prose').get_attribute('data-chapter-id') == chapter['id'], 'Chapter bounced after one tap'
-    assert len(page.locator('.reader-body').inner_text()) > 30
+    expect(page.locator('.reader-body')).to_have_text(re.compile(r'.{31,}', re.S))
     no_overflow(page)
 
 
@@ -96,6 +118,7 @@ def selected_raw(page, part_id: str):
     expect(page.locator('.reader-part-list [aria-current="page"]')).to_have_count(1)
     expect(page.locator('.reader-part-list [aria-current="page"]')).to_have_attribute('data-part-id', part_id)
     assert parse_qs(urlparse(page.url).query).get('part') == [part_id]
+    expect(page.locator('.transcript-flow')).to_be_visible()
     page.wait_for_timeout(180)
     assert page.locator('.transcript-reader').get_attribute('data-part-id') == part_id, 'PART bounced after one tap'
     no_overflow(page)
@@ -106,8 +129,11 @@ def audit_book(page, base: str, chronicle: str, width: int):
     chapters = BOOKS[chronicle]['chapters']
     key = 'survival-diary-archive:story-progress:v1:' + chronicle
     page.evaluate('([key,id]) => localStorage.setItem(key,id)', [key, chapters[-1]['id']])
+    before = len(page.requests_seen)
     page.goto(query_url(base, view='story', chronicle=chronicle, chapter=chapters[0]['id']))
     selected_book(page, chapters[0], chronicle)  # explicit link beats stored last chapter
+    book_assets = [url for url in page.requests_seen[before:] if re.search(r'/BOOK-[^/]+\.json(?:\?|$)', url)]
+    assert len(book_assets) == 1, f'Opening {chronicle} should fetch only its own BOOK asset: {book_assets}'
     if chronicle == 'C03-AFTERFALL':
         assert chapters[0]['id'] == 'c03-afterfall-opening-01'
         expect(page.locator('.reader-body')).to_contain_text('서림대학교병원 응급의료센터')
@@ -144,6 +170,7 @@ def audit_book(page, base: str, chronicle: str, width: int):
 
 def audit_raw(page, base: str, chronicle: str, width: int):
     mobile = width < 700
+    request_start = len(page.requests_seen)
     page.goto(query_url(base, view='raw', chronicle=chronicle))
     expect(page.locator('.reader-part-list button').first).to_be_visible()
     # Select two actual published, fully verified PARTs from the live TOC.
@@ -158,6 +185,8 @@ def audit_raw(page, base: str, chronicle: str, width: int):
         tap(page.locator(f'.reader-part-list [data-part-id="{part_id}"]'), mobile)
         selected_raw(page, part_id)
         assert page.locator('.transcript-message').count() > 0, 'Verified RAW renders a blank body'
+        raw_requests = [url for url in page.requests_seen[request_start:] if re.search(r'\.md(?:\?|$)', url)]
+        assert len(raw_requests) == len(verified[:verified.index(part_id) + 1]), f'{chronicle} should fetch one RAW file per selected PART: {raw_requests}'
     page.go_back()
     selected_raw(page, verified[0])
     page.go_forward()
@@ -189,7 +218,6 @@ def audit_extra(page, base: str, width: int):
     page.goto(query_url(base, view='raw', chronicle='C03-AFTERFALL', part='c03-s01-008'))
     expect(page.locator('.transcript-gm').first).to_be_visible()
     report('S02 finale / season switch / missing and fragment preserved', width=width)
-
     page.goto(base)
     search = page.locator('.archive-search input')
     search.fill('체육')
@@ -212,6 +240,59 @@ def audit_extra(page, base: str, width: int):
     page.go_back()
     expect(page.locator('.archive-detail-header h1')).to_have_text('서진우')
     report('Explorer search / empty result recovery / filter / Story-to-Wiki route', width=width)
+
+
+def audit_graph_keyboard(page, base: str, width: int):
+    page.goto(base)
+    nodes = page.get_by_role('button', name=re.compile('열기$'))
+    assert nodes.count() >= 2, 'Graph does not expose at least one focusable relation'
+    target = nodes.nth(1)
+    label = target.get_attribute('aria-label').removesuffix(' 열기')
+    target.focus()
+    assert page.evaluate('(element) => document.activeElement === element', target.element_handle()), 'Graph node is not keyboard focusable'
+    page.keyboard.press('Enter')
+    expect(page.locator('.archive-detail h1')).to_have_text(label)
+    second = nodes.nth(0)
+    second.focus()
+    page.keyboard.press('Space')
+    expect(page.locator('.archive-detail h1')).to_have_text(second.get_attribute('aria-label').removesuffix(' 열기'))
+    report('graph nodes support visible focus, Enter and Space', width=width)
+
+
+def audit_content_retry(page, base: str, width: int):
+    browser = page.context.browser
+    context = browser.new_context(viewport={'width': width, 'height': 844}, is_mobile=width < 700, has_touch=width < 700)
+    retry_page = context.new_page()
+    failures = {'book': 0, 'raw': 0}
+
+    def fail_first(kind: str):
+        def route_once(route):
+            failures[kind] += 1
+            if failures[kind] == 1:
+                route.abort()
+            else:
+                route.continue_()
+        return route_once
+
+    retry_page.route(re.compile(r'/assets/BOOK-[^/]+\.json(?:\?.*)?$'), fail_first('book'))
+    retry_page.goto(query_url(base, view='story', chronicle='C01-HAN-JUNHO'))
+    expect(retry_page.locator('.reader-body [role="alert"]')).to_be_visible()
+    tap(retry_page.locator('.reader-body [role="alert"] button'), width < 700)
+    expect(retry_page.locator('.reader-body [role="alert"]')).to_have_count(0)
+    expect(retry_page.locator('.reader-body [role="status"]')).to_have_count(0)
+    assert len(retry_page.locator('.reader-body').inner_text().strip()) > 30
+    assert failures['book'] == 2, f'Book retry did not issue a second request: {failures}'
+    retry_page.unroute(re.compile(r'/assets/BOOK-[^/]+\.json(?:\?.*)?$'))
+
+    retry_page.route(re.compile(r'/assets/[^/]+\.md(?:\?.*)?$'), fail_first('raw'))
+    retry_page.goto(query_url(base, view='raw', chronicle='C01-HAN-JUNHO', part='c01-s01-001'))
+    expect(retry_page.get_by_role('alert')).to_be_visible()
+    tap(retry_page.get_by_role('alert').get_by_role('button', name='다시 시도'), width < 700)
+    expect(retry_page.locator('.transcript-flow')).to_be_visible()
+    assert failures['raw'] == 2, f'RAW retry did not issue a second request: {failures}'
+    report('BOOK and RAW errors expose retry and recover', width=width)
+    context.close()
+
 
 
 def probe_original(browser, url: str):
@@ -260,11 +341,19 @@ def main():
                 errors, failures = [], []
                 page.on('pageerror', lambda error: errors.append(str(error)))
                 page.on('response', lambda response: failures.append(f'{response.status} {response.url}') if response.status >= 400 and response.url.startswith(base) else None)
+                page.requests_seen = []
+                page.on('request', lambda request: page.requests_seen.append(request.url))
                 page.goto(base)
+                page.wait_for_load_state('networkidle')
+                eager_reader_assets = [url for url in page.requests_seen if re.search(r'/BOOK-[^/]+\.json(?:\?|$)|\.md(?:\?|$)', url)]
+                assert not eager_reader_assets, f'Initial Archive shell eagerly fetched Reader/RAW content: {eager_reader_assets}'
+                report('initial shell excludes BOOK bodies and RAW files', width=width)
                 for chronicle in BOOKS:
                     audit_book(page, base, chronicle, width)
                     audit_raw(page, base, chronicle, width)
                 audit_extra(page, base, width)
+                audit_graph_keyboard(page, base, width)
+                audit_content_retry(page, base, width)
                 assert not errors, f'Browser runtime errors: {errors}'
                 assert not failures, f'HTTP failures: {failures}'
                 report('no runtime exceptions or same-site HTTP errors', width=width)

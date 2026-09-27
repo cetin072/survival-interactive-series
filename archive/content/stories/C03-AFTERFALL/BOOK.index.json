@@ -1,0 +1,697 @@
+{
+  "chronicleId": "C03-AFTERFALL",
+  "title": "서진우의 생존기",
+  "subtitle": "겨울을 건너 다섯 거점에 닿은 기록",
+  "description": "AFTERFALL 공개 플레이에서 검증된 GM 장면.",
+  "protagonist": "서진우",
+  "worldlineId": "AFTERFALL",
+  "sourceRoot": "worldlines/AFTERFALL",
+  "beginningStatus": "MISSING_BEGINNING",
+  "transformVersion": "reader-selection-v1.2.0",
+  "coverage": {
+    "verifiedRawParts": 26,
+    "scanned": 26,
+    "eligibleGmProse": 21,
+    "included": 21,
+    "omitted": [
+      {
+        "sourceRef": "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_006.md",
+        "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_006.md",
+        "reason": "design_retro_only"
+      },
+      {
+        "sourceRef": "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_007.md",
+        "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_007.md",
+        "reason": "design_plan_only"
+      },
+      {
+        "sourceRef": "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_008.md",
+        "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_008.md",
+        "reason": "operational_meta_only"
+      },
+      {
+        "sourceRef": "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_009.md",
+        "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_009.md",
+        "reason": "operational_meta_only"
+      },
+      {
+        "sourceRef": "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_010.md",
+        "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_010.md",
+        "reason": "operational_meta_only"
+      }
+    ]
+  },
+  "editorialExclusions": [
+    {
+      "sourceRef": "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_006.md",
+      "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_006.md",
+      "reason": "design_retro_only"
+    },
+    {
+      "sourceRef": "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_007.md",
+      "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_007.md",
+      "reason": "design_plan_only"
+    },
+    {
+      "sourceRef": "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_008.md",
+      "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_008.md",
+      "reason": "operational_meta_only"
+    },
+    {
+      "sourceRef": "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_009.md",
+      "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_009.md",
+      "reason": "operational_meta_only"
+    },
+    {
+      "sourceRef": "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_010.md",
+      "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_010.md",
+      "reason": "operational_meta_only"
+    },
+    {
+      "sourceRef": "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_002.md",
+      "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_001/PART_002.md",
+      "reason": "trailing_operational_meta"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "c03-afterfall-chapter-01",
+      "chapterNumber": 1,
+      "title": "두 번째 거점",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "두 거점과 외곽",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_001.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_001.md"
+      ],
+      "sourceHashes": [
+        "e2acc04ba7708e7714c705bcc8561e9db3270b6f5c038d12199b1d0d2dd3f518"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "loc-nw-center",
+        "loc-agri"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-02",
+      "chapterNumber": 2,
+      "title": "정식 연합체",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "두 거점과 외곽",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_002.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_002.md"
+      ],
+      "sourceHashes": [
+        "59b1e81c56e0de115a6748bb8ec8bae63a27c33c89fad95c4391ce17ade65e0e"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "loc-agri"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-03",
+      "chapterNumber": 3,
+      "title": "폐쇄된 체육시설",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "두 거점과 외곽",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_002.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_002.md"
+      ],
+      "sourceHashes": [
+        "59b1e81c56e0de115a6748bb8ec8bae63a27c33c89fad95c4391ce17ade65e0e"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "loc-contact"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-04",
+      "chapterNumber": 4,
+      "title": "북쪽 의원",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "두 거점과 외곽",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_003.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_003.md"
+      ],
+      "sourceHashes": [
+        "b911a75a2d2204f6ac79c192e106de0142689662267f87db693f18a7067a133c"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "loc-clinic"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-05",
+      "chapterNumber": 5,
+      "title": "산림교육원",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "두 거점과 외곽",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_003.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_003.md"
+      ],
+      "sourceHashes": [
+        "b911a75a2d2204f6ac79c192e106de0142689662267f87db693f18a7067a133c"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "loc-forest"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-06",
+      "chapterNumber": 6,
+      "title": "백운생활관",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "두 거점과 외곽",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_004.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_004.md"
+      ],
+      "sourceHashes": [
+        "8b47ab7b7efeff90cc791866b3b2bfcc0b185348d7dd3c15a29cb4a217104c5d"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "loc-baekun"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-07",
+      "chapterNumber": 7,
+      "title": "교환지의 사람들",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "두 거점과 외곽",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_004.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_004.md"
+      ],
+      "sourceHashes": [
+        "8b47ab7b7efeff90cc791866b3b2bfcc0b185348d7dd3c15a29cb4a217104c5d"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "loc-contact",
+        "loc-clinic"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-08",
+      "chapterNumber": 8,
+      "title": "겨울 전 갈무리",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "두 거점과 외곽",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_005.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_005.md"
+      ],
+      "sourceHashes": [
+        "aa52730e33afbce17e03a82cba3c425a53b6c6a4b0b8a1d1722b79e7e408db11"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "loc-nw-center"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-09",
+      "chapterNumber": 9,
+      "title": "서쪽 화재선",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S02",
+      "seasonId": "S02",
+      "arcLabel": "화재선과 첫겨울",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_001.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_001/PART_001.md"
+      ],
+      "sourceHashes": [
+        "d5cffaee29e4a79c6cc09f237f41d3b735e4ea636bfbe98df5e21359c19185ad"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "char-taehoon",
+        "event-fireline"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-10",
+      "chapterNumber": 10,
+      "title": "실증단지의 불",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S02",
+      "seasonId": "S02",
+      "arcLabel": "화재선과 첫겨울",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_002.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_001/PART_002.md"
+      ],
+      "sourceHashes": [
+        "8e966047202a051473784e264e9cf747f4e3039da1c19157abbbe29e1c1920b8"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "char-taehoon",
+        "loc-agri",
+        "event-fireline"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-11",
+      "chapterNumber": 11,
+      "title": "야간 감시",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S02",
+      "seasonId": "S02",
+      "arcLabel": "화재선과 첫겨울",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_003.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_001/PART_003.md"
+      ],
+      "sourceHashes": [
+        "634b6b24db781b974c857c19bed3bea34a52124b5fc9a1d45efcea9b70de9f3d"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "char-taehoon",
+        "event-fireline"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-12",
+      "chapterNumber": 12,
+      "title": "불이 지나간 자리",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S02",
+      "seasonId": "S02",
+      "arcLabel": "화재선과 첫겨울",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_004.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_001/PART_004.md"
+      ],
+      "sourceHashes": [
+        "e63f8225d1f75c59a2637a63c805ee683700404111ff4265796f56ab864d2868"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "char-taehoon",
+        "event-fireline"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-13",
+      "chapterNumber": 13,
+      "title": "첫겨울의 아침",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S02",
+      "seasonId": "S02",
+      "arcLabel": "화재선과 첫겨울",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/PART_001.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_002/PART_001.md"
+      ],
+      "sourceHashes": [
+        "9654e3edaaf160cc59ca471d76ebc3faf61c1a0553c497b2ef142f22f39e316f"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "event-winter-council"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-14",
+      "chapterNumber": 14,
+      "title": "공공대피시설",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S02",
+      "seasonId": "S02",
+      "arcLabel": "화재선과 첫겨울",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/PART_002.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_002/PART_002.md"
+      ],
+      "sourceHashes": [
+        "1a1bb88aad7ea55f3011da3a789cfeb8e061a2a651b574fcb07b90190e657f58"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "char-hajin",
+        "loc-shelter",
+        "event-shelter"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-15",
+      "chapterNumber": 15,
+      "title": "일곱 명의 원칙",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S02",
+      "seasonId": "S02",
+      "arcLabel": "화재선과 첫겨울",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/PART_003.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_002/PART_003.md"
+      ],
+      "sourceHashes": [
+        "d3f1e80e03b149cca9add810045b4c9c662d3184c935041f63ca610d50a05d9f"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "loc-nw-center"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-16",
+      "chapterNumber": 16,
+      "title": "외곽 주민복지관",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S02",
+      "seasonId": "S02",
+      "arcLabel": "화재선과 첫겨울",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/PART_004.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_002/PART_004.md"
+      ],
+      "sourceHashes": [
+        "144ec3f374b658c51b707b984ae035fa177849c54db756a001cfd92a82044283"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "char-hajin",
+        "char-hayoung",
+        "char-yujin",
+        "loc-shelter"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-17",
+      "chapterNumber": 17,
+      "title": "복지관의 두 축",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "2027-01",
+      "seasonId": "S02",
+      "arcLabel": "겨울 생활망",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_005/PART_001.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_005/PART_001.md"
+      ],
+      "sourceHashes": [
+        "fdb83b5ac426f8d9a7ae58c4c4f7f252ffa902d7c236ae7c532c30d0d76e1851"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "char-hajin",
+        "char-hayoung"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-18",
+      "chapterNumber": 18,
+      "title": "연료장과 길의 규칙",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "2027-01",
+      "seasonId": "S02",
+      "arcLabel": "겨울 생활망",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_006/PART_001.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_006/PART_001.md"
+      ],
+      "sourceHashes": [
+        "dd9842826463a277e2bada287944f6abedb20c10e3ebcbdbe79f91f55be7f6f1"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "loc-bridge",
+        "loc-west-road"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-19",
+      "chapterNumber": 19,
+      "title": "열세 사람의 밤",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "2027-01",
+      "seasonId": "S02",
+      "arcLabel": "대혹한",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_006/PART_002.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_006/PART_002.md"
+      ],
+      "sourceHashes": [
+        "1e72f759f3b9b74b319de2d8550fecfad0fc5c7bfa9195c545c971d93c09a1ff"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "char-hajin"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-20",
+      "chapterNumber": 20,
+      "title": "얼어붙은 관정",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "2027-02",
+      "seasonId": "S02",
+      "arcLabel": "대혹한",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_006/PART_003.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_006/PART_003.md"
+      ],
+      "sourceHashes": [
+        "4834838efaf732eb9d3713cba668ae1c80261514ef45ee9c13f7f53e98eafa75"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "char-taehoon",
+        "loc-agri"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-21",
+      "chapterNumber": 21,
+      "title": "백운 밖의 잠자리",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "2027-02",
+      "seasonId": "S02",
+      "arcLabel": "대혹한",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_007/PART_001.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_007/PART_001.md"
+      ],
+      "sourceHashes": [
+        "1ab4f8982fb108ec1e3319d8c38cf9ac14c50d9235d4f927988f6895cd10c5c0"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-hayoung",
+        "char-yujin",
+        "loc-baekun"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-22",
+      "chapterNumber": 22,
+      "title": "다섯 거점의 선택",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "2027-02",
+      "seasonId": "S02",
+      "arcLabel": "거점 재편",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_008/PART_001.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_008/PART_001.md"
+      ],
+      "sourceHashes": [
+        "648080bca3b98e521be05443dfe8779ad2bdbe154fc1967e251c3e2b3f2feefb"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "char-eunchae",
+        "char-taehoon"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-23",
+      "chapterNumber": 23,
+      "title": "체육시설의 낮",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "2027-03",
+      "seasonId": "S02",
+      "arcLabel": "거점 재편",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_009/PART_001.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_009/PART_001.md"
+      ],
+      "sourceHashes": [
+        "23e1c56dbad9e5ffbb708953500cae20c2c8dd0602f0af5b1ce985f435d0db1a"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "char-seojin",
+        "char-eunchae",
+        "char-taehoon"
+      ]
+    },
+    {
+      "id": "c03-afterfall-chapter-24",
+      "chapterNumber": 24,
+      "title": "동천교 바깥의 차량들",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "2027-03-23",
+      "seasonId": "S02",
+      "arcLabel": "봄 전환",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_009/PART_002.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_009/PART_002.md"
+      ],
+      "sourceHashes": [
+        "da7ad9639154e66728608e33064d5d4f8e304a49dc3cbb5226c9d40fb17650e6"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": [
+        "char-jinwoo",
+        "loc-bridge"
+      ]
+    }
+  ]
+}

@@ -58,5 +58,5 @@ export async function makeBooks({ readSource = (path) => readFile(resolve(root, 
   return books
 }
 
-export async function writeBooks() { for (const book of await makeBooks()) { const file = output(book.chronicleId, 'BOOK.json'); await mkdir(dirname(file), { recursive: true }); await writeFile(file, JSON.stringify(book, null, 2) + '\n') } }
+export async function writeBooks() { for (const book of await makeBooks()) { const file = output(book.chronicleId, 'BOOK.json'); await mkdir(dirname(file), { recursive: true }); await writeFile(file, JSON.stringify(book, null, 2) + '\n'); const indexFile = output(book.chronicleId, 'BOOK.index.json'); const index = { ...book, chapters: book.chapters.map(({ body, ...chapter }) => chapter) }; await writeFile(indexFile, JSON.stringify(index, null, 2) + '\n') } }
 if (process.argv[1]?.endsWith('build-reader-edition.mjs')) await writeBooks()

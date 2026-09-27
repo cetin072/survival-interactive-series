@@ -78,13 +78,13 @@ describe('RAW presentation supports the real preserved header formats', () => {
     expect(messages[0].content).toBe('저장 안내')
     expect(messages[1].content).toContain('이사했다.')
   })
-  it('renders the actual C03 numbered S01 and S02 finale source instead of a blank body', () => {
+  it('keeps the actual C03 numbered S01 and S02 finale source addressable for lazy loading', () => {
     for (const id of ['c03-s01-001', 'c03-s02-session-009-001', 'c03-s02-session-009-002']) {
       const part = [...transcriptPartsFor('C03-AFTERFALL')].find((item) => item.id === id)
       expect(part?.status).toBe('verified_transcript')
-      const original = part!.content!
-      expect(messagesFromRaw(original).some((message) => message.role === 'gm' && message.content.length > 50)).toBe(true)
-      expect(part!.content).toBe(original)
+      expect(part!.contentUrl).toMatch(/\.md(?:\?|$)/)
     }
+    const messages = messagesFromRaw('### USER\n선택\n### GM\n' + '공개 장면 '.repeat(20))
+    expect(messages.some((message) => message.role === 'gm' && message.content.length > 50)).toBe(true)
   })
 })
