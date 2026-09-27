@@ -42,6 +42,25 @@ export function planArchiveVisualRegistry({ catalog, observation, approval, orig
     public_assets: 0, site_publications: 0 }
 }
 
+/** Read-only reconciliation of an existing private asset. */
+export async function verifyExistingPrivateVisualRegistry({ baseUrl, serviceKey, fetchImpl = fetch,
+  ...input }) {
+  demand(typeof baseUrl === 'string' && /^https:\/\/[a-z0-9.-]+$/.test(baseUrl)
+    && typeof serviceKey === 'string' && serviceKey.length > 20, 'REGISTRY_CREDENTIALS_REQUIRED')
+  const planned = planArchiveVisualRegistry(input)
+  const url = `${baseUrl}/rest/v1/visual_assets?select=*&worldline_id=eq.AFTERFALL&asset_id=eq.${encodeURIComponent(planned.row.asset_id)}`
+  const response = await fetchImpl(url, { method: 'GET', headers: {
+    apikey: serviceKey, Authorization: `Bearer ${serviceKey}`,
+    'Accept-Profile': 'survival_rpg' }, cache: 'no-store' })
+  demand(response.ok, 'REGISTRY_READ_FAILED')
+  const rows = await response.json()
+  demand(Array.isArray(rows) && rows.length <= 1, 'REGISTRY_READ_INVALID')
+  const result = planArchiveVisualRegistry({ ...input, existingRows: rows })
+  demand(result.status === 'EXISTING_PRIVATE_ASSET_REUSED', 'REGISTRY_ASSET_NOT_FOUND')
+  return { status: result.status, asset_id: result.row.asset_id,
+    database_writes: 0, site_publications: 0 }
+}
+
 /** Insert only the private plan. A lost response is reconciled from DB before retrying. */
 export async function insertPrivateVisualRegistry({ baseUrl, serviceKey, fetchImpl = fetch, ...input }) {
   demand(typeof baseUrl === 'string' && /^https:\/\/[a-z0-9.-]+$/.test(baseUrl)

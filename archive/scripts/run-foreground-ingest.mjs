@@ -3,14 +3,14 @@ import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { acceptForegroundLocalCandidate, planForegroundLocalIngest } from './lib/foreground-image-handoff.mjs'
-import { uploadAndVerifyArchiveOriginal } from './lib/archive-storage-original.mjs'
-import { insertPrivateVisualRegistry } from './lib/archive-visual-registry.mjs'
+import { uploadAndVerifyArchiveOriginal, verifyExistingArchiveOriginal } from './lib/archive-storage-original.mjs'
+import { insertPrivateVisualRegistry, verifyExistingPrivateVisualRegistry } from './lib/archive-visual-registry.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 const json = async (path) => JSON.parse(await readFile(resolve(root, path), 'utf8'))
 
 export async function runForegroundIngest(mode, environment = process.env) {
-  if (!['--check', '--upload-only', '--register-private'].includes(mode))
+  if (!['--check', '--verify-private', '--upload-only', '--register-private'].includes(mode))
     throw new Error('INGEST_MODE_REQUIRED')
   const [catalog, observation, approval, originalBytes] = await Promise.all([
     json('archive/content/visuals/C03-AFTERFALL/VISUALS.json'),
@@ -28,8 +28,19 @@ export async function runForegroundIngest(mode, environment = process.env) {
   const serviceKey = environment.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY
   if (baseUrl !== 'https://jgsxpdflgkqroecfjzxq.supabase.co')
     throw new Error('STAGING_PROJECT_URL_REQUIRED')
-  const storageResult = await uploadAndVerifyArchiveOriginal({ baseUrl, serviceKey,
-    catalog, observation, approval, candidate, originalBytes })
+  const storageInput = { baseUrl, serviceKey,
+    catalog, observation, approval, candidate, originalBytes }
+  const storageResult = mode === '--verify-private'
+    ? await verifyExistingArchiveOriginal(storageInput)
+    : await uploadAndVerifyArchiveOriginal(storageInput)
+  if (mode === '--verify-private') {
+    const registryResult = await verifyExistingPrivateVisualRegistry({ ...storageInput, storageResult })
+    return { status: registryResult.status, candidate_id: candidate.candidate_id,
+      source_sha256: candidate.file.sha256, bucket: storageResult.bucket,
+      object_path: storageResult.object_path, storage_verified: true,
+      asset_id: registryResult.asset_id, storage_writes: 0, registry_writes: 0,
+      site_publications: 0 }
+  }
   if (mode === '--upload-only' || !storageResult.storage_verified)
     return { status: storageResult.status, candidate_id: candidate.candidate_id,
       source_sha256: candidate.file.sha256, bucket: storageResult.bucket,

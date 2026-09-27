@@ -2,6 +2,8 @@
 
 Status: CODE COMPLETE FOR CURRENT PENDING STATES / IMAGE DISPLAY BLOCKED
 
+Current follow-up (2026-09-27): One approved 서진우 original now exists in private Supabase Storage with a matching `GENERATED/CORE_PRIVATE` registry row and a checked-in local web derivative. The site manifest still has 0 assets. The private row is deliberately ineligible for the public handoff gate; storage and registration do not authorize site display.
+
 The archive website now consumes the checked-in public `VISUALS.json` snapshot derived by the Step 5 compiler from `main` at `1da3cd03f27b1c072a98a108311223b62055b8a3` (save 253). The Explorer detail displays a prepared-brief state or a public-source-pending state for matching public nodes. References without a visual point receive no invented image state. The current catalog contains 34 points: 30 ready briefs and 4 waiting. These are **brief counts, not images**.
 
 `SITE_ASSETS.json` is a separate, empty, digest-bound site-ready manifest. Its build-time validator accepts only current READY point/generation bindings and same-origin `/visual-assets/<sha256>.png` files whose bytes, hash, size (at most 200 KB) and PNG dimensions match. Symlinked files and invalid paths fail. The browser displays an image only when this manifest includes one; it uses declared dimensions, lazy loading and an explicit load-error/retry state. The current manifest has **0 assets**, so the UI still says that a prepared brief awaits an image. Synthetic positive tests verify the contract without claiming model generation or publication.

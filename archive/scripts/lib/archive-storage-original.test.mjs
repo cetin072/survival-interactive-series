@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { acceptForegroundLocalCandidate } from './foreground-image-handoff.mjs'
-import { uploadAndVerifyArchiveOriginal } from './archive-storage-original.mjs'
+import { uploadAndVerifyArchiveOriginal, verifyExistingArchiveOriginal } from './archive-storage-original.mjs'
 
 // Real committed source bytes; HTTP responses are synthetic and are not a Supabase upload proof.
 const root = new URL('../../', import.meta.url)
@@ -41,6 +41,21 @@ test('existing content is reused after registry failure without overwriting or d
   const result = await uploadAndVerifyArchiveOriginal({ ...base, fetchImpl: storage.fetchImpl })
   assert.equal(result.status, 'EXISTING_OBJECT_REUSED')
   assert.deepEqual(storage.calls.map((call) => call.method), ['POST', 'GET'])
+})
+test('existing object verification sends only GET and rejects changed or absent bytes', async () => {
+  const storage = fakeStorage(200)
+  const result = await verifyExistingArchiveOriginal({ ...base, fetchImpl: storage.fetchImpl })
+  assert.equal(result.status, 'EXISTING_OBJECT_REUSED')
+  assert.equal(result.upload_attempts, 0)
+  assert.deepEqual(storage.calls.map((call) => call.method), ['GET'])
+  const changed = fakeStorage(200, Buffer.from('changed'))
+  await assert.rejects(verifyExistingArchiveOriginal({ ...base, fetchImpl: changed.fetchImpl }),
+    /STORAGE_READBACK_HASH_MISMATCH/)
+  assert.deepEqual(changed.calls.map((call) => call.method), ['GET'])
+  const absent = fakeStorage(200, null)
+  await assert.rejects(verifyExistingArchiveOriginal({ ...base, fetchImpl: absent.fetchImpl }),
+    /STORAGE_OBJECT_NOT_FOUND/)
+  assert.deepEqual(absent.calls.map((call) => call.method), ['GET'])
 })
 test('lost upload response reconciles readback and never sends a second POST', async () => {
   const calls = []

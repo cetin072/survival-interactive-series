@@ -5,8 +5,7 @@ import { acceptForegroundLocalCandidate, planForegroundLocalIngest } from './for
 const demand = (ok, code) => { if (!ok) throw new Error(code) }
 const BUCKET = 'survival-archive-originals'
 
-export async function uploadAndVerifyArchiveOriginal({ baseUrl, serviceKey, catalog, observation,
-  approval, candidate, originalBytes, fetchImpl = fetch }) {
+function storageBinding({ baseUrl, serviceKey, catalog, observation, approval, candidate, originalBytes }) {
   demand(typeof baseUrl === 'string' && /^https:\/\/[a-z0-9.-]+$/.test(baseUrl)
     && typeof serviceKey === 'string' && serviceKey.length > 20, 'STORAGE_CREDENTIALS_REQUIRED')
   const file = inspectPng(originalBytes)
@@ -18,9 +17,11 @@ export async function uploadAndVerifyArchiveOriginal({ baseUrl, serviceKey, cata
     && candidate.storage_status === 'NOT_STORED' && candidate.file?.sha256 === file.sha256
     && /^candidate-[a-f0-9]{64}$/.test(candidate.candidate_id), 'STORAGE_CANDIDATE_INVALID')
   const path = `AFTERFALL/${candidate.candidate_id}/${file.sha256}.png`
-  const url = `${baseUrl}/storage/v1/object/${BUCKET}/${path}`
   const headers = { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }
-  const readback = async () => {
+  return { path, file, headers }
+}
+
+async function readbackOriginal({ baseUrl, path, headers, originalBytes, fetchImpl }) {
     const response = await fetchImpl(`${baseUrl}/storage/v1/object/authenticated/${BUCKET}/${path}`,
       { method: 'GET', headers, cache: 'no-store' })
     if (response.status === 404) return null
@@ -28,7 +29,25 @@ export async function uploadAndVerifyArchiveOriginal({ baseUrl, serviceKey, cata
     const bytes = Buffer.from(await response.arrayBuffer())
     demand(bytes.equals(originalBytes), 'STORAGE_READBACK_HASH_MISMATCH')
     return bytes
-  }
+}
+
+/** Reconcile a previously stored original without sending an upload request. */
+export async function verifyExistingArchiveOriginal({ baseUrl, serviceKey, catalog, observation,
+  approval, candidate, originalBytes, fetchImpl = fetch }) {
+  const { path, file, headers } = storageBinding({ baseUrl, serviceKey, catalog,
+    observation, approval, candidate, originalBytes })
+  const bytes = await readbackOriginal({ baseUrl, path, headers, originalBytes, fetchImpl })
+  demand(bytes !== null, 'STORAGE_OBJECT_NOT_FOUND')
+  return { status: 'EXISTING_OBJECT_REUSED', bucket: BUCKET, object_path: path,
+    sha256: file.sha256, upload_attempts: 0, storage_verified: true }
+}
+
+export async function uploadAndVerifyArchiveOriginal({ baseUrl, serviceKey, catalog, observation,
+  approval, candidate, originalBytes, fetchImpl = fetch }) {
+  const { path, file, headers } = storageBinding({ baseUrl, serviceKey, catalog,
+    observation, approval, candidate, originalBytes })
+  const url = `${baseUrl}/storage/v1/object/${BUCKET}/${path}`
+  const readback = () => readbackOriginal({ baseUrl, path, headers, originalBytes, fetchImpl })
   let uploadStatus
   try {
     const response = await fetchImpl(url, { method: 'POST', headers: { ...headers,

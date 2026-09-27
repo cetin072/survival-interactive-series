@@ -2,6 +2,8 @@
 
 Status: POC REVIEWED WITH BLOCKER — NOT AN OPERATIONAL IMAGE PIPELINE
 
+Current follow-up (2026-09-27): The later foreground sample described below was subsequently accepted as a local candidate by the project owner, uploaded to a private Supabase Storage bucket and registered once as `GENERATED/CORE_PRIVATE`. Its downloaded original matched SHA-256 `f4882707c0272d1eb7123493bb46dc7193e0235ceba778d3582d0112a087a78d`. The two outputs in the original POC remain rejected; the historical observations below describe the state *at that experiment*, not the current accepted/stored count. Site publication and unattended generation remain unverified.
+
 2026-09-27 follow-up: Step 7 handoff code accepts only a separately reviewed, hash-bound local candidate. The two earlier outputs remain quarantined. One later built-in Codex foreground sample is described below; accepted archive images remain **0**.
 Base audited: `5c1a0c59eae96a535c9e5f94d973308f52f8e7b6` (includes #138 and #139).
 

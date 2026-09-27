@@ -2,7 +2,8 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { acceptForegroundLocalCandidate } from './foreground-image-handoff.mjs'
-import { planArchiveVisualRegistry, insertPrivateVisualRegistry } from './archive-visual-registry.mjs'
+import { planArchiveVisualRegistry, insertPrivateVisualRegistry,
+  verifyExistingPrivateVisualRegistry } from './archive-visual-registry.mjs'
 
 const root = new URL('../../', import.meta.url)
 const [catalog, observation, approval, originalBytes] = await Promise.all([
@@ -34,6 +35,27 @@ test('same registry row is reusable after upload success and registry retry', ()
   assert.throws(() => planArchiveVisualRegistry({ ...input,
     existingRows: [{ ...planned.row, object_path: 'survival-archive-originals/other.png' }] }),
   /REGISTRY_EXISTING_ASSET_CONFLICT/)
+})
+test('existing private registry verification is GET only and rejects mismatched binding', async () => {
+  const existing = planArchiveVisualRegistry(input).row
+  const calls = []
+  const args = { ...input, baseUrl: 'https://example.supabase.co',
+    serviceKey: 'synthetic-test-service-key-12345',
+    fetchImpl: async (url, request) => {
+      calls.push({ url, method: request.method })
+      return Response.json([existing])
+    } }
+  const result = await verifyExistingPrivateVisualRegistry(args)
+  assert.equal(result.status, 'EXISTING_PRIVATE_ASSET_REUSED')
+  assert.equal(result.database_writes, 0)
+  assert.deepEqual(calls.map((call) => call.method), ['GET'])
+  assert.match(calls[0].url, /asset_id=eq\.AF-CHAR-/)
+  await assert.rejects(verifyExistingPrivateVisualRegistry({ ...args,
+    fetchImpl: async () => Response.json([{ ...existing, source: {
+      ...existing.source, generation_key: `generation-${'0'.repeat(64)}` } }]) }),
+  /REGISTRY_EXISTING_ASSET_CONFLICT/)
+  await assert.rejects(verifyExistingPrivateVisualRegistry({ ...args,
+    fetchImpl: async () => Response.json([]) }), /REGISTRY_ASSET_NOT_FOUND/)
 })
 test('fake candidate, approval, storage receipt and duplicate candidate binding are rejected', () => {
   assert.throws(() => planArchiveVisualRegistry({ ...input,
