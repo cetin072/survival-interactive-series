@@ -13,8 +13,11 @@ const refPattern = /^refs\/heads\/codex\/archive-publication-[a-z0-9-]{1,50}$/
 const seasonPattern = /^S\d{2,3}$/
 const transcriptRoot = 'archive/content/transcripts/C03-AFTERFALL'
 const bookPath = 'archive/content/stories/C03-AFTERFALL/BOOK.json'
+const graphPath = 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'
+const seedPath = 'archive/web/src/archive/archiveData.ts'
 
-export async function prepareReaderFromPublicRef({ repoRoot, ref, seasonId, checkpointRef,
+/** Shared pinned public-ref reader for downstream local proposal stages. */
+export async function inspectPublicRef({ repoRoot, ref, seasonId, checkpointRef,
   gitBinary = process.env.ARCHIVE_GIT_BINARY || 'git' } = {}) {
   demand(repoRoot && refPattern.test(ref) && seasonPattern.test(seasonId)
     && !['S01', 'S02'].includes(seasonId), 'INVALID_READER_PUBLIC_REF_REQUEST')
@@ -28,11 +31,11 @@ export async function prepareReaderFromPublicRef({ repoRoot, ref, seasonId, chec
   demand(ancestor === head, 'READER_REF_NOT_DESCENDANT_OF_CHECKOUT')
   const changed = (await git(gitBinary, root, ['diff', '--name-only', head, base])).toString('utf8')
     .split('\n').filter(Boolean)
-  demand(changed.every((path) => path === bookPath
+  demand(changed.every((path) => path === bookPath || path === graphPath
     || /^archive\/content\/transcripts\/C03-AFTERFALL\/S\d{2,3}\/[A-Za-z0-9_./-]+$/.test(path)),
   'READER_REF_CHANGED_CODE_OR_OTHER_CONTENT')
   const read = async (path) => {
-    demand((path === bookPath
+    demand((path === bookPath || path === graphPath || path === seedPath
       || /^archive\/content\/transcripts\/C03-AFTERFALL\/S\d{2,3}\/[A-Za-z0-9_./-]+$/.test(path)
       || /^worldlines\/AFTERFALL\/seasons\/S\d{2,3}\/[A-Za-z0-9_/-]+\.md$/.test(path))
       && !path.split('/').includes('..'), 'INVALID_READER_GIT_PATH')
@@ -54,6 +57,13 @@ export async function prepareReaderFromPublicRef({ repoRoot, ref, seasonId, chec
   demand(manifestPaths.includes(targetPath), 'MISSING_PUBLIC_SEASON_AT_REF')
   const target = JSON.parse((await read(targetPath)).toString('utf8'))
   const snapshot = await snapshotFromPublicSeason(target, base, checkpointRef, { read, listParts })
+  return { root, ref, head, base, seasonId, read, paths, listParts,
+    manifestPaths, snapshot, gitBinary }
+}
+
+async function compileReaderFromPublicRef(options, acceptCurrentBook) {
+  const { ref, base, seasonId, read, listParts, manifestPaths, snapshot } =
+    await inspectPublicRef(options)
   const { rawCatalog } = await import('../reader-source-catalog.mjs')
   const { makeBooks } = await import('../build-reader-edition.mjs')
   const catalog = rawCatalog['C03-AFTERFALL'].filter((item) => !item.autoPublication)
@@ -68,14 +78,24 @@ export async function prepareReaderFromPublicRef({ repoRoot, ref, seasonId, chec
   const allowed = new Set(snapshot.sources.filter((source) => source.atomic_pairing_complete === true)
     .map((source) => source.source_ref))
   const additions = checkAppendOnlyEdition(previous, candidate, allowed)
-  demand(additions.length > 0, 'READER_REF_HAS_NO_NEW_CHAPTER')
   const candidateBytes = Buffer.from(JSON.stringify(candidate, null, 2) + '\n')
   demand(candidateBytes.length <= 2_500_000, 'READER_BOOK_TOO_LARGE')
+  if (acceptCurrentBook) {
+    demand(additions.length === 0 && candidateBytes.equals(await read(bookPath)),
+      'READER_BOOK_AT_REF_NOT_VERIFIED')
+  } else demand(additions.length > 0, 'READER_REF_HAS_NO_NEW_CHAPTER')
   return { ref, baseCommit: base, seasonId, bookPath, candidateBytes,
     report: { status: 'READER_PROPOSAL_READY_IN_MEMORY', source_revision: base,
       book_sha256: hash(candidateBytes), added_chapters: additions.length,
       files_written: 0, remote_pushes: 0, site_publications: 0 } }
 }
+
+export const prepareReaderFromPublicRef = (options = {}) =>
+  compileReaderFromPublicRef(options, false)
+
+/** Recompile and compare the already-proposed BOOK before downstream graph work. */
+export const verifyReaderBookAtPublicRef = (options = {}) =>
+  compileReaderFromPublicRef(options, true)
 
 /** Caller supplies real authorization. This method can advance only the existing local ref. */
 export async function commitReaderFromPublicRef(options = {}) {

@@ -40,7 +40,7 @@ try {
   command('git', ['add', checkpointRef], copy)
   command('git', ['-c', 'user.name=Reader test', '-c', 'user.email=reader-test@example.invalid',
     'commit', '--no-verify', '-qm', 'Synthetic checkpoint fixture; local test only'], copy)
-  const raw = '## USER 000\n\nTEST_INPUT\n\n## GM 001\n\n## 2099년 1월 1일 10:00\n\nTEST_GM_PROSE\n\n다음 선택\n1. TEST_A\n2. TEST_B\n'
+  const raw = '## USER 000\n\nTEST_INPUT\n\n## GM 001\n\n## 2099년 1월 1일 10:00\n\nTEST_GM_PROSE 서진우\n\n다음 선택\n1. TEST_A\n2. TEST_B\n'
   const range = { start: '2099-01-01 10:00', end: '2099-01-01 10:00' }
   const entry = { session_id: 'SESSION_001', source_type: 'SUPABASE_ROLLING_RAW', visibility: 'PUBLIC_ARCHIVE', capture_quality: 'VERIFIED_CONTIGUOUS_TURN_PAIRS', atomic_pairing_complete: true, source_manifest: 'SESSION_001/SOURCE_MANIFEST.json', coverage_basis: 'captured_message_range', captured_message_range: range, user_messages: 1, gm_public_blocks: 1 }
   const manifest = { chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', season_id: 'S99', archive_class: 'COLD_RAW', visibility: 'PUBLIC_ARCHIVE', sessions: [entry] }
@@ -79,6 +79,25 @@ process.stdout.write(JSON.stringify(result));`
     command('git', ['rev-parse', `${fixtureHead}^`], copy).trim())
   assert.deepEqual(await readFile(resolve(copy, 'archive/content/stories/C03-AFTERFALL/BOOK.json')), beforeRefBook)
   assert.throws(() => command('node', ['--input-type=module', '-e', refScript], copy))
+  const graphScript = `import { commitGraphRelinkFromPublicRef } from './archive/scripts/lib/graph-public-ref.mjs';
+const result = await commitGraphRelinkFromPublicRef({ repoRoot: process.cwd(),
+  ref: '${refSource}', seasonId: 'S99', checkpointRef: '${checkpointRef}',
+  authorizeCommit: async () => true });
+process.stdout.write(JSON.stringify(result));`
+  const graphResult = JSON.parse(command('node', [
+    '--experimental-strip-types', '--input-type=module', '-e', graphScript], copy))
+  assert.equal(graphResult.status, 'LOCAL_GRAPH_PROPOSAL_COMMITTED')
+  assert.equal(graphResult.nodes_added, 0)
+  assert.equal(graphResult.relations_added, 0)
+  assert.equal(command('git', ['rev-parse', refSource], copy).trim(), graphResult.commit)
+  assert.deepEqual(await readFile(resolve(copy, 'archive/content/stories/C03-AFTERFALL/BOOK.json')), beforeRefBook)
+  const proposedGraph = JSON.parse(command('git', ['show',
+    `${graphResult.commit}:archive/content/graphs/C03-AFTERFALL/GRAPH.json`], copy))
+  assert.ok(proposedGraph.story_links.some((link) =>
+    link.chapter_id === 'c03-afterfall-auto-' + sha(`${relative}/PART_001.md`)
+      && link.node_id === 'char-jinwoo'))
+  assert.throws(() => command('node', [
+    '--experimental-strip-types', '--input-type=module', '-e', graphScript], copy))
   command('git', ['checkout', '--detach', fixtureHead], copy)
   const proposalRef = 'refs/heads/codex/archive-publication-reader-test'
   command('git', ['branch', 'codex/archive-publication-reader-test', fixtureHead], copy)
@@ -110,7 +129,7 @@ process.stdout.write(JSON.stringify(result));`
   assert.equal(command('git', ['show', `${proposal.commit}:archive/content/stories/C03-AFTERFALL/BOOK.json`], copy), changedBook)
   const parsed = JSON.parse(changedBook)
   assert.deepEqual(parsed.chapters.slice(0, -1), books.find((b) => b.chronicleId === 'C03-AFTERFALL').chapters)
-  assert.equal(parsed.chapters.at(-1).body, '## 2099년 1월 1일 10:00\n\nTEST_GM_PROSE')
+  assert.equal(parsed.chapters.at(-1).body, '## 2099년 1월 1일 10:00\n\nTEST_GM_PROSE 서진우')
   assert.equal(JSON.parse(command('node', args, copy)).reader_status, 'NOOP')
   assert.equal(await readFile(resolve(copy, relative, 'PART_001.md'), 'utf8'), raw)
   assert.equal(command('git', ['diff', '--name-only'], copy).trim(), 'archive/content/stories/C03-AFTERFALL/BOOK.json')
@@ -126,5 +145,5 @@ process.stdout.write(JSON.stringify(result));`
   await writeFile(resolve(copy, relative, 'PART_001.md'), raw + '\nCORRUPTED\n')
   assert.throws(() => command('node', args, copy))
   assert.equal(await readFile(bookFile, 'utf8'), changedBook)
-  console.log(JSON.stringify({ real_books_unchanged: books.map((b) => ({ chronicle: b.chronicleId, chapters: b.chapters.length })), real_s02_reader_batch: report, historical_batch_after_newer_publication: 'PASS', synthetic_ref_pinned_reader_proposal: 'PASS', synthetic_local_git_proposal: 'PASS', synthetic_append: 'PASS', synthetic_repeat_noop: 'PASS', corrupted_source_retains_book: 'PASS' }))
+  console.log(JSON.stringify({ real_books_unchanged: books.map((b) => ({ chronicle: b.chronicleId, chapters: b.chapters.length })), real_s02_reader_batch: report, historical_batch_after_newer_publication: 'PASS', synthetic_ref_pinned_reader_proposal: 'PASS', synthetic_ref_pinned_graph_relink: 'PASS', synthetic_local_git_proposal: 'PASS', synthetic_append: 'PASS', synthetic_repeat_noop: 'PASS', corrupted_source_retains_book: 'PASS' }))
 } finally { await rm(temporary, { recursive: true, force: true }) }

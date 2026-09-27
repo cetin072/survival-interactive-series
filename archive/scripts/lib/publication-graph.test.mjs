@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { mkdtemp, readFile, writeFile, rm, readdir, symlink } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { reconcilePublicGraph, graphHash, graphBytes, byteHash, relationId, legacyPublicFacts } from './publication-graph.mjs'
+import { reconcilePublicGraph, relinkPublicGraph, graphHash, graphBytes, byteHash, relationId, legacyPublicFacts } from './publication-graph.mjs'
 import { writeGraphAtomically } from './atomic-graph.mjs'
 
 // Synthetic, metadata-only examples. Never committed as a played scene or Canon.
@@ -27,6 +27,29 @@ function reseal(g) { const { content_sha256, ...body } = g; g.content_sha256 = g
 test('compiles public nodes, explicit relations and articles', () => { const r = reconcilePublicGraph(fixture()); assert.equal(r.graph.nodes.length, 3); assert.equal(r.graph.relations.length, 1); assert.equal(r.graph.articles.length, 3); assert.equal(r.report.inferred_relationships, 0) })
 test('same inputs produce byte-identical graph and report', () => assert.deepEqual(reconcilePublicGraph(fixture()), reconcilePublicGraph(fixture())))
 test('repeat graph reconciliation is NOOP', () => { const f = fixture(); f.previous = reconcilePublicGraph(f).graph; const again = reconcilePublicGraph(f); assert.equal(again.report.status, 'NOOP'); assert.equal(again.report.unchanged_records, 4) })
+test('Reader relink adds only navigational mentions of existing public entities', () => {
+  const f = fixture(), previous = reconcilePublicGraph(f).graph
+  f.batch.snapshot.source_save_version = 999
+  f.batch.snapshot.source_game_time = '2099-01-01 10:00'
+  f.book.chapters.push({ id: 'c03-afterfall-auto-test', title: '시험 장면',
+    sourceKind: 'VERIFIED_GM_NARRATIVE', relatedNodeIds: [],
+    publicationProvenance: { visibility: 'PUBLIC_ARCHIVE',
+      capturedRange: { end: '2099-01-01 10:00' } }, body: '시험인물이 기록되었다.' })
+  const result = relinkPublicGraph({ batch: f.batch, previous, book: f.book,
+    bookSource: f.bookSource })
+  assert.equal(result.report.status, 'GRAPH_RELINKED')
+  assert.deepEqual(result.graph.nodes, previous.nodes)
+  assert.deepEqual(result.graph.relations, previous.relations)
+  assert.ok(result.graph.story_links.some((link) =>
+    link.chapter_id === 'c03-afterfall-auto-test' && link.node_id === 'char-test'))
+  assert.equal(result.report.nodes_added, 0)
+  assert.equal(result.report.relations_added, 0)
+  assert.equal(relinkPublicGraph({ batch: f.batch, previous: result.graph,
+    book: f.book, bookSource: f.bookSource }).report.status, 'NOOP')
+  f.batch.snapshot.source_save_version = 1
+  assert.throws(() => relinkPublicGraph({ batch: f.batch, previous: result.graph,
+    book: f.book, bookSource: f.bookSource }), /STALE_READER_GRAPH_BATCH/)
+})
 test('does not mutate caller-owned inputs', () => { const f = fixture(), old = structuredClone(f); reconcilePublicGraph(f); assert.deepEqual(f, old) })
 test('node ids and prior public prose are preserved', () => { const f = fixture(), r = reconcilePublicGraph(f); assert.deepEqual(r.graph.nodes.find((n) => n.id === 'char-test').data, f.facts.nodes[0]); assert.equal(r.graph.articles.find((n) => n.id === 'char-test').overview, f.facts.nodes[0].summary) })
 test('node update on newer save records history', () => { const f = fixture(); f.previous = reconcilePublicGraph(f).graph; next(f); f.facts.nodes[0].summary = '새 공개 시험 설명'; const r = reconcilePublicGraph(f); assert.equal(r.report.nodes_updated, 1); assert.equal(r.graph.nodes.find((n) => n.id === 'char-test').history.length, 1) })
