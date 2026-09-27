@@ -59,6 +59,8 @@ jobs:
         run: node --test ../scripts/lib/site-asset-contract.test.mjs
       - name: Test foreground original, storage readback and registry site handoff
         run: node --test ../scripts/lib/site-foreground-handoff.test.mjs
+      - name: Test idempotent private original upload and uncertain response recovery
+        run: node --test ../scripts/lib/archive-storage-original.test.mjs
       - name: Test local image POC request and quarantine receipts
         run: node --test ../scripts/lib/image-poc-exchange.test.mjs
       - name: Test reviewed local image handoff and disabled ingest plan
