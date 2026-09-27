@@ -193,6 +193,11 @@ begin
   select * into strict v_reclaim from survival_rpg.claim_archive_publication_daily_run(v_date, 'ci-runner-b', 300);
   if not v_reclaim.out_claimed or v_reclaim.out_lease_token is null
      or v_reclaim.out_claim_version <= v_owner.out_claim_version then raise exception 'RUN_RECLAIM_FAILED'; end if;
+  select to_jsonb(r) into strict v_before from survival_rpg.archive_publication_daily_runs r where scheduled_date = v_date;
+  select count(*) into v_events_before from survival_rpg.archive_publication_daily_run_events where scheduled_date = v_date;
+  if survival_rpg.renew_archive_publication_daily_run_lease(
+    v_date, v_owner.out_claim_version, v_owner.out_lease_token, 300
+  ) then raise exception 'STALE_RUN_OWNER_RENEWED'; end if;
   v_rejected := false;
   begin
     perform survival_rpg.finish_archive_publication_daily_run(
@@ -200,7 +205,11 @@ begin
     );
   exception when sqlstate '55000' then v_rejected := true;
   end;
-  if not v_rejected then raise exception 'STALE_RUN_OWNER_FINISHED'; end if;
+  select to_jsonb(r) into strict v_after from survival_rpg.archive_publication_daily_runs r where scheduled_date = v_date;
+  select count(*) into v_events_after from survival_rpg.archive_publication_daily_run_events where scheduled_date = v_date;
+  if not v_rejected or v_before is distinct from v_after or v_events_before <> v_events_after then
+    raise exception 'STALE_RUN_OWNER_MUTATED_STATE';
+  end if;
   if survival_rpg.finish_archive_publication_daily_run(
     v_date, v_reclaim.out_claim_version, v_reclaim.out_lease_token, 'COMPLETE', '{"result":"COMPLETE"}'::jsonb
   ) <> 'COMPLETE' then raise exception 'RECLAIMED_RUN_FINISH_FAILED'; end if;
