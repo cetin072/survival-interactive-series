@@ -240,10 +240,6 @@ begin
   v_current_save_version :=
     survival_rpg.lock_afterfall_authoritative_save_head(p_worldline_id);
 
-  if not found then
-    raise exception 'AFTERFALL authoritative save is missing' using errcode = '23503';
-  end if;
-
   -- Replays are checked against the immutable link before comparing the live
   -- head: a later turn must not make an acknowledged retry fail.
   select l.* into v_link

@@ -91,6 +91,7 @@ class TurnStateLinkMigrationTests(unittest.TestCase):
         self.assertIn("security invoker", rpc)
         self.assertIn("lock_afterfall_authoritative_save_head(p_worldline_id)", rpc)
         self.assertNotIn("for update", rpc)
+        self.assertNotIn("raise exception 'afterfall authoritative save is missing'", rpc)
         self.assertNotIn("for update", rpc)
         self.assertIn("lock_afterfall_authoritative_save_head(new.worldline_id)", sql)
         self.assertIn("lock_afterfall_authoritative_save_head(p_worldline_id)", sql)
