@@ -7,6 +7,11 @@ import { sealPublicationSegment } from './publication-segment.mjs'
 
 const hash = (value) => createHash('sha256').update(value).digest('hex')
 const demand = (ok, code) => { if (!ok) throw new Error(code) }
+function validTime(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(value)) return false
+  const date = new Date(value.replace(' ', 'T') + ':00Z')
+  return Number.isFinite(date.valueOf()) && date.toISOString().slice(0, 16).replace('T', ' ') === value
+}
 const keys = (value, names) => demand(value && typeof value === 'object' && !Array.isArray(value)
   && Object.keys(value).length === names.length && Object.keys(value).every((key) => names.includes(key)),
 'INVALID_MATERIALIZED_ROW')
@@ -18,9 +23,11 @@ export function materializePublicationSegment(snapshot, rows) {
   const blocks = []
   for (let index = 0; index < rows.length; index++) {
     const row = rows[index], expected = snapshot.messages[index]
-    keys(row, ['message_id', 'content'])
+    keys(row, ['message_id', 'content', 'game_time'])
     demand(row.message_id === expected.message_id && typeof row.content === 'string'
       && row.content.trim().length > 0 && !row.content.includes('\0'), 'MATERIALIZED_ROW_IDENTITY_MISMATCH')
+    demand(validTime(row.game_time) && (index === 0 || row.game_time >= rows[index - 1].game_time),
+      'MATERIALIZED_TIME_RANGE_INVALID')
     const bytes = Buffer.from(row.content, 'utf8')
     totalBytes += bytes.length
     demand(bytes.length <= 200_000 && totalBytes <= 2_000_000, 'MATERIALIZED_BODY_TOO_LARGE')
@@ -34,6 +41,9 @@ export function materializePublicationSegment(snapshot, rows) {
     && Number(block.header.messageLabel) === index
     && block.body === rows[index].content.trim()), 'RAW_ROLE_HEADER_COLLISION')
   const readerPreview = extractReaderNarrative(partBytes.toString('utf8'), { details: true })
+  const capturedRange = { start: rows[0].game_time, end: rows.at(-1).game_time }
+  const sourceSaveVersion = snapshot.turn_outcomes.at(-1).gm_save_version
+  const partSha256 = hash(partBytes)
   const candidate = {
     version: 'publication-segment-raw-candidate-v1', chronicle_id: segment.chronicle_id,
     worldline_id: segment.worldline_id, season_id: segment.season_id,
@@ -42,13 +52,18 @@ export function materializePublicationSegment(snapshot, rows) {
     source_digest: segment.source_digest, source_message_order: {
       start: segment.snapshot_start_order, end: segment.snapshot_end_order,
     },
-    part_name: 'PART_001.md', part_sha256: hash(partBytes),
+    captured_message_range: capturedRange, source_save_version: sourceSaveVersion,
+    capture_quality: 'VERIFIED_CONTIGUOUS_TURN_PAIRS', atomic_pairing_complete: true,
+    counts: { user: rows.length / 2, gm: rows.length / 2, total: rows.length },
+    part_name: 'PART_001.md', part_sha256: partSha256,
     content_sha256: snapshot.messages.map((message, index) => ({
       source_message_order: message.message_order, local_message_order: index,
       role: message.role, sha256: message.content_sha256,
     })),
     visibility: 'PENDING_PUBLIC_APPROVAL', publication_allowed: false,
   }
+  candidate.candidate_id = `candidate-${hash(JSON.stringify({ segment_id: segment.segment_id,
+    part_sha256: partSha256, captured_message_range: capturedRange, source_save_version: sourceSaveVersion }))}`
   return { candidate, partBytes, report: { segment_id: segment.segment_id,
     source_session_status: segment.session_status, message_count: rows.length,
     content_bytes: totalBytes, part_sha256: candidate.part_sha256,

@@ -7,8 +7,8 @@ const hash = (value) => createHash('sha256').update(value).digest('hex')
 const uuid = (tail) => `00000000-0000-4000-8000-${String(tail).padStart(12, '0')}`
 function fixture(start = 0) {
   const rows = [
-    { message_id: uuid(101 + start), content: 'SYNTHETIC_USER_INPUT' },
-    { message_id: uuid(102 + start), content: '## 2099년 1월 1일 10:00\n\nSYNTHETIC_GM_SCENE' },
+    { message_id: uuid(101 + start), content: 'SYNTHETIC_USER_INPUT', game_time: '2099-01-01 09:59' },
+    { message_id: uuid(102 + start), content: '## 2099년 1월 1일 10:00\n\nSYNTHETIC_GM_SCENE', game_time: '2099-01-01 10:00' },
   ]
   const messages = rows.map((row, index) => ({
     message_id: row.message_id, idempotency_key: uuid(201 + start + index),
@@ -30,6 +30,10 @@ test('materializes exact verified bodies without closing or approving an open se
   assert.equal(candidate.publication_allowed, false)
   assert.equal(candidate.source_session_status, 'OPEN')
   assert.equal(candidate.part_sha256, hash(partBytes))
+  assert.match(candidate.candidate_id, /^candidate-[a-f0-9]{64}$/)
+  assert.deepEqual(candidate.captured_message_range, { start: '2099-01-01 09:59', end: '2099-01-01 10:00' })
+  assert.equal(candidate.source_save_version, 253)
+  assert.equal(candidate.counts.total, 2)
   assert.match(partBytes.toString(), /## USER 000\n\nSYNTHETIC_USER_INPUT\n\n## GM 001/)
   assert.equal(report.files_written, 0)
   assert.equal(report.database_writes, 0)
@@ -47,6 +51,12 @@ test('later pairs have a distinct source fence and locally numbered RAW headers'
   assert.match(next.partBytes.toString(), /^## USER 000/)
   snapshot.session_observed_last_order = 7
   assert.equal(materializePublicationSegment(snapshot, rows).candidate.segment_id, next.candidate.segment_id)
+  const changedTime = fixture(2)
+  changedTime.rows[1].game_time = '2099-01-01 10:01'
+  assert.equal(materializePublicationSegment(changedTime.snapshot, changedTime.rows).candidate.segment_id,
+    next.candidate.segment_id)
+  assert.notEqual(materializePublicationSegment(changedTime.snapshot, changedTime.rows).candidate.candidate_id,
+    next.candidate.candidate_id)
 })
 test('wrong body, identity, order, private metadata or hidden fields fail closed', () => {
   const cases = [
@@ -56,6 +66,8 @@ test('wrong body, identity, order, private metadata or hidden fields fail closed
     (f) => { f.rows[0].hidden_state = 'DO_NOT_EXPORT' },
     (f) => { f.snapshot.messages[0].public_safe = false },
     (f) => { f.snapshot.messages[0].save_version = null },
+    (f) => { f.rows[0].game_time = '2099-02-30 00:00' },
+    (f) => { f.rows[1].game_time = '2098-01-01 00:00' },
   ]
   for (const change of cases) {
     const f = fixture(); change(f)
