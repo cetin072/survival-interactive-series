@@ -14,6 +14,7 @@ const seasonPattern = /^S\d{2,3}$/
 const transcriptRoot = 'archive/content/transcripts/C03-AFTERFALL'
 const bookPath = 'archive/content/stories/C03-AFTERFALL/BOOK.json'
 const graphPath = 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'
+const visualPath = 'archive/content/visuals/C03-AFTERFALL/VISUALS.json'
 const seedPath = 'archive/web/src/archive/archiveData.ts'
 
 /** Shared pinned public-ref reader for downstream local proposal stages. */
@@ -32,10 +33,13 @@ export async function inspectPublicRef({ repoRoot, ref, seasonId, checkpointRef,
   const changed = (await git(gitBinary, root, ['diff', '--name-only', head, base])).toString('utf8')
     .split('\n').filter(Boolean)
   demand(changed.every((path) => path === bookPath || path === graphPath
+    || path === visualPath
     || /^archive\/content\/transcripts\/C03-AFTERFALL\/S\d{2,3}\/[A-Za-z0-9_./-]+$/.test(path)),
   'READER_REF_CHANGED_CODE_OR_OTHER_CONTENT')
   const read = async (path) => {
-    demand((path === bookPath || path === graphPath || path === seedPath
+    demand((path === bookPath || path === graphPath || path === visualPath
+      || path === seedPath
+      || /^archive\/content\/public-facts\/C03-AFTERFALL\/S02\/[A-Za-z0-9_-]+\.json$/.test(path)
       || /^archive\/content\/transcripts\/C03-AFTERFALL\/S\d{2,3}\/[A-Za-z0-9_./-]+$/.test(path)
       || /^worldlines\/AFTERFALL\/seasons\/S\d{2,3}\/[A-Za-z0-9_/-]+\.md$/.test(path))
       && !path.split('/').includes('..'), 'INVALID_READER_GIT_PATH')

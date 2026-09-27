@@ -93,3 +93,7 @@ References checked for this delivery:
 - https://www.netlify.com/knowledge-base/how-to-deploy-a-site-to-netlify/
 
 Next is Step 6: test the real included-cost ChatGPT image-generation/result-ingestion path, and distinguish supported interaction from unattended scheduling. Step 5 makes **no** claim that zero-cost unattended image production has been demonstrated. Storage, scheduling and site integration remain later stages.
+
+## Later local-ref graph-to-visual bridge (Draft PR, not activated)
+
+`visual-public-ref.mjs` compiles a visual worklist from the graph already verified on an existing local publication ref. It reuses the explicitly reviewed S02 appearance file as past public evidence for unchanged characters; it does not infer any new-season appearance or map. The output is a deterministic VISUALS.json candidate, with generation and execution still disabled. A mandatory trusted authorization callback and Git compare-and-swap can add that candidate to the same **local** ref, with duplicate replay rejected. An isolated S99 fixture checks the chained public source → Reader → graph → visual proposal without editing checkout files. This is synthetic code evidence, not real S03 publication, an accepted image, provider execution, site delivery or zero-added-cost proof.
