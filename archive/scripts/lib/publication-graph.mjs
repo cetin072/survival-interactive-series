@@ -187,6 +187,32 @@ export function reconcilePublicGraph({ batch, previous = null, facts, source, bo
   return { graph, report: { ...report, status: previous?.content_sha256 === graph.content_sha256 ? 'NOOP' : 'GRAPH_COMPILED', node_count: sortedNodes.length, relation_count: sortedRelations.length, story_links: graph.story_links.length, ambiguous_aliases: derived.ambiguous_aliases, inferred_relationships: 0 } }
 }
 
+/** Refresh only Reader-derived navigation after a public book changes.
+ * Entity facts and explicit relationships remain byte-for-byte the prior approved records.
+ */
+export function relinkPublicGraph({ batch, previous, book, bookSource }) {
+  demand(/^batch-[a-f0-9]{64}$/.test(batch?.batch_id), 'INVALID_BATCH_ID')
+  namespace(batch.snapshot)
+  demand(previous, 'PUBLIC_GRAPH_BASELINE_REQUIRED')
+  validatePrevious(previous)
+  const boundary = { save_version: batch.snapshot.source_save_version,
+    game_time: batch.snapshot.source_game_time }
+  anchor(boundary)
+  demand(compare(boundary, previous.anchor) >= 0, 'STALE_READER_GRAPH_BATCH')
+  const derived = views(previous.nodes, previous.relations, book, bookSource, boundary)
+  const body = { version: 'archive-graph-v1', ...ns, anchor: boundary,
+    nodes: structuredClone(previous.nodes), relations: structuredClone(previous.relations),
+    story_links: derived.story_links, articles: derived.articles }
+  const graph = { ...body, content_sha256: graphHash(body) }
+  return { graph, report: { status: graph.content_sha256 === previous.content_sha256
+    ? 'NOOP' : 'GRAPH_RELINKED', batch_id: batch.batch_id,
+    node_count: graph.nodes.length, relation_count: graph.relations.length,
+    story_links: graph.story_links.length, ambiguous_aliases: derived.ambiguous_aliases,
+    nodes_added: 0, nodes_updated: 0, relations_added: 0, relations_updated: 0,
+    inferred_relationships: 0, database_writes: 0, external_calls: 0,
+    site_publications: 0 } }
+}
+
 /** The one legacy adapter is limited to the graph already deployed from main, not live DB data. */
 export function legacyPublicFacts({ archiveMeta, archiveNodes, archiveEdges }) {
   demand(archiveMeta?.worldline === 'AFTERFALL' && archiveMeta.season === 'S02 COMPLETE' && archiveMeta.saveVersion === '253' && archiveMeta.gameTime === '2027-03-23 17:50', 'LEGACY_BASELINE_CHANGED_REVIEW_REQUIRED')

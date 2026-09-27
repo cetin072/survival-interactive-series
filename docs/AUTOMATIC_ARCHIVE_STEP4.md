@@ -75,3 +75,7 @@ References:
 ## Handoff
 
 Next: Step 5 — Visual Point and provider-neutral Visual Brief generation from approved public facts. No new Canon, gameplay turn, image request, Supabase write, paid API, schedule or site publication is part of Step 4.
+
+## Later local-ref Reader-to-graph bridge (Draft PR, not activated)
+
+After a verified Reader BOOK has been committed to an existing local publication ref, `graph-public-ref.mjs` can recompile that BOOK from pinned Git objects and refresh only the graph's Reader-derived story links and article navigation. If the ref has no GRAPH.json yet, it reconstructs the known S02 public baseline from the exact committed `archiveData.ts` bytes before relinking. `relinkPublicGraph` preserves every approved node and explicit relationship record unchanged; it creates no new entity facts or inferred relationships. A caller-supplied authorization callback and Git compare-and-swap are mandatory before the GRAPH.json proposal advances the same local ref. Synthetic S99 tests exercise a known public name in new Reader prose, unchanged fact records, no checkout edits, and stale replay rejection. This is code and synthetic proof only. It does not supply S03 public fact classification, push a remote, publish the website, generate images, or prove unattended operation and cost.
