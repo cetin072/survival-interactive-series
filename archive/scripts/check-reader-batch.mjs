@@ -33,16 +33,19 @@ try {
   command('git', ['clone', '--local', '--no-hardlinks', '--quiet', '--no-checkout', root, copy])
   command('git', ['checkout', '--detach', head], copy)
   const relative = 'archive/content/transcripts/C03-AFTERFALL/S99/SESSION_001'
+  const checkpointRef = 'worldlines/AFTERFALL/seasons/S99/END_CHECKPOINT_2099-01-01.md'
   await mkdir(resolve(copy, relative), { recursive: true })
+  await mkdir(resolve(copy, 'worldlines/AFTERFALL/seasons/S99'), { recursive: true })
   const raw = '## USER 000\n\nTEST_INPUT\n\n## GM 001\n\n## 2099년 1월 1일 10:00\n\nTEST_GM_PROSE\n\n다음 선택\n1. TEST_A\n2. TEST_B\n'
   const range = { start: '2099-01-01 10:00', end: '2099-01-01 10:00' }
   const entry = { session_id: 'SESSION_001', source_type: 'SUPABASE_ROLLING_RAW', visibility: 'PUBLIC_ARCHIVE', capture_quality: 'VERIFIED_CONTIGUOUS_TURN_PAIRS', atomic_pairing_complete: true, source_manifest: 'SESSION_001/SOURCE_MANIFEST.json', coverage_basis: 'captured_message_range', captured_message_range: range, user_messages: 1, gm_public_blocks: 1 }
   const manifest = { chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', season_id: 'S99', archive_class: 'COLD_RAW', visibility: 'PUBLIC_ARCHIVE', sessions: [entry] }
-  const source = { ...manifest, sessions: undefined, ...entry, public_safe_only: true, closed_at: '2099-01-01', counts: { user: 1, gm: 1, total: 2 }, message_order: { min: 0, max: 1, contiguous: true }, content_sha256: [{ message_order: 0, role: 'USER', sha256: sha('TEST_INPUT') }, { message_order: 1, role: 'GM', sha256: sha('TEST_GM_PROSE') }], parts: ['PART_001.md'], parts_sha256: { 'PART_001.md': sha(raw) } }
+  const source = { ...manifest, sessions: undefined, ...entry, public_safe_only: true, closed_at: '2099-01-01', source_save_version: 999, counts: { user: 1, gm: 1, total: 2 }, message_order: { min: 0, max: 1, contiguous: true }, content_sha256: [{ message_order: 0, role: 'USER', sha256: sha('TEST_INPUT') }, { message_order: 1, role: 'GM', sha256: sha('TEST_GM_PROSE') }], parts: ['PART_001.md'], parts_sha256: { 'PART_001.md': sha(raw) } }
   await writeFile(resolve(copy, relative, 'PART_001.md'), raw)
   await writeFile(resolve(copy, relative, 'SOURCE_MANIFEST.json'), JSON.stringify(source, null, 2) + '\n')
   await writeFile(resolve(copy, relative, '../MANIFEST.json'), JSON.stringify(manifest, null, 2) + '\n')
-  command('git', ['add', 'archive/content/transcripts/C03-AFTERFALL/S99'], copy)
+  await writeFile(resolve(copy, checkpointRef), 'SYNTHETIC_CHECKPOINT_ONLY\n')
+  command('git', ['add', 'archive/content/transcripts/C03-AFTERFALL/S99', checkpointRef], copy)
   command('git', ['-c', 'user.name=Reader test', '-c', 'user.email=reader-test@example.invalid', 'commit', '--no-verify', '-qm', 'Synthetic S99 fixture; local test only'], copy)
   const snapshot = { version: 'publication-snapshot-v1', chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', season_id: 'S99', visibility: 'PUBLIC_ARCHIVE', source_revision: command('git', ['rev-parse', 'HEAD'], copy).trim(), source_save_version: 999, source_game_time: range.end, source_checkpoint: 'worldlines/AFTERFALL/seasons/S99/END_CHECKPOINT_2099-01-01.md', coverage_status: 'PARTIAL', sources: [{ session_id: entry.session_id, source_ref: `${relative}/SOURCE_MANIFEST.json`, source_digest: fingerprint(entry), visibility: 'PUBLIC_ARCHIVE', capture_quality: entry.capture_quality, atomic_pairing_complete: true, captured_message_range: range, user_messages: 1, gm_public_blocks: 1 }] }
   const snapshotFile = join(temporary, 'snapshot.json')
@@ -50,6 +53,11 @@ try {
   const pastBefore = JSON.parse(command('node', ['archive/scripts/run-reader-publication.mjs', '--demo-s02', '--check'], copy))
   assert.equal(pastBefore.reader_status, 'NOOP')
   assert.equal(pastBefore.deferred_source_parts, 1)
+  const derived = JSON.parse(command('node', ['archive/scripts/run-reader-publication.mjs',
+    '--public-season', 'S99', '--checkpoint', checkpointRef, '--check'], copy))
+  assert.equal(derived.reader_status, 'READY_TO_UPDATE_LOCAL_BOOK')
+  assert.equal(derived.added_chapters, 1)
+  assert.equal(derived.source_save_version, 999)
   const args = ['archive/scripts/run-reader-publication.mjs', '--snapshot', snapshotFile, '--apply']
   const updated = JSON.parse(command('node', args, copy))
   assert.equal(updated.reader_status, 'UPDATED_LOCAL_BOOK')
