@@ -1,14 +1,18 @@
 /** Verify the fixed foreground experiment's committed PNG and non-publication state. */
 import { readFile, lstat } from 'node:fs/promises'
+import { execFileSync } from 'node:child_process'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { inspectPng } from './lib/image-poc-exchange.mjs'
+import { snapshotFromPublishedS02 } from './dry-run-publication.mjs'
+import { prepareVisualPublication } from './run-visual-publication.mjs'
+import { observeForegroundImage } from './lib/foreground-image-handoff.mjs'
 
 const root = resolve(import.meta.dirname, '..', '..')
 const evidencePath = resolve(root, 'docs/AUTOMATIC_ARCHIVE_STEP6_FOREGROUND_20260927.json')
 const demand = (ok, code) => { if (!ok) throw new Error(code) }
 
-export async function checkForegroundSample() {
+export async function checkForegroundSample({ checkBrief = false } = {}) {
   const record = JSON.parse(await readFile(evidencePath, 'utf8'))
   demand(record.version === 'codex-foreground-image-observation-v1'
     && record.chronicle_id === 'C03-AFTERFALL' && record.worldline_id === 'AFTERFALL'
@@ -40,12 +44,27 @@ export async function checkForegroundSample() {
     && inspected.width === record.file.width && inspected.height === record.file.height
     && inspected.format === 'PNG' && record.file.structure_check === inspected.structure_check,
   'SAMPLE_BYTES_MISMATCH')
+  let handoff = null
+  if (checkBrief) {
+    const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 })
+    const sourceRevision = git('rev-parse', 'HEAD').trim()
+    const manifest = JSON.parse(git('show', `${sourceRevision}:archive/content/transcripts/C03-AFTERFALL/S02/MANIFEST.json`))
+    const snapshot = snapshotFromPublishedS02(manifest, sourceRevision)
+    const { catalog } = await prepareVisualPublication(snapshot)
+    const point = catalog.points.find((item) => item.point_id === record.point_id)
+    handoff = observeForegroundImage(point, record, bytes)
+  }
   return { status: 'LOCAL_SAMPLE_BYTES_VERIFIED_NOT_ACCEPTED', point_id: record.point_id,
     generation_key: record.generation_key, sha256: inspected.sha256, bytes: inspected.bytes,
-    accepted_images: 0, provider_calls: 0, database_writes: 0, storage_uploads: 0, site_publications: 0 }
+    handoff, accepted_images: 0, provider_calls_during_check: 0,
+    database_writes: 0, storage_uploads: 0, site_publications: 0 }
 }
 
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
-  try { process.stdout.write(JSON.stringify(await checkForegroundSample(), null, 2) + '\n') }
+  try {
+    const args = process.argv.slice(2)
+    demand(args.length === 0 || args.length === 1 && args[0] === '--brief', 'INVALID_CHECK_MODE')
+    process.stdout.write(JSON.stringify(await checkForegroundSample({ checkBrief: args[0] === '--brief' }), null, 2) + '\n')
+  }
   catch { process.stderr.write('{"ok":false,"error":"FOREGROUND_SAMPLE_REJECTED","accepted_images":0}\n'); process.exitCode = 1 }
 }
