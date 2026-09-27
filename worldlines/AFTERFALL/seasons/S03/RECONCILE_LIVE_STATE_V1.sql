@@ -1,6 +1,8 @@
 -- One-time, observed-play reconciliation. Run only while the S03 room is idle.
 -- Source: LIVE session 8ef127f7-4729-4161-9784-49123171ad2a, turns 1-16.
 -- Never retro-link those RAW rows or substitute a guessed save version.
+-- The first live execution reached save 254; a guarded same-version correction
+-- then set known_world.time/location. This source includes both final fields.
 begin;
 set local lock_timeout = '5s';
 
@@ -124,14 +126,20 @@ begin
         s.state->'runtime_index', '{current_checkpoint}', to_jsonb(v_checkpoint), true
       ),
       'known_world', jsonb_set(
-        s.state->'known_world', '{current_focus}',
-        to_jsonb(array[
-          'S03 LIVE RAW through 2027-04-08 11:30; next guild investment choice remains open',
-          'Guild security final command belongs to Seo Jinwoo; two candidates are on limited daytime trial duty',
-          'Direct lunch and customer electrical repair services operate; lodging is not yet open',
-          'Paid relocation completed and four bed frames, four mattresses, six bedding sets and one cabinet remain as lodging preparation assets',
-          'Outside convoy identity and intent remain unconfirmed; private rear bases remain undisclosed'
-        ]::text[]), true
+        jsonb_set(
+          jsonb_set(
+            s.state->'known_world', '{current_focus}',
+            to_jsonb(array[
+              'S03 LIVE RAW through 2027-04-08 11:30; next guild investment choice remains open',
+              'Guild security final command belongs to Seo Jinwoo; two candidates are on limited daytime trial duty',
+              'Direct lunch and customer electrical repair services operate; lodging is not yet open',
+              'Paid relocation completed and four bed frames, four mattresses, six bedding sets and one cabinet remain as lodging preparation assets',
+              'Outside convoy identity and intent remain unconfirmed; private rear bases remain undisclosed'
+            ]::text[]), true
+          ),
+          '{time}', to_jsonb('2027-04-08 11:30'::text), true
+        ),
+        '{location}', to_jsonb('폐쇄 체육시설 길드권역'::text), true
       ),
       'recent_events', (
         select coalesce(jsonb_agg(x.value order by x.ordinality), '[]'::jsonb)
