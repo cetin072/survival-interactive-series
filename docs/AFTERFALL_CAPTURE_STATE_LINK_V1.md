@@ -55,10 +55,14 @@ own authenticated integration and end-to-end evidence.
 
 Migration `20260927042720_afterfall_turn_state_continuity_v1.sql` adds a
 `BEFORE INSERT` trigger without editing or re-running the already-applied v1
-migration. When an adjacent linked turn exists, the new USER save version must
-equal that prior turn's GM save version. An already-inserted successor is also
-checked, so inserting links out of order cannot bypass the rule. Both backward
-movement and unexplained forward gaps are rejected.
+migration. The trigger confirms that both referenced messages belong to the
+same worldline, chronicle, season, session, and turn as the link, with USER/GM
+roles, matching save versions, and consecutive message orders. When an adjacent
+linked turn exists, the new USER save version must equal that prior turn's GM
+save version, and its message order must follow the prior GM. An already-inserted
+successor is also checked, so inserting links out of order cannot bypass the
+same rules. Backward movement, unexplained forward gaps, and reversed adjacent
+turn/message ordering are rejected.
 
 The trigger validates adjacent linked pairs only. It does not invent a link
 across an existing unlinked RAW gap, update old rows, or approve publication.

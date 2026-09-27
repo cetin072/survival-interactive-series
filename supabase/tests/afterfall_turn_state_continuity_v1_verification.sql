@@ -45,8 +45,13 @@ begin
   if position('new.turn_no - 1' in lower(v_definition)) = 0
      or position('new.turn_no + 1' in lower(v_definition)) = 0
      or position('new.user_save_version' in lower(v_definition)) = 0
-     or position('new.gm_save_version' in lower(v_definition)) = 0 then
-    raise exception 'continuity trigger does not validate both adjacent turn links';
+     or position('new.gm_save_version' in lower(v_definition)) = 0
+     or position('v_user.turn_no is distinct from new.turn_no' in lower(v_definition)) = 0
+     or position('v_gm.turn_no is distinct from new.turn_no' in lower(v_definition)) = 0
+     or position('v_gm.message_order is distinct from v_user.message_order + 1' in lower(v_definition)) = 0
+     or position('v_user.message_order is distinct from v_previous_gm_message_order + 1' in lower(v_definition)) = 0
+     or position('v_next_user_message_order is distinct from v_gm.message_order + 1' in lower(v_definition)) = 0 then
+    raise exception 'continuity trigger does not validate message pairs and adjacent turn links';
   end if;
 end;
 $$;
