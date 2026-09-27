@@ -98,6 +98,25 @@ process.stdout.write(JSON.stringify(result));`
       && link.node_id === 'char-jinwoo'))
   assert.throws(() => command('node', [
     '--experimental-strip-types', '--input-type=module', '-e', graphScript], copy))
+  const visualScript = `import { commitVisualFromPublicRef } from './archive/scripts/lib/visual-public-ref.mjs';
+const result = await commitVisualFromPublicRef({ repoRoot: process.cwd(),
+  ref: '${refSource}', seasonId: 'S99', checkpointRef: '${checkpointRef}',
+  authorizeCommit: async () => true });
+process.stdout.write(JSON.stringify(result));`
+  const visualResult = JSON.parse(command('node', [
+    '--experimental-strip-types', '--input-type=module', '-e', visualScript], copy))
+  assert.equal(visualResult.status, 'LOCAL_VISUAL_PROPOSAL_COMMITTED')
+  assert.equal(visualResult.point_count, 34)
+  assert.equal(visualResult.provider_calls, 0)
+  assert.equal(visualResult.execution_enabled, false)
+  assert.equal(command('git', ['rev-parse', refSource], copy).trim(), visualResult.commit)
+  const proposedVisual = JSON.parse(command('git', ['show',
+    `${visualResult.commit}:archive/content/visuals/C03-AFTERFALL/VISUALS.json`], copy))
+  assert.equal(proposedVisual.graph_sha256, proposedGraph.content_sha256)
+  assert.equal(proposedVisual.points.find((point) => point.subject_id === 'char-jinwoo').status, 'READY')
+  assert.deepEqual(await readFile(resolve(copy, 'archive/content/stories/C03-AFTERFALL/BOOK.json')), beforeRefBook)
+  assert.throws(() => command('node', [
+    '--experimental-strip-types', '--input-type=module', '-e', visualScript], copy))
   command('git', ['checkout', '--detach', fixtureHead], copy)
   const proposalRef = 'refs/heads/codex/archive-publication-reader-test'
   command('git', ['branch', 'codex/archive-publication-reader-test', fixtureHead], copy)
@@ -145,5 +164,5 @@ process.stdout.write(JSON.stringify(result));`
   await writeFile(resolve(copy, relative, 'PART_001.md'), raw + '\nCORRUPTED\n')
   assert.throws(() => command('node', args, copy))
   assert.equal(await readFile(bookFile, 'utf8'), changedBook)
-  console.log(JSON.stringify({ real_books_unchanged: books.map((b) => ({ chronicle: b.chronicleId, chapters: b.chapters.length })), real_s02_reader_batch: report, historical_batch_after_newer_publication: 'PASS', synthetic_ref_pinned_reader_proposal: 'PASS', synthetic_ref_pinned_graph_relink: 'PASS', synthetic_local_git_proposal: 'PASS', synthetic_append: 'PASS', synthetic_repeat_noop: 'PASS', corrupted_source_retains_book: 'PASS' }))
+  console.log(JSON.stringify({ real_books_unchanged: books.map((b) => ({ chronicle: b.chronicleId, chapters: b.chapters.length })), real_s02_reader_batch: report, historical_batch_after_newer_publication: 'PASS', synthetic_ref_pinned_reader_proposal: 'PASS', synthetic_ref_pinned_graph_relink: 'PASS', synthetic_ref_pinned_visual_catalog: 'PASS', synthetic_local_git_proposal: 'PASS', synthetic_append: 'PASS', synthetic_repeat_noop: 'PASS', corrupted_source_retains_book: 'PASS' }))
 } finally { await rm(temporary, { recursive: true, force: true }) }

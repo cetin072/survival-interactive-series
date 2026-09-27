@@ -15,7 +15,7 @@ const bookPath = 'archive/content/stories/C03-AFTERFALL/BOOK.json'
 const graphPath = 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'
 const s02Path = 'archive/content/transcripts/C03-AFTERFALL/S02/MANIFEST.json'
 
-export async function prepareGraphRelinkFromPublicRef(options = {}) {
+async function compileGraphRelinkFromPublicRef(options, acceptCurrentGraph) {
   const inspected = await inspectPublicRef(options)
   const verifiedBook = await verifyReaderBookAtPublicRef(options)
   demand(verifiedBook.baseCommit === inspected.base, 'READER_REF_MOVED_DURING_GRAPH_READ')
@@ -44,14 +44,25 @@ export async function prepareGraphRelinkFromPublicRef(options = {}) {
   }
   const result = relinkPublicGraph({ batch: createBatch(snapshot), previous,
     book, bookSource })
-  demand(result.report.status !== 'NOOP', 'GRAPH_REF_ALREADY_CURRENT')
   const candidateBytes = Buffer.from(graphBytes(result.graph))
   demand(candidateBytes.length <= 2_500_000, 'PUBLIC_GRAPH_TOO_LARGE')
+  if (acceptCurrentGraph) {
+    demand(existing && result.report.status === 'NOOP'
+      && candidateBytes.equals(await read(graphPath)),
+    'GRAPH_AT_REF_NOT_VERIFIED')
+  } else demand(result.report.status !== 'NOOP', 'GRAPH_REF_ALREADY_CURRENT')
   return { ref, baseCommit: base, seasonId, candidateBytes,
     report: { ...result.report, status: 'GRAPH_RELINK_READY_IN_MEMORY',
       graph_sha256: result.graph.content_sha256, bootstrapped,
       files_written: 0, remote_pushes: 0, site_publications: 0 } }
 }
+
+export const prepareGraphRelinkFromPublicRef = (options = {}) =>
+  compileGraphRelinkFromPublicRef(options, false)
+
+/** Recompute and compare a committed graph before deriving visual work. */
+export const verifyGraphAtPublicRef = (options = {}) =>
+  compileGraphRelinkFromPublicRef(options, true)
 
 export async function commitGraphRelinkFromPublicRef(options = {}) {
   demand(typeof options.authorizeCommit === 'function', 'GRAPH_GIT_COMMIT_DISABLED')
