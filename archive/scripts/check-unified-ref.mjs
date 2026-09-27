@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
-import { mkdtemp, readFile, rm } from 'node:fs/promises'
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -54,7 +54,44 @@ try {
   assert.equal(second.status, 'EXISTING_UNIFIED_PROPOSAL_REUSED')
   assert.equal(second.commit, first.commit)
   assert.equal(git(copy, 'status', '--short').toString().trim(), '')
+
+  // A newer public visual source invalidates the old image binding. The
+  // proposal must update its manifest and remove the stale public PNG atomically.
+  const appearancePath = join(copy,
+    'archive/content/public-facts/C03-AFTERFALL/S02/APPEARANCES_APPROVED_20260926.json')
+  const appearance = JSON.parse(await readFile(appearancePath, 'utf8'))
+  appearance.records.find((record) => record.node_id === 'char-jinwoo').visual.hair += ' (isolated fixture)'
+  await writeFile(appearancePath, JSON.stringify(appearance, null, 2) + '\n')
+  git(copy, 'add', '--', 'archive/content/public-facts/C03-AFTERFALL/S02/APPEARANCES_APPROVED_20260926.json')
+  git(copy, '-c', 'user.name=Archive Fixture',
+    '-c', 'user.email=archive-fixture@users.noreply.github.com',
+    'commit', '--quiet', '-m', 'Isolated visual source change')
+  const changedBase = git(copy, 'rev-parse', 'HEAD').toString().trim()
+  const changedRef = 'refs/heads/codex/archive-publication-unified-site-change-test'
+  git(copy, 'update-ref', changedRef, changedBase)
+  const changedSnapshot = snapshotFromPublishedS02(manifest, changedBase)
+  const changed = await proposeUnifiedPublication({ snapshot: changedSnapshot,
+    repoRoot: copy, ref: changedRef, baseCommit: changedBase, gitBinary,
+    authorizeCommit: async ({ staleSiteAssetsRemoved }) => staleSiteAssetsRemoved === 1 })
+  assert.equal(changed.status, 'LOCAL_UNIFIED_PROPOSAL_COMMITTED')
+  assert.equal(changed.files_in_commit, 5)
+  assert.equal(changed.stale_site_assets_removed, 1)
+  const site = JSON.parse(git(copy, 'show',
+    `${changed.commit}:archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json`))
+  const visual = JSON.parse(git(copy, 'show',
+    `${changed.commit}:archive/content/visuals/C03-AFTERFALL/VISUALS.json`))
+  assert.equal(site.visual_catalog_sha256, visual.content_sha256)
+  assert.deepEqual(site.assets, [])
+  const oldPublicPath = `archive/web/public${JSON.parse(await readFile(join(copy,
+    'archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json'), 'utf8')).assets[0].public_path}`
+  assert.equal(git(copy, 'ls-tree', changed.commit, '--', oldPublicPath).toString().trim(), '')
+  const changedReplay = await proposeUnifiedPublication({ snapshot: changedSnapshot,
+    repoRoot: copy, ref: changedRef, baseCommit: changedBase, gitBinary,
+    authorizeCommit: async () => { throw new Error('REPLAY_MUST_NOT_AUTHORIZE') } })
+  assert.equal(changedReplay.commit, changed.commit)
+  assert.equal(git(copy, 'status', '--short').toString().trim(), '')
   process.stdout.write(JSON.stringify({ real_public_input: true,
     atomic_files: first.files_in_commit, replay_status: second.status,
+    stale_visual_assets_removed_in_isolated_fixture: changed.stale_site_assets_removed,
     remote_pushes: 0, site_publications: 0 }) + '\n')
 } finally { await rm(temp, { recursive: true, force: true }) }

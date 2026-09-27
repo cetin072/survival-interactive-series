@@ -34,12 +34,17 @@ export async function git(binary, root, args, { input, indexFile } = {}) {
 
 /** Commit already validated files to an existing, detached local proposal ref. */
 export async function commitLocalProposalFiles({ repoRoot, ref, baseCommit, files, subject,
+  allowVisualDeletes = false,
   gitBinary = process.env.ARCHIVE_GIT_BINARY || 'git' }) {
   demand(repoRoot && sha(baseCommit) && refPattern.test(ref)
-    && files instanceof Map && files.size > 0 && files.size <= 3
+    && files instanceof Map && files.size > 0
+    && files.size <= (allowVisualDeletes ? 504 : 3)
     && [...files].every(([path, bytes]) => /^[A-Za-z0-9_./-]+$/.test(path)
-      && !path.split('/').includes('..') && Buffer.isBuffer(bytes)
-      && bytes.length > 0 && bytes.length <= 2_500_000)
+      && !path.split('/').includes('..')
+      && (Buffer.isBuffer(bytes)
+        ? bytes.length > 0 && bytes.length <= 2_500_000
+        : allowVisualDeletes && bytes === null
+          && /^archive\/web\/public\/visual-assets\/[a-f0-9]{64}\.png$/.test(path)))
     && typeof subject === 'string' && /^[A-Za-z0-9 _.-]{1,100}$/.test(subject),
   'INVALID_LOCAL_PROPOSAL')
   const root = resolve(repoRoot)
@@ -56,6 +61,10 @@ export async function commitLocalProposalFiles({ repoRoot, ref, baseCommit, file
     const indexFile = join(directory, 'index')
     await git(gitBinary, root, ['read-tree', current], { indexFile })
     for (const [path, bytes] of files) {
+      if (bytes === null) {
+        await git(gitBinary, root, ['update-index', '--force-remove', '--', path], { indexFile })
+        continue
+      }
       const blob = (await git(gitBinary, root, ['hash-object', '-w', '--stdin'],
         { input: bytes })).toString().trim()
       demand(sha(blob), 'PUBLIC_BLOB_HASH_FAILED')
