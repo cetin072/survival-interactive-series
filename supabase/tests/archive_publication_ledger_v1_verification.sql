@@ -185,7 +185,7 @@ begin
   begin
     perform survival_rpg.finish_archive_publication_daily_run(
       v_schedule, v_task.out_claim_version, v_task.out_lease_token,
-      'NOOP', '{"result":"loser"}'::jsonb, null, null
+      'NOOP', '{"result":"NOOP"}'::jsonb, null, null
     );
     raise exception 'FAILED_DAILY_RUN_CLAIM_FINISHED_ACTIVE_LEASE';
   exception when sqlstate '22023' then
@@ -265,7 +265,7 @@ begin
 
   begin
     perform survival_rpg.finish_archive_publication_task(
-      v_task.out_task_id, null::bigint, null::uuid, 'NOOP', '{"result":"null-both"}'::jsonb, null, null
+      v_task.out_task_id, null::bigint, null::uuid, 'NOOP', '{"result":"NOOP"}'::jsonb, null, null
     );
     raise exception 'NULL_TASK_LEASE_IDENTITY_BOTH_ACCEPTED';
   exception when sqlstate '55000' then
@@ -273,7 +273,7 @@ begin
   end;
   begin
     perform survival_rpg.finish_archive_publication_task(
-      v_task.out_task_id, null::bigint, v_task.out_lease_token, 'NOOP', '{"result":"null-version"}'::jsonb, null, null
+      v_task.out_task_id, null::bigint, v_task.out_lease_token, 'NOOP', '{"result":"NOOP"}'::jsonb, null, null
     );
     raise exception 'NULL_TASK_CLAIM_VERSION_ACCEPTED';
   exception when sqlstate '55000' then
@@ -281,7 +281,7 @@ begin
   end;
   begin
     perform survival_rpg.finish_archive_publication_task(
-      v_task.out_task_id, v_task.out_claim_version, null::uuid, 'NOOP', '{"result":"null-token"}'::jsonb, null, null
+      v_task.out_task_id, v_task.out_claim_version, null::uuid, 'NOOP', '{"result":"NOOP"}'::jsonb, null, null
     );
     raise exception 'NULL_TASK_LEASE_TOKEN_ACCEPTED';
   exception when sqlstate '55000' then
