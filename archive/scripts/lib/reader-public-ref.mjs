@@ -2,6 +2,7 @@
 import { createHash } from 'node:crypto'
 import { resolve } from 'node:path'
 import { approvedSeasonCatalog } from './approved-reader-sources.mjs'
+import { c03BaselineCatalog } from './reader-c03-baseline-catalog.mjs'
 import { snapshotFromPublicSeason } from './public-season-snapshot.mjs'
 import { checkAppendOnlyEdition, selectTextBatchCatalog } from './reader-auto.mjs'
 import { commitLocalProposalFiles, git } from './atomic-public-segment-git.mjs'
@@ -66,11 +67,11 @@ export async function inspectPublicRef({ repoRoot, ref, seasonId, checkpointRef,
 }
 
 async function compileReaderFromPublicRef(options, acceptCurrentBook) {
-  const { ref, base, seasonId, read, listParts, manifestPaths, snapshot } =
+  const { ref, base, seasonId, read, paths, listParts, manifestPaths, snapshot } =
     await inspectPublicRef(options)
-  const { rawCatalog } = await import('../reader-source-catalog.mjs')
   const { makeBooks } = await import('../build-reader-edition.mjs')
-  const catalog = rawCatalog['C03-AFTERFALL'].filter((item) => !item.autoPublication)
+  const s02Manifest = JSON.parse((await read(`${transcriptRoot}/S02/MANIFEST.json`)).toString('utf8'))
+  const catalog = c03BaselineCatalog(s02Manifest, paths)
   for (const path of manifestPaths) {
     const manifest = JSON.parse((await read(path)).toString('utf8'))
     catalog.push(...await approvedSeasonCatalog(manifest, manifest.season_id, { read, listParts }))
