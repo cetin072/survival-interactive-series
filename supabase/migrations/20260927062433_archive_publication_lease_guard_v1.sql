@@ -371,3 +371,16 @@ revoke all on function survival_rpg.finish_archive_publication_daily_run(date,bi
 grant execute on function survival_rpg.finish_archive_publication_daily_run(date,bigint,uuid,text,jsonb,text,integer) to service_role;
 revoke all on function survival_rpg.link_archive_publication_run_batch(date,bigint,uuid,text,text) from public, anon, authenticated;
 grant execute on function survival_rpg.link_archive_publication_run_batch(date,bigint,uuid,text,text) to service_role;
+-- Correct existing remote ACL drift on every related RPC, not just the four
+-- replaced above. The service credential remains the only callable worker
+-- identity; the internal receipt helper is restricted to the function owner.
+revoke all on function survival_rpg.archive_publication_receipt_is_valid(jsonb) from public, anon, authenticated, service_role;
+grant execute on function survival_rpg.archive_publication_receipt_is_valid(jsonb) to archive_runner_internal;
+revoke all on function survival_rpg.enqueue_archive_publication_task(text,text,text,text,text,text,text,text) from public, anon, authenticated;
+grant execute on function survival_rpg.enqueue_archive_publication_task(text,text,text,text,text,text,text,text) to service_role;
+revoke all on function survival_rpg.renew_archive_publication_daily_run_lease(date,bigint,uuid,integer) from public, anon, authenticated;
+grant execute on function survival_rpg.renew_archive_publication_daily_run_lease(date,bigint,uuid,integer) to service_role;
+revoke all on function survival_rpg.claim_archive_publication_task(text,integer) from public, anon, authenticated;
+grant execute on function survival_rpg.claim_archive_publication_task(text,integer) to service_role;
+revoke all on function survival_rpg.renew_archive_publication_task_lease(text,bigint,uuid,integer) from public, anon, authenticated;
+grant execute on function survival_rpg.renew_archive_publication_task_lease(text,bigint,uuid,integer) to service_role;

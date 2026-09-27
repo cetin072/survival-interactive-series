@@ -1,6 +1,33 @@
 \set ON_ERROR_STOP on
 begin;
 
+do $$
+declare
+  v_signature text;
+begin
+  foreach v_signature in array array[
+    'enqueue_archive_publication_task(text,text,text,text,text,text,text,text)',
+    'link_archive_publication_run_batch(date,bigint,uuid,text,text)',
+    'claim_archive_publication_daily_run(date,text,integer)',
+    'renew_archive_publication_daily_run_lease(date,bigint,uuid,integer)',
+    'finish_archive_publication_daily_run(date,bigint,uuid,text,jsonb,text,integer)',
+    'claim_archive_publication_task(text,integer)',
+    'renew_archive_publication_task_lease(text,bigint,uuid,integer)',
+    'finish_archive_publication_task(text,bigint,uuid,text,jsonb,text,integer)'
+  ] loop
+    if has_function_privilege('anon', 'survival_rpg.' || v_signature, 'EXECUTE')
+       or has_function_privilege('authenticated', 'survival_rpg.' || v_signature, 'EXECUTE')
+       or not has_function_privilege('service_role', 'survival_rpg.' || v_signature, 'EXECUTE') then
+      raise exception 'LEDGER_RPC_EXECUTE_GRANTS_INVALID: %', v_signature;
+    end if;
+  end loop;
+  if has_function_privilege('service_role', 'survival_rpg.archive_publication_receipt_is_valid(jsonb)', 'EXECUTE')
+     or has_function_privilege('anon', 'survival_rpg.archive_publication_receipt_is_valid(jsonb)', 'EXECUTE') then
+    raise exception 'RECEIPT_HELPER_GRANTS_INVALID';
+  end if;
+end;
+$$;
+
 -- Exercise the installed RPC bodies on real PostgreSQL. Every rejected task
 -- completion must leave the full row and event count unchanged.
 do $$
