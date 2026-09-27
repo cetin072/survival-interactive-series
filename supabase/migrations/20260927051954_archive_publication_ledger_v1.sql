@@ -342,7 +342,7 @@ begin
     return query select
       v_task.task_id, v_task.batch_id, v_task.plan_id, v_task.task_kind,
       v_task.chronicle_id, v_task.worldline_id, v_task.season_id,
-      v_task.source_snapshot_sha256, v_task.attempt_count, v_task.claim_version,
+      v_task.source_snapshot_sha256, v_task.attempt_count::integer, v_task.claim_version,
       v_task.lease_token, v_task.lease_expires_at;
     return;
   end loop;
