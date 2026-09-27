@@ -131,7 +131,7 @@ def deliver(source, mode, catalog_path, check_only=False):
     if not new_manifest:
         existing = json.loads(MANIFEST.read_text(encoding="utf-8"))
         assets = existing.get("assets")
-        fail_if(not isinstance(assets, list) or len(assets) != 2 or assets[0] != ASSET,
+        fail_if(not isinstance(assets, list) or len(assets) != 3 or assets[0] != ASSET,
                 "EXISTING_MANIFEST_CONFLICT")
         expected = desired_manifest(assets)
         fail_if(json.loads(MANIFEST.read_text(encoding="utf-8")) != expected,

@@ -37,7 +37,23 @@
       "width": 512,
       "height": 512,
       "mime_type": "image/png"
+    },
+    {
+      "point_id": "point-bbeb7172397587adcf5cba41a67654735c1c5fe7d3ec5fdd68601107bc1d435c",
+      "generation_key": "generation-9201d1f67b953acaf3987a7ebff9b96d9f37467d00a303699014cd8670f0cd0c",
+      "subject_id": "char-seojin",
+      "source_sha256": "361bb0280410b5d752836b07a7cee5640f4bb274372b0884bacaf5bb18232bf7",
+      "storage_bucket": "survival-archive-originals",
+      "storage_object_path": "AFTERFALL/point-bbeb7172397587adcf5cba41a67654735c1c5fe7d3ec5fdd68601107bc1d435c/generation-9201d1f67b953acaf3987a7ebff9b96d9f37467d00a303699014cd8670f0cd0c/361bb0280410b5d752836b07a7cee5640f4bb274372b0884bacaf5bb18232bf7.png",
+      "registry_asset_id": "AF-CHAR-9201D1F67B953ACAF3987A7E",
+      "derivative_version": "site-png-512-v1",
+      "public_path": "/visual-assets/4b8354b38fcdb4936b770cad7cb0afa733755f5099a6b14dd04b03e055b9b9ae.png",
+      "sha256": "4b8354b38fcdb4936b770cad7cb0afa733755f5099a6b14dd04b03e055b9b9ae",
+      "bytes": 172840,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png"
     }
   ],
-  "content_sha256": "78fd1955b64a5cde78a215cae2fc7d9653f5f86c8308f9d80b6a3075414ad963"
+  "content_sha256": "6a0db055e38d2784a741b2bfaca4faaf47224436b1a944a18be67d65968cf29d"
 }

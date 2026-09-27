@@ -10,6 +10,7 @@ on:
       - .github/workflows/archive-approved-image-readback.yml
       - archive/scripts/deliver-approved-jinwoo.py
       - archive/scripts/verify-eunchae-site.py
+      - archive/scripts/verify-seojin-site.py
       - archive/scripts/derive_site_original.py
       - archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json
       - archive/web/public/visual-assets/**
@@ -41,3 +42,8 @@ jobs:
           ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
           ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
         run: python archive/scripts/verify-eunchae-site.py --storage
+      - name: Read scheduled Seojin original and verify committed site derivative
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: python archive/scripts/verify-seojin-site.py --storage
