@@ -5,19 +5,22 @@ import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { prepareGraphPublication } from './run-graph-publication.mjs'
-import { snapshotFromPublishedS02 } from './dry-run-publication.mjs'
+import { fingerprint } from './lib/publication-plan.mjs'
 import { byteHash } from './lib/publication-graph.mjs'
 import { archiveNodes, archiveEdges } from '../web/src/archive/archiveData.ts'
 
 const root = resolve(import.meta.dirname, '..', '..')
 const command = (exe, args, cwd = root) => execFileSync(exe, args, { cwd, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] })
 const head = command('git', ['rev-parse', 'HEAD']).trim()
-const snapshot = snapshotFromPublishedS02(JSON.parse(await readFile(resolve(root, 'archive/content/transcripts/C03-AFTERFALL/S02/MANIFEST.json'))), head)
-const initial = await prepareGraphPublication(snapshot)
-const again = await prepareGraphPublication(snapshot)
+const source = JSON.parse(await readFile(resolve(root, 'archive/content/transcripts/C03-AFTERFALL/S03/MANIFEST.json'))).sessions[0]
+const factsRefS03 = 'archive/content/public-facts/C03-AFTERFALL/S03/FACTS.json'
+const snapshot = { version: 'publication-snapshot-v1', chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', season_id: 'S03', visibility: 'PUBLIC_ARCHIVE', source_revision: head, source_save_version: 258, source_game_time: '2027-04-11 17:20', source_checkpoint: 'worldlines/AFTERFALL/seasons/S03/CURRENT_CHECKPOINT_2027-04-08.md', coverage_status: 'PARTIAL', sources: [{ session_id: source.session_id, source_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_001/SOURCE_MANIFEST.json', source_digest: fingerprint(source), visibility: source.visibility, capture_quality: source.capture_quality, atomic_pairing_complete: source.atomic_pairing_complete, captured_message_range: source.captured_message_range, user_messages: source.user_messages, gm_public_blocks: source.gm_public_blocks }] }
+const initial = await prepareGraphPublication(snapshot, factsRefS03)
+const again = await prepareGraphPublication(snapshot, factsRefS03)
 assert.ok(initial.candidateBytes.equals(again.candidateBytes))
-assert.equal(initial.graph.nodes.length, archiveNodes.length)
-assert.equal(initial.graph.relations.length, archiveEdges.length)
+assert.equal(initial.graph.nodes.length, archiveNodes.length + 2)
+assert.equal(initial.graph.relations.length, archiveEdges.length + 2)
+assert.ok(initial.graph.nodes.some((n) => n.id === 'loc-guild-rear-warehouse'))
 for (const source of archiveNodes) assert.deepEqual(initial.graph.nodes.find((n) => n.id === source.id).data, source)
 for (const source of archiveEdges) assert.ok(initial.graph.relations.some((r) => r.data.from === source.from && r.data.to === source.to && r.data.label === source.label && r.data.kind === 'published_relation'))
 assert.ok(initial.graph.story_links.length > 0)
@@ -29,15 +32,19 @@ const temporary = await mkdtemp(join(tmpdir(), 'graph-git-e2e-'))
 try {
   const copy = join(temporary, 'repo')
   command('git', ['clone', '--local', '--no-hardlinks', '--quiet', '--no-checkout', root, copy])
+  command('git', ['config', 'core.autocrlf', 'false'], copy)
   command('git', ['checkout', '--detach', head], copy)
   const run = (args) => JSON.parse(command('node', ['--experimental-strip-types', 'archive/scripts/run-graph-publication.mjs', ...args], copy))
-  const first = run(['--demo-s02', '--apply'])
-  assert.equal(first.status, 'UPDATED_LOCAL_GRAPH')
-  assert.equal(first.files_written, 1)
+  const s03SnapshotFile = join(temporary, 's03-snapshot.json')
+  await writeFile(s03SnapshotFile, JSON.stringify(snapshot))
+  const s03Args = ['--snapshot', s03SnapshotFile, '--facts', factsRefS03, '--apply']
+  const first = run(s03Args)
+  assert.equal(first.status, 'NOOP')
+  assert.equal(first.files_written, 0)
   const graphPath = resolve(copy, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json')
   const firstBytes = await readFile(graphPath)
   assert.ok(firstBytes.equals(initial.candidateBytes))
-  assert.equal(run(['--demo-s02', '--apply']).status, 'NOOP')
+  assert.equal(run(s03Args).status, 'NOOP')
   assert.equal(command('git', ['diff', '--name-only'], copy).trim(), '')
   const bookHashes = {}
   for (const id of ['C01-HAN-JUNHO', 'C02-STRONGHOLD', 'C03-AFTERFALL']) bookHashes[id] = byteHash(await readFile(resolve(copy, 'archive/content/stories', id, 'BOOK.json')))
@@ -64,7 +71,9 @@ try {
   assert.equal(updated.status, 'UPDATED_LOCAL_GRAPH')
   const goodBytes = await readFile(graphPath)
   assert.equal(run(args).status, 'NOOP')
-  assert.equal(run(['--demo-s02', '--apply']).status, 'NOOP')
+  snapshot.source_revision = command('git', ['rev-parse', 'HEAD'], copy).trim()
+  await writeFile(s03SnapshotFile, JSON.stringify(snapshot))
+  assert.equal(run(s03Args).status, 'NOOP')
   assert.ok(goodBytes.equals(await readFile(graphPath)))
   // Invalid committed public-source classification cannot replace the last good graph.
   facts.visibility = 'CORE_PRIVATE'
@@ -74,6 +83,6 @@ try {
   assert.throws(() => run(args))
   assert.ok(goodBytes.equals(await readFile(graphPath)))
   for (const [id, hash] of Object.entries(bookHashes)) assert.equal(byteHash(await readFile(resolve(copy, 'archive/content/stories', id, 'BOOK.json'))), hash)
-  assert.equal(command('git', ['diff', '--name-only'], copy).trim(), '')
+  assert.equal(command('git', ['diff', '--name-only'], copy).trim(), 'archive/content/graphs/C03-AFTERFALL/GRAPH.json')
   console.log(JSON.stringify({ real_public_graph: initial.report, real_node_types: Object.fromEntries(['character', 'location', 'event', 'reference'].map((type) => [type, archiveNodes.filter((n) => n.type === type).length])), preserved_public_nodes_and_relations: true, double_run_identical: true, synthetic_new_nodes: updated.nodes_added, synthetic_new_relations: updated.relations_added, repeat_noop: true, historical_batch_no_rollback: true, private_source_rejected: true, original_reader_books_unchanged: true, production_writes: 0 }))
 } finally { await rm(temporary, { recursive: true, force: true }) }
