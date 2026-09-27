@@ -50,3 +50,19 @@ passed on the connected staging project.
 They do not prove that ChatGPT game rooms or a trusted external runtime invoke
 the API. A real game-room capture and safe public exporter still require their
 own authenticated integration and end-to-end evidence.
+
+## Adjacent-turn save-version continuity
+
+Migration `20260927000000_afterfall_turn_state_continuity_v1.sql` adds a
+`BEFORE INSERT` trigger without editing or re-running the already-applied v1
+migration. When an adjacent linked turn exists, the new USER save version must
+equal that prior turn's GM save version. An already-inserted successor is also
+checked, so inserting links out of order cannot bypass the rule. Both backward
+movement and unexplained forward gaps are rejected.
+
+The trigger validates adjacent linked pairs only. It does not invent a link
+across an existing unlinked RAW gap, update old rows, or approve publication.
+The migration and its read-only catalog verifier are code-only and have not
+been deployed to staging; the connected database still has zero state-link
+rows for the existing S03 capture.
+
