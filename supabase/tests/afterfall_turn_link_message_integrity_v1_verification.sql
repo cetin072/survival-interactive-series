@@ -50,6 +50,10 @@ insert into survival_rpg.transcript_messages (
   ('20000000-0000-4000-8000-000000000014', 'AFTERFALL', 'C03', 'S03',
    '10000000-0000-4000-8000-000000000003', 1, 3, 'GM', 13);
 
+-- Exercise the trigger under the same restricted database role used by the
+-- capture RPC. This verifies its invoker privileges as well as its behavior.
+set role service_role;
+
 -- A valid linked pair is accepted at the current save head.
 insert into survival_rpg.transcript_turn_state_links (
   worldline_id, chronicle_id, season_id, session_id, turn_no,

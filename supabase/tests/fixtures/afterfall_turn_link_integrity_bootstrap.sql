@@ -2,7 +2,7 @@
 -- Contains synthetic schema only; no project data or transcript text.
 create role anon nologin;
 create role authenticated nologin;
-create role service_role nologin;
+create role service_role nologin bypassrls;
 
 create schema survival_rpg;
 
