@@ -17,6 +17,12 @@ insert into survival_rpg.transcript_sessions (
   '10000000-0000-4000-8000-000000000003', 'AFTERFALL', 'C03', 'S03', 'OPEN', 5
 );
 
+insert into survival_rpg.transcript_sessions (
+  id, worldline_id, chronicle_id, season_id, status, last_message_order
+) values (
+  '10000000-0000-4000-8000-000000000004', 'AFTERFALL', 'C03', 'S03', 'OPEN', -1
+);
+
 insert into survival_rpg.transcript_messages (
   id, worldline_id, chronicle_id, season_id, session_id,
   turn_no, message_order, role, save_version
@@ -66,7 +72,9 @@ insert into survival_rpg.transcript_turn_state_links (
 );
 
 -- The next adjacent pair is accepted only after the authoritative head advances.
+reset role;
 update survival_rpg.saves set save_version = 12 where worldline_id = 'AFTERFALL';
+set role service_role;
 insert into survival_rpg.transcript_turn_state_links (
   worldline_id, chronicle_id, season_id, session_id, turn_no,
   user_message_id, gm_message_id, outcome,
@@ -98,8 +106,23 @@ begin
   if not v_rejected then
     raise exception 'link at a stale save head was accepted';
   end if;
+end;
+$$;
 
-  update survival_rpg.saves set save_version = 13 where worldline_id = 'AFTERFALL';
+reset role;
+update survival_rpg.saves set save_version = 13 where worldline_id = 'AFTERFALL';
+set role service_role;
+
+do $$
+declare
+  v_rejected boolean;
+begin
+  if has_table_privilege(current_user, 'survival_rpg.saves', 'SELECT')
+     or has_table_privilege(current_user, 'survival_rpg.saves', 'UPDATE')
+     or has_table_privilege(current_user, 'survival_rpg.transcript_messages', 'UPDATE')
+     or has_table_privilege(current_user, 'survival_rpg.transcript_turn_state_links', 'UPDATE') then
+    raise exception 'service_role gained direct save or transcript update privileges';
+  end if;
 
   v_rejected := false;
   begin
@@ -184,3 +207,46 @@ begin
   end if;
 end;
 $$;
+
+-- The installed invoker RPC must still append both rows and a link under the
+-- actual service_role grants, without UPDATE access to saves or transcript rows.
+do $$
+declare
+  v_first record;
+  v_retry record;
+  v_link_count integer;
+begin
+  select * into v_first
+  from survival_rpg.append_public_transcript_turn_with_state_link(
+    '10000000-0000-4000-8000-000000000004', 'AFTERFALL', 'C03', 'S03', 0, 0,
+    'fixture USER message', repeat('a', 64), '30000000-0000-4000-8000-000000000001',
+    'fixture GM message', repeat('b', 64), '30000000-0000-4000-8000-000000000002',
+    '2027-03-23 10:00', 'S03-SCENE-001', 12,
+    '2027-03-23 10:01', 'S03-SCENE-001', 13, 'LIVE', 'APPLIED'
+  );
+
+  select * into v_retry
+  from survival_rpg.append_public_transcript_turn_with_state_link(
+    '10000000-0000-4000-8000-000000000004', 'AFTERFALL', 'C03', 'S03', 0, 0,
+    'fixture USER message', repeat('a', 64), '30000000-0000-4000-8000-000000000001',
+    'fixture GM message', repeat('b', 64), '30000000-0000-4000-8000-000000000002',
+    '2027-03-23 10:00', 'S03-SCENE-001', 12,
+    '2027-03-23 10:01', 'S03-SCENE-001', 13, 'LIVE', 'APPLIED'
+  );
+
+  if v_first.user_message_id is distinct from v_retry.user_message_id
+     or v_first.gm_message_id is distinct from v_retry.gm_message_id then
+    raise exception 'atomic capture retry changed message identities';
+  end if;
+
+  select count(*) into v_link_count
+  from survival_rpg.transcript_turn_state_links as l
+  where l.session_id = '10000000-0000-4000-8000-000000000004'
+    and l.turn_no = 0;
+  if v_link_count <> 1 then
+    raise exception 'atomic capture retry created duplicate state links';
+  end if;
+end;
+$$;
+
+reset role;

@@ -143,6 +143,8 @@ jobs:
           sudo apt-get install --no-install-recommends -y postgresql-client
       - name: Bootstrap isolated synthetic AFTERFALL schema
         run: psql -v ON_ERROR_STOP=1 -f supabase/tests/fixtures/afterfall_turn_link_integrity_bootstrap.sql
+      - name: Apply the installed atomic capture API unchanged
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql
       - name: Apply the installed continuity migration unchanged
         run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260927042720_afterfall_turn_state_continuity_v1.sql
       - name: Apply additive message and save-head guard

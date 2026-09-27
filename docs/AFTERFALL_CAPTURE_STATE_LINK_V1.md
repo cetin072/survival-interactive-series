@@ -9,7 +9,7 @@ Connected staging migration: `20260926162611` (`afterfall_atomic_turn_state_link
 
 `append_public_transcript_turn_with_state_link(...)` extends the current atomic
 USER/GM append path with a required `APPLIED` or `NO_STATE_CHANGE` assertion and
-non-null user/GM save versions. It locks the current AFTERFALL save row, checks
+non-null user/GM save versions. It serializes on the current AFTERFALL save row, checks
 that the submitted GM version is the database's current save head, appends both
 exact transcript messages, then inserts an immutable turn-to-save link in the
 same PostgreSQL transaction. A failure rolls back the pair and link together.
@@ -68,8 +68,18 @@ across an existing unlinked RAW gap, update old rows, or approve publication.
 Migration `20260927095300_afterfall_turn_link_message_integrity_v1.sql` uses
 `CREATE OR REPLACE FUNCTION` to strengthen the installed trigger function. It
 does not edit or rerun `20260927042720_afterfall_turn_state_continuity_v1.sql`
-and does not recreate the trigger. Before accepting a link, it locks the
-authoritative AFTERFALL save row and requires the linked version to match its
+and does not recreate the trigger. It also replaces the installed invoker RPC
+to use the same lock helper: staging ACL inspection found that `service_role`
+has no direct SELECT/UPDATE on `saves`, no UPDATE on immutable transcript rows,
+and no UPDATE on the link table. Its old direct row-lock statements therefore
+could not run under its actual grants. A narrow, namespace-checked
+`SECURITY DEFINER` helper locks and returns only the AFTERFALL save version;
+EXECUTE is granted only to `service_role`, with a `pg_catalog` search path and
+fully qualified table reference. No table grant is widened. Message and
+adjacent-link validation uses SELECT under the invoker role; append-only table
+permissions and the serialized save lock protect the transaction boundary.
+
+Before accepting a link, the trigger uses that helper and requires the linked version to match its
 current head. It also verifies that the referenced stored rows are the same
 namespace, session, season, and turn; that they are USER then GM; that their
 save versions match the link; and that their message orders are consecutive.
