@@ -36,6 +36,14 @@ async function fixture(edit = () => {}) {
 const empty = () => ({ version: 1, sources: [] })
 const record = (item, status = 'PROCESSED') => ({ source_manifest_ref: item.source_manifest_ref, source_manifest_sha256: item.source_manifest_sha256,
   status, processed_at: '2026-09-27T00:00:00.000Z', candidate_ids: [], brief_ids: [] })
+async function loadKnowledgeForValidation() {
+  const data = await loadKnowledge(root)
+  const bytes = await readFile(join(root, data.stories[0].reader_book_ref))
+  const readerBookSha = sha(bytes)
+  return { ...data,
+    stories: data.stories.map((item) => ({ ...item, reader_book_sha256: readerBookSha })),
+    candidates: data.candidates.map((item) => item.source_kind === 'PUBLIC_READER' ? { ...item, reader_book_sha256: readerBookSha } : item) }
+}
 
 test('bootstrap existing public input then NOOP without falsely marking processed', async () => {
   const base = await fixture()
@@ -77,7 +85,7 @@ test('malformed approved source fails closed', async () => {
   finally { await rm(base, { recursive: true, force: true }) }
 })
 test('golden fixtures satisfy content contract and policy gate', async () => {
-  const data = await loadKnowledge(root)
+  const data = await loadKnowledgeForValidation()
   assert.equal(await validateKnowledge(data), true)
   for (const brief of data.briefs.filter((item) => ['K-002', 'K-003'].includes(item.id))) {
     assert.equal(brief.status, 'PUBLISHED')
@@ -94,7 +102,7 @@ test('golden fixtures satisfy content contract and policy gate', async () => {
   assert.equal(publicationEligibility({ ...brief, risk_domains: ['WATER_PURIFICATION'] }, evidence, data.config), 'HUMAN_REVIEW')
 })
 test('Reader backfill is pinned to verified public chapter and source metadata', async () => {
-  const data = await loadKnowledge(root)
+  const data = await loadKnowledgeForValidation()
   const candidate = data.candidates.find((item) => item.id === 'KC-community-reserve-tracking')
   assert.equal(candidate.source_kind, 'PUBLIC_READER')
   assert.equal(candidate.reader_chapter_id, 'c03-afterfall-chapter-02')
@@ -102,8 +110,14 @@ test('Reader backfill is pinned to verified public chapter and source metadata',
   const tampered = { ...candidate, source_hashes: ['f'.repeat(64)] }
   await assert.rejects(validateKnowledge({ ...data, candidates: data.candidates.map((item) => item.id === candidate.id ? tampered : item) }), /Reader provenance mismatch/)
 })
+test('Reader backfill rejects a mismatched BOOK byte hash', async () => {
+  const data = await loadKnowledgeForValidation()
+  const candidate = data.candidates.find((item) => item.id === 'KC-community-reserve-tracking')
+  const tampered = { ...candidate, reader_book_sha256: 'f'.repeat(64) }
+  await assert.rejects(validateKnowledge({ ...data, candidates: data.candidates.map((item) => item.id === candidate.id ? tampered : item) }), /KC-community-reserve-tracking Reader book changed/)
+})
 test('AUTO_LOW_RISK READY and PUBLISHED must pass the same publication gate', async () => {
-  const data = await loadKnowledge(root)
+  const data = await loadKnowledgeForValidation()
   const auto = { ...data.briefs[0], publication_policy: 'AUTO_LOW_RISK' }
   const withAuto = (patch = {}, evidence = data.evidence) => ({
     ...data, briefs: [{ ...auto, ...patch }, ...data.briefs.slice(1)], evidence,
@@ -128,7 +142,7 @@ test('AUTO_LOW_RISK READY and PUBLISHED must pass the same publication gate', as
   await assert.rejects(validateKnowledge(withAuto({ status: 'READY', risk_domains: ['UNCLASSIFIED'] })), /risk domains/)
 })
 test('duplicate identity, broken relations and missing downloads fail validation', async () => {
-  const data = await loadKnowledge(root)
+  const data = await loadKnowledgeForValidation()
   await assert.rejects(validateKnowledge({ ...data, briefs: [...data.briefs, { ...data.briefs[0] }] }), /duplicate or invalid brief id/)
   await assert.rejects(validateKnowledge({ ...data, briefs: [{ ...data.briefs[0], related_brief_ids: ['K-999'] }, data.briefs[1]] }), /related ref/)
   const broken = { ...data.briefs[0],
