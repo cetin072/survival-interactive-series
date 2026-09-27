@@ -5,6 +5,7 @@ import { makeImagePocRequest, validateImagePocRequest } from './image-poc-exchan
 import { planVisualSelection, validateVisualCatalog } from './visual-compiler.mjs'
 import { inspectPublicRef } from './reader-public-ref.mjs'
 import { verifyVisualAtPublicRef } from './visual-public-ref.mjs'
+import { git } from './atomic-public-segment-git.mjs'
 
 const demand = (ok, code) => { if (!ok) throw new Error(code) }
 const visualPath = 'archive/content/visuals/C03-AFTERFALL/VISUALS.json'
@@ -15,6 +16,13 @@ export async function prepareImageRequestsFromPublicRef(options = {}) {
   demand(verified.baseCommit === inspected.base, 'VISUAL_REF_MOVED_DURING_REQUEST_READ')
   const bytes = await inspected.read(visualPath)
   demand(bytes.equals(verified.candidateBytes), 'VISUAL_CATALOG_CHANGED_DURING_REQUEST_READ')
+  // A later local proposal commit must not change the identity of the same brief.
+  const visualRevision = (await git(inspected.gitBinary, inspected.root,
+    ['log', '-1', '--format=%H', inspected.base, '--', visualPath])).toString().trim()
+  demand(/^[a-f0-9]{40}$/.test(visualRevision)
+    && bytes.equals(await git(inspected.gitBinary, inspected.root,
+      ['show', `${visualRevision}:${visualPath}`])),
+  'IMAGE_REQUEST_VISUAL_REVISION_NOT_PINNED')
   const catalog = JSON.parse(bytes.toString('utf8'))
   validateVisualCatalog(catalog)
   const selection = planVisualSelection(catalog)
@@ -29,12 +37,13 @@ export async function prepareImageRequestsFromPublicRef(options = {}) {
       continue
     }
     const request = makeImagePocRequest(point, {
-      batch_id: catalog.batch_id, source_revision: inspected.base })
+      batch_id: catalog.batch_id, source_revision: visualRevision })
     validateImagePocRequest(request)
     requests.push(request)
   }
   return { status: 'IMAGE_REQUESTS_PREPARED_NO_EXECUTION',
     ref: inspected.ref, source_revision: inspected.base,
+    request_source_revision: visualRevision,
     catalog_sha256: catalog.content_sha256,
     selected_point_ids: selection.selected_point_ids,
     requests, deferred, attempt_history: 'NOT_SUPPLIED',
