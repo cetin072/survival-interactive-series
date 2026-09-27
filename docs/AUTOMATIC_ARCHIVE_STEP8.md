@@ -1,8 +1,12 @@
 # Automatic Archive Publication — Step 8 / 10: website visual states
 
-Status: CODE COMPLETE FOR CURRENT PENDING STATES / IMAGE DISPLAY BLOCKED
+Status: ONE APPROVED IMAGE IN LOCAL SITE BUILD / DEPLOY PREVIEW UNVERIFIED
 
-Current follow-up (2026-09-27): One approved 서진우 original now exists in private Supabase Storage with a matching `GENERATED/CORE_PRIVATE` registry row and a checked-in local web derivative. The site manifest still has 0 assets. The private row is deliberately ineligible for the public handoff gate; storage and registration do not authorize site display.
+Later Preview checkpoint (2026-09-27): The owner approved a single 서진우 image on the Archive world explorer's character detail for Preview. The staging row was conditionally promoted to `READY/PLAYER_ARCHIVE`; the private original was rechecked byte for byte and the committed 512×512 derivative passed the pinned transformer check. The site manifest now contains one hash-bound asset, the local Vite build contains the exact PNG, and the local browser shows it on 서진우's detail. Netlify's `deploy-preview-167` still returned 404 before this change; remote Preview and Production display remain unverified. This is a one-image POC, not a recurring image pipeline.
+
+Earlier private-ingest checkpoint (2026-09-27): One approved 서진우 original now exists in private Supabase Storage with a matching `GENERATED/CORE_PRIVATE` registry row and a checked-in local web derivative. The site manifest still has 0 assets. The private row is deliberately ineligible for the public handoff gate; storage and registration do not authorize site display.
+
+The implementation notes below describe that earlier empty-manifest baseline. The later Preview checkpoint above supersedes its image counts and registry status.
 
 The archive website now consumes the checked-in public `VISUALS.json` snapshot derived by the Step 5 compiler from `main` at `1da3cd03f27b1c072a98a108311223b62055b8a3` (save 253). The Explorer detail displays a prepared-brief state or a public-source-pending state for matching public nodes. References without a visual point receive no invented image state. The current catalog contains 34 points: 30 ready briefs and 4 waiting. These are **brief counts, not images**.
 

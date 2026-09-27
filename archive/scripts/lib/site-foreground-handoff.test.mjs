@@ -38,6 +38,7 @@ function fixture() {
   const registry = { worldline_id: 'AFTERFALL', asset_id: 'AF-CHAR-TEST', asset_type: 'CHARACTER',
     status: 'READY', visibility: 'PLAYER_ARCHIVE', object_path: `survival-archive-originals/${path}`,
     source: { point_id: point.point_id, generation_key: point.generation_key,
+      subject_id: point.subject_id,
       candidate_id: candidate.candidate_id, source_sha256: file.sha256 },
     generation_meta: { source_sha256: file.sha256 } }
   return { catalog, observation, approval, originalBytes, candidate, derivativeBytes: originalBytes,
@@ -56,6 +57,7 @@ test('candidate, generation and reviewed source cannot be borrowed', async () =>
   await assert.rejects(prepareForegroundSiteAsset({ ...f, approval: { ...f.approval, generation_key: `generation-${'0'.repeat(64)}` } }))
   await assert.rejects(prepareForegroundSiteAsset({ ...f, originalBytes: png(2) }))
   await assert.rejects(prepareForegroundSiteAsset({ ...f, registry: { ...f.registry, source: { ...f.registry.source, generation_key: `generation-${'0'.repeat(64)}` } } }))
+  await assert.rejects(prepareForegroundSiteAsset({ ...f, registry: { ...f.registry, source: { ...f.registry.source, subject_id: 'another-character' } } }), /SITE_REGISTRY_BINDING_MISMATCH/)
 })
 test('unverified upload bytes, unrelated derivative and registry/public status are refused', async () => {
   const f = fixture()

@@ -11,7 +11,7 @@ export type PublicVisualStatus = {
   image?: { src: string; width: number; height: number }
 }
 
-// The checked-in manifest is empty until a verified, approved site asset exists.
+// Only the validated, checked-in site manifest can expose an image.
 const visualBySubject = new Map(catalog.points.filter((point) => point.point_type !== 'MAP').map((point) => [point.subject_id, point]))
 const siteAssetByPoint = new Map((siteAssets.assets as SiteAsset[]).map((asset) => [asset.point_id, asset]))
 

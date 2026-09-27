@@ -4,6 +4,24 @@
   "worldline_id": "AFTERFALL",
   "visibility": "PUBLIC_ARCHIVE",
   "visual_catalog_sha256": "fce74e24aa7ac5ddb8138c0427a7fddcb8b5325d425470ca49e55383474d5b1c",
-  "assets": [],
-  "content_sha256": "663c2337ded0f3b72a0bd6b346469dba1c5e7421994798855f092801c84af3c5"
+  "assets": [
+    {
+      "point_id": "point-e33f848046b1245234e579828dadc03939faf10d609c15bff315b8c421be1a72",
+      "generation_key": "generation-a59f0391ed3fa13bcbcde8ea2123446837e6cc84ef5ab24f93d07f815170f7e8",
+      "subject_id": "char-jinwoo",
+      "accepted_candidate_id": "candidate-dac3f0800d1c4d06f73c9c2447649e9a3ac1103edd30c9cfd81d3614843307fc",
+      "source_sha256": "f4882707c0272d1eb7123493bb46dc7193e0235ceba778d3582d0112a087a78d",
+      "storage_bucket": "survival-archive-originals",
+      "storage_object_path": "AFTERFALL/candidate-dac3f0800d1c4d06f73c9c2447649e9a3ac1103edd30c9cfd81d3614843307fc/f4882707c0272d1eb7123493bb46dc7193e0235ceba778d3582d0112a087a78d.png",
+      "registry_asset_id": "AF-CHAR-DAC3F0800D1C4D06F73C9C24",
+      "derivative_version": "site-png-512-v1",
+      "public_path": "/visual-assets/5112dc7b2e8901aed2fcbe2c4a34736af0fefed2394a5c82e7d08fa6f2d558c8.png",
+      "sha256": "5112dc7b2e8901aed2fcbe2c4a34736af0fefed2394a5c82e7d08fa6f2d558c8",
+      "bytes": 153519,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png"
+    }
+  ],
+  "content_sha256": "ae9dbcbc212e9abb5e8d64e65692f3a87d9633555a55a08ab949af4a92bffcd7"
 }

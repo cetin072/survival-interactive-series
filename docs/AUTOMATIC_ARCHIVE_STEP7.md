@@ -1,8 +1,12 @@
 # Automatic Archive Publication — Step 7 / 10: accepted image handoff
 
-Status: ONE ACCEPTED ORIGINAL STORED AND PRIVATELY REGISTERED / SITE DELIVERY PENDING
+Status: ONE ACCEPTED ORIGINAL STORED / PREVIEW SITE ASSET PREPARED
 
-Current checkpoint (2026-09-27): The later Codex foreground 서진우 PNG was accepted by the project owner as a **local candidate**. The exact original (1,880,742 bytes; SHA-256 `f4882707c0272d1eb7123493bb46dc7193e0235ceba778d3582d0112a087a78d`) was uploaded once to the dedicated private `survival-archive-originals` bucket and downloaded again with an identical byte hash. Staging contains one matching `survival_rpg.visual_assets` row, `AF-CHAR-DAC3F0800D1C4D06F73C9C24`, with `GENERATED/CORE_PRIVATE` status. Readback matched the planned row, `char-jinwoo` subject, current point/generation and exact Storage object path. The committed 512×512 derivative remains an unpublished local experiment. Site manifest assets and site publications remain **0**. The two earlier rejected image observations remain quarantined.
+Later Preview checkpoint (2026-09-27): Following the owner's approval for one 서진우 derivative in the Archive world's character detail, the exact staging registry row was changed with a guarded single-row update from `GENERATED/CORE_PRIVATE` to `READY/PLAYER_ARCHIVE`. The original Storage object remains in the dedicated private bucket. The existing 512×512 derivative passed the pinned transformer check and was added to the site manifest and local build. This is not evidence of a Netlify Preview or Production deployment, scheduled execution, or automatic image generation.
+
+The private-ingest counts and state descriptions below are historical; the current manifest contains one local site asset and the remote Preview display count remains zero.
+
+Earlier private-ingest checkpoint (2026-09-27): The later Codex foreground 서진우 PNG was accepted by the project owner as a **local candidate**. The exact original (1,880,742 bytes; SHA-256 `f4882707c0272d1eb7123493bb46dc7193e0235ceba778d3582d0112a087a78d`) was uploaded once to the dedicated private `survival-archive-originals` bucket and downloaded again with an identical byte hash. Staging contains one matching `survival_rpg.visual_assets` row, `AF-CHAR-DAC3F0800D1C4D06F73C9C24`, with `GENERATED/CORE_PRIVATE` status. Readback matched the planned row, `char-jinwoo` subject, current point/generation and exact Storage object path. The committed 512×512 derivative remains an unpublished local experiment. Site manifest assets and site publications remain **0**. The two earlier rejected image observations remain quarantined.
 
 ## Implemented
 
@@ -20,8 +24,8 @@ The real foreground PNG and its observer record now exercise the disabled inbox 
 
 ## Runtime and release boundary
 
-Current accepted local candidates: **1**. Verified private original Storage objects: **1**. Matching private registry rows: **1**. Site manifest assets and site publications: **0**. The two older Step 6 observations remain quarantined and cannot enter this receiver. The private registry status does not authorize PLAYER_ARCHIVE or public site publication. The stored original was verified by actual download; the checked-in candidate metadata alone would not prove durability.
+At the private-ingest checkpoint, accepted local candidates: **1**. Verified private original Storage objects: **1**. Matching private registry rows: **1**. Site manifest assets and site publications: **0**. The two older Step 6 observations remain quarantined and cannot enter this receiver. The private registry status does not authorize PLAYER_ARCHIVE or public site publication. The stored original was verified by actual download; the checked-in candidate metadata alone would not prove durability.
 
 A later built-in Codex foreground sample is preserved at `archive/experiments/step6/char-jinwoo-20260927-foreground.png` with a separate observer record. The legacy `image_gen.text2im` receiver cannot honestly relabel this `image_gen.imagegen` artifact basename as a provider result UUID. `foreground-image-handoff.mjs` uses a separate hash-bound owner-decision record for this tool surface and leaves provider result ID and prompt equality unproven. The owner decision and private handoff are now actual recorded events; they are not evidence of unattended generation or permission to publish.
 
-Step 8 has guarded waiting/ready states and a static image path. The next connection is a real privileged, idempotent runner readback and a separately approved site handoff; the current `CORE_PRIVATE` row must fail the public gate. Per-image review was an initial calibration gate, not the final unattended player-only workflow.
+Step 8 has guarded waiting/ready states and a static image path. The remaining runtime connection is a privileged, idempotent runner readback and an actual Preview deployment; the earlier `CORE_PRIVATE` row correctly failed the public gate before the approved single-row promotion. Per-image review was an initial calibration gate, not the final unattended player-only workflow.

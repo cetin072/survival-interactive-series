@@ -72,6 +72,29 @@ export async function validateSiteAssetInventory(manifest, catalog, publicRoot) 
   return { ...verified, unreferenced_files: 0 }
 }
 
+/** Prepare one already verified original-derived asset for an existing site manifest. */
+export async function planSiteAssetAddition(manifest, catalog, publicRoot, prepared) {
+  await validateSiteAssetInventory(manifest, catalog, publicRoot)
+  demand(prepared?.status === 'SITE_ASSET_PREPARED_NOT_PUBLISHED'
+    && prepared.asset && prepared.storage_readback_sha256 === prepared.asset.source_sha256
+    && prepared.derivative_sha256 === prepared.asset.sha256,
+  'SITE_ASSET_PREPARATION_REQUIRED')
+  const prior = manifest.assets.find((asset) => asset.point_id === prepared.asset.point_id)
+  if (prior) {
+    demand(visualDigest(prior) === visualDigest(prepared.asset), 'SITE_ASSET_ALREADY_BOUND_DIFFERENTLY')
+    return { status: 'EXISTING_SITE_ASSET_REUSED', manifest, files_written: 0,
+      site_publications: 0 }
+  }
+  const body = { version: manifest.version, chronicle_id: manifest.chronicle_id,
+    worldline_id: manifest.worldline_id, visibility: manifest.visibility,
+    visual_catalog_sha256: manifest.visual_catalog_sha256,
+    assets: [...manifest.assets, prepared.asset] }
+  demand(body.assets.length <= 500, 'INVALID_SITE_ASSET_COUNT')
+  return { status: 'SITE_ASSET_ADDITION_PREPARED', manifest: {
+    ...body, content_sha256: visualDigest(body) }, files_written: 0,
+    site_publications: 0 }
+}
+
 /** Rebind an already verified site manifest to a newer public catalog in memory only. */
 export async function reconcileSiteAssets(previousManifest, previousCatalog, nextCatalog, publicRoot) {
   await validateSiteAssets(previousManifest, previousCatalog, publicRoot)

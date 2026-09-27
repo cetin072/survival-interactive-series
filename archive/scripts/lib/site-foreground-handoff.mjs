@@ -30,6 +30,7 @@ export async function prepareForegroundSiteAsset({ catalog, observation, approva
     && registry.object_path === `${BUCKET}/${objectPath}`
     && registry.source?.point_id === point.point_id
     && registry.source?.generation_key === point.generation_key
+    && registry.source?.subject_id === point.subject_id
     && registry.source?.candidate_id === expected.candidate_id
     && registry.source?.source_sha256 === sourceHash
     && registry.generation_meta?.source_sha256 === sourceHash,

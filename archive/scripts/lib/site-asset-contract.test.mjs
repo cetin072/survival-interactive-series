@@ -1,12 +1,14 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdtemp, mkdir, readFile, rm, unlink, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
+import { fileURLToPath } from 'node:url'
 import { deflateSync } from 'node:zlib'
 import { validateVisualCatalog, visualDigest } from './visual-compiler.mjs'
-import { validateSiteAssets, validateSiteAssetInventory, reconcileSiteAssets } from './site-asset-contract.mjs'
+import { validateSiteAssets, validateSiteAssetInventory, planSiteAssetAddition,
+  reconcileSiteAssets } from './site-asset-contract.mjs'
 
 // Generated test bytes only; no model image, real acceptance or publication.
 function crc(bytes) { let c = 0xffffffff; for (const n of bytes) { c ^= n; for (let b = 0; b < 8; b++) c = (c >>> 1) ^ ((c & 1) ? 0xedb88320 : 0) }; return (c ^ 0xffffffff) >>> 0 }
@@ -33,10 +35,13 @@ async function fixture(fn) {
   } finally { await rm(root, { recursive: true, force: true }) }
 }
 
-test('empty committed manifest is valid but proves zero assets', async () => {
-  const empty = JSON.parse(await readFile(new URL('../../content/visuals/C03-AFTERFALL/SITE_ASSETS.json', import.meta.url), 'utf8'))
+test('committed manifest contains verified site bytes and an empty future manifest remains valid', async () => {
+  const committed = JSON.parse(await readFile(new URL('../../content/visuals/C03-AFTERFALL/SITE_ASSETS.json', import.meta.url), 'utf8'))
+  const publicRoot = fileURLToPath(new URL('../../web/public/', import.meta.url))
+  assert.equal((await validateSiteAssetInventory(committed, catalog, publicRoot)).site_assets, committed.assets.length)
+  assert.equal(committed.assets.length >= 1, true)
+  const empty = manifest([])
   assert.equal((await validateSiteAssets(empty, catalog, join(tmpdir(), 'unused-public-root'))).site_assets, 0)
-  assert.equal((await validateSiteAssetInventory(empty, catalog, join(tmpdir(), 'unused-public-root'))).unreferenced_files, 0)
 })
 test('synthetic local PNG can satisfy the site-ready contract only by exact bytes and current point', async () => fixture(async ({ root, asset }) => {
   const result = await validateSiteAssets(manifest([asset]), catalog, root)
@@ -90,6 +95,22 @@ test('reconciliation rejects unverified old assets and regressed catalogs', asyn
 test('build inventory refuses static PNGs omitted from the validated manifest', async () => fixture(async ({ root, asset }) => {
   assert.equal((await validateSiteAssetInventory(manifest([asset]), catalog, root)).site_assets, 1)
   await assert.rejects(validateSiteAssetInventory(manifest([]), catalog, root), /UNREFERENCED_PUBLIC_VISUAL_ASSET/)
+}))
+test('verified handoff plans one site asset, and replay reuses its exact manifest', async () => fixture(async ({ root, asset, bytes }) => {
+  const path = join(root, 'visual-assets', `${asset.sha256}.png`)
+  await unlink(path)
+  const prepared = { status: 'SITE_ASSET_PREPARED_NOT_PUBLISHED', asset,
+    storage_readback_sha256: asset.source_sha256, derivative_sha256: asset.sha256 }
+  const planned = await planSiteAssetAddition(manifest([]), catalog, root, prepared)
+  assert.equal(planned.status, 'SITE_ASSET_ADDITION_PREPARED')
+  await writeFile(path, bytes)
+  assert.equal((await validateSiteAssetInventory(planned.manifest, catalog, root)).site_assets, 1)
+  const replay = await planSiteAssetAddition(planned.manifest, catalog, root, prepared)
+  assert.equal(replay.status, 'EXISTING_SITE_ASSET_REUSED')
+  assert.equal(replay.files_written, 0)
+  await assert.rejects(planSiteAssetAddition(planned.manifest, catalog, root,
+    { ...prepared, asset: { ...asset, registry_asset_id: 'AF-CHAR-OTHER' } }),
+  /SITE_ASSET_ALREADY_BOUND_DIFFERENTLY/)
 }))
 test('a growing public catalog remains valid without fixed point or save counts', async () => {
   const { content_sha256: ignored, ...body } = catalog
