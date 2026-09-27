@@ -103,7 +103,7 @@ begin
 
   select * into strict v_task
     from survival_rpg.claim_archive_publication_daily_run(v_schedule, 'ci-runner-b', 300);
-  if v_task.out_claimed or v_task.out_lease_token <> v_run.out_lease_token
+  if v_task.out_claimed or v_task.out_lease_token is not null
      or v_task.out_claim_version <> v_run.out_claim_version then
     raise exception 'LIVE_DAILY_RUN_LEASE_STOLEN';
   end if;
@@ -132,7 +132,7 @@ begin
 
   select * into strict v_task
     from survival_rpg.claim_archive_publication_daily_run(v_schedule, 'ci-runner-c', 300);
-  if v_task.out_claimed or v_task.out_status <> 'NOOP' then
+  if v_task.out_claimed or v_task.out_status <> 'NOOP' or v_task.out_lease_token is not null then
     raise exception 'COMPLETED_DAILY_RUN_RECLAIMED';
   end if;
 

@@ -29,10 +29,11 @@ jobs:
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: archive_test
+          POSTGRES_USER: supabase_admin
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U postgres -d archive_test"
+          --health-cmd "pg_isready -U supabase_admin -d archive_test"
           --health-interval 10s --health-timeout 5s --health-retries 5
     defaults:
       run:
@@ -45,10 +46,17 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: |
+          psql --host localhost --username supabase_admin --dbname archive_test --set ON_ERROR_STOP=1 --command "CREATE ROLE postgres SUPERUSER LOGIN PASSWORD 'postgres';"
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --command "CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE ROLE service_role NOLOGIN; CREATE SCHEMA survival_rpg;"
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927054730_archive_publication_ledger_v1.sql
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927055745_archive_publication_ledger_owner_membership_cleanup_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927064252_archive_publication_lease_guard_v1.sql
+          psql --host localhost --username supabase_admin --dbname archive_test --set ON_ERROR_STOP=1 --command "GRANT archive_runner_internal TO postgres WITH ADMIN TRUE, SET FALSE, INHERIT FALSE; ALTER ROLE postgres NOSUPERUSER CREATEROLE;"
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927071329_archive_publication_lease_guard_corrective_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927071628_archive_publication_owner_grant_cleanup_v1.sql
+          psql --host localhost --username supabase_admin --dbname archive_test --set ON_ERROR_STOP=1 --command "ALTER ROLE postgres SUPERUSER;"
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_publication_ledger_v1_verification.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_publication_lease_guard_v1_verification.sql
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
