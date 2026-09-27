@@ -19,7 +19,7 @@ from playwright.sync_api import expect, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[2]
 DIST = ROOT / 'archive/web/dist'
-BOOKS = {name: json.loads((ROOT / f'archive/content/stories/{name}/BOOK.json').read_text())
+BOOKS = {name: json.loads((ROOT / f'archive/content/stories/{name}/BOOK.json').read_text(encoding='utf-8'))
          for name in ['C01-HAN-JUNHO', 'C02-STRONGHOLD', 'C03-AFTERFALL']}
 RESULTS: list[dict] = []
 
@@ -40,7 +40,7 @@ def asset_names(html: str) -> set[str]:
 
 
 def wait_for_deploy(url: str):
-    expected = asset_names((DIST / 'index.html').read_text())
+    expected = asset_names((DIST / 'index.html').read_text(encoding='utf-8'))
     assert expected, 'No local production JS/CSS asset fingerprints'
     deadline = time.monotonic() + 240
     last = ''
@@ -87,6 +87,7 @@ def selected_book(page, chapter: dict, chronicle: str):
     # Check again after effects/animation frames: transient selection is not success.
     page.wait_for_timeout(180)
     assert page.locator('.book-prose').get_attribute('data-chapter-id') == chapter['id'], 'Chapter bounced after one tap'
+    page.wait_for_function("document.querySelector('.reader-body')?.innerText.length > 30")
     assert len(page.locator('.reader-body').inner_text()) > 30
     no_overflow(page)
 
@@ -96,6 +97,7 @@ def selected_raw(page, part_id: str):
     expect(page.locator('.reader-part-list [aria-current="page"]')).to_have_count(1)
     expect(page.locator('.reader-part-list [aria-current="page"]')).to_have_attribute('data-part-id', part_id)
     assert parse_qs(urlparse(page.url).query).get('part') == [part_id]
+    expect(page.locator('.transcript-flow')).to_be_visible()
     page.wait_for_timeout(180)
     assert page.locator('.transcript-reader').get_attribute('data-part-id') == part_id, 'PART bounced after one tap'
     no_overflow(page)
@@ -106,8 +108,11 @@ def audit_book(page, base: str, chronicle: str, width: int):
     chapters = BOOKS[chronicle]['chapters']
     key = 'survival-diary-archive:story-progress:v1:' + chronicle
     page.evaluate('([key,id]) => localStorage.setItem(key,id)', [key, chapters[-1]['id']])
+    before = len(page.requests_seen)
     page.goto(query_url(base, view='story', chronicle=chronicle, chapter=chapters[0]['id']))
     selected_book(page, chapters[0], chronicle)  # explicit link beats stored last chapter
+    book_assets = [url for url in page.requests_seen[before:] if re.search(r'/BOOK-[^/]+\.json(?:\?|$)', url)]
+    assert len(book_assets) == 1, f'Opening {chronicle} should fetch only its own BOOK asset: {book_assets}'
     for index in [1, 2]:
         tap(page.locator(f'.book-toc [data-chapter-id="{chapters[index]["id"]}"]'), mobile)
         selected_book(page, chapters[index], chronicle)
@@ -135,6 +140,7 @@ def audit_book(page, base: str, chronicle: str, width: int):
 
 def audit_raw(page, base: str, chronicle: str, width: int):
     mobile = width < 700
+    request_start = len(page.requests_seen)
     page.goto(query_url(base, view='raw', chronicle=chronicle))
     expect(page.locator('.reader-part-list button').first).to_be_visible()
     # Select two actual published, fully verified PARTs from the live TOC.
@@ -149,6 +155,8 @@ def audit_raw(page, base: str, chronicle: str, width: int):
         tap(page.locator(f'.reader-part-list [data-part-id="{part_id}"]'), mobile)
         selected_raw(page, part_id)
         assert page.locator('.transcript-message').count() > 0, 'Verified RAW renders a blank body'
+        raw_requests = [url for url in page.requests_seen[request_start:] if re.search(r'\.md(?:\?|$)', url)]
+        assert len(raw_requests) == len(verified[:verified.index(part_id) + 1]), f'{chronicle} should fetch one RAW file per selected PART: {raw_requests}'
     page.go_back()
     selected_raw(page, verified[0])
     page.go_forward()
@@ -177,7 +185,6 @@ def audit_extra(page, base: str, width: int):
     page.goto(query_url(base, view='raw', chronicle='C03-AFTERFALL', part='c03-s01-008'))
     expect(page.locator('.transcript-fragment pre')).to_be_visible()
     report('S02 finale / season switch / missing and fragment preserved', width=width)
-
     page.goto(base)
     search = page.locator('.archive-search input')
     search.fill('체육')
@@ -200,6 +207,57 @@ def audit_extra(page, base: str, width: int):
     page.go_back()
     expect(page.locator('.archive-detail-header h1')).to_have_text('서진우')
     report('Explorer search / empty result recovery / filter / Story-to-Wiki route', width=width)
+
+
+def audit_graph_keyboard(page, base: str, width: int):
+    page.goto(base)
+    nodes = page.get_by_role('button', name=re.compile('열기$'))
+    assert nodes.count() >= 2, 'Graph does not expose at least one focusable relation'
+    target = nodes.nth(1)
+    label = target.get_attribute('aria-label').removesuffix(' 열기')
+    target.focus()
+    assert page.evaluate('(element) => document.activeElement === element', target.element_handle()), 'Graph node is not keyboard focusable'
+    page.keyboard.press('Enter')
+    expect(page.locator('.archive-detail h1')).to_have_text(label)
+    second = nodes.nth(0)
+    second.focus()
+    page.keyboard.press('Space')
+    expect(page.locator('.archive-detail h1')).to_have_text(second.get_attribute('aria-label').removesuffix(' 열기'))
+    report('graph nodes support visible focus, Enter and Space', width=width)
+
+
+def audit_content_retry(page, base: str, width: int):
+    browser = page.context.browser
+    context = browser.new_context(viewport={'width': width, 'height': 844}, is_mobile=width < 700, has_touch=width < 700)
+    retry_page = context.new_page()
+    failures = {'book': 0, 'raw': 0}
+
+    def fail_first(kind: str):
+        def route_once(route):
+            failures[kind] += 1
+            if failures[kind] == 1:
+                route.abort()
+            else:
+                route.continue_()
+        return route_once
+
+    retry_page.route(re.compile(r'/assets/BOOK-[^/]+\.json(?:\?.*)?$'), fail_first('book'))
+    retry_page.goto(query_url(base, view='story', chronicle='C01-HAN-JUNHO'))
+    expect(retry_page.locator('.reader-body [role="alert"]')).to_be_visible()
+    tap(retry_page.locator('.reader-body [role="alert"] button'), width < 700)
+    retry_page.wait_for_function("document.querySelector('.reader-body')?.innerText.length > 30")
+    assert failures['book'] == 2, f'Book retry did not issue a second request: {failures}'
+    retry_page.unroute(re.compile(r'/assets/BOOK-[^/]+\.json(?:\?.*)?$'))
+
+    retry_page.route(re.compile(r'/assets/[^/]+\.md(?:\?.*)?$'), fail_first('raw'))
+    retry_page.goto(query_url(base, view='raw', chronicle='C01-HAN-JUNHO', part='c01-s01-001'))
+    expect(retry_page.get_by_role('alert')).to_be_visible()
+    tap(retry_page.get_by_role('alert').get_by_role('button', name='다시 시도'), width < 700)
+    expect(retry_page.locator('.transcript-flow')).to_be_visible()
+    assert failures['raw'] == 2, f'RAW retry did not issue a second request: {failures}'
+    report('BOOK and RAW errors expose retry and recover', width=width)
+    context.close()
+
 
 
 def probe_original(browser, url: str):
@@ -248,11 +306,19 @@ def main():
                 errors, failures = [], []
                 page.on('pageerror', lambda error: errors.append(str(error)))
                 page.on('response', lambda response: failures.append(f'{response.status} {response.url}') if response.status >= 400 and response.url.startswith(base) else None)
+                page.requests_seen = []
+                page.on('request', lambda request: page.requests_seen.append(request.url))
                 page.goto(base)
+                page.wait_for_load_state('networkidle')
+                eager_reader_assets = [url for url in page.requests_seen if re.search(r'/BOOK-[^/]+\.json(?:\?|$)|\.md(?:\?|$)', url)]
+                assert not eager_reader_assets, f'Initial Archive shell eagerly fetched Reader/RAW content: {eager_reader_assets}'
+                report('initial shell excludes BOOK bodies and RAW files', width=width)
                 for chronicle in BOOKS:
                     audit_book(page, base, chronicle, width)
                     audit_raw(page, base, chronicle, width)
                 audit_extra(page, base, width)
+                audit_graph_keyboard(page, base, width)
+                audit_content_retry(page, base, width)
                 assert not errors, f'Browser runtime errors: {errors}'
                 assert not failures, f'HTTP failures: {failures}'
                 report('no runtime exceptions or same-site HTTP errors', width=width)

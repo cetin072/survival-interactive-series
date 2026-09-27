@@ -1,7 +1,7 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { archiveMeta, archiveNodes } from './archiveData'
 import { seasonSummaries } from './storyData'
-import { getChronicle, transcriptPartsFor, type ChronicleId, type TranscriptPart } from './transcriptData'
+import { getChronicle, loadTranscriptContent, transcriptPartsFor, type ChronicleId, type TranscriptPart } from './transcriptData'
 import { rawProgressKey, selectReaderItem } from './readerNavigation'
 import { useReaderPosition } from './useReaderPosition'
 // @ts-expect-error Shared pure Markdown parser has no TypeScript declaration.
@@ -59,11 +59,12 @@ function MessageBody({ content }: { content: string }) {
   })}</div>
 }
 
-function TranscriptBody({ part }: { part: TranscriptPart }) {
-  const messages = useMemo(() => messagesFromRaw(part.content ?? ''), [part.content])
+function TranscriptBody({ part, content }: { part: TranscriptPart; content?: string }) {
+  const messages = useMemo(() => messagesFromRaw(content ?? ''), [content])
   if (part.status === 'missing_transcript') return <section className="missing-transcript" aria-label="원문 미확보 구간"><p className="reader-status">MISSING TRANSCRIPT</p><h2>이 구간의 공개 원문은 아직 아카이브에 백필되지 않았습니다.</h2><p>정본 요약·체크포인트·운영 기록을 실제 USER/GM 대화로 재구성하지 않습니다.</p><p className="reader-source">기록 위치: {part.source}</p></section>
-  if (part.status === 'verified_fragment') return <section className="transcript-fragment" aria-label="검증된 원문 조각"><p className="reader-status">VERIFIED FRAGMENT · 현재 확인된 원문 일부</p><p>이 출처에서 문자 그대로 확인된 공개 기록만 보입니다. 누락된 GM 장면과 구간은 채우지 않았습니다.</p><pre>{part.content}</pre></section>
-  if (!messages.length) return <section className="transcript-fragment" aria-label="원문 그대로 보기"><p>대화 구분을 인식하지 못해 보존된 원문을 그대로 표시합니다.</p><pre>{part.content}</pre></section>
+  if (content === undefined) return <p role="status">원문을 불러오는 중입니다…</p>
+  if (part.status === 'verified_fragment') return <section className="transcript-fragment" aria-label="검증된 원문 조각"><p className="reader-status">VERIFIED FRAGMENT · 현재 확인된 원문 일부</p><p>이 출처에서 문자 그대로 확인된 공개 기록만 보입니다. 누락된 GM 장면과 구간은 채우지 않았습니다.</p><pre>{content}</pre></section>
+  if (!messages.length) return <section className="transcript-fragment" aria-label="원문 그대로 보기"><p>대화 구분을 인식하지 못해 보존된 원문을 그대로 표시합니다.</p><pre>{content}</pre></section>
   return <div className="transcript-flow">{messages.map((message, index) => <section key={index} className={'transcript-message transcript-' + message.role}><p className="transcript-role">{message.label}</p><MessageBody content={message.content} /></section>)}</div>
 }
 
@@ -71,6 +72,21 @@ export function RawTranscriptReader({ chronicleId, initialPartId, onPartChange, 
   const chronicle = getChronicle(chronicleId)
   const chronicleParts = useMemo(() => transcriptPartsFor(chronicleId), [chronicleId])
   const selected = selectInitialTranscriptPart(chronicleParts, initialPartId)
+  const [content, setContent] = useState<{ partId: string; value: string } | null>(null)
+  const [contentError, setContentError] = useState<string | null>(null)
+  const [attempt, setAttempt] = useState(0)
+  useEffect(() => {
+    setContent(null)
+    setContentError(null)
+    if (!selected || selected.status === 'missing_transcript') return
+    let current = true
+    loadTranscriptContent(selected).then((value) => {
+      if (current) setContent({ partId: selected.id, value })
+    }).catch(() => {
+      if (current) setContentError('원문을 불러오지 못했습니다.')
+    })
+    return () => { current = false }
+  }, [selected?.id, attempt])
   const seasonId = selected?.seasonId ?? 'S01'
   const parts = chronicleParts.filter((part) => part.seasonId === seasonId)
   const seasonIds = Array.from(new Set(chronicleParts.map((part) => part.seasonId)))
@@ -102,7 +118,7 @@ export function RawTranscriptReader({ chronicleId, initialPartId, onPartChange, 
     <article className="transcript-reader" ref={articleRef} data-part-id={selected.id}>
       <header className="reader-header"><div><p className="archive-eyebrow">{selected.seasonId} · {chronicle.label} · {selected.status === 'verified_transcript' ? 'VERIFIED TRANSCRIPT' : selected.status === 'verified_fragment' ? 'VERIFIED FRAGMENT' : 'MISSING TRANSCRIPT'}</p><h1>{selected.title}</h1><p>{selected.range}</p></div><div className="reader-progress" aria-label={'읽기 진행률 ' + progress + '%'}><strong>{progress}%</strong><span><i style={{ width: progress + '%' }} /></span></div></header>
       <aside className="reader-integrity-note"><strong>{selected.status === 'verified_transcript' ? '검증 원문' : selected.status === 'verified_fragment' ? '검증된 원문 일부' : '원문 미확보'}</strong><p>{selected.status === 'verified_transcript' ? '실제 USER/GM 공개 메시지의 순서와 내용을 보존합니다. 표시 형식만 읽기 쉽게 바꿉니다.' : selected.status === 'verified_fragment' ? '실제 공개 텍스트가 확인된 일부만 보존합니다. 빠진 USER/GM 원문은 보완하지 않습니다.' : '이 빈 구간은 정본 요약이나 이벤트 기록으로 대사를 만들지 않습니다.'}</p><small>Source · {selected.source}</small></aside>
-      <TranscriptBody part={selected} />
+      {contentError ? <section role="alert"><p>{contentError}</p><button onClick={() => setAttempt((value) => value + 1)}>다시 시도</button></section> : <TranscriptBody part={selected} content={content?.partId === selected.id ? content.value : undefined} />}
       {showCanonicalSummary && selected.seasonId in seasonSummaries && <section className="canon-summary" aria-label="정본 요약"><p className="reader-status">정본 요약 · 원문과 별도</p><h2>{seasonSummaries[selected.seasonId as keyof typeof seasonSummaries].title}</h2><p>{seasonSummaries[selected.seasonId as keyof typeof seasonSummaries].description}</p></section>}
       {selected.relatedNodeIds.length > 0 && <section className="reader-related"><p className="archive-eyebrow">세계 탐색</p><h2>관련 인물·장소</h2><div>{selected.relatedNodeIds.map((id) => { const node = archiveNodeById.get(id); return node ? <button key={id} onClick={() => onOpenNode(id)}><strong>{node.label}</strong><span>{node.subtitle}</span></button> : null })}</div><button className="reader-world-link" onClick={onOpenExplorer}>세계 탐색으로 돌아가기</button></section>}
       <nav className="reader-pager" aria-label="원문 이동">{previous ? <button onClick={() => openPart(previous)}>← {previous.title}</button> : <span />}{next ? <button onClick={() => openPart(next)}>다음 · {next.title} →</button> : <span />}</nav>

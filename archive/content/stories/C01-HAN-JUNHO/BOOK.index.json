@@ -1,0 +1,240 @@
+{
+  "chronicleId": "C01-HAN-JUNHO",
+  "title": "한준호의 생존기",
+  "subtitle": "흩어진 가족이 살아남는 길",
+  "description": "현재 확보된 공개 GM 기록을 순서대로 엮은 이야기.",
+  "protagonist": "한준호",
+  "worldlineId": "CANON-V2",
+  "sourceRoot": "seasons_v2",
+  "transformVersion": "reader-selection-v1.2.0",
+  "coverage": {
+    "verifiedRawParts": 10,
+    "scanned": 10,
+    "eligibleGmProse": 10,
+    "included": 10,
+    "omitted": []
+  },
+  "editorialExclusions": [],
+  "chapters": [
+    {
+      "id": "c01-han-junho-chapter-01",
+      "chapterNumber": 1,
+      "title": "붉은 하늘",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "붉은 하늘",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_001.md"
+      ],
+      "archiveSourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_001.md"
+      ],
+      "sourceHashes": [
+        "7e917c2061eec2749a7f540f862a3debdd986f9d41a94b67368a2df3e749ca0f"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c01-han-junho-chapter-02",
+      "chapterNumber": 2,
+      "title": "남쪽으로 가는 밤",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "붉은 하늘",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_002.md"
+      ],
+      "archiveSourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_002.md"
+      ],
+      "sourceHashes": [
+        "de9f84356d66fd2c055bfb724dd16a1a47980c42139a11cfd777a2e12cf494c7"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c01-han-junho-chapter-03",
+      "chapterNumber": 3,
+      "title": "체육관의 밤",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "붉은 하늘",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_003.md"
+      ],
+      "archiveSourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_003.md"
+      ],
+      "sourceHashes": [
+        "1cc4e060513a0d7831be27f79abc4baf553b8429babc12c860708b7b48c53086"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c01-han-junho-chapter-04",
+      "chapterNumber": 4,
+      "title": "돌아갈 곳",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "붉은 하늘",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_004.md"
+      ],
+      "archiveSourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_004.md"
+      ],
+      "sourceHashes": [
+        "76d3a25ed86ee4c6737845e6943701e40e6d3137c18f1a719e68b046a3f023ad"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c01-han-junho-chapter-05",
+      "chapterNumber": 5,
+      "title": "두 번째 거점",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "붉은 하늘",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_005.md"
+      ],
+      "archiveSourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_005.md"
+      ],
+      "sourceHashes": [
+        "755c7b59fe0ca3f141614dd082ec340eb60bee3bf1737c10f34e990a10385d9b"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c01-han-junho-chapter-06",
+      "chapterNumber": 6,
+      "title": "남쪽 생활권",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "붉은 하늘",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_006.md"
+      ],
+      "archiveSourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_006.md"
+      ],
+      "sourceHashes": [
+        "2ba316af9bfdcd25460e25b0134f6a7f9a088da18af8b2109d8beba8abac4df4"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c01-han-junho-chapter-07",
+      "chapterNumber": 7,
+      "title": "가까운 임시거점",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "붉은 하늘",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_007.md"
+      ],
+      "archiveSourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_007.md"
+      ],
+      "sourceHashes": [
+        "d5ec46540c3f0329e6ecedd69739937a4485dc1f30976d401bf3ef4e9c0d17d8"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c01-han-junho-chapter-08",
+      "chapterNumber": 8,
+      "title": "외곽주택의 불빛",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "붉은 하늘",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_008.md"
+      ],
+      "archiveSourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_008.md"
+      ],
+      "sourceHashes": [
+        "cc64e8d0b6adb05e52007cc919b11e5b0eba55dff5b4d72fcefc655e942e91ea"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c01-han-junho-chapter-09",
+      "chapterNumber": 9,
+      "title": "생활서비스의 시작",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "붉은 하늘",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_009.md"
+      ],
+      "archiveSourceRefs": [
+        "seasons_v2/S01/raw_transcript/PART_009.md"
+      ],
+      "sourceHashes": [
+        "7519164e37e67544fadd81d0e26fb17b0971413df62e5dbc00cd5e63ceb73828"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c01-han-junho-chapter-10",
+      "chapterNumber": 10,
+      "title": "도심 아파트",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S02",
+      "seasonId": "S02",
+      "arcLabel": "두 번째 계절",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "seasons_v2/S02/raw_transcript/PART_001.md"
+      ],
+      "archiveSourceRefs": [
+        "seasons_v2/S02/raw_transcript/PART_001.md"
+      ],
+      "sourceHashes": [
+        "51428eb4a41a374a909834158c5f2c040792839835a64e7ab53693d52c018739"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    }
+  ]
+}

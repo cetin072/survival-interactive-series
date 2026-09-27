@@ -51,10 +51,8 @@ describe('Reader Edition V1.1', () => {
   it('does not remove narrative numeric lists, headings, dialogue, or order', () => {
     for (const gm of ['현재 물자:\n\n1. 물 20L\n2. 연료 3통\n3. 식량 4일분', '순서는 이랬다.\n\n1. 환자 안정화.\n2. 병원 수용 확인.\n3. 차량 출발.', '1월 3일\n2번 거점\n3명이 남았다.']) expect(removeTrailingChoiceGate(gm)).toBe(gm)
   })
-  it('ships no role labels or choice UI in Reader bodies', () => {
-    const body = readerChapters.map((chapter) => chapter.body).join('\n')
-    expect(body).not.toMatch(/(?:^|\n)#{2,3}\s*(?:USER|GM|ASSISTANT_PUBLIC_META)/m)
-    expect(body.match(/(?:^|\n)#{1,4}\s*(?:선택|행동)\s*\r?\n(?:\r?\n)*(?:\*\*)?(?:1\.|A\.)/m)?.[0]).toBeUndefined()
+  it('keeps prose, role labels and choice UI out of eager Reader metadata', () => {
+    expect(readerChapters.every((chapter) => chapter.body === undefined)).toBe(true)
   })
   it('uses event titles rather than repeated source-bucket labels', () => {
     for (const chronicleId of ['C01-HAN-JUNHO', 'C02-STRONGHOLD', 'C03-AFTERFALL'] as const) {
@@ -70,20 +68,17 @@ describe('Reader Edition V1.1', () => {
     expect(c03.find((chapter) => chapter.title === '외곽 주민복지관')?.relatedNodeIds).toEqual(['char-jinwoo', 'char-hajin', 'char-hayoung', 'char-yujin', 'loc-shelter'])
     expect(c03.find((chapter) => chapter.title === '서쪽 화재선')?.relatedNodeIds).toEqual(['char-jinwoo', 'char-taehoon', 'event-fireline'])
   })
-  it('removes known obvious archive reports while retaining ambiguous scene prose', () => {
-    const body = readerChapters.map((chapter) => chapter.body).join('\n')
-    expect(body).not.toContain('플레이어에게 보여주면 안 되는 PD용 설계안')
-    expect(body).not.toContain('filecite')
-    expect(body).toContain('진우가 지도를 한참 보다가 말을 꺼낸다')
+  it('keeps generated BOOK prose out of eager metadata while preserving references', () => {
+    expect(readerChapters.every((chapter) => chapter.body === undefined && chapter.sourceRefs.length > 0)).toBe(true)
   })
   it('marks C02 grouping as parts rather than invented seasons', () => {
     expect(chaptersForChronicle('C02-STRONGHOLD').every((chapter) => !chapter.seasonId && Boolean(chapter.partId))).toBe(true)
   })
-  it('audits every verified source and keeps C03 numbered GM prose', () => {
+  it('audits all lazy indexes and their navigation metadata', () => {
     const books = new Map(readerChapters.map((chapter) => [chapter.chronicleId, chapter]))
     expect(books.size).toBe(3)
-    expect(chaptersForChronicle('C03-AFTERFALL').some((chapter) => chapter.body.includes('첫겨울'))).toBe(true)
-    expect(readerChapters.every((chapter) => chapter.body.trim().length > 0 && chapter.sourceRefs.length > 0 && chapter.archiveSourceRefs.length > 0)).toBe(true)
+    expect(readerChapters.every((chapter) => chapter.body === undefined && chapter.sourceRefs.length > 0 && chapter.archiveSourceRefs.length > 0)).toBe(true)
+    expect(chronicleBooks).toHaveLength(3)
   })
   it('keeps the unrecovered C03 opening explicit without fabricating a replacement', () => {
     expect(chronicleBooks.find((book) => book.chronicleId === 'C03-AFTERFALL')?.beginningStatus).toBe('MISSING_BEGINNING')

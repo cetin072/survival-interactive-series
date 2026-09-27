@@ -17,7 +17,7 @@ describe('Chronicle-isolated public transcript catalog', () => {
     const c01 = transcriptPartsFor('C01-HAN-JUNHO')
     expect(c01.filter((part) => part.status === 'verified_transcript')).toHaveLength(10)
     expect(c01.find((part) => part.id === 'c01-s02-missing')).toMatchObject({ status: 'missing_transcript', sourceVerified: true })
-    expect(c01.filter((part) => part.status === 'verified_transcript').every((part) => Boolean(part.content?.trim()))).toBe(true)
+    expect(c01.filter((part) => part.status === 'verified_transcript').every((part) => Boolean(part.contentUrl))).toBe(true)
   })
 
   it('publishes only verified C03 raw while retaining every known gap and session boundary', () => {
@@ -43,7 +43,7 @@ describe('Chronicle-isolated public transcript catalog', () => {
     expect(c03.find((part) => part.sessionId === 'SESSION_003')?.range).toBe('2027-01-16 09:28 → 2027-01-16 09:28')
     expect(c03.find((part) => part.sessionId === 'SESSION_007')?.range).toBe('2027-02-06 21:15 → 2027-02-07 13:40')
     expect(c03.filter((part) => ['SESSION_005', 'SESSION_006', 'SESSION_007', 'SESSION_008', 'SESSION_009'].includes(part.sessionId ?? '')).every((part) => part.status === 'verified_transcript')).toBe(true)
-    expect(c03.filter((part) => part.status !== 'missing_transcript').every((part) => Boolean(part.content?.trim()))).toBe(true)
+    expect(c03.filter((part) => part.status !== 'missing_transcript').every((part) => Boolean(part.contentUrl))).toBe(true)
   })
 
   it('derives current and past shelves from the registry instead of a fixed Chronicle id', () => {
@@ -72,8 +72,8 @@ describe('Chronicle-isolated public transcript catalog', () => {
     expect(c02.filter((part) => part.status === 'missing_transcript')).toHaveLength(5)
     expect(c02.filter((part) => part.status === 'verified_fragment')).toHaveLength(3)
     expect(new Set(c02.filter((part) => part.status === 'verified_transcript').map((part) => part.sessionId)).size).toBe(5)
-    expect(c02.filter((part) => part.status === 'verified_transcript').every((part) => part.source.startsWith('worldlines/STRONGHOLD/raw_transcript/SESSION_') && Boolean(part.content?.trim()))).toBe(true)
-    expect(c02.filter((part) => part.status === 'verified_fragment').every((part) => part.contentFormat === 'raw_fragment' && Boolean(part.content?.trim()))).toBe(true)
+    expect(c02.filter((part) => part.status === 'verified_transcript').every((part) => part.source.startsWith('worldlines/STRONGHOLD/raw_transcript/SESSION_') && Boolean(part.contentUrl))).toBe(true)
+    expect(c02.filter((part) => part.status === 'verified_fragment').every((part) => part.contentFormat === 'raw_fragment' && Boolean(part.contentUrl))).toBe(true)
     expect(c02.every((part) => part.relatedNodeIds.length === 0)).toBe(true)
   })
 })
