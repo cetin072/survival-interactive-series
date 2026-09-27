@@ -38,6 +38,12 @@ node --test archive/scripts/lib/publication-segment.test.mjs
 The tests use synthetic metadata only. They do not call Supabase, read live RAW,
 publish a site, create images, or prove scheduler behavior.
 
+## Exact-body candidate materialization
+
+`materializePublicationSegment(snapshot, rows)` verifies an exported row's identity and exact UTF-8 content hash against each sealed message. It produces one deterministic in-memory RAW PART candidate with locally numbered role headers, preserving the original source message-order fence separately. It invokes the existing Reader transform for a digest-only preview, rejects embedded role headings that would confuse Reader parsing, and rejects oversized or unexpected row fields. An OPEN source session stays OPEN. The candidate remains `PENDING_PUBLIC_APPROVAL` with `publication_allowed: false`; neither a supplied approval reference nor a successful preview changes that. The function does not create `SOURCE_MANIFEST.json`, write to Git/DB, or publish text.
+
+The new CI test uses synthetic bodies. There is still no restricted live body exporter or trusted public approval, and the currently observed unlinked S03 rows cannot pass the segment seal. A later trusted exporter must provide a transaction-consistent exact metadata/body snapshot. A separate reviewed promotion must allocate an archive session path, prove public visibility and create the Step 3 manifest before Reader publication.
+
 ## Operations still required
 
 The repository has no least-privilege public exporter for open transcript
