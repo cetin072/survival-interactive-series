@@ -32,6 +32,9 @@ export async function proposeUnifiedPublication({ snapshot, options = {}, repoRo
   const current = (await git(gitBinary, root, ['rev-parse', '--verify', ref])).toString().trim()
   const matches = async (commit) => {
     for (const [path, bytes] of files) {
+      const entry = (await git(gitBinary, root,
+        ['ls-tree', commit, '--', path])).toString('utf8').trim()
+      if (!entry) return false
       if (!(await git(gitBinary, root, ['show', `${commit}:${path}`])).equals(bytes)) return false
     }
     return true
