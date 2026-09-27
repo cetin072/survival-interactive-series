@@ -2,7 +2,7 @@
 
 Status: **FORWARD MIGRATION IN DRAFT #167; STAGING NOT APPLIED; NO LOGIN SECRET**
 
-Current implementation checkpoint (2026-09-27): `supabase/migrations/20260927121600_archive_exporter_reader_v1.sql` implements the scoped role, column grants and forced-RLS policies below after the exact already-applied worldline link migration files. The isolated PostgreSQL 17 CI exercises actual role impersonation, linked versus unlinked/out-of-scope rows, denied writes and passwordless install. This does not prove a real staging login or game-room call. The role and policies have not been installed in staging. The original review proposal below remains the design record.
+Current implementation checkpoint (2026-09-27): Supabase applied the forward migration as `20260927123458_archive_exporter_reader_v1`; `supabase/migrations/20260927123458_archive_exporter_reader_v1.sql` preserves the exact SQL and actual history version. Read-only staging checks confirm a passwordless `archive_exporter` role, three scoped SELECT policies, no role memberships, no save read and no source write privilege. The isolated PostgreSQL 17 CI exercises an actual restricted login, linked versus unlinked/out-of-scope rows, denied writes and passwordless install. No staging login secret has been provisioned, so live exporter reads and game-room calls remain untested. The original review proposal below remains the design record.
 
 This proposal is the database half of the opt-in, read-only source check in Draft PR #152. The exporter handles private, unapproved USER/GM bodies. `public_safe` means a capture was screened for storage; it is not owner approval to publish. The application still returns `PENDING_PUBLIC_APPROVAL` after a valid read.
 
