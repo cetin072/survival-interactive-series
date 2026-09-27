@@ -31,6 +31,24 @@ ROOT = Path(__file__).resolve().parents[2]
 PUBLIC_KEY = ROOT / ".github/eunchae-upload-public.pem"
 AAD = f"{BUCKET}/{OBJECT_PATH}:{SOURCE_SHA}".encode()
 LIMIT = 20 * 1024 * 1024
+SEOJIN = {
+    "point_id": "point-bbeb7172397587adcf5cba41a67654735c1c5fe7d3ec5fdd68601107bc1d435c",
+    "generation_key": "generation-9201d1f67b953acaf3987a7ebff9b96d9f37467d00a303699014cd8670f0cd0c",
+    "source_sha": "361bb0280410b5d752836b07a7cee5640f4bb274372b0884bacaf5bb18232bf7",
+}
+
+
+def select_asset(name):
+    global POINT_ID, GENERATION_KEY, SOURCE_SHA, OBJECT_PATH, AAD
+    if name == "eunchae":
+        return
+    if name != "seojin":
+        raise ValueError("ASSET_NOT_PINNED")
+    POINT_ID = SEOJIN["point_id"]
+    GENERATION_KEY = SEOJIN["generation_key"]
+    SOURCE_SHA = SEOJIN["source_sha"]
+    OBJECT_PATH = f"AFTERFALL/{POINT_ID}/{GENERATION_KEY}/{SOURCE_SHA}.png"
+    AAD = f"{BUCKET}/{OBJECT_PATH}:{SOURCE_SHA}".encode()
 
 
 class NoRedirect(HTTPRedirectHandler):
@@ -182,7 +200,9 @@ def main():
     parser.add_argument("--image", type=Path)
     parser.add_argument("--envelope", type=Path)
     parser.add_argument("--private-key", type=Path)
+    parser.add_argument("--asset", choices=("eunchae", "seojin"), default="eunchae")
     args = parser.parse_args()
+    select_asset(args.asset)
     if args.issue:
         return issue()
     if args.verify:

@@ -30,6 +30,18 @@ class Response:
 
 
 class HandoffTests(unittest.TestCase):
+    def test_seojin_selection_is_pinned_to_one_object(self):
+        original = (handoff.POINT_ID, handoff.GENERATION_KEY, handoff.SOURCE_SHA,
+                    handoff.OBJECT_PATH, handoff.AAD)
+        self.addCleanup(lambda: [setattr(handoff, key, value) for key, value in
+                         zip(("POINT_ID", "GENERATION_KEY", "SOURCE_SHA", "OBJECT_PATH", "AAD"), original)])
+        handoff.select_asset("seojin")
+        self.assertEqual(handoff.POINT_ID, handoff.SEOJIN["point_id"])
+        self.assertEqual(handoff.SOURCE_SHA, handoff.SEOJIN["source_sha"])
+        self.assertIn(handoff.GENERATION_KEY, handoff.OBJECT_PATH)
+        with self.assertRaisesRegex(ValueError, "ASSET_NOT_PINNED"):
+            handoff.select_asset("other")
+
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)

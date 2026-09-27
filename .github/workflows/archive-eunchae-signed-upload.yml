@@ -34,4 +34,4 @@ jobs:
         env:
           ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
           ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
-        run: python archive/scripts/eunchae_signed_handoff.py --issue
+        run: python archive/scripts/eunchae_signed_handoff.py --issue --asset seojin
