@@ -111,10 +111,10 @@ def image_check(source, generated, committed):
     return "BYTE_EXACT" if generated == committed else "PIXEL_EQUIVALENT"
 
 
-def desired_manifest():
+def desired_manifest(assets=None):
     body = {"version": "archive-site-assets-v1", "chronicle_id": "C03-AFTERFALL",
             "worldline_id": "AFTERFALL", "visibility": "PUBLIC_ARCHIVE",
-            "visual_catalog_sha256": CATALOG_SHA, "assets": [ASSET]}
+            "visual_catalog_sha256": CATALOG_SHA, "assets": assets or [ASSET]}
     canonical = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
     return {**body, "content_sha256": digest(canonical)}
 
@@ -123,15 +123,21 @@ def deliver(source, mode, catalog_path, check_only=False):
     catalog_status = catalog_check(catalog_path)
     fail_if(digest(source) != SOURCE_SHA, "APPROVED_ORIGINAL_SHA_MISMATCH")
     derivative = derive(source)
-    expected = desired_manifest()
     public_file = PUBLIC / f"{DERIVATIVE_SHA}.png"
     new_asset = not public_file.exists()
     committed = public_file.read_bytes() if not new_asset else derivative
     derivative_match = image_check(source, derivative, committed)
     new_manifest = not MANIFEST.exists()
     if not new_manifest:
+        existing = json.loads(MANIFEST.read_text(encoding="utf-8"))
+        assets = existing.get("assets")
+        fail_if(not isinstance(assets, list) or len(assets) != 2 or assets[0] != ASSET,
+                "EXISTING_MANIFEST_CONFLICT")
+        expected = desired_manifest(assets)
         fail_if(json.loads(MANIFEST.read_text(encoding="utf-8")) != expected,
                 "EXISTING_MANIFEST_CONFLICT")
+    else:
+        expected = desired_manifest()
     fail_if(check_only and (new_asset or new_manifest), "SITE_ASSET_NOT_COMMITTED")
     if new_asset and not check_only:
         PUBLIC.mkdir(parents=True, exist_ok=True)
