@@ -74,6 +74,7 @@ export function sealPublicationSegment(input) {
   }
   const seenTurns = new Set()
   let previousTurn = null
+  let previousGmSaveVersion = null
   for (let index = 0; index < input.turn_outcomes.length; index++) {
     const outcome = input.turn_outcomes[index]
     exactKeys(outcome, ['turn_no', 'outcome', 'user_save_version', 'gm_save_version'], 'INVALID_TURN_OUTCOME')
@@ -87,6 +88,9 @@ export function sealPublicationSegment(input) {
     demand(outcome.outcome === 'NO_STATE_CHANGE'
       ? outcome.user_save_version === outcome.gm_save_version
       : outcome.gm_save_version > outcome.user_save_version, 'TURN_OUTCOME_VERSION_CONFLICT')
+    demand(previousGmSaveVersion === null || outcome.user_save_version === previousGmSaveVersion,
+      'CROSS_TURN_SAVE_VERSION_DISCONTINUITY')
+    previousGmSaveVersion = outcome.gm_save_version
   }
 
   const sourceMessages = input.messages.map(({ message_id, idempotency_key, message_order, role, content_sha256, save_version, source_type }) => ({

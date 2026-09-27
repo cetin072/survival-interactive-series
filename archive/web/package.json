@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && node ../scripts/create-release-manifest.mjs",
     "build:verified": "npm run reader:check && npm run build",
     "test": "vitest run",
     "reader:build": "node ../scripts/build-reader-edition.mjs",

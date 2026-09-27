@@ -76,6 +76,56 @@ test('incomplete state linkage, private rows and raw content are rejected', () =
   assert.throws(() => sealPublicationSegment(raw), /INVALID_SEGMENT_MESSAGE/)
 })
 
+
+test('rejects save-version discontinuities across adjacent turns', () => {
+  for (const [outcome, userVersion, gmVersion] of [
+    ['APPLIED', 200, 255],
+    ['NO_STATE_CHANGE', 200, 200],
+  ]) {
+    const input = snapshot()
+    input.snapshot_end_order = 3
+    input.session_observed_last_order = 5
+    input.messages.push(message(2, 'USER', 1, userVersion), message(3, 'GM', 1, gmVersion))
+    input.turn_outcomes[0] = { turn_no: 1, outcome: 'APPLIED', user_save_version: 253, gm_save_version: 254 }
+    input.messages[1].save_version = 254
+    input.turn_outcomes.push({ turn_no: 2, outcome, user_save_version: userVersion, gm_save_version: gmVersion })
+    assert.throws(() => sealPublicationSegment(input), /CROSS_TURN_SAVE_VERSION_DISCONTINUITY/)
+  }
+  const gap = snapshot()
+  gap.snapshot_end_order = 3
+  gap.session_observed_last_order = 5
+  gap.messages.push(message(2, 'USER', 1, 255), message(3, 'GM', 1, 256))
+  gap.messages[1].save_version = 254
+  gap.turn_outcomes[0] = { turn_no: 1, outcome: 'APPLIED', user_save_version: 253, gm_save_version: 254 }
+  gap.turn_outcomes.push({ turn_no: 2, outcome: 'APPLIED', user_save_version: 255, gm_save_version: 256 })
+  assert.throws(() => sealPublicationSegment(gap), /CROSS_TURN_SAVE_VERSION_DISCONTINUITY/)
+})
+
+test('final integration tip enforces the exact adjacent-turn continuity matrix', () => {
+  for (const [outcome, versions, accepted] of [
+    ['APPLIED', [253, 254, 200, 201], false],
+    ['APPLIED', [253, 254, 260, 261], false],
+    ['NO_STATE_CHANGE', [253, 253, 200, 200], false],
+    ['APPLIED', [253, 254, 254, 255], true],
+    ['NO_STATE_CHANGE', [253, 253, 253, 253], true],
+  ]) {
+    const input = snapshot()
+    input.snapshot_end_order = 3
+    input.session_observed_last_order = 5
+    input.messages = [
+      message(0, 'USER', 0, versions[0]), message(1, 'GM', 0, versions[1]),
+      message(2, 'USER', 1, versions[2]), message(3, 'GM', 1, versions[3]),
+    ]
+    input.turn_outcomes = [
+      { turn_no: 1, outcome: versions[0] === versions[1] ? 'NO_STATE_CHANGE' : 'APPLIED',
+        user_save_version: versions[0], gm_save_version: versions[1] },
+      { turn_no: 2, outcome, user_save_version: versions[2], gm_save_version: versions[3] },
+    ]
+    if (accepted) assert.equal(sealPublicationSegment(input).segment_status, 'SEALED')
+    else assert.throws(() => sealPublicationSegment(input), /CROSS_TURN_SAVE_VERSION_DISCONTINUITY/)
+  }
+})
+
 test('public provenance references do not grant public publication', () => {
   const input = snapshot()
   input.approval_provenance_ref = 'SUPABASE:approved-release:token-redacted'

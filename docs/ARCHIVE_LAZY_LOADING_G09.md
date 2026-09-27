@@ -15,8 +15,8 @@ Built the `main` base SHA `1da3cd03f27b1c072a98a108311223b62055b8a3` and this wo
 | Build | Initial JS (gzip) | Initial JS + CSS (gzip) |
 | --- | ---: | ---: |
 | Base `main` | 1,036.23 KiB | 1,042.60 KiB |
-| Lazy loading | 103.04 KiB | 109.43 KiB |
-| Change | -933.19 KiB (-90.1%) | -933.17 KiB (-89.5%) |
+| Lazy loading + release chunks | 105.03 KiB | 111.42 KiB |
+| Change | -931.20 KiB (-89.9%) | -931.18 KiB (-89.3%) |
 
 The prior eager inputs contained 1,406,424 bytes across three BOOK files and 1,712,321 bytes across 83 RAW Markdown files. They are no longer in the initial application chunk. Reader prose remains available in separately fingerprinted per-Chronicle assets; RAW stays in separately fingerprinted per-PART assets.
 
