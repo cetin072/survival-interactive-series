@@ -36,6 +36,10 @@ try {
   const checkpointRef = 'worldlines/AFTERFALL/seasons/S99/END_CHECKPOINT_2099-01-01.md'
   await mkdir(resolve(copy, relative), { recursive: true })
   await mkdir(resolve(copy, 'worldlines/AFTERFALL/seasons/S99'), { recursive: true })
+  await writeFile(resolve(copy, checkpointRef), 'SYNTHETIC_CHECKPOINT_ONLY\n')
+  command('git', ['add', checkpointRef], copy)
+  command('git', ['-c', 'user.name=Reader test', '-c', 'user.email=reader-test@example.invalid',
+    'commit', '--no-verify', '-qm', 'Synthetic checkpoint fixture; local test only'], copy)
   const raw = '## USER 000\n\nTEST_INPUT\n\n## GM 001\n\n## 2099년 1월 1일 10:00\n\nTEST_GM_PROSE\n\n다음 선택\n1. TEST_A\n2. TEST_B\n'
   const range = { start: '2099-01-01 10:00', end: '2099-01-01 10:00' }
   const entry = { session_id: 'SESSION_001', source_type: 'SUPABASE_ROLLING_RAW', visibility: 'PUBLIC_ARCHIVE', capture_quality: 'VERIFIED_CONTIGUOUS_TURN_PAIRS', atomic_pairing_complete: true, source_manifest: 'SESSION_001/SOURCE_MANIFEST.json', coverage_basis: 'captured_message_range', captured_message_range: range, user_messages: 1, gm_public_blocks: 1 }
@@ -44,8 +48,7 @@ try {
   await writeFile(resolve(copy, relative, 'PART_001.md'), raw)
   await writeFile(resolve(copy, relative, 'SOURCE_MANIFEST.json'), JSON.stringify(source, null, 2) + '\n')
   await writeFile(resolve(copy, relative, '../MANIFEST.json'), JSON.stringify(manifest, null, 2) + '\n')
-  await writeFile(resolve(copy, checkpointRef), 'SYNTHETIC_CHECKPOINT_ONLY\n')
-  command('git', ['add', 'archive/content/transcripts/C03-AFTERFALL/S99', checkpointRef], copy)
+  command('git', ['add', 'archive/content/transcripts/C03-AFTERFALL/S99'], copy)
   command('git', ['-c', 'user.name=Reader test', '-c', 'user.email=reader-test@example.invalid', 'commit', '--no-verify', '-qm', 'Synthetic S99 fixture; local test only'], copy)
   const snapshot = { version: 'publication-snapshot-v1', chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', season_id: 'S99', visibility: 'PUBLIC_ARCHIVE', source_revision: command('git', ['rev-parse', 'HEAD'], copy).trim(), source_save_version: 999, source_game_time: range.end, source_checkpoint: 'worldlines/AFTERFALL/seasons/S99/END_CHECKPOINT_2099-01-01.md', coverage_status: 'PARTIAL', sources: [{ session_id: entry.session_id, source_ref: `${relative}/SOURCE_MANIFEST.json`, source_digest: fingerprint(entry), visibility: 'PUBLIC_ARCHIVE', capture_quality: entry.capture_quality, atomic_pairing_complete: true, captured_message_range: range, user_messages: 1, gm_public_blocks: 1 }] }
   const snapshotFile = join(temporary, 'snapshot.json')
@@ -59,6 +62,24 @@ try {
   assert.equal(derived.added_chapters, 1)
   assert.equal(derived.source_save_version, 999)
   const fixtureHead = command('git', ['rev-parse', 'HEAD'], copy).trim()
+  const refSource = 'refs/heads/codex/archive-publication-ref-source-test'
+  command('git', ['branch', 'codex/archive-publication-ref-source-test', fixtureHead], copy)
+  command('git', ['checkout', '--detach', 'HEAD^'], copy)
+  const beforeRefBook = await readFile(resolve(copy, 'archive/content/stories/C03-AFTERFALL/BOOK.json'))
+  const refScript = `import { commitReaderFromPublicRef } from './archive/scripts/lib/reader-public-ref.mjs';
+const result = await commitReaderFromPublicRef({ repoRoot: process.cwd(),
+  ref: '${refSource}', seasonId: 'S99', checkpointRef: '${checkpointRef}',
+  authorizeCommit: async () => true });
+process.stdout.write(JSON.stringify(result));`
+  const refResult = JSON.parse(command('node', ['--input-type=module', '-e', refScript], copy))
+  assert.equal(refResult.status, 'LOCAL_READER_PROPOSAL_COMMITTED')
+  assert.equal(refResult.added_chapters, 1)
+  assert.equal(command('git', ['rev-parse', refSource], copy).trim(), refResult.commit)
+  assert.equal(command('git', ['rev-parse', 'HEAD'], copy).trim(),
+    command('git', ['rev-parse', `${fixtureHead}^`], copy).trim())
+  assert.deepEqual(await readFile(resolve(copy, 'archive/content/stories/C03-AFTERFALL/BOOK.json')), beforeRefBook)
+  assert.throws(() => command('node', ['--input-type=module', '-e', refScript], copy))
+  command('git', ['checkout', '--detach', fixtureHead], copy)
   const proposalRef = 'refs/heads/codex/archive-publication-reader-test'
   command('git', ['branch', 'codex/archive-publication-reader-test', fixtureHead], copy)
   const proposalScript = `import { readFileSync } from 'node:fs';
@@ -85,6 +106,7 @@ process.stdout.write(JSON.stringify(result));`
   assert.equal(updated.files_written, 1)
   const bookFile = resolve(copy, 'archive/content/stories/C03-AFTERFALL/BOOK.json')
   const changedBook = await readFile(bookFile, 'utf8')
+  assert.equal(command('git', ['show', `${refResult.commit}:archive/content/stories/C03-AFTERFALL/BOOK.json`], copy), changedBook)
   assert.equal(command('git', ['show', `${proposal.commit}:archive/content/stories/C03-AFTERFALL/BOOK.json`], copy), changedBook)
   const parsed = JSON.parse(changedBook)
   assert.deepEqual(parsed.chapters.slice(0, -1), books.find((b) => b.chronicleId === 'C03-AFTERFALL').chapters)
@@ -104,5 +126,5 @@ process.stdout.write(JSON.stringify(result));`
   await writeFile(resolve(copy, relative, 'PART_001.md'), raw + '\nCORRUPTED\n')
   assert.throws(() => command('node', args, copy))
   assert.equal(await readFile(bookFile, 'utf8'), changedBook)
-  console.log(JSON.stringify({ real_books_unchanged: books.map((b) => ({ chronicle: b.chronicleId, chapters: b.chapters.length })), real_s02_reader_batch: report, historical_batch_after_newer_publication: 'PASS', synthetic_local_git_proposal: 'PASS', synthetic_append: 'PASS', synthetic_repeat_noop: 'PASS', corrupted_source_retains_book: 'PASS' }))
+  console.log(JSON.stringify({ real_books_unchanged: books.map((b) => ({ chronicle: b.chronicleId, chapters: b.chapters.length })), real_s02_reader_batch: report, historical_batch_after_newer_publication: 'PASS', synthetic_ref_pinned_reader_proposal: 'PASS', synthetic_local_git_proposal: 'PASS', synthetic_append: 'PASS', synthetic_repeat_noop: 'PASS', corrupted_source_retains_book: 'PASS' }))
 } finally { await rm(temporary, { recursive: true, force: true }) }
