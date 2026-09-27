@@ -71,6 +71,14 @@ test('private Reader chapter rejected', () => rejects((f) => { f.book.chapters[0
 test('future chapter omitted until its public batch boundary', () => { const f = fixture(); f.book.chapters[0].publicationProvenance = { visibility: 'PUBLIC_ARCHIVE', capturedRange: { end: '2027-03-24 00:00' } }; assert.equal(reconcilePublicGraph(f).graph.story_links.length, 0) })
 test('duplicate chapter ids rejected', () => rejects((f) => f.book.chapters.push(f.book.chapters[0])))
 test('unknown editorial id rejected', () => rejects((f) => { f.book.chapters[0].relatedNodeIds = ['c02-person'] }))
+test('historical opening remains Reader-only even when its prose mentions current graph names', () => {
+  const f = fixture(), ref = 'archive/content/transcripts/C03-AFTERFALL/S01/OPENING_RECOVERY/PART_OPENING_001.md'
+  const opening = { id: 'c03-afterfall-opening-01', title: '균열', sourceKind: 'VERIFIED_GM_NARRATIVE', sourceRefs: [ref], archiveSourceRefs: [ref], relatedNodeIds: [], body: '시험인물은 시험건물에서 만났다.' }
+  f.book.chapters.unshift(opening)
+  assert.deepEqual(reconcilePublicGraph(f).graph.story_links, reconcilePublicGraph(fixture()).graph.story_links)
+  opening.relatedNodeIds = ['char-test']
+  assert.throws(() => reconcilePublicGraph(f), /INVALID_HISTORICAL_OPENING/)
+})
 test('explicit Reader link exists even without a literal mention', () => { const f = fixture(); f.book.chapters[0].body = '다른 문장'; f.book.chapters[0].relatedNodeIds = ['event-test']; const r = reconcilePublicGraph(f); assert.equal(r.graph.story_links[0].node_id, 'event-test'); assert.equal(r.graph.story_links[0].reasons[0].kind, 'EDITORIAL_REFERENCE') })
 test('Korean particles match unique exact names', () => { const r = reconcilePublicGraph(fixture()); assert.equal(r.graph.story_links.length, 2); const link = r.graph.story_links.find((l) => l.node_id === 'char-test'); assert.equal(link.reasons.filter((r) => r.kind === 'EXACT_TEXT_MENTION').length, 2) })
 test('similar substring is not a character match', () => { const f = fixture(); f.book.chapters[0].body = '가짜시험인물과 시험인물복제품'; assert.equal(reconcilePublicGraph(f).graph.story_links.length, 0) })

@@ -85,8 +85,14 @@ describe('Reader Edition V1.1', () => {
     expect(chaptersForChronicle('C03-AFTERFALL').some((chapter) => chapter.body.includes('첫겨울'))).toBe(true)
     expect(readerChapters.every((chapter) => chapter.body.trim().length > 0 && chapter.sourceRefs.length > 0 && chapter.archiveSourceRefs.length > 0)).toBe(true)
   })
-  it('keeps the unrecovered C03 opening explicit without fabricating a replacement', () => {
-    expect(chronicleBooks.find((book) => book.chronicleId === 'C03-AFTERFALL')?.beginningStatus).toBe('MISSING_BEGINNING')
+  it('opens with the recovered hospital scene while retaining all existing chapter routes and the gap', () => {
+    const c03 = chaptersForChronicle('C03-AFTERFALL')
+    expect(c03[0]).toMatchObject({ id: 'c03-afterfall-opening-01', chapterNumber: 0, dateLabel: '2026-09-18 13:42', relatedNodeIds: [] })
+    expect(c03[0].body).toContain('서림대학교병원 응급의료센터')
+    expect(c03[0].body).toContain('“7번 베드 코드블루!”')
+    expect(c03[0].body).not.toMatch(/캐릭터 생성|부모의 채무|연애 중|## 선택|## 다음 행동|자유행동/)
+    expect(c03.slice(1).map((chapter) => chapter.id)).toEqual(Array.from({ length: 24 }, (_, i) => `c03-afterfall-chapter-${String(i + 1).padStart(2, '0')}`))
+    expect(chronicleBooks.find((book) => book.chronicleId === 'C03-AFTERFALL')).toMatchObject({ beginningStatus: 'PARTIAL_BEGINNING_RECOVERED', beginningGap: { after: '2026-09-18 14:12', before: '2026-10-23 20:10' } })
   })
   it('rejects a stale or incomplete generated manifest before it reaches the Reader', () => {
     expect(() => assertReaderManifest({ chronicleId: 'C99', transformVersion: 'old', coverage: { verifiedRawParts: 1, scanned: 1 }, chapters: [] })).toThrow('Unsupported Reader manifest')
