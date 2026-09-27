@@ -1,5 +1,6 @@
 import { chronicleRegistry, type ChronicleId } from './chronicleRegistry'
 import { assertReaderManifest } from './readerManifestContract'
+import publicGraph from '../../../content/graphs/C03-AFTERFALL/GRAPH.json'
 
 export type ReaderSourceKind = 'VERIFIED_GM_NARRATIVE' | 'EDITORIAL_CANON_BRIDGE'
 export type ReaderChapter = {
@@ -23,7 +24,10 @@ export const chronicleBooks: ChronicleBook[] = chronicleRegistry.filter((item) =
 })
 export const readerChapters: ReaderChapter[] = files.flatMap((book) => book.chapters.map((chapter) => ({ ...chapter, chronicleId: book.chronicleId })))
 export const chaptersForChronicle = (chronicleId: ChronicleId) => readerChapters.filter((chapter) => chapter.chronicleId === chronicleId)
-export const chapterForNode = (nodeId: string) => readerChapters.find((chapter) => chapter.relatedNodeIds.includes(nodeId))
+export const chapterForNode = (nodeId: string) => {
+  const linked = publicGraph.story_links.find((link) => link.node_id === nodeId)
+  return readerChapters.find((chapter) => chapter.id === linked?.chapter_id) ?? readerChapters.find((chapter) => chapter.relatedNodeIds.includes(nodeId))
+}
 
 // Raw vault summaries are intentionally separate from Reader Edition prose.
-export const seasonSummaries = { S01: { title: 'Season 1', description: '원문 보관소의 시즌 기록입니다.' }, S02: { title: 'Season 2', description: '원문 보관소의 시즌 기록입니다.' } } as const
+export const seasonSummaries = { S01: { title: 'Season 1', description: '원문 보관소의 시즌 기록입니다.' }, S02: { title: 'Season 2', description: '원문 보관소의 시즌 기록입니다.' }, S03: { title: 'Season 3', description: '현재 공개된 구간만 수록하며 앞선 메시지 0–41은 아직 보존되지 않았습니다.' } } as const
