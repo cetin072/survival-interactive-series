@@ -48,6 +48,8 @@ jobs:
         run: node --test ../scripts/lib/publication-segment.test.mjs
       - name: Test sealed-segment RAW materialization without publication
         run: node --test ../scripts/lib/publication-segment-materialize.test.mjs
+      - name: Test pending segment inventory and replay safety
+        run: node --test ../scripts/lib/pending-segment-inventory.test.mjs
       - name: Test linked capture admission without database access
         run: node --test ../scripts/lib/linked-capture-admission.test.mjs
       - name: Test restricted read-only export session without database access

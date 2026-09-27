@@ -72,3 +72,9 @@ References:
 ## Handoff
 
 Next: Step 4 — automatic public Character / Location / Event / Relationship updates. Step 3 does not change the game's Canon, advance S03, or turn on background work. Image creation/storage and batch scheduling remain steps 5–8, site integration and end-to-end operation remain steps 9–10.
+
+## Later sealed-segment bridge (Draft PR, not activated)
+
+`pending-segment-inventory.mjs` now takes an exact, previously validated RAW candidate from a linked capture, its PART bytes, and a reviewed same-season segment inventory. It proposes the next `SESSION_NNN` and a metadata-only `SOURCE_MANIFEST.json` candidate with `PENDING_PUBLIC_APPROVAL`. Replaying the same segment is a no-op; changed bytes, overlapping source-message orders, an older backfill, duplicate inventory identities and cross-season entries fail closed. Existing non-segment session IDs can be reserved before numbering. It does not write the proposed PART or manifest and carries no public text in its return value.
+
+An OPEN live capture session is represented as `source_session_status: OPEN` with `segment_status: SEALED`; the proposal does **not** fabricate `closed_at`. Consequently the existing `approvedSeasonCatalog` will not read this proposal: it still requires `PUBLIC_ARCHIVE`, a closed approved source manifest and committed PART bytes. A future promotion needs a reviewed standing public-text policy, a trusted approval/provenance decision, exact file commit with collision protection, and an explicit Step 3 contract for sealed segments. This bridge proves none of those activations and cannot publish from a `public_safe` flag alone.
