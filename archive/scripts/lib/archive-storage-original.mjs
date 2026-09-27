@@ -48,6 +48,11 @@ export async function uploadAndVerifyArchiveOriginal({ baseUrl, serviceKey, cata
     observation, approval, candidate, originalBytes })
   const url = `${baseUrl}/storage/v1/object/${BUCKET}/${path}`
   const readback = () => readbackOriginal({ baseUrl, path, headers, originalBytes, fetchImpl })
+  // A restart should reuse an already verified object without another upload
+  // request. A mismatched object fails before any write.
+  if (await readback() !== null) return { status: 'EXISTING_OBJECT_REUSED',
+    bucket: BUCKET, object_path: path, sha256: file.sha256,
+    upload_attempts: 0, storage_verified: true }
   let uploadStatus
   try {
     const response = await fetchImpl(url, { method: 'POST', headers: { ...headers,

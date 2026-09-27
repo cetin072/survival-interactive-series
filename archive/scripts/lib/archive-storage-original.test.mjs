@@ -17,11 +17,15 @@ const candidate = acceptForegroundLocalCandidate(point, observation, originalByt
 const base = { baseUrl: 'https://example.supabase.co', serviceKey: 'synthetic-test-service-key-12345',
   catalog, observation, approval, candidate, originalBytes }
 const response = (status, body = '') => new Response(body, { status })
-function fakeStorage(uploadStatus = 200, stored = originalBytes) {
+function fakeStorage(uploadStatus = 200, initialStored = null) {
   const calls = []
+  let stored = initialStored
   const fetchImpl = async (url, init) => {
     calls.push({ url, method: init.method })
-    if (init.method === 'POST') return response(uploadStatus)
+    if (init.method === 'POST') {
+      if (uploadStatus >= 200 && uploadStatus < 300) stored = originalBytes
+      return response(uploadStatus)
+    }
     return stored === null ? response(404) : response(200, stored)
   }
   return { calls, fetchImpl }
@@ -33,17 +37,18 @@ test('real accepted bytes are bound before one upload and exact private readback
   assert.equal(result.status, 'UPLOADED')
   assert.equal(result.storage_verified, true)
   assert.equal(result.sha256, observation.file.sha256)
-  assert.deepEqual(storage.calls.map((call) => call.method), ['POST', 'GET'])
-  assert.equal(storage.calls[1].url.includes('/object/authenticated/survival-archive-originals/'), true)
+  assert.deepEqual(storage.calls.map((call) => call.method), ['GET', 'POST', 'GET'])
+  assert.equal(storage.calls[2].url.includes('/object/authenticated/survival-archive-originals/'), true)
 })
 test('existing content is reused after registry failure without overwriting or duplicate upload', async () => {
-  const storage = fakeStorage(409)
+  const storage = fakeStorage(409, originalBytes)
   const result = await uploadAndVerifyArchiveOriginal({ ...base, fetchImpl: storage.fetchImpl })
   assert.equal(result.status, 'EXISTING_OBJECT_REUSED')
-  assert.deepEqual(storage.calls.map((call) => call.method), ['POST', 'GET'])
+  assert.equal(result.upload_attempts, 0)
+  assert.deepEqual(storage.calls.map((call) => call.method), ['GET'])
 })
 test('existing object verification sends only GET and rejects changed or absent bytes', async () => {
-  const storage = fakeStorage(200)
+  const storage = fakeStorage(200, originalBytes)
   const result = await verifyExistingArchiveOriginal({ ...base, fetchImpl: storage.fetchImpl })
   assert.equal(result.status, 'EXISTING_OBJECT_REUSED')
   assert.equal(result.upload_attempts, 0)
@@ -59,14 +64,16 @@ test('existing object verification sends only GET and rejects changed or absent 
 })
 test('lost upload response reconciles readback and never sends a second POST', async () => {
   const calls = []
+  let checked = false
   const fetchImpl = async (_url, init) => {
     calls.push(init.method)
     if (init.method === 'POST') throw new Error('simulated timeout')
+    if (!checked) { checked = true; return response(404) }
     return response(200, originalBytes)
   }
   const result = await uploadAndVerifyArchiveOriginal({ ...base, fetchImpl })
   assert.equal(result.status, 'UPLOAD_RESPONSE_LOST_OBJECT_VERIFIED')
-  assert.deepEqual(calls, ['POST', 'GET'])
+  assert.deepEqual(calls, ['GET', 'POST', 'GET'])
   const absent = fakeStorage(200, null)
   const unknown = await uploadAndVerifyArchiveOriginal({ ...base, fetchImpl: async (url, init) => {
     if (init.method === 'POST') throw new Error('simulated timeout')
