@@ -5,8 +5,8 @@ Chronicle: **03 / AFTERFALL / 서진우**
 Supersedes: `PLAY_SESSION_PROTOCOL_V2.md` for live transcript capture  
 Database API:
 - `survival_rpg.open_public_transcript_session`
-- `survival_rpg.append_public_transcript_turn`
-- `survival_rpg.append_public_transcript_turn_with_state_link` — state-linked live turn API
+- `survival_rpg.append_public_transcript_turn_with_state_link` — required state-linked LIVE turn API
+- `survival_rpg.append_public_transcript_turn` — explicit unlinked fallback only with `source_type='RECOVERY'`
 - `survival_rpg.append_public_transcript_message` — recovery/meta primitive only
 - `survival_rpg.close_public_transcript_session`
 
@@ -137,11 +137,16 @@ Immediately before emitting the response:
    versions and the explicit `APPLIED` or `NO_STATE_CHANGE` outcome. This API
    locks and checks the current save head, then commits the exact pair and its
    state-version link in one transaction. It does not mutate the save itself.
-   The older `append_public_transcript_turn(...)` remains a RAW-preservation
-   fallback only after a technical linked-call failure; that pair must be
-   reported as unlinked and quarantined from publication. Missing or stale
-   authoritative save state is a runtime reconciliation failure, not permission
-   to silently select the legacy API for normal play.
+   The older `append_public_transcript_turn(...)` is not a valid `LIVE` writer for
+   AFTERFALL. It may be used only after a technical linked-call failure, with the
+   exact same public pair and `source_type='RECOVERY'`. That pair must be reported
+   as state-unlinked and quarantined from state-derived publication. Missing or
+   stale authoritative save state is a runtime reconciliation failure, not
+   permission to silently select the legacy API for normal play.
+9. the database has a deferred guard for AFTERFALL/C03 `LIVE` USER/GM rows: a
+   transaction cannot commit unless those new rows belong to a state-link. This
+   makes accidental legacy `LIVE` capture fail closed instead of silently
+   creating another unlinked normal turn.
 
 The database commits:
 
@@ -192,20 +197,20 @@ meta procedure at a safe boundary rather than corrupting pair ordering.
 
 ## 8. Retry and ambiguous acknowledgement
 
-If `append_public_transcript_turn` errors:
+If `append_public_transcript_turn_with_state_link(...)` errors:
 
-1. retry the same API with the exact same USER text, GM text, message order,
+1. retry the linked API with the exact same USER text, GM text, message order,
    hashes, outcome, versions and both idempotency UUIDs;
 2. after ambiguous network acknowledgement, inspect the session tail before
    generating new keys;
 3. never renumber acknowledged rows.
 
-After two failed attempts:
-- do not claim RAW capture succeeded;
-- preserve the current ChatGPT room as the recovery source;
-- emit one short operational warning;
-- gameplay may continue, but the next Archive reconciliation must mark the
-  capture gap.
+After two failed linked attempts, preserve the exact public pair with the legacy
+pair writer only as `source_type='RECOVERY'`. Never send a legacy AFTERFALL pair
+as `LIVE`. Report the pair as state-unlinked, emit one short operational warning,
+and let Archive reconciliation keep it outside state-derived publication. If the
+RECOVERY fallback also fails, preserve the ChatGPT room as the recovery source
+and do not claim RAW capture succeeded.
 
 ## 9. Session close
 
