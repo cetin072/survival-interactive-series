@@ -51,6 +51,13 @@ export async function approvedSeasonCatalog(manifest, seasonId, { read, listPart
         && source.source_session_uuid === session.source_session_uuid
         && source.segment_id === session.segment_id
         && source.candidate_id === session.candidate_id
+        && (!Object.hasOwn(session, 'segment_status') || session.segment_status === source.segment_status)
+        && (!Object.hasOwn(session, 'publication_allowed')
+          || session.publication_allowed === source.publication_allowed)
+        && (!Object.hasOwn(session, 'approval_provenance_ref')
+          || session.approval_provenance_ref === source.approval_provenance_ref)
+        && (!Object.hasOwn(session, 'source_session_status')
+          || session.source_session_status === source.source_session_status)
         && Number.isSafeInteger(order?.start) && order.start >= 0 && order.start % 2 === 0
         && Number.isSafeInteger(order?.end) && order.end >= order.start && order.end % 2 === 1
         && order.start === session.source_message_order?.start

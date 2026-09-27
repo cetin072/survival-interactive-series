@@ -70,6 +70,10 @@ test('pending or inconsistent sealed segment remains outside Reader', async () =
     (f) => { f.source.source_message_order.start = 2; f.source.source_message_order.end = 3;
       f.session.source_message_order = { start: 2, end: 3 } },
     (f) => { f.source.closed_at = '2099-01-01' },
+    (f) => { f.session.segment_status = 'PENDING' },
+    (f) => { f.session.publication_allowed = false },
+    (f) => { f.session.approval_provenance_ref = 'OTHER' },
+    (f) => { f.session.source_session_status = 'CLOSED' },
     (f) => { f.source.parts.push('PART_002.md') },
     (f) => { delete f.session.segment_id },
   ]) {
