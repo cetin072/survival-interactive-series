@@ -7,6 +7,7 @@ begin
     raise exception 'ARCHIVE_RUNNER_ROLE_NAME_COLLISION';
   end if;
   create role archive_runner_internal nologin noinherit nobypassrls;
+  grant archive_runner_internal to postgres;
 end;
 $$;
 
@@ -779,6 +780,7 @@ alter function survival_rpg.finish_archive_publication_daily_run(date,bigint,uui
 alter function survival_rpg.claim_archive_publication_task(text,integer) owner to archive_runner_internal;
 alter function survival_rpg.renew_archive_publication_task_lease(text,bigint,uuid,integer) owner to archive_runner_internal;
 alter function survival_rpg.finish_archive_publication_task(text,bigint,uuid,text,jsonb,text,integer) owner to archive_runner_internal;
+revoke archive_runner_internal from postgres;
 
 revoke all on function survival_rpg.archive_publication_receipt_is_valid(jsonb) from public, anon, authenticated, service_role;
 revoke all on function survival_rpg.enqueue_archive_publication_task(text,text,text,text,text,text,text,text) from public, anon, authenticated;
