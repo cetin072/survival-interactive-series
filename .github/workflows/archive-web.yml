@@ -6,6 +6,7 @@ on:
       - 'archive/web/**'
       - 'archive/content/**'
       - 'archive/scripts/**'
+      - 'archive/exporter/**'
       - '.github/workflows/archive-web.yml'
   push:
     branches:
@@ -14,6 +15,7 @@ on:
       - 'archive/web/**'
       - 'archive/content/**'
       - 'archive/scripts/**'
+      - 'archive/exporter/**'
       - '.github/workflows/archive-web.yml'
 
 jobs:
@@ -31,6 +33,15 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: archive/web/package-lock.json
+      - name: Setup pinned pnpm for private exporter package
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.19.0
+      - name: Verify locked exporter dependency without executing a database read
+        working-directory: archive/exporter
+        run: |
+          pnpm install --frozen-lockfile --ignore-scripts
+          node --input-type=module -e 'import("pg").then(m => { if (typeof m.default.Client !== "function") process.exit(1) })'
       - name: Test offline publication planning
         run: node --test ../scripts/lib/publication-plan.test.mjs
       - name: Test immutable open-session publication segments
@@ -39,6 +50,8 @@ jobs:
         run: node --test ../scripts/lib/publication-segment-materialize.test.mjs
       - name: Test linked capture admission without database access
         run: node --test ../scripts/lib/linked-capture-admission.test.mjs
+      - name: Test restricted read-only export session without database access
+        run: node --test ../scripts/lib/linked-export-runner.test.mjs
       - name: Verify deterministic S02 dry-run (no external services)
         run: |
           node ../scripts/dry-run-publication.mjs --demo-s02 --source-revision "$GITHUB_SHA" > "$RUNNER_TEMP/publication-first.json"
