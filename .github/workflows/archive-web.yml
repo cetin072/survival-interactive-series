@@ -7,6 +7,7 @@ on:
       - 'archive/content/**'
       - 'archive/experiments/**'
       - 'archive/scripts/**'
+      - 'supabase/migrations/**'
       - '.github/workflows/archive-web.yml'
   push:
     branches:
@@ -16,6 +17,7 @@ on:
       - 'archive/content/**'
       - 'archive/experiments/**'
       - 'archive/scripts/**'
+      - 'supabase/migrations/**'
       - '.github/workflows/archive-web.yml'
 
 jobs:
@@ -33,6 +35,12 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: archive/web/package-lock.json
+      - name: Setup pinned image transformer
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned image transformer
+        run: python -m pip install --disable-pip-version-check -r ../scripts/requirements-image.txt
       - name: Test offline publication planning
         run: node --test ../scripts/lib/publication-plan.test.mjs
       - name: Verify deterministic S02 dry-run (no external services)
@@ -53,6 +61,20 @@ jobs:
         run: node --test ../scripts/lib/visual-compiler.test.mjs
       - name: Verify public appearance-to-brief and isolated visual catalog integration
         run: node --experimental-strip-types ../scripts/check-visual-batch.mjs
+      - name: Verify pinned public visual catalog consumed by website
+        run: node ../scripts/check-site-visual-catalog.mjs
+      - name: Test same-origin site asset manifest and file gate
+        run: node --test ../scripts/lib/site-asset-contract.test.mjs
+      - name: Test foreground original, storage readback and registry site handoff
+        run: node --test ../scripts/lib/site-foreground-handoff.test.mjs
+      - name: Test idempotent private original upload and uncertain response recovery
+        run: node --test ../scripts/lib/archive-storage-original.test.mjs
+      - name: Test private visual registry binding and retry plan
+        run: node --test ../scripts/lib/archive-visual-registry.test.mjs
+      - name: Verify real candidate private ingest plan without external calls
+        run: node ../scripts/run-foreground-ingest.mjs --check
+      - name: Verify real accepted original produces exact private site derivative
+        run: python ../scripts/derive-site-original.py ../experiments/step6/char-jinwoo-20260927-foreground.png ../experiments/step8/char-jinwoo-20260927-site-512.png --check
       - name: Test local image POC request and quarantine receipts
         run: node --test ../scripts/lib/image-poc-exchange.test.mjs
       - name: Test reviewed local image handoff and disabled ingest plan
