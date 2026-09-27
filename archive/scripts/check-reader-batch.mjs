@@ -180,6 +180,20 @@ process.stdout.write(JSON.stringify(result));`
   assert.deepEqual(repeated.stages_advanced, [])
   assert.deepEqual(repeated.requests, resumed.requests)
   assert.equal(repeated.source_revision, resumed.source_revision)
+  // Advancing the ref with an unrelated allowed transcript path leaves the
+  // already-verified visual brief and its request identities unchanged.
+  command('git', ['checkout', '--detach', visualResult.commit], copy)
+  await writeFile(resolve(checkoutOnlySeason, 'NOTE.md'), 'SYNTHETIC_UNRELATED_REF_PATH\n')
+  command('git', ['add', 'archive/content/transcripts/C03-AFTERFALL/S98/NOTE.md'], copy)
+  command('git', ['-c', 'user.name=Reader test', '-c', 'user.email=reader-test@example.invalid',
+    'commit', '--no-verify', '-qm', 'Unrelated local ref path; synthetic test only'], copy)
+  const laterCommit = command('git', ['rev-parse', 'HEAD'], copy).trim()
+  command('git', ['update-ref', refSource, laterCommit, visualResult.commit], copy)
+  command('git', ['checkout', '--detach', `${fixtureHead}^`], copy)
+  const laterRequests = JSON.parse(command('node', imageRequestArgs, copy))
+  assert.notEqual(laterRequests.source_revision, requestPlan.source_revision)
+  assert.equal(laterRequests.request_source_revision, visualResult.commit)
+  assert.deepEqual(laterRequests.requests, requestPlan.requests)
   await rm(checkoutOnlySeason, { recursive: true })
   command('git', ['checkout', '--detach', fixtureHead], copy)
   const proposalRef = 'refs/heads/codex/archive-publication-reader-test'
