@@ -28,6 +28,12 @@ test('restricted runner waits on linked source, then records one NOOP and replay
     assert.deepEqual(state.rows, [{ status: 'NOOP', attempt_count: 1,
       receipt: { reason_code: 'NO_LINKED_RANGES', result: 'NOOP' } }])
     const eventCount = (await admin.query('select count(*)::integer as n from survival_rpg.archive_publication_daily_run_events where scheduled_date=$1', [date])).rows[0].n
+    const interruptedDate = '2026-01-02'
+    const stale = (await runner.query(
+      'select * from survival_rpg.claim_archive_publication_daily_run($1::date,$2::text,$3::integer)',
+      [interruptedDate, 'ci-abandoned-worker', 30])).rows[0]
+    assert.equal(stale.out_claimed, true)
+    await admin.query('update survival_rpg.archive_publication_daily_runs set lease_expires_at=clock_timestamp()-interval \'1 second\' where scheduled_date=$1', [interruptedDate])
     await runner.end() // A new process/session must observe the same terminal record.
     const restarted = new pg.Client({ connectionString: runnerUrl })
     await restarted.connect()
@@ -36,6 +42,19 @@ test('restricted runner waits on linked source, then records one NOOP and replay
       assert.equal(replay.status, 'NOOP')
       assert.equal(replay.claimed, false)
       assert.equal((await admin.query('select count(*)::integer as n from survival_rpg.archive_publication_daily_run_events where scheduled_date=$1', [date])).rows[0].n, eventCount)
+      const recovered = await runDailyNoop({ exporter, runner: restarted,
+        scheduledDate: interruptedDate })
+      assert.equal(recovered.status, 'NOOP')
+      const recoveredState = (await admin.query('select status, attempt_count, claim_version from survival_rpg.archive_publication_daily_runs where scheduled_date=$1', [interruptedDate])).rows[0]
+      assert.equal(recoveredState.status, 'NOOP')
+      assert.equal(recoveredState.attempt_count, 2)
+      assert.equal(Number(recoveredState.claim_version), Number(stale.out_claim_version) + 1)
+      const beforeStale = (await admin.query('select count(*)::integer as n from survival_rpg.archive_publication_daily_run_events where scheduled_date=$1', [interruptedDate])).rows[0].n
+      await assert.rejects(restarted.query(
+        'select survival_rpg.finish_archive_publication_daily_run($1::date,$2::bigint,$3::uuid,$4::text,$5::jsonb,$6::text,$7::integer)',
+        [interruptedDate, stale.out_claim_version, stale.out_lease_token,
+          'NOOP', '{}', null, null]), /RUN_LEASE_NOT_OWNED/)
+      assert.equal((await admin.query('select count(*)::integer as n from survival_rpg.archive_publication_daily_run_events where scheduled_date=$1', [interruptedDate])).rows[0].n, beforeStale)
     } finally { await restarted.end() }
   } finally {
     await Promise.allSettled([exporter.end(), runner.end(), admin.end()])
