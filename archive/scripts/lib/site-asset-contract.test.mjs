@@ -66,6 +66,13 @@ test('verified assets survive unchanged public briefs and stale bindings are omi
   assert.equal(changed.release_blocked_until_stale_files_removed, true)
   assert.equal(changed.manifest.visual_catalog_sha256, newer.content_sha256)
   assert.equal((await validateSiteAssets(changed.manifest, newer, root)).site_assets, 0)
+  const revisedPoint = structuredClone(point)
+  revisedPoint.brief.canon_facts.appearance.hair = '새로 승인된 공개 머리'
+  revisedPoint.generation_key = `generation-${visualDigest(revisedPoint.brief)}`
+  const revised = seal({ ...body, points: body.points.map((item) => item.point_id === point.point_id ? revisedPoint : item) })
+  const changedBrief = await reconcileSiteAssets(prior, catalog, revised, root)
+  assert.equal(changedBrief.omitted_stale, 1)
+  assert.deepEqual(changedBrief.omitted_public_paths, [asset.public_path])
 }))
 test('reconciliation rejects unverified old assets and regressed catalogs', async () => fixture(async ({ root, asset }) => {
   const prior = manifest([asset])
