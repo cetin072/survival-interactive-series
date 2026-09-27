@@ -44,6 +44,7 @@ export async function prepareGraphRelinkFromPublicRef(options = {}) {
   }
   const result = relinkPublicGraph({ batch: createBatch(snapshot), previous,
     book, bookSource })
+  demand(result.report.status !== 'NOOP', 'GRAPH_REF_ALREADY_CURRENT')
   const candidateBytes = Buffer.from(graphBytes(result.graph))
   demand(candidateBytes.length <= 2_500_000, 'PUBLIC_GRAPH_TOO_LARGE')
   return { ref, baseCommit: base, seasonId, candidateBytes,
