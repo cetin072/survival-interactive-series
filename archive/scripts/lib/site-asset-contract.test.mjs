@@ -25,6 +25,9 @@ async function fixture(fn) {
     await writeFile(join(root, 'visual-assets', `${sha256}.png`), bytes)
     const asset = { point_id: point.point_id, generation_key: point.generation_key, subject_id: point.subject_id,
       accepted_candidate_id: `candidate-${'a'.repeat(64)}`, source_sha256: 'b'.repeat(64),
+      storage_bucket: 'survival-archive-originals',
+      storage_object_path: `AFTERFALL/candidate-${'a'.repeat(64)}/${'b'.repeat(64)}.png`,
+      registry_asset_id: 'AF-CHAR-TEST', derivative_version: 'site-png-512-v1',
       public_path: `/visual-assets/${sha256}.png`, sha256, bytes: bytes.length, width: 1, height: 1, mime_type: 'image/png' }
     await fn({ root, asset, bytes })
   } finally { await rm(root, { recursive: true, force: true }) }

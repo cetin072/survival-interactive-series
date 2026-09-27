@@ -24,12 +24,17 @@ export async function validateSiteAssets(manifest, catalog, publicRoot) {
   const seen = new Set()
   for (const asset of manifest.assets) {
     exact(asset, ['point_id', 'generation_key', 'subject_id', 'accepted_candidate_id', 'source_sha256',
+      'storage_bucket', 'storage_object_path', 'registry_asset_id', 'derivative_version',
       'public_path', 'sha256', 'bytes', 'width', 'height', 'mime_type'])
     const point = points.get(asset.point_id)
     demand(point?.status === 'READY' && point.point_type !== 'MAP' && point.generation_key === asset.generation_key
       && point.subject_id === asset.subject_id && !seen.has(asset.point_id), 'SITE_ASSET_POINT_MISMATCH')
     seen.add(asset.point_id)
     demand(hex(asset.accepted_candidate_id, 'candidate-') && hex(asset.source_sha256)
+      && asset.storage_bucket === 'survival-archive-originals'
+      && asset.storage_object_path === `AFTERFALL/${asset.accepted_candidate_id}/${asset.source_sha256}.png`
+      && typeof asset.registry_asset_id === 'string' && /^AF-[A-Z0-9-]{4,80}$/.test(asset.registry_asset_id)
+      && asset.derivative_version === 'site-png-512-v1'
       && hex(asset.sha256) && asset.public_path === `/visual-assets/${asset.sha256}.png`
       && asset.mime_type === 'image/png' && Number.isSafeInteger(asset.bytes) && asset.bytes > 0
       && asset.bytes <= 200_000 && Number.isSafeInteger(asset.width) && asset.width > 0
