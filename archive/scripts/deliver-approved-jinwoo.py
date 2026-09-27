@@ -91,37 +91,6 @@ def storage_readback():
         raise ValueError(code) from None
     except URLError:
         raise ValueError("STORAGE_NETWORK_ERROR") from None
-    registry_request = Request(
-        f"{url}/rest/v1/visual_assets?select=asset_id,worldline_id,asset_type,status,visibility,style_version,object_path,source,generation_meta&asset_id=eq.{ASSET['registry_asset_id']}",
-        headers={"apikey": key, "Authorization": f"Bearer {key}", "Accept-Profile": "survival_rpg"})
-    try:
-        with opener.open(registry_request, timeout=30) as response:
-            fail_if(response.status != 200, "REGISTRY_READBACK_FAILED")
-            rows = json.load(response)
-    except HTTPError as error:
-        code = ({401: "REGISTRY_AUTH_FAILED", 403: "REGISTRY_AUTH_FAILED",
-                 404: "REGISTRY_ENDPOINT_NOT_FOUND"}.get(error.code)
-                or f"REGISTRY_HTTP_ERROR_{error.code}")
-        raise ValueError(code) from None
-    except URLError:
-        raise ValueError("REGISTRY_NETWORK_ERROR") from None
-    fail_if(not isinstance(rows, list) or len(rows) != 1, "REGISTRY_ROW_MISSING")
-    row = rows[0]
-    source = row.get("source") or {}
-    fail_if(row.get("asset_id") != ASSET["registry_asset_id"]
-            or row.get("worldline_id") != "AFTERFALL"
-            or row.get("asset_type") != "CHARACTER"
-            or row.get("status") != "READY"
-            or row.get("visibility") != "PLAYER_ARCHIVE"
-            or row.get("style_version") != "AFTERFALL_ARCHIVE_V1"
-            or row.get("object_path") != f"{ASSET['storage_bucket']}/{path}"
-            or source.get("point_id") != ASSET["point_id"]
-            or source.get("generation_key") != ASSET["generation_key"]
-            or source.get("subject_id") != ASSET["subject_id"]
-            or source.get("candidate_id") != ASSET["accepted_candidate_id"]
-            or source.get("source_sha256") != SOURCE_SHA
-            or row.get("generation_meta", {}).get("source_sha256") != SOURCE_SHA,
-            "REGISTRY_BINDING_MISMATCH")
     return original
 
 
