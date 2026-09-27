@@ -256,7 +256,8 @@ def audit_content_retry(page, base: str, width: int):
     retry_page.goto(query_url(base, view='story', chronicle='C01-HAN-JUNHO'))
     expect(retry_page.locator('.reader-body [role="alert"]')).to_be_visible()
     tap(retry_page.locator('.reader-body [role="alert"] button'), width < 700)
-    retry_page.wait_for_function("document.querySelector('.reader-body')?.innerText.length > 30")
+    expect(retry_page.locator('.reader-body [role="alert"]')).to_have_count(0)
+    assert len(retry_page.locator('.reader-body').inner_text().strip()) > 30
     assert failures['book'] == 2, f'Book retry did not issue a second request: {failures}'
     retry_page.unroute(re.compile(r'/assets/BOOK-[^/]+\.json(?:\?.*)?$'))
 
