@@ -1,5 +1,6 @@
 /** Isolated real public S02 proposal and replay; never changes the calling checkout. */
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -41,6 +42,13 @@ try {
   assert.equal(first.checkout_files_written + first.remote_pushes
     + first.site_publications, 0)
   assert.equal(git(copy, 'rev-parse', ref).toString().trim(), first.commit)
+  const hash = (bytes) => createHash('sha256').update(bytes).digest('hex')
+  for (const [path, expected] of [
+    ['archive/content/stories/C03-AFTERFALL/BOOK.json', first.reader_sha256],
+    ['archive/content/graphs/C03-AFTERFALL/GRAPH.json', first.graph_sha256],
+    ['archive/content/visuals/C03-AFTERFALL/VISUALS.json', first.visual_sha256],
+  ]) assert.equal(hash(git(copy, 'show', `${first.commit}:${path}`)), expected)
+  assert.equal(git(copy, 'rev-parse', `${first.commit}^`).toString().trim(), head)
   const second = await proposeUnifiedPublication({ ...common, ref,
     authorizeCommit: async () => { throw new Error('REPLAY_MUST_NOT_AUTHORIZE') } })
   assert.equal(second.status, 'EXISTING_UNIFIED_PROPOSAL_REUSED')
