@@ -6,6 +6,7 @@ is isolated test data. Install playwright==1.55.0 and its Chromium browser first
 from __future__ import annotations
 import argparse
 import functools
+import hashlib
 import http.server
 import json
 import os
@@ -42,6 +43,7 @@ def asset_names(html: str) -> set[str]:
 def wait_for_deploy(url: str):
     expected = asset_names((DIST / 'index.html').read_text(encoding='utf-8'))
     assert expected, 'No local production JS/CSS asset fingerprints'
+    expected_manifest = json.loads((DIST / 'archive-release-manifest.json').read_text(encoding='utf-8'))
     deadline = time.monotonic() + 240
     last = ''
     while time.monotonic() < deadline:
@@ -51,7 +53,16 @@ def wait_for_deploy(url: str):
                 for asset in actual:
                     with urllib.request.urlopen(url.rstrip('/') + asset, timeout=20) as response:
                         assert response.status == 200
+                with urllib.request.urlopen(url.rstrip('/') + '/archive-release-manifest.json', timeout=20) as response:
+                    deployed_manifest = json.loads(response.read().decode('utf-8'))
+                assert deployed_manifest == expected_manifest, 'Deployed content release manifest differs from the tested build'
+                for entry in expected_manifest['assets']:
+                    with urllib.request.urlopen(url.rstrip('/') + '/' + entry['path'], timeout=20) as response:
+                        content = response.read()
+                    assert len(content) == entry['byte_length'], f"Deployed asset size mismatch: {entry['path']}"
+                    assert hashlib.sha256(content).hexdigest() == entry['sha256'], f"Deployed asset hash mismatch: {entry['path']}"
                 report('deployed JS/CSS matches tested build', url=url, assets=sorted(actual))
+                report('deployed BOOK/graph/character assets match release hashes', url=url, manifest=expected_manifest)
                 return
             last = f'assets still differ: {sorted(actual)}'
         except Exception as error:
@@ -347,3 +358,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
