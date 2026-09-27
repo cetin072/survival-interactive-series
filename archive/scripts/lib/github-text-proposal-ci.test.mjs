@@ -45,3 +45,21 @@ test('rejects a run for a moved proposal without exposing token', async () => {
     return true
   })
 })
+
+test('waits for GitHub 204 dispatch to expose the exact run before returning', async () => {
+  let dispatched = false
+  const fetchImpl = async (url) => {
+    if (url.endsWith('/dispatches')) {
+      dispatched = true
+      return { ok: true, status: 204 }
+    }
+    assert.match(url, /\/actions\/workflows\/archive-web\.yml\/runs\?/)
+    return response({ workflow_runs: dispatched ? [row()] : [] })
+  }
+  assert.deepEqual(await dispatchOrReuseTextProposalCi({ remoteRef,
+    commit, token, fetchImpl }), {
+    ciRunId: 51,
+    ciUrl: 'https://github.com/cetin072/survival-interactive-series/actions/runs/51',
+    reused: false,
+  })
+})
