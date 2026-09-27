@@ -49,7 +49,9 @@ jobs:
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927054730_archive_publication_ledger_v1.sql
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927055745_archive_publication_ledger_owner_membership_cleanup_v1.sql
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927064252_archive_publication_lease_guard_v1.sql
-          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927064434_archive_publication_lease_guard_corrective_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --command "CREATE ROLE supabase_admin SUPERUSER NOLOGIN; SET ROLE supabase_admin; GRANT archive_runner_internal TO postgres WITH ADMIN TRUE, SET FALSE, INHERIT FALSE; RESET ROLE;"
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927071329_archive_publication_lease_guard_corrective_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927071423_archive_publication_owner_grant_cleanup_v1.sql
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_publication_ledger_v1_verification.sql
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_publication_lease_guard_v1_verification.sql
       - name: Setup Node
