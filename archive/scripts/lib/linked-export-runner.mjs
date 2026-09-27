@@ -28,6 +28,8 @@ export async function readLinkedRange(client, { sessionId, startOrder, endOrder 
       session_user::text as session_role,
       current_setting('transaction_read_only')::text as read_only,
       r.rolsuper, r.rolbypassrls, r.rolcreaterole, r.rolcreatedb, r.rolreplication,
+      r.rolinherit,
+      exists (select 1 from pg_auth_members as am where am.member = r.oid) as has_role_membership,
       pg_has_role(current_user, 'service_role', 'member') as service_member,
       pg_has_role(current_user, 'postgres', 'member') as postgres_member,
       has_table_privilege(current_user, 'survival_rpg.transcript_messages', 'INSERT') as can_insert,
@@ -46,7 +48,8 @@ export async function readLinkedRange(client, { sessionId, startOrder, endOrder 
       && role.session_role === 'archive_exporter' && role.read_only === 'on'
       && role.rolsuper === false && role.rolbypassrls === false
       && role.rolcreaterole === false && role.rolcreatedb === false
-      && role.rolreplication === false
+      && role.rolreplication === false && role.rolinherit === false
+      && role.has_role_membership === false
       && role.service_member === false && role.postgres_member === false
       && role.can_insert === false && role.can_update === false && role.can_delete === false
       && role.can_insert_session === false && role.can_update_session === false

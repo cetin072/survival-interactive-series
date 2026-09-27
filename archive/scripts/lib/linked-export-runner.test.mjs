@@ -24,7 +24,8 @@ function exportFixture() {
 }
 const role = () => ({ role_name: 'archive_exporter', session_role: 'archive_exporter',
   read_only: 'on', rolsuper: false, rolbypassrls: false, rolcreaterole: false,
-  rolcreatedb: false, rolreplication: false, service_member: false,
+  rolcreatedb: false, rolreplication: false, rolinherit: false,
+  has_role_membership: false, service_member: false,
   postgres_member: false, can_insert: false, can_update: false,
   can_delete: false, can_insert_session: false, can_update_session: false,
   can_delete_session: false, can_insert_link: false, can_update_link: false,
@@ -64,7 +65,7 @@ test('broad role, writable transaction and unlinked payload roll back without ex
   assert.deepEqual(invalid.calls, [])
   for (const changed of [{ role_name: 'service_role' }, { read_only: 'off' },
     { can_insert: true }, { can_update_save: true }, { service_member: true },
-    { rolbypassrls: true }]) {
+    { rolbypassrls: true }, { rolinherit: true }, { has_role_membership: true }]) {
     const client = new FakeClient({}, { ...role(), ...changed })
     await assert.rejects(readLinkedRange(client, { sessionId, startOrder: 0, endOrder: 1 }),
       /RESTRICTED_EXPORT_ROLE_REQUIRED/)
