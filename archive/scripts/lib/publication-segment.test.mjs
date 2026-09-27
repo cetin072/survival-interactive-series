@@ -76,6 +76,23 @@ test('incomplete state linkage, private rows and raw content are rejected', () =
   assert.throws(() => sealPublicationSegment(raw), /INVALID_SEGMENT_MESSAGE/)
 })
 
+
+test('rejects save-version rollback across adjacent turns for APPLIED and NO_STATE_CHANGE', () => {
+  for (const [outcome, userVersion, gmVersion] of [
+    ['APPLIED', 200, 255],
+    ['NO_STATE_CHANGE', 200, 200],
+  ]) {
+    const input = snapshot()
+    input.snapshot_end_order = 3
+    input.session_observed_last_order = 5
+    input.messages.push(message(2, 'USER', 1, userVersion), message(3, 'GM', 1, gmVersion))
+    input.turn_outcomes[0] = { turn_no: 1, outcome: 'APPLIED', user_save_version: 253, gm_save_version: 254 }
+    input.messages[1].save_version = 254
+    input.turn_outcomes.push({ turn_no: 2, outcome, user_save_version: userVersion, gm_save_version: gmVersion })
+    assert.throws(() => sealPublicationSegment(input), /CROSS_TURN_SAVE_VERSION_ROLLBACK/)
+  }
+})
+
 test('public provenance references do not grant public publication', () => {
   const input = snapshot()
   input.approval_provenance_ref = 'SUPABASE:approved-release:token-redacted'
