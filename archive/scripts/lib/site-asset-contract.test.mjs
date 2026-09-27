@@ -5,7 +5,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { deflateSync } from 'node:zlib'
-import { visualDigest } from './visual-compiler.mjs'
+import { validateVisualCatalog, visualDigest } from './visual-compiler.mjs'
 import { validateSiteAssets, validateSiteAssetInventory, reconcileSiteAssets } from './site-asset-contract.mjs'
 
 // Generated test bytes only; no model image, real acceptance or publication.
@@ -88,3 +88,17 @@ test('build inventory refuses static PNGs omitted from the validated manifest', 
   assert.equal((await validateSiteAssetInventory(manifest([asset]), catalog, root)).site_assets, 1)
   await assert.rejects(validateSiteAssetInventory(manifest([]), catalog, root), /UNREFERENCED_PUBLIC_VISUAL_ASSET/)
 }))
+test('a growing public catalog remains valid without fixed point or save counts', async () => {
+  const { content_sha256: ignored, ...body } = catalog
+  const additional = structuredClone(point)
+  additional.point_id = `point-${'e'.repeat(64)}`
+  additional.subject_id = 'char-new-survivor'
+  additional.brief.subject.node_id = additional.subject_id
+  additional.generation_key = `generation-${visualDigest(additional.brief)}`
+  const grown = seal({ ...body, anchor: { ...body.anchor, save_version: body.anchor.save_version + 1 },
+    points: [...body.points, additional] })
+  validateVisualCatalog(grown)
+  const { content_sha256: unused, ...emptyBody } = manifest([])
+  const rebound = seal({ ...emptyBody, visual_catalog_sha256: grown.content_sha256 })
+  assert.equal((await validateSiteAssets(rebound, grown, join(tmpdir(), 'unused-public-root'))).site_assets, 0)
+})
