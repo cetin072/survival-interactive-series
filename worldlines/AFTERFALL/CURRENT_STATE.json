@@ -48,14 +48,15 @@
     "mode": "CHATGPT_TOOL_ENFORCED_ATOMIC_TURN_PAIR",
     "storage": "survival_rpg.transcript_sessions + survival_rpg.transcript_messages",
     "open_function": "survival_rpg.open_public_transcript_session",
-    "append_function": "survival_rpg.append_public_transcript_turn",
+    "append_function": "survival_rpg.append_public_transcript_turn_with_state_link",
+    "raw_fallback_function": "survival_rpg.append_public_transcript_turn",
     "close_function": "survival_rpg.close_public_transcript_session",
     "policy": "Capture exact PLAYER_SAFE USER/GM public messages during actual AFTERFALL play; exclude system/developer/tools/private reasoning/GM-only future material.",
     "product_boundary": "Requires a trusted Supabase tool/connector call from the GM runtime; do not claim automatic capture if that tool path is unavailable.",
     "low_level_append_function": "survival_rpg.append_public_transcript_message",
     "protocol_version": 3,
     "first_live_trial": "INCOMPLETE: v2 stored one GM row and zero USER rows; session closed without reconstruction.",
-    "next_validation": "Start a fresh capture session and verify at least two exact USER→GM pairs with contiguous orders 0..3."
+    "next_validation": "S03 LIVE RAW exists without save versions or state links. Reconcile the authoritative S03 runtime save from observed play before the next normal turn, then verify one new exact USER→GM pair and its linked state row. Do not retro-link existing RAW."
   },
   "long_range_direction": "worldlines/AFTERFALL/APOCALYPSE_LONG_RANGE_DIRECTION_V1.md",
   "live_turn_fast_path": "worldlines/AFTERFALL/LIVE_TURN_FAST_PATH_V1.md",

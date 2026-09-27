@@ -18,11 +18,16 @@ REQUIRED_MARKERS = {
         "exact USER text",
         "USER = p_user_message_order",
         "stable USER idempotency UUID",
+        "Missing or stale",
     ),
     "worldlines/AFTERFALL/BOOT.md": (
         "LIVE_TURN_FAST_PATH_V1.md",
         "check_runtime_consistency",
         "append_public_transcript_turn_with_state_link(...)",
+    ),
+    "worldlines/AFTERFALL/CURRENT_STATE.json": (
+        '"append_function": "survival_rpg.append_public_transcript_turn_with_state_link"',
+        '"raw_fallback_function": "survival_rpg.append_public_transcript_turn"',
     ),
     "worldlines/AFTERFALL/NEXT_CHAT_PROMPT.md": (
         "`append_public_transcript_turn_with_state_link`",
