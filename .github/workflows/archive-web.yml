@@ -5,28 +5,103 @@ on:
     paths:
       - 'archive/web/**'
       - 'archive/content/**'
+      - 'archive/experiments/**'
       - 'archive/scripts/**'
       - 'archive/exporter/**'
       - '.github/workflows/archive-web.yml'
+      - '.github/workflows/archive-linked-batch-check.yml'
+      - 'supabase/migrations/**'
+      - 'supabase/tests/**'
   push:
     branches:
       - main
     paths:
       - 'archive/web/**'
       - 'archive/content/**'
+      - 'archive/experiments/**'
       - 'archive/scripts/**'
       - 'archive/exporter/**'
       - '.github/workflows/archive-web.yml'
+      - '.github/workflows/archive-linked-batch-check.yml'
+      - 'supabase/migrations/**'
+      - 'supabase/tests/**'
+  workflow_dispatch:
+    inputs:
+      proposal_sha:
+        description: 'Exact Archive proposal commit to validate'
+        required: true
+        type: string
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: archive_test
+          POSTGRES_USER: supabase_admin
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U supabase_admin -d archive_test"
+          --health-interval 10s --health-timeout 5s --health-retries 5
     defaults:
       run:
         working-directory: archive/web
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Verify explicit proposal dispatch identity
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: .
+        env:
+          EXPECTED_PROPOSAL_SHA: ${{ inputs.proposal_sha }}
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_REF" =~ ^refs/heads/codex/archive-publication-[a-z0-9-]{1,50}$ ]] || { echo 'PUBLIC_CI_BRANCH_INVALID' >&2; exit 1; }
+          [[ "$EXPECTED_PROPOSAL_SHA" =~ ^[a-f0-9]{40}$ ]] || { echo 'PUBLIC_CI_SHA_INVALID' >&2; exit 1; }
+          [[ "$GITHUB_SHA" == "$EXPECTED_PROPOSAL_SHA" ]] || { echo 'PUBLIC_CI_SHA_CHANGED' >&2; exit 1; }
+      - name: Verify publication ledger against PostgreSQL 17
+        working-directory: .
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql --host localhost --username supabase_admin --dbname archive_test --set ON_ERROR_STOP=1 --command "CREATE ROLE postgres SUPERUSER LOGIN PASSWORD 'postgres';"
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --command "CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE ROLE service_role NOLOGIN; CREATE SCHEMA survival_rpg;"
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927054730_archive_publication_ledger_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927055745_archive_publication_ledger_owner_membership_cleanup_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927064252_archive_publication_lease_guard_v1.sql
+          psql --host localhost --username supabase_admin --dbname archive_test --set ON_ERROR_STOP=1 --command "GRANT archive_runner_internal TO postgres WITH ADMIN TRUE, SET FALSE, INHERIT FALSE; ALTER ROLE postgres NOSUPERUSER CREATEROLE;"
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927071329_archive_publication_lease_guard_corrective_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927071628_archive_publication_owner_grant_cleanup_v1.sql
+          psql --host localhost --username supabase_admin --dbname archive_test --set ON_ERROR_STOP=1 --command "ALTER ROLE postgres SUPERUSER;"
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_publication_ledger_v1_verification.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_publication_lease_guard_v1_verification.sql
+      - name: Verify restricted linked-source exporter against PostgreSQL 17
+        working-directory: .
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --command "CREATE TABLE survival_rpg.saves (worldline_id text PRIMARY KEY, save_version integer NOT NULL);"
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260924173125_rolling_raw_capture_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260925003736_public_transcript_capture_session_api_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260925044647_public_transcript_turn_pair_api_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927042720_afterfall_turn_state_continuity_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927103011_afterfall_turn_link_message_integrity_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927123458_archive_exporter_reader_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_exporter_reader_v1_verification.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927215800_archive_daily_runner_login_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_daily_runner_login_v1_verification.sql
+          psql --host localhost --username supabase_admin --dbname archive_test --set ON_ERROR_STOP=1 --command "ALTER ROLE postgres NOSUPERUSER CREATEROLE;"
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927221300_archive_publication_runner_task_rpc_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927223500_archive_daily_runner_acl_correction_v1.sql
+          psql --host localhost --username supabase_admin --dbname archive_test --set ON_ERROR_STOP=1 --command "ALTER ROLE postgres SUPERUSER;"
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -42,6 +117,39 @@ jobs:
         run: |
           pnpm install --frozen-lockfile --ignore-scripts
           node --input-type=module -e 'import("pg").then(m => { if (typeof m.default.Client !== "function") process.exit(1) })'
+      - name: Verify real restricted exporter login against isolated PostgreSQL
+        working-directory: archive/exporter
+        env:
+          PGPASSWORD: postgres
+          ARCHIVE_TEST_EXPORT_DATABASE_URL: postgresql://archive_exporter:ci_fixture_only@localhost:5432/archive_test
+        run: |
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --command "ALTER ROLE archive_exporter PASSWORD 'ci_fixture_only';"
+          node --test linked-export-postgres.test.mjs
+      - name: Verify one-shot daily runner against isolated PostgreSQL
+        working-directory: archive/exporter
+        env:
+          PGPASSWORD: postgres
+          ARCHIVE_TEST_EXPORT_DATABASE_URL: postgresql://archive_exporter:ci_fixture_only@localhost:5432/archive_test
+          ARCHIVE_TEST_RUNNER_DATABASE_URL: postgresql://archive_publication_runner:ci_fixture_only@localhost:5432/archive_test
+          ARCHIVE_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/archive_test
+        run: |
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --command "ALTER ROLE archive_publication_runner PASSWORD 'ci_fixture_only';"
+          node --test daily-noop-postgres.test.mjs
+      - name: Verify durable text proposal and interrupted task recovery
+        working-directory: archive/exporter
+        env:
+          ARCHIVE_TEST_RUNNER_DATABASE_URL: postgresql://archive_publication_runner:ci_fixture_only@localhost:5432/archive_test
+          ARCHIVE_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/archive_test
+        run: node --test text-proposal-postgres.test.mjs
+      - name: Verify Draft PR and exact-SHA CI dispatch contracts
+        working-directory: archive/scripts/lib
+        run: node --test github-text-proposal-pr.test.mjs github-text-proposal-ci.test.mjs
+      - name: Setup pinned image transformer
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned image transformer
+        run: python -m pip install --disable-pip-version-check -r ../scripts/requirements-image.txt
       - name: Test offline publication planning
         run: node --test ../scripts/lib/publication-plan.test.mjs
       - name: Test immutable open-session publication segments
@@ -56,6 +164,10 @@ jobs:
         run: node --test ../scripts/lib/linked-capture-admission.test.mjs
       - name: Test restricted read-only export session without database access
         run: node --test ../scripts/lib/linked-export-runner.test.mjs
+      - name: Test bounded linked-range discovery without database access
+        run: node --test ../scripts/lib/linked-export-discovery.test.mjs
+      - name: Test private linked-range discovery command without database access
+        run: node --test ../exporter/discover-linked-ranges.test.mjs
       - name: Test Git-pinned season inventory without database access
         run: node --test ../exporter/pinned-inventory.test.mjs
       - name: Test inventory derived from pinned public season manifests
@@ -78,14 +190,42 @@ jobs:
         run: node --test ../scripts/lib/publication-graph.test.mjs
       - name: Verify public graph baseline and isolated fact-to-graph integration
         run: node --experimental-strip-types ../scripts/check-graph-batch.mjs
+      - name: Verify one-snapshot Reader Graph Visual preparation
+        run: node --experimental-strip-types --test ../scripts/prepare-unified-publication.test.mjs
+      - name: Verify atomic local unified edition proposal and replay
+        run: node --experimental-strip-types ../scripts/check-unified-ref.mjs
       - name: Test visual candidate and brief compiler
         run: node --test ../scripts/lib/visual-compiler.test.mjs
       - name: Verify public appearance-to-brief and isolated visual catalog integration
         run: node --experimental-strip-types ../scripts/check-visual-batch.mjs
+      - name: Verify pinned public visual catalog consumed by website
+        run: node ../scripts/check-site-visual-catalog.mjs
+      - name: Test same-origin site asset manifest and file gate
+        run: node --test ../scripts/lib/site-asset-contract.test.mjs
+      - name: Test foreground original, storage readback and registry site handoff
+        run: node --test ../scripts/lib/site-foreground-handoff.test.mjs
+      - name: Test read-only site asset runner against accepted source and registry binding
+        run: node --test ../scripts/run-site-asset-handoff.test.mjs
+      - name: Test atomic local-ref proposal of site manifest and reviewed derivative
+        run: node --test ../scripts/lib/site-asset-public-ref.test.mjs
+      - name: Test idempotent private original upload and uncertain response recovery
+        run: node --test ../scripts/lib/archive-storage-original.test.mjs
+      - name: Test private visual registry binding and retry plan
+        run: node --test ../scripts/lib/archive-visual-registry.test.mjs
+      - name: Verify real candidate private ingest plan without external calls
+        run: node ../scripts/run-foreground-ingest.mjs --check
+      - name: Verify real accepted original produces exact private site derivative
+        run: python ../scripts/derive-site-original.py ../experiments/step6/char-jinwoo-20260927-foreground.png ../experiments/step8/char-jinwoo-20260927-site-512.png --check
       - name: Test local image POC request and quarantine receipts
         run: node --test ../scripts/lib/image-poc-exchange.test.mjs
+      - name: Test reviewed local image handoff and disabled ingest plan
+        run: node --test ../scripts/lib/accepted-image-handoff.test.mjs
+      - name: Test real Codex foreground observation inbox
+        run: node --test ../scripts/lib/foreground-image-handoff.test.mjs
       - name: Verify real portrait request without image execution
         run: node --experimental-strip-types ../scripts/prepare-image-poc.mjs --check
+      - name: Verify committed foreground sample remains unpublished
+        run: node ../scripts/check-foreground-sample.mjs --brief
       - name: Install
         run: npm ci
       - name: Test

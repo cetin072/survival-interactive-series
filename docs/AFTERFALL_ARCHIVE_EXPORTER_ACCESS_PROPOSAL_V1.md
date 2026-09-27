@@ -1,6 +1,8 @@
 # AFTERFALL archive exporter access proposal v1
 
-Status: **REVIEW PROPOSAL ONLY — NO ROLE, GRANT, RLS POLICY OR SECRET APPLIED**
+Status: **FORWARD MIGRATION IN DRAFT #167; STAGING NOT APPLIED; NO LOGIN SECRET**
+
+Current implementation checkpoint (2026-09-27): Supabase applied the forward migration as `20260927123458_archive_exporter_reader_v1`; `supabase/migrations/20260927123458_archive_exporter_reader_v1.sql` preserves the exact SQL and actual history version. Read-only staging checks confirm a passwordless `archive_exporter` role, three scoped SELECT policies, no role memberships, no save read and no source write privilege. The isolated PostgreSQL 17 CI exercises an actual restricted login, linked versus unlinked/out-of-scope rows, denied writes and passwordless install. `archive/exporter/check-linked-batch.mjs --check` now discovers bounded linked ranges, reads each through the restricted role and returns counts without bodies or identifiers. `.github/workflows/archive-linked-batch-check.yml` prepares a manual default-branch read-only run; it has no schedule or publication step. No staging login secret has been provisioned, so live exporter reads and game-room calls remain untested. The original review proposal below remains the design record.
 
 This proposal is the database half of the opt-in, read-only source check in Draft PR #152. The exporter handles private, unapproved USER/GM bodies. `public_safe` means a capture was screened for storage; it is not owner approval to publish. The application still returns `PENDING_PUBLIC_APPROVAL` after a valid read.
 

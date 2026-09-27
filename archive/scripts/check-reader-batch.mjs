@@ -5,12 +5,16 @@ import { execFileSync } from 'node:child_process'
 import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
 import { tmpdir } from 'node:os'
+import { deflateSync } from 'node:zlib'
 import { makeBooks } from './build-reader-edition.mjs'
 import { fingerprint } from './lib/publication-plan.mjs'
 import { makeAttemptEvent } from './lib/attempt-ledger.mjs'
 
 const root = resolve(import.meta.dirname, '..', '..')
 const sha = (v) => createHash('sha256').update(v).digest('hex')
+const crc = (bytes) => { let value = 0xffffffff; for (const n of bytes) { value ^= n; for (let b = 0; b < 8; b++) value = (value >>> 1) ^ ((value & 1) ? 0xedb88320 : 0) }; return (value ^ 0xffffffff) >>> 0 }
+const pngChunk = (type, data) => { const body = Buffer.concat([Buffer.from(type), data]); const out = Buffer.alloc(body.length + 8); out.writeUInt32BE(data.length); body.copy(out, 4); out.writeUInt32BE(crc(body), out.length - 4); return out }
+const syntheticPng = () => { const header = Buffer.alloc(13); header.writeUInt32BE(1); header.writeUInt32BE(1, 4); header[8] = 8; header[9] = 2; return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]), pngChunk('IHDR', header), pngChunk('IDAT', deflateSync(Buffer.alloc(4))), pngChunk('IEND', Buffer.alloc(0))]) }
 const command = (exe, args, cwd = root) => execFileSync(exe, args, { cwd, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] })
 const head = command('git', ['rev-parse', 'HEAD']).trim()
 const books = await makeBooks()
@@ -216,6 +220,109 @@ process.stdout.write(JSON.stringify(result));`
   assert.deepEqual(repeated.stages_advanced, [])
   assert.deepEqual(repeated.requests, resumed.requests)
   assert.equal(repeated.source_revision, resumed.source_revision)
+  const journalScript = `import { commitEmptyAttemptJournalFromPublicRef } from './archive/scripts/lib/attempt-public-ref.mjs';
+const result = await commitEmptyAttemptJournalFromPublicRef({ repoRoot: process.cwd(),
+  ref: '${driverRef}', seasonId: 'S99', checkpointRef: '${checkpointRef}',
+  authorizeCommit: async () => true });
+process.stdout.write(JSON.stringify(result));`
+  const journalArgs = ['--experimental-strip-types', '--input-type=module', '-e', journalScript]
+  assert.throws(() => command('node', ['--experimental-strip-types', '--input-type=module',
+    '-e', journalScript.replace('authorizeCommit: async () => true', '')], copy))
+  assert.equal(command('git', ['rev-parse', driverRef], copy).trim(), resumed.source_revision)
+  const initialized = JSON.parse(command('node', journalArgs, copy))
+  assert.equal(initialized.status, 'LOCAL_EMPTY_ATTEMPT_JOURNAL_COMMITTED')
+  assert.equal(initialized.provider_calls, 0)
+  const committedJournal = JSON.parse(command('git', ['show',
+    `${initialized.commit}:${initialized.journal_path}`], copy))
+  assert.deepEqual(committedJournal.events, [])
+  const driverRequestScript = `import { prepareImageRequestsFromPublicRef } from './archive/scripts/lib/image-request-public-ref.mjs';
+const result = await prepareImageRequestsFromPublicRef({ repoRoot: process.cwd(),
+  ref: '${driverRef}', seasonId: 'S99', checkpointRef: '${checkpointRef}' });
+process.stdout.write(JSON.stringify(result));`
+  const driverRequestArgs = ['--experimental-strip-types', '--input-type=module', '-e', driverRequestScript]
+  const pinnedRequests = JSON.parse(command('node', driverRequestArgs, copy))
+  assert.equal(pinnedRequests.attempt_history, 'LOCAL_REF_PINNED_NOT_AUTHENTICATED')
+  assert.deepEqual(pinnedRequests.requests, resumed.requests)
+  const reserveScript = `import { commitAttemptReservationFromPublicRef } from './archive/scripts/lib/attempt-public-ref.mjs';
+const result = await commitAttemptReservationFromPublicRef({ repoRoot: process.cwd(),
+  ref: '${driverRef}', seasonId: 'S99', checkpointRef: '${checkpointRef}',
+  requestId: '${pinnedRequests.requests[0].request_id}', authorizeCommit: async () => true });
+process.stdout.write(JSON.stringify(result));`
+  const reserveArgs = ['--experimental-strip-types', '--input-type=module', '-e', reserveScript]
+  const reserved = JSON.parse(command('node', reserveArgs, copy))
+  assert.equal(reserved.status, 'LOCAL_IMAGE_ATTEMPT_RESERVED_NO_EXECUTION')
+  assert.equal(reserved.provider_calls, 0)
+  const afterReservation = JSON.parse(command('node', driverRequestArgs, copy))
+  assert.equal(afterReservation.requests.length, 2)
+  assert.ok(afterReservation.requests.every((item) => item.request_id !== reserved.request_id))
+  assert.throws(() => command('node', reserveArgs, copy))
+  assert.equal(command('git', ['rev-parse', driverRef], copy).trim(), reserved.commit)
+  const closeRef = 'refs/heads/codex/archive-publication-close-test'
+  command('git', ['branch', 'codex/archive-publication-close-test', reserved.commit], copy)
+  const syntheticImage = join(temporary, 'synthetic-quarantine.png')
+  await writeFile(syntheticImage, syntheticPng())
+  const closeScript = (state, attemptId, authorized = true) =>
+    `import { commitAttemptTerminalFromPublicRef } from './archive/scripts/lib/attempt-public-ref.mjs';
+const result = await commitAttemptTerminalFromPublicRef({ repoRoot: process.cwd(),
+  ref: '${closeRef}', seasonId: 'S99', checkpointRef: '${checkpointRef}',
+  attemptId: '${attemptId}', state: '${state}',
+  imageRoot: ${JSON.stringify(temporary)}, imagePath: ${JSON.stringify(syntheticImage)},
+  observation: { request_id: '${reserved.request_id}', point_id: '${reserved.point_id}',
+    generation_key: '${pinnedRequests.requests[0].generation_key}',
+    tool_result_id: '00000000-0000-4000-8000-000000000099',
+    tool: 'image_gen.text2im', surface: 'CHATGPT_FOREGROUND',
+    review: 'REJECTED_REQUEST_MISMATCH' },
+  failureReason: 'EXECUTION_ERROR',
+  ${authorized ? 'authorizeCommit: async () => true' : ''} });
+process.stdout.write(JSON.stringify(result));`
+  const closeArgs = (script) => ['--experimental-strip-types', '--input-type=module', '-e', script]
+  assert.throws(() => command('node', closeArgs(closeScript('ACCEPTED', reserved.attempt_id)), copy))
+  assert.throws(() => command('node', closeArgs(closeScript('QUARANTINED', reserved.attempt_id, false)), copy))
+  assert.throws(() => command('node', closeArgs(closeScript('QUARANTINED', `attempt-${sha('UNKNOWN')}`)), copy))
+  assert.equal(command('git', ['rev-parse', closeRef], copy).trim(), reserved.commit)
+  const closed = JSON.parse(command('node', closeArgs(closeScript('QUARANTINED', reserved.attempt_id)), copy))
+  assert.equal(closed.status, 'LOCAL_IMAGE_ATTEMPT_CLOSED_NO_ASSET')
+  assert.equal(closed.state, 'QUARANTINED')
+  assert.equal(closed.provider_calls, 0)
+  assert.throws(() => command('node', closeArgs(closeScript('FAILED', reserved.attempt_id)), copy))
+  assert.equal(command('git', ['rev-parse', closeRef], copy).trim(), closed.commit)
+  const closedJournal = JSON.parse(command('git', ['show', `${closed.commit}:${closed.journal_path}`], copy))
+  assert.deepEqual(closedJournal.events.map((event) => event.state), ['RESERVED', 'QUARANTINED'])
+  const closedEvidence = JSON.parse(command('git', ['show',
+    `${closed.commit}:${closed.evidence_ref}`], copy))
+  assert.equal(closedEvidence.receipt.observed_file.sha256, sha(syntheticPng()))
+  assert.equal(closedEvidence.receipt.publication_allowed, false)
+  const closedRequestScript = driverRequestScript.replaceAll(driverRef, closeRef)
+  const afterClosure = JSON.parse(command('node', closeArgs(closedRequestScript), copy))
+  assert.equal(afterClosure.attempt_plan.quarantined, 1)
+  assert.equal(afterClosure.attempt_plan.reserved, 0)
+  assert.ok(afterClosure.requests.some((item) => item.point_id === reserved.point_id))
+  const evidenceTamperRef = 'refs/heads/codex/archive-publication-evidence-tamper-test'
+  command('git', ['branch', 'codex/archive-publication-evidence-tamper-test', closed.commit], copy)
+  command('git', ['checkout', '--detach', closed.commit], copy)
+  await writeFile(resolve(copy, closed.evidence_ref),
+    JSON.stringify({ ...closedEvidence, state: 'FAILED' }, null, 2) + '\n')
+  command('git', ['add', closed.evidence_ref], copy)
+  command('git', ['-c', 'user.name=Reader test', '-c', 'user.email=reader-test@example.invalid',
+    'commit', '--no-verify', '-qm', 'Tampered local observation; synthetic test only'], copy)
+  const tamperedEvidenceCommit = command('git', ['rev-parse', 'HEAD'], copy).trim()
+  command('git', ['update-ref', evidenceTamperRef, tamperedEvidenceCommit, closed.commit], copy)
+  command('git', ['checkout', '--detach', `${fixtureHead}^`], copy)
+  assert.throws(() => command('node', closeArgs(driverRequestScript.replaceAll(driverRef, evidenceTamperRef)), copy))
+  const resumedAfterReservation = JSON.parse(command('node', [
+    '--experimental-strip-types', '--input-type=module', '-e', driverScript(true)], copy))
+  assert.deepEqual(resumedAfterReservation.stages_advanced, [])
+  assert.deepEqual(resumedAfterReservation.requests, afterReservation.requests)
+  command('git', ['checkout', '--detach', reserved.commit], copy)
+  await writeFile(resolve(copy, initialized.journal_path),
+    JSON.stringify({ ...committedJournal, events: [] }, null, 2) + '\n')
+  command('git', ['add', initialized.journal_path], copy)
+  command('git', ['-c', 'user.name=Reader test', '-c', 'user.email=reader-test@example.invalid',
+    'commit', '--no-verify', '-qm', 'Tampered local attempt history; synthetic test only'], copy)
+  const tamperedCommit = command('git', ['rev-parse', 'HEAD'], copy).trim()
+  command('git', ['update-ref', driverRef, tamperedCommit, reserved.commit], copy)
+  command('git', ['checkout', '--detach', `${fixtureHead}^`], copy)
+  assert.throws(() => command('node', driverRequestArgs, copy))
   // Advancing the ref with an unrelated allowed transcript path leaves the
   // already-verified visual brief and its request identities unchanged.
   command('git', ['checkout', '--detach', visualResult.commit], copy)

@@ -84,7 +84,9 @@ export function planFromAttemptLedger(catalog, ledger, { dailyHistory = null } =
         && prior.request_id === event.request_id && prior.point_id === event.point_id
         && prior.generation_key === event.generation_key, 'INVALID_ATTEMPT_TRANSITION')
       demand(typeof event.evidence_ref === 'string'
-        && /^docs\/AUTOMATIC_ARCHIVE_STEP6_[A-Z0-9_]+\.json$/.test(event.evidence_ref), 'INVALID_ATTEMPT_EVIDENCE')
+        && (/^docs\/AUTOMATIC_ARCHIVE_STEP6_[A-Z0-9_]+\.json$/.test(event.evidence_ref)
+          || /^archive\/content\/visuals\/C03-AFTERFALL\/attempts\/[a-f0-9]{64}\.json$/.test(event.evidence_ref)),
+      'INVALID_ATTEMPT_EVIDENCE')
       prior.state = event.state
     }
   }

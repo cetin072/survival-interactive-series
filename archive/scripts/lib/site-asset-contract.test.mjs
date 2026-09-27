@@ -1,0 +1,128 @@
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
+import { mkdtemp, mkdir, readFile, rm, unlink, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import { tmpdir } from 'node:os'
+import { fileURLToPath } from 'node:url'
+import { deflateSync } from 'node:zlib'
+import { validateVisualCatalog, visualDigest } from './visual-compiler.mjs'
+import { validateSiteAssets, validateSiteAssetInventory, planSiteAssetAddition,
+  reconcileSiteAssets } from './site-asset-contract.mjs'
+
+// Generated test bytes only; no model image, real acceptance or publication.
+function crc(bytes) { let c = 0xffffffff; for (const n of bytes) { c ^= n; for (let b = 0; b < 8; b++) c = (c >>> 1) ^ ((c & 1) ? 0xedb88320 : 0) }; return (c ^ 0xffffffff) >>> 0 }
+function chunk(type, data) { const body = Buffer.concat([Buffer.from(type), data]); const out = Buffer.alloc(body.length + 8); out.writeUInt32BE(data.length); body.copy(out, 4); out.writeUInt32BE(crc(body), out.length - 4); return out }
+function png() { const head = Buffer.alloc(13); head.writeUInt32BE(1); head.writeUInt32BE(1, 4); head[8] = 8; head[9] = 2; return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]), chunk('IHDR', head), chunk('IDAT', deflateSync(Buffer.alloc(4))), chunk('IEND', Buffer.alloc(0))]) }
+const catalog = JSON.parse(await readFile(new URL('../../content/visuals/C03-AFTERFALL/VISUALS.json', import.meta.url), 'utf8'))
+const point = catalog.points.find((entry) => entry.subject_id === 'char-jinwoo')
+function seal(body) { return { ...body, content_sha256: visualDigest(body) } }
+function manifest(assets) { return seal({ version: 'archive-site-assets-v1', chronicle_id: catalog.chronicle_id,
+  worldline_id: catalog.worldline_id, visibility: 'PUBLIC_ARCHIVE', visual_catalog_sha256: catalog.content_sha256, assets }) }
+async function fixture(fn) {
+  const root = await mkdtemp(join(tmpdir(), 'site-assets-'))
+  try {
+    await mkdir(join(root, 'visual-assets'))
+    const bytes = png(), sha256 = createHash('sha256').update(bytes).digest('hex')
+    await writeFile(join(root, 'visual-assets', `${sha256}.png`), bytes)
+    const asset = { point_id: point.point_id, generation_key: point.generation_key, subject_id: point.subject_id,
+      accepted_candidate_id: `candidate-${'a'.repeat(64)}`, source_sha256: 'b'.repeat(64),
+      storage_bucket: 'survival-archive-originals',
+      storage_object_path: `AFTERFALL/candidate-${'a'.repeat(64)}/${'b'.repeat(64)}.png`,
+      registry_asset_id: 'AF-CHAR-TEST', derivative_version: 'site-png-512-v1',
+      public_path: `/visual-assets/${sha256}.png`, sha256, bytes: bytes.length, width: 1, height: 1, mime_type: 'image/png' }
+    await fn({ root, asset, bytes })
+  } finally { await rm(root, { recursive: true, force: true }) }
+}
+
+test('committed manifest contains verified site bytes and an empty future manifest remains valid', async () => {
+  const committed = JSON.parse(await readFile(new URL('../../content/visuals/C03-AFTERFALL/SITE_ASSETS.json', import.meta.url), 'utf8'))
+  const publicRoot = fileURLToPath(new URL('../../web/public/', import.meta.url))
+  assert.equal((await validateSiteAssetInventory(committed, catalog, publicRoot)).site_assets, committed.assets.length)
+  assert.equal(committed.assets.length >= 1, true)
+  const empty = manifest([])
+  assert.equal((await validateSiteAssets(empty, catalog, join(tmpdir(), 'unused-public-root'))).site_assets, 0)
+})
+test('synthetic local PNG can satisfy the site-ready contract only by exact bytes and current point', async () => fixture(async ({ root, asset }) => {
+  const result = await validateSiteAssets(manifest([asset]), catalog, root)
+  assert.equal(result.site_assets, 1)
+  assert.equal(result.site_publications, 0)
+}))
+test('stale generation, tampered pixels and path escape are refused', async () => fixture(async ({ root, asset }) => {
+  await assert.rejects(validateSiteAssets(manifest([{ ...asset, generation_key: `generation-${'0'.repeat(64)}` }]), catalog, root))
+  await assert.rejects(validateSiteAssets(manifest([{ ...asset, public_path: '/../private.png' }]), catalog, root))
+  await writeFile(join(root, 'visual-assets', `${asset.sha256}.png`), Buffer.from('not an image'))
+  await assert.rejects(validateSiteAssets(manifest([asset]), catalog, root))
+}))
+test('duplicate point and unsealed metadata are refused', async () => fixture(async ({ root, asset }) => {
+  await assert.rejects(validateSiteAssets(manifest([asset, asset]), catalog, root))
+  await assert.rejects(validateSiteAssets({ ...manifest([asset]), secret: 'unreviewed' }, catalog, root))
+}))
+test('verified assets survive unchanged public briefs and stale bindings are omitted', async () => fixture(async ({ root, asset }) => {
+  const prior = manifest([asset])
+  const unchanged = await reconcileSiteAssets(prior, catalog, catalog, root)
+  assert.equal(unchanged.retained, 1)
+  assert.equal(unchanged.omitted_stale, 0)
+  assert.equal(unchanged.release_blocked_until_stale_files_removed, false)
+  assert.deepEqual(unchanged.manifest, prior)
+  assert.equal(unchanged.files_written, 0)
+  const { content_sha256: ignored, ...body } = catalog
+  const newer = seal({ ...body, points: body.points.filter((item) => item.point_id !== asset.point_id) })
+  const changed = await reconcileSiteAssets(prior, catalog, newer, root)
+  assert.equal(changed.retained, 0)
+  assert.equal(changed.omitted_stale, 1)
+  assert.deepEqual(changed.omitted_public_paths, [asset.public_path])
+  assert.equal(changed.release_blocked_until_stale_files_removed, true)
+  assert.equal(changed.manifest.visual_catalog_sha256, newer.content_sha256)
+  assert.equal((await validateSiteAssets(changed.manifest, newer, root)).site_assets, 0)
+  const revisedPoint = structuredClone(point)
+  revisedPoint.brief.canon_facts.appearance.hair = '새로 승인된 공개 머리'
+  revisedPoint.generation_key = `generation-${visualDigest(revisedPoint.brief)}`
+  const revised = seal({ ...body, points: body.points.map((item) => item.point_id === point.point_id ? revisedPoint : item) })
+  const changedBrief = await reconcileSiteAssets(prior, catalog, revised, root)
+  assert.equal(changedBrief.omitted_stale, 1)
+  assert.deepEqual(changedBrief.omitted_public_paths, [asset.public_path])
+}))
+test('reconciliation rejects unverified old assets and regressed catalogs', async () => fixture(async ({ root, asset }) => {
+  const prior = manifest([asset])
+  const { content_sha256: ignored, ...body } = catalog
+  const newer = seal({ ...body, anchor: { ...body.anchor, save_version: body.anchor.save_version + 1 } })
+  const { content_sha256: ignoredManifest, ...priorBody } = prior
+  const newerManifest = seal({ ...priorBody, visual_catalog_sha256: newer.content_sha256 })
+  await assert.rejects(reconcileSiteAssets(newerManifest, newer, catalog, root), /SITE_ASSET_CATALOG_REGRESSION/)
+  await assert.rejects(reconcileSiteAssets({ ...prior, content_sha256: '0'.repeat(64) }, catalog, catalog, root))
+}))
+test('build inventory refuses static PNGs omitted from the validated manifest', async () => fixture(async ({ root, asset }) => {
+  assert.equal((await validateSiteAssetInventory(manifest([asset]), catalog, root)).site_assets, 1)
+  await assert.rejects(validateSiteAssetInventory(manifest([]), catalog, root), /UNREFERENCED_PUBLIC_VISUAL_ASSET/)
+}))
+test('verified handoff plans one site asset, and replay reuses its exact manifest', async () => fixture(async ({ root, asset, bytes }) => {
+  const path = join(root, 'visual-assets', `${asset.sha256}.png`)
+  await unlink(path)
+  const prepared = { status: 'SITE_ASSET_PREPARED_NOT_PUBLISHED', asset,
+    storage_readback_sha256: asset.source_sha256, derivative_sha256: asset.sha256 }
+  const planned = await planSiteAssetAddition(manifest([]), catalog, root, prepared)
+  assert.equal(planned.status, 'SITE_ASSET_ADDITION_PREPARED')
+  await writeFile(path, bytes)
+  assert.equal((await validateSiteAssetInventory(planned.manifest, catalog, root)).site_assets, 1)
+  const replay = await planSiteAssetAddition(planned.manifest, catalog, root, prepared)
+  assert.equal(replay.status, 'EXISTING_SITE_ASSET_REUSED')
+  assert.equal(replay.files_written, 0)
+  await assert.rejects(planSiteAssetAddition(planned.manifest, catalog, root,
+    { ...prepared, asset: { ...asset, registry_asset_id: 'AF-CHAR-OTHER' } }),
+  /SITE_ASSET_ALREADY_BOUND_DIFFERENTLY/)
+}))
+test('a growing public catalog remains valid without fixed point or save counts', async () => {
+  const { content_sha256: ignored, ...body } = catalog
+  const additional = structuredClone(point)
+  additional.point_id = `point-${'e'.repeat(64)}`
+  additional.subject_id = 'char-new-survivor'
+  additional.brief.subject.node_id = additional.subject_id
+  additional.generation_key = `generation-${visualDigest(additional.brief)}`
+  const grown = seal({ ...body, anchor: { ...body.anchor, save_version: body.anchor.save_version + 1 },
+    points: [...body.points, additional] })
+  validateVisualCatalog(grown)
+  const { content_sha256: unused, ...emptyBody } = manifest([])
+  const rebound = seal({ ...emptyBody, visual_catalog_sha256: grown.content_sha256 })
+  assert.equal((await validateSiteAssets(rebound, grown, join(tmpdir(), 'unused-public-root'))).site_assets, 0)
+})

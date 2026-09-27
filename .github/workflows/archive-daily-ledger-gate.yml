@@ -1,0 +1,49 @@
+name: Archive one-shot ledger gate
+
+# This limited dispatch records a durable NOOP only when the restricted
+# exporter sees no linked source. It is not the 04:30 publication scheduler.
+on:
+  workflow_dispatch:
+    inputs:
+      scheduled_date:
+        description: 'KST date to claim (YYYY-MM-DD); empty uses current KST date'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: archive-daily-ledger-gate
+  cancel-in-progress: false
+
+jobs:
+  daily-gate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.19.0
+      - name: Install pinned exporter dependencies
+        working-directory: archive/exporter
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Run one isolated daily ledger gate
+        working-directory: archive/exporter
+        env:
+          ARCHIVE_EXPORT_DATABASE_URL: ${{ secrets.ARCHIVE_EXPORT_DATABASE_URL }}
+          ARCHIVE_RUNNER_DATABASE_URL: ${{ secrets.ARCHIVE_RUNNER_DATABASE_URL }}
+          REQUESTED_DATE: ${{ inputs.scheduled_date }}
+        run: |
+          set -euo pipefail
+          scheduled_date="${REQUESTED_DATE:-$(TZ=Asia/Seoul date +%F)}"
+          if ! [[ "$scheduled_date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+            echo 'INVALID_SCHEDULE_DATE' >&2
+            exit 1
+          fi
+          node run-daily-noop.mjs --date "$scheduled_date"

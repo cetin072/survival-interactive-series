@@ -5,6 +5,7 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { createBatch, fingerprint, planPublication } from './lib/publication-plan.mjs'
 import { snapshotFromPublishedS02 } from './dry-run-publication.mjs'
+import { prepareTextPublication } from './run-reader-publication.mjs'
 import { byteHash, graphBytes, legacyPublicFacts, reconcilePublicGraph } from './lib/publication-graph.mjs'
 import { writeGraphAtomically } from './lib/atomic-graph.mjs'
 
@@ -14,6 +15,8 @@ const bookRef = 'archive/content/stories/C03-AFTERFALL/BOOK.json'
 const graphRef = 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'
 const manifestRef = 'archive/content/transcripts/C03-AFTERFALL/S02/MANIFEST.json'
 const demand = (c, code) => { if (!c) throw new Error(code) }
+const sameText = (a, b) => Buffer.from(a).toString('utf8').replace(/\r\n/g, '\n')
+  === Buffer.from(b).toString('utf8').replace(/\r\n/g, '\n')
 const git = (...args) => execFileSync('git', args, { cwd: root, maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] })
 const headSHA = () => git('rev-parse', 'HEAD').toString().trim()
 function pinned(sha, ref) {
@@ -29,7 +32,7 @@ async function localGraph() {
   try { demand((await lstat(resolve(root, graphRef))).isFile(), 'INVALID_GRAPH_FILE'); return await readFile(resolve(root, graphRef)) }
   catch (e) { if (e.code === 'ENOENT') return null; throw e }
 }
-export async function prepareGraphPublication(snapshot, factsRef = null) {
+export async function prepareGraphPublication(snapshot, factsRef = null, { readerCandidateBytes = null } = {}) {
   const batch = createBatch(snapshot), sha = headSHA()
   demand(batch.snapshot.source_revision === sha, 'GRAPH_SNAPSHOT_CHECKOUT_MISMATCH')
   demand(batch.snapshot.chronicle_id === 'C03-AFTERFALL', 'GRAPH_CHRONICLE_UNSUPPORTED')
@@ -40,10 +43,19 @@ export async function prepareGraphPublication(snapshot, factsRef = null) {
   }
   // The only imported data module is this fixed, hash-checked, already-public source file.
   const seedBytes = pinned(sha, seedRef)
-  demand((await lstat(resolve(root, seedRef))).isFile() && seedBytes.equals(await readFile(resolve(root, seedRef))), 'PUBLIC_SEED_CHECKOUT_MODIFIED')
+  demand((await lstat(resolve(root, seedRef))).isFile() && sameText(seedBytes,
+    await readFile(resolve(root, seedRef))), 'PUBLIC_SEED_CHECKOUT_MODIFIED')
   const seedModule = await import(pathToFileURL(resolve(root, seedRef)).href)
   const seedFacts = legacyPublicFacts(seedModule)
-  const bookBytes = pinned(sha, bookRef), book = JSON.parse(bookBytes)
+  let bookBytes = pinned(sha, bookRef)
+  if (readerCandidateBytes !== null) {
+    demand(Buffer.isBuffer(readerCandidateBytes), 'GRAPH_READER_BYTES_REQUIRED')
+    const reader = await prepareTextPublication(snapshot)
+    demand(reader.bookPath === bookRef && reader.candidateBytes.equals(readerCandidateBytes),
+      'GRAPH_READER_CANDIDATE_MISMATCH')
+    bookBytes = readerCandidateBytes
+  }
+  const book = JSON.parse(bookBytes)
   const bookSource = { source_ref: bookRef, source_sha256: byteHash(bookBytes) }
   const seedSource = { source_ref: seedRef, source_sha256: byteHash(seedBytes) }
   const actualBytes = await localGraph()
@@ -68,7 +80,8 @@ export async function prepareGraphPublication(snapshot, factsRef = null) {
   return { actualBytes, candidateBytes, graph: compiled.graph, report: {
     ...compiled.report, mode: 'LOCAL_GRAPH_BATCH', task_id: task.task_id, bootstrap,
     source_revision: sha, source_save_version: snapshot.source_save_version, graph_sha256: compiled.graph.content_sha256,
-    status: actualBytes?.equals(candidateBytes) ? 'NOOP' : 'READY_TO_UPDATE_LOCAL_GRAPH', files_written: 0,
+    reader_sha256: bookSource.source_sha256,
+    status: actualBytes && sameText(actualBytes, candidateBytes) ? 'NOOP' : 'READY_TO_UPDATE_LOCAL_GRAPH', files_written: 0,
   } }
 }
 export async function runGraphCli(args) {

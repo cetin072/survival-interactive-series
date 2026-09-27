@@ -7,9 +7,47 @@ import { inspectPublicRef } from './reader-public-ref.mjs'
 import { verifyVisualAtPublicRef } from './visual-public-ref.mjs'
 import { git } from './atomic-public-segment-git.mjs'
 import { planFromAttemptLedger } from './attempt-ledger.mjs'
+import { validateAttemptObservation } from './attempt-observation.mjs'
+import { isDeepStrictEqual } from 'node:util'
 
 const demand = (ok, code) => { if (!ok) throw new Error(code) }
 const visualPath = 'archive/content/visuals/C03-AFTERFALL/VISUALS.json'
+export const attemptJournalPath = (catalogSha256) => {
+  demand(typeof catalogSha256 === 'string' && /^[a-f0-9]{64}$/.test(catalogSha256),
+    'INVALID_ATTEMPT_CATALOG_SHA')
+  return `archive/content/visuals/C03-AFTERFALL/attempts/${catalogSha256}.json`
+}
+
+async function readJournalHistory(inspected, catalog, path, present) {
+  const revisions = (await git(inspected.gitBinary, inspected.root,
+    ['log', '--reverse', '--format=%H', inspected.base, '--', path]))
+    .toString('utf8').split('\n').filter(Boolean)
+  demand(revisions.length <= 7 && (present ? revisions.length > 0 : revisions.length === 0),
+    'ATTEMPT_JOURNAL_HISTORY_INVALID')
+  if (!present) return undefined
+  let prior
+  for (const revision of revisions) {
+    const ledger = JSON.parse((await git(inspected.gitBinary, inspected.root,
+      ['show', `${revision}:${path}`])).toString('utf8'))
+    planFromAttemptLedger(catalog, ledger)
+    if (prior === undefined) demand(ledger.events.length === 0,
+      'ATTEMPT_JOURNAL_NOT_INITIALIZED_EMPTY')
+    else demand(ledger.events.length === prior.events.length + 1
+      && isDeepStrictEqual(ledger.events.slice(0, -1), prior.events),
+    'ATTEMPT_JOURNAL_HISTORY_REWRITTEN')
+    prior = ledger
+  }
+  const current = JSON.parse((await inspected.read(path)).toString('utf8'))
+  demand(isDeepStrictEqual(current, prior), 'ATTEMPT_JOURNAL_CURRENT_CHANGED')
+  for (const event of current.events.filter((item) => item.state !== 'RESERVED')) {
+    demand(event.evidence_ref !== path
+      && /^archive\/content\/visuals\/C03-AFTERFALL\/attempts\/[a-f0-9]{64}\.json$/.test(event.evidence_ref),
+    'ATTEMPT_REF_OBSERVATION_REQUIRED')
+    const record = JSON.parse((await inspected.read(event.evidence_ref)).toString('utf8'))
+    validateAttemptObservation(event, record, event.evidence_ref)
+  }
+  return current
+}
 
 export async function prepareImageRequestsFromPublicRef(options = {}) {
   const inspected = await inspectPublicRef(options)
@@ -26,16 +64,25 @@ export async function prepareImageRequestsFromPublicRef(options = {}) {
   'IMAGE_REQUEST_VISUAL_REVISION_NOT_PINNED')
   const catalog = JSON.parse(bytes.toString('utf8'))
   validateVisualCatalog(catalog)
-  demand(options.dailyHistory == null || options.attemptLedger !== undefined,
+  const journalPath = attemptJournalPath(catalog.content_sha256)
+  const committedJournal = (await git(inspected.gitBinary, inspected.root,
+    ['ls-tree', '-r', '--name-only', inspected.base, '--', journalPath]))
+    .toString('utf8').trim() === journalPath
+  demand(!committedJournal || options.attemptLedger === undefined,
+    'COMMITTED_ATTEMPT_JOURNAL_OVERRIDE_FORBIDDEN')
+  const recordedJournal = await readJournalHistory(inspected, catalog, journalPath,
+    committedJournal)
+  const attemptLedger = committedJournal ? recordedJournal : options.attemptLedger
+  demand(options.dailyHistory == null || attemptLedger !== undefined,
     'DAILY_HISTORY_WITHOUT_ATTEMPT_LEDGER')
-  const selection = options.attemptLedger === undefined
+  const selection = attemptLedger === undefined
     ? planVisualSelection(catalog)
-    : planFromAttemptLedger(catalog, options.attemptLedger,
+    : planFromAttemptLedger(catalog, attemptLedger,
       { dailyHistory: options.dailyHistory ?? null })
   demand(selection.execution_enabled === false, 'IMAGE_EXECUTION_NOT_ALLOWED')
   const byId = new Map(catalog.points.map((point) => [point.point_id, point]))
-  if (options.attemptLedger !== undefined) {
-    for (const event of options.attemptLedger.events) {
+  if (attemptLedger !== undefined) {
+    for (const event of attemptLedger.events) {
       const point = byId.get(event.point_id)
       demand(point?.point_type === 'CHARACTER', 'UNSUPPORTED_LEDGER_IMAGE_POINT')
       const expected = makeImagePocRequest(point, {
@@ -63,9 +110,10 @@ export async function prepareImageRequestsFromPublicRef(options = {}) {
     catalog_sha256: catalog.content_sha256,
     selected_point_ids: selection.selected_point_ids,
     requests, deferred,
-    attempt_history: options.attemptLedger === undefined
-      ? 'NOT_SUPPLIED' : 'CALLER_SUPPLIED_NOT_AUTHENTICATED',
-    ...(options.attemptLedger === undefined ? {} : { attempt_plan: selection }),
+    attempt_history: committedJournal ? 'LOCAL_REF_PINNED_NOT_AUTHENTICATED'
+      : attemptLedger === undefined ? 'NOT_SUPPLIED' : 'CALLER_SUPPLIED_NOT_AUTHENTICATED',
+    ...(attemptLedger === undefined ? {} : { attempt_plan: selection }),
+    ...(committedJournal ? { attempt_journal_path: journalPath } : {}),
     execution_enabled: false, provider_calls: 0, images_generated: 0,
     database_writes: 0, storage_uploads: 0, site_publications: 0,
     zero_added_cost_proven: false }

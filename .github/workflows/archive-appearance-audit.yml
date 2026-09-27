@@ -44,7 +44,12 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: git diff --check "$BASE_SHA" HEAD
+        run: |
+          # The installed worldline migration has a historical blank EOF line.
+          # Preserve its exact blob; still check whitespace in every other file.
+          path=supabase/migrations/20260927042720_afterfall_turn_state_continuity_v1.sql
+          git diff --check "$BASE_SHA" HEAD -- . ":(exclude)$path"
+          test "$(git rev-parse "HEAD:$path")" = "$(git rev-parse "origin/worldline/afterfall-rpg:$path")"
       - name: Test and build the real application
         working-directory: archive/web
         env:

@@ -1,8 +1,15 @@
 /** Historical C03 source order, built from a supplied public S02 inventory. */
 const pad = (n) => String(n).padStart(3, '0')
 const s02Root = 'archive/content/transcripts/C03-AFTERFALL/S02'
+const openingPath = 'archive/content/transcripts/C03-AFTERFALL/S01/OPENING_RECOVERY/PART_OPENING_001.md'
 
 export function c03BaselineCatalog(s02Manifest, paths) {
+  const opening = { archivePath: openingPath, canonicalRef: openingPath,
+    group: 'S01', title: '복구된 시작 기록' }
+  const prelude = Array.from({ length: 8 }, (_, i) => {
+    const path = `archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_${pad(i + 1)}.md`
+    return { archivePath: path, canonicalRef: path, group: 'S01', title: '공유 채팅 복구 기록' }
+  })
   const s01 = Array.from({ length: 10 }, (_, i) => ({
     archivePath: `archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_${pad(i + 1)}.md`,
     canonicalRef: `worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_${pad(i + 1)}.md`,
@@ -21,5 +28,9 @@ export function c03BaselineCatalog(s02Manifest, paths) {
           title: session.source_type === 'SUPABASE_ROLLING_RAW' ? '겨울 생활망과 다섯 거점' : session.session_id === 'SESSION_001' ? '화재선과 겨울' : '첫겨울의 기록',
         }))
     })
-  return [...s01, ...s02]
+  const recoveredFeedbackPath = 'archive/content/transcripts/C03-AFTERFALL/S01/LATE_DOCX_RECOVERY/PART_C03_008_RECOVERED.md'
+  return [opening, ...prelude, ...s01, {
+    archivePath: recoveredFeedbackPath, canonicalRef: recoveredFeedbackPath,
+    group: 'S01', title: 'S01 피드백 원문 복구',
+  }, ...s02]
 }
