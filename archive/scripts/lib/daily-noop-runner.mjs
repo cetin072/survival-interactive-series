@@ -13,10 +13,24 @@ export async function runDailyNoop({ exporter, runner, scheduledDate,
     && !Number.isNaN(Date.parse(`${scheduledDate}T00:00:00Z`)),
   'INVALID_SCHEDULE_DATE')
   demand(/^archive-noop-[a-f0-9-]{36}$/.test(workerId), 'INVALID_WORKER_ID')
-  const identity = await runner.query('select session_user, current_user')
+  const identity = await runner.query(`select session_user::text, current_user::text,
+      r.rolsuper, r.rolbypassrls, r.rolinherit, r.rolcreaterole,
+      exists (select 1 from pg_auth_members m where m.member=r.oid) as has_membership,
+      has_table_privilege(current_user, 'survival_rpg.transcript_messages', 'SELECT') as can_read_source,
+      has_table_privilege(current_user, 'survival_rpg.archive_publication_daily_runs', 'SELECT') as can_read_ledger,
+      has_table_privilege(current_user, 'survival_rpg.archive_publication_daily_runs', 'UPDATE') as can_update_ledger,
+      has_function_privilege(current_user,
+        'survival_rpg.claim_archive_publication_task(text,integer)', 'EXECUTE') as can_claim_task
+    from pg_roles r where r.rolname=current_user`)
+  const role = identity.rows[0]
   demand(identity.rows.length === 1
-    && identity.rows[0].session_user === 'archive_publication_runner'
-    && identity.rows[0].current_user === 'archive_publication_runner',
+    && role.session_user === 'archive_publication_runner'
+    && role.current_user === 'archive_publication_runner'
+    && role.rolsuper === false && role.rolbypassrls === false
+    && role.rolinherit === false && role.rolcreaterole === false
+    && role.has_membership === false && role.can_read_source === false
+    && role.can_read_ledger === false && role.can_update_ledger === false
+    && role.can_claim_task === false,
   'DEDICATED_RUNNER_ROLE_REQUIRED')
 
   const discovery = await discoverLinkedRanges(exporter)
