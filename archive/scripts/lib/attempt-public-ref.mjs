@@ -3,6 +3,8 @@ import { inspectPublicRef } from './reader-public-ref.mjs'
 import { attemptJournalPath, prepareImageRequestsFromPublicRef } from './image-request-public-ref.mjs'
 import { makeAttemptEvent, planFromAttemptLedger } from './attempt-ledger.mjs'
 import { visualDigest } from './visual-compiler.mjs'
+import { makeImagePocRequest, imagePocReceipt, readPocImage } from './image-poc-exchange.mjs'
+import { attemptObservationPath, validateAttemptObservation } from './attempt-observation.mjs'
 import { commitLocalProposalFiles, git } from './atomic-public-segment-git.mjs'
 
 const demand = (ok, code) => { if (!ok) throw new Error(code) }
@@ -102,6 +104,7 @@ export async function commitAttemptTerminalFromPublicRef(options = {}) {
     'EXTERNAL_ATTEMPT_HISTORY_NOT_ALLOWED_FOR_COMMIT')
   demand(['FAILED', 'QUARANTINED'].includes(options.state),
     'ATTEMPT_TERMINAL_STATE_INVALID')
+  demand(options.evidenceRef === undefined, 'EXTERNAL_ATTEMPT_EVIDENCE_REF_FORBIDDEN')
   const { inspected, requests, catalog, path, exists } = await context(options)
   demand(exists && requests.attempt_history === 'LOCAL_REF_PINNED_NOT_AUTHENTICATED',
     'COMMITTED_ATTEMPT_JOURNAL_REQUIRED')
@@ -111,12 +114,39 @@ export async function commitAttemptTerminalFromPublicRef(options = {}) {
   demand(reservation && !ledger.events.some((event) =>
     event.attempt_id === options.attemptId && event.state !== 'RESERVED'),
   'ACTIVE_ATTEMPT_RESERVATION_REQUIRED')
+  const baseObservation = {
+    version: 'archive-image-attempt-observation-v1',
+    authority: 'CALLER_REPORTED_NOT_INDEPENDENTLY_VERIFIED',
+    attempt_id: reservation.attempt_id, request_id: reservation.request_id,
+    point_id: reservation.point_id, generation_key: reservation.generation_key,
+    state: options.state,
+  }
+  let observation
+  if (options.state === 'QUARANTINED') {
+    const point = catalog.points.find((item) => item.point_id === reservation.point_id)
+    demand(point?.point_type === 'CHARACTER', 'ATTEMPT_PORTRAIT_POINT_REQUIRED')
+    const request = makeImagePocRequest(point, {
+      batch_id: catalog.batch_id, source_revision: requests.request_source_revision })
+    demand(request.request_id === reservation.request_id, 'ATTEMPT_REQUEST_CHANGED')
+    const bytes = await readPocImage(options.imageRoot, options.imagePath)
+    const receipt = imagePocReceipt(request, bytes, options.observation)
+    demand(receipt.status === 'QUARANTINED_NOT_AN_ASSET',
+      'ATTEMPT_IMAGE_NOT_QUARANTINED')
+    observation = { ...baseObservation, receipt }
+  } else {
+    demand(['PROVIDER_UNAVAILABLE', 'EXECUTION_ERROR', 'NO_FILE_RETURNED'].includes(options.failureReason),
+      'ATTEMPT_FAILURE_REASON_REQUIRED')
+    observation = { ...baseObservation, failure_reason: options.failureReason }
+  }
+  const evidenceRef = attemptObservationPath(observation)
+  demand(evidenceRef !== path, 'ATTEMPT_OBSERVATION_PATH_COLLISION')
   const event = makeAttemptEvent({
     attempt_id: reservation.attempt_id, request_id: reservation.request_id,
     point_id: reservation.point_id, generation_key: reservation.generation_key,
-    state: options.state, evidence_ref: options.evidenceRef,
+    state: options.state, evidence_ref: evidenceRef,
     previous_event_sha256: ledger.events.at(-1)?.event_sha256 ?? null,
   })
+  validateAttemptObservation(event, observation, evidenceRef)
   const next = { ...ledger, events: [...ledger.events, event] }
   const plan = planFromAttemptLedger(catalog, next)
   demand(plan.execution_enabled === false, 'ATTEMPT_EXECUTION_NOT_ALLOWED')
@@ -129,7 +159,10 @@ export async function commitAttemptTerminalFromPublicRef(options = {}) {
   'ATTEMPT_TERMINAL_NOT_AUTHORIZED')
   const commit = await commitLocalProposalFiles({ repoRoot: inspected.root,
     ref: inspected.ref, baseCommit: inspected.base,
-    files: new Map([[path, Buffer.from(JSON.stringify(next, null, 2) + '\n')]]),
+    files: new Map([
+      [path, Buffer.from(JSON.stringify(next, null, 2) + '\n')],
+      [evidenceRef, Buffer.from(JSON.stringify(observation, null, 2) + '\n')],
+    ]),
     subject: `Close image attempt ${inspected.seasonId}`,
     gitBinary: inspected.gitBinary })
   return { status: 'LOCAL_IMAGE_ATTEMPT_CLOSED_NO_ASSET',

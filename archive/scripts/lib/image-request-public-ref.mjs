@@ -7,6 +7,7 @@ import { inspectPublicRef } from './reader-public-ref.mjs'
 import { verifyVisualAtPublicRef } from './visual-public-ref.mjs'
 import { git } from './atomic-public-segment-git.mjs'
 import { planFromAttemptLedger } from './attempt-ledger.mjs'
+import { validateAttemptObservation } from './attempt-observation.mjs'
 import { isDeepStrictEqual } from 'node:util'
 
 const demand = (ok, code) => { if (!ok) throw new Error(code) }
@@ -38,6 +39,13 @@ async function readJournalHistory(inspected, catalog, path, present) {
   }
   const current = JSON.parse((await inspected.read(path)).toString('utf8'))
   demand(isDeepStrictEqual(current, prior), 'ATTEMPT_JOURNAL_CURRENT_CHANGED')
+  for (const event of current.events.filter((item) => item.state !== 'RESERVED')) {
+    demand(event.evidence_ref !== path
+      && /^archive\/content\/visuals\/C03-AFTERFALL\/attempts\/[a-f0-9]{64}\.json$/.test(event.evidence_ref),
+    'ATTEMPT_REF_OBSERVATION_REQUIRED')
+    const record = JSON.parse((await inspected.read(event.evidence_ref)).toString('utf8'))
+    validateAttemptObservation(event, record, event.evidence_ref)
+  }
   return current
 }
 
