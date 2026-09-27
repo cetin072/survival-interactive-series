@@ -77,7 +77,7 @@ test('incomplete state linkage, private rows and raw content are rejected', () =
 })
 
 
-test('rejects save-version rollback across adjacent turns for APPLIED and NO_STATE_CHANGE', () => {
+test('rejects save-version discontinuities across adjacent turns', () => {
   for (const [outcome, userVersion, gmVersion] of [
     ['APPLIED', 200, 255],
     ['NO_STATE_CHANGE', 200, 200],
@@ -89,8 +89,16 @@ test('rejects save-version rollback across adjacent turns for APPLIED and NO_STA
     input.turn_outcomes[0] = { turn_no: 1, outcome: 'APPLIED', user_save_version: 253, gm_save_version: 254 }
     input.messages[1].save_version = 254
     input.turn_outcomes.push({ turn_no: 2, outcome, user_save_version: userVersion, gm_save_version: gmVersion })
-    assert.throws(() => sealPublicationSegment(input), /CROSS_TURN_SAVE_VERSION_ROLLBACK/)
+    assert.throws(() => sealPublicationSegment(input), /CROSS_TURN_SAVE_VERSION_DISCONTINUITY/)
   }
+  const gap = snapshot()
+  gap.snapshot_end_order = 3
+  gap.session_observed_last_order = 5
+  gap.messages.push(message(2, 'USER', 1, 255), message(3, 'GM', 1, 256))
+  gap.messages[1].save_version = 254
+  gap.turn_outcomes[0] = { turn_no: 1, outcome: 'APPLIED', user_save_version: 253, gm_save_version: 254 }
+  gap.turn_outcomes.push({ turn_no: 2, outcome: 'APPLIED', user_save_version: 255, gm_save_version: 256 })
+  assert.throws(() => sealPublicationSegment(gap), /CROSS_TURN_SAVE_VERSION_DISCONTINUITY/)
 })
 
 test('public provenance references do not grant public publication', () => {
