@@ -38,7 +38,20 @@ try {
     authorizeCommit: async ({ baseCommit, batchId }) => baseCommit === head
       && typeof batchId === 'string' })
   assert.equal(first.status, 'LOCAL_UNIFIED_PROPOSAL_COMMITTED')
-  assert.equal(first.files_in_commit, 3)
+  assert.equal(first.files_in_commit, 4)
+  assert.equal(first.stale_site_assets_removed, 0)
+  assert.deepEqual(git(copy, 'diff-tree', '--no-commit-id', '--name-only', '-r', first.commit)
+    .toString().trim().split('\n'), [
+    'archive/content/graphs/C03-AFTERFALL/GRAPH.json',
+    'archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json',
+    'archive/content/visuals/C03-AFTERFALL/VISUALS.json',
+  ])
+  const firstSite = JSON.parse(git(copy, 'show',
+    `${first.commit}:archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json`))
+  const firstVisual = JSON.parse(git(copy, 'show',
+    `${first.commit}:archive/content/visuals/C03-AFTERFALL/VISUALS.json`))
+  assert.equal(firstSite.visual_catalog_sha256, firstVisual.content_sha256)
+  assert.equal(firstSite.assets.length, 1)
   assert.equal(first.checkout_files_written + first.remote_pushes
     + first.site_publications, 0)
   assert.equal(git(copy, 'rev-parse', ref).toString().trim(), first.commit)
