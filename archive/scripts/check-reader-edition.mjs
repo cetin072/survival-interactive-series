@@ -8,15 +8,36 @@ const root = resolve(import.meta.dirname, '..', '..')
 const normalizeEol = (text) => text.replace(/\r\n/g, '\n')
 const archiveNodeSource = await readFile(resolve(root, 'archive', 'web', 'src', 'archive', 'archiveData.ts'), 'utf8')
 const archiveNodeIds = new Set([...archiveNodeSource.matchAll(/id:\s*'([^']+)'/g)].map((match) => match[1]))
+const recoveryRoot = resolve(root, 'archive', 'content', 'transcripts', 'C03-AFTERFALL', 'S01', 'SHARED_CHAT_RECOVERY')
+const recoveryManifest = JSON.parse(await readFile(resolve(recoveryRoot, 'SOURCE_MANIFEST.json'), 'utf8'))
+const recoverySnapshotBytes = await readFile(resolve(recoveryRoot, 'SOURCE_PUBLIC_MESSAGES.json'))
+const recoverySnapshot = JSON.parse(recoverySnapshotBytes.toString('utf8'))
+const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex')
+if (sha256(recoverySnapshotBytes) !== recoveryManifest.snapshotSha256 || recoverySnapshot.messages.length !== recoveryManifest.publicMessageCount || recoveryManifest.storySceneCount !== 56) throw new Error('Shared-chat source snapshot changed')
+for (const part of recoveryManifest.parts) {
+  const bytes = await readFile(resolve(recoveryRoot, part.file))
+  if (sha256(bytes) !== part.sha256) throw new Error(`Shared-chat RAW changed: ${part.file}`)
+  const content = normalizeEol(bytes.toString('utf8'))
+  for (const message of recoverySnapshot.messages.filter((item) => item.linearIndex >= part.firstLinearIndex && item.linearIndex <= part.lastLinearIndex)) {
+    if (!content.includes(message.content)) throw new Error(`Shared-chat message ${message.linearIndex} lost from ${part.file}`)
+  }
+}
+const docxRoot = resolve(root, 'archive', 'content', 'transcripts', 'C03-AFTERFALL', 'S01', 'LATE_DOCX_RECOVERY')
+const docxManifest = JSON.parse(await readFile(resolve(docxRoot, 'SOURCE_MANIFEST.json'), 'utf8'))
+if (sha256(await readFile(resolve(docxRoot, docxManifest.source.archive_path))) !== docxManifest.source.sha256 || sha256(normalizeEol(await readFile(resolve(docxRoot, docxManifest.recovery.raw_file), 'utf8'))) !== docxManifest.recovery.raw_sha256) throw new Error('Late S01 DOCX recovery changed')
 await validateAfterfallS02Publication({ sourceRef: process.env.ARCHIVE_AFTERFALL_SOURCE_REF })
 for (const book of await makeBooks()) {
   if (book.chronicleId === 'C03-AFTERFALL') {
-    const [opening, ...existing] = book.chapters
+    const [opening, ...following] = book.chapters
+    const preludes = following.slice(0, 8)
+    const existing = following.slice(8)
     if (opening?.id !== 'c03-afterfall-opening-01' || opening.chapterNumber !== 0 || !opening.body.startsWith('# S1 — 균열\n\n2026년 9월 18일 13:42')) throw new Error('Recovered C03 opening is not first')
     if (existing.length < 24 || createHash('sha256').update(JSON.stringify(existing.slice(0, 24))).digest('hex') !== 'b23374ad37254bd1484df9a7de91dd56b3f0cbf7c5cef8417864fb00b622cbf8') throw new Error('Existing C03 Reader chapters changed')
     if (/캐릭터 생성|부모의 채무|연애 중|(?:^|\n)## (?:선택|다음 행동)|(?:^|\n)\d+\. 자유행동/m.test(opening.body) || opening.relatedNodeIds.length) throw new Error('Opening choice/setup leaked or historical facts were linked to current graph')
     if (!opening.body.includes('“7번 베드 코드블루!”') || !opening.body.includes('그리고 자동문 너머로 또 구급차 한 대가 들어온다.')) throw new Error('Opening GM prose was lost')
-    if (book.beginningStatus !== 'PARTIAL_BEGINNING_RECOVERED' || book.beginningGap?.after !== '2026-09-18 14:12' || book.beginningGap?.before !== '2026-10-23 20:10') throw new Error('Recovered C03 interval is not explicit')
+    if (preludes.length !== 8 || preludes.some((chapter, index) => chapter.id !== `c03-afterfall-prelude-${String(index + 1).padStart(2, '0')}` || chapter.relatedNodeIds.length || /(?:^|\n)#{1,4}\s*(?:다음 선택|다음 판단|현재 선택지|\d+[.)])|자유행동|(?:^|\n)## USER/m.test(chapter.body))) throw new Error('Shared-chat Reader backfill contains a choice gate or unstable id')
+    if (!preludes[0].body.startsWith('## 14:14 — 병원 밖') || !preludes.at(-1).body.startsWith('## 10월 23일 17:36')) throw new Error('Shared-chat Reader interval is incomplete')
+    if (book.beginningStatus !== 'OPENING_PLAY_RECOVERED' || book.beginningGap) throw new Error('Recovered C03 interval still marked missing')
   }
   const file = resolve(root, 'archive', 'content', 'stories', book.chronicleId, 'BOOK.json')
   const saved = await readFile(file, 'utf8')

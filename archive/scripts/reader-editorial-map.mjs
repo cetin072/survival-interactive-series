@@ -6,6 +6,8 @@ const c01 = (number) => `seasons_v2/${number === 10 ? 'S02' : 'S01'}/raw_transcr
 const c02 = (session, number) => `archive/content/transcripts/C02-STRONGHOLD/SESSIONS/${session}/PART_${String(number).padStart(3, '0')}.md`
 const c03s1 = (number) => `archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_${String(number).padStart(3, '0')}.md`
 const c03Opening = 'archive/content/transcripts/C03-AFTERFALL/S01/OPENING_RECOVERY/PART_OPENING_001.md'
+const c03Prelude = (number) => `archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_${String(number).padStart(3, '0')}.md`
+const c03LateRecovery = 'archive/content/transcripts/C03-AFTERFALL/S01/LATE_DOCX_RECOVERY/PART_C03_008_RECOVERED.md'
 const c03s2 = (session, number) => `archive/content/transcripts/C03-AFTERFALL/S02/${session}/PART_${String(number).padStart(3, '0')}.md`
 const source = (path, range = {}) => ({ path, ...range })
 
@@ -18,6 +20,7 @@ export const editorialOverrides = {
     [c03s1(6)]: 'design_retro_only',
     [c03s1(7)]: 'design_plan_only',
     [c03s1(8)]: 'operational_meta_only',
+    [c03LateRecovery]: 'postseason_feedback_only',
     [c03s1(9)]: 'operational_meta_only',
     [c03s1(10)]: 'operational_meta_only',
   },
@@ -57,6 +60,7 @@ export const editorialPlan = {
   ],
   'C03-AFTERFALL': [
     { id: 'c03-afterfall-opening-01', chapterNumber: 0, title: '균열', seasonId: 'S01', arcLabel: '복구된 시작 장면', dateLabel: '2026-09-18 13:42', sources: [source(c03Opening)], relatedNodeIds: [] },
+    ...['병원 밖', '사람을 찾다', '두 거점의 첫 연결', '공동저장고', '자원 수지', '재난의 원인', '철수 준비', '10월 23일'].map((title, index) => ({ id: `c03-afterfall-prelude-${String(index + 1).padStart(2, '0')}`, chapterNumber: 0, title, seasonId: 'S01', arcLabel: '복구된 초기 플레이', dateLabel: index === 0 ? '2026-09-18 14:14' : index === 7 ? '2026-10-23 17:36' : 'S01', sources: [source(c03Prelude(index + 1))], relatedNodeIds: [] })),
     { title: '두 번째 거점', seasonId: 'S01', arcLabel: '두 거점과 외곽', dateLabel: 'S01', sources: [source(c03s1(1))], relatedNodeIds: ['char-jinwoo', 'loc-nw-center', 'loc-agri'] },
     { title: '정식 연합체', seasonId: 'S01', arcLabel: '두 거점과 외곽', dateLabel: 'S01', sources: [source(c03s1(2), { before: '## 11월 2일 08:05' })], relatedNodeIds: ['char-jinwoo', 'loc-agri'] },
     { title: '폐쇄된 체육시설', seasonId: 'S01', arcLabel: '두 거점과 외곽', dateLabel: 'S01', sources: [source(c03s1(2), { from: '## 11월 2일 08:05' })], relatedNodeIds: ['char-jinwoo', 'loc-contact'] },
