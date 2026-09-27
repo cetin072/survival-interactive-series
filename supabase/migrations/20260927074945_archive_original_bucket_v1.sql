@@ -1,4 +1,3 @@
--- Private archive-only originals. Service-role runner uploads; no public object policy.
 do $archive_bucket$
 declare
   v_bucket storage.buckets%rowtype;

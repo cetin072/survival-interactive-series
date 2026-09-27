@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import io
+import json
 from pathlib import Path
 
 from PIL import Image
@@ -37,15 +38,23 @@ def main() -> None:
     generated = derive(args.source.read_bytes())
     if args.check:
         committed = args.output.read_bytes()
+        record = json.loads(args.output.with_suffix('.json').read_text(encoding='utf-8'))
+        if (record.get('source_sha256') != hashlib.sha256(args.source.read_bytes()).hexdigest()
+                or record.get('derivative_sha256') != hashlib.sha256(committed).hexdigest()
+                or record.get('derivative_bytes') != len(committed)
+                or record.get('derivative_version') != 'site-png-512-v1'):
+            raise ValueError('DERIVATIVE_PROVENANCE_MISMATCH')
         if generated != committed:
             with Image.open(io.BytesIO(generated)) as generated_image:
                 generated_pixels = hashlib.sha256(generated_image.convert("RGB").tobytes()).hexdigest()
             with Image.open(io.BytesIO(committed)) as committed_image:
+                if (committed_image.width != record.get('derivative_width')
+                        or committed_image.height != record.get('derivative_height')):
+                    raise ValueError('DERIVATIVE_DIMENSIONS_MISMATCH')
                 committed_pixels = hashlib.sha256(committed_image.convert("RGB").tobytes()).hexdigest()
-            print(f"generated_sha256={hashlib.sha256(generated).hexdigest()} "
-                  f"committed_sha256={hashlib.sha256(committed).hexdigest()} "
-                  f"generated_pixel_sha256={generated_pixels} committed_pixel_sha256={committed_pixels}")
-            raise ValueError("DERIVATIVE_NOT_FROM_SOURCE")
+            if generated_pixels != committed_pixels:
+                raise ValueError("DERIVATIVE_NOT_FROM_SOURCE")
+            print(f"pixel_sha256={committed_pixels} encoding=PLATFORM_DIFFERENT")
     else:
         args.output.write_bytes(generated)
     print(f"sha256={hashlib.sha256(generated).hexdigest()} bytes={len(generated)}")
