@@ -22,6 +22,26 @@ const git = (root, ...args) => run(gitBinary, ['-C', root, ...args],
   { windowsHide: true })
 const hash = (value) => createHash('sha256').update(value).digest('hex')
 const uuid = (tail) => `00000000-0000-4000-8000-${String(tail).padStart(12, '0')}`
+const githubToken = 'synthetic-test-token-never-used-remotely'
+
+function fakeGitHub(root) {
+  let next = 100
+  return async (url, options) => {
+    const path = new URL(url)
+    if (options.method !== 'POST') return { ok: true, json: async () => [] }
+    const body = JSON.parse(options.body)
+    assert.equal(body.draft, true)
+    assert.equal(body.base, 'main')
+    const sha = (await git(root, 'ls-remote', '--heads', 'origin',
+      `refs/heads/${body.head}`)).stdout.split('\t')[0]
+    const number = next++
+    assert.ok(/^[a-f0-9]{40}$/.test(sha))
+    assert.equal(path.pathname, '/repos/cetin072/survival-interactive-series/pulls')
+    return { ok: true, json: async () => ({ number, state: 'open', draft: true,
+      merged_at: null, head: { ref: body.head, sha }, base: { ref: 'main' },
+      html_url: `https://github.com/cetin072/survival-interactive-series/pull/${number}` }) }
+  }
+}
 
 async function approvedBundle(baseCommit, sessionTail) {
   const rows = [
@@ -74,14 +94,29 @@ test('dedicated task RPCs produce one remote text proposal and recover a lost le
     await git(root, 'remote', 'add', 'origin', remote)
     await git(root, 'push', 'origin', 'main')
     const baseCommit = (await git(root, 'rev-parse', 'HEAD')).stdout.trim()
+    const fetchImpl = fakeGitHub(root)
     await Promise.all([runner.connect(), admin.connect()])
     await assert.rejects(runner.query(
       'select * from survival_rpg.archive_publication_tasks'), /permission denied/)
+    await assert.rejects(runner.query(
+      'select * from survival_rpg.claim_archive_publication_task($1::text,$2::integer)',
+      ['ci-forbidden-global', 30]), /permission denied/)
+    const unrelatedInput = await approvedBundle(baseCommit, 9)
+    const unrelated = textProposalIdentity(unrelatedInput.candidate,
+      unrelatedInput.bundle)
+    await runner.query(`select * from survival_rpg.enqueue_archive_publication_task(
+      $1::text,$2::text,$3::text,$4::text,$5::text,$6::text,$7::text,$8::text)`,
+    [unrelated.taskId, unrelated.batchId, unrelated.planId, 'TEXT_SOURCE',
+      'C03-AFTERFALL', 'AFTERFALL', unrelated.seasonId, unrelated.sourceSha256])
     const firstInput = await approvedBundle(baseCommit, 1)
     const first = await runApprovedTextProposal({ runner,
       scheduledDate: '2026-01-03', ...firstInput, repoRoot: root,
-      authorizeCommit: async () => true, gitBinary })
-    assert.equal(first.status, 'LOCAL_TEXT_PROPOSAL_COMPLETE')
+      authorizeCommit: async () => true, gitBinary, githubToken, fetchImpl })
+    assert.equal(first.status, 'DRAFT_TEXT_PR_READY')
+    assert.equal(first.pr_number, 100)
+    assert.deepEqual((await admin.query(`select status,attempt_count
+      from survival_rpg.archive_publication_tasks where task_id=$1`,
+    [unrelated.taskId])).rows[0], { status: 'PENDING', attempt_count: 0 })
     assert.equal(first.proposal_reused, false)
     const state = await admin.query(`select d.status as daily_status,
       t.status as task_status, t.attempt_count as task_attempts
@@ -98,7 +133,7 @@ test('dedicated task RPCs produce one remote text proposal and recover a lost le
     const replay = await runApprovedTextProposal({ runner,
       scheduledDate: '2026-01-03', ...firstInput, repoRoot: root,
       authorizeCommit: async () => { throw new Error('REPLAY_MUST_NOT_COMMIT') },
-      gitBinary })
+      gitBinary, githubToken, fetchImpl })
     assert.equal(replay.status, 'NOOP')
     assert.equal(replay.claimed, false)
     assert.equal((await admin.query(`select count(*)::integer as n
@@ -120,8 +155,8 @@ test('dedicated task RPCs produce one remote text proposal and recover a lost le
     [date, oldDaily.out_claim_version, oldDaily.out_lease_token,
       identity.batchId, identity.planId])
     const oldTask = (await runner.query(
-      'select * from survival_rpg.claim_archive_publication_task($1::text,$2::integer)',
-      [abandoned, 30])).rows[0]
+      'select * from survival_rpg.claim_archive_publication_task_by_id($1::text,$2::text,$3::integer)',
+      [identity.taskId, abandoned, 30])).rows[0]
     assert.equal(oldTask.out_task_id, identity.taskId)
     const pushed = await commitOrReuseRemoteTextProposal(resumedInput.bundle,
       { repoRoot: root, taskId: identity.taskId,
@@ -136,8 +171,9 @@ test('dedicated task RPCs produce one remote text proposal and recover a lost le
     const recovered = await runApprovedTextProposal({ runner,
       scheduledDate: date, ...resumedInput, repoRoot: root,
       authorizeCommit: async () => { throw new Error('REPLAY_MUST_NOT_COMMIT') },
-      gitBinary })
-    assert.equal(recovered.status, 'LOCAL_TEXT_PROPOSAL_COMPLETE')
+      gitBinary, githubToken, fetchImpl })
+    assert.equal(recovered.status, 'DRAFT_TEXT_PR_READY')
+    assert.equal(recovered.pr_number, 101)
     assert.equal(recovered.proposal_reused, true)
     assert.equal(recovered.proposal_commit, pushed.commit)
     const attempts = (await admin.query(`select attempt_count, status

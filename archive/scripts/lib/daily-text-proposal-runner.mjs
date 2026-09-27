@@ -5,6 +5,7 @@
 import { createHash, randomUUID } from 'node:crypto'
 import { fingerprint } from './publication-plan.mjs'
 import { commitOrReuseRemoteTextProposal } from './remote-text-proposal.mjs'
+import { openOrReuseDraftTextPr } from './github-text-proposal-pr.mjs'
 
 const demand = (ok, code) => { if (!ok) throw new Error(code) }
 const digest = (value) => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value)
@@ -67,7 +68,9 @@ export async function requirePublicationRunnerRole(runner) {
       has_table_privilege(current_user, 'survival_rpg.archive_publication_tasks', 'SELECT') as can_read_tasks,
       has_table_privilege(current_user, 'survival_rpg.archive_publication_tasks', 'UPDATE') as can_update_tasks,
       has_function_privilege(current_user,
-        'survival_rpg.claim_archive_publication_task(text,integer)', 'EXECUTE') as can_claim_task,
+        'survival_rpg.claim_archive_publication_task_by_id(text,text,integer)', 'EXECUTE') as can_claim_task,
+      has_function_privilege(current_user,
+        'survival_rpg.claim_archive_publication_task(text,integer)', 'EXECUTE') as can_claim_any_task,
       has_function_privilege(current_user,
         'survival_rpg.renew_archive_publication_task_lease(text,bigint,uuid,integer)', 'EXECUTE') as can_renew_task,
       has_function_privilege(current_user,
@@ -82,6 +85,7 @@ export async function requirePublicationRunnerRole(runner) {
     && role.rolcreatedb === false && role.has_membership === false
     && role.can_read_source === false && role.can_read_tasks === false
     && role.can_update_tasks === false && role.can_claim_task === true
+    && role.can_claim_any_task === false
     && role.can_renew_task === true && role.can_finish_task === true,
   'DEDICATED_PUBLICATION_RUNNER_REQUIRED')
 }
@@ -112,12 +116,15 @@ async function finishTask(runner, claim, status, receipt,
  */
 export async function runApprovedTextProposal({ runner, scheduledDate,
   candidate, bundle, repoRoot, authorizeCommit,
+  githubToken = process.env.GITHUB_TOKEN,
+  fetchImpl = globalThis.fetch,
   gitBinary = process.env.ARCHIVE_GIT_BINARY || 'git',
   workerId = `archive-text-${randomUUID()}`, leaseSeconds = 300 } = {}) {
   demand(date(scheduledDate), 'INVALID_SCHEDULE_DATE')
   demand(/^archive-text-[a-f0-9-]{36}$/.test(workerId)
     && Number.isInteger(leaseSeconds) && leaseSeconds >= 30 && leaseSeconds <= 1800
-    && repoRoot && typeof authorizeCommit === 'function',
+    && repoRoot && typeof authorizeCommit === 'function'
+    && typeof githubToken === 'string' && githubToken.length >= 20,
   'INVALID_TEXT_RUNNER_CONFIGURATION')
   const identity = textProposalIdentity(candidate, bundle)
   await requirePublicationRunnerRole(runner)
@@ -156,21 +163,12 @@ export async function runApprovedTextProposal({ runner, scheduledDate,
   }
 
   const claimed = await runner.query(
-    'select * from survival_rpg.claim_archive_publication_task($1::text,$2::integer)',
-    [workerId, leaseSeconds])
+    'select * from survival_rpg.claim_archive_publication_task_by_id($1::text,$2::text,$3::integer)',
+    [identity.taskId, workerId, leaseSeconds])
   demand(claimed.rows?.length === 1, 'TEXT_TASK_NOT_CLAIMED')
   const task = claimed.rows[0]
-  if (task.out_task_id !== identity.taskId) {
-    await finishTask(runner, task, 'RETRY_WAIT',
-      { result: 'SKIPPED', reason_code: 'TASK_ROUTING_MISMATCH' },
-      'TASK_ROUTING_MISMATCH', 30)
-    await finishDaily(runner, scheduledDate, daily, 'RETRY_WAIT',
-      { result: 'SKIPPED', reason_code: 'TASK_ROUTING_MISMATCH' },
-      'TASK_ROUTING_MISMATCH', 30)
-    return { status: 'RETRY_WAIT', claimed: true, task_id: identity.taskId,
-      site_publications: 0 }
-  }
-  demand(task.out_batch_id === identity.batchId
+  demand(task.out_task_id === identity.taskId
+    && task.out_batch_id === identity.batchId
     && task.out_plan_id === identity.planId
     && task.out_source_snapshot_sha256 === identity.sourceSha256
     && task.out_task_kind === 'TEXT_SOURCE'
@@ -208,16 +206,19 @@ export async function runApprovedTextProposal({ runner, scheduledDate,
     && /^refs\/heads\/codex\/archive-publication-[a-z0-9-]{1,50}$/.test(proposal?.remoteRef)
     && proposal.remoteVerified === true
     && typeof proposal.reused === 'boolean', 'TEXT_PROPOSAL_RESULT_INVALID')
+  const pr = await openOrReuseDraftTextPr({ remoteRef: proposal.remoteRef,
+    commit: proposal.commit, token: githubToken, fetchImpl })
   await renew()
   await finishTask(runner, task, 'COMPLETE',
-    { result: 'COMPLETE', reason_code: 'LOCAL_TEXT_PROPOSAL',
-      source_sha256: identity.sourceSha256 })
+    { result: 'COMPLETE', reason_code: 'DRAFT_TEXT_PR',
+      source_sha256: identity.sourceSha256, pr_number: String(pr.prNumber) })
   await finishDaily(runner, scheduledDate, daily, 'COMPLETE',
-    { result: 'COMPLETE', reason_code: 'LOCAL_TEXT_PROPOSAL',
-      source_sha256: identity.sourceSha256 })
-  return { status: 'LOCAL_TEXT_PROPOSAL_COMPLETE', task_id: identity.taskId,
+    { result: 'COMPLETE', reason_code: 'DRAFT_TEXT_PR',
+      source_sha256: identity.sourceSha256, pr_number: String(pr.prNumber) })
+  return { status: 'DRAFT_TEXT_PR_READY', task_id: identity.taskId,
     batch_id: identity.batchId, plan_id: identity.planId,
     proposal_commit: proposal.commit, proposal_ref: proposal.remoteRef,
-    proposal_reused: proposal.reused,
+    proposal_reused: proposal.reused, pr_number: pr.prNumber,
+    pr_reused: pr.reused,
     site_publications: 0 }
 }
