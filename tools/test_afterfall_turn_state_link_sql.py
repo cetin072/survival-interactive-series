@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MIGRATION = ROOT / "supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql"
 CONTINUITY_MIGRATION = ROOT / "supabase/migrations/20260927042720_afterfall_turn_state_continuity_v1.sql"
+INTEGRITY_MIGRATION = ROOT / "supabase/migrations/20260927095300_afterfall_turn_link_message_integrity_v1.sql"
 
 
 class TurnStateLinkMigrationTests(unittest.TestCase):
@@ -33,7 +34,9 @@ class TurnStateLinkMigrationTests(unittest.TestCase):
         self.assertNotIn("to authenticated", self.sql)
 
     def test_pair_and_link_share_transaction_and_lock_current_save(self) -> None:
-        lock = self.sql.index("for update")
+        rpc_start = self.sql.index("create function survival_rpg.append_public_transcript_turn_with_state_link")
+        rpc = self.sql[rpc_start:]
+        lock = rpc.index("for update")
         stale_guard = self.sql.index("authoritative save head changed before transcript capture")
         user_append = self.sql.index("v_user := survival_rpg.append_public_transcript_message", stale_guard)
         gm_append = self.sql.index("v_gm := survival_rpg.append_public_transcript_message", user_append)
@@ -69,6 +72,43 @@ class TurnStateLinkMigrationTests(unittest.TestCase):
         self.assertNotIn("drop ", sql)
         self.assertNotRegex(sql, r"\b(update|delete)\s+survival_rpg\.(saves|transcript_messages|transcript_turn_state_links)\b")
         self.assertNotIn("grant execute", sql)
+
+    def test_new_additive_migration_hardens_installed_trigger_without_rewriting_it(self) -> None:
+        sql = INTEGRITY_MIGRATION.read_text(encoding="utf-8").lower()
+        self.assertIn("create or replace function survival_rpg.enforce_afterfall_turn_state_continuity()", sql)
+        self.assertIn("set search_path = pg_catalog, survival_rpg", sql)
+        self.assertIn("security invoker", sql)
+        self.assertIn("create or replace function survival_rpg.lock_afterfall_authoritative_save_head(", sql)
+        self.assertIn("security definer", sql)
+        self.assertIn("set search_path = pg_catalog", sql)
+        self.assertIn("p_worldline_id is distinct from 'afterfall'", sql)
+        self.assertIn("from survival_rpg.saves as s", sql)
+        self.assertIn("for update", sql)
+        self.assertIn("grant execute on function survival_rpg.lock_afterfall_authoritative_save_head(text)", sql)
+        self.assertIn("to service_role", sql)
+        self.assertIn("create or replace function survival_rpg.append_public_transcript_turn_with_state_link(", sql)
+        rpc = sql[sql.index("create or replace function survival_rpg.append_public_transcript_turn_with_state_link("):]
+        self.assertIn("security invoker", rpc)
+        self.assertIn("lock_afterfall_authoritative_save_head(p_worldline_id)", rpc)
+        self.assertNotIn("for update", rpc)
+        self.assertNotIn("raise exception 'afterfall authoritative save is missing'", rpc)
+        self.assertNotIn("for update", rpc)
+        self.assertIn("lock_afterfall_authoritative_save_head(new.worldline_id)", sql)
+        self.assertIn("lock_afterfall_authoritative_save_head(p_worldline_id)", sql)
+        self.assertIn("new.linked_save_version is distinct from v_current_save_version", sql)
+        self.assertIn("v_user_role is distinct from 'user'", sql)
+        self.assertIn("v_gm_role is distinct from 'gm'", sql)
+        self.assertIn("v_user_turn_no is distinct from new.turn_no", sql)
+        self.assertIn("v_gm_turn_no is distinct from new.turn_no", sql)
+        self.assertIn("v_gm_message_order is distinct from v_user_message_order + 1", sql)
+        self.assertNotIn("for share", sql)
+        self.assertIn("new.turn_no - 1", sql)
+        self.assertIn("new.turn_no + 1", sql)
+        self.assertNotIn("create trigger", sql)
+        self.assertNotIn("drop ", sql)
+        self.assertNotRegex(sql, r"\b(update|delete)\s+survival_rpg\.(saves|transcript_messages|transcript_turn_state_links)\b")
+        self.assertEqual(sql.count("grant execute on function"), 1)
+        self.assertIn("from public, anon, authenticated", sql)
 
 
 if __name__ == "__main__":

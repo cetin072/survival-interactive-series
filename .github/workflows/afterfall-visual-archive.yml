@@ -21,8 +21,11 @@ on:
       - "tools/test_afterfall_turn_state_link_sql.py"
       - "supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql"
       - "supabase/migrations/20260927042720_afterfall_turn_state_continuity_v1.sql"
+      - "supabase/migrations/20260927095300_afterfall_turn_link_message_integrity_v1.sql"
       - "supabase/tests/afterfall_atomic_turn_state_link_v1_verification.sql"
       - "supabase/tests/afterfall_turn_state_continuity_v1_verification.sql"
+      - "supabase/tests/afterfall_turn_link_message_integrity_v1_verification.sql"
+      - "supabase/tests/fixtures/afterfall_turn_link_integrity_bootstrap.sql"
       - "worldlines/AFTERFALL/BOOT.md"
       - "worldlines/AFTERFALL/START_ROOM.md"
       - "worldlines/AFTERFALL/PLAY_SESSION_PROTOCOL_V3.md"
@@ -51,8 +54,11 @@ on:
       - "tools/test_afterfall_turn_state_link_sql.py"
       - "supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql"
       - "supabase/migrations/20260927042720_afterfall_turn_state_continuity_v1.sql"
+      - "supabase/migrations/20260927095300_afterfall_turn_link_message_integrity_v1.sql"
       - "supabase/tests/afterfall_atomic_turn_state_link_v1_verification.sql"
       - "supabase/tests/afterfall_turn_state_continuity_v1_verification.sql"
+      - "supabase/tests/afterfall_turn_link_message_integrity_v1_verification.sql"
+      - "supabase/tests/fixtures/afterfall_turn_link_integrity_bootstrap.sql"
       - "worldlines/AFTERFALL/BOOT.md"
       - "worldlines/AFTERFALL/START_ROOM.md"
       - "worldlines/AFTERFALL/PLAY_SESSION_PROTOCOL_V3.md"
@@ -108,4 +114,41 @@ jobs:
         run: python tools/validate_afterfall_live_turn_fast_path.py
       - name: Verify additive state-link migration contract
         run: python -m unittest -v tools.test_afterfall_turn_state_link_sql
+
+  turn-link-integrity-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: afterfall_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d afterfall_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGPASSWORD: postgres
+      PGHOST: localhost
+      PGUSER: postgres
+      PGDATABASE: afterfall_test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client for the disposable CI database
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y postgresql-client
+      - name: Bootstrap isolated synthetic AFTERFALL schema
+        run: psql -v ON_ERROR_STOP=1 -f supabase/tests/fixtures/afterfall_turn_link_integrity_bootstrap.sql
+      - name: Apply the installed atomic capture API unchanged
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql
+      - name: Apply the installed continuity migration unchanged
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260927042720_afterfall_turn_state_continuity_v1.sql
+      - name: Apply additive message and save-head guard
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260927095300_afterfall_turn_link_message_integrity_v1.sql
+      - name: Verify linked pair acceptance and unsafe-link rejection
+        run: psql -v ON_ERROR_STOP=1 -f supabase/tests/afterfall_turn_link_message_integrity_v1_verification.sql
 
