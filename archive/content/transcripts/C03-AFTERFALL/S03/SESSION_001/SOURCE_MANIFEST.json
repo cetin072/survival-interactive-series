@@ -1,0 +1,114 @@
+{
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "protagonist": "서진우",
+  "season_id": "S03",
+  "session_id": "SESSION_001",
+  "source_type": "SUPABASE_ROLLING_RAW_SEGMENT",
+  "source_session_uuid": "8ef127f7-4729-4161-9784-49123171ad2a",
+  "source_session_status_at_capture": "OPEN",
+  "visibility": "PUBLIC_ARCHIVE",
+  "archive_class": "COLD_RAW",
+  "public_safe_only": true,
+  "status": "PARTIAL",
+  "capture_quality": "VERIFIED_CONTIGUOUS_TURN_PAIRS",
+  "atomic_pairing_complete": true,
+  "coverage_basis": "captured_message_range",
+  "captured_message_range": {
+    "start": "2027-04-08 11:30",
+    "end": "2027-04-11 17:20"
+  },
+  "source_message_order": {
+    "min": 42,
+    "max": 49,
+    "contiguous": true,
+    "archive_offset": 42
+  },
+  "closed_at": "2026-09-27 16:32:46.636015+00",
+  "closure_meaning": "This eight-message archive segment was sealed at the last recorded row; the source DB session remains OPEN.",
+  "counts": {
+    "user": 4,
+    "gm": 4,
+    "total": 8,
+    "assistant_public_meta": 0
+  },
+  "message_order": {
+    "min": 0,
+    "max": 7,
+    "contiguous": true
+  },
+  "parts": [
+    "PART_001.md"
+  ],
+  "parts_sha256": {
+    "PART_001.md": "6048547fc3db3f06758ca22c6951eb838a04ce713f07b7c7837a88ab8ce6646d"
+  },
+  "content_sha256": [
+    {
+      "message_order": 0,
+      "source_message_order": 42,
+      "turn_no": 17,
+      "role": "USER",
+      "sha256": "eede802a30a474f5bf00cd75dd14fa99963e384120d97827af456e55191a75c8",
+      "save_version": 254
+    },
+    {
+      "message_order": 1,
+      "source_message_order": 43,
+      "turn_no": 17,
+      "role": "GM",
+      "sha256": "5f242a08d46db76d83fa4b92846bcff47b6685262d03ba498d654145476ca3e1",
+      "save_version": 255
+    },
+    {
+      "message_order": 2,
+      "source_message_order": 44,
+      "turn_no": 18,
+      "role": "USER",
+      "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+      "save_version": 255
+    },
+    {
+      "message_order": 3,
+      "source_message_order": 45,
+      "turn_no": 18,
+      "role": "GM",
+      "sha256": "492d824a1ca17181de06932b3fe006cf19239e70f7054e64243a5a6d0521b00d",
+      "save_version": 256
+    },
+    {
+      "message_order": 4,
+      "source_message_order": 46,
+      "turn_no": 19,
+      "role": "USER",
+      "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+      "save_version": 256
+    },
+    {
+      "message_order": 5,
+      "source_message_order": 47,
+      "turn_no": 19,
+      "role": "GM",
+      "sha256": "2262cedbd842b89acf6b3f563b1837467a1c1ddade4e1dadaec4f871a70dc927",
+      "save_version": 257
+    },
+    {
+      "message_order": 6,
+      "source_message_order": 48,
+      "turn_no": 20,
+      "role": "USER",
+      "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+      "save_version": 257
+    },
+    {
+      "message_order": 7,
+      "source_message_order": 49,
+      "turn_no": 20,
+      "role": "GM",
+      "sha256": "6bd589a8942f53da54c9e1a0a3d628d486b60a251c6295a95df24eda163daf31",
+      "save_version": 258
+    }
+  ],
+  "source_policy": "Exact public_safe USER/GM content; no hidden, tool, or private messages. The original orders 0–41 are outside this segment and remain unarchived."
+}
+

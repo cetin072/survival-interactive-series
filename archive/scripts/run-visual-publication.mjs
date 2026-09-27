@@ -44,10 +44,12 @@ export async function prepareVisualPublication(snapshot, { factsRef = null, appe
   const preparedGraph = await prepareGraphPublication(snapshot, factsRef)
   // Only this reviewed S02 editorial decision has a default. Other snapshots
   // still require an explicit dated appearance input when the legacy UI drifts.
-  const reviewedAppearanceRef = appearancesRef ?? (snapshot.season_id === 'S02' ? APPROVED_S02_APPEARANCE_REF : null)
+  // The dated S02 approval remains valid for unchanged appearances in a later batch.
+  const reviewedAppearanceRef = appearancesRef ?? APPROVED_S02_APPEARANCE_REF
   let appearances
   if (reviewedAppearanceRef) {
-    const loaded = approvedJSON(sha, reviewedAppearanceRef, 'public-facts', snapshot.season_id)
+    const appearanceSeason = reviewedAppearanceRef === APPROVED_S02_APPEARANCE_REF ? 'S02' : snapshot.season_id
+    const loaded = approvedJSON(sha, reviewedAppearanceRef, 'public-facts', appearanceSeason)
     demand(Array.isArray(loaded.data.records), 'MISSING_APPEARANCE_RECORDS')
     appearances = { ...loaded.data, records: loaded.data.records.map((item) => {
       demand(!Object.hasOwn(item, 'evidence'), 'CALLER_APPEARANCE_EVIDENCE_REJECTED')
