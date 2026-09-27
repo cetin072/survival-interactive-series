@@ -94,13 +94,21 @@ def storage_readback():
     return original
 
 
-def image_check(source, derivative):
-    fail_if(digest(source) != SOURCE_SHA, "APPROVED_ORIGINAL_SHA_MISMATCH")
-    fail_if(digest(derivative) != DERIVATIVE_SHA or len(derivative) != ASSET["bytes"],
-            "DERIVATIVE_MISMATCH")
-    with Image.open(io.BytesIO(derivative)) as image:
+def checked_pixels(data):
+    with Image.open(io.BytesIO(data)) as image:
         fail_if(image.format != "PNG" or image.size != (512, 512), "DERIVATIVE_IMAGE_INVALID")
         image.verify()
+    with Image.open(io.BytesIO(data)) as image:
+        return digest(image.convert("RGB").tobytes())
+
+
+def image_check(source, generated, committed):
+    fail_if(digest(source) != SOURCE_SHA, "APPROVED_ORIGINAL_SHA_MISMATCH")
+    fail_if(digest(committed) != DERIVATIVE_SHA or len(committed) != ASSET["bytes"],
+            "DERIVATIVE_MISMATCH")
+    fail_if(checked_pixels(generated) != checked_pixels(committed),
+            "DERIVATIVE_NOT_FROM_ORIGINAL")
+    return "BYTE_EXACT" if generated == committed else "PIXEL_EQUIVALENT"
 
 
 def desired_manifest():
@@ -113,13 +121,13 @@ def desired_manifest():
 
 def deliver(source, mode, catalog_path, check_only=False):
     catalog_status = catalog_check(catalog_path)
+    fail_if(digest(source) != SOURCE_SHA, "APPROVED_ORIGINAL_SHA_MISMATCH")
     derivative = derive(source)
-    image_check(source, derivative)
     expected = desired_manifest()
     public_file = PUBLIC / f"{DERIVATIVE_SHA}.png"
     new_asset = not public_file.exists()
-    if not new_asset:
-        fail_if(public_file.read_bytes() != derivative, "EXISTING_ASSET_CONFLICT")
+    committed = public_file.read_bytes() if not new_asset else derivative
+    derivative_match = image_check(source, derivative, committed)
     new_manifest = not MANIFEST.exists()
     if not new_manifest:
         fail_if(json.loads(MANIFEST.read_text(encoding="utf-8")) != expected,
@@ -135,7 +143,7 @@ def deliver(source, mode, catalog_path, check_only=False):
             "catalog": catalog_status, "source_sha256": SOURCE_SHA, "derivative_sha256": DERIVATIVE_SHA,
             "storage_objects_created": 0, "site_assets_created": int(new_asset and not check_only),
             "manifests_created": int(new_manifest and not check_only), "duplicates": 0,
-            "read_only": check_only,
+            "read_only": check_only, "derivative_match": derivative_match,
             "public_path": ASSET["public_path"]}
 
 
