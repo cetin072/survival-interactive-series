@@ -211,5 +211,30 @@ class CaptureSyncAuditTests(unittest.TestCase):
                                  ("NEEDS_GM_REVIEW", "TURN_STATE_LINK_CONFLICT"))
 
 
+    def test_unlinked_forward_save_version_gap_needs_review(self) -> None:
+        data = snapshot()
+        first = data["session"]["turns"][0]
+        first["outcome"] = "APPLIED"
+        first["gm"]["save_version"] = 254
+        first["state_link"].update({"outcome": "APPLIED", "gm_save_version": 254,
+                                     "linked_save_version": 254})
+        user = message(2, 255, "2027-03-24 17:10", 2)
+        gm = message(3, 256, "2027-03-24 17:10", 2)
+        data["database"]["save_version"] = 256
+        data["repository"]["save_version_anchor"] = 256
+        data["session"]["last_message_order"] = 3
+        data["session"]["turns"].append({
+            "turn_no": 2, "outcome": "APPLIED", "user": user, "gm": gm,
+            "state_link": {"session_id": SESSION_ID, "worldline_id": "AFTERFALL",
+                           "chronicle_id": "C03", "season_id": "S03",
+                           "user_message_id": user["message_id"], "gm_message_id": gm["message_id"],
+                           "outcome": "APPLIED", "user_save_version": 255,
+                           "gm_save_version": 256, "linked_save_version": 256},
+        })
+        result = audit(data)
+        self.assertEqual((result["status"], result["reason"]),
+                         ("NEEDS_GM_REVIEW", "TURN_STATE_LINK_CONFLICT"))
+
+
 if __name__ == "__main__":
     unittest.main()
