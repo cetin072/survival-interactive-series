@@ -93,6 +93,13 @@ declare
   v_link_run record;
   v_task record;
   v_finished text;
+  v_event_count integer;
+  v_event_count_after integer;
+  v_batch_count integer;
+  v_task_status text;
+  v_task_receipt jsonb;
+  v_run_receipt jsonb;
+  v_run_finished_at timestamptz;
 begin
   select * into strict v_run
     from survival_rpg.claim_archive_publication_daily_run(v_schedule, 'ci-runner-a', 300);
@@ -103,9 +110,57 @@ begin
 
   select * into strict v_task
     from survival_rpg.claim_archive_publication_daily_run(v_schedule, 'ci-runner-b', 300);
-  if v_task.out_claimed or v_task.out_lease_token <> v_run.out_lease_token
-     or v_task.out_claim_version <> v_run.out_claim_version then
-    raise exception 'LIVE_DAILY_RUN_LEASE_STOLEN';
+  if v_task.out_claimed or v_task.out_lease_token is not null
+     or v_task.out_claim_version is not null or v_task.out_lease_expires_at is not null then
+    raise exception 'FAILED_DAILY_RUN_CLAIM_EXPOSED_LEASE';
+  end if;
+
+  begin
+    perform survival_rpg.renew_archive_publication_daily_run_lease(
+      v_schedule, v_task.out_claim_version, v_task.out_lease_token, 300
+    );
+    raise exception 'FAILED_DAILY_RUN_CLAIM_RENEWED_ACTIVE_LEASE';
+  exception when sqlstate '22023' then
+    null;
+  end;
+  begin
+    perform survival_rpg.link_archive_publication_run_batch(
+      v_schedule, v_task.out_claim_version, v_task.out_lease_token,
+      'batch-' || repeat('8', 64), 'plan-' || repeat('9', 64)
+    );
+    raise exception 'FAILED_DAILY_RUN_CLAIM_LINKED_BATCH';
+  exception when sqlstate '22023' then
+    null;
+  end;
+
+  select count(*) into v_event_count
+    from survival_rpg.archive_publication_daily_run_events
+   where scheduled_date = v_schedule;
+  begin
+    perform survival_rpg.finish_archive_publication_daily_run(
+      v_schedule, v_task.out_claim_version, v_task.out_lease_token,
+      'NOOP', '{"result":"loser"}'::jsonb, null, null
+    );
+    raise exception 'FAILED_DAILY_RUN_CLAIM_FINISHED_ACTIVE_LEASE';
+  exception when sqlstate '22023' then
+    null;
+  end;
+  select count(*) into v_event_count_after
+    from survival_rpg.archive_publication_daily_run_events
+   where scheduled_date = v_schedule;
+  select count(*) into v_batch_count
+    from survival_rpg.archive_publication_run_batches
+   where scheduled_date = v_schedule;
+  select receipt, finished_at into v_run_receipt, v_run_finished_at
+    from survival_rpg.archive_publication_daily_runs where scheduled_date = v_schedule;
+  if v_event_count_after <> v_event_count or v_batch_count <> 0
+     or v_run_receipt <> '{}'::jsonb or v_run_finished_at is not null
+     or not exists (
+       select 1 from survival_rpg.archive_publication_daily_runs
+        where scheduled_date = v_schedule and status = 'CLAIMED'
+          and lease_owner = 'ci-runner-a' and lease_token = v_run.out_lease_token
+     ) then
+    raise exception 'FAILED_DAILY_RUN_CLAIM_MUTATED_ACTIVE_LEASE';
   end if;
 
   if not survival_rpg.renew_archive_publication_daily_run_lease(
@@ -173,6 +228,43 @@ begin
   if v_task.out_task_id <> 'task-' || repeat('1', 64) or v_task.out_attempt_count <> 1 then
     raise exception 'TASK_CLAIM_FAILED';
   end if;
+
+  select count(*) into v_event_count
+    from survival_rpg.archive_publication_task_events
+   where task_id = v_task.out_task_id;
+  begin
+    perform survival_rpg.finish_archive_publication_task(
+      v_task.out_task_id, null::bigint, null::uuid, 'NOOP', '{"result":"null-both"}'::jsonb, null, null
+    );
+    raise exception 'NULL_TASK_LEASE_IDENTITY_BOTH_ACCEPTED';
+  exception when sqlstate '55000' then
+    null;
+  end;
+  begin
+    perform survival_rpg.finish_archive_publication_task(
+      v_task.out_task_id, null::bigint, v_task.out_lease_token, 'NOOP', '{"result":"null-version"}'::jsonb, null, null
+    );
+    raise exception 'NULL_TASK_CLAIM_VERSION_ACCEPTED';
+  exception when sqlstate '55000' then
+    null;
+  end;
+  begin
+    perform survival_rpg.finish_archive_publication_task(
+      v_task.out_task_id, v_task.out_claim_version, null::uuid, 'NOOP', '{"result":"null-token"}'::jsonb, null, null
+    );
+    raise exception 'NULL_TASK_LEASE_TOKEN_ACCEPTED';
+  exception when sqlstate '55000' then
+    null;
+  end;
+  select status, receipt into v_task_status, v_task_receipt
+    from survival_rpg.archive_publication_tasks where task_id = v_task.out_task_id;
+  select count(*) into v_event_count_after
+    from survival_rpg.archive_publication_task_events where task_id = v_task.out_task_id;
+  if v_task_status <> 'CLAIMED' or v_task_receipt <> '{}'::jsonb
+     or v_event_count_after <> v_event_count then
+    raise exception 'INVALID_TASK_LEASE_IDENTITY_MUTATED_TASK';
+  end if;
+
   v_finished := survival_rpg.finish_archive_publication_task(
     v_task.out_task_id, v_task.out_claim_version, v_task.out_lease_token,
     'NOOP', '{"result":"NOOP"}'::jsonb, null, null

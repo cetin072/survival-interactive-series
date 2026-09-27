@@ -48,6 +48,7 @@ jobs:
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --command "CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE ROLE service_role NOLOGIN; CREATE SCHEMA survival_rpg;"
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927054730_archive_publication_ledger_v1.sql
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927055745_archive_publication_ledger_owner_membership_cleanup_v1.sql
+          psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927083332_archive_publication_lease_identity_hardening_v1.sql
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_publication_ledger_v1_verification.sql
       - name: Setup Node
         uses: actions/setup-node@v4
