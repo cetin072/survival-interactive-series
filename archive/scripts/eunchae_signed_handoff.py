@@ -78,7 +78,10 @@ def readback(headers, missing_ok=False):
                 raise ValueError("STORAGE_READBACK_FAILED")
             data = response.read(LIMIT + 1)
     except HTTPError as error:
-        if missing_ok and error.code == 404:
+        # Storage may report a missing object as HTTP 400 on this project.
+        # Treat it as absence only for the signing preflight. The subsequent
+        # sign request must succeed independently before an upload is possible.
+        if missing_ok and error.code in (400, 404):
             return None
         raise ValueError(safe_http_code(error)) from None
     except URLError:

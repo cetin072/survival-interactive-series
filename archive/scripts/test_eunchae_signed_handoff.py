@@ -49,22 +49,22 @@ class HandoffTests(unittest.TestCase):
     def test_issue_encrypts_token_and_has_no_plaintext_field(self):
         token = "synthetic-signed-token-12345678901234567890"
         expected_url = f"/object/upload/sign/{handoff.BUCKET}/{handoff.OBJECT_PATH}?token={token}"
+        for missing_status in (400, 404):
+            with self.subTest(missing_status=missing_status):
+                class Opener:
+                    def open(self, request, timeout):
+                        if request.get_method() == "GET":
+                            raise HTTPError(request.full_url, missing_status, "not found", {}, None)
+                        assert request.get_method() == "POST"
+                        return Response(200, json.dumps({"url": expected_url}).encode())
 
-        class Opener:
-            def open(self, request, timeout):
-                if request.get_method() == "GET":
-                    raise HTTPError(request.full_url, 404, "not found", {}, None)
-                self_request = request
-                assert self_request.get_method() == "POST"
-                return Response(200, json.dumps({"url": expected_url}).encode())
-
-        with patch.object(handoff, "OPENER", Opener()), patch.dict(os.environ, {
-                "ARCHIVE_SUPABASE_URL": handoff.BASE_URL,
-                "ARCHIVE_SUPABASE_SERVICE_ROLE_KEY": "synthetic-service-role-value-12345"}):
-            result = handoff.issue()
-        self.assertEqual(result["status"], "SIGNED_UPLOAD_READY")
-        self.assertNotIn(token, json.dumps(result))
-        self.assertEqual(handoff.decrypt_token(result["envelope"], self.private_path), token)
+                with patch.object(handoff, "OPENER", Opener()), patch.dict(os.environ, {
+                        "ARCHIVE_SUPABASE_URL": handoff.BASE_URL,
+                        "ARCHIVE_SUPABASE_SERVICE_ROLE_KEY": "synthetic-service-role-value-12345"}):
+                    result = handoff.issue()
+                self.assertEqual(result["status"], "SIGNED_UPLOAD_READY")
+                self.assertNotIn(token, json.dumps(result))
+                self.assertEqual(handoff.decrypt_token(result["envelope"], self.private_path), token)
 
     def test_local_upload_sends_only_scoped_token_and_image(self):
         source = b"\x89PNG\r\n\x1a\n" + b"synthetic-test-image"
