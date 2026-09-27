@@ -62,7 +62,7 @@ export function acceptForegroundLocalCandidate(point, record, bytes, approval) {
     && !Number.isNaN(Date.parse(approval.reviewed_at))
     && new Date(approval.reviewed_at).toISOString() === approval.reviewed_at
     && typeof approval.source_ref === 'string'
-    && /^codex-thread:[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}#msg_[a-f0-9]{40}$/.test(approval.source_ref),
+    && /^codex-thread:[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}#(?:msg_[a-f0-9]{40}|[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})$/.test(approval.source_ref),
   'FOREGROUND_EXPLICIT_OWNER_DECISION_REQUIRED')
   demand(approval.observation_id === observation.observation_id
     && approval.point_id === observation.point_id

@@ -8,6 +8,8 @@ import { compileVisualCatalog, visualDigest } from './visual-compiler.mjs'
 const root = resolve(import.meta.dirname, '..', '..', '..')
 const record = JSON.parse(await readFile(resolve(root, 'docs/AUTOMATIC_ARCHIVE_STEP6_FOREGROUND_20260927.json'), 'utf8'))
 const bytes = await readFile(resolve(root, record.workspace_file))
+const ownerApproval = JSON.parse(await readFile(resolve(root,
+  'archive/experiments/step6/char-jinwoo-20260927-owner-approval.json'), 'utf8'))
 const point = { status: 'READY', visibility: 'PUBLIC_ARCHIVE', point_type: 'CHARACTER',
   subject_id: record.subject_id, point_id: record.point_id, generation_key: record.generation_key }
 
@@ -28,6 +30,18 @@ test('changed brief, bytes or acceptance claims cannot enter the inbox', () => {
   assert.throws(() => observeForegroundImage(point, record, Buffer.from(bytes.subarray(0, -1))))
   assert.throws(() => observeForegroundImage(point, { ...record, review: { ...record.review, final_canon_approval: true } }, bytes))
   assert.throws(() => observeForegroundImage(point, { ...record, site_publications: 1 }, bytes))
+})
+
+test('actual owner decision binds only the exact local foreground candidate', () => {
+  const candidate = acceptForegroundLocalCandidate(point, record, bytes, ownerApproval)
+  assert.equal(candidate.candidate_id,
+    'candidate-dac3f0800d1c4d06f73c9c2447649e9a3ac1103edd30c9cfd81d3614843307fc')
+  assert.equal(candidate.provider_result_id, null)
+  assert.equal(candidate.storage_status, 'NOT_STORED')
+  assert.equal(candidate.publication_status, 'NOT_PUBLISHED')
+  assert.throws(() => acceptForegroundLocalCandidate(point, record, bytes,
+    { ...ownerApproval, generation_key: `generation-${'0'.repeat(64)}` }))
+  assert.throws(() => acceptForegroundLocalCandidate(point, record, bytes.subarray(0, -1), ownerApproval))
 })
 
 function syntheticCatalog() {
@@ -59,6 +73,10 @@ test('a synthetic owner approval yields only a local candidate and disabled plan
     observation_id: observation.observation_id, point_id: testPoint.point_id,
     generation_key: testPoint.generation_key, file_sha256: record.file.sha256 }
   const candidate = acceptForegroundLocalCandidate(testPoint, testRecord, bytes, approval)
+  const uuidMessageApproval = { ...approval,
+    source_ref: 'codex-thread:00000000-0000-4000-8000-000000000001#00000000-0000-4000-8000-000000000002' }
+  assert.equal(acceptForegroundLocalCandidate(testPoint, testRecord, bytes, uuidMessageApproval).status,
+    'ACCEPTED_LOCAL_CANDIDATE')
   assert.equal(candidate.association, 'OBSERVER_ATTESTED_LOCAL_ARTIFACT')
   assert.equal(candidate.provider_result_id, null)
   assert.equal(candidate.storage_status, 'NOT_STORED')
