@@ -6,6 +6,7 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { createBatch, fingerprint, planPublication } from './lib/publication-plan.mjs'
 import { snapshotFromPublishedS02 } from './dry-run-publication.mjs'
+import { snapshotFromPublicSeason } from './lib/public-season-snapshot.mjs'
 import { checkAppendOnlyEdition, selectTextBatchCatalog } from './lib/reader-auto.mjs'
 import { replaceBookAtomically } from './lib/atomic-book.mjs'
 
@@ -17,9 +18,18 @@ function git(...args) { return execFileSync('git', args, { cwd: root, maxBuffer:
 function pinnedReader(revision) {
   demand(/^[a-f0-9]{40}$/.test(revision), 'UNPINNED_REVISION')
   return (path) => {
-    demand(/^(?:archive\/content\/|seasons_v2\/)[A-Za-z0-9_./-]+$/.test(path) && !path.split('/').includes('..'), 'INVALID_SOURCE_PATH')
+    demand((/^(?:archive\/content\/|seasons_v2\/)[A-Za-z0-9_./-]+$/.test(path)
+      || /^worldlines\/AFTERFALL\/seasons\/S\d{2,3}\/[A-Za-z0-9_./-]+\.md$/.test(path))
+      && !path.split('/').includes('..'), 'INVALID_SOURCE_PATH')
     return git('show', `${revision}:${path}`)
   }
+}
+function pinnedPartNames(revision, prefix) {
+  demand(/^archive\/content\/transcripts\/C03-AFTERFALL\/S\d{2,3}\/SESSION_\d{3}$/.test(prefix),
+    'INVALID_PUBLIC_PART_DIRECTORY')
+  return git('ls-tree', '-r', '--name-only', revision, '--', prefix).toString('utf8')
+    .split('\n').filter(Boolean).map((path) => path.slice(prefix.length + 1))
+    .filter((name) => /^PART_\d{3}\.md$/.test(name))
 }
 
 export async function prepareTextPublication(input) {
@@ -83,7 +93,7 @@ export async function prepareTextPublication(input) {
 }
 
 export async function runReaderCli(args) {
-  if (args.length === 1 && args[0] === '--help') return 'Usage: --demo-s02 (--check|--apply) or --snapshot <file> (--check|--apply). Apply updates one local BOOK.json only; no remote publish.\n'
+  if (args.length === 1 && args[0] === '--help') return 'Usage: --demo-s02, --snapshot <file>, or --public-season <Sxx> --checkpoint <committed-path>, followed by --check or --apply. Apply updates one local BOOK.json only; no remote publish.\n'
   const mode = args.at(-1)
   demand(['--check', '--apply'].includes(mode), 'EXPLICIT_LOCAL_MODE_REQUIRED')
   let snapshot
@@ -92,6 +102,16 @@ export async function runReaderCli(args) {
     snapshot = snapshotFromPublishedS02(JSON.parse(pinnedReader(head)('archive/content/transcripts/C03-AFTERFALL/S02/MANIFEST.json')), head)
   } else if (args.length === 3 && args[0] === '--snapshot') {
     snapshot = JSON.parse(await readFile(resolve(args[1]), 'utf8'))
+  } else if (args.length === 5 && args[0] === '--public-season'
+    && args[2] === '--checkpoint') {
+    demand(/^S\d{2,3}$/.test(args[1]), 'INVALID_PUBLIC_SEASON_ID')
+    const head = git('rev-parse', 'HEAD').toString().trim()
+    const read = pinnedReader(head)
+    const manifestPath = `archive/content/transcripts/C03-AFTERFALL/${args[1]}/MANIFEST.json`
+    const manifest = JSON.parse(read(manifestPath))
+    snapshot = await snapshotFromPublicSeason(manifest, head, args[3], {
+      read, listParts: (prefix) => pinnedPartNames(head, prefix),
+    })
   } else { throw new Error('INVALID_CLI_ARGUMENTS') }
   const prepared = await prepareTextPublication(snapshot)
   if (mode === '--apply') {
