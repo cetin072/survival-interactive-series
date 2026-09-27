@@ -10,6 +10,7 @@ import { acceptForegroundLocalCandidate } from './lib/foreground-image-handoff.m
 import { planArchiveVisualRegistry } from './lib/archive-visual-registry.mjs'
 import { prepareForegroundSiteAsset } from './lib/site-foreground-handoff.mjs'
 import { planSiteAssetAddition } from './lib/site-asset-contract.mjs'
+import { commitSiteAssetFromPublicRef } from './lib/site-asset-public-ref.mjs'
 
 const run = promisify(execFile)
 const root = resolve(import.meta.dirname, '../..')
@@ -26,7 +27,7 @@ const paths = {
 const demand = (ok, code) => { if (!ok) throw new Error(code) }
 const json = async (path) => JSON.parse(await readFile(resolve(root, path), 'utf8'))
 
-export async function verifySiteAssetHandoff({ downloadOriginal, registry,
+async function prepareSiteAssetHandoff({ downloadOriginal, registry,
   deriveFromOriginal } = {}) {
   demand(typeof downloadOriginal === 'function' && typeof deriveFromOriginal === 'function',
     'SITE_HANDOFF_READERS_REQUIRED')
@@ -42,7 +43,7 @@ export async function verifySiteAssetHandoff({ downloadOriginal, registry,
     registry })
   const plan = await planSiteAssetAddition(manifest, catalog,
     resolve(root, paths.publicRoot), prepared)
-  return { status: plan.status, asset_id: prepared.asset.registry_asset_id,
+  const report = { status: plan.status, asset_id: prepared.asset.registry_asset_id,
     point_id: prepared.asset.point_id, generation_key: prepared.asset.generation_key,
     source_sha256: prepared.asset.source_sha256,
     derivative_sha256: prepared.asset.sha256,
@@ -50,6 +51,11 @@ export async function verifySiteAssetHandoff({ downloadOriginal, registry,
     site_asset_current: plan.status === 'EXISTING_SITE_ASSET_REUSED',
     remote_readback_proven: false, execution_code_uploads: 0, database_writes: 0,
     files_written: 0, site_publications: 0 }
+  return { report, prepared, derivativeBytes }
+}
+
+export async function verifySiteAssetHandoff(options = {}) {
+  return (await prepareSiteAssetHandoff(options)).report
 }
 
 async function pinnedDerivativeCheck(bytes, python) {
@@ -60,7 +66,7 @@ async function pinnedDerivativeCheck(bytes, python) {
   return readFile(resolve(root, paths.derivative))
 }
 
-export async function verifyStagingSiteAsset({ baseUrl, serviceKey, fetchImpl = fetch,
+async function readStagingSiteAsset({ baseUrl, serviceKey, fetchImpl = fetch,
   python = 'python', deriveFromOriginal = (bytes) => pinnedDerivativeCheck(bytes, python) } = {}) {
   demand(baseUrl === 'https://jgsxpdflgkqroecfjzxq.supabase.co'
     && typeof serviceKey === 'string' && serviceKey.length > 20,
@@ -88,14 +94,32 @@ export async function verifyStagingSiteAsset({ baseUrl, serviceKey, fetchImpl = 
   demand(registryResponse.ok, 'SITE_REGISTRY_READ_FAILED')
   const rows = await registryResponse.json()
   demand(Array.isArray(rows) && rows.length === 1, 'SITE_REGISTRY_ROW_REQUIRED')
-  const report = await verifySiteAssetHandoff({ registry: rows[0],
+  const prepared = await prepareSiteAssetHandoff({ registry: rows[0],
     downloadOriginal: async (bucket, path) => {
       demand(bucket === 'survival-archive-originals' && path === objectPath,
         'SITE_STORAGE_PATH_MISMATCH')
       return readback
     },
     deriveFromOriginal })
-  return { ...report, remote_readback_proven: true }
+  return { ...prepared, report: { ...prepared.report, remote_readback_proven: true } }
+}
+
+export async function verifyStagingSiteAsset(options = {}) {
+  return (await readStagingSiteAsset(options)).report
+}
+
+/** A trusted caller can connect the remote readback to an atomic local proposal. */
+export async function proposeStagingSiteAsset({ repoRoot, ref, baseCommit,
+  authorizeCommit, gitBinary, ...readOptions } = {}) {
+  demand(typeof authorizeCommit === 'function', 'SITE_REF_COMMIT_DISABLED')
+  const verified = await readStagingSiteAsset(readOptions)
+  const proposal = await commitSiteAssetFromPublicRef({ repoRoot, ref, baseCommit,
+    prepared: verified.prepared, derivativeBytes: verified.derivativeBytes,
+    authorizeCommit, gitBinary })
+  return { ...proposal, remote_readback_proven: true,
+    source_sha256: verified.report.source_sha256,
+    derivative_sha256: verified.report.derivative_sha256,
+    execution_code_uploads: 0, database_writes: 0 }
 }
 
 export async function runSiteAssetHandoff(args, environment = process.env) {
