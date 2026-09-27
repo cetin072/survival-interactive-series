@@ -2,12 +2,20 @@
 
 Status: POC REVIEWED WITH BLOCKER — NOT AN OPERATIONAL IMAGE PIPELINE
 
-2026-09-27 follow-up: Step 7 handoff code now accepts only a separately reviewed, hash-bound local image candidate. The two recorded outputs remain quarantined; accepted real images remain **0**. The new passing tests use synthetic pixels and do not change the experiment verdict. No further native image call was made because the zero-added-cost allowance for an additional run has not been verified.
+2026-09-27 follow-up: Step 7 handoff code accepts only a separately reviewed, hash-bound local candidate. The two earlier outputs remain quarantined. One later built-in Codex foreground sample is described below; accepted archive images remain **0**.
 Base audited: `5c1a0c59eae96a535c9e5f94d973308f52f8e7b6` (includes #138 and #139).
+
+## Later foreground sample (2026-09-27)
+
+One additional built-in Codex `image_gen.imagegen` invocation returned a **real** square PNG for the same public 서진우 point and generation key. This is distinct from the two quarantined `image_gen.text2im` outputs below. The observer saw a single fictional person, no embedded text or collage, and an apparent match to the public appearance anchors; Pillow independently verified and decoded the 1254×1254 pixels. The committed experiment PNG is `archive/experiments/step6/char-jinwoo-20260927-foreground.png` (1,880,742 bytes; SHA-256 `f4882707c0272d1eb7123493bb46dc7193e0235ceba778d3582d0112a087a78d`). `archive/scripts/check-foreground-sample.mjs` verifies the PNG structure, dimensions and byte hash without generating another image. The exact observer record is `AUTOMATIC_ARCHIVE_STEP6_FOREGROUND_20260927.json`.
+
+This is **one reviewed local sample, not an accepted archive asset**. The built-in tool returned an artifact path, but no provider prompt equality or durable tool-result receipt was established. The path alone does not establish those claims. The Step 7 contract currently accepts the earlier `image_gen.text2im` receipt schema, so the new `image_gen.imagegen` output is held outside that receiver pending an honest adapter and final Canon/publication review. The experiment file is not referenced by the website and is not Canon. Accepted images remain **0**; Storage uploads, database writes and site publications remain **0**.
+
+Official OpenAI documentation says built-in image generation uses included Codex usage limits, while API-key generation uses API pricing. A before/after account read showed ordinary Codex usage allowed and zero available extra credits; no API key, credit purchase, reset or plan change was used. This supports a single included-limit foreground experiment, **not** an audited invoice, a guarantee about repeated runs, or a scheduled zero-cost image path. Unattended generation remains NOT_TESTED. Sources: https://learn.chatgpt.com/docs/image-generation and https://learn.chatgpt.com/docs/pricing.
 
 ## Actual experiment result
 
-Two native ChatGPT image outputs were returned during this development conversation. Both were readable local PNG files, and both independently passed Pillow `verify()` and pixel `load()`. **Neither complied with the requested single-character, no-text portrait brief. Both are quarantined and neither is an accepted illustration.** Stop after these two observations rather than repeatedly consuming image allowance.
+Two native ChatGPT image outputs were returned during this development conversation. Both were readable local PNG files, and both independently passed Pillow `verify()` and pixel `load()`. **Neither complied with the requested single-character, no-text portrait brief. Both are quarantined and neither is an accepted illustration.** The initial 2026-09-26 attempt stopped after these two observations. A separate built-in Codex foreground experiment followed on 2026-09-27, as recorded above.
 
 The generated pixels contain completion/PR/test/cost assertions. Those assertions are model-created image content, not repository actions or measurements. They must never be used as evidence of a merge, a passed test, successful style/Canon QA, or an invoice. The actual observations are in `AUTOMATIC_ARCHIVE_STEP6_OBSERVATIONS.json`.
 
@@ -41,7 +49,7 @@ The assistant invoked the native tool in the conversation, **not from JavaScript
 | 1 | `018c9ad4-82b6-4d6d-9579-a0bd6f1081da` | 1,814,033 bytes / 1536x1024 | `9b36d658bdc2ad5d449b9ad0ddfeaf7e02d336f9df3b2f6527e39a3824bd70d5` | QUARANTINED_NOT_AN_ASSET |
 | 2 | `ad71390b-0f25-4356-8e41-bdea6640e4f3` | 1,677,612 bytes / 1226x1283 | `e1367031e28af6ae2a3251c669eed9226ac395a7a3ee81cd5b607beb46ca208f` | QUARANTINED_NOT_AN_ASSET |
 
-The image files remain conversation artifacts. No pixels or temporary runtime path are committed to the repository; only observation metadata is preserved. A receipt does not make a temporary ChatGPT file a permanent storage object or CDN URL.
+Those two rejected image files remain conversation artifacts. Their pixels and temporary runtime paths are not committed to the repository; only their observation metadata is preserved. The later distinct foreground sample is committed under `archive/experiments/step6/` for review. A receipt does not make a temporary ChatGPT file a permanent storage object or CDN URL.
 
 ## Small reusable addition
 
@@ -64,11 +72,11 @@ node --experimental-strip-types archive/scripts/prepare-image-poc.mjs --check
 node --experimental-strip-types archive/scripts/prepare-image-poc.mjs --request
 ```
 
-No new package is needed. Full-repository checks run on GitHub CI; isolated module tests and the two actual local PNG reads/receipts run in the working container. Direct GitHub cloning is unavailable in that container, so a local full-repository build is not claimed.
+No new package is needed. Full-repository checks run on GitHub CI; isolated module tests and the two actual local PNG reads/receipts run in the working container. The initial 2026-09-26 POC was checked in a restricted container. The later foreground sample and its file-integrity checker are verified separately; no full-repository build is claimed for this document-only follow-up.
 
 ## Current product-path review (official documentation checked 2026-09-26)
 
-1. **Native ChatGPT foreground images.** The official Images help page documents conversational image creation. The two observed outputs establish generation and local handoff in this environment, but do not establish faithful brief rendering. Retry in a focused image-only context is a future experiment, not an automatically successful fallback.
+1. **Native ChatGPT foreground images.** The official Images help page documents conversational image creation. The two observed outputs establish generation and local handoff in this environment, but do not establish faithful brief rendering. A later focused built-in Codex foreground experiment produced the single reviewed local sample described above. It does not establish reliable repeated execution.
 2. **ChatGPT scheduled tasks.** Tasks documentation supports recurring work and says plan limits apply. Its current unsupported-feature list does not list image generation. Therefore do not repeat the outdated blanket assertion that all scheduled image generation is impossible. The exact scheduled image + artifact + connector chain remains **NOT TESTED**, with no scheduler enabled here.
 3. **Codex/Work image capability.** Official image documentation describes a built-in image path and associated usage allowances. This is not proof that this account's unattended runs and overages have zero incremental cost. Leave disabled pending capability, quota and cost evidence. Local scheduled project workflows may require the app and computer to stay running.
 4. **Image API.** Programmatic image APIs are a different execution/billing path. They are not assumed to be covered by the ChatGPT subscription and are not called or configured in this project.

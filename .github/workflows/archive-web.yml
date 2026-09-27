@@ -5,6 +5,7 @@ on:
     paths:
       - 'archive/web/**'
       - 'archive/content/**'
+      - 'archive/experiments/**'
       - 'archive/scripts/**'
       - '.github/workflows/archive-web.yml'
   push:
@@ -13,6 +14,7 @@ on:
     paths:
       - 'archive/web/**'
       - 'archive/content/**'
+      - 'archive/experiments/**'
       - 'archive/scripts/**'
       - '.github/workflows/archive-web.yml'
 
@@ -57,6 +59,8 @@ jobs:
         run: node --test ../scripts/lib/accepted-image-handoff.test.mjs
       - name: Verify real portrait request without image execution
         run: node --experimental-strip-types ../scripts/prepare-image-poc.mjs --check
+      - name: Verify committed foreground sample remains unpublished
+        run: node ../scripts/check-foreground-sample.mjs
       - name: Install
         run: npm ci
       - name: Test
