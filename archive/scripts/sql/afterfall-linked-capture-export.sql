@@ -20,6 +20,7 @@ with scope as materialized (
     and s.chronicle_id = m.chronicle_id
     and s.season_id = m.season_id
   where m.message_order between $2::integer and $3::integer
+    and m.public_safe is true
 ), selected_links as materialized (
   select l.turn_no, l.user_message_id, l.gm_message_id, l.outcome,
     l.user_save_version, l.gm_save_version, l.linked_save_version
