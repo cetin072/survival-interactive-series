@@ -47,16 +47,17 @@ python -m unittest tools.test_afterfall_capture_sync
 
 The read-only audit on 2026-09-27 found the current repository continuity
 anchor and `survival_rpg.saves` at S02 / save 253, while the database has one
-open C03 / AFTERFALL S03 session with three complete USER→GM pairs. The six
-captured rows have valid lowercase SHA-256 shape and contiguous orders, but
-their `save_version` values are null. The S03 start handoff in this branch also
+open C03 / AFTERFALL S03 session with eight complete USER→GM pairs (16 messages)
+in distinct orders 0–15. All 16 have a valid lowercase SHA-256 shape, null
+`save_version`, and the session has a null `starting_save_version`; the state-link
+table has no rows for this session. The S03 start handoff in this branch also
 does not establish that these turns are reflected in the authoritative save.
 
 This is `NEEDS_GM_REVIEW` for the affected S03 range. It is not safe to infer
 that the game state advanced, alter the save, rewrite the current checkpoint,
-or publish those messages as a reconciled S03 chapter. The 76 existing
-public-safe transcript rows remain unchanged. The audit did not read message
-bodies or hidden GM state and did not write to Supabase.
+or publish those messages as a reconciled S03 chapter. The audit used aggregate
+metadata only; it did not read transcript bodies or hidden GM state and did not
+write to Supabase.
 
 ## Remaining runtime integration
 
