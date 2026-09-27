@@ -149,6 +149,37 @@ process.stdout.write(JSON.stringify(result));`
   assert.equal(requestPlan.zero_added_cost_proven, false)
   assert.deepEqual(JSON.parse(command('node', imageRequestArgs, copy)), requestPlan)
   assert.equal(command('git', ['rev-parse', refSource], copy).trim(), visualResult.commit)
+  const driverRef = 'refs/heads/codex/archive-publication-ref-driver-test'
+  command('git', ['branch', 'codex/archive-publication-ref-driver-test', fixtureHead], copy)
+  const disabledDriver = `import { advanceLocalPublicRef } from './archive/scripts/lib/public-ref-driver.mjs';
+await advanceLocalPublicRef({ repoRoot: process.cwd(), ref: '${driverRef}',
+  seasonId: 'S99', checkpointRef: '${checkpointRef}' });`
+  assert.throws(() => command('node', [
+    '--experimental-strip-types', '--input-type=module', '-e', disabledDriver], copy))
+  assert.equal(command('git', ['rev-parse', driverRef], copy).trim(), fixtureHead)
+  const driverScript = (graphAllowed) => `import { advanceLocalPublicRef } from './archive/scripts/lib/public-ref-driver.mjs';
+const result = await advanceLocalPublicRef({ repoRoot: process.cwd(),
+  ref: '${driverRef}', seasonId: 'S99', checkpointRef: '${checkpointRef}',
+  authorizers: { READER: async () => true, GRAPH: async () => ${graphAllowed},
+    VISUAL: async () => true } });
+process.stdout.write(JSON.stringify(result));`
+  assert.throws(() => command('node', [
+    '--experimental-strip-types', '--input-type=module', '-e', driverScript(false)], copy))
+  const afterReader = command('git', ['rev-parse', driverRef], copy).trim()
+  assert.notEqual(afterReader, fixtureHead)
+  const resumed = JSON.parse(command('node', [
+    '--experimental-strip-types', '--input-type=module', '-e', driverScript(true)], copy))
+  assert.equal(resumed.status, 'LOCAL_PUBLIC_REF_READY_FOR_IMAGE_REVIEW')
+  assert.deepEqual(resumed.stages_advanced.map((stage) => stage.stage), ['GRAPH', 'VISUAL'])
+  assert.equal(resumed.requests.length, 3)
+  assert.equal(resumed.provider_calls, 0)
+  assert.equal(resumed.site_publications, 0)
+  assert.equal(command('git', ['rev-parse', driverRef], copy).trim(), resumed.source_revision)
+  const repeated = JSON.parse(command('node', [
+    '--experimental-strip-types', '--input-type=module', '-e', driverScript(true)], copy))
+  assert.deepEqual(repeated.stages_advanced, [])
+  assert.deepEqual(repeated.requests, resumed.requests)
+  assert.equal(repeated.source_revision, resumed.source_revision)
   await rm(checkoutOnlySeason, { recursive: true })
   command('git', ['checkout', '--detach', fixtureHead], copy)
   const proposalRef = 'refs/heads/codex/archive-publication-reader-test'
