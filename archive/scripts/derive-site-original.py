@@ -36,7 +36,15 @@ def main() -> None:
         raise ValueError("PINNED_PILLOW_VERSION_REQUIRED")
     generated = derive(args.source.read_bytes())
     if args.check:
-        if generated != args.output.read_bytes():
+        committed = args.output.read_bytes()
+        if generated != committed:
+            with Image.open(io.BytesIO(generated)) as generated_image:
+                generated_pixels = hashlib.sha256(generated_image.convert("RGB").tobytes()).hexdigest()
+            with Image.open(io.BytesIO(committed)) as committed_image:
+                committed_pixels = hashlib.sha256(committed_image.convert("RGB").tobytes()).hexdigest()
+            print(f"generated_sha256={hashlib.sha256(generated).hexdigest()} "
+                  f"committed_sha256={hashlib.sha256(committed).hexdigest()} "
+                  f"generated_pixel_sha256={generated_pixels} committed_pixel_sha256={committed_pixels}")
             raise ValueError("DERIVATIVE_NOT_FROM_SOURCE")
     else:
         args.output.write_bytes(generated)
