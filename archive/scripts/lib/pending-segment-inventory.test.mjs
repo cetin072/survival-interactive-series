@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto'
 import test from 'node:test'
 import { materializePublicationSegment } from './publication-segment-materialize.mjs'
 import { planPendingSegment } from './pending-segment-inventory.mjs'
+import { approvedSeasonCatalog } from './approved-reader-sources.mjs'
 
 const hash = (value) => createHash('sha256').update(value).digest('hex')
 const uuid = (tail) => `00000000-0000-4000-8000-${String(tail).padStart(12, '0')}`
@@ -46,6 +47,22 @@ test('one open-session pair becomes an unapproved, body-free cold-source proposa
   assert.equal(plan.source_manifest_candidate.parts_sha256['PART_001.md'], hash(partBytes))
   assert.ok(!JSON.stringify(plan).includes('SYNTHETIC_GM'))
   assert.ok(!('closed_at' in plan.source_manifest_candidate))
+})
+test('Step 3 Reader refuses a pending source even if the season entry is mislabeled public', async () => {
+  const { candidate, partBytes } = materialized()
+  const plan = planPendingSegment(candidate, partBytes, [])
+  const season = { chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL',
+    season_id: 'S03', archive_class: 'COLD_RAW', visibility: 'PUBLIC_ARCHIVE',
+    sessions: [{ session_id: plan.session_id, visibility: 'PUBLIC_ARCHIVE',
+      capture_quality: 'VERIFIED_CONTIGUOUS_TURN_PAIRS', atomic_pairing_complete: true,
+      source_manifest: `${plan.session_id}/SOURCE_MANIFEST.json`,
+      coverage_basis: 'captured_message_range',
+      captured_message_range: { ...candidate.captured_message_range },
+      user_messages: 1, gm_public_blocks: 1 }] }
+  await assert.rejects(approvedSeasonCatalog(season, 'S03', {
+    read: async () => Buffer.from(JSON.stringify(plan.source_manifest_candidate)),
+    listParts: async () => ['PART_001.md'],
+  }), /INVALID_APPROVED_READER_SOURCE/)
 })
 test('repeat is a no-op; adjacent turns receive distinct source ids', () => {
   const first = materialized()
