@@ -17,11 +17,13 @@ function selectRange(part, selector) { const start = selector.from ? anchor(part
 
 function makeChapters(chronicleId, parts) {
   const byPath = new Map(parts.map((part) => [part.archivePath, part])), ranges = new Map()
+  let numberedIndex = 0
   const chapters = editorialPlan[chronicleId].map((plan, index) => {
     const selected = plan.sources.map((selector) => { const part = byPath.get(selector.path); if (!part) throw new Error(`Editorial chapter references unavailable source: ${selector.path}`); const range = selectRange(part, selector); ranges.set(part.archivePath, [...(ranges.get(part.archivePath) ?? []), range]); return { part, range } })
     const body = selected.map(({ range }) => range.body).join('\n\n').trim()
     if (!body) throw new Error(`${chronicleId} chapter ${index + 1} is not a non-empty VERIFIED_GM_NARRATIVE chapter`)
-    return { id: `${chronicleId.toLowerCase()}-chapter-${String(index + 1).padStart(2, '0')}`, chapterNumber: index + 1, title: plan.title, subtitle: `공개 기록 ${new Set(selected.map(({ part }) => part.archivePath)).size}건`, dateLabel: plan.dateLabel, ...(plan.seasonId ? { seasonId: plan.seasonId } : { partId: plan.partId }), arcLabel: plan.arcLabel, sourceKind: 'VERIFIED_GM_NARRATIVE', sourceRefs: selected.map(({ part }) => part.canonicalRef), archiveSourceRefs: selected.map(({ part }) => part.archivePath), sourceHashes: selected.map(({ part }) => part.sourceHash), supportingRefs: [], transformVersion, relatedNodeIds: plan.relatedNodeIds, body }
+    if (!plan.id) numberedIndex++
+    return { id: plan.id ?? `${chronicleId.toLowerCase()}-chapter-${String(numberedIndex).padStart(2, '0')}`, chapterNumber: plan.chapterNumber ?? numberedIndex, title: plan.title, subtitle: `공개 기록 ${new Set(selected.map(({ part }) => part.archivePath)).size}건`, dateLabel: plan.dateLabel, ...(plan.seasonId ? { seasonId: plan.seasonId } : { partId: plan.partId }), arcLabel: plan.arcLabel, sourceKind: 'VERIFIED_GM_NARRATIVE', sourceRefs: selected.map(({ part }) => part.canonicalRef), archiveSourceRefs: selected.map(({ part }) => part.archivePath), sourceHashes: selected.map(({ part }) => part.sourceHash), supportingRefs: [], transformVersion, relatedNodeIds: plan.relatedNodeIds, body }
   })
   for (const part of parts) {
     const covered = (ranges.get(part.archivePath) ?? []).sort((a, b) => a.start - b.start)

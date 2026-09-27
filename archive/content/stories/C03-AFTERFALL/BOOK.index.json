@@ -6,13 +6,18 @@
   "protagonist": "서진우",
   "worldlineId": "AFTERFALL",
   "sourceRoot": "worldlines/AFTERFALL",
-  "beginningStatus": "MISSING_BEGINNING",
+  "beginningStatus": "PARTIAL_BEGINNING_RECOVERED",
+  "beginningGap": {
+    "after": "2026-09-18 14:12",
+    "before": "2026-10-23 20:10",
+    "label": "원문 미확보 구간"
+  },
   "transformVersion": "reader-selection-v1.2.0",
   "coverage": {
-    "verifiedRawParts": 26,
-    "scanned": 26,
-    "eligibleGmProse": 21,
-    "included": 21,
+    "verifiedRawParts": 27,
+    "scanned": 27,
+    "eligibleGmProse": 22,
+    "included": 22,
     "omitted": [
       {
         "sourceRef": "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_006.md",
@@ -42,6 +47,11 @@
     ]
   },
   "editorialExclusions": [
+    {
+      "sourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/OPENING_RECOVERY/PART_OPENING_001.md",
+      "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/OPENING_RECOVERY/PART_OPENING_001.md",
+      "reason": "trailing_operational_meta"
+    },
     {
       "sourceRef": "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_006.md",
       "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_006.md",
@@ -74,6 +84,28 @@
     }
   ],
   "chapters": [
+    {
+      "id": "c03-afterfall-opening-01",
+      "chapterNumber": 0,
+      "title": "균열",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "2026-09-18 13:42",
+      "seasonId": "S01",
+      "arcLabel": "복구된 시작 장면",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/OPENING_RECOVERY/PART_OPENING_001.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/OPENING_RECOVERY/PART_OPENING_001.md"
+      ],
+      "sourceHashes": [
+        "2a6d041fee52cfc5cf18cd02499776c7cb4257d223b8d133b22e5c7f0b3cce68"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
     {
       "id": "c03-afterfall-chapter-01",
       "chapterNumber": 1,

@@ -10,7 +10,7 @@ export type ReaderChapter = {
 export type ReaderCoverage = { verifiedRawParts: number; scanned: number; eligibleGmProse: number; included: number; omitted: { sourceRef: string; archiveSourceRef: string; reason: string }[] }
 export type ChronicleBook = {
   chronicleId: ChronicleId; title: string; protagonist: string; worldlineId: string; subtitle: string
-  description: string; sourceRoot: string; transformVersion: string; beginningStatus?: 'MISSING_BEGINNING'; coverage?: ReaderCoverage
+  description: string; sourceRoot: string; transformVersion: string; beginningStatus?: 'MISSING_BEGINNING' | 'PARTIAL_BEGINNING_RECOVERED'; beginningGap?: { after: string; before: string; label: string }; coverage?: ReaderCoverage
 }
 type BookFile = Omit<ChronicleBook, 'chronicleId'> & { chronicleId: ChronicleId; chapters: Omit<ReaderChapter, 'chronicleId'>[] }
 type BookIndex = Omit<BookFile, 'chapters'> & { chapters: Omit<ReaderChapter, 'chronicleId' | 'body'>[] }
@@ -21,7 +21,7 @@ const bookUrls = import.meta.glob('../../../content/stories/*/BOOK.json', { eage
 export const chronicleBooks: ChronicleBook[] = chronicleRegistry.filter((item) => item.readerAvailable).map((registry) => {
   const book = files.find((file) => file.chronicleId === registry.id)
   if (!book) throw new Error('Reader manifest missing for ' + registry.id)
-  return { chronicleId: registry.id, title: registry.title, protagonist: registry.protagonist, worldlineId: registry.worldlineId, subtitle: book.subtitle, description: book.description, sourceRoot: registry.sourceRoot, transformVersion: book.transformVersion, beginningStatus: book.beginningStatus, coverage: book.coverage }
+  return { chronicleId: registry.id, title: registry.title, protagonist: registry.protagonist, worldlineId: registry.worldlineId, subtitle: book.subtitle, description: book.description, sourceRoot: registry.sourceRoot, transformVersion: book.transformVersion, beginningStatus: book.beginningStatus, beginningGap: book.beginningGap, coverage: book.coverage }
 })
 export const readerChapters: ReaderChapter[] = files.flatMap((book) => book.chapters.map((chapter) => ({ ...chapter, chronicleId: book.chronicleId })))
 export const chaptersForChronicle = (chronicleId: ChronicleId) => readerChapters.filter((chapter) => chapter.chronicleId === chronicleId)

@@ -17,6 +17,7 @@ const c02SessionRaw = import.meta.glob(
   { eager: true, query: '?url&no-inline', import: 'default' },
 ) as Record<string, string>
 import c03S01Part1 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_001.md?url&no-inline'
+import c03Opening from '../../../content/transcripts/C03-AFTERFALL/S01/OPENING_RECOVERY/PART_OPENING_001.md?url&no-inline'
 import c03S01Part2 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_002.md?url&no-inline'
 import c03S01Part3 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_003.md?url&no-inline'
 import c03S01Part4 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_004.md?url&no-inline'
@@ -47,6 +48,7 @@ export type TranscriptPart = {
   seasonId: string
   sessionId?: string
   number: number
+  tocLabel?: string
   title: string
   range: string
   status: TranscriptStatus
@@ -213,7 +215,8 @@ export const transcriptParts: TranscriptPart[] = [
   c02({ id: 'c02-2032-03-fragment', seasonId: '2032-03~09', number: 1, title: '산업단지 사고 이후', range: '2032-03 → 2032-09 · USER 공개 입력 일부', status: 'verified_fragment', source: 'worldlines/STRONGHOLD/raw_transcript/RAW_2032_03_TO_2032_09_PARTIAL_01.md', sourceVerified: true, contentUrl: c02Fragment2032, contentFormat: 'raw_fragment' }),
   c02({ id: 'c02-2032-09-fragment', seasonId: '2032-09~2038-04', number: 1, title: '기록·신원 붕괴 이후', range: '2032-09 → 2038-04 · USER 공개 입력 일부', status: 'verified_fragment', source: 'worldlines/STRONGHOLD/raw_transcript/RAW_2032_09_TO_2038_04_PARTIAL_01.md', sourceVerified: true, contentUrl: c02Fragment2038, contentFormat: 'raw_fragment' }),
   c02({ id: 'c02-2038-05-fragment', seasonId: '2038-05~2039-12', number: 1, title: '이상 일사와 기록현실', range: '2038-05 → 2039-12 · USER 공개 입력·종료 피드백 일부', status: 'verified_fragment', source: 'worldlines/STRONGHOLD/raw_transcript/RAW_2038_05_TO_2039_12_PARTIAL_01.md', sourceVerified: true, contentUrl: c02Fragment2039, contentFormat: 'raw_fragment' }),
-  c03({ id: 'c03-s01-missing-before', seasonId: 'S01', number: 0, title: '직접 확인 전 구간', range: 'S01 · 직접 확인 가능한 첫 USER 메시지 이전', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/INDEX.md', sourceVerified: true }),
+  c03({ id: 'c03-s01-opening-001', seasonId: 'S01', number: 0, tocLabel: 'OPENING', title: '복구된 시작 기록', range: '2026-09-18 13:42 → 14:12', status: 'verified_transcript', source: 'archive/content/transcripts/C03-AFTERFALL/S01/OPENING_RECOVERY/PART_OPENING_001.md', sourceVerified: true, contentUrl: c03Opening }),
+  c03({ id: 'c03-s01-missing-before', seasonId: 'S01', number: 0, title: '원문 미확보 구간', range: '2026-09-18 14:12 → 2026-10-23 20:10', status: 'missing_transcript', source: 'archive/content/transcripts/C03-AFTERFALL/S01/OPENING_RECOVERY/INDEX.md', sourceVerified: true }),
   c03({ id: 'c03-s01-001', seasonId: 'S01', number: 1, title: '두 거점 연합시험', range: '직접확인 시작점 → 두 거점 연합시험 최종평가 진입', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_001.md', sourceVerified: true, contentUrl: c03S01Part1 }),
   c03({ id: 'c03-s01-002', seasonId: 'S01', number: 2, title: '외부 신뢰망', range: '정식 두 거점 연합 → 북쪽 의원 외부관찰', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_002.md', sourceVerified: true, contentUrl: c03S01Part2 }),
   c03({ id: 'c03-s01-003', seasonId: 'S01', number: 3, title: '교환망과 정찰', range: '북쪽 의원 첫 접촉 → 백운생활관 정찰', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_003.md', sourceVerified: true, contentUrl: c03S01Part3 }),

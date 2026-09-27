@@ -132,8 +132,17 @@ def audit_book(page, base: str, chronicle: str, width: int):
     before = len(page.requests_seen)
     page.goto(query_url(base, view='story', chronicle=chronicle, chapter=chapters[0]['id']))
     selected_book(page, chapters[0], chronicle)  # explicit link beats stored last chapter
+    if chronicle == 'C03-AFTERFALL':
+        assert chapters[0]['id'] == 'c03-afterfall-opening-01'
+        expect(page.locator('.reader-body')).to_contain_text('서림대학교병원 응급의료센터')
+        expect(page.locator('.reader-integrity-note')).to_contain_text('2026-09-18 14:12')
+        expect(page.locator('.reader-integrity-note')).to_contain_text('2026-10-23 20:10')
+        page.goto(query_url(base, view='story', chronicle=chronicle, chapter='c03-afterfall-chapter-01'))
+        selected_book(page, chapters[1], chronicle)
+        page.goto(query_url(base, view='story', chronicle=chronicle, chapter=chapters[0]['id']))
+        selected_book(page, chapters[0], chronicle)
     book_assets = [url for url in page.requests_seen[before:] if re.search(r'/BOOK-[^/]+\.json(?:\?|$)', url)]
-    assert len(book_assets) == 1, f'Opening {chronicle} should fetch only its own BOOK asset: {book_assets}'
+    assert len(set(book_assets)) == 1, f'Opening {chronicle} should fetch only its own BOOK asset: {book_assets}'
     for index in [1, 2]:
         tap(page.locator(f'.book-toc [data-chapter-id="{chapters[index]["id"]}"]'), mobile)
         selected_book(page, chapters[index], chronicle)

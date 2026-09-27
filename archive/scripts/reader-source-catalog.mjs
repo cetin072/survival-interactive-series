@@ -33,5 +33,5 @@ const c02 = [['SESSION_2031_02_TO_2031_03_ROOM_20260925', 5, 'PART I', '정전�
 export const rawCatalog = {
   'C01-HAN-JUNHO': Array.from({ length: 10 }, (_, i) => { const n = i + 1, season = n === 10 ? 'S02' : 'S01', number = n === 10 ? 1 : n, p = `seasons_v2/${season}/raw_transcript/PART_${pad(number)}.md`; return { archivePath: p, canonicalRef: p, group: season, title: season === 'S01' ? '첫해의 기록' : '두 번째 계절' } }),
   'C02-STRONGHOLD': c02.flatMap(([session, count, group, title]) => Array.from({ length: count }, (_, i) => { const name = `PART_${pad(i + 1)}.md`; return { archivePath: `archive/content/transcripts/C02-STRONGHOLD/SESSIONS/${session}/${name}`, canonicalRef: `worldlines/STRONGHOLD/raw_transcript/${session}/${name}`, group, title } })),
-  'C03-AFTERFALL': [...c03BaselineCatalog(c03S02Manifest, c03S02Parts), ...c03Automatic],
+  'C03-AFTERFALL': [{ archivePath: 'archive/content/transcripts/C03-AFTERFALL/S01/OPENING_RECOVERY/PART_OPENING_001.md', canonicalRef: 'archive/content/transcripts/C03-AFTERFALL/S01/OPENING_RECOVERY/PART_OPENING_001.md', group: 'S01', title: '복구된 시작 기록' }, ...c03BaselineCatalog(c03S02Manifest, c03S02Parts), ...c03Automatic],
 }
