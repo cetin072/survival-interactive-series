@@ -20,7 +20,9 @@ on:
       - "tools/test_afterfall_capture_sync.py"
       - "tools/test_afterfall_turn_state_link_sql.py"
       - "supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql"
+      - "supabase/migrations/20260927000000_afterfall_turn_state_continuity_v1.sql"
       - "supabase/tests/afterfall_atomic_turn_state_link_v1_verification.sql"
+      - "supabase/tests/afterfall_turn_state_continuity_v1_verification.sql"
       - "worldlines/AFTERFALL/BOOT.md"
       - "worldlines/AFTERFALL/START_ROOM.md"
       - "worldlines/AFTERFALL/PLAY_SESSION_PROTOCOL_V3.md"
@@ -48,7 +50,9 @@ on:
       - "tools/test_afterfall_capture_sync.py"
       - "tools/test_afterfall_turn_state_link_sql.py"
       - "supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql"
+      - "supabase/migrations/20260927000000_afterfall_turn_state_continuity_v1.sql"
       - "supabase/tests/afterfall_atomic_turn_state_link_v1_verification.sql"
+      - "supabase/tests/afterfall_turn_state_continuity_v1_verification.sql"
       - "worldlines/AFTERFALL/BOOT.md"
       - "worldlines/AFTERFALL/START_ROOM.md"
       - "worldlines/AFTERFALL/PLAY_SESSION_PROTOCOL_V3.md"
@@ -104,3 +108,4 @@ jobs:
         run: python tools/validate_afterfall_live_turn_fast_path.py
       - name: Verify additive state-link migration contract
         run: python -m unittest -v tools.test_afterfall_turn_state_link_sql
+
