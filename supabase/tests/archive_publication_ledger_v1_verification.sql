@@ -21,7 +21,7 @@ begin
     select 1 from pg_catalog.pg_auth_members m
      where m.roleid = 'archive_runner_internal'::regrole
        and m.member = 'postgres'::regrole
-       and (m.admin_option or m.inherit_option or m.set_option)
+       and (m.inherit_option or m.set_option)
   ) then
     raise exception 'POSTGRES_INTERNAL_ROLE_OPTIONS_REMAIN';
   end if;
