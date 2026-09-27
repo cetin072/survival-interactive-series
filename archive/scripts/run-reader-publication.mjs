@@ -75,6 +75,7 @@ export async function prepareTextPublication(input) {
     report: { mode: 'LOCAL_READER_BATCH', batch_id: batch.batch_id, source_revision: head,
       source_save_version: snapshot.source_save_version, source_game_time: snapshot.source_game_time,
       reader_status: equal(actualBytes, candidateBytes) ? 'NOOP' : 'READY_TO_UPDATE_LOCAL_BOOK',
+      committed_book_current: equal(baselineBytes, candidateBytes),
       deferred_source_parts: allParts.length - catalog.length,
       prior_chapters: previous.chapters.length, generated_chapters: candidate.chapters.length, added_chapters: additions.length,
       source_receipts: sourceReceipts, book_sha256: hash(candidateBytes),

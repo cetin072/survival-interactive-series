@@ -4,11 +4,13 @@ import { assembleArchiveRun } from './archive-orchestration.mjs'
 
 const reader = () => ({ mode: 'LOCAL_READER_BATCH', batch_id: 'batch-test', source_revision: 'a'.repeat(40),
   source_save_version: 253, reader_status: 'NOOP', added_chapters: 0, book_sha256: 'b'.repeat(64),
+  committed_book_current: true,
   files_written: 0, external_calls: 0, database_writes: 0, site_publications: 0 })
 const graph = () => ({ mode: 'LOCAL_GRAPH_BATCH', batch_id: 'batch-test', source_revision: 'a'.repeat(40),
-  graph_sha256: 'c'.repeat(64), files_written: 0 })
+  graph_sha256: 'c'.repeat(64), book_sha256: 'b'.repeat(64), reader_candidate_only: false, files_written: 0 })
 const visual = () => ({ mode: 'LOCAL_VISUAL_BRIEF_COMPILER', batch_id: 'batch-test', source_revision: 'a'.repeat(40),
-  catalog_sha256: 'd'.repeat(64), files_written: 0, provider_calls: 0, database_writes: 0, site_publications: 0,
+  catalog_sha256: 'd'.repeat(64), graph_sha256: 'c'.repeat(64), reader_candidate_only: false,
+  files_written: 0, provider_calls: 0, database_writes: 0, site_publications: 0,
   selection: { execution_enabled: false, ready: 30, waiting: 4, selected_point_ids: ['point-test'] } })
 
 test('the read-only plan keeps downstream image, storage and cost unproven', () => {
@@ -20,13 +22,19 @@ test('the read-only plan keeps downstream image, storage and cost unproven', () 
   assert.equal(result.daily_budget.status, 'NOT_SUPPLIED')
   assert.equal(result.storage_uploads, 0)
 })
-test('an uncommitted Reader candidate blocks graph and visual claims', () => {
-  const changed = { ...reader(), reader_status: 'READY_TO_UPDATE_LOCAL_BOOK', added_chapters: 1 }
-  const result = assembleArchiveRun({ reader: changed })
-  assert.equal(result.stages.graph.status, 'WAITING_READER')
-  assert.equal(result.stages.visual.status, 'WAITING_READER')
+test('an uncommitted Reader candidate previews downstream but cannot select image attempts', () => {
+  const changed = { ...reader(), reader_status: 'READY_TO_UPDATE_LOCAL_BOOK', committed_book_current: false, added_chapters: 1 }
+  const result = assembleArchiveRun({ reader: changed,
+    graph: { ...graph(), reader_candidate_only: true },
+    visual: { ...visual(), reader_candidate_only: true } })
+  assert.equal(result.stages.graph.status, 'CANDIDATE_FROM_UNCOMMITTED_READER')
+  assert.equal(result.stages.visual.status, 'CANDIDATE_FROM_UNCOMMITTED_READER')
   assert.deepEqual(result.selected_point_ids, [])
-  assert.throws(() => assembleArchiveRun({ reader: changed, graph: graph(), visual: visual() }))
+  assert.throws(() => assembleArchiveRun({ reader: changed, graph: graph(), visual: visual() }),
+    /PIPELINE_CANDIDATE_HANDOFF_MISMATCH/)
+  assert.equal(assembleArchiveRun({ reader: { ...changed, reader_status: 'NOOP' },
+    graph: { ...graph(), reader_candidate_only: true }, visual: { ...visual(), reader_candidate_only: true } })
+    .stages.reader.status, 'AWAITING_REVIEWED_BOOK_COMMIT')
 })
 test('mismatched batch or an execution flag cannot be reported as a dry-run', () => {
   assert.throws(() => assembleArchiveRun({ reader: reader(), graph: { ...graph(), batch_id: 'wrong' }, visual: visual() }))

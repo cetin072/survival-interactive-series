@@ -46,11 +46,13 @@ export async function checkArchivePipeline(args) {
   }
   if (dailyRef !== null && ledgerRef === null) throw new Error('DAILY_HISTORY_REQUIRES_ATTEMPT_LEDGER')
   const reader = await prepareTextPublication(snapshot)
-  if (reader.report.reader_status !== 'NOOP') return { ...assembleArchiveRun({ reader: reader.report }), historical_poc: historicalPoc }
-  const graph = await prepareGraphPublication(snapshot, factsRef)
-  const visual = await prepareVisualPublication(snapshot, { factsRef, appearancesRef, mapRef })
+  const readerCurrent = reader.report.committed_book_current === true
+  const graph = await prepareGraphPublication(snapshot, factsRef,
+    { bookCandidateBytes: readerCurrent ? null : reader.candidateBytes })
+  const visual = await prepareVisualPublication(snapshot,
+    { factsRef, appearancesRef, mapRef, preparedGraph: graph })
   let attemptPlan = null
-  if (ledgerRef !== null) {
+  if (readerCurrent && ledgerRef !== null) {
     const path = resolve(ledgerRef), stat = await lstat(path)
     if (!stat.isFile() || stat.size > 1_000_000) throw new Error('INVALID_ATTEMPT_LEDGER_FILE')
     let dailyHistory = null

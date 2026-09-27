@@ -29,7 +29,7 @@ async function localGraph() {
   try { demand((await lstat(resolve(root, graphRef))).isFile(), 'INVALID_GRAPH_FILE'); return await readFile(resolve(root, graphRef)) }
   catch (e) { if (e.code === 'ENOENT') return null; throw e }
 }
-export async function prepareGraphPublication(snapshot, factsRef = null) {
+export async function prepareGraphPublication(snapshot, factsRef = null, { bookCandidateBytes = null } = {}) {
   const batch = createBatch(snapshot), sha = headSHA()
   demand(batch.snapshot.source_revision === sha, 'GRAPH_SNAPSHOT_CHECKOUT_MISMATCH')
   demand(batch.snapshot.chronicle_id === 'C03-AFTERFALL', 'GRAPH_CHRONICLE_UNSUPPORTED')
@@ -43,7 +43,9 @@ export async function prepareGraphPublication(snapshot, factsRef = null) {
   demand((await lstat(resolve(root, seedRef))).isFile() && seedBytes.equals(await readFile(resolve(root, seedRef))), 'PUBLIC_SEED_CHECKOUT_MODIFIED')
   const seedModule = await import(pathToFileURL(resolve(root, seedRef)).href)
   const seedFacts = legacyPublicFacts(seedModule)
-  const bookBytes = pinned(sha, bookRef), book = JSON.parse(bookBytes)
+  const committedBookBytes = pinned(sha, bookRef)
+  demand(bookCandidateBytes === null || Buffer.isBuffer(bookCandidateBytes), 'INVALID_READER_CANDIDATE')
+  const bookBytes = bookCandidateBytes ?? committedBookBytes, book = JSON.parse(bookBytes)
   const bookSource = { source_ref: bookRef, source_sha256: byteHash(bookBytes) }
   const seedSource = { source_ref: seedRef, source_sha256: byteHash(seedBytes) }
   const actualBytes = await localGraph()
@@ -68,6 +70,7 @@ export async function prepareGraphPublication(snapshot, factsRef = null) {
   return { actualBytes, candidateBytes, graph: compiled.graph, report: {
     ...compiled.report, mode: 'LOCAL_GRAPH_BATCH', task_id: task.task_id, bootstrap,
     source_revision: sha, source_save_version: snapshot.source_save_version, graph_sha256: compiled.graph.content_sha256,
+    reader_candidate_only: !bookBytes.equals(committedBookBytes), book_sha256: bookSource.source_sha256,
     status: actualBytes?.equals(candidateBytes) ? 'NOOP' : 'READY_TO_UPDATE_LOCAL_GRAPH', files_written: 0,
   } }
 }
