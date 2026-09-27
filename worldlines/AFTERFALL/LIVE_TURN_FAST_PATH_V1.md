@@ -12,6 +12,10 @@ Status: **AUTHORITATIVE LIVE PLAY OPERATING RULE**
    acknowledgement된 `message_order`를 보관해 다음 order를 계산하되, reconnect,
    acknowledgement 불명확, retry 또는 corruption 의심 때에는 실제 DB를 다시 읽는다.
    새 gameplay turn마다 `turn_no`는 정상적으로 증가한다.
+   새 season의 LIVE RAW가 있는데 authoritative `saves`가 이전 season에
+   머물러 있으면 정상 턴을 이어가기 전에 실제 플레이 기록으로 runtime을
+   정합화한다. 오래된 save version을 `NO_STATE_CHANGE`라고 주장하거나
+   legacy RAW 호출을 정상 경로처럼 반복하지 않는다.
 2. 새 gameplay turn마다 새 USER idempotency UUID와 별개의 새 GM idempotency UUID를
    만든다. **같은 turn의 retry에만** 정확히 같은 두 UUID, USER/GM text, hashes와
    message order를 재사용한다. 과거 turn의 UUID를 새 turn에 재사용하지 않는다.
@@ -31,6 +35,9 @@ Status: **AUTHORITATIVE LIVE PLAY OPERATING RULE**
    명시적 outcome에 연결해 `append_public_transcript_turn_with_state_link(...)`
    한 번으로 원자 저장한다. 이 함수는 save를 변경하지 않고, 실제 current
    save head를 확인한 뒤 transcript pair와 state link를 함께 commit한다.
+   `CURRENT_STATE.json`의 `live_transcript_capture.append_function`이 이
+   linked RPC를 가리키는지 확인한다. 기술적 호출 실패에만 기존 RAW RPC를
+   안전 보존용으로 사용하고, 그 턴을 state-unlinked로 격리한다.
 8. 해당 GM 문자열을 플레이어에게 출력한다.
 
 평범한 대사, 몇 분 이동, 반복 정비, 자동 상쇄되는 일상소비, 상태를 바꾸지

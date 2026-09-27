@@ -128,14 +128,20 @@ Immediately before emitting the response:
 4. generate one distinct stable GM idempotency UUID;
 5. compute lowercase SHA-256 for the exact USER text;
 6. compute lowercase SHA-256 for the exact final GM text;
-7. when a current authoritative save version is available, call
+7. verify that the current authoritative save belongs to the live season and
+   reflects the already played durable changes. If it still belongs to an
+   earlier season, reconcile from the exact observed RAW before another normal
+   turn. Do not label a stale save head `NO_STATE_CHANGE`.
+8. call
    `append_public_transcript_turn_with_state_link(...)` with non-null USER/GM
    versions and the explicit `APPLIED` or `NO_STATE_CHANGE` outcome. This API
    locks and checks the current save head, then commits the exact pair and its
    state-version link in one transaction. It does not mutate the save itself.
    The older `append_public_transcript_turn(...)` remains a RAW-preservation
-   fallback if the linked API is unavailable or rejects the link; that pair
-   must be reported as unlinked and quarantined from publication.
+   fallback only after a technical linked-call failure; that pair must be
+   reported as unlinked and quarantined from publication. Missing or stale
+   authoritative save state is a runtime reconciliation failure, not permission
+   to silently select the legacy API for normal play.
 
 The database commits:
 

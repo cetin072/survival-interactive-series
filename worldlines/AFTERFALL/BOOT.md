@@ -65,6 +65,12 @@ Save status가 `PREPLAY_READY`이면:
 ## 5. 턴 처리
 `LIVE_TURN_FAST_PATH_V1.md`가 normal turn의 authoritative call budget이다.
 
+`CURRENT_STATE.json`의 `live_transcript_capture.append_function`을 실제 호출
+대상으로 사용한다. 새 season의 LIVE RAW가 기록됐지만 Supabase `saves`가
+이전 season에 머물러 있다면 새 장면을 진행하기 전에 실제 RAW를 기준으로
+runtime을 정합화한다. 오래된 save head를 정상적인 `NO_STATE_CHANGE`로
+간주하거나 RAW fallback을 평상시 호출로 고정하지 않는다.
+
 1. 새 room, 새 장면, 큰 전환, 큰 시간점프 또는 오류 의심일 때만 `check_runtime_consistency` 확인
 2. 새 장면이거나 stable context가 바뀐 경우에만 장면 관련 인물로 `get_scene_context` 로드
 3. 큰 시간점프/날짜경계면 World Tick checklist 확인
