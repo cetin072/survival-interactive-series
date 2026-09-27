@@ -6,6 +6,7 @@ import { createHash, randomUUID } from 'node:crypto'
 import { fingerprint } from './publication-plan.mjs'
 import { commitOrReuseRemoteTextProposal } from './remote-text-proposal.mjs'
 import { openOrReuseDraftTextPr } from './github-text-proposal-pr.mjs'
+import { dispatchOrReuseTextProposalCi } from './github-text-proposal-ci.mjs'
 
 const demand = (ok, code) => { if (!ok) throw new Error(code) }
 const digest = (value) => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value)
@@ -208,17 +209,22 @@ export async function runApprovedTextProposal({ runner, scheduledDate,
     && typeof proposal.reused === 'boolean', 'TEXT_PROPOSAL_RESULT_INVALID')
   const pr = await openOrReuseDraftTextPr({ remoteRef: proposal.remoteRef,
     commit: proposal.commit, token: githubToken, fetchImpl })
+  const ci = await dispatchOrReuseTextProposalCi({ remoteRef: proposal.remoteRef,
+    commit: proposal.commit, token: githubToken, fetchImpl })
   await renew()
   await finishTask(runner, task, 'COMPLETE',
-    { result: 'COMPLETE', reason_code: 'DRAFT_TEXT_PR',
-      source_sha256: identity.sourceSha256, pr_number: String(pr.prNumber) })
+    { result: 'COMPLETE', reason_code: 'DRAFT_TEXT_PR_CI_DISPATCHED',
+      source_sha256: identity.sourceSha256, pr_number: String(pr.prNumber),
+      ci_run_id: String(ci.ciRunId) })
   await finishDaily(runner, scheduledDate, daily, 'COMPLETE',
-    { result: 'COMPLETE', reason_code: 'DRAFT_TEXT_PR',
-      source_sha256: identity.sourceSha256, pr_number: String(pr.prNumber) })
+    { result: 'COMPLETE', reason_code: 'DRAFT_TEXT_PR_CI_DISPATCHED',
+      source_sha256: identity.sourceSha256, pr_number: String(pr.prNumber),
+      ci_run_id: String(ci.ciRunId) })
   return { status: 'DRAFT_TEXT_PR_READY', task_id: identity.taskId,
     batch_id: identity.batchId, plan_id: identity.planId,
     proposal_commit: proposal.commit, proposal_ref: proposal.remoteRef,
     proposal_reused: proposal.reused, pr_number: pr.prNumber,
-    pr_reused: pr.reused,
+    pr_reused: pr.reused, ci_run_id: ci.ciRunId,
+    ci_reused: ci.reused,
     site_publications: 0 }
 }
