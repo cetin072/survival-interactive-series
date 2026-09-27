@@ -66,6 +66,10 @@ try {
   command('git', ['branch', 'codex/archive-publication-ref-source-test', fixtureHead], copy)
   command('git', ['checkout', '--detach', 'HEAD^'], copy)
   const beforeRefBook = await readFile(resolve(copy, 'archive/content/stories/C03-AFTERFALL/BOOK.json'))
+  // An untracked local season must not affect compilation from the pinned ref.
+  const checkoutOnlySeason = resolve(copy, 'archive/content/transcripts/C03-AFTERFALL/S98')
+  await mkdir(checkoutOnlySeason, { recursive: true })
+  await writeFile(resolve(checkoutOnlySeason, 'MANIFEST.json'), '{ malformed checkout-only manifest')
   const refScript = `import { commitReaderFromPublicRef } from './archive/scripts/lib/reader-public-ref.mjs';
 const result = await commitReaderFromPublicRef({ repoRoot: process.cwd(),
   ref: '${refSource}', seasonId: 'S99', checkpointRef: '${checkpointRef}',
@@ -131,6 +135,7 @@ process.stdout.write(JSON.stringify(result));`
   assert.equal(requestPlan.zero_added_cost_proven, false)
   assert.deepEqual(JSON.parse(command('node', imageRequestArgs, copy)), requestPlan)
   assert.equal(command('git', ['rev-parse', refSource], copy).trim(), visualResult.commit)
+  await rm(checkoutOnlySeason, { recursive: true })
   command('git', ['checkout', '--detach', fixtureHead], copy)
   const proposalRef = 'refs/heads/codex/archive-publication-reader-test'
   command('git', ['branch', 'codex/archive-publication-reader-test', fixtureHead], copy)

@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { extractReaderNarrative } from './lib/reader-transform.mjs'
-import { bookMetadata, rawCatalog } from './reader-source-catalog.mjs'
+import { bookMetadata } from './lib/reader-book-metadata.mjs'
 import { editorialOverrides, editorialPlan } from './reader-editorial-map.mjs'
 import { appendAutomaticChapters } from './lib/reader-auto.mjs'
 
@@ -31,7 +31,8 @@ function makeChapters(chronicleId, parts) {
   return appendAutomaticChapters(chronicleId, parts, chapters, new Set(ranges.keys()))
 }
 
-export async function makeBooks({ readSource = (path) => readFile(resolve(root, path)), catalogs = rawCatalog } = {}) {
+export async function makeBooks({ readSource = (path) => readFile(resolve(root, path)), catalogs } = {}) {
+  catalogs ??= (await import('./reader-source-catalog.mjs')).rawCatalog
   const books = []
   for (const [chronicleId, catalog] of Object.entries(catalogs)) {
     const included = [], omitted = [], editorialExclusions = []
