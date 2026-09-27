@@ -161,5 +161,55 @@ class CaptureSyncAuditTests(unittest.TestCase):
                          ("NEEDS_GM_REVIEW", "RAW_AHEAD_OF_SAVE"))
 
 
+    def test_turn_order_is_not_repaired_by_sorting_message_orders(self) -> None:
+        data = snapshot()
+        first = data["session"]["turns"][0]
+        second_user = message(2, 253, "2027-03-24 17:10", 2)
+        second_gm = message(3, 254, "2027-03-24 17:10", 2)
+        data["session"]["last_message_order"] = 3
+        first["user"]["message_order"], first["gm"]["message_order"] = 2, 3
+        second = {"turn_no": 2, "outcome": "APPLIED", "user": second_user, "gm": second_gm,
+                  "state_link": {"session_id": SESSION_ID, "worldline_id": "AFTERFALL",
+                                 "chronicle_id": "C03", "season_id": "S03",
+                                 "user_message_id": second_user["message_id"],
+                                 "gm_message_id": second_gm["message_id"], "outcome": "APPLIED",
+                                 "user_save_version": 253, "gm_save_version": 254,
+                                 "linked_save_version": 254}}
+        second["user"]["message_order"], second["gm"]["message_order"] = 0, 1
+        data["session"]["turns"].append(second)
+        with self.assertRaisesRegex(ValueError, "SESSION_ORDER_GAP_OR_TAIL_MISMATCH"):
+            audit(data)
+
+    def test_cross_turn_save_version_rollback_quarantines_applied_and_no_change(self) -> None:
+        for outcome, second_user_version, second_gm_version in (
+            ("APPLIED", 200, 255), ("NO_STATE_CHANGE", 200, 200),
+        ):
+            with self.subTest(outcome=outcome):
+                data = snapshot()
+                first = data["session"]["turns"][0]
+                first["outcome"] = "APPLIED"
+                first["user"]["save_version"] = 253
+                first["gm"]["save_version"] = 254
+                first["state_link"].update({"outcome": "APPLIED", "user_save_version": 253,
+                                             "gm_save_version": 254, "linked_save_version": 254})
+                user = message(2, second_user_version, "2027-03-24 17:10", 2)
+                gm = message(3, second_gm_version, "2027-03-24 17:10", 2)
+                data["database"]["save_version"] = second_gm_version
+                data["repository"]["save_version_anchor"] = second_gm_version
+                data["session"]["last_message_order"] = 3
+                data["session"]["turns"].append({
+                    "turn_no": 2, "outcome": outcome, "user": user, "gm": gm,
+                    "state_link": {"session_id": SESSION_ID, "worldline_id": "AFTERFALL",
+                                   "chronicle_id": "C03", "season_id": "S03",
+                                   "user_message_id": user["message_id"], "gm_message_id": gm["message_id"],
+                                   "outcome": outcome, "user_save_version": second_user_version,
+                                   "gm_save_version": second_gm_version,
+                                   "linked_save_version": second_gm_version},
+                })
+                result = audit(data)
+                self.assertEqual((result["status"], result["reason"]),
+                                 ("NEEDS_GM_REVIEW", "TURN_STATE_LINK_CONFLICT"))
+
+
 if __name__ == "__main__":
     unittest.main()
