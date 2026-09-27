@@ -120,6 +120,7 @@ def audit(snapshot: Any) -> dict[str, Any]:
     unlinked_state = False
     state_link_errors = False
     previous_turn: int | None = None
+    previous_gm_save_version: int | None = None
     for turn in session["turns"]:
         exact_keys(turn, TURN_KEYS, "INVALID_TURN_METADATA")
         require(isinstance(turn["turn_no"], int) and not isinstance(turn["turn_no"], bool)
@@ -172,8 +173,12 @@ def audit(snapshot: Any) -> dict[str, Any]:
                 state_link_errors = True
             elif turn["outcome"] == "APPLIED" and linked_gm_version <= linked_user_version:
                 state_link_errors = True
+            elif (previous_gm_save_version is not None
+                    and linked_user_version < previous_gm_save_version):
+                state_link_errors = True
+            else:
+                previous_gm_save_version = linked_gm_version
 
-    orders.sort()
     require(orders == list(range(session["last_message_order"] + 1)), "SESSION_ORDER_GAP_OR_TAIL_MISMATCH")
     require(len(orders) % 2 == 0, "UNPAIRED_SESSION_TAIL")
 
