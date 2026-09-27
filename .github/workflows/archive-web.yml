@@ -9,6 +9,7 @@ on:
       - 'archive/scripts/**'
       - 'archive/exporter/**'
       - '.github/workflows/archive-web.yml'
+      - '.github/workflows/archive-linked-batch-check.yml'
       - 'supabase/migrations/**'
       - 'supabase/tests/**'
   push:
@@ -21,6 +22,7 @@ on:
       - 'archive/scripts/**'
       - 'archive/exporter/**'
       - '.github/workflows/archive-web.yml'
+      - '.github/workflows/archive-linked-batch-check.yml'
       - 'supabase/migrations/**'
       - 'supabase/tests/**'
 
