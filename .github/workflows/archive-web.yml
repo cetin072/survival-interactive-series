@@ -128,6 +128,8 @@ jobs:
         run: node --test ../scripts/lib/site-asset-contract.test.mjs
       - name: Test foreground original, storage readback and registry site handoff
         run: node --test ../scripts/lib/site-foreground-handoff.test.mjs
+      - name: Test read-only site asset runner against accepted source and registry binding
+        run: node --test ../scripts/run-site-asset-handoff.test.mjs
       - name: Test idempotent private original upload and uncertain response recovery
         run: node --test ../scripts/lib/archive-storage-original.test.mjs
       - name: Test private visual registry binding and retry plan
