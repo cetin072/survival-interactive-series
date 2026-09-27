@@ -1,0 +1,10 @@
+{
+  "brief_id": "K-003",
+  "question": "가족 비상연락 계획은 어떻게 만들어두면 좋은가",
+  "claims": [
+    {"claim": "국민안전24는 가족 연락처와 만남 장소를 미리 정하도록 안내한다.", "source_ids": ["S1"], "context": "비상대비 행동요령", "limitation": "원자료는 비상사태 문맥이다."},
+    {"claim": "국민안전24 산불 행동요령은 연락망, 역할, 대피 장소와 경로를 미리 정하도록 안내한다.", "source_ids": ["S2"], "context": "산불 행동요령", "limitation": "실제 대피 장소와 경로는 상황과 지역에 따라 달라진다."}
+  ],
+  "conflicts": [], "unknowns": [], "risk_notes": [], "story_source_status": "UNVERIFIED_NO_LINK",
+  "copyright_status": "CLEAR"
+}

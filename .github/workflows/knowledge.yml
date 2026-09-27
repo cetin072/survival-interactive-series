@@ -1,0 +1,45 @@
+name: Validate knowledge BRIEF pipeline
+
+on:
+  pull_request:
+    paths:
+      - 'knowledge/**'
+      - 'archive/scripts/*knowledge*'
+      - 'archive/scripts/lib/knowledge*'
+      - 'archive/web/public/knowledge/**'
+      - 'archive/web/public/sitemap.xml'
+      - 'archive/web/package.json'
+      - '.github/workflows/knowledge.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'knowledge/**'
+      - 'archive/scripts/*knowledge*'
+      - 'archive/scripts/lib/knowledge*'
+      - 'archive/web/public/knowledge/**'
+      - 'archive/web/public/sitemap.xml'
+      - 'archive/web/package.json'
+      - '.github/workflows/knowledge.yml'
+
+jobs:
+  knowledge:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: archive/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: archive/web/package-lock.json
+      - run: npm ci
+      - name: Knowledge scanner, contract, generator and gate tests
+        run: npm run knowledge:test
+      - name: Verify checked-in static pages, sitemap and source inventory
+        run: npm run knowledge:check
+      - name: Archive Reader public-source regression
+        run: node --test ../scripts/lib/reader-batch.test.mjs
+      - name: Site build
+        run: npm run build
