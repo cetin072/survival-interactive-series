@@ -135,10 +135,10 @@ def audit_book(page, base: str, chronicle: str, width: int):
     if chronicle == 'C03-AFTERFALL':
         assert chapters[0]['id'] == 'c03-afterfall-opening-01'
         expect(page.locator('.reader-body')).to_contain_text('서림대학교병원 응급의료센터')
-        expect(page.locator('.reader-integrity-note')).to_contain_text('2026-09-18 14:12')
-        expect(page.locator('.reader-integrity-note')).to_contain_text('2026-10-23 20:10')
+        assert chapters[1]['id'] == 'c03-afterfall-prelude-01'
+        assert chapters[9]['id'] == 'c03-afterfall-chapter-01'
         page.goto(query_url(base, view='story', chronicle=chronicle, chapter='c03-afterfall-chapter-01'))
-        selected_book(page, chapters[1], chronicle)
+        selected_book(page, chapters[9], chronicle)  # existing deep link stays valid
         page.goto(query_url(base, view='story', chronicle=chronicle, chapter=chapters[0]['id']))
         selected_book(page, chapters[0], chronicle)
     book_assets = [url for url in page.requests_seen[before:] if re.search(r'/BOOK-[^/]+\.json(?:\?|$)', url)]
@@ -214,9 +214,9 @@ def audit_extra(page, base: str, width: int):
     selected_raw(page, 'c03-s01-opening-001')
     expect(page.locator('.transcript-flow')).to_contain_text('서림대학교병원 응급의료센터')
     page.goto(query_url(base, view='raw', chronicle='C03-AFTERFALL', part='c03-s01-missing-before'))
-    expect(page.locator('.missing-transcript')).to_be_visible()
+    expect(page.locator('.transcript-gm').first).to_be_visible()
     page.goto(query_url(base, view='raw', chronicle='C03-AFTERFALL', part='c03-s01-008'))
-    expect(page.locator('.transcript-fragment pre')).to_be_visible()
+    expect(page.locator('.transcript-gm').first).to_be_visible()
     report('S02 finale / season switch / missing and fragment preserved', width=width)
     page.goto(base)
     search = page.locator('.archive-search input')

@@ -10,7 +10,7 @@ export type ReaderChapter = {
 export type ReaderCoverage = { verifiedRawParts: number; scanned: number; eligibleGmProse: number; included: number; omitted: { sourceRef: string; archiveSourceRef: string; reason: string }[] }
 export type ChronicleBook = {
   chronicleId: ChronicleId; title: string; protagonist: string; worldlineId: string; subtitle: string
-  description: string; sourceRoot: string; transformVersion: string; beginningStatus?: 'MISSING_BEGINNING' | 'PARTIAL_BEGINNING_RECOVERED'; beginningGap?: { after: string; before: string; label: string }; coverage?: ReaderCoverage
+  description: string; sourceRoot: string; transformVersion: string; beginningStatus?: 'MISSING_BEGINNING' | 'PARTIAL_BEGINNING_RECOVERED' | 'OPENING_PLAY_RECOVERED'; beginningGap?: { after: string; before: string; label: string }; coverage?: ReaderCoverage
 }
 type BookFile = Omit<ChronicleBook, 'chronicleId'> & { chronicleId: ChronicleId; chapters: Omit<ReaderChapter, 'chronicleId'>[] }
 type BookIndex = Omit<BookFile, 'chapters'> & { chapters: Omit<ReaderChapter, 'chronicleId' | 'body'>[] }

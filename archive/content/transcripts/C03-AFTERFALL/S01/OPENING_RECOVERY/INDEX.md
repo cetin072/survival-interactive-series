@@ -15,10 +15,10 @@ The original DOCX was supplied directly in this ChatGPT conversation. The reposi
 ## Reading order
 
 1. `PART_OPENING_001.md`
-2. `[원문 확인 불가 구간]`
+2. `../SHARED_CHAT_RECOVERY/PART_PRELUDE_001.md`–`008.md` (later recovered public play)
 3. Existing S01 archive resumes at `../PART_C03_001.md` (2026-10-23 20:10 visible start).
 
-The interval after the recovered 2026-09-18 14:12 scene and before the current `PART_C03_001.md` start is **not reconstructed**.
+The interval previously marked missing was recovered from the shared source conversation. See `../SHARED_CHAT_RECOVERY/INDEX.md`. The original opening document remains unchanged.
 
 ## Preservation notes
 

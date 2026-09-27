@@ -42,7 +42,7 @@ export async function makeBooks({ readSource = (path) => readFile(resolve(root, 
       const bytes = await readSource(item.archivePath)
       if (item.autoPublication && hash(bytes) !== item.autoPublication.rawSha256) throw new Error('AUTOMATIC_RAW_HASH_CHANGED')
       const raw = normalizeEol(bytes.toString('utf8'))
-      const selected = extractReaderNarrative(raw, { details: true })
+      const selected = extractReaderNarrative(raw, { details: true, strictChoiceGate: item.archivePath.includes('/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_') })
       const overrideReason = editorialOverrides.exclude[item.archivePath]
       if (overrideReason) { omitted.push({ sourceRef: item.canonicalRef, archiveSourceRef: item.archivePath, reason: overrideReason }); editorialExclusions.push({ sourceRef: item.canonicalRef, archiveSourceRef: item.archivePath, reason: overrideReason }); continue }
       if (!selected.body || !selected.gmBlocks) { omitted.push({ sourceRef: item.canonicalRef, archiveSourceRef: item.archivePath, reason: selected.classifications.some((x) => x.classification === 'design_meta') ? 'design_meta_only' : 'operational_meta_or_no_eligible_gm_prose' }); continue }

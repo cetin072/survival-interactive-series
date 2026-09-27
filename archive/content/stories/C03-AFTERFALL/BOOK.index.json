@@ -6,18 +6,13 @@
   "protagonist": "서진우",
   "worldlineId": "AFTERFALL",
   "sourceRoot": "worldlines/AFTERFALL",
-  "beginningStatus": "PARTIAL_BEGINNING_RECOVERED",
-  "beginningGap": {
-    "after": "2026-09-18 14:12",
-    "before": "2026-10-23 20:10",
-    "label": "원문 미확보 구간"
-  },
+  "beginningStatus": "OPENING_PLAY_RECOVERED",
   "transformVersion": "reader-selection-v1.2.0",
   "coverage": {
-    "verifiedRawParts": 27,
-    "scanned": 27,
-    "eligibleGmProse": 22,
-    "included": 22,
+    "verifiedRawParts": 36,
+    "scanned": 36,
+    "eligibleGmProse": 30,
+    "included": 30,
     "omitted": [
       {
         "sourceRef": "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_006.md",
@@ -43,6 +38,11 @@
         "sourceRef": "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_010.md",
         "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/PART_C03_010.md",
         "reason": "operational_meta_only"
+      },
+      {
+        "sourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/LATE_DOCX_RECOVERY/PART_C03_008_RECOVERED.md",
+        "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/LATE_DOCX_RECOVERY/PART_C03_008_RECOVERED.md",
+        "reason": "postseason_feedback_only"
       }
     ]
   },
@@ -78,6 +78,11 @@
       "reason": "operational_meta_only"
     },
     {
+      "sourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/LATE_DOCX_RECOVERY/PART_C03_008_RECOVERED.md",
+      "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S01/LATE_DOCX_RECOVERY/PART_C03_008_RECOVERED.md",
+      "reason": "postseason_feedback_only"
+    },
+    {
       "sourceRef": "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_002.md",
       "archiveSourceRef": "archive/content/transcripts/C03-AFTERFALL/S02/SESSION_001/PART_002.md",
       "reason": "trailing_operational_meta"
@@ -101,6 +106,182 @@
       ],
       "sourceHashes": [
         "2a6d041fee52cfc5cf18cd02499776c7cb4257d223b8d133b22e5c7f0b3cce68"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c03-afterfall-prelude-01",
+      "chapterNumber": 0,
+      "title": "병원 밖",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "2026-09-18 14:14",
+      "seasonId": "S01",
+      "arcLabel": "복구된 초기 플레이",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_001.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_001.md"
+      ],
+      "sourceHashes": [
+        "9694b1d57aefc1c6c88caf95008e3fe6a2d8fd10f2e5073be5ee1d719b2a0de5"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c03-afterfall-prelude-02",
+      "chapterNumber": 0,
+      "title": "사람을 찾다",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "복구된 초기 플레이",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_002.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_002.md"
+      ],
+      "sourceHashes": [
+        "379a79b4498038394224f2894b5c175e26655478bf60a45c2b51ef659bf60903"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c03-afterfall-prelude-03",
+      "chapterNumber": 0,
+      "title": "두 거점의 첫 연결",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "복구된 초기 플레이",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_003.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_003.md"
+      ],
+      "sourceHashes": [
+        "5923f71c562d19ce315becf8e7a7a000b7968320c9c0e60e0d5764692c68f212"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c03-afterfall-prelude-04",
+      "chapterNumber": 0,
+      "title": "공동저장고",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "복구된 초기 플레이",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_004.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_004.md"
+      ],
+      "sourceHashes": [
+        "4d2161d341c0377f13973f0d1b4db8cb9d2c6ef06365c5e74b820f589af7bef7"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c03-afterfall-prelude-05",
+      "chapterNumber": 0,
+      "title": "자원 수지",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "복구된 초기 플레이",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_005.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_005.md"
+      ],
+      "sourceHashes": [
+        "0a29d351dabf447e68bfd2f1b1808285ceed01cc7a9564de85856faa6924ffb2"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c03-afterfall-prelude-06",
+      "chapterNumber": 0,
+      "title": "재난의 원인",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "복구된 초기 플레이",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_006.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_006.md"
+      ],
+      "sourceHashes": [
+        "ffd960ee6fc698b593867dca43440db620c37f3f36e7b708f0ff10087db6b22e"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c03-afterfall-prelude-07",
+      "chapterNumber": 0,
+      "title": "철수 준비",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "S01",
+      "seasonId": "S01",
+      "arcLabel": "복구된 초기 플레이",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_007.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_007.md"
+      ],
+      "sourceHashes": [
+        "56f7215383a2265235b8874fc3497c687e531bc533c75a9dfcb506ad81b5d943"
+      ],
+      "supportingRefs": [],
+      "transformVersion": "reader-selection-v1.2.0",
+      "relatedNodeIds": []
+    },
+    {
+      "id": "c03-afterfall-prelude-08",
+      "chapterNumber": 0,
+      "title": "10월 23일",
+      "subtitle": "공개 기록 1건",
+      "dateLabel": "2026-10-23 17:36",
+      "seasonId": "S01",
+      "arcLabel": "복구된 초기 플레이",
+      "sourceKind": "VERIFIED_GM_NARRATIVE",
+      "sourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_008.md"
+      ],
+      "archiveSourceRefs": [
+        "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_008.md"
+      ],
+      "sourceHashes": [
+        "ac9ecf534ab595431da9e1e2fa1a7946b9cf9ab0611e6539b1b6de257d5b85e4"
       ],
       "supportingRefs": [],
       "transformVersion": "reader-selection-v1.2.0",
