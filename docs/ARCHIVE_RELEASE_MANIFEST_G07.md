@@ -7,4 +7,3 @@ The graph and character modules are split into distinct fingerprinted output fil
 Story JSON assets use LF line endings in every checkout so Windows local builds and Linux CI/Netlify builds produce identical content bytes. Transcript files remain under their existing byte-preservation rule.
 
 This manifest identifies built content by its bytes. It is not an operational Publication Batch ID and does not prove source approval, Preview availability, branch protection, merge, or Production publication. Those checks remain separate release gates.
-

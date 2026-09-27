@@ -1,4 +1,3 @@
 # Raw Markdown uses two trailing spaces for intentional line breaks. Preserve it byte-for-byte.
 transcripts/** -whitespace
 stories/** text eol=lf
-

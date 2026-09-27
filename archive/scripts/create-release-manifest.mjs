@@ -51,4 +51,3 @@ const manifest = {
 const bytes = JSON.stringify(manifest, null, 2) + '\n'
 await writeFile(resolve(distRoot, 'archive-release-manifest.json'), bytes, 'utf8')
 process.stdout.write(JSON.stringify({ schema: manifest.schema, release_id: manifest.release_id, assets: assets.map(({ kind, chronicle_id, path, sha256 }) => ({ kind, chronicle_id, path, sha256 })) }) + '\n')
-
