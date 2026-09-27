@@ -11,6 +11,7 @@ MIGRATION = ROOT / "supabase/migrations/20260926162611_afterfall_atomic_turn_sta
 CONTINUITY_MIGRATION = ROOT / "supabase/migrations/20260927042720_afterfall_turn_state_continuity_v1.sql"
 INTEGRITY_MIGRATION = ROOT / "supabase/migrations/20260927103011_afterfall_turn_link_message_integrity_v1.sql"
 LIVE_LINK_REQUIRED_MIGRATION = ROOT / "supabase/migrations/20260927154303_afterfall_live_link_required_v1.sql"
+FAST_RAW_FIRST_MIGRATION = ROOT / "supabase/migrations/20260927160718_afterfall_fast_raw_first_v1.sql"
 
 
 class TurnStateLinkMigrationTests(unittest.TestCase):
@@ -126,6 +127,13 @@ class TurnStateLinkMigrationTests(unittest.TestCase):
         self.assertIn("after insert on survival_rpg.transcript_messages", sql)
         self.assertNotRegex(sql, r"\b(update|delete)\s+survival_rpg\.(saves|transcript_messages|transcript_turn_state_links)\b")
 
+
+    def test_fast_raw_first_forward_migration_removes_only_live_link_guard(self) -> None:
+        sql = FAST_RAW_FIRST_MIGRATION.read_text(encoding="utf-8").lower()
+        self.assertIn("drop trigger if exists afterfall_live_message_requires_state_link", sql)
+        self.assertIn("on survival_rpg.transcript_messages", sql)
+        self.assertIn("drop function if exists survival_rpg.enforce_afterfall_live_message_link()", sql)
+        self.assertNotRegex(sql, r"\b(update|delete)\s+survival_rpg\.(saves|transcript_messages|transcript_turn_state_links)\b")
 
 
 if __name__ == "__main__":
