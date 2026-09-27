@@ -1,0 +1,10 @@
+{
+  "brief_id": "K-002",
+  "question": "비상용품은 어떻게 목록화하고 점검하면 좋은가",
+  "claims": [
+    {"claim": "국민안전24 호우 행동요령은 비상용품과 최소 3일분의 식량·식수·생필품 준비를 안내한다.", "source_ids": ["S1"], "context": "호우 대비", "limitation": "모든 재난에 충분한 양이라는 뜻은 아니다."},
+    {"claim": "CDC는 비상키트의 내용물을 6개월마다 확인하는 예를 제시한다.", "source_ids": ["S2"], "context": "미국의 비상키트 안내", "limitation": "한국의 법적 의무나 모든 품목의 수명이 아니다."}
+  ],
+  "conflicts": [], "unknowns": [], "risk_notes": [], "story_source_status": "UNVERIFIED_NO_LINK",
+  "copyright_status": "CLEAR"
+}
