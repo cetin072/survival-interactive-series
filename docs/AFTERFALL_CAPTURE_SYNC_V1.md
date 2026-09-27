@@ -1,6 +1,6 @@
 # AFTERFALL capture/state synchronization v1
 
-Status: **AUDIT GUARD IMPLEMENTED / LIVE CAPTURE LINKAGE BLOCKED**
+Status: **AUDIT GUARD IMPLEMENTED / NEW LIVE CAPTURE = CAPTURE_BLOCKED**
 
 Scope: `C03 / AFTERFALL / 서진우` on `worldline/afterfall-rpg`. This document and
 the metadata auditor do not change Canon, RAW, Supabase rows, or season state.
@@ -16,6 +16,13 @@ The current database has no restricted public Archive exporter, and the
 available administrative database connection is not the game-room capture
 caller. Therefore its presence does not prove that every ChatGPT game room is
 automatically observed. Do not scrape rooms or infer uncaptured dialogue.
+
+Until a real supported game-room call to the trusted pair writer is verified,
+the operational status for new automatic capture is `CAPTURE_BLOCKED`. The
+available Codex/Supabase administration connection is not evidence that the
+separate ChatGPT game room can call it. This is an integration-evidence blocker;
+it does not assert that uncaptured content can be recovered. Historical rows
+remain separately classified by their metadata audit below.
 
 ## Required link for each completed turn
 
