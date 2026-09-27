@@ -12,7 +12,7 @@ const visualPath = 'archive/content/visuals/C03-AFTERFALL/VISUALS.json'
 const reviewedAppearancePath =
   'archive/content/public-facts/C03-AFTERFALL/S02/APPEARANCES_APPROVED_20260926.json'
 
-export async function prepareVisualFromPublicRef(options = {}) {
+async function compileVisualFromPublicRef(options, acceptCurrentCatalog) {
   const inspected = await inspectPublicRef(options)
   const graphProof = await verifyGraphAtPublicRef(options)
   demand(graphProof.baseCommit === inspected.base, 'GRAPH_REF_MOVED_DURING_VISUAL_READ')
@@ -42,8 +42,11 @@ export async function prepareVisualFromPublicRef(options = {}) {
     demand(previous.anchor.save_version <= catalog.anchor.save_version
       && previous.anchor.game_time <= catalog.anchor.game_time,
     'STALE_VISUAL_CATALOG')
-    demand(!previousBytes.equals(candidateBytes), 'VISUAL_REF_ALREADY_CURRENT')
+    if (acceptCurrentCatalog) demand(previousBytes.equals(candidateBytes),
+      'VISUAL_AT_REF_NOT_VERIFIED')
+    else demand(!previousBytes.equals(candidateBytes), 'VISUAL_REF_ALREADY_CURRENT')
   }
+  else demand(!acceptCurrentCatalog, 'VISUAL_AT_REF_NOT_VERIFIED')
   const selection = planVisualSelection(catalog)
   return { ref, baseCommit: base, seasonId, candidateBytes,
     report: { status: 'VISUAL_CATALOG_READY_IN_MEMORY',
@@ -52,6 +55,13 @@ export async function prepareVisualFromPublicRef(options = {}) {
       execution_enabled: false, provider_calls: 0, files_written: 0,
       remote_pushes: 0, site_publications: 0 } }
 }
+
+export const prepareVisualFromPublicRef = (options = {}) =>
+  compileVisualFromPublicRef(options, false)
+
+/** Recompile and compare the committed catalog before preparing an image request. */
+export const verifyVisualAtPublicRef = (options = {}) =>
+  compileVisualFromPublicRef(options, true)
 
 export async function commitVisualFromPublicRef(options = {}) {
   demand(typeof options.authorizeCommit === 'function', 'VISUAL_GIT_COMMIT_DISABLED')
