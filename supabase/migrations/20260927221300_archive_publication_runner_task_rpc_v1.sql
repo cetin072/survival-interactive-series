@@ -1,6 +1,7 @@
 -- Extend the dedicated publication login with ledger RPCs only.
 -- Apply after 20260927215800_archive_daily_runner_login_v1.sql.
 -- The exporter remains read only, and this login has no direct table grants.
+begin;
 do $$
 begin
   if not exists (
@@ -34,6 +35,11 @@ grant execute on function survival_rpg.link_archive_publication_run_batch(date,b
   to archive_publication_runner;
 -- The generic claim chooses any pending task. A text runner must claim only
 -- its deterministic task ID, so another publication lane cannot lose attempts.
+-- Staging postgres is non-superuser. Restore SET/CREATE only within this
+-- transaction and create the SECURITY DEFINER function as its final owner.
+grant archive_runner_internal to postgres with set true, inherit false;
+grant create on schema survival_rpg to archive_runner_internal;
+set role archive_runner_internal;
 create or replace function survival_rpg.claim_archive_publication_task_by_id(
   p_task_id text, p_worker_id text, p_lease_seconds integer default 300
 )
@@ -93,10 +99,11 @@ begin
     v_task.lease_token,v_task.lease_expires_at;
 end;
 $$;
-alter function survival_rpg.claim_archive_publication_task_by_id(text,text,integer)
-  owner to archive_runner_internal;
 revoke all on function survival_rpg.claim_archive_publication_task_by_id(text,text,integer)
   from public, anon, authenticated, service_role;
+reset role;
+revoke create on schema survival_rpg from archive_runner_internal;
+grant archive_runner_internal to postgres with set false, inherit false;
 revoke all on function survival_rpg.claim_archive_publication_task(text,integer)
   from archive_publication_runner;
 grant execute on function survival_rpg.claim_archive_publication_task_by_id(text,text,integer)
@@ -116,9 +123,17 @@ begin
          or has_table_privilege('archive_publication_runner', c.oid, 'DELETE'))
   ) or has_table_privilege('archive_publication_runner',
       'survival_rpg.transcript_messages', 'SELECT')
+    or (select p.proowner <> 'archive_runner_internal'::regrole
+          from pg_proc p
+         where p.oid = 'survival_rpg.claim_archive_publication_task_by_id(text,text,integer)'::regprocedure)
+    or has_schema_privilege('archive_runner_internal', 'survival_rpg', 'CREATE')
+    or exists (select 1 from pg_auth_members m
+      where m.roleid = 'archive_runner_internal'::regrole
+        and m.member = 'postgres'::regrole and m.set_option)
     or exists (select 1 from pg_auth_members
       where member = 'archive_publication_runner'::regrole) then
     raise exception 'PUBLICATION_RUNNER_DIRECT_ACCESS_FORBIDDEN' using errcode = '42501';
   end if;
 end;
 $$;
+commit;
