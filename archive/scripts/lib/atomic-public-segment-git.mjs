@@ -13,7 +13,7 @@ const sha = (value) => typeof value === 'string' && /^[a-f0-9]{40}$/.test(value)
 const refPattern = /^refs\/heads\/codex\/archive-publication-[a-z0-9-]{1,50}$/
 const MAX_OUTPUT = 3_000_000
 
-async function git(binary, root, args, { input, indexFile } = {}) {
+export async function git(binary, root, args, { input, indexFile } = {}) {
   const child = spawn(binary, args, { cwd: root, windowsHide: true,
     env: { ...process.env, ...(indexFile ? { GIT_INDEX_FILE: indexFile } : {}) },
     stdio: ['pipe', 'pipe', 'pipe'] })
@@ -32,6 +32,51 @@ async function git(binary, root, args, { input, indexFile } = {}) {
   return Buffer.concat(stdout)
 }
 
+/** Commit already validated files to an existing, detached local proposal ref. */
+export async function commitLocalProposalFiles({ repoRoot, ref, baseCommit, files, subject,
+  gitBinary = process.env.ARCHIVE_GIT_BINARY || 'git' }) {
+  demand(repoRoot && sha(baseCommit) && refPattern.test(ref)
+    && files instanceof Map && files.size > 0 && files.size <= 3
+    && [...files].every(([path, bytes]) => /^[A-Za-z0-9_./-]+$/.test(path)
+      && !path.split('/').includes('..') && Buffer.isBuffer(bytes)
+      && bytes.length > 0 && bytes.length <= 2_500_000)
+    && typeof subject === 'string' && /^[A-Za-z0-9 _.-]{1,100}$/.test(subject),
+  'INVALID_LOCAL_PROPOSAL')
+  const root = resolve(repoRoot)
+  const actualRoot = (await git(gitBinary, root, ['rev-parse', '--show-toplevel'])).toString().trim()
+  demand(resolve(actualRoot) === root, 'PUBLIC_GIT_ROOT_MISMATCH')
+  const currentBranch = (await git(gitBinary, root, ['rev-parse', '--symbolic-full-name', 'HEAD'])).toString().trim()
+  demand(currentBranch !== ref, 'CHECKED_OUT_PUBLICATION_REF_FORBIDDEN')
+  const current = (await git(gitBinary, root, ['rev-parse', '--verify', ref])).toString().trim()
+  demand(current === baseCommit, 'PUBLIC_BASE_MOVED')
+  demand((await git(gitBinary, root, ['cat-file', '-t', current])).toString().trim() === 'commit',
+    'PUBLIC_BASE_NOT_COMMIT')
+  const directory = await mkdtemp(join(tmpdir(), 'archive-public-index-'))
+  try {
+    const indexFile = join(directory, 'index')
+    await git(gitBinary, root, ['read-tree', current], { indexFile })
+    for (const [path, bytes] of files) {
+      const blob = (await git(gitBinary, root, ['hash-object', '-w', '--stdin'],
+        { input: bytes })).toString().trim()
+      demand(sha(blob), 'PUBLIC_BLOB_HASH_FAILED')
+      await git(gitBinary, root, ['update-index', '--add', '--cacheinfo',
+        `100644,${blob},${path}`], { indexFile })
+    }
+    const tree = (await git(gitBinary, root, ['write-tree'], { indexFile })).toString().trim()
+    demand(sha(tree), 'PUBLIC_TREE_HASH_FAILED')
+    const newCommit = (await git(gitBinary, root, ['-c', 'user.name=Archive Proposal',
+      '-c', 'user.email=archive-proposal@users.noreply.github.com',
+      'commit-tree', tree, '-p', current, '-m', subject])).toString().trim()
+    demand(sha(newCommit), 'PUBLIC_COMMIT_HASH_FAILED')
+    await git(gitBinary, root, ['update-ref', ref, newCommit, current])
+    return newCommit
+  } finally {
+    const target = resolve(directory), temp = resolve(tmpdir()) + sep
+    demand(target.startsWith(temp), 'UNSAFE_TEMP_INDEX_PATH')
+    await rm(target, { recursive: true, force: true })
+  }
+}
+
 /** All files are rechecked against the pinned base before any Git object is written. */
 export async function commitPublicSegmentBundle(bundle, {
   repoRoot, ref, gitBinary = process.env.ARCHIVE_GIT_BINARY || 'git',
@@ -43,7 +88,7 @@ export async function commitPublicSegmentBundle(bundle, {
   const root = resolve(repoRoot)
   const actualRoot = (await git(gitBinary, root, ['rev-parse', '--show-toplevel'])).toString().trim()
   demand(resolve(actualRoot) === root, 'PUBLIC_GIT_ROOT_MISMATCH')
-  const currentBranch = (await git(gitBinary, root, ['symbolic-ref', '-q', 'HEAD'])).toString().trim()
+  const currentBranch = (await git(gitBinary, root, ['rev-parse', '--symbolic-full-name', 'HEAD'])).toString().trim()
   demand(currentBranch !== ref, 'CHECKED_OUT_PUBLICATION_REF_FORBIDDEN')
   const current = (await git(gitBinary, root, ['rev-parse', '--verify', ref])).toString().trim()
   demand(current === bundle.baseCommit, 'PUBLIC_BASE_MOVED')
@@ -89,33 +134,11 @@ export async function commitPublicSegmentBundle(bundle, {
   demand(await authorizeCommit({ baseCommit: current, ref, seasonId: season.season_id,
     sessionId: last.session_id, segmentId: last.segment_id }) === true,
   'PUBLIC_GIT_COMMIT_NOT_AUTHORIZED')
-  const directory = await mkdtemp(join(tmpdir(), 'archive-public-index-'))
-  try {
-    const indexFile = join(directory, 'index')
-    await git(gitBinary, root, ['read-tree', current], { indexFile })
-    for (const [path, bytes] of bundle.files) {
-      const blob = (await git(gitBinary, root, ['hash-object', '-w', '--stdin'],
-        { input: bytes })).toString().trim()
-      demand(sha(blob), 'PUBLIC_BLOB_HASH_FAILED')
-      await git(gitBinary, root, ['update-index', '--add', '--cacheinfo',
-        `100644,${blob},${path}`], { indexFile })
-    }
-    const tree = (await git(gitBinary, root, ['write-tree'], { indexFile })).toString().trim()
-    demand(sha(tree), 'PUBLIC_TREE_HASH_FAILED')
-    const newCommit = (await git(gitBinary, root, ['-c', 'user.name=Archive Proposal',
-      '-c', 'user.email=archive-proposal@users.noreply.github.com',
-      'commit-tree', tree, '-p', current, '-m',
-      `Propose public archive ${season.season_id} ${last.session_id}`])).toString().trim()
-    demand(sha(newCommit), 'PUBLIC_COMMIT_HASH_FAILED')
-    // Compare-and-swap: a competing publication wins; this one never overwrites it.
-    await git(gitBinary, root, ['update-ref', ref, newCommit, current])
-    return { status: 'LOCAL_PROPOSAL_COMMITTED', ref, base_commit: current,
-      commit: newCommit, session_id: last.session_id,
-      files_in_commit: 3, checkout_files_written: 0,
-      remote_pushes: 0, site_publications: 0 }
-  } finally {
-    const target = resolve(directory), temp = resolve(tmpdir()) + sep
-    demand(target.startsWith(temp), 'UNSAFE_TEMP_INDEX_PATH')
-    await rm(target, { recursive: true, force: true })
-  }
+  const newCommit = await commitLocalProposalFiles({ repoRoot: root, ref,
+    baseCommit: current, files: bundle.files,
+    subject: `Propose public archive ${season.season_id} ${last.session_id}`, gitBinary })
+  return { status: 'LOCAL_PROPOSAL_COMMITTED', ref, base_commit: current,
+    commit: newCommit, session_id: last.session_id,
+    files_in_commit: 3, checkout_files_written: 0,
+    remote_pushes: 0, site_publications: 0 }
 }
