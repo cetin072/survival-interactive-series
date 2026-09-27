@@ -44,6 +44,14 @@ publish a site, create images, or prove scheduler behavior.
 
 The new CI test uses synthetic bodies. There is still no restricted live body exporter or trusted public approval, and the currently observed unlinked S03 rows cannot pass the segment seal. A later trusted exporter must provide a transaction-consistent exact metadata/body snapshot. A separate reviewed promotion must allocate an archive session path, prove public visibility and create the Step 3 manifest before Reader publication.
 
+## Linked source admission, still disabled
+
+`archive/scripts/sql/afterfall-linked-capture-export.sql` specifies one parameterized read-only PostgreSQL statement for a future restricted exporter. The single statement selects session head, exact message fields and matching state-link fields from one database snapshot. It contains full USER/GM bodies and must never be logged or run from a public client. Its SQL parsed successfully under a read-only staging `EXPLAIN` with a null session id; this did not execute an export or inspect any body.
+
+`admitLinkedCaptureExport` accepts that narrow JSON shape, checks scope, complete pair order and link-to-message identities, then delegates to the existing seal and materializer. Missing links, mismatched save heads, modified content and unexpected columns fail closed. A passed JavaScript object is not authenticated database evidence: `exporter_authenticated` and `transaction_snapshot_verified` stay false in the report. No database connection, credential, grant, role, migration, schedule, public approval, or write path is enabled here. A later execution adapter needs an independently reviewed least-privilege database identity; the existing broad `service_role` key must not become an archive export credential.
+
+Read-only staging aggregates on 2026-09-27 still show S03 OPEN through message order 15, with 16 rows lacking save versions, zero linked turns and authoritative save version 253. Those rows remain ineligible. The source state-link migration exists in Draft PR #148, while this code is stacked on Draft PR #149; neither Draft PR proves a ChatGPT game-room caller or public exporter in operation.
+
 ## Operations still required
 
 The repository has no least-privilege public exporter for open transcript
