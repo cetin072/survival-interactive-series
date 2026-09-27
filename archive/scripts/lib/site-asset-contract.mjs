@@ -47,3 +47,34 @@ export async function validateSiteAssets(manifest, catalog, publicRoot) {
   return { manifest_sha256: content_sha256, site_assets: manifest.assets.length, provider_calls: 0,
     storage_uploads: 0, site_publications: 0 }
 }
+
+/** Rebind an already verified site manifest to a newer public catalog in memory only. */
+export async function reconcileSiteAssets(previousManifest, previousCatalog, nextCatalog, publicRoot) {
+  await validateSiteAssets(previousManifest, previousCatalog, publicRoot)
+  validateVisualCatalog(nextCatalog)
+  demand(nextCatalog.chronicle_id === previousCatalog.chronicle_id
+    && nextCatalog.worldline_id === previousCatalog.worldline_id
+    && nextCatalog.visibility === previousCatalog.visibility
+    && nextCatalog.anchor.save_version >= previousCatalog.anchor.save_version
+    && nextCatalog.anchor.game_time >= previousCatalog.anchor.game_time,
+  'SITE_ASSET_CATALOG_REGRESSION')
+  const current = new Map(nextCatalog.points.filter((point) => point.status === 'READY')
+    .map((point) => [point.point_id, point]))
+  const assets = previousManifest.assets.filter((asset) => {
+    const point = current.get(asset.point_id)
+    return point?.generation_key === asset.generation_key && point.subject_id === asset.subject_id
+  })
+  const retainedPaths = new Set(assets.map((asset) => asset.public_path))
+  const omittedPublicPaths = previousManifest.assets.filter((asset) => !retainedPaths.has(asset.public_path))
+    .map((asset) => asset.public_path)
+  const body = { version: 'archive-site-assets-v1', chronicle_id: nextCatalog.chronicle_id,
+    worldline_id: nextCatalog.worldline_id, visibility: 'PUBLIC_ARCHIVE',
+    visual_catalog_sha256: nextCatalog.content_sha256, assets }
+  const manifest = { ...body, content_sha256: visualDigest(body) }
+  await validateSiteAssets(manifest, nextCatalog, publicRoot)
+  return { status: 'LOCAL_SITE_ASSET_RECONCILIATION_ONLY', manifest,
+    retained: assets.length, omitted_stale: previousManifest.assets.length - assets.length,
+    omitted_public_paths: omittedPublicPaths,
+    release_blocked_until_stale_files_removed: omittedPublicPaths.length > 0,
+    files_written: 0, storage_uploads: 0, site_publications: 0 }
+}

@@ -6,7 +6,7 @@ import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { deflateSync } from 'node:zlib'
 import { visualDigest } from './visual-compiler.mjs'
-import { validateSiteAssets } from './site-asset-contract.mjs'
+import { validateSiteAssets, reconcileSiteAssets } from './site-asset-contract.mjs'
 
 // Generated test bytes only; no model image, real acceptance or publication.
 function crc(bytes) { let c = 0xffffffff; for (const n of bytes) { c ^= n; for (let b = 0; b < 8; b++) c = (c >>> 1) ^ ((c & 1) ? 0xedb88320 : 0) }; return (c ^ 0xffffffff) >>> 0 }
@@ -48,4 +48,31 @@ test('stale generation, tampered pixels and path escape are refused', async () =
 test('duplicate point and unsealed metadata are refused', async () => fixture(async ({ root, asset }) => {
   await assert.rejects(validateSiteAssets(manifest([asset, asset]), catalog, root))
   await assert.rejects(validateSiteAssets({ ...manifest([asset]), secret: 'unreviewed' }, catalog, root))
+}))
+test('verified assets survive unchanged public briefs and stale bindings are omitted', async () => fixture(async ({ root, asset }) => {
+  const prior = manifest([asset])
+  const unchanged = await reconcileSiteAssets(prior, catalog, catalog, root)
+  assert.equal(unchanged.retained, 1)
+  assert.equal(unchanged.omitted_stale, 0)
+  assert.equal(unchanged.release_blocked_until_stale_files_removed, false)
+  assert.deepEqual(unchanged.manifest, prior)
+  assert.equal(unchanged.files_written, 0)
+  const { content_sha256: ignored, ...body } = catalog
+  const newer = seal({ ...body, points: body.points.filter((item) => item.point_id !== asset.point_id) })
+  const changed = await reconcileSiteAssets(prior, catalog, newer, root)
+  assert.equal(changed.retained, 0)
+  assert.equal(changed.omitted_stale, 1)
+  assert.deepEqual(changed.omitted_public_paths, [asset.public_path])
+  assert.equal(changed.release_blocked_until_stale_files_removed, true)
+  assert.equal(changed.manifest.visual_catalog_sha256, newer.content_sha256)
+  assert.equal((await validateSiteAssets(changed.manifest, newer, root)).site_assets, 0)
+}))
+test('reconciliation rejects unverified old assets and regressed catalogs', async () => fixture(async ({ root, asset }) => {
+  const prior = manifest([asset])
+  const { content_sha256: ignored, ...body } = catalog
+  const newer = seal({ ...body, anchor: { ...body.anchor, save_version: body.anchor.save_version + 1 } })
+  const { content_sha256: ignoredManifest, ...priorBody } = prior
+  const newerManifest = seal({ ...priorBody, visual_catalog_sha256: newer.content_sha256 })
+  await assert.rejects(reconcileSiteAssets(newerManifest, newer, catalog, root), /SITE_ASSET_CATALOG_REGRESSION/)
+  await assert.rejects(reconcileSiteAssets({ ...prior, content_sha256: '0'.repeat(64) }, catalog, catalog, root))
 }))
