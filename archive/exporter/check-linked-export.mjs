@@ -5,18 +5,24 @@ import { pathToFileURL } from 'node:url'
 import { readLinkedRange, validateExportRange } from '../scripts/lib/linked-export-runner.mjs'
 import { planPendingSegment } from '../scripts/lib/pending-segment-inventory.mjs'
 import { readPinnedInventory } from './pinned-inventory.mjs'
+import { readPinnedPublishedSeason } from './published-season-git.mjs'
 
 function inputs(args, connectionString) {
   if (![7, 9, 11].includes(args.length) || args[0] !== '--session' || args[2] !== '--start'
     || args[4] !== '--end' || args[6] !== '--check') throw new Error('EXPLICIT_READ_ONLY_MODE_REQUIRED')
   const inventoryPath = args.length >= 9 && args[7] === '--inventory' ? args[8] : null
+  const publishedSeason = args.length === 11 && args[7] === '--published-season' ? args[8] : null
   const inventoryCommit = args.length === 11 && args[9] === '--inventory-commit' ? args[10] : null
-  if (args.length >= 9 && (!inventoryPath || !isAbsolute(inventoryPath))) {
+  if (args.length >= 9 && !publishedSeason && (!inventoryPath || !isAbsolute(inventoryPath))) {
     throw new Error('ABSOLUTE_INVENTORY_PATH_REQUIRED')
+  }
+  if (publishedSeason && !/^S\d{2,3}$/.test(publishedSeason)) {
+    throw new Error('INVALID_PUBLISHED_SEASON_ID')
   }
   if (args.length === 11 && (!inventoryCommit || !/^[a-f0-9]{40}$/.test(inventoryCommit))) {
     throw new Error('INVALID_INVENTORY_COMMIT')
   }
+  if (publishedSeason && !inventoryCommit) throw new Error('INVENTORY_COMMIT_REQUIRED')
   if (!connectionString) throw new Error('EXPORT_CREDENTIAL_NOT_CONFIGURED')
   const url = new URL(connectionString)
   if (!['postgres:', 'postgresql:'].includes(url.protocol)
@@ -27,7 +33,7 @@ function inputs(args, connectionString) {
   }
   const range = { sessionId: args[1], startOrder: Number(args[3]), endOrder: Number(args[5]) }
   validateExportRange(range)
-  return { range, inventoryPath, inventoryCommit }
+  return { range, inventoryPath, publishedSeason, inventoryCommit }
 }
 
 async function localInventory(path) {
@@ -53,10 +59,12 @@ function validateInventory(input) {
 }
 
 export async function runLinkedExportCli(args, { connectionString = process.env.ARCHIVE_EXPORT_DATABASE_URL,
-  ClientClass = null, readInventory = localInventory, readPinned = readPinnedInventory } = {}) {
-  const { range, inventoryPath, inventoryCommit } = inputs(args, connectionString)
+  ClientClass = null, readInventory = localInventory, readPinned = readPinnedInventory,
+  readPublished = readPinnedPublishedSeason } = {}) {
+  const { range, inventoryPath, publishedSeason, inventoryCommit } = inputs(args, connectionString)
   // Validate caller-supplied metadata before touching the private database.
-  const source = inventoryPath ? (inventoryCommit
+  const source = publishedSeason ? await readPublished(publishedSeason, inventoryCommit)
+    : inventoryPath ? (inventoryCommit
     ? await readPinned(inventoryPath, inventoryCommit)
     : { inventory: await readInventory(inventoryPath), inventory_commit: null,
       inventory_sha256: null }) : null
@@ -64,6 +72,9 @@ export async function runLinkedExportCli(args, { connectionString = process.env.
     throw new Error('INVENTORY_COMMIT_MISMATCH')
   }
   const inventory = source ? validateInventory(source.inventory) : null
+  if (publishedSeason && inventory.season_id !== publishedSeason) {
+    throw new Error('PUBLISHED_SEASON_MISMATCH')
+  }
   const Client = ClientClass ?? (await import('pg')).default.Client
   const client = new Client({ connectionString, ssl: { rejectUnauthorized: true },
     application_name: 'archive_readonly_export_check' })
@@ -71,7 +82,7 @@ export async function runLinkedExportCli(args, { connectionString = process.env.
     await client.connect()
     const prepared = await readLinkedRange(client, range)
     const { partBytes, ...safe } = prepared
-    if (inventoryPath) {
+    if (inventory) {
       if (inventory.season_id !== safe.candidate.season_id) throw new Error('INVENTORY_SEASON_MISMATCH')
       const plan = planPendingSegment(safe.candidate, partBytes,
         inventory.segments, inventory.reserved_session_ids)
@@ -81,6 +92,7 @@ export async function runLinkedExportCli(args, { connectionString = process.env.
         source_manifest_ref: plan.source_manifest_ref ?? null,
         inventory_authenticated: false, exporter_authenticated: true,
         inventory_git_pinned: Boolean(inventoryCommit),
+        inventory_source: publishedSeason ? 'PUBLISHED_SEASON_MANIFESTS' : 'SUPPLIED_INVENTORY',
         inventory_commit: source.inventory_commit,
         inventory_sha256: source.inventory_sha256,
         transaction_snapshot_verified: true, publication_allowed: false,

@@ -56,6 +56,8 @@ jobs:
         run: node --test ../scripts/lib/linked-export-runner.test.mjs
       - name: Test Git-pinned season inventory without database access
         run: node --test ../exporter/pinned-inventory.test.mjs
+      - name: Test inventory derived from pinned public season manifests
+        run: node --test ../exporter/published-season-inventory.test.mjs ../exporter/published-season-git.test.mjs
       - name: Verify deterministic S02 dry-run (no external services)
         run: |
           node ../scripts/dry-run-publication.mjs --demo-s02 --source-revision "$GITHUB_SHA" > "$RUNNER_TEMP/publication-first.json"

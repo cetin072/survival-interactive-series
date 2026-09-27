@@ -132,6 +132,25 @@ test('opt-in inventory check links restricted read to a pending proposal without
     assert.equal(pinned.inventory_authenticated, false)
     assert.equal(pinned.inventory_commit, commit)
     assert.equal(pinned.publication_allowed, false)
+    const fromPublished = JSON.parse(await runLinkedExportCli(
+      [...args.slice(0, 7), '--published-season', 'S03', '--inventory-commit', commit], {
+        connectionString, ClientClass: FakeClient,
+        readPublished: async (season, revision) => {
+          assert.equal(season, 'S03'); assert.equal(revision, commit)
+          return { inventory, inventory_commit: commit,
+            inventory_sha256: hash(JSON.stringify(inventory)) }
+        },
+      }))
+    assert.equal(fromPublished.inventory_source, 'PUBLISHED_SEASON_MANIFESTS')
+    assert.equal(fromPublished.inventory_git_pinned, true)
+    assert.equal(fromPublished.inventory_authenticated, false)
+    assert.equal(fromPublished.publication_allowed, false)
+    await assert.rejects(runLinkedExportCli(
+      [...args.slice(0, 7), '--published-season', 'S03', '--inventory-commit', commit], {
+        connectionString, ClientClass: FakeClient,
+        readPublished: async () => ({ inventory: { ...inventory, season_id: 'S02' },
+          inventory_commit: commit, inventory_sha256: hash('other') }),
+      }), /PUBLISHED_SEASON_MISMATCH/)
     await assert.rejects(runLinkedExportCli([...args, '--inventory-commit', 'bad'],
       { connectionString, ClientClass: FakeClient }), /INVALID_INVENTORY_COMMIT/)
     await assert.rejects(runLinkedExportCli([...args.slice(0, -1), 'relative.json'],
