@@ -262,19 +262,41 @@ def validate_closeout_state(validation: Validation) -> None:
     start = load_json(S03 / "START_STATE.json")
 
     validation.check(end.get("status") == "COMPLETE", "S02 END_STATE is COMPLETE")
-    validation.check(
-        end.get("save_version") == current.get("save_version_anchor"),
-        "S02 end save version matches CURRENT_STATE anchor",
-    )
-    validation.check(
-        end.get("game_time") == current.get("game_time_anchor"),
-        "S02 end game time matches CURRENT_STATE anchor",
-    )
-    validation.check(
-        current.get("season2_end", {}).get("status") == "COMPLETE"
-        and current.get("season2_end", {}).get("season3_started") is False,
-        "CURRENT_STATE records S02 COMPLETE and S03 NOT STARTED",
-    )
+    if current.get("season") == 2:
+        validation.check(
+            end.get("save_version") == current.get("save_version_anchor"),
+            "S02 end save version matches CURRENT_STATE anchor",
+        )
+        validation.check(
+            end.get("game_time") == current.get("game_time_anchor"),
+            "S02 end game time matches CURRENT_STATE anchor",
+        )
+        validation.check(
+            current.get("season2_end", {}).get("status") == "COMPLETE"
+            and current.get("season2_end", {}).get("season3_started") is False,
+            "CURRENT_STATE records S02 COMPLETE and S03 NOT STARTED",
+        )
+    else:
+        validation.check(
+            current.get("season") == 3
+            and isinstance(current.get("save_version_anchor"), int)
+            and current["save_version_anchor"] > end.get("save_version", 0)
+            and isinstance(current.get("game_time_anchor"), str)
+            and current["game_time_anchor"] > end.get("game_time", ""),
+            "S03 current anchor advances beyond the S02 ending",
+        )
+        validation.check(
+            current.get("season2_end", {}).get("status") == "COMPLETE"
+            and current.get("season2_end", {}).get("season3_started") is True,
+            "CURRENT_STATE preserves S02 completion and records S03 start",
+        )
+        checkpoint = current.get("current_checkpoint")
+        validation.check(
+            isinstance(checkpoint, str)
+            and checkpoint.startswith("worldlines/AFTERFALL/seasons/S03/")
+            and (ROOT / checkpoint).is_file(),
+            "S03 current checkpoint exists in its worldline",
+        )
     validation.check(
         start.get("status") == "READY_FOR_SEASON_START",
         "S03 START_STATE uses continuation-ready status",
