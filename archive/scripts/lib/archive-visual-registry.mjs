@@ -3,6 +3,8 @@ import { pocDigest } from './image-poc-exchange.mjs'
 import { acceptForegroundLocalCandidate, planForegroundLocalIngest } from './foreground-image-handoff.mjs'
 
 const demand = (ok, code) => { if (!ok) throw new Error(code) }
+const reusable = (status) => status === 'EXISTING_PRIVATE_ASSET_REUSED'
+  || status === 'EXISTING_APPROVED_ASSET_REUSED'
 
 export function planArchiveVisualRegistry({ catalog, observation, approval, originalBytes,
   candidate, storageResult, existingRows = [] }) {
@@ -34,17 +36,27 @@ export function planArchiveVisualRegistry({ catalog, observation, approval, orig
     && (item.asset_id === row.asset_id || item.source?.candidate_id === candidate.candidate_id))
   if (conflicts.length) {
     demand(conflicts.length === 1, 'REGISTRY_EXISTING_ASSET_CONFLICT')
+    const existing = conflicts[0]
+    const approved = existing.status === 'READY'
+      && existing.visibility === 'PLAYER_ARCHIVE'
+    const privateRow = existing.status === 'GENERATED'
+      && existing.visibility === 'CORE_PRIVATE'
+    demand(approved || privateRow, 'REGISTRY_EXISTING_ASSET_CONFLICT')
+    // An approved first POC may have advanced beyond the initial private
+    // ingest state. Only the exact status/visibility pair may differ.
     const existingBody = Object.fromEntries(Object.keys(row)
-      .map((key) => [key, conflicts[0][key]]))
+      .map((key) => [key, key === 'status' ? row.status
+        : key === 'visibility' ? row.visibility : existing[key]]))
     demand(pocDigest(existingBody) === pocDigest(row), 'REGISTRY_EXISTING_ASSET_CONFLICT')
-    return { status: 'EXISTING_PRIVATE_ASSET_REUSED', row, database_writes: 0,
+    return { status: approved ? 'EXISTING_APPROVED_ASSET_REUSED'
+      : 'EXISTING_PRIVATE_ASSET_REUSED', row, database_writes: 0,
       public_assets: 0, site_publications: 0 }
   }
   return { status: 'PRIVATE_REGISTRY_INSERT_REQUIRED', row, database_writes: 0,
     public_assets: 0, site_publications: 0 }
 }
 
-/** Read-only reconciliation of an existing private asset. */
+/** Read-only reconciliation of an existing private or explicitly approved asset. */
 export async function verifyExistingPrivateVisualRegistry({ baseUrl, serviceKey, fetchImpl = fetch,
   ...input }) {
   demand(typeof baseUrl === 'string' && /^https:\/\/[a-z0-9.-]+$/.test(baseUrl)
@@ -58,7 +70,7 @@ export async function verifyExistingPrivateVisualRegistry({ baseUrl, serviceKey,
   const rows = await response.json()
   demand(Array.isArray(rows) && rows.length <= 1, 'REGISTRY_READ_INVALID')
   const result = planArchiveVisualRegistry({ ...input, existingRows: rows })
-  demand(result.status === 'EXISTING_PRIVATE_ASSET_REUSED', 'REGISTRY_ASSET_NOT_FOUND')
+  demand(reusable(result.status), 'REGISTRY_ASSET_NOT_FOUND')
   return { status: result.status, asset_id: result.row.asset_id,
     database_writes: 0, site_publications: 0 }
 }
@@ -94,7 +106,7 @@ export async function insertPrivateVisualRegistry({ baseUrl, serviceKey, fetchIm
     return [...found.values()]
   }
   const before = planArchiveVisualRegistry({ ...input, existingRows: await readRows() })
-  if (before.status === 'EXISTING_PRIVATE_ASSET_REUSED')
+  if (reusable(before.status))
     return { status: before.status, asset_id: before.row.asset_id,
       database_writes: 0, site_publications: 0 }
   let response
@@ -104,7 +116,7 @@ export async function insertPrivateVisualRegistry({ baseUrl, serviceKey, fetchIm
       Prefer: 'return=minimal' }, body: JSON.stringify(before.row) })
   } catch {
     const after = planArchiveVisualRegistry({ ...input, existingRows: await readRows() })
-    if (after.status === 'EXISTING_PRIVATE_ASSET_REUSED')
+    if (reusable(after.status))
       return { status: 'INSERT_RESPONSE_LOST_ROW_VERIFIED', asset_id: after.row.asset_id,
         database_writes: 1, site_publications: 0 }
     return { status: 'INSERT_OUTCOME_UNKNOWN_RECONCILE_LATER', asset_id: before.row.asset_id,
@@ -113,8 +125,8 @@ export async function insertPrivateVisualRegistry({ baseUrl, serviceKey, fetchIm
   if (!response.ok) {
     if (response.status === 409 || response.status >= 500) {
       const after = planArchiveVisualRegistry({ ...input, existingRows: await readRows() })
-      if (after.status === 'EXISTING_PRIVATE_ASSET_REUSED')
-        return { status: 'EXISTING_PRIVATE_ASSET_REUSED', asset_id: after.row.asset_id,
+      if (reusable(after.status))
+        return { status: after.status, asset_id: after.row.asset_id,
           database_writes: 0, site_publications: 0 }
       if (response.status >= 500) return { status: 'INSERT_OUTCOME_UNKNOWN_RECONCILE_LATER',
         asset_id: before.row.asset_id, database_writes: 0, site_publications: 0 }
@@ -122,7 +134,7 @@ export async function insertPrivateVisualRegistry({ baseUrl, serviceKey, fetchIm
     throw new Error('REGISTRY_INSERT_FAILED')
   }
   const after = planArchiveVisualRegistry({ ...input, existingRows: await readRows() })
-  demand(after.status === 'EXISTING_PRIVATE_ASSET_REUSED', 'REGISTRY_INSERT_NOT_READABLE')
+  demand(reusable(after.status), 'REGISTRY_INSERT_NOT_READABLE')
   return { status: 'PRIVATE_ASSET_INSERTED', asset_id: after.row.asset_id,
     database_writes: 1, site_publications: 0 }
 }

@@ -36,6 +36,38 @@ test('same registry row is reusable after upload success and registry retry', ()
     existingRows: [{ ...planned.row, object_path: 'survival-archive-originals/other.png' }] }),
   /REGISTRY_EXISTING_ASSET_CONFLICT/)
 })
+test('an exactly bound approved asset is reused without undoing its promotion', async () => {
+  const initial = planArchiveVisualRegistry(input).row
+  const approved = { ...structuredClone(initial), status: 'READY',
+    visibility: 'PLAYER_ARCHIVE' }
+  const plan = planArchiveVisualRegistry({ ...input, existingRows: [approved] })
+  assert.equal(plan.status, 'EXISTING_APPROVED_ASSET_REUSED')
+  assert.equal(plan.database_writes, 0)
+  const calls = []
+  const args = { ...input, baseUrl: 'https://example.supabase.co',
+    serviceKey: 'synthetic-test-service-key-12345',
+    fetchImpl: async (_url, request) => {
+      calls.push(request.method)
+      return Response.json([approved])
+    } }
+  assert.equal((await verifyExistingPrivateVisualRegistry(args)).status,
+    'EXISTING_APPROVED_ASSET_REUSED')
+  assert.equal((await insertPrivateVisualRegistry(args)).status,
+    'EXISTING_APPROVED_ASSET_REUSED')
+  assert.deepEqual(calls, ['GET', 'GET', 'GET'])
+  for (const changed of [
+    { status: 'READY', visibility: 'CORE_PRIVATE' },
+    { status: 'REJECTED', visibility: 'PLAYER_ARCHIVE' },
+    { object_path: 'survival-archive-originals/other.png' },
+    { source: { ...approved.source, subject_id: 'char-other' } },
+    { generation_meta: { ...approved.generation_meta,
+      source_sha256: '0'.repeat(64) } },
+  ]) {
+    assert.throws(() => planArchiveVisualRegistry({ ...input,
+      existingRows: [{ ...approved, ...changed }] }),
+    /REGISTRY_EXISTING_ASSET_CONFLICT/)
+  }
+})
 test('existing private registry verification is GET only and rejects mismatched binding', async () => {
   const existing = planArchiveVisualRegistry(input).row
   const calls = []
