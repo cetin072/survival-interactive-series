@@ -79,7 +79,9 @@ jobs:
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_exporter_reader_v1_verification.sql
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927215800_archive_daily_runner_login_v1.sql
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/tests/archive_daily_runner_login_v1_verification.sql
+          psql --host localhost --username supabase_admin --dbname archive_test --set ON_ERROR_STOP=1 --command "ALTER ROLE postgres NOSUPERUSER CREATEROLE;"
           psql --host localhost --username postgres --dbname archive_test --set ON_ERROR_STOP=1 --file supabase/migrations/20260927221300_archive_publication_runner_task_rpc_v1.sql
+          psql --host localhost --username supabase_admin --dbname archive_test --set ON_ERROR_STOP=1 --command "ALTER ROLE postgres SUPERUSER;"
       - name: Setup Node
         uses: actions/setup-node@v4
         with:

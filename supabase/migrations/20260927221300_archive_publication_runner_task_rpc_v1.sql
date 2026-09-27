@@ -103,7 +103,9 @@ revoke all on function survival_rpg.claim_archive_publication_task_by_id(text,te
   from public, anon, authenticated, service_role;
 reset role;
 revoke create on schema survival_rpg from archive_runner_internal;
-grant archive_runner_internal to postgres with set false, inherit false;
+-- Preserve only Supabase's pre-existing ADMIN-only grant. A GRANT issued by
+-- postgres creates a second grantor row even after SET is switched off.
+revoke archive_runner_internal from postgres granted by postgres;
 revoke all on function survival_rpg.claim_archive_publication_task(text,integer)
   from archive_publication_runner;
 grant execute on function survival_rpg.claim_archive_publication_task_by_id(text,text,integer)
@@ -127,9 +129,14 @@ begin
           from pg_proc p
          where p.oid = 'survival_rpg.claim_archive_publication_task_by_id(text,text,integer)'::regprocedure)
     or has_schema_privilege('archive_runner_internal', 'survival_rpg', 'CREATE')
+    or (select count(*) from pg_auth_members m
+      where m.roleid = 'archive_runner_internal'::regrole
+        and m.member = 'postgres'::regrole) <> 1
     or exists (select 1 from pg_auth_members m
       where m.roleid = 'archive_runner_internal'::regrole
-        and m.member = 'postgres'::regrole and m.set_option)
+        and m.member = 'postgres'::regrole
+        and (m.grantor <> 'supabase_admin'::regrole or not m.admin_option
+          or m.inherit_option or m.set_option))
     or exists (select 1 from pg_auth_members
       where member = 'archive_publication_runner'::regrole) then
     raise exception 'PUBLICATION_RUNNER_DIRECT_ACCESS_FORBIDDEN' using errcode = '42501';
