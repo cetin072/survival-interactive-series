@@ -54,6 +54,8 @@ jobs:
         run: node --test ../scripts/lib/linked-capture-admission.test.mjs
       - name: Test restricted read-only export session without database access
         run: node --test ../scripts/lib/linked-export-runner.test.mjs
+      - name: Test Git-pinned season inventory without database access
+        run: node --test ../exporter/pinned-inventory.test.mjs
       - name: Verify deterministic S02 dry-run (no external services)
         run: |
           node ../scripts/dry-run-publication.mjs --demo-s02 --source-revision "$GITHUB_SHA" > "$RUNNER_TEMP/publication-first.json"

@@ -4,13 +4,18 @@ import { isAbsolute, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { readLinkedRange, validateExportRange } from '../scripts/lib/linked-export-runner.mjs'
 import { planPendingSegment } from '../scripts/lib/pending-segment-inventory.mjs'
+import { readPinnedInventory } from './pinned-inventory.mjs'
 
 function inputs(args, connectionString) {
-  if (![7, 9].includes(args.length) || args[0] !== '--session' || args[2] !== '--start'
+  if (![7, 9, 11].includes(args.length) || args[0] !== '--session' || args[2] !== '--start'
     || args[4] !== '--end' || args[6] !== '--check') throw new Error('EXPLICIT_READ_ONLY_MODE_REQUIRED')
-  const inventoryPath = args.length === 9 && args[7] === '--inventory' ? args[8] : null
-  if (args.length === 9 && (!inventoryPath || !isAbsolute(inventoryPath))) {
+  const inventoryPath = args.length >= 9 && args[7] === '--inventory' ? args[8] : null
+  const inventoryCommit = args.length === 11 && args[9] === '--inventory-commit' ? args[10] : null
+  if (args.length >= 9 && (!inventoryPath || !isAbsolute(inventoryPath))) {
     throw new Error('ABSOLUTE_INVENTORY_PATH_REQUIRED')
+  }
+  if (args.length === 11 && (!inventoryCommit || !/^[a-f0-9]{40}$/.test(inventoryCommit))) {
+    throw new Error('INVALID_INVENTORY_COMMIT')
   }
   if (!connectionString) throw new Error('EXPORT_CREDENTIAL_NOT_CONFIGURED')
   const url = new URL(connectionString)
@@ -22,7 +27,7 @@ function inputs(args, connectionString) {
   }
   const range = { sessionId: args[1], startOrder: Number(args[3]), endOrder: Number(args[5]) }
   validateExportRange(range)
-  return { range, inventoryPath }
+  return { range, inventoryPath, inventoryCommit }
 }
 
 async function localInventory(path) {
@@ -48,10 +53,17 @@ function validateInventory(input) {
 }
 
 export async function runLinkedExportCli(args, { connectionString = process.env.ARCHIVE_EXPORT_DATABASE_URL,
-  ClientClass = null, readInventory = localInventory } = {}) {
-  const { range, inventoryPath } = inputs(args, connectionString)
+  ClientClass = null, readInventory = localInventory, readPinned = readPinnedInventory } = {}) {
+  const { range, inventoryPath, inventoryCommit } = inputs(args, connectionString)
   // Validate caller-supplied metadata before touching the private database.
-  const inventory = inventoryPath ? validateInventory(await readInventory(inventoryPath)) : null
+  const source = inventoryPath ? (inventoryCommit
+    ? await readPinned(inventoryPath, inventoryCommit)
+    : { inventory: await readInventory(inventoryPath), inventory_commit: null,
+      inventory_sha256: null }) : null
+  if (inventoryCommit && source.inventory_commit !== inventoryCommit) {
+    throw new Error('INVENTORY_COMMIT_MISMATCH')
+  }
+  const inventory = source ? validateInventory(source.inventory) : null
   const Client = ClientClass ?? (await import('pg')).default.Client
   const client = new Client({ connectionString, ssl: { rejectUnauthorized: true },
     application_name: 'archive_readonly_export_check' })
@@ -68,6 +80,9 @@ export async function runLinkedExportCli(args, { connectionString = process.env.
         candidate_id: safe.candidate.candidate_id,
         source_manifest_ref: plan.source_manifest_ref ?? null,
         inventory_authenticated: false, exporter_authenticated: true,
+        inventory_git_pinned: Boolean(inventoryCommit),
+        inventory_commit: source.inventory_commit,
+        inventory_sha256: source.inventory_sha256,
         transaction_snapshot_verified: true, publication_allowed: false,
         part_bytes_verified_in_memory: partBytes.length,
         files_written: 0, database_writes: 0, site_publications: 0 }, null, 2) + '\n'

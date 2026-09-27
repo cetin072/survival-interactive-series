@@ -113,6 +113,7 @@ test('opt-in inventory check links restricted read to a pending proposal without
     assert.equal(value.status, 'PENDING_PUBLIC_APPROVAL')
     assert.equal(value.session_id, 'SESSION_010')
     assert.equal(value.inventory_authenticated, false)
+    assert.equal(value.inventory_git_pinned, false)
     assert.equal(value.publication_allowed, false)
     assert.equal(value.files_written, 0)
     assert.ok(!output.includes('SYNTHETIC_GM'))
@@ -120,6 +121,19 @@ test('opt-in inventory check links restricted read to a pending proposal without
     assert.deepEqual(JSON.parse(await readFile(path, 'utf8')), inventory)
     assert.equal(FakeClient.last.calls.at(-1), 'COMMIT')
     assert.equal(FakeClient.last.ended, true)
+    const commit = 'a'.repeat(40)
+    const pinned = JSON.parse(await runLinkedExportCli(
+      [...args, '--inventory-commit', commit], {
+        connectionString, ClientClass: FakeClient,
+        readPinned: async () => ({ inventory, inventory_commit: commit,
+          inventory_sha256: hash(JSON.stringify(inventory)) }),
+      }))
+    assert.equal(pinned.inventory_git_pinned, true)
+    assert.equal(pinned.inventory_authenticated, false)
+    assert.equal(pinned.inventory_commit, commit)
+    assert.equal(pinned.publication_allowed, false)
+    await assert.rejects(runLinkedExportCli([...args, '--inventory-commit', 'bad'],
+      { connectionString, ClientClass: FakeClient }), /INVALID_INVENTORY_COMMIT/)
     await assert.rejects(runLinkedExportCli([...args.slice(0, -1), 'relative.json'],
       { connectionString, ClientClass: FakeClient }), /ABSOLUTE_INVENTORY_PATH_REQUIRED/)
     const priorClient = FakeClient.last
