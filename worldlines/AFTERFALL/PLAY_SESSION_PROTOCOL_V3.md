@@ -5,8 +5,8 @@ Chronicle: **03 / AFTERFALL / 서진우**
 Supersedes: `PLAY_SESSION_PROTOCOL_V2.md` for live transcript capture  
 Database API:
 - `survival_rpg.open_public_transcript_session`
-- `survival_rpg.append_public_transcript_turn_with_state_link` — required state-linked LIVE turn API
-- `survival_rpg.append_public_transcript_turn` — explicit unlinked fallback only with `source_type='RECOVERY'`
+- `survival_rpg.append_public_transcript_turn` — default fast RAW pair writer for routine LIVE turns
+- `survival_rpg.append_public_transcript_turn_with_state_link` — use when the turn already has a meaningful durable state mutation/version outcome
 - `survival_rpg.append_public_transcript_message` — recovery/meta primitive only
 - `survival_rpg.close_public_transcript_session`
 
@@ -117,58 +117,22 @@ Run the normal GM process:
 
 Do **not** emit the final response yet.
 
-### Step C — write one atomic pair
+### Step C — preserve the pair without turning play into an archive job
+
 Immediately before emitting the response:
 
-1. use the last acknowledged `message_order` retained for the current healthy room/session;
-   re-read it only after reconnect, room movement, ambiguous acknowledgement, idempotency retry,
-   or suspected session corruption;
-2. set `p_user_message_order = last_message_order + 1`;
-3. generate one stable USER idempotency UUID;
-4. generate one distinct stable GM idempotency UUID;
-5. compute lowercase SHA-256 for the exact USER text;
-6. compute lowercase SHA-256 for the exact final GM text;
-7. verify that the current authoritative save belongs to the live season and
-   reflects the already played durable changes. If it still belongs to an
-   earlier season, reconcile from the exact observed RAW before another normal
-   turn. Do not label a stale save head `NO_STATE_CHANGE`.
-8. call
-   `append_public_transcript_turn_with_state_link(...)` with non-null USER/GM
-   versions and the explicit `APPLIED` or `NO_STATE_CHANGE` outcome. This API
-   locks and checks the current save head, then commits the exact pair and its
-   state-version link in one transaction. It does not mutate the save itself.
-   The older `append_public_transcript_turn(...)` is not a valid `LIVE` writer for
-   AFTERFALL. It may be used only after a technical linked-call failure, with the
-   exact same public pair and `source_type='RECOVERY'`. That pair must be reported
-   as state-unlinked and quarantined from state-derived publication.
-   Missing or stale authoritative save state is a runtime reconciliation failure,
-   not permission to silently select the legacy API for normal play.
-9. the database has a deferred guard for AFTERFALL/C03 `LIVE` USER/GM rows: a
-   transaction cannot commit unless those new rows belong to a state-link. This
-   makes accidental legacy `LIVE` capture fail closed instead of silently
-   creating another unlinked normal turn.
+1. reuse the healthy room/session and last acknowledged `message_order`; re-read only after reconnect, ambiguous acknowledgement, retry, room movement, or suspected corruption;
+2. generate fresh USER/GM idempotency UUIDs for this turn and compute the exact lowercase SHA-256 hashes;
+3. **routine turn:** call `append_public_transcript_turn(..., source_type='LIVE')` once. Do not run save reconciliation, full context audit, GitHub, Reader, Graph, image or Netlify work just to archive a normal turn;
+4. **meaningful durable state mutation already being saved for gameplay:** use `append_public_transcript_turn_with_state_link(...)` instead, because the real before/after versions and outcome are already available as part of that gameplay mutation. Do not create an extra save mutation only to satisfy Archive metadata;
+5. if the one-shot RAW write fails, retry once with the exact same payload. After that, do not hold the player waiting on Archive work: emit the final GM response and keep the exact visible pair in the ChatGPT room as a recovery source for the next room-close/daily reconciliation.
 
-The database commits:
-
-```text
-USER = p_user_message_order
-GM   = p_user_message_order + 1
-```
-
-inside one database statement.
-
-If the GM half fails, the USER half must not remain committed.
-
-For the full normal-turn call budget and same-scene context reuse rule, follow
-`LIVE_TURN_FAST_PATH_V1.md`. GitHub, Archive, Reader and Netlify work are not
-normal-turn work.
+The default goal is one lightweight transcript write for an ordinary turn. State linkage is useful evidence for durable changes, not a prerequisite for preserving the historical conversation.
 
 ### Step D — emit verbatim
-Only after the turn-pair call succeeds, emit **the exact same GM string** that
-was stored.
 
-No cleanup, rewriting, extra paragraph, or hidden post-processing may make the
-public reply differ from the stored GM content.
+After the fast capture attempt, emit the exact GM string that was resolved in Step B.
+The Archive path must not rewrite the response or add normal-turn latency through GitHub/Reader/Netlify work.
 
 ## 7. Ordering invariant
 
@@ -265,10 +229,11 @@ Default-branch database contract:
 Live RAW capture and Archive publication are intentionally separated.
 
 ### Every gameplay turn
-- store the exact USER→GM pair and state-version link in Supabase with
-  `append_public_transcript_turn_with_state_link(...)`;
-- do not create a GitHub commit or Netlify deploy for routine turns;
-- do not interrupt the player with save/archive progress messages.
+- best-effort preserve the exact USER→GM pair with one lightweight Supabase pair write;
+- use the state-linked writer only when a meaningful runtime mutation already provides real version/outcome data;
+- after one quick retry, Archive failure must not block the story response; leave the exact visible room pair for later recovery;
+- do not create GitHub commits, Reader builds, image work or Netlify deploys during a routine turn;
+- do not interrupt the player with routine save/archive progress messages.
 
 ### Important irreversible branch point
 A major irreversible event may trigger early promotion before the daily batch when useful, for example:
@@ -290,4 +255,4 @@ Routine accumulated PLAYER_SAFE material waits for the daily Archive reconciliat
 
 If nothing material changed, create no commit or deploy.
 
-> **Per turn: preserve. 04:30: reconcile and publish. Important branch: optionally promote early.**
+> **Per turn: fast RAW safety only. 04:30: reconcile and publish. Important branch: checkpoint/link/promote early when useful.**
