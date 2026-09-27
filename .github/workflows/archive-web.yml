@@ -61,6 +61,8 @@ jobs:
         run: node --test ../scripts/lib/site-foreground-handoff.test.mjs
       - name: Test idempotent private original upload and uncertain response recovery
         run: node --test ../scripts/lib/archive-storage-original.test.mjs
+      - name: Test private visual registry binding and retry plan
+        run: node --test ../scripts/lib/archive-visual-registry.test.mjs
       - name: Test local image POC request and quarantine receipts
         run: node --test ../scripts/lib/image-poc-exchange.test.mjs
       - name: Test reviewed local image handoff and disabled ingest plan
