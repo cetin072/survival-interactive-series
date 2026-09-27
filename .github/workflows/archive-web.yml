@@ -5,6 +5,7 @@ on:
     paths:
       - 'archive/web/**'
       - 'archive/content/**'
+      - 'archive/experiments/**'
       - 'archive/scripts/**'
       - '.github/workflows/archive-web.yml'
   push:
@@ -13,6 +14,7 @@ on:
     paths:
       - 'archive/web/**'
       - 'archive/content/**'
+      - 'archive/experiments/**'
       - 'archive/scripts/**'
       - '.github/workflows/archive-web.yml'
 
@@ -57,8 +59,14 @@ jobs:
         run: node --test ../scripts/lib/site-asset-contract.test.mjs
       - name: Test local image POC request and quarantine receipts
         run: node --test ../scripts/lib/image-poc-exchange.test.mjs
+      - name: Test reviewed local image handoff and disabled ingest plan
+        run: node --test ../scripts/lib/accepted-image-handoff.test.mjs
+      - name: Test real Codex foreground observation inbox
+        run: node --test ../scripts/lib/foreground-image-handoff.test.mjs
       - name: Verify real portrait request without image execution
         run: node --experimental-strip-types ../scripts/prepare-image-poc.mjs --check
+      - name: Verify committed foreground sample remains unpublished
+        run: node ../scripts/check-foreground-sample.mjs --brief
       - name: Install
         run: npm ci
       - name: Test
