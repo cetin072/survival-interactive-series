@@ -7,7 +7,7 @@ import { selectReaderItem, storyProgressKey } from './readerNavigation'
 import { useReaderPosition } from './useReaderPosition'
 
 const nodeById = new Map(archiveNodes.map((node) => [node.id, node]))
-const chapterLabel = (chapter: ReaderChapter) => chapter.chapterNumber === 0 ? '시작 장면' : `제${chapter.chapterNumber}장`
+const chapterLabel = (chapter: ReaderChapter) => chapter.id.startsWith('c03-afterfall-prelude-') ? `초기 기록 ${Number(chapter.id.slice(-2))}` : chapter.chapterNumber === 0 ? '시작 장면' : `제${chapter.chapterNumber}장`
 
 export function StoryBookReader({ chronicleId, initialChapterId, onChapterChange, onOpenNode, onBack }: {
   chronicleId: ChronicleId

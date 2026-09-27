@@ -122,6 +122,13 @@ function views(nodes, relations, book, bookSource, currentAnchor) {
       demand(!chapter.publicationProvenance && chapter.sourceRefs?.length === 1 && chapter.sourceRefs[0] === openingRef && chapter.archiveSourceRefs?.length === 1 && chapter.archiveSourceRefs[0] === openingRef && Array.isArray(chapter.relatedNodeIds) && chapter.relatedNodeIds.length === 0, 'INVALID_HISTORICAL_OPENING')
       continue
     }
+    if (/^c03-afterfall-prelude-0[1-8]$/.test(chapter.id)) {
+      // Newly recovered historical play is Reader evidence only, not current graph facts.
+      const number = chapter.id.slice(-2).padStart(3, '0')
+      const preludeRef = `archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_${number}.md`
+      demand(!chapter.publicationProvenance && chapter.sourceRefs?.length === 1 && chapter.sourceRefs[0] === preludeRef && chapter.archiveSourceRefs?.length === 1 && chapter.archiveSourceRefs[0] === preludeRef && Array.isArray(chapter.relatedNodeIds) && chapter.relatedNodeIds.length === 0, 'INVALID_HISTORICAL_PRELUDE')
+      continue
+    }
     if (chapter.publicationProvenance) {
       demand(chapter.publicationProvenance.visibility === 'PUBLIC_ARCHIVE' && time(chapter.publicationProvenance.capturedRange?.end), 'NON_PUBLIC_CHAPTER')
       if (chapter.publicationProvenance.capturedRange.end > currentAnchor.game_time) continue
