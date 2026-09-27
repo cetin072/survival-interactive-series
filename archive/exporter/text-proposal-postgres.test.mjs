@@ -25,11 +25,30 @@ const uuid = (tail) => `00000000-0000-4000-8000-${String(tail).padStart(12, '0')
 const githubToken = 'synthetic-test-token-never-used-remotely'
 
 function fakeGitHub(root) {
-  let next = 100
+  let next = 100, nextCi = 500
+  const ciRuns = new Map()
   return async (url, options) => {
     const path = new URL(url)
-    if (options.method !== 'POST') return { ok: true, json: async () => [] }
+    if (options.method !== 'POST') {
+      if (path.pathname.endsWith('/actions/workflows/archive-web.yml/runs'))
+        return { ok: true, json: async () => ({ workflow_runs: [...ciRuns.values()] }) }
+      if (/\/actions\/runs\/\d+$/.test(path.pathname)) {
+        const id = Number(path.pathname.split('/').at(-1))
+        return { ok: true, json: async () => [...ciRuns.values()].find((row) => row.id === id) }
+      }
+      return { ok: true, json: async () => [] }
+    }
     const body = JSON.parse(options.body)
+    if (path.pathname.endsWith('/actions/workflows/archive-web.yml/dispatches')) {
+      const sha = (await git(root, 'ls-remote', '--heads', 'origin',
+        `refs/heads/${body.ref}`)).stdout.split('\t')[0]
+      assert.equal(body.inputs.proposal_sha, sha)
+      const id = nextCi++
+      ciRuns.set(id, { id, event: 'workflow_dispatch',
+        head_branch: body.ref, head_sha: sha })
+      return { ok: true, status: 200,
+        json: async () => ({ workflow_run_id: id }) }
+    }
     assert.equal(body.draft, true)
     assert.equal(body.base, 'main')
     const sha = (await git(root, 'ls-remote', '--heads', 'origin',
@@ -114,6 +133,8 @@ test('dedicated task RPCs produce one remote text proposal and recover a lost le
       authorizeCommit: async () => true, gitBinary, githubToken, fetchImpl })
     assert.equal(first.status, 'DRAFT_TEXT_PR_READY')
     assert.equal(first.pr_number, 100)
+    assert.equal(first.ci_run_id, 500)
+    assert.equal(first.ci_reused, false)
     assert.deepEqual((await admin.query(`select status,attempt_count
       from survival_rpg.archive_publication_tasks where task_id=$1`,
     [unrelated.taskId])).rows[0], { status: 'PENDING', attempt_count: 0 })
@@ -174,6 +195,7 @@ test('dedicated task RPCs produce one remote text proposal and recover a lost le
       gitBinary, githubToken, fetchImpl })
     assert.equal(recovered.status, 'DRAFT_TEXT_PR_READY')
     assert.equal(recovered.pr_number, 101)
+    assert.equal(recovered.ci_run_id, 501)
     assert.equal(recovered.proposal_reused, true)
     assert.equal(recovered.proposal_commit, pushed.commit)
     const attempts = (await admin.query(`select attempt_count, status
