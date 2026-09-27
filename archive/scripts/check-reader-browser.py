@@ -257,6 +257,7 @@ def audit_content_retry(page, base: str, width: int):
     expect(retry_page.locator('.reader-body [role="alert"]')).to_be_visible()
     tap(retry_page.locator('.reader-body [role="alert"] button'), width < 700)
     expect(retry_page.locator('.reader-body [role="alert"]')).to_have_count(0)
+    expect(retry_page.locator('.reader-body [role="status"]')).to_have_count(0)
     assert len(retry_page.locator('.reader-body').inner_text().strip()) > 30
     assert failures['book'] == 2, f'Book retry did not issue a second request: {failures}'
     retry_page.unroute(re.compile(r'/assets/BOOK-[^/]+\.json(?:\?.*)?$'))
