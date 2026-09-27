@@ -1,6 +1,8 @@
 # AFTERFALL archive exporter access proposal v1
 
-Status: **REVIEW PROPOSAL ONLY — NO ROLE, GRANT, RLS POLICY OR SECRET APPLIED**
+Status: **FORWARD MIGRATION IN DRAFT #167; STAGING NOT APPLIED; NO LOGIN SECRET**
+
+Current implementation checkpoint (2026-09-27): `supabase/migrations/20260927121600_archive_exporter_reader_v1.sql` implements the scoped role, column grants and forced-RLS policies below after the exact already-applied worldline link migration files. The isolated PostgreSQL 17 CI exercises actual role impersonation, linked versus unlinked/out-of-scope rows, denied writes and passwordless install. This does not prove a real staging login or game-room call. The role and policies have not been installed in staging. The original review proposal below remains the design record.
 
 This proposal is the database half of the opt-in, read-only source check in Draft PR #152. The exporter handles private, unapproved USER/GM bodies. `public_safe` means a capture was screened for storage; it is not owner approval to publish. The application still returns `PENDING_PUBLIC_APPROVAL` after a valid read.
 

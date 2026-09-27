@@ -15,11 +15,13 @@ insert into survival_rpg.transcript_messages
 values
   ('10000000-0000-4000-8000-000000000001', 'AFTERFALL', 'C03', 'S99',
    '11111111-1111-4111-8111-111111111111', 1, 0, 'USER',
-   'synthetic linked user', repeat('a', 64), 253,
+   'synthetic linked user',
+   '117b6b9f1e01ac02d23d3eed7c1a01223c7107bbfd133e6a6968282ff6664282', 253,
    '30000000-0000-4000-8000-000000000001'),
   ('10000000-0000-4000-8000-000000000002', 'AFTERFALL', 'C03', 'S99',
    '11111111-1111-4111-8111-111111111111', 1, 1, 'GM',
-   'synthetic linked gm', repeat('b', 64), 253,
+   'synthetic linked gm',
+   '7a92b031edac305119b4e820f66f85e1f7ef8bd73d6219d1b31daf17fb18f067', 253,
    '30000000-0000-4000-8000-000000000002'),
   ('10000000-0000-4000-8000-000000000003', 'AFTERFALL', 'C03', 'S99',
    '11111111-1111-4111-8111-111111111111', 2, 2, 'USER',
@@ -92,4 +94,6 @@ end;
 $$;
 reset role;
 
-rollback;
+-- Keep only these synthetic rows in the ephemeral CI database for the actual
+-- node-postgres login test that follows. Never run this fixture on staging.
+commit;

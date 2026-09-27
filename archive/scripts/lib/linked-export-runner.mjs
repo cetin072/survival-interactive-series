@@ -16,15 +16,9 @@ export function validateExportRange({ sessionId, startOrder, endOrder }) {
     && endOrder - startOrder + 1 <= 10000, 'INVALID_EXPORT_RANGE')
 }
 
-/** `client` follows the node-postgres Client query interface and is caller-owned. */
-export async function readLinkedRange(client, { sessionId, startOrder, endOrder }) {
-  validateExportRange({ sessionId, startOrder, endOrder })
-  let begun = false
-  try {
-    await client.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY')
-    begun = true
-    await client.query("SET LOCAL statement_timeout = '10s'")
-    const identity = await client.query(`select current_user::text as role_name,
+/** Verify the actual login role inside a read-only transaction. */
+export async function requireRestrictedExporterRole(client) {
+  const identity = await client.query(`select current_user::text as role_name,
       session_user::text as session_role,
       current_setting('transaction_read_only')::text as read_only,
       r.rolsuper, r.rolbypassrls, r.rolcreaterole, r.rolcreatedb, r.rolreplication,
@@ -43,8 +37,8 @@ export async function readLinkedRange(client, { sessionId, startOrder, endOrder 
       has_table_privilege(current_user, 'survival_rpg.transcript_turn_state_links', 'DELETE') as can_delete_link,
       has_table_privilege(current_user, 'survival_rpg.saves', 'UPDATE') as can_update_save
     from pg_roles as r where r.rolname = current_user`)
-    const role = identity.rows?.[0]
-    demand(identity.rows?.length === 1 && role.role_name === 'archive_exporter'
+  const role = identity.rows?.[0]
+  demand(identity.rows?.length === 1 && role.role_name === 'archive_exporter'
       && role.session_role === 'archive_exporter' && role.read_only === 'on'
       && role.rolsuper === false && role.rolbypassrls === false
       && role.rolcreaterole === false && role.rolcreatedb === false
@@ -56,7 +50,18 @@ export async function readLinkedRange(client, { sessionId, startOrder, endOrder 
       && role.can_delete_session === false && role.can_insert_link === false
       && role.can_update_link === false && role.can_delete_link === false
       && role.can_update_save === false,
-    'RESTRICTED_EXPORT_ROLE_REQUIRED')
+  'RESTRICTED_EXPORT_ROLE_REQUIRED')
+}
+
+/** `client` follows the node-postgres Client query interface and is caller-owned. */
+export async function readLinkedRange(client, { sessionId, startOrder, endOrder }) {
+  validateExportRange({ sessionId, startOrder, endOrder })
+  let begun = false
+  try {
+    await client.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY')
+    begun = true
+    await client.query("SET LOCAL statement_timeout = '10s'")
+    await requireRestrictedExporterRole(client)
     const sql = await readFile(queryFile, 'utf8')
     const result = await client.query({ text: sql, values: [sessionId, startOrder, endOrder] })
     demand(result.rows?.length === 1 && result.rows[0]?.linked_capture_export,

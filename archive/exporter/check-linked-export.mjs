@@ -6,6 +6,7 @@ import { readLinkedRange, validateExportRange } from '../scripts/lib/linked-expo
 import { planPendingSegment } from '../scripts/lib/pending-segment-inventory.mjs'
 import { readPinnedInventory } from './pinned-inventory.mjs'
 import { readPinnedPublishedSeason } from './published-season-git.mjs'
+import { requireExporterConnectionString } from './exporter-connection.mjs'
 
 function inputs(args, connectionString) {
   if (![7, 9, 11].includes(args.length) || args[0] !== '--session' || args[2] !== '--start'
@@ -23,14 +24,7 @@ function inputs(args, connectionString) {
     throw new Error('INVALID_INVENTORY_COMMIT')
   }
   if (publishedSeason && !inventoryCommit) throw new Error('INVENTORY_COMMIT_REQUIRED')
-  if (!connectionString) throw new Error('EXPORT_CREDENTIAL_NOT_CONFIGURED')
-  const url = new URL(connectionString)
-  if (!['postgres:', 'postgresql:'].includes(url.protocol)
-    || !/^archive_exporter(?:\.[a-z0-9]+)?$/.test(decodeURIComponent(url.username))
-    || !/\.supabase\.co$|\.pooler\.supabase\.com$/.test(url.hostname)
-    || ['sslmode', 'sslcert', 'sslkey', 'sslrootcert'].some((key) => url.searchParams.has(key))) {
-    throw new Error('DEDICATED_EXPORT_DATABASE_URL_REQUIRED')
-  }
+  requireExporterConnectionString(connectionString)
   const range = { sessionId: args[1], startOrder: Number(args[3]), endOrder: Number(args[5]) }
   validateExportRange(range)
   return { range, inventoryPath, publishedSeason, inventoryCommit }
