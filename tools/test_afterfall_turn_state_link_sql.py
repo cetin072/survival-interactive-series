@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MIGRATION = ROOT / "supabase/migrations/20260926162611_afterfall_atomic_turn_state_link_v1.sql"
-CONTINUITY_MIGRATION = ROOT / "supabase/migrations/20260927000000_afterfall_turn_state_continuity_v1.sql"
+CONTINUITY_MIGRATION = ROOT / "supabase/migrations/20260927042720_afterfall_turn_state_continuity_v1.sql"
 
 
 class TurnStateLinkMigrationTests(unittest.TestCase):
