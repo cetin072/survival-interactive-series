@@ -9,7 +9,7 @@ import { archiveRouteUrl, browserReaderStorage, parseArchiveRoute, resolveReader
 import './archive.css'
 
 export { buildPositions, buildVisibleGraph }
-export const primaryNavigationLabels = ['세계 탐색', '이야기 읽기'] as const
+export const primaryNavigationLabels = ['세계 탐색', '이야기 읽기', '생존 지식'] as const
 const readRoute = () => parseArchiveRoute(window.location.search, browserReaderStorage())
 
 function writeRoute(route: ArchiveRoute, replace = false) {
@@ -39,7 +39,7 @@ export function ArchiveApp() {
   return <main className="archive-shell">
     <header className="archive-header">
       <button className="archive-brand" onClick={() => open({ view: 'archive', chronicleId: activeChronicle.id })}><p className="archive-kicker">SURVIVAL DIARY</p><h1>생존일기 <span>ARCHIVE</span></h1></button>
-      <nav className="archive-primary-nav" aria-label="주요 탐색"><button className={route.view === 'archive' ? 'active' : ''} onClick={() => open({ view: 'archive', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[0]}</button><button className={route.view === 'story' || route.view === 'book' ? 'active' : ''} onClick={() => open({ view: 'story', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[1]}</button></nav>
+      <nav className="archive-primary-nav" aria-label="주요 탐색"><button className={route.view === 'archive' ? 'active' : ''} onClick={() => open({ view: 'archive', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[0]}</button><button className={route.view === 'story' || route.view === 'book' ? 'active' : ''} onClick={() => open({ view: 'story', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[1]}</button><a href="/knowledge/">{primaryNavigationLabels[2]}</a></nav>
     </header>
     {route.view === 'archive' && <ExplorerView key={route.nodeId ?? 'default'} initialNodeId={route.nodeId} onOpenStory={(chapterId) => openBook('C03-AFTERFALL', chapterId)} />}
     {route.view === 'story' && <StoryLibrary onOpenBook={(chronicleId) => openBook(chronicleId)} />}

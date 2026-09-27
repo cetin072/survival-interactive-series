@@ -7,6 +7,7 @@ import { selectReaderItem, storyProgressKey } from './readerNavigation'
 import { useReaderPosition } from './useReaderPosition'
 
 const nodeById = new Map(archiveNodes.map((node) => [node.id, node]))
+const chapterLabel = (chapter: ReaderChapter) => chapter.id.startsWith('c03-afterfall-prelude-') ? `초기 기록 ${Number(chapter.id.slice(-2))}` : chapter.chapterNumber === 0 ? '시작 장면' : `제${chapter.chapterNumber}장`
 
 export function StoryBookReader({ chronicleId, initialChapterId, onChapterChange, onOpenNode, onBack }: {
   chronicleId: ChronicleId
@@ -55,14 +56,16 @@ export function StoryBookReader({ chronicleId, initialChapterId, onChapterChange
 
   return <section className="book-reader" aria-label={book.title + ' reader'}>
     <aside className="book-toc"><button className="text-button" onClick={onBack}>← 책장</button><p className="archive-eyebrow">{book.title}</p><h2>목차</h2>
-      {groups.map((group) => <section key={group.id}><h3>{group.label}</h3>{chapters.filter((chapter) => (chapter.seasonId ?? chapter.partId ?? '기록') === group.id).map((chapter) => <button className={chapter.id === selected.id ? 'selected' : ''} aria-current={chapter.id === selected.id ? 'page' : undefined} data-chapter-id={chapter.id} key={chapter.id} onClick={() => openChapter(chapter)}><span>제{chapter.chapterNumber}장</span>{chapter.title}</button>)}</section>)}
+      {groups.map((group) => <section key={group.id}><h3>{group.label}</h3>{chapters.filter((chapter) => (chapter.seasonId ?? chapter.partId ?? '기록') === group.id).map((chapter) => <button className={chapter.id === selected.id ? 'selected' : ''} aria-current={chapter.id === selected.id ? 'page' : undefined} data-chapter-id={chapter.id} key={chapter.id} onClick={() => openChapter(chapter)}><span>{chapterLabel(chapter)}</span>{chapter.title}</button>)}</section>)}
     </aside>
     <article className="book-prose" ref={articleRef} data-chapter-id={selected.id}>
-      <header><p className="archive-eyebrow">{selected.dateLabel} · 제{selected.chapterNumber}장</p><h1>{selected.title}</h1><p>{selected.subtitle}</p><div className="reader-progress" aria-label={'읽기 진행률 ' + progress + '%'}><strong>{progress}%</strong><span><i style={{ width: progress + '%' }} /></span></div></header>
+      <header><p className="archive-eyebrow">{selected.dateLabel} · {chapterLabel(selected)}</p><h1>{selected.title}</h1><p>{selected.subtitle}</p><div className="reader-progress" aria-label={'읽기 진행률 ' + progress + '%'}><strong>{progress}%</strong><span><i style={{ width: progress + '%' }} /></span></div></header>
       {book.beginningStatus === 'MISSING_BEGINNING' && <aside className="reader-integrity-note"><strong>초기 기록 복구 중</strong><p>현재 공개본은 확보된 첫 검증 장면부터 시작합니다.</p></aside>}
+      {book.beginningGap && selected.id === 'c03-afterfall-chapter-01' && <aside className="reader-integrity-note"><strong>{book.beginningGap.label}</strong><p>{book.beginningGap.after} 이후부터 {book.beginningGap.before} 시작 전까지의 공개 원문은 확보되지 않았습니다.</p></aside>}
       <div className="reader-body" aria-live="polite">{loadState === 'loading' && <p role="status">이 작품을 불러오는 중입니다…</p>}{loadState === 'error' && <div role="alert"><p>작품을 불러오지 못했습니다.</p><button onClick={() => setAttempt((value) => value + 1)}>다시 시도</button></div>}{loadState === 'ready' && selectedContent && <SafeMarkdown body={selectedContent.body ?? ''} />}{loadState === 'ready' && !selectedContent && <p role="status">선택한 장을 찾을 수 없습니다.</p>}</div>
+      {book.beginningGap && selected.id === 'c03-afterfall-opening-01' && <aside className="reader-integrity-note"><strong>{book.beginningGap.label}</strong><p>{book.beginningGap.after} 이후부터 {book.beginningGap.before} 시작 전까지의 공개 원문은 확보되지 않았습니다.</p></aside>}
       {selected.relatedNodeIds.length > 0 && <section className="book-related"><p className="archive-eyebrow">세계 탐색</p><h2>이 장의 인물과 장소</h2><div>{selected.relatedNodeIds.map((id) => { const node = nodeById.get(id); return node ? <button key={id} onClick={() => onOpenNode(id)}><strong>{node.label}</strong><span>{node.subtitle}</span></button> : null })}</div></section>}
-      <nav className="book-pager" aria-label="이전과 다음 장">{previous ? <button onClick={() => openChapter(previous)}>← 제{previous.chapterNumber}장 {previous.title}</button> : <span />}{next ? <button onClick={() => openChapter(next)}>제{next.chapterNumber}장 {next.title} →</button> : <span />}</nav>
+      <nav className="book-pager" aria-label="이전과 다음 장">{previous ? <button onClick={() => openChapter(previous)}>← {chapterLabel(previous)} {previous.title}</button> : <span />}{next ? <button onClick={() => openChapter(next)}>{chapterLabel(next)} {next.title} →</button> : <span />}</nav>
     </article>
   </section>
 }

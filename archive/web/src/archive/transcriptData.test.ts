@@ -10,7 +10,7 @@ describe('Chronicle-isolated public transcript catalog', () => {
       ['C03-AFTERFALL', 'worldlines/AFTERFALL'],
     ])
     expect(transcriptPartsFor('C01-HAN-JUNHO').every((part) => part.source.startsWith('seasons_v2/'))).toBe(true)
-    expect(transcriptPartsFor('C03-AFTERFALL').every((part) => part.source.startsWith('worldlines/AFTERFALL/'))).toBe(true)
+    expect(transcriptPartsFor('C03-AFTERFALL').every((part) => part.source.startsWith('worldlines/AFTERFALL/') || part.source.startsWith('archive/content/transcripts/C03-AFTERFALL/'))).toBe(true)
   })
 
   it('publishes only C01 raw records that were verified, with the known S02 gap explicit', () => {
@@ -23,15 +23,18 @@ describe('Chronicle-isolated public transcript catalog', () => {
   it('publishes only verified C03 raw while retaining every known gap and session boundary', () => {
     expect(activeChronicle).toMatchObject({ id: 'C03-AFTERFALL', active: true, transcriptStatus: 'partial' })
     const c03 = transcriptPartsFor('C03-AFTERFALL')
-    expect(c03).toHaveLength(31)
-    expect(c03.filter((part) => part.status === 'verified_transcript')).toHaveLength(25)
+    expect(c03).toHaveLength(39)
+    expect(c03.filter((part) => part.status === 'verified_transcript')).toHaveLength(35)
+    expect(c03.slice(0, 2)).toMatchObject([
+      { id: 'c03-s01-opening-001', range: '2026-09-18 13:42 → 14:12', status: 'verified_transcript' },
+      { id: 'c03-s01-missing-before', status: 'verified_transcript' },
+    ])
+    expect(c03.slice(1, 9).every((part) => part.source.includes('/SHARED_CHAT_RECOVERY/') && Boolean(part.contentUrl))).toBe(true)
     expect(c03.filter((part) => part.status === 'verified_fragment')).toMatchObject([
-      { id: 'c03-s01-008', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_008.md' },
       { sessionId: 'SESSION_003', status: 'verified_fragment' },
       { sessionId: 'SESSION_004', status: 'verified_fragment' },
     ])
     expect(c03.filter((part) => part.status === 'missing_transcript').map((part) => part.id)).toEqual([
-      'c03-s01-missing-before',
       'c03-s02-session-001-gap',
       'c03-s02-session-002-gap',
     ])

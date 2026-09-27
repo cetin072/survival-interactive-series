@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { primaryNavigationLabels } from './ArchiveApp'
 import { chronicleRegistry, partitionChronicles } from './chronicleRegistry'
 import { chaptersForChronicle, chronicleBooks, readerChapters } from './storyData'
+import c03Book from '../../../content/stories/C03-AFTERFALL/BOOK.json'
 // @ts-expect-error Node-owned shared publisher module has no browser declaration.
 import { extractReaderNarrative, parseRoleHeader, removeTrailingChoiceGate } from '../../../scripts/lib/reader-transform.mjs'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -11,8 +12,8 @@ import { assertReaderManifest } from './readerManifestContract'
 import { archiveNodes } from './archiveData'
 
 describe('Reader Edition V1.1', () => {
-  it('keeps RAW outside the two-item primary navigation', () => {
-    expect(primaryNavigationLabels).toEqual(['세계 탐색', '이야기 읽기'])
+  it('keeps RAW outside the primary navigation while exposing Survival Knowledge', () => {
+    expect(primaryNavigationLabels).toEqual(['세계 탐색', '이야기 읽기', '생존 지식'])
   })
   it('has one registry and switches current shelf without Story code changes', () => {
     expect(partitionChronicles().active.id).toBe('C03-AFTERFALL')
@@ -80,8 +81,19 @@ describe('Reader Edition V1.1', () => {
     expect(readerChapters.every((chapter) => chapter.body === undefined && chapter.sourceRefs.length > 0 && chapter.archiveSourceRefs.length > 0)).toBe(true)
     expect(chronicleBooks).toHaveLength(3)
   })
-  it('keeps the unrecovered C03 opening explicit without fabricating a replacement', () => {
-    expect(chronicleBooks.find((book) => book.chronicleId === 'C03-AFTERFALL')?.beginningStatus).toBe('MISSING_BEGINNING')
+  it('opens with the recovered hospital scene and shared-chat play while retaining all existing chapter routes', () => {
+    const c03 = chaptersForChronicle('C03-AFTERFALL')
+    const recoveredNarrative = c03Book.chapters.slice(0, 9).map((chapter) => chapter.body ?? '')
+    expect(c03[0]).toMatchObject({ id: 'c03-afterfall-opening-01', chapterNumber: 0, dateLabel: '2026-09-18 13:42', relatedNodeIds: [] })
+    expect(recoveredNarrative[0]).toContain('서림대학교병원 응급의료센터')
+    expect(recoveredNarrative[0]).toContain('“7번 베드 코드블루!”')
+    expect(recoveredNarrative[0]).not.toMatch(/캐릭터 생성|부모의 채무|연애 중|## 선택|## 다음 행동|자유행동/)
+    expect(c03.slice(1, 9).map((chapter) => chapter.id)).toEqual(Array.from({ length: 8 }, (_, i) => `c03-afterfall-prelude-${String(i + 1).padStart(2, '0')}`))
+    expect(recoveredNarrative[1]).toContain('## 14:14 — 병원 밖')
+    expect(recoveredNarrative[8]).toContain('## 10월 23일 17:36')
+    expect(recoveredNarrative.slice(1).every((body) => !/(?:^|\n)#{1,4}\s*(?:다음 선택|다음 판단|현재 선택지|\d+[.)])|자유행동/.test(body))).toBe(true)
+    expect(c03.slice(9).map((chapter) => chapter.id)).toEqual(Array.from({ length: 24 }, (_, i) => `c03-afterfall-chapter-${String(i + 1).padStart(2, '0')}`))
+    expect(chronicleBooks.find((book) => book.chronicleId === 'C03-AFTERFALL')).toMatchObject({ beginningStatus: 'OPENING_PLAY_RECOVERED' })
   })
   it('rejects a stale or incomplete generated manifest before it reaches the Reader', () => {
     expect(() => assertReaderManifest({ chronicleId: 'C99', transformVersion: 'old', coverage: { verifiedRawParts: 1, scanned: 1 }, chapters: [] })).toThrow('Unsupported Reader manifest')

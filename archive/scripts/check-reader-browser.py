@@ -134,6 +134,15 @@ def audit_book(page, base: str, chronicle: str, width: int):
     selected_book(page, chapters[0], chronicle)  # explicit link beats stored last chapter
     book_assets = [url for url in page.requests_seen[before:] if re.search(r'/BOOK-[^/]+\.json(?:\?|$)', url)]
     assert len(book_assets) == 1, f'Opening {chronicle} should fetch only its own BOOK asset: {book_assets}'
+    if chronicle == 'C03-AFTERFALL':
+        assert chapters[0]['id'] == 'c03-afterfall-opening-01'
+        expect(page.locator('.reader-body')).to_contain_text('서림대학교병원 응급의료센터')
+        assert chapters[1]['id'] == 'c03-afterfall-prelude-01'
+        assert chapters[9]['id'] == 'c03-afterfall-chapter-01'
+        page.goto(query_url(base, view='story', chronicle=chronicle, chapter='c03-afterfall-chapter-01'))
+        selected_book(page, chapters[9], chronicle)  # existing deep link stays valid
+        page.goto(query_url(base, view='story', chronicle=chronicle, chapter=chapters[0]['id']))
+        selected_book(page, chapters[0], chronicle)
     for index in [1, 2]:
         tap(page.locator(f'.book-toc [data-chapter-id="{chapters[index]["id"]}"]'), mobile)
         selected_book(page, chapters[index], chronicle)
@@ -202,9 +211,12 @@ def audit_extra(page, base: str, width: int):
     selected_raw(page, 'c03-s02-session-009-002')
     assert len(page.locator('.transcript-flow').inner_text()) > 100
     tap(page.get_by_role('tab', name='S01', exact=True), mobile)
-    expect(page.locator('.missing-transcript')).to_be_visible()
+    selected_raw(page, 'c03-s01-opening-001')
+    expect(page.locator('.transcript-flow')).to_contain_text('서림대학교병원 응급의료센터')
+    page.goto(query_url(base, view='raw', chronicle='C03-AFTERFALL', part='c03-s01-missing-before'))
+    expect(page.locator('.transcript-gm').first).to_be_visible()
     page.goto(query_url(base, view='raw', chronicle='C03-AFTERFALL', part='c03-s01-008'))
-    expect(page.locator('.transcript-fragment pre')).to_be_visible()
+    expect(page.locator('.transcript-gm').first).to_be_visible()
     report('S02 finale / season switch / missing and fragment preserved', width=width)
     page.goto(base)
     search = page.locator('.archive-search input')
@@ -353,6 +365,8 @@ def main():
             expect(page.locator('.book-prose > header h1')).to_have_text(BOOKS['C01-HAN-JUNHO']['chapters'][0]['title'])
             tap(page.locator('.book-toc section button').nth(1), True)
             expect(page.locator('.book-prose > header h1')).to_have_text(BOOKS['C01-HAN-JUNHO']['chapters'][1]['title'])
+            page.goto(query_url(base, view='story', chronicle='C03-AFTERFALL'))
+            selected_book(page, BOOKS['C03-AFTERFALL']['chapters'][0], 'C03-AFTERFALL')
             page.goto(query_url(base, view='raw', chronicle='C03-AFTERFALL', part='invalid'))
             expect(page.locator('.reader-page')).to_be_visible()
             report('blocked localStorage and invalid links remain navigable')

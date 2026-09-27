@@ -1,0 +1,67 @@
+{
+  "sourceUrl": "https://chatgpt.com/share/6ab91d18-0c48-83ee-b4e5-b067be942522",
+  "conversationId": "6ab91d18-0c48-83ee-b4e5-b067be942522",
+  "shareHtmlSha256": "0ec3e976a19b3524dd87243a6acd441dac5c043c6b1d77719df7b5d67581270a",
+  "snapshotSha256": "83cfb0d7056ebdf64551d55c5bca445ed00dfcbc67c23d24b24e5f0e175a2a74",
+  "linearMessageCount": 2253,
+  "publicMessageCount": 224,
+  "storyExcerptLinearRange": [
+    95,
+    1078
+  ],
+  "storySceneCount": 56,
+  "operationalHeadedSummaryLinearIndex": 889,
+  "parts": [
+    {
+      "file": "PART_PRELUDE_001.md",
+      "firstLinearIndex": 95,
+      "lastLinearIndex": 219,
+      "sha256": "9694b1d57aefc1c6c88caf95008e3fe6a2d8fd10f2e5073be5ee1d719b2a0de5"
+    },
+    {
+      "file": "PART_PRELUDE_002.md",
+      "firstLinearIndex": 220,
+      "lastLinearIndex": 332,
+      "sha256": "379a79b4498038394224f2894b5c175e26655478bf60a45c2b51ef659bf60903"
+    },
+    {
+      "file": "PART_PRELUDE_003.md",
+      "firstLinearIndex": 333,
+      "lastLinearIndex": 475,
+      "sha256": "5923f71c562d19ce315becf8e7a7a000b7968320c9c0e60e0d5764692c68f212"
+    },
+    {
+      "file": "PART_PRELUDE_004.md",
+      "firstLinearIndex": 476,
+      "lastLinearIndex": 600,
+      "sha256": "4d2161d341c0377f13973f0d1b4db8cb9d2c6ef06365c5e74b820f589af7bef7"
+    },
+    {
+      "file": "PART_PRELUDE_005.md",
+      "firstLinearIndex": 601,
+      "lastLinearIndex": 735,
+      "sha256": "0a29d351dabf447e68bfd2f1b1808285ceed01cc7a9564de85856faa6924ffb2"
+    },
+    {
+      "file": "PART_PRELUDE_006.md",
+      "firstLinearIndex": 736,
+      "lastLinearIndex": 874,
+      "sha256": "ffd960ee6fc698b593867dca43440db620c37f3f36e7b708f0ff10087db6b22e"
+    },
+    {
+      "file": "PART_PRELUDE_007.md",
+      "firstLinearIndex": 875,
+      "lastLinearIndex": 1067,
+      "sha256": "56f7215383a2265235b8874fc3497c687e531bc533c75a9dfcb506ad81b5d943"
+    },
+    {
+      "file": "PART_PRELUDE_008.md",
+      "firstLinearIndex": 1068,
+      "lastLinearIndex": 1078,
+      "sha256": "ac9ecf534ab595431da9e1e2fa1a7946b9cf9ab0611e6539b1b6de257d5b85e4"
+    }
+  ],
+  "overlap": "Linear indices 3–94 overlap OPENING_RECOVERY; index 1090 onward overlaps PART_C03_001 and later S01 archive.",
+  "selection": "Public USER and final assistant text only. Part excerpts preserve exact message content; operational assistant replies marked ASSISTANT_PUBLIC_META for Reader omission.",
+  "canonPropagation": false
+}

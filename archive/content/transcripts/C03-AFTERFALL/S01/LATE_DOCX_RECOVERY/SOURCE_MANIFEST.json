@@ -1,0 +1,31 @@
+{
+  "version": "afterfall-s01-late-user-docx-recovery-v1",
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "season_id": "S01",
+  "archive_class": "COLD_RAW_RECOVERY",
+  "visibility": "PUBLIC_ARCHIVE",
+  "status": "VERIFIED_PUBLIC_GM_RESPONSE_RECOVERY",
+  "source": {
+    "kind": "USER_UPLOADED_DOCX",
+    "filename": "《생존일기》 AFTERFALL 새 RPG 시작22.docx",
+    "archive_path": "SOURCE.docx",
+    "sha256": "f978c2f8b33cd1187d94b8a23f13d9734651f10a9cd28fcaec4af32e36760eb7",
+    "bytes": 46225,
+    "paragraphs": 975
+  },
+  "recovery": {
+    "raw_file": "PART_C03_008_RECOVERED.md",
+    "raw_sha256": "e8927657ca5051e0520332f6ecb60a12cce1e4b4b1599cdd2c0f41841c531b4d",
+    "user_paragraphs_zero_based": [948, 949],
+    "gm_paragraphs_zero_based": [951, 961],
+    "ui_processing_marker_excluded": "35s 동안 처리함",
+    "site_part_id": "c03-s01-008",
+    "prior_fragment": "../PART_C03_008.md",
+    "prior_fragment_sha256": "1dae856191b2f51a8e86dbf6b297c568b51feeeef5535e4d3686c1d458ba61ea"
+  },
+  "canon_policy": {
+    "promote_to_canon": false,
+    "reason": "Historical post-season feedback is RAW evidence, not current character, relationship, or gameplay state."
+  }
+}
