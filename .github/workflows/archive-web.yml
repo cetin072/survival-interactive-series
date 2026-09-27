@@ -68,6 +68,8 @@ jobs:
           node --input-type=module -e 'import { readFileSync } from "node:fs"; import assert from "node:assert/strict"; const p=JSON.parse(readFileSync(process.env.RUNNER_TEMP+"/publication-first.json","utf8")); assert.equal(p.mode,"DRY_RUN_ONLY"); assert.equal(p.snapshot.source_save_version,253); assert.equal(p.summary.reader_input_spans,5); assert.equal(p.summary.paired_turns,34); assert.equal(p.summary.rolling_captured_messages,70); assert.equal(p.summary.preserved_fragments,2); assert.equal(p.summary.external_calls,0); assert.equal(p.summary.records_written,0); console.log(JSON.stringify(p.summary));'
       - name: Test Reader batch security and atomic replacement
         run: node --test ../scripts/lib/reader-batch.test.mjs
+      - name: Test image attempt journal validation
+        run: node --test ../scripts/lib/attempt-ledger.test.mjs
       - name: Test public-season snapshot derivation without private sources
         run: node --test ../scripts/lib/public-season-snapshot.test.mjs
       - name: Verify real Reader roundtrip and isolated new-RAW publication

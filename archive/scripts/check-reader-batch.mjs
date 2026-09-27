@@ -7,6 +7,7 @@ import { resolve, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { makeBooks } from './build-reader-edition.mjs'
 import { fingerprint } from './lib/publication-plan.mjs'
+import { makeAttemptEvent } from './lib/attempt-ledger.mjs'
 
 const root = resolve(import.meta.dirname, '..', '..')
 const sha = (v) => createHash('sha256').update(v).digest('hex')
@@ -148,6 +149,41 @@ process.stdout.write(JSON.stringify(result));`
   assert.equal(requestPlan.provider_calls, 0)
   assert.equal(requestPlan.zero_added_cost_proven, false)
   assert.deepEqual(JSON.parse(command('node', imageRequestArgs, copy)), requestPlan)
+  const ledgerFile = join(temporary, 'synthetic-attempt-ledger.json')
+  const ledger = { version: 'archive-image-attempt-ledger-v2',
+    chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL',
+    visibility: 'PUBLIC_ARCHIVE', catalog_sha256: requestPlan.catalog_sha256, events: [] }
+  const ledgerScript = `import { readFileSync } from 'node:fs';
+import { prepareImageRequestsFromPublicRef } from './archive/scripts/lib/image-request-public-ref.mjs';
+const result = await prepareImageRequestsFromPublicRef({ repoRoot: process.cwd(),
+  ref: '${refSource}', seasonId: 'S99', checkpointRef: '${checkpointRef}',
+  attemptLedger: JSON.parse(readFileSync(process.argv[1], 'utf8')) });
+process.stdout.write(JSON.stringify(result));`
+  const ledgerArgs = ['--experimental-strip-types', '--input-type=module', '-e', ledgerScript, ledgerFile]
+  await writeFile(ledgerFile, JSON.stringify(ledger))
+  const emptyLedgerPlan = JSON.parse(command('node', ledgerArgs, copy))
+  assert.deepEqual(emptyLedgerPlan.requests, requestPlan.requests)
+  assert.equal(emptyLedgerPlan.attempt_history, 'CALLER_SUPPLIED_NOT_AUTHENTICATED')
+  const firstRequest = requestPlan.requests[0]
+  ledger.events.push(makeAttemptEvent({
+    attempt_id: `attempt-${sha('SYNTHETIC_S99_ATTEMPT')}`,
+    request_id: firstRequest.request_id, point_id: firstRequest.point_id,
+    generation_key: firstRequest.generation_key, state: 'RESERVED',
+    evidence_ref: null, previous_event_sha256: null,
+  }))
+  await writeFile(ledgerFile, JSON.stringify(ledger))
+  const reservedPlan = JSON.parse(command('node', ledgerArgs, copy))
+  assert.equal(reservedPlan.attempt_plan.reserved, 1)
+  assert.equal(reservedPlan.requests.length, 2)
+  assert.ok(reservedPlan.requests.every((request) => request.point_id !== firstRequest.point_id))
+  const validEvent = ledger.events[0]
+  const { event_sha256: _eventHash, ...eventBody } = validEvent
+  ledger.events[0] = makeAttemptEvent({ ...eventBody,
+    request_id: `request-${sha('WRONG_SYNTHETIC_REQUEST')}` })
+  await writeFile(ledgerFile, JSON.stringify(ledger))
+  assert.throws(() => command('node', ledgerArgs, copy))
+  ledger.events[0] = validEvent
+  await writeFile(ledgerFile, JSON.stringify(ledger))
   assert.equal(command('git', ['rev-parse', refSource], copy).trim(), visualResult.commit)
   const driverRef = 'refs/heads/codex/archive-publication-ref-driver-test'
   command('git', ['branch', 'codex/archive-publication-ref-driver-test', fixtureHead], copy)
@@ -194,6 +230,8 @@ process.stdout.write(JSON.stringify(result));`
   assert.notEqual(laterRequests.source_revision, requestPlan.source_revision)
   assert.equal(laterRequests.request_source_revision, visualResult.commit)
   assert.deepEqual(laterRequests.requests, requestPlan.requests)
+  const laterLedgerPlan = JSON.parse(command('node', ledgerArgs, copy))
+  assert.deepEqual(laterLedgerPlan.requests, reservedPlan.requests)
   await rm(checkoutOnlySeason, { recursive: true })
   command('git', ['checkout', '--detach', fixtureHead], copy)
   const proposalRef = 'refs/heads/codex/archive-publication-reader-test'
