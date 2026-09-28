@@ -9,9 +9,11 @@ R2 is intentionally fail-closed until a dedicated adapter is implemented and
 verified. Selecting it must never silently fall back to Supabase.
 """
 from dataclasses import dataclass
+import hashlib
+import json
 import os
 from urllib.error import HTTPError, URLError
-from urllib.parse import parse_qs, quote, urlparse
+from urllib.parse import quote
 from urllib.request import Request
 
 
@@ -73,6 +75,19 @@ class SupabaseOriginalStorage:
         # Preserve the existing visual_assets object_path contract.
         return f"{self.bucket}/{path}"
 
+    def assert_private_bucket(self):
+        url = f"{self.selection.endpoint}/storage/v1/bucket/{quote(self.bucket, safe='')}"
+        try:
+            with self.opener.open(Request(url, headers=self._trusted_headers()), timeout=30) as response:
+                bucket = json.loads(response.read(8193))
+        except HTTPError as error:
+            raise ValueError(f"STORAGE_BUCKET_READ_FAILED_HTTP_{error.code}") from None
+        except URLError:
+            raise ValueError("STORAGE_BUCKET_READ_FAILED_NETWORK") from None
+        demand(isinstance(bucket, dict) and bucket.get("id") == self.bucket
+               and bucket.get("public") is False, "STORAGE_BUCKET_NOT_PRIVATE")
+        return {"bucket": self.bucket, "public": False}
+
     def readback(self, path, missing_ok=False):
         url = (
             f"{self.selection.endpoint}/storage/v1/object/authenticated/"
@@ -91,46 +106,51 @@ class SupabaseOriginalStorage:
         demand(len(data) <= self.limit, "STORAGE_OBJECT_TOO_LARGE")
         return data
 
-    def issue_upload_grant(self, path):
-        url = (
-            f"{self.selection.endpoint}/storage/v1/object/upload/sign/"
-            f"{self.bucket}/{quote(path, safe='/')}"
-        )
-        request = Request(
-            url,
-            data=b"{}",
-            method="POST",
-            headers={**self._trusted_headers(), "Content-Type": "application/json"},
-        )
+    def upload_original(self, path, contents, expected_sha256):
+        demand(isinstance(contents, bytes) and 0 < len(contents) <= self.limit,
+               "STORAGE_ORIGINAL_SIZE_INVALID")
+        demand(contents.startswith(b"\x89PNG\r\n\x1a\n"), "STORAGE_ORIGINAL_PNG_INVALID")
+        observed_sha256 = hashlib.sha256(contents).hexdigest()
+        demand(observed_sha256 == expected_sha256, "STORAGE_LOCAL_ORIGINAL_SHA_MISMATCH")
+
+        existing = self.readback(path, missing_ok=True)
+        if existing is not None:
+            demand(hashlib.sha256(existing).hexdigest() == expected_sha256,
+                   "STORAGE_EXISTING_OBJECT_SHA_MISMATCH")
+            return {"status": "EXISTING_OBJECT_REUSED", "storage_uploads": 0,
+                    "source_sha256": expected_sha256}
+
+        url = (f"{self.selection.endpoint}/storage/v1/object/{self.bucket}/"
+               f"{quote(path, safe='/')}")
+        request = Request(url, data=contents, method="POST", headers={
+            **self._trusted_headers(), "Content-Type": "image/png", "x-upsert": "false",
+        })
         try:
-            with self.opener.open(request, timeout=30) as response:
-                demand(response.status in (200, 201), "STORAGE_SIGN_FAILED")
-                payload = response.read(8193)
+            with self.opener.open(request, timeout=60) as response:
+                demand(response.status in (200, 201), "STORAGE_UPLOAD_OUTCOME_UNKNOWN")
         except HTTPError as error:
+            if error.code in (400, 409):
+                # Storage can report an existing object as 400 or 409. Reuse only
+                # after an exact trusted readback; never overwrite or retry.
+                existing = self.readback(path, missing_ok=True)
+                if existing is not None and hashlib.sha256(existing).hexdigest() == expected_sha256:
+                    return {"status": "EXISTING_OBJECT_REUSED", "storage_uploads": 0,
+                            "source_sha256": expected_sha256}
             raise ValueError(f"STORAGE_HTTP_ERROR_{error.code}") from None
         except URLError:
-            raise ValueError("STORAGE_NETWORK_ERROR") from None
-
-        demand(len(payload) <= 8192, "STORAGE_SIGN_RESPONSE_INVALID")
-        import json
-        signed = urlparse(json.loads(payload).get("url", ""))
-        demand(
-            not signed.scheme
-            and not signed.netloc
-            and signed.path == f"/object/upload/sign/{self.bucket}/{path}",
-            "STORAGE_SIGN_RESPONSE_INVALID",
-        )
-        tokens = parse_qs(signed.query).get("token", [])
-        demand(len(tokens) == 1, "STORAGE_SIGN_RESPONSE_INVALID")
-        return tokens[0]
-
-    def upload_url(self, path, grant):
-        demand(isinstance(grant, str) and 20 <= len(grant) <= 4096, "SIGNED_TOKEN_INVALID")
-        return (
-            f"{self.selection.endpoint}/storage/v1/object/upload/sign/"
-            f"{self.bucket}/{quote(path, safe='/')}?token={quote(grant, safe='')}"
-        )
-
+            # A single readback resolves a lost response without repeating the upload.
+            try:
+                existing = self.readback(path, missing_ok=True)
+            except ValueError:
+                raise ValueError("STORAGE_UPLOAD_OUTCOME_UNKNOWN") from None
+            if existing is not None and hashlib.sha256(existing).hexdigest() == expected_sha256:
+                return {"status": "UPLOAD_CONFIRMED_BY_READBACK", "storage_uploads": 1,
+                        "source_sha256": expected_sha256}
+            if existing is not None:
+                raise ValueError("STORAGE_EXISTING_OBJECT_SHA_MISMATCH") from None
+            raise ValueError("STORAGE_UPLOAD_OUTCOME_UNKNOWN") from None
+        return {"status": "UPLOADED_REQUIRES_TRUSTED_READBACK", "storage_uploads": 1,
+                "source_sha256": expected_sha256}
 
 def build_original_storage_provider(opener, limit, env=None):
     selection = load_original_storage_selection(env)

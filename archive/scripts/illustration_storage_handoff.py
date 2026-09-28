@@ -1,28 +1,21 @@
-"""Scoped private Storage and registry handoff for one public illustration.
+"""Verify a private Storage original and reconcile its READY registry row.
 
-The trusted GitHub runner issues a one-object upload token, then verifies the
-private readback and inserts the READY registry row. The local machine only
-decrypts the short-lived token and uploads the already reviewed PNG once.
+Draft Release validation and the trusted direct upload live in
+draft_release_illustration_handoff.py. This module owns the exact private
+readback and registry read/reconcile/readback steps.
 """
 import argparse
-import base64
 import hashlib
 import json
 import os
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.parse import parse_qs, quote, urlparse
+from urllib.parse import quote
 from urllib.request import HTTPRedirectHandler, Request, build_opener
-
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import padding
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
 
 from original_storage_provider import (
     DEFAULT_SUPABASE_URL,
     build_original_storage_provider,
-    load_original_storage_selection,
 )
 
 
@@ -31,7 +24,6 @@ ROOT = Path(__file__).resolve().parents[2]
 IDENTITY = ROOT / "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_WAREHOUSE.json"
 CATALOG = ROOT / "archive/content/visuals/C03-AFTERFALL/VISUALS.json"
 SITE_ASSETS = ROOT / "archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json"
-PUBLIC_KEY = ROOT / ".github/warehouse-e2e-upload-public.pem"
 LIMIT = 20 * 1024 * 1024
 
 
@@ -52,8 +44,8 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def identity():
-    record = json.loads(IDENTITY.read_text(encoding="utf-8"))
+def identity(identity_path=IDENTITY, allow_published=False):
+    record = json.loads(Path(identity_path).read_text(encoding="utf-8"))
     catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
     manifest = json.loads(SITE_ASSETS.read_text(encoding="utf-8"))
     point = next((item for item in catalog.get("points", [])
@@ -77,7 +69,7 @@ def identity():
                 if asset.get("point_id") == record["point_id"]
                 or asset.get("generation_key") == record["generation_key"]
                 or asset.get("subject_id") == record["subject_id"]]
-    demand(not existing, "SITE_ASSET_ALREADY_EXISTS")
+    demand(allow_published or not existing, "SITE_ASSET_ALREADY_EXISTS")
     path = (f"AFTERFALL/{record['point_id']}/{record['generation_key']}/"
             f"{record['source_sha256']}.png")
     return record, catalog, point, path
@@ -92,92 +84,6 @@ def registry_credentials():
     key = os.environ.get("ARCHIVE_SUPABASE_SERVICE_ROLE_KEY", "")
     demand(url == REGISTRY_BASE_URL and len(key) >= 20, "REGISTRY_CREDENTIALS_REQUIRED")
     return url, {"apikey": key, "Authorization": f"Bearer {key}"}
-
-
-def envelope_aad(provider, bucket, path, sha):
-    return f"{provider}:{bucket}/{path}:{sha}".encode()
-
-
-def encrypt_token(token, path, sha):
-    selection = load_original_storage_selection()
-    public = load_pem_public_key(PUBLIC_KEY.read_bytes())
-    key, nonce = os.urandom(32), os.urandom(12)
-    aad = envelope_aad(selection.provider, selection.bucket, path, sha)
-    wrapped = public.encrypt(key, padding.OAEP(mgf=padding.MGF1(hashes.SHA256()),
-                                               algorithm=hashes.SHA256(), label=None))
-    return {"version": 2, "provider": selection.provider, "bucket": selection.bucket,
-            "path": path, "source_sha256": sha,
-            "wrapped_key": base64.b64encode(wrapped).decode("ascii"),
-            "nonce": base64.b64encode(nonce).decode("ascii"),
-            "ciphertext": base64.b64encode(AESGCM(key).encrypt(nonce, token.encode(), aad)).decode("ascii")}
-
-
-def decrypt_token(envelope, private_path, path, sha):
-    selection = load_original_storage_selection()
-    demand(set(envelope) == {"version", "provider", "bucket", "path", "source_sha256",
-                             "wrapped_key", "nonce", "ciphertext"}
-           and envelope.get("version") == 2
-           and envelope.get("provider") == selection.provider
-           and envelope.get("bucket") == selection.bucket
-           and envelope.get("path") == path
-           and envelope.get("source_sha256") == sha,
-           "SIGNED_TOKEN_ENVELOPE_INVALID")
-    decode = lambda key: base64.b64decode(envelope[key], validate=True)
-    private = load_pem_private_key(Path(private_path).read_bytes(), password=None)
-    key = private.decrypt(decode("wrapped_key"), padding.OAEP(mgf=padding.MGF1(hashes.SHA256()),
-                                                              algorithm=hashes.SHA256(), label=None))
-    aad = envelope_aad(selection.provider, selection.bucket, path, sha)
-    token = AESGCM(key).decrypt(decode("nonce"), decode("ciphertext"), aad).decode("ascii")
-    demand(20 <= len(token) <= 4096, "SIGNED_TOKEN_INVALID")
-    return token
-
-
-def issue(envelope_path):
-    record, _, _, path = identity()
-    provider = storage_provider()
-    existing = provider.readback(path, missing_ok=True)
-    if existing is not None:
-        demand(digest(existing) == record["source_sha256"], "STORAGE_EXISTING_OBJECT_SHA_MISMATCH")
-        Path(envelope_path).write_text(json.dumps({"version": 0, "status": "EXISTING_OBJECT_REUSED",
-                                                   "storage_provider": provider.provider_id,
-                                                   "source_sha256": digest(existing)}), encoding="utf-8")
-        return {"status": "EXISTING_OBJECT_REUSED", "storage_provider": provider.provider_id,
-                "source_sha256": digest(existing), "storage_uploads": 0}
-    grant = provider.issue_upload_grant(path)
-    Path(envelope_path).write_text(
-        json.dumps(encrypt_token(grant, path, record["source_sha256"])),
-        encoding="utf-8",
-    )
-    return {"status": "SIGNED_UPLOAD_READY", "storage_provider": provider.provider_id,
-            "source_sha256": record["source_sha256"],
-            "storage_object_path": path, "storage_uploads": 0}
-
-
-def upload(image_path, envelope_path, private_key):
-    record, _, _, path = identity()
-    provider = storage_provider()
-    original = Path(image_path).read_bytes()
-    demand(0 < len(original) <= LIMIT and original.startswith(b"\\x89PNG\\r\\n\\x1a\\n")
-           and digest(original) == record["source_sha256"], "LOCAL_ORIGINAL_SHA_MISMATCH")
-    envelope = json.loads(Path(envelope_path).read_text(encoding="utf-8"))
-    grant = decrypt_token(envelope, private_key, path, record["source_sha256"])
-    url = provider.upload_url(path, grant)
-    request = Request(url, data=original, method="PUT",
-                      headers={"Content-Type": "image/png", "x-upsert": "false"})
-    try:
-        with OPENER.open(request, timeout=60) as response:
-            demand(response.status in (200, 201), "STORAGE_UPLOAD_OUTCOME_UNKNOWN")
-    except HTTPError as error:
-        if error.code == 409:
-            return {"status": "OBJECT_EXISTS_REQUIRES_TRUSTED_READBACK",
-                    "storage_provider": provider.provider_id, "upload_attempts": 1}
-        raise ValueError("STORAGE_UPLOAD_OUTCOME_UNKNOWN" if error.code >= 500
-                         else f"STORAGE_HTTP_ERROR_{error.code}") from None
-    except URLError:
-        raise ValueError("STORAGE_UPLOAD_OUTCOME_UNKNOWN") from None
-    return {"status": "UPLOAD_SUBMITTED_REQUIRES_TRUSTED_READBACK",
-            "storage_provider": provider.provider_id, "upload_attempts": 1,
-            "source_sha256": record["source_sha256"], "storage_object_path": path}
 
 
 def registry_row(record, catalog, point, path):
@@ -205,21 +111,82 @@ def registry_row(record, catalog, point, path):
     }
 
 
-def verify_register():
-    record, catalog, point, path = identity()
+def registry_read_error(error):
+    body = error.read(4097).decode("utf-8", errors="replace")
+    return ValueError(f"REGISTRY_READ_FAILED_HTTP_{error.code}:{body[:4000]}")
+
+
+def registry_rpc_headers(headers):
+    return {**headers, "Content-Profile": "public", "Content-Type": "application/json"}
+
+
+def read_registry_rows(registry_url, headers, record):
+    url = f"{registry_url}/rest/v1/rpc/archive_visual_asset_readback"
+    payload = {"p_point_id": record["point_id"], "p_generation_key": record["generation_key"]}
+    request = Request(url, data=json.dumps(payload).encode(), method="POST",
+                      headers=registry_rpc_headers(headers))
+    try:
+        with OPENER.open(request, timeout=30) as response:
+            return json.loads(response.read(2_000_001))
+    except HTTPError as error:
+        raise registry_read_error(error) from None
+    except URLError:
+        raise ValueError("REGISTRY_READ_FAILED_NETWORK") from None
+
+
+def reconcile_registry_row(registry_url, headers, expected):
+    url = f"{registry_url}/rest/v1/rpc/archive_visual_asset_reconcile"
+    request = Request(url, data=json.dumps({"p_row": expected}).encode(), method="POST",
+                      headers=registry_rpc_headers(headers))
+    try:
+        with OPENER.open(request, timeout=30) as response:
+            return json.loads(response.read(2_000_001))
+    except HTTPError as error:
+        body = error.read(4097).decode("utf-8", errors="replace")[:4000]
+        raise ValueError(f"REGISTRY_RECONCILE_FAILED_HTTP_{error.code}:{body}") from None
+    except URLError:
+        raise ValueError("REGISTRY_RECONCILE_FAILED_NETWORK") from None
+
+
+def diagnose_registry(identity_path=IDENTITY):
+    record, _, _, object_path = identity(identity_path, allow_published=True)
+    registry_url, headers = registry_credentials()
+    rows = read_registry_rows(registry_url, headers, record)
+    demand(isinstance(rows, list) and len(rows) <= 2, "REGISTRY_SCAN_INCOMPLETE")
+    matches = [row for row in rows if row.get("source", {}).get("point_id") == record["point_id"]
+               or row.get("source", {}).get("generation_key") == record["generation_key"]]
+    demand(len(matches) == 1, "REGISTRY_DIAGNOSTIC_MATCH_COUNT_INVALID")
+    row = matches[0]
+    expected_object_path = storage_provider().registry_object_path(object_path)
+    observed_storage_provider = row.get("generation_meta", {}).get("storage_provider")
+    demand(row.get("source", {}).get("point_id") == record["point_id"]
+           and row.get("source", {}).get("generation_key") == record["generation_key"]
+           and row.get("source", {}).get("source_sha256") == record["source_sha256"]
+           and row.get("object_path") == expected_object_path
+           and observed_storage_provider in (None, "supabase"),
+           "REGISTRY_DIAGNOSTIC_BINDING_INVALID")
+    return {
+        "status": "REGISTRY_READBACK_DIAGNOSTIC_PASS",
+        "point_id": record["point_id"],
+        "generation_key": record["generation_key"],
+        "source_sha256": row["source"]["source_sha256"],
+        "object_path": row["object_path"],
+        "storage_provider": observed_storage_provider,
+        "storage_provider_inferred": ("supabase" if observed_storage_provider is None
+                                       and row["object_path"].startswith("survival-archive-originals/")
+                                       else observed_storage_provider),
+        "duplicate_count": 0,
+    }
+
+
+def verify_register(identity_path=IDENTITY):
+    record, catalog, point, path = identity(identity_path)
     provider = storage_provider()
     source = provider.readback(path)
     demand(source is not None and digest(source) == record["source_sha256"], "STORAGE_ORIGINAL_SHA_MISMATCH")
     registry_url, headers = registry_credentials()
-    url = f"{registry_url}/rest/v1/visual_assets"
-    profile_headers = {**headers, "Accept-Profile": "survival_rpg"}
-    get = Request(f"{url}?select=*&worldline_id=eq.AFTERFALL&limit=1000", headers=profile_headers)
-    try:
-        with OPENER.open(get, timeout=30) as response:
-            rows = json.loads(response.read(2_000_001))
-    except (HTTPError, URLError):
-        raise ValueError("REGISTRY_READ_FAILED") from None
-    demand(isinstance(rows, list) and len(rows) < 1000, "REGISTRY_SCAN_INCOMPLETE")
+    rows = read_registry_rows(registry_url, headers, record)
+    demand(isinstance(rows, list) and len(rows) <= 2, "REGISTRY_SCAN_INCOMPLETE")
     expected = registry_row(record, catalog, point, path)
     matched = [row for row in rows if row.get("source", {}).get("point_id") == record["point_id"]
                or row.get("source", {}).get("generation_key") == record["generation_key"]]
@@ -228,27 +195,16 @@ def verify_register():
                "REGISTRY_EXISTING_ASSET_CONFLICT")
         return {"status": "EXISTING_READY_ASSET_REUSED", "asset_id": expected["asset_id"],
                 "registry_writes": 0, "storage_readback_sha256": digest(source)}
-    post_headers = {**profile_headers, "Content-Profile": "survival_rpg",
-                    "Content-Type": "application/json", "Prefer": "return=minimal"}
-    try:
-        with OPENER.open(Request(url, data=json.dumps(expected).encode(), method="POST", headers=post_headers), timeout=30) as response:
-            demand(response.status in (200, 201, 204), "REGISTRY_INSERT_FAILED")
-    except HTTPError as error:
-        if error.code not in (409,) and error.code < 500:
-            raise ValueError("REGISTRY_INSERT_FAILED") from None
-    except URLError:
-        pass
-    # Whether the response arrived or not, reconcile from a fresh DB read before reporting success.
-    return verify_registry_readback(headers, expected, url, profile_headers, digest(source))
+    reconcile_registry_row(registry_url, headers, expected)
+    # Reconcile only inserts when no matching row exists. Confirm its result with a fresh RPC read.
+    return verify_registry_readback(headers, expected, registry_url, digest(source))
 
 
-def verify_registry_readback(headers, expected, url, profile_headers, source_sha):
-    request = Request(f"{url}?select=*&worldline_id=eq.AFTERFALL&limit=1000", headers=profile_headers)
-    try:
-        with OPENER.open(request, timeout=30) as response:
-            rows = json.loads(response.read(2_000_001))
-    except (HTTPError, URLError):
-        raise ValueError("REGISTRY_READ_FAILED") from None
+def verify_registry_readback(headers, expected, registry_url, source_sha):
+    record = {"point_id": expected["source"]["point_id"],
+              "generation_key": expected["source"]["generation_key"]}
+    rows = read_registry_rows(registry_url, headers, record)
+    demand(isinstance(rows, list) and len(rows) <= 2, "REGISTRY_SCAN_INCOMPLETE")
     matches = [row for row in rows if row.get("source", {}).get("point_id") == expected["source"]["point_id"]
                or row.get("source", {}).get("generation_key") == expected["source"]["generation_key"]]
     demand(len(matches) == 1 and all(matches[0].get(key) == value for key, value in expected.items()),
@@ -260,27 +216,30 @@ def verify_registry_readback(headers, expected, url, profile_headers, source_sha
 def main():
     parser = argparse.ArgumentParser()
     modes = parser.add_mutually_exclusive_group(required=True)
-    modes.add_argument("--issue", action="store_true")
-    modes.add_argument("--upload", action="store_true")
     modes.add_argument("--verify-register", action="store_true")
-    parser.add_argument("--envelope", type=Path)
-    parser.add_argument("--image", type=Path)
-    parser.add_argument("--private-key", type=Path)
+    modes.add_argument("--registry-diagnostic", action="store_true")
+    parser.add_argument("--identity", type=Path, default=IDENTITY)
     args = parser.parse_args()
-    if args.issue:
-        demand(args.envelope is not None, "ENVELOPE_OUTPUT_REQUIRED")
-        return issue(args.envelope)
-    if args.upload:
-        demand(args.envelope and args.image and args.private_key, "UPLOAD_INPUTS_REQUIRED")
-        return upload(args.image, args.envelope, args.private_key)
-    return verify_register()
+    if args.registry_diagnostic:
+        return diagnose_registry(args.identity)
+    return verify_register(args.identity)
 
 
 if __name__ == "__main__":
     try:
         print(json.dumps(main(), separators=(",", ":")))
     except Exception as error:
-        code = (str(error) if isinstance(error, ValueError) and str(error).isupper()
+        code = ("REGISTRY_READ_FAILED" if isinstance(error, ValueError)
+                and str(error).startswith("REGISTRY_READ_FAILED_HTTP_") else
+                "REGISTRY_RECONCILE_FAILED" if isinstance(error, ValueError)
+                and str(error).startswith("REGISTRY_RECONCILE_FAILED_HTTP_") else
+                str(error) if isinstance(error, ValueError) and str(error).isupper()
                 and str(error).replace("_", "").isalnum() else "HANDOFF_UNEXPECTED_ERROR")
-        print(json.dumps({"status": "IMAGE_HANDOFF_REJECTED", "code": code}))
+        result = {"status": "IMAGE_HANDOFF_REJECTED", "code": code}
+        if isinstance(error, ValueError) and str(error).startswith(("REGISTRY_READ_FAILED_HTTP_",
+                                                                    "REGISTRY_RECONCILE_FAILED_HTTP_")):
+            prefix, response = str(error).split(":", 1)
+            result["http_status"] = int(prefix.rsplit("_", 1)[1])
+            result["response"] = response
+        print(json.dumps(result))
         raise SystemExit(1)
