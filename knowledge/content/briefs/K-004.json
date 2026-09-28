@@ -1,0 +1,106 @@
+{
+  "content_type": "BRIEF",
+  "topic_id": "community-emergency-resource-management",
+  "status": "READY",
+  "risk_level": "LOW",
+  "publication_policy": "AUTO_LOW_RISK",
+  "semantic_qa_status": "PASS",
+  "risk_domains": ["GENERAL_PREPAREDNESS"],
+  "source_checked_at": "2026-09-28",
+  "published_at": "2026-09-28",
+  "updated_at": "2026-09-28",
+  "guide_id": null,
+  "story_refs": ["afterfall-two-site-reserve"],
+  "ai_assisted": true,
+  "editorial_note": "PUBLIC_READER backfill을 바탕으로 작성한 검토 대기 초안입니다. 자동화 정책은 PR_ONLY이며 병합이나 공개 배포를 승인하지 않습니다.",
+  "id": "K-004",
+  "slug": "community-emergency-reserve-tracking",
+  "label": "공동체 비상재고",
+  "title": "공동체 비상 물자를 나눠 둘 때 무엇을 기록해야 할까",
+  "summary": "여러 거점을 운영하는 조직이 비상 물자를 배치하고 사용할 때, 책임자·사용 기준·위치·수량·보충 기록을 함께 정리하는 방법을 설명합니다.",
+  "meta_description": "FEMA NIMS 자원관리 안내와 생존일기 Reader 기록을 바탕으로 공동체 비상 물자의 배치와 사용, 추적, 보충 기준을 정리합니다.",
+  "lead": "공동 비상재고를 여러 장소에 둘 때는 분산 자체보다 누가 어디의 무엇을 관리하고, 어떤 기준으로 쓰며, 사용 뒤 어떻게 보충하는지 합의하는 일이 먼저입니다.",
+  "scope": "공동체·조직의 비상 물자 운영",
+  "basis": "FEMA NIMS Resource Management + 검증된 공개 Reader 장면",
+  "footer": "이 글은 일반적인 조직 운영 아이디어입니다. 공식 기관의 재난 대응 계획이나 지역별 지침을 대신하지 않습니다. 실제 재난 중에는 관할 당국의 안내를 따르세요.",
+  "sections": [
+    {
+      "heading": "먼저 공동재고의 역할과 사용 기준을 정합니다",
+      "blocks": [
+        {
+          "type": "prose",
+          "text": "FEMA의 NIMS 자원관리 안내는 조직이 대비 단계에서 필요한 자원을 식별하고, 계획하고, 확보·보관·목록화하도록 설명합니다. 재난 대응 중에는 필요한 자원을 요청하고 이동·추적하며, 대응 뒤에는 복구와 재비축을 관리합니다. 이는 미국의 조직 자원관리 체계이므로 한국의 의무나 표준으로 해석하면 안 됩니다."
+        },
+        {
+          "type": "ordered_list",
+          "items": [
+            "공동재고가 지원할 임무와 대상 거점을 적습니다.",
+            "평시 물자와 공동 비상분을 구분하고, 함께 결정할 사용 상황을 합의합니다.",
+            "각 거점의 보관 책임자와 재고 현황을 갱신할 담당자를 지정합니다.",
+            "사용·이동·폐기·보충 때 기록할 항목과 서로 알릴 방법을 정합니다."
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "위치별 재고와 이동 기록을 연결합니다",
+      "blocks": [
+        {
+          "type": "table",
+          "headers": ["기록 항목", "확인할 내용"],
+          "rows": [
+            ["품목·단위", "무엇을 어떤 단위로 세는지"],
+            ["보관 위치·담당자", "어느 거점에 있고 누가 확인하는지"],
+            ["수량·상태·점검일", "사용 가능 여부와 마지막 확인 시점"],
+            ["이동·사용 내역", "언제 어디로 옮기거나 사용했는지"],
+            ["보충 조치", "부족분을 누가 확인하고 언제 다시 채울지"]
+          ]
+        },
+        {
+          "type": "prose",
+          "text": "재고표는 각 장소의 현재 수량과 공동 합계를 함께 보여 주되, 이동할 때 원래 위치의 출고와 도착 위치의 입고를 같이 기록하면 장부가 실제 보관 상태와 어긋나는 일을 줄일 수 있습니다. 이 방식은 NIMS의 자원 목록화·추적·보충 절차를 작은 조직에 맞춰 편집한 제안입니다."
+        }
+      ]
+    },
+    {
+      "heading": "분산 여부와 비율은 현장 조건에 맞춥니다",
+      "blocks": [
+        {
+          "type": "prose",
+          "text": "Reader 장면에서는 두 거점의 역할을 나누고 일부 공동 비상재고를 지정해 두 곳에 배치합니다. 이 장면은 이야기 속 결정이지 현실의 정답이나 권장 비율은 아닙니다. 실제 조직은 위험, 이동 경로, 보관 환경, 접근 권한, 관리 인력과 보충 가능성을 함께 살펴 각 장소의 역할을 정해야 합니다."
+        },
+        {
+          "type": "note",
+          "text": "이 글은 가정용 비상키트의 수량·구성·보관 장소를 새로 권고하지 않습니다. 의료품이나 위험물의 취급은 해당 품목과 관할 기관의 지침을 따르세요."
+        }
+      ]
+    },
+    {
+      "heading": "《생존일기》에서 시작한 질문",
+      "blocks": [
+        {
+          "type": "prose",
+          "text": "C03-AFTERFALL의 ‘정식 연합체’ 장면에서 두 거점은 생산·후방 복원 역할을 구분하고 공동 비상재고를 별도 지정합니다. 이 결정에서 공동체가 비상 물자를 여러 장소에 둘 때 사용 기준과 책임, 재고 이동을 어떻게 연결할지 질문을 가져왔습니다."
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "U.S. Fire Administration · NIMS: Resource Management",
+      "url": "https://www.usfa.fema.gov/a-z/nims/resource-management.html",
+      "note": "조직의 대비 단계 자원 식별·계획·확보·보관·목록화, incident 중 추적과 이후 재비축 및 상호지원 원칙을 확인했습니다. 미국 NIMS 문맥으로 한정했습니다.",
+      "checked_at": "2026-09-28"
+    },
+    {
+      "id": "S2",
+      "title": "생존일기 Reader · C03-AFTERFALL ‘정식 연합체’",
+      "url": "https://survival-diary-archive.netlify.app/?view=story&chronicle=C03-AFTERFALL&chapter=c03-afterfall-chapter-02",
+      "note": "검증된 공개 Reader chapter의 두 거점 역할 구분과 공동 비상재고 장면을 확인했습니다. 허구 세계의 설정이며 현실 권고 근거로 사용하지 않았습니다.",
+      "checked_at": "2026-09-28"
+    }
+  ],
+  "related_brief_ids": [],
+  "tools": []
+}
