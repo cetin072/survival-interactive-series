@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "active_provider": "CHATGPT_SCHEDULED",
+  "providers": {
+    "CHATGPT_SCHEDULED": {
+      "enabled": true,
+      "kind": "CHATGPT_AUTOMATION",
+      "requires_secret": false
+    },
+    "OPENAI_API": {
+      "enabled": false,
+      "kind": "HTTP_LLM_API",
+      "requires_secret": true,
+      "secret_env": "OPENAI_API_KEY"
+    },
+    "OTHER_LLM_API": {
+      "enabled": false,
+      "kind": "HTTP_LLM_API",
+      "requires_secret": true,
+      "secret_env": "KNOWLEDGE_LLM_API_KEY"
+    }
+  },
+  "contracts": {
+    "job": "KNOWLEDGE_WORKER_JOB_V1",
+    "result": "KNOWLEDGE_WORKER_RESULT_V1",
+    "provider_must_not_bypass_repository_gate": true
+  }
+}
