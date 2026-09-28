@@ -9,6 +9,7 @@ on:
       - 'archive/automation/**'
       - '.github/workflows/archive-web.yml'
       - '.github/workflows/archive-daily.yml'
+      - '.github/workflows/archive-production-release.yml'
   push:
     branches:
       - main
@@ -19,6 +20,7 @@ on:
       - 'archive/automation/**'
       - '.github/workflows/archive-web.yml'
       - '.github/workflows/archive-daily.yml'
+      - '.github/workflows/archive-production-release.yml'
 
 jobs:
   build:
@@ -55,6 +57,8 @@ jobs:
         run: node --test ../scripts/lib/archive-daily-core.test.mjs
       - name: Test exact Netlify production deploy identity
         run: node --test ../scripts/lib/netlify-production.test.mjs
+      - name: Test batched Production release policy
+        run: node --test ../scripts/lib/production-release.test.mjs
       - name: Verify real Reader roundtrip and isolated new-RAW publication
         run: node ../scripts/check-reader-batch.mjs
       - name: Test public graph reconciliation and atomic persistence
