@@ -10,6 +10,7 @@ import { loadKnowledge, validateKnowledge, publicationEligibility, root } from '
 import { checkContentOnly, checkRelease, verifyProductionPublication } from './knowledge-release.mjs'
 import { planWorkerRun, validateProviderConfig, validateWorkerPolicy } from './knowledge-worker-config.mjs'
 import { assertReleaseReady, expectedReleaseDecision, promoteBriefRecord } from './knowledge-publish.mjs'
+import { isExactProductionDeployMeta } from './knowledge-production.mjs'
 
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex')
 const manifestRef = 'archive/content/transcripts/C03-AFTERFALL/S99/SESSION_001/SOURCE_MANIFEST.json'
@@ -528,4 +529,34 @@ test('worker publication policy requires exact-head and exact Production verific
     ...policy,
     publication_policy: { ...policy.publication_policy, production_publish: false },
   }), /Production publish must match publication mode/)
+})
+
+
+test('tokenless Production metadata requires Netlify production and exact merge SHA', () => {
+  const sha = 'a'.repeat(40)
+  assert.equal(isExactProductionDeployMeta({
+    version: 1,
+    provider: 'netlify',
+    context: 'production',
+    commit_ref: sha,
+  }, sha), true)
+  assert.equal(isExactProductionDeployMeta({
+    version: 1,
+    provider: 'netlify',
+    context: 'deploy-preview',
+    commit_ref: sha,
+  }, sha), false)
+  assert.equal(isExactProductionDeployMeta({
+    version: 1,
+    provider: 'github-actions',
+    context: 'production',
+    commit_ref: sha,
+  }, sha), false)
+  assert.equal(isExactProductionDeployMeta({
+    version: 1,
+    provider: 'netlify',
+    context: 'production',
+    commit_ref: 'b'.repeat(40),
+  }, sha), false)
+  assert.equal(isExactProductionDeployMeta(null, sha), false)
 })
