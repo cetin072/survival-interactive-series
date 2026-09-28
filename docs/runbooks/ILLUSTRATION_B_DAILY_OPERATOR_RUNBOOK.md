@@ -33,7 +33,8 @@
 ## Batch publication과 배포
 
 - 각 대상의 E2E가 모두 통과한 뒤 파생 PNG, SITE_ASSETS.json, 최소한의 검증 변경만 publication PR 한 개에 포함합니다.
-- PR CI와 Preview에서 모든 asset 경로, 원본 4개 이미지 보존, 신규 수량 증가를 확인합니다.
+- PR CI와 Deploy Preview에서 모든 asset 경로, 원본 4개 이미지 보존, 신규 수량 증가를 확인합니다.
+- archive/web 또는 archive/content가 바뀌는 PR에는 [skip netlify]를 붙이지 않습니다. Browser CI가 같은 PR의 Deploy Preview asset fingerprint와 동작을 확인합니다.
 - 승인된 batch PR만 병합합니다. 기존 이미지 경로가 깨지거나 대상/해시가 다르면 공개하지 않습니다.
 - Production 배포는 #217의 2일 batch release만 사용합니다. 개별 수동 배포를 반복하지 않습니다.
 
