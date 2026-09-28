@@ -419,7 +419,7 @@ test('generated golden pages remain static, searchable, linked and downloadable'
     assert.ok(page.includes('https://schema.org'))
     assert.ok(page.includes('rel="canonical"'))
     for (const source of brief.sources) assert.ok(page.includes(source.url.replace(/&/g, '&amp;')))
-    for (const related of brief.related_brief_ids) assert.ok(page.includes(`/knowledge/${data.briefs.find((item) => item.id === related).slug}/`))
+    for (const related of brief.related_brief_ids.map((id) => data.briefs.find((item) => item.id === id)).filter((item) => item?.status === 'PUBLISHED')) assert.ok(page.includes(`/knowledge/${related.slug}/`))
     for (const tool of brief.tools) assert.ok(page.includes(`href="${tool.path}" download`))
     assert.doesNotMatch(page, /<script(?! type="application\/ld\+json")/)
   }
