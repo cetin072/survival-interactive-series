@@ -30,7 +30,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install pinned PNG validator
-        run: python -m pip install --only-binary=:all: Pillow==12.3.0
+        run: 'python -m pip install --only-binary=:all: Pillow==12.3.0'
       - name: Execute exactly one newly-added trusted request
         env:
           BEFORE_SHA: ${{ github.event.before }}
