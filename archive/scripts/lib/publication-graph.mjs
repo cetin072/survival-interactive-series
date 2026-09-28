@@ -83,6 +83,21 @@ function validatePrevious(previous) {
   for (const r of previous.relations) { record(r, false, nodes); demand(!edges.has(r.id) && compare(r.anchor, previous.anchor) <= 0, 'INVALID_PRIOR_RELATION'); edges.add(r.id) }
   // Derived views are rebuilt below, not trusted or spread into the next graph.
 }
+
+/** Advance Reader links from verified public prose without promoting new durable facts. */
+export function reconcileReaderOnlyGraph({ previous, book, bookSource, boundary }) {
+  validatePrevious(previous)
+  anchor(boundary)
+  demand(compare(boundary, previous.anchor) >= 0, 'STALE_READER_GRAPH')
+  const derived = views(previous.nodes, previous.relations, book, bookSource, boundary)
+  const body = { version: 'archive-graph-v1', ...ns, anchor: { ...boundary },
+    nodes: structuredClone(previous.nodes), relations: structuredClone(previous.relations),
+    story_links: derived.story_links, articles: derived.articles }
+  const graph = { ...body, content_sha256: graphHash(body) }
+  return { graph, report: { nodes_added: 0, nodes_updated: 0, relations_added: 0,
+    relations_updated: 0, story_links: graph.story_links.length,
+    status: graph.content_sha256 === previous.content_sha256 ? 'NOOP' : 'READER_LINKS_RECONCILED' } }
+}
 function aliases(nodes) {
   const result = new Map()
   for (const { data } of nodes) {

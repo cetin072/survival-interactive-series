@@ -1,0 +1,54 @@
+name: AFTERFALL daily Archive
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 19:30 UTC is 04:30 KST on the following day.
+    - cron: '30 19 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: archive-daily
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify required credentials exist
+        env:
+          EXPORT_URL: ${{ secrets.ARCHIVE_EXPORT_DATABASE_URL }}
+          PROPOSAL_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+        run: |
+          if [ -z "$EXPORT_URL" ] || [ -z "$PROPOSAL_TOKEN" ]; then
+            echo 'BLOCKER_SECRET_SETUP_REQUIRED: ARCHIVE_EXPORT_DATABASE_URL and ARCHIVE_GITHUB_TOKEN'
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # A dedicated token makes proposal pushes trigger CI and permits PR creation.
+          token: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            archive/scripts/package-lock.json
+            archive/web/package-lock.json
+      - name: Install restricted source reader
+        run: npm ci --prefix archive/scripts
+      - name: Verify main baseline
+        run: |
+          git fetch origin main
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+      - name: One daily Archive cycle
+        env:
+          ARCHIVE_EXPORT_DATABASE_URL: ${{ secrets.ARCHIVE_EXPORT_DATABASE_URL }}
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: node archive/scripts/run-daily-archive.mjs --apply

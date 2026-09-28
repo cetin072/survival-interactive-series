@@ -1,0 +1,73 @@
+name: Verify Archive exporter database contract
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/tests/archive_exporter_readonly_verification.sql'
+      - '.github/workflows/archive-exporter-migration.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/tests/archive_exporter_readonly_verification.sql'
+      - '.github/workflows/archive-exporter-migration.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  exporter-migration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+      - name: Create Supabase role and schema prerequisites
+        run: |
+          psql -v ON_ERROR_STOP=1 -c 'CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE ROLE service_role NOLOGIN BYPASSRLS; CREATE SCHEMA extensions; CREATE SCHEMA survival_rpg; CREATE EXTENSION pgcrypto WITH SCHEMA extensions;'
+      - name: Apply tracked transcript capture migrations
+        run: |
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260924173125_rolling_raw_capture_v1.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260925003736_public_transcript_capture_session_api_v1.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260925044647_public_transcript_turn_pair_api_v1.sql
+      - name: Create the test-only state-link table present in the connected project
+        run: |
+          psql -v ON_ERROR_STOP=1 -c 'CREATE TABLE survival_rpg.transcript_turn_state_links (
+            worldline_id text NOT NULL,
+            chronicle_id text NOT NULL,
+            season_id text NOT NULL,
+            session_id uuid NOT NULL,
+            turn_no integer NOT NULL,
+            user_message_id uuid NOT NULL REFERENCES survival_rpg.transcript_messages(id),
+            gm_message_id uuid NOT NULL REFERENCES survival_rpg.transcript_messages(id),
+            outcome text NOT NULL,
+            user_save_version integer NOT NULL,
+            gm_save_version integer NOT NULL,
+            linked_save_version integer NOT NULL,
+            recorded_at timestamptz NOT NULL DEFAULT now()
+          )'
+      - name: Apply exporter privileges and policies
+        run: psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260928050000_archive_exporter_readonly.sql
+      - name: Verify exporter grants, RLS scope, optional links, and denied writes
+        run: psql -v ON_ERROR_STOP=1 --file supabase/tests/archive_exporter_readonly_verification.sql
