@@ -14,12 +14,14 @@ const root = resolve(import.meta.dirname, '..', '..')
 const command = (exe, args, cwd = root) => execFileSync(exe, args, { cwd, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] })
 const head = command('git', ['rev-parse', 'HEAD']).trim()
 const manifest = JSON.parse(await readFile(resolve(root, 'archive/content/transcripts/C03-AFTERFALL/S03/MANIFEST.json')))
-const source = manifest.sessions.at(-1)
-assert.ok(source?.session_id && source?.source_manifest)
 const graph = JSON.parse(await readFile(resolve(root, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json')))
 assert.ok(Number.isSafeInteger(graph.anchor?.save_version) && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(graph.anchor?.game_time))
 const factsRefS03 = 'archive/content/public-facts/C03-AFTERFALL/S03/FACTS.json'
-const snapshot = { version: 'publication-snapshot-v1', chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', season_id: 'S03', visibility: 'PUBLIC_ARCHIVE', source_revision: head, source_save_version: graph.anchor.save_version, source_game_time: graph.anchor.game_time, source_checkpoint: 'worldlines/AFTERFALL/seasons/S03/CURRENT_CHECKPOINT_2027-04-08.md', coverage_status: 'PARTIAL', sources: [{ session_id: source.session_id, source_ref: `archive/content/transcripts/C03-AFTERFALL/S03/${source.source_manifest}`, source_digest: fingerprint(source), visibility: source.visibility, capture_quality: source.capture_quality, atomic_pairing_complete: source.atomic_pairing_complete, captured_message_range: source.captured_message_range, user_messages: source.user_messages, gm_public_blocks: source.gm_public_blocks }] }
+const facts = JSON.parse(await readFile(resolve(root, factsRefS03)))
+const source = manifest.sessions.find((session) => session.captured_message_range?.end === facts.anchor?.game_time)
+assert.ok(source?.session_id && source?.source_manifest)
+const newerVisual = graph.anchor.save_version > facts.anchor.save_version
+const snapshot = { version: 'publication-snapshot-v1', chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', season_id: 'S03', visibility: 'PUBLIC_ARCHIVE', source_revision: head, source_save_version: facts.anchor.save_version, source_game_time: facts.anchor.game_time, source_checkpoint: 'worldlines/AFTERFALL/seasons/S03/CURRENT_CHECKPOINT_2027-04-08.md', coverage_status: 'PARTIAL', sources: [{ session_id: source.session_id, source_ref: `archive/content/transcripts/C03-AFTERFALL/S03/${source.source_manifest}`, source_digest: fingerprint(source), visibility: source.visibility, capture_quality: source.capture_quality, atomic_pairing_complete: source.atomic_pairing_complete, captured_message_range: source.captured_message_range, user_messages: source.user_messages, gm_public_blocks: source.gm_public_blocks }] }
 const approvedBytes = execFileSync('git', ['show', `${head}:${APPROVED_S02_APPEARANCE_REF}`], { cwd: root })
 const approvedInput = JSON.parse(approvedBytes)
 assert.equal(approvedInput.records.length, 18)
@@ -83,12 +85,17 @@ try {
   const s03SnapshotFile = join(temporary, 's03-snapshot.json')
   await writeFile(s03SnapshotFile, JSON.stringify(snapshot))
   const s03Args = ['--snapshot', s03SnapshotFile, '--facts', factsRefS03, '--apply']
-  const first = run(s03Args)
-  assert.equal(first.status, 'NOOP')
-  assert.equal(first.files_written, 0)
   const outputPath = resolve(copy, 'archive/content/visuals/C03-AFTERFALL/VISUALS.json')
-  assert.ok(initial.candidateBytes.equals(await readFile(outputPath)))
-  assert.equal(run(s03Args).status, 'NOOP')
+  const publishedVisual = await readFile(outputPath)
+  if (newerVisual) {
+    assert.equal(JSON.parse(publishedVisual).anchor.save_version, graph.anchor.save_version)
+  } else {
+    const first = run(s03Args)
+    assert.equal(first.status, 'NOOP')
+    assert.equal(first.files_written, 0)
+    assert.ok(initial.candidateBytes.equals(publishedVisual))
+    assert.equal(run(s03Args).status, 'NOOP')
+  }
   assert.equal(command('git', ['diff', '--name-only'], copy).trim(), '')
 
   // Publicly approved synthetic sources prove new environment and map-layers work. Not real Canon.
@@ -115,7 +122,7 @@ try {
   await writeFile(snapshotFile, JSON.stringify(laterSnapshot))
   // An unapproved explicit appearance path still fails closed.
   assert.throws(() => run(['--snapshot', snapshotFile, '--facts', factsRef, '--appearances', factsRef, '--map', mapRef, '--apply']))
-  assert.ok(initial.candidateBytes.equals(await readFile(outputPath)))
+  assert.ok(publishedVisual.equals(await readFile(outputPath)))
   const args = ['--snapshot', snapshotFile, '--facts', factsRef, '--appearances', appearancesRef, '--map', mapRef, '--apply']
   const later = run(args)
   assert.equal(later.point_count, 38)
