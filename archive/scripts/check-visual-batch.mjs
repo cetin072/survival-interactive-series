@@ -13,9 +13,13 @@ import { characterAppearanceByNodeId } from '../web/src/archive/characterAppeara
 const root = resolve(import.meta.dirname, '..', '..')
 const command = (exe, args, cwd = root) => execFileSync(exe, args, { cwd, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] })
 const head = command('git', ['rev-parse', 'HEAD']).trim()
-const source = JSON.parse(await readFile(resolve(root, 'archive/content/transcripts/C03-AFTERFALL/S03/MANIFEST.json'))).sessions[0]
+const manifest = JSON.parse(await readFile(resolve(root, 'archive/content/transcripts/C03-AFTERFALL/S03/MANIFEST.json')))
+const source = manifest.sessions.at(-1)
+assert.ok(source?.session_id && source?.source_manifest)
+const graph = JSON.parse(await readFile(resolve(root, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json')))
+assert.ok(Number.isSafeInteger(graph.anchor?.save_version) && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(graph.anchor?.game_time))
 const factsRefS03 = 'archive/content/public-facts/C03-AFTERFALL/S03/FACTS.json'
-const snapshot = { version: 'publication-snapshot-v1', chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', season_id: 'S03', visibility: 'PUBLIC_ARCHIVE', source_revision: head, source_save_version: 258, source_game_time: '2027-04-11 17:20', source_checkpoint: 'worldlines/AFTERFALL/seasons/S03/CURRENT_CHECKPOINT_2027-04-08.md', coverage_status: 'PARTIAL', sources: [{ session_id: source.session_id, source_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_001/SOURCE_MANIFEST.json', source_digest: fingerprint(source), visibility: source.visibility, capture_quality: source.capture_quality, atomic_pairing_complete: source.atomic_pairing_complete, captured_message_range: source.captured_message_range, user_messages: source.user_messages, gm_public_blocks: source.gm_public_blocks }] }
+const snapshot = { version: 'publication-snapshot-v1', chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', season_id: 'S03', visibility: 'PUBLIC_ARCHIVE', source_revision: head, source_save_version: graph.anchor.save_version, source_game_time: graph.anchor.game_time, source_checkpoint: 'worldlines/AFTERFALL/seasons/S03/CURRENT_CHECKPOINT_2027-04-08.md', coverage_status: 'PARTIAL', sources: [{ session_id: source.session_id, source_ref: `archive/content/transcripts/C03-AFTERFALL/S03/${source.source_manifest}`, source_digest: fingerprint(source), visibility: source.visibility, capture_quality: source.capture_quality, atomic_pairing_complete: source.atomic_pairing_complete, captured_message_range: source.captured_message_range, user_messages: source.user_messages, gm_public_blocks: source.gm_public_blocks }] }
 const approvedBytes = execFileSync('git', ['show', `${head}:${APPROVED_S02_APPEARANCE_REF}`], { cwd: root })
 const approvedInput = JSON.parse(approvedBytes)
 assert.equal(approvedInput.records.length, 18)
