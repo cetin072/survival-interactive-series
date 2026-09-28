@@ -54,6 +54,7 @@
   "accepted_review": {
     "vegetation": "NONE_OBSERVED",
     "surface": "DRY_MATTE",
-    "style": "PAINTERLY_AFTERFALL_ARCHIVE_V1"
+    "style": "PAINTERLY_AFTERFALL_ARCHIVE_V1",
+    "reference_style_asset_subject_id": "loc-guild-rear-warehouse"
   }
 }
