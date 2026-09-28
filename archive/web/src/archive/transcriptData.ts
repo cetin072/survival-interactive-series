@@ -152,12 +152,14 @@ if (c03S03Sessions.size !== c03S03SessionEntries.length) {
 
 function c03S03DisplayRange(session: C03S03Session) {
   const captured = session.captured_message_range
-  const order = session.source_message_order
+  const minOrder = session.source_message_order?.min
+  const maxOrder = session.source_message_order?.max
   if (!captured?.start || !captured.end
-    || !Number.isSafeInteger(order?.min) || !Number.isSafeInteger(order?.max)) {
+    || typeof minOrder !== 'number' || !Number.isSafeInteger(minOrder)
+    || typeof maxOrder !== 'number' || !Number.isSafeInteger(maxOrder)) {
     throw new Error('C03 S03 Archive session has incomplete range metadata: ' + session.session_id)
   }
-  return `${captured.start} → ${captured.end} · 원본 순서 ${order.min}–${order.max}`
+  return `${captured.start} → ${captured.end} · 원본 순서 ${minOrder}–${maxOrder}`
 }
 
 const c03S03TranscriptParts: TranscriptPart[] = Object.entries(c03S03Raw)
