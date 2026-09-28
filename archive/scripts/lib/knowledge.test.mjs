@@ -430,11 +430,15 @@ test('generated golden pages remain static, searchable, linked and downloadable'
 })
 
 
-test('worker V2 dispatcher prefers FRESH and uses one daily BACKFILL window', async () => {
+test('worker V2 dispatcher prefers FRESH on twice-daily cadence and uses one daily BACKFILL window', async () => {
   const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
   const providerConfig = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
   assert.equal(validateWorkerPolicy(policy), true)
   assert.equal(validateProviderConfig(providerConfig), true)
+  assert.equal(policy.dispatcher.trigger_interval_hours, 12)
+  assert.equal(policy.editorial_spec_ref, 'docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V1.md')
+  assert.equal(policy.research_policy.minimum_authoritative_sources_per_brief, 2)
+  assert.equal(policy.research_policy.preferred_authoritative_sources_per_brief, 3)
 
   const pending = [{ source_manifest_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_999/SOURCE_MANIFEST.json' }]
   assert.equal(planWorkerRun({ policy, providerConfig, pendingSources: pending, openWorkerPr: false, localHour: 6 }).decision, 'FRESH')
@@ -559,4 +563,21 @@ test('tokenless Production metadata requires Netlify production and exact merge 
     commit_ref: 'b'.repeat(40),
   }, sha), false)
   assert.equal(isExactProductionDeployMeta(null, sha), false)
+})
+
+
+test('editorial policy reference and quality target fail closed', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  assert.throws(() => validateWorkerPolicy({
+    ...policy,
+    editorial_spec_ref: 'docs/WRONG.md',
+  }), /editorial spec ref/)
+  assert.throws(() => validateWorkerPolicy({
+    ...policy,
+    research_policy: { ...policy.research_policy, preferred_authoritative_sources_per_brief: 1 },
+  }), /preferred authoritative sources/)
+  assert.throws(() => validateWorkerPolicy({
+    ...policy,
+    dispatcher: { ...policy.dispatcher, trigger_interval_hours: 6 },
+  }), /dispatcher trigger interval must be 12 hours/)
 })

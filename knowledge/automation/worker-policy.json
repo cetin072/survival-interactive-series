@@ -3,7 +3,7 @@
   "worker_enabled": true,
   "provider_config_ref": "knowledge/automation/provider-config.json",
   "dispatcher": {
-    "trigger_interval_hours": 6,
+    "trigger_interval_hours": 12,
     "timezone": "Asia/Seoul",
     "fresh_priority": true,
     "max_sources_per_run": 1,
@@ -43,7 +43,8 @@
     "story_source_is_narrative_provenance_only": true,
     "authoritative_external_source_required_for_reality_claims": true,
     "minimum_authoritative_sources_per_brief": 2,
-    "record_context_limitations_conflicts_unknowns": true
+    "record_context_limitations_conflicts_unknowns": true,
+    "preferred_authoritative_sources_per_brief": 3
   },
   "publication_policy": {
     "required_repository_mode": "AUTO_LOW_RISK",
@@ -71,5 +72,6 @@
       "ORDINARY_HOLD",
       "OPEN_WORKER_PR_EXISTS"
     ]
-  }
+  },
+  "editorial_spec_ref": "docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V1.md"
 }
