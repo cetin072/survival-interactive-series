@@ -184,7 +184,7 @@ jobs:
           RELEASE_ID: ${{ steps.handoff_request.outputs.release_id }}
           SOURCE_COMMIT: ${{ steps.handoff_request.outputs.source_commit }}
           IDENTITY_PATH: ${{ steps.handoff_request.outputs.identity_path }}
-          TAG_NAME: codex-private-image-loc-baekun-fb2d1d9664f8-325913999ae7
+          TAG_NAME: ${{ steps.handoff_prepare.outputs.tag_name }}
         run: >-
           python archive/scripts/draft_release_illustration_handoff.py
           --cleanup --release-id "$RELEASE_ID"
