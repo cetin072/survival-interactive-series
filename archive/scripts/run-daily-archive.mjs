@@ -175,7 +175,7 @@ function gates() {
   run('npm', ['run', 'build'], absolute('archive/web'))
 }
 
-function proposal({ discovery, candidate, base }) {
+function proposal({ discovery, candidate, base, mode }) {
   insist(git('rev-parse', 'origin/main') === base, 'STALE_BASE_HUMAN_REVIEW_REQUIRED')
   const digest = candidate.source.segmentId.slice(8, 20)
   const branch = `codex/archive-daily-${discovery.startOrder}-${discovery.endOrder}-${digest}`
@@ -190,7 +190,7 @@ function proposal({ discovery, candidate, base }) {
   git('push', 'origin', `HEAD:refs/heads/${branch}`)
   const existing = JSON.parse(gh('pr', 'list', '--repo', 'cetin072/survival-interactive-series',
     '--head', branch, '--state', 'open', '--json', 'number,url'))
-  const body = `Source session: ${DAILY_SOURCE_SESSION}\nSource orders: ${discovery.startOrder}-${discovery.endOrder}\nPairs: ${discovery.pairs}\nRAW segments: 1\nReader chapters added: ${candidate.additions.length}\nGraph facts added: ${candidate.graphReport.nodes_added}; Reader links: ${candidate.graphReport.story_links}\nVisual points: ${candidate.catalog.points.length}\nReplay: same published range is NOOP after merge\nMode: SHADOW until acceptance; Production auto merge disabled.\n`
+  const body = `Source session: ${DAILY_SOURCE_SESSION}\nSource orders: ${discovery.startOrder}-${discovery.endOrder}\nPairs: ${discovery.pairs}\nRAW segments: 1\nReader chapters added: ${candidate.additions.length}\nGraph facts added: ${candidate.graphReport.nodes_added}; Reader links: ${candidate.graphReport.story_links}\nVisual points: ${candidate.catalog.points.length}\nReplay: same published range is NOOP after merge\nMode: ${mode}.\n`
   let pr = existing[0]
   if (!pr) {
     const bodyFile = join(tmpdir(), `archive-daily-pr-${randomUUID()}.md`)
@@ -213,6 +213,26 @@ function priorProposal(discovery) {
   if (open.length) return { branch, pr: open[0].url, commit: open[0].headRefOid, status: 'EXISTING_PROPOSAL_NOOP' }
   insist(!git('ls-remote', '--heads', 'origin', branch), 'ORPHAN_BRANCH_HUMAN_REVIEW_REQUIRED')
   return null
+}
+
+async function verifyExistingProposal(existing, candidate, base) {
+  const info = JSON.parse(gh('pr', 'view', existing.pr, '--repo', 'cetin072/survival-interactive-series',
+    '--json', 'headRefName,headRefOid,baseRefName,baseRefOid,state'))
+  insist(info.state === 'OPEN' && info.headRefName === existing.branch
+    && info.headRefOid === existing.commit && info.baseRefName === 'main'
+    && info.baseRefOid === base, 'EXISTING_PROPOSAL_CHANGED')
+  git('fetch', 'origin', `refs/heads/${existing.branch}`)
+  insist(git('rev-parse', 'FETCH_HEAD') === existing.commit, 'EXISTING_PROPOSAL_CHANGED')
+  const allowed = new Set([`${seasonRoot}/MANIFEST.json`, `${candidate.prefix}/PART_001.md`,
+    `${candidate.prefix}/SOURCE_MANIFEST.json`, bookRef, graphRef, visualRef])
+  const changed = git('diff', '--name-only', base, existing.commit).split('\n').filter(Boolean)
+  insist(changed.length >= 4 && changed.every((ref) => allowed.has(ref)), 'EXISTING_PROPOSAL_OWNERSHIP_VIOLATION')
+  for (const ref of allowed) {
+    const committed = execFileSync('git', ['show', `${existing.commit}:${ref}`],
+      { cwd: root, maxBuffer: 4_000_000, stdio: ['ignore', 'pipe', 'pipe'] })
+    const expected = await readFile(absolute(ref))
+    insist(committed.equals(expected), 'EXISTING_PROPOSAL_SOURCE_MISMATCH')
+  }
 }
 
 function previewGate(pr, expectedHead, expectedBase) {
@@ -294,15 +314,17 @@ export async function runDaily(args) {
   insist(git('status', '--porcelain') === '', 'DIRTY_WORKTREE_HUMAN_REVIEW_REQUIRED')
   insist(base === git('rev-parse', 'origin/main'), 'STALE_BASE_HUMAN_REVIEW_REQUIRED')
   const existing = priorProposal(live.discovery)
-  if (existing) return { ...summary, ...existing }
+  if (existing && mode === 'SHADOW') return { ...summary, ...existing }
   const candidate = await compileCandidate(state, live)
   gates()
-  const result = proposal({ discovery: live.discovery, candidate, base })
+  if (existing) await verifyExistingProposal(existing, candidate, base)
+  const result = existing ?? proposal({ discovery: live.discovery, candidate, base, mode })
   const publication = mode === 'AUTO' ? await autoPublish(result, candidate, base)
     : { status: 'SHADOW_PROPOSAL', would_auto_publish: true }
-  return { ...summary, ...publication, ...result,
+  return { ...summary, ...result, ...publication,
     raw_segment_sha256: sha(candidate.source.part), reader_chapters_added: candidate.additions.length,
-    graph_facts_added: 0, visual_points: candidate.catalog.points.length,
+    graph_facts_added: candidate.graphReport.nodes_added + candidate.graphReport.relations_added,
+    visual_points: candidate.catalog.points.length,
     auto_mode_enabled: mode === 'AUTO' }
 }
 

@@ -40,9 +40,25 @@ test('incomplete trailing USER is withheld; unsafe and hash-invalid rows fail cl
   const trailing = row(52, 'USER', 22)
   assert.equal(discoverCompletePairs({ ...session, last_message_order: 52 }, [...complete, trailing], 50).endOrder, 51)
   assert.equal(discoverCompletePairs({ ...session, last_message_order: 50 }, [complete[0]], 50).status, 'NO_NEW_SOURCE')
+  assert.equal(discoverCompletePairs({ ...session, last_message_order: 52 },
+    [...complete, { ...trailing, public_safe: false, content_sha256: 'pending' }], 50).endOrder, 51)
   assert.throws(() => discoverCompletePairs(session, [{ ...complete[0], public_safe: false }, complete[1]], 50))
   assert.throws(() => discoverCompletePairs(session, [{ ...complete[0], content: 'changed' }, complete[1]], 50))
   assert.throws(() => discoverCompletePairs(session, [complete[0]], 50))
+})
+
+test('optional state links must identify both exact pair messages and versions', () => {
+  const rows = [row(50, 'USER', 21), row(51, 'GM', 21)]
+  const discovery = discoverCompletePairs(session, rows, 50)
+  const link = { turn_no: 21, user_message_id: rows[0].id, gm_message_id: rows[1].id,
+    user_save_version: 50, gm_save_version: 51, linked_save_version: 51, outcome: 'APPLIED' }
+  const args = { session, discovery, sessionId: 'SESSION_002',
+    sealedAt: '2026-09-28T00:00:00.000Z' }
+  assert.equal(materializeSegment({ ...args, links: [link] }).source.content_sha256[1].state_link.outcome, 'APPLIED')
+  assert.throws(() => materializeSegment({ ...args, links: [{ ...link, user_message_id: rows[1].id }] }),
+    /INVALID_OPTIONAL_STATE_LINK/)
+  assert.throws(() => materializeSegment({ ...args, links: [{ ...link, user_save_version: 49 }] }),
+    /INVALID_OPTIONAL_STATE_LINK/)
 })
 
 test('replay of a published range advances the GitHub watermark and becomes NOOP', () => {

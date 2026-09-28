@@ -46,6 +46,14 @@ export function discoverCompletePairs(session, rows, nextOrder) {
   const selected = []
   for (const [index, row] of rows.entries()) {
     const order = nextOrder + index
+    // A lone USER at the live tail is not yet a publishable pair. Its content
+    // may still be edited before the GM reply, so only check its identity.
+    if (index % 2 === 0 && index === rows.length - 1) {
+      requireThat(row.message_order === order && row.session_id === sourceId
+        && row.worldline_id === 'AFTERFALL' && row.chronicle_id === 'C03'
+        && row.season_id === 'S03' && row.role === 'USER', 'SOURCE_RANGE_GAP_OR_TOO_LARGE')
+      break
+    }
     requireThat(row.message_order === order && row.session_id === sourceId
       && row.worldline_id === 'AFTERFALL' && row.chronicle_id === 'C03'
       && row.season_id === 'S03' && row.role === (index % 2 ? 'GM' : 'USER')
@@ -60,7 +68,6 @@ export function discoverCompletePairs(session, rows, nextOrder) {
       requireThat(row.turn_no === rows[index - 1].turn_no
         && (index === 1 || row.turn_no === rows[index - 2].turn_no + 1), 'SOURCE_TURN_PAIR_MISMATCH')
     }
-    if (index % 2 === 0 && index === rows.length - 1) break // Incomplete USER tail stays unpublished.
     selected.push(row)
   }
   if (!selected.length) return { status: 'NO_NEW_SOURCE', rows: [] }
@@ -74,8 +81,11 @@ export function materializeSegment({ session, discovery, sessionId, links = [], 
   const rows = discovery.rows, start = discovery.startOrder, end = discovery.endOrder
   const linked = new Map(links.map((item) => [item.turn_no, item]))
   requireThat(linked.size === links.length && links.every((link) => {
-    const pair = rows.find((row) => row.turn_no === link.turn_no && row.role === 'GM')
-    return pair && link.gm_message_id === pair.id && link.linked_save_version === pair.save_version
+    const gm = rows.find((row) => row.turn_no === link.turn_no && row.role === 'GM')
+    const user = rows.find((row) => row.turn_no === link.turn_no && row.role === 'USER')
+    return gm && user && link.user_message_id === user.id && link.gm_message_id === gm.id
+      && link.user_save_version === user.save_version && link.gm_save_version === gm.save_version
+      && link.linked_save_version === gm.save_version
   }), 'INVALID_OPTIONAL_STATE_LINK')
   const blocks = rows.map((row, index) => `## ${row.role} ${String(index).padStart(3, '0')}\n\n${row.content}`)
   const preface = `# Chronicle 03 / AFTERFALL / S03 — daily RAW ${sessionId}\n\nSource session UUID: \`${sourceId}\` (${session.status} at capture).\nOriginal message orders: **${start}–${end}**. Archive labels 000–${String(rows.length - 1).padStart(3, '0')} map to those orders in SOURCE_MANIFEST.json.\nContent below is verbatim from public_safe USER/GM rows; headers and this note are archive metadata.\n\n`
