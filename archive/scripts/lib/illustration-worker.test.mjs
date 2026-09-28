@@ -1,5 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
@@ -298,17 +299,45 @@ test('daily summary is a receipt projection and does not create empty run histor
   })
 })
 
-test('preserves the three real published images and the siteVisualFor path contract', async () => {
+test('preserves three approved images and validates the warehouse site asset contract', async () => {
   const root = resolve(fileURLToPath(new URL('../../..', import.meta.url)))
   const manifestPath = resolve(root, 'archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json')
-  const assets = JSON.parse(await readFile(manifestPath, 'utf8')).assets
-  assert.deepEqual(assets.map((asset) => asset.subject_id).sort(), ['char-eunchae', 'char-jinwoo', 'char-seojin'])
+  const manifest = JSON.parse(await readFile(manifestPath, 'utf8'))
+  const catalog = JSON.parse(await readFile(resolve(root, 'archive/content/visuals/C03-AFTERFALL/VISUALS.json'), 'utf8'))
+  const assets = manifest.assets
+  assert.deepEqual(assets.map((asset) => asset.subject_id), [
+    'char-jinwoo', 'char-eunchae', 'char-seojin', 'loc-guild-rear-warehouse',
+  ])
+  assert.equal(manifest.visual_catalog_sha256, catalog.content_sha256)
+  const stable = (value) => Array.isArray(value) ? value.map(stable)
+    : value && typeof value === 'object'
+      ? Object.fromEntries(Object.keys(value).sort().map((key) => [key, stable(value[key])]))
+      : value
+  const { content_sha256: manifestSha, ...manifestBody } = manifest
+  assert.equal(createHash('sha256').update(JSON.stringify(stable(manifestBody))).digest('hex'), manifestSha)
+  const approvedDerivatives = {
+    'char-jinwoo': ['5112dc7b2e8901aed2fcbe2c4a34736af0fefed2394a5c82e7d08fa6f2d558c8', 153519],
+    'char-eunchae': ['d05543a3fb5f3ba23256c5d2d277074ee4650ea9708cd7980e79b7e4fa296314', 168453],
+    'char-seojin': ['4b8354b38fcdb4936b770cad7cb0afa733755f5099a6b14dd04b03e055b9b9ae', 172840],
+  }
   for (const asset of assets) {
     assert.match(asset.point_id, /^point-[a-f0-9]{64}$/)
     assert.match(asset.generation_key, /^generation-[a-f0-9]{64}$/)
     assert.match(asset.public_path, /^\/visual-assets\/[a-f0-9]{64}\.png$/)
-    await readFile(resolve(root, 'archive/web/public', asset.public_path.slice(1)))
+    const bytes = await readFile(resolve(root, 'archive/web/public', asset.public_path.slice(1)))
+    assert.equal(bytes.length, asset.bytes)
+    assert.equal(createHash('sha256').update(bytes).digest('hex'), asset.sha256)
+    assert.equal(asset.width, 512)
+    assert.equal(asset.height, 512)
+    if (approvedDerivatives[asset.subject_id]) {
+      assert.deepEqual([asset.sha256, asset.bytes], approvedDerivatives[asset.subject_id])
+    }
   }
+  const warehouse = assets[3]
+  assert.equal(warehouse.point_id, 'point-df6dfecbd13bcd0d2fc7de0a0b44d2d4f87c5343b7fa4b343bdaaa67e59e67b5')
+  assert.equal(warehouse.generation_key, 'generation-3743c065c28f7621e2c6d3cc01fd4860af12f16f3430481663ed37dc4a2c0f1b')
+  assert.equal(warehouse.source_sha256, '2eb7736605c96f23d089af36cbad001b06954989678a296db7a27696fc43e810')
+  assert.ok(warehouse.bytes <= 200_000)
   const renderer = await readFile(resolve(root, 'archive/web/src/archive/siteVisual.ts'), 'utf8')
   assert.match(renderer, /manifest\.assets as SiteAsset\[\]/)
   assert.match(renderer, /export function siteVisualFor\(subjectId: string\)/)
