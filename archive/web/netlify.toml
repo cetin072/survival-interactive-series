@@ -5,6 +5,11 @@ command = "npm run build:verified"
 [build.environment]
   NODE_VERSION = "22"
 
+# Archive content lives outside this site's base directory. Keep Preview builds
+# when the Reader inputs or build scripts change.
+[context.deploy-preview]
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ':(top)archive/content' ':(top)archive/web' ':(top)archive/scripts'"
+
 [[headers]]
   for = "/*"
 

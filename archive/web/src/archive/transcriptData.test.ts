@@ -23,8 +23,13 @@ describe('Chronicle-isolated public transcript catalog', () => {
   it('publishes only verified C03 raw while retaining every known gap and session boundary', () => {
     expect(activeChronicle).toMatchObject({ id: 'C03-AFTERFALL', active: true, transcriptStatus: 'partial' })
     const c03 = transcriptPartsFor('C03-AFTERFALL')
-    expect(c03).toHaveLength(41)
-    expect(c03.filter((part) => part.status === 'verified_transcript')).toHaveLength(36)
+    const preS03 = c03.filter((part) => part.seasonId !== 'S03')
+    const s03Verified = c03.filter((part) => part.seasonId === 'S03' && part.status === 'verified_transcript')
+    expect(preS03).toHaveLength(39)
+    expect(preS03.filter((part) => part.status === 'verified_transcript')).toHaveLength(35)
+    expect(s03Verified.length).toBeGreaterThanOrEqual(1)
+    expect(c03).toHaveLength(40 + s03Verified.length)
+    expect(c03.filter((part) => part.status === 'verified_transcript')).toHaveLength(35 + s03Verified.length)
     expect(c03.slice(0, 2)).toMatchObject([
       { id: 'c03-s01-opening-001', range: '2026-09-18 13:42 → 14:12', status: 'verified_transcript' },
       { id: 'c03-s01-missing-before', status: 'verified_transcript' },
@@ -39,7 +44,18 @@ describe('Chronicle-isolated public transcript catalog', () => {
       'c03-s02-session-002-gap',
       'c03-s03-session-001-gap',
     ])
-    expect(c03.find((part) => part.id === 'c03-s03-session-001-001')).toMatchObject({ seasonId: 'S03', status: 'verified_transcript', sourceVerified: true })
+    expect(s03Verified.every((part) =>
+      part.source.startsWith('archive/content/transcripts/C03-AFTERFALL/S03/SESSION_')
+      && Boolean(part.content?.trim())
+      && /원본 순서 \d+–\d+$/.test(part.range)
+    )).toBe(true)
+    expect(new Set(s03Verified.map((part) => part.id)).size).toBe(s03Verified.length)
+    expect(c03.find((part) => part.id === 'c03-s03-session-001-001')).toMatchObject({
+      seasonId: 'S03',
+      status: 'verified_transcript',
+      sourceVerified: true,
+      range: '2027-04-08 11:30 → 2027-04-11 17:20 · 원본 순서 42–49',
+    })
     expect(new Set(c03.filter((part) => part.seasonId === 'S02').map((part) => part.sessionId))).toEqual(new Set([
       'SESSION_001', 'SESSION_002', 'SESSION_003', 'SESSION_004', 'SESSION_005',
       'SESSION_006', 'SESSION_007', 'SESSION_008', 'SESSION_009',
