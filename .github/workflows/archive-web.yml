@@ -39,6 +39,10 @@ jobs:
         run: node --test ../scripts/lib/publication-plan.test.mjs
       - name: Test illustration worker controls
         run: node --test ../scripts/lib/illustration-worker.test.mjs
+      - name: Test original image storage provider boundary
+        run: |
+          python3 ../scripts/test_original_storage_provider.py
+          python3 -m py_compile ../scripts/original_storage_provider.py ../scripts/illustration_storage_handoff.py
       - name: Verify deterministic S02 dry-run (no external services)
         run: |
           node ../scripts/dry-run-publication.mjs --demo-s02 --source-revision "$GITHUB_SHA" > "$RUNNER_TEMP/publication-first.json"
