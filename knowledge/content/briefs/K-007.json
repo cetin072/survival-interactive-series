@@ -5,14 +5,17 @@
   "risk_level": "LOW",
   "publication_policy": "AUTO_LOW_RISK",
   "semantic_qa_status": "PASS",
-  "risk_domains": ["GENERAL_PREPAREDNESS", "COMMUNICATION"],
+  "risk_domains": [
+    "GENERAL_PREPAREDNESS",
+    "COMMUNICATION"
+  ],
   "source_checked_at": "2026-09-28",
   "published_at": "2026-09-28",
   "updated_at": "2026-09-28",
   "guide_id": null,
   "story_refs": [],
   "ai_assisted": true,
-  "editorial_note": "Knowledge Worker가 검증된 S03/SESSION_003 PUBLIC_ARCHIVE에서 자동 생성한 첫 무인 FRESH 결과를 최신 V2 계약에 맞춰 정리한 BRIEF입니다. 작품은 narrative provenance로만 사용했으며 현실 주장은 Ready.gov/FEMA 공식자료로 검증했습니다.",
+  "editorial_note": "Knowledge Worker가 검증된 S03/SESSION_003 PUBLIC_ARCHIVE에서 자동 생성한 첫 무인 FRESH 결과를 최신 V2 계약에 맞춰 정리한 BRIEF입니다. 작품은 narrative provenance로만 사용했으며 현실 주장은 Ready.gov/FEMA 공식자료로 검증했습니다. SHADOW 자동게시 rehearsal 검증용 변경입니다.",
   "id": "K-007",
   "slug": "information-status-handoff",
   "label": "정보 상태 인계",
@@ -33,13 +36,31 @@
         },
         {
           "type": "table",
-          "headers": ["상태 예시", "의미"],
+          "headers": [
+            "상태 예시",
+            "의미"
+          ],
           "rows": [
-            ["전언", "직접 확인하지 않았고 다른 사람에게 들은 정보"],
-            ["확인됨", "지정한 확인자나 현장에서 직접 확인한 정보"],
-            ["요청", "상대에게 확인·예약·지원 등을 요구한 상태"],
-            ["확정", "상대가 조건이나 가능 여부를 명시적으로 확인한 상태"],
-            ["미확인", "아직 근거가 부족하거나 서로 다른 전언이 남아 있는 상태"]
+            [
+              "전언",
+              "직접 확인하지 않았고 다른 사람에게 들은 정보"
+            ],
+            [
+              "확인됨",
+              "지정한 확인자나 현장에서 직접 확인한 정보"
+            ],
+            [
+              "요청",
+              "상대에게 확인·예약·지원 등을 요구한 상태"
+            ],
+            [
+              "확정",
+              "상대가 조건이나 가능 여부를 명시적으로 확인한 상태"
+            ],
+            [
+              "미확인",
+              "아직 근거가 부족하거나 서로 다른 전언이 남아 있는 상태"
+            ]
           ]
         },
         {
@@ -111,6 +132,9 @@
       "checked_at": "2026-09-28"
     }
   ],
-  "related_brief_ids": ["K-003", "K-006"],
+  "related_brief_ids": [
+    "K-003",
+    "K-006"
+  ],
   "tools": []
 }
