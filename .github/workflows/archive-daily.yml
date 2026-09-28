@@ -3,8 +3,8 @@ name: AFTERFALL daily Archive
 on:
   workflow_dispatch:
   schedule:
-    # 19:30 UTC is 04:30 KST on the following day.
-    - cron: '30 19 * * *'
+    # 23:40 UTC is 08:40 KST on the following day.
+    - cron: '40 23 * * *'
 
 permissions:
   contents: write
@@ -52,7 +52,7 @@ jobs:
           curl --fail --silent --show-error --location \
             https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt \
             --output "$ca"
-          printf '%s  %s\n' '700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7' "$ca" | sha256sum --check --status
+          printf '%s  %s\\n' '700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7' "$ca" | sha256sum --check --status
           echo "NODE_EXTRA_CA_CERTS=$ca" >> "$GITHUB_ENV"
       - name: One daily Archive cycle
         env:
