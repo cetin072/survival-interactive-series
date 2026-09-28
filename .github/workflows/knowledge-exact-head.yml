@@ -132,4 +132,5 @@ jobs:
           BRIEF_ID: ${{ inputs.brief_id }}
           EXPECTED_SHA: ${{ inputs.expected_sha }}
         run: |
-          gh pr comment "$PR_NUMBER" --body "Exact publication-head validation PASS for `$BRIEF_ID` at `$EXPECTED_SHA`. Knowledge tests/check/build, release gate, article/index/sitemap verification all passed. This validation does not merge or deploy Production."
+          BODY="$(printf 'Exact publication-head validation PASS for `%s` at `%s`. Knowledge tests/check/build, release gate, article/index/sitemap verification all passed. This validation does not merge or deploy Production.' "$BRIEF_ID" "$EXPECTED_SHA")"
+          gh pr comment "$PR_NUMBER" --body "$BODY"
