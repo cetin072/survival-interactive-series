@@ -1,28 +1,21 @@
-"""Scoped private Storage and registry handoff for one public illustration.
+"""Verify a private Storage original and reconcile its READY registry row.
 
-The trusted GitHub runner issues a one-object upload token, then verifies the
-private readback and inserts the READY registry row. The local machine only
-decrypts the short-lived token and uploads the already reviewed PNG once.
+Draft Release validation and the trusted direct upload live in
+draft_release_illustration_handoff.py. This module owns the exact private
+readback and registry read/reconcile/readback steps.
 """
 import argparse
-import base64
 import hashlib
 import json
 import os
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.parse import parse_qs, quote, urlparse
+from urllib.parse import quote
 from urllib.request import HTTPRedirectHandler, Request, build_opener
-
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import padding
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
 
 from original_storage_provider import (
     DEFAULT_SUPABASE_URL,
     build_original_storage_provider,
-    load_original_storage_selection,
 )
 
 
@@ -31,7 +24,6 @@ ROOT = Path(__file__).resolve().parents[2]
 IDENTITY = ROOT / "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_WAREHOUSE.json"
 CATALOG = ROOT / "archive/content/visuals/C03-AFTERFALL/VISUALS.json"
 SITE_ASSETS = ROOT / "archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json"
-PUBLIC_KEY = ROOT / ".github/warehouse-e2e-upload-public.pem"
 LIMIT = 20 * 1024 * 1024
 
 
@@ -92,92 +84,6 @@ def registry_credentials():
     key = os.environ.get("ARCHIVE_SUPABASE_SERVICE_ROLE_KEY", "")
     demand(url == REGISTRY_BASE_URL and len(key) >= 20, "REGISTRY_CREDENTIALS_REQUIRED")
     return url, {"apikey": key, "Authorization": f"Bearer {key}"}
-
-
-def envelope_aad(provider, bucket, path, sha):
-    return f"{provider}:{bucket}/{path}:{sha}".encode()
-
-
-def encrypt_token(token, path, sha):
-    selection = load_original_storage_selection()
-    public = load_pem_public_key(PUBLIC_KEY.read_bytes())
-    key, nonce = os.urandom(32), os.urandom(12)
-    aad = envelope_aad(selection.provider, selection.bucket, path, sha)
-    wrapped = public.encrypt(key, padding.OAEP(mgf=padding.MGF1(hashes.SHA256()),
-                                               algorithm=hashes.SHA256(), label=None))
-    return {"version": 2, "provider": selection.provider, "bucket": selection.bucket,
-            "path": path, "source_sha256": sha,
-            "wrapped_key": base64.b64encode(wrapped).decode("ascii"),
-            "nonce": base64.b64encode(nonce).decode("ascii"),
-            "ciphertext": base64.b64encode(AESGCM(key).encrypt(nonce, token.encode(), aad)).decode("ascii")}
-
-
-def decrypt_token(envelope, private_path, path, sha):
-    selection = load_original_storage_selection()
-    demand(set(envelope) == {"version", "provider", "bucket", "path", "source_sha256",
-                             "wrapped_key", "nonce", "ciphertext"}
-           and envelope.get("version") == 2
-           and envelope.get("provider") == selection.provider
-           and envelope.get("bucket") == selection.bucket
-           and envelope.get("path") == path
-           and envelope.get("source_sha256") == sha,
-           "SIGNED_TOKEN_ENVELOPE_INVALID")
-    decode = lambda key: base64.b64decode(envelope[key], validate=True)
-    private = load_pem_private_key(Path(private_path).read_bytes(), password=None)
-    key = private.decrypt(decode("wrapped_key"), padding.OAEP(mgf=padding.MGF1(hashes.SHA256()),
-                                                              algorithm=hashes.SHA256(), label=None))
-    aad = envelope_aad(selection.provider, selection.bucket, path, sha)
-    token = AESGCM(key).decrypt(decode("nonce"), decode("ciphertext"), aad).decode("ascii")
-    demand(20 <= len(token) <= 4096, "SIGNED_TOKEN_INVALID")
-    return token
-
-
-def issue(envelope_path, identity_path=IDENTITY):
-    record, _, _, path = identity(identity_path)
-    provider = storage_provider()
-    existing = provider.readback(path, missing_ok=True)
-    if existing is not None:
-        demand(digest(existing) == record["source_sha256"], "STORAGE_EXISTING_OBJECT_SHA_MISMATCH")
-        Path(envelope_path).write_text(json.dumps({"version": 0, "status": "EXISTING_OBJECT_REUSED",
-                                                   "storage_provider": provider.provider_id,
-                                                   "source_sha256": digest(existing)}), encoding="utf-8")
-        return {"status": "EXISTING_OBJECT_REUSED", "storage_provider": provider.provider_id,
-                "source_sha256": digest(existing), "storage_uploads": 0}
-    grant = provider.issue_upload_grant(path)
-    Path(envelope_path).write_text(
-        json.dumps(encrypt_token(grant, path, record["source_sha256"])),
-        encoding="utf-8",
-    )
-    return {"status": "SIGNED_UPLOAD_READY", "storage_provider": provider.provider_id,
-            "source_sha256": record["source_sha256"],
-            "storage_object_path": path, "storage_uploads": 0}
-
-
-def upload(image_path, envelope_path, private_key, identity_path=IDENTITY):
-    record, _, _, path = identity(identity_path)
-    provider = storage_provider()
-    original = Path(image_path).read_bytes()
-    demand(0 < len(original) <= LIMIT and original.startswith(b"\\x89PNG\\r\\n\\x1a\\n")
-           and digest(original) == record["source_sha256"], "LOCAL_ORIGINAL_SHA_MISMATCH")
-    envelope = json.loads(Path(envelope_path).read_text(encoding="utf-8"))
-    grant = decrypt_token(envelope, private_key, path, record["source_sha256"])
-    url = provider.upload_url(path, grant)
-    request = Request(url, data=original, method="PUT",
-                      headers={"Content-Type": "image/png", "x-upsert": "false"})
-    try:
-        with OPENER.open(request, timeout=60) as response:
-            demand(response.status in (200, 201), "STORAGE_UPLOAD_OUTCOME_UNKNOWN")
-    except HTTPError as error:
-        if error.code == 409:
-            return {"status": "OBJECT_EXISTS_REQUIRES_TRUSTED_READBACK",
-                    "storage_provider": provider.provider_id, "upload_attempts": 1}
-        raise ValueError("STORAGE_UPLOAD_OUTCOME_UNKNOWN" if error.code >= 500
-                         else f"STORAGE_HTTP_ERROR_{error.code}") from None
-    except URLError:
-        raise ValueError("STORAGE_UPLOAD_OUTCOME_UNKNOWN") from None
-    return {"status": "UPLOAD_SUBMITTED_REQUIRES_TRUSTED_READBACK",
-            "storage_provider": provider.provider_id, "upload_attempts": 1,
-            "source_sha256": record["source_sha256"], "storage_object_path": path}
 
 
 def registry_row(record, catalog, point, path):
@@ -310,21 +216,10 @@ def verify_registry_readback(headers, expected, registry_url, source_sha):
 def main():
     parser = argparse.ArgumentParser()
     modes = parser.add_mutually_exclusive_group(required=True)
-    modes.add_argument("--issue", action="store_true")
-    modes.add_argument("--upload", action="store_true")
     modes.add_argument("--verify-register", action="store_true")
     modes.add_argument("--registry-diagnostic", action="store_true")
     parser.add_argument("--identity", type=Path, default=IDENTITY)
-    parser.add_argument("--envelope", type=Path)
-    parser.add_argument("--image", type=Path)
-    parser.add_argument("--private-key", type=Path)
     args = parser.parse_args()
-    if args.issue:
-        demand(args.envelope is not None, "ENVELOPE_OUTPUT_REQUIRED")
-        return issue(args.envelope, args.identity)
-    if args.upload:
-        demand(args.envelope and args.image and args.private_key, "UPLOAD_INPUTS_REQUIRED")
-        return upload(args.image, args.envelope, args.private_key, args.identity)
     if args.registry_diagnostic:
         return diagnose_registry(args.identity)
     return verify_register(args.identity)

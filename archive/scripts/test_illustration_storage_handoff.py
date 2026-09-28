@@ -43,19 +43,13 @@ class IllustrationStorageHandoffTests(unittest.TestCase):
             self.assertEqual(point["status"], "READY")
             self.assertEqual(path, f"AFTERFALL/{record['point_id']}/{record['generation_key']}/{record['source_sha256']}.png")
 
-    def test_token_envelope_is_bound_to_one_bucket_path_and_sha(self):
-        with pre_delivery_site_assets():
-            record, _, _, path = handoff.identity()
-            envelope = handoff.encrypt_token("test-upload-token-123456789", path, record["source_sha256"])
-            self.assertEqual(envelope["version"], 2)
-            self.assertEqual(envelope["provider"], "supabase")
-            self.assertEqual(envelope["bucket"], "survival-archive-originals")
-            private_path = Path(__file__).resolve().parents[2] / ".github/warehouse-e2e-upload-public.pem"
-            # The private key is never in the repository. The test instead verifies that mismatched
-            # identity metadata is rejected before attempting decryption.
-            envelope["path"] = path + "/other"
-            with self.assertRaisesRegex(ValueError, "SIGNED_TOKEN_ENVELOPE_INVALID"):
-                handoff.decrypt_token(envelope, private_path, path, record["source_sha256"])
+    def test_cli_does_not_expose_encrypted_signed_upload_modes(self):
+        with patch("sys.argv", ["illustration_storage_handoff.py", "--issue"]):
+            with self.assertRaises(SystemExit):
+                handoff.main()
+        with patch("sys.argv", ["illustration_storage_handoff.py", "--upload"]):
+            with self.assertRaises(SystemExit):
+                handoff.main()
 
     def test_registry_row_is_ready_location_and_private_original_bound(self):
         with pre_delivery_site_assets():

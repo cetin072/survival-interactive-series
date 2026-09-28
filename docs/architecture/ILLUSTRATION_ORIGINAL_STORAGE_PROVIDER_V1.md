@@ -44,11 +44,24 @@ Provider responsibilities:
 
 1. resolve its private bucket/container
 2. perform trusted exact-byte readback
-3. issue a one-object upload grant
-4. construct the grant-bound upload URL
-5. return the registry object locator
+3. create one content-addressed original with a service-role direct upload and `x-upsert: false`
+4. return the registry object locator
 
-The current `illustration_storage_handoff.py` calls this provider boundary rather than implementing Supabase Storage directly.
+The current `illustration_storage_handoff.py` calls this provider boundary rather than implementing Supabase Storage directly. Service-role credentials remain only in the trusted GitHub Actions workflow; no private key, signed upload token, or upload grant is passed to the local machine.
+
+## Temporary private image handoff
+
+The routine path uses a GitHub Draft Release as a short-lived staging handoff:
+
+1. Codex native image generation produces the candidate; the accepted PNG and its identity record are committed to the task branch.
+2. A Draft Release contains exactly one asset with the identity-bound filename. Its tag points at the exact source commit.
+3. A `workflow_dispatch` run on `main` checks that the source commit is in the workflow commit history and that the identity JSON and catalog still match that source revision.
+4. The trusted runner confirms the Release is still a draft, verifies anonymous asset download is denied, then downloads the authenticated bytes. It checks PNG validity, dimensions, byte count, and SHA-256 against the accepted identity.
+5. The runner confirms the Supabase bucket is private, uploads the bytes directly with create-only semantics, and performs an exact authenticated readback.
+6. It reads the registry, reconciles only if no matching row exists, and reads the exact row back.
+7. A separate least-privilege cleanup job deletes the Draft Release and its source-bound tag, including when handoff processing fails after source validation.
+
+The workflow runs only from the repository's `main` branch. It never grants a browser or local process Storage credentials. Draft assets are temporary and are not publication assets. The original remains private; public site derivatives and the two-image publication batch follow the separate release policy.
 
 ## Trusted registry API boundary
 

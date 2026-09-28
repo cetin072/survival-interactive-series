@@ -13,10 +13,10 @@
   "original_bytes": 2276652,
   "original_width": 1672,
   "original_height": 941,
-  "content_review": "MATCHES_INTENDED_BRIEF",
-  "review_summary": "Accepted candidate 3 of 3: painterly wide overview of intact, anonymous contemporary Korean residential blocks in subdued natural light; no text, people, identifiable landmark, catastrophic decay, or speculative interior/security details.",
+  "content_review": "HOLD_NO_BRIEF_COMPLIANT_CANDIDATE",
+  "review_summary": "Three candidates were reviewed and all were rejected because they added invented vegetation. No accepted original is eligible for private handoff.",
   "generation_attempts": 3,
-  "accepted_image_count": 1,
+  "accepted_image_count": 0,
   "paid_api_calls": 0,
   "unattended_generation_proven": false
 }
