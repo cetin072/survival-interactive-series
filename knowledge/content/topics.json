@@ -14,5 +14,13 @@
     "guide_id": null,
     "tools": [],
     "story_refs": ["afterfall-two-site-reserve"]
+  },
+  {
+    "id": "community-evacuation-waypoints",
+    "title": "대피 경로와 임시 경유지",
+    "brief_ids": ["K-006"],
+    "guide_id": null,
+    "tools": [],
+    "story_refs": []
   }
 ]
