@@ -16,6 +16,14 @@
       "processed_at": "2026-09-28T11:30:00.000Z",
       "candidate_ids": ["KC-waypoint-assessment"],
       "brief_ids": ["K-006"]
+    },
+    {
+      "source_manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_003/SOURCE_MANIFEST.json",
+      "source_manifest_sha256": "c3ab077c6917a64d0eccfa2788f4e27db75245082462b2072ab1325dad0fa62a",
+      "status": "PROCESSED",
+      "processed_at": "2026-09-28T11:45:58.000Z",
+      "candidate_ids": ["KC-information-status-handoff"],
+      "brief_ids": ["K-007"]
     }
   ]
 }
