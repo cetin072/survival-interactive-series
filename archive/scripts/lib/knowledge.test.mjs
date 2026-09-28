@@ -201,30 +201,30 @@ test('publication mode config is authoritative and internally consistent', async
 test('every changed brief is bound to the exact release targets and must pass independently', async () => {
   const data = await loadKnowledge(root)
   const k004 = data.briefs.find((brief) => brief.id === 'K-004')
-  const k007 = { ...k004, id: 'K-007', slug: 'another-fixture-brief', title: 'A second verified test brief' }
-  const k007Evidence = { ...data.evidence.get('K-004'), brief_id: 'K-007', question: k007.title }
-  const k007Candidate = { ...data.candidates[0], id: 'KC-second-brief', brief_id: 'K-007', question: 'A second verified test question' }
+  const k007 = { ...k004, id: 'K-997', slug: 'another-fixture-brief', title: 'A second verified test brief' }
+  const k007Evidence = { ...data.evidence.get('K-004'), brief_id: 'K-997', question: k007.title }
+  const k007Candidate = { ...data.candidates[0], id: 'KC-second-brief', brief_id: 'K-997', question: 'A second verified test question' }
   const evidence = new Map(data.evidence)
-  evidence.set('K-007', k007Evidence)
+  evidence.set('K-997', k007Evidence)
   const bothBriefs = { ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK', auto_publish_enabled: true },
     briefs: [...data.briefs, k007], evidence, candidates: [...data.candidates, k007Candidate] }
-  const changed = ['knowledge/content/briefs/K-004.json', 'knowledge/content/briefs/K-007.json']
+  const changed = ['knowledge/content/briefs/K-004.json', 'knowledge/content/briefs/K-997.json']
 
   const firstOnly = await checkRelease(bothBriefs, { changedFiles: changed, briefIds: ['K-004'], mode: 'AUTO_LOW_RISK' })
   assert.equal(firstOnly.decision, 'REJECTED')
-  assert.ok(firstOnly.reasons.includes('CHANGED_BRIEF_NOT_TARGETED:K-007'))
+  assert.ok(firstOnly.reasons.includes('CHANGED_BRIEF_NOT_TARGETED:K-997'))
 
-  const both = await checkRelease(bothBriefs, { changedFiles: changed, briefIds: ['K-004', 'K-007'], mode: 'AUTO_LOW_RISK' })
+  const both = await checkRelease(bothBriefs, { changedFiles: changed, briefIds: ['K-004', 'K-997'], mode: 'AUTO_LOW_RISK' })
   assert.equal(both.decision, 'AUTO_PUBLISH_ELIGIBLE')
-  assert.deepEqual(both.brief_ids, ['K-004', 'K-007'])
+  assert.deepEqual(both.brief_ids, ['K-004', 'K-997'])
 
   const withSupportingRecords = await checkRelease(bothBriefs, {
-    changedFiles: [...changed, 'knowledge/content/evidence/K-007.json', 'knowledge/content/candidates/KC-second-brief.json'],
-    briefIds: ['K-004', 'K-007'], mode: 'AUTO_LOW_RISK',
+    changedFiles: [...changed, 'knowledge/content/evidence/K-997.json', 'knowledge/content/candidates/KC-second-brief.json'],
+    briefIds: ['K-004', 'K-997'], mode: 'AUTO_LOW_RISK',
   })
   assert.equal(withSupportingRecords.decision, 'AUTO_PUBLISH_ELIGIBLE')
   const unsupportedEvidence = await checkRelease(bothBriefs, {
-    changedFiles: [...changed, 'knowledge/content/evidence/K-007.json'], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK',
+    changedFiles: [...changed, 'knowledge/content/evidence/K-997.json'], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK',
   })
   assert.equal(unsupportedEvidence.decision, 'REJECTED')
   const unsupportedCandidate = await checkRelease(bothBriefs, {
@@ -234,7 +234,7 @@ test('every changed brief is bound to the exact release targets and must pass in
 
   const unsafeK007 = { ...k007, publication_policy: 'HUMAN_APPROVED' }
   const unsafe = { ...bothBriefs, briefs: [...data.briefs, unsafeK007] }
-  const bothWithUnsafe = await checkRelease(unsafe, { changedFiles: changed, briefIds: ['K-004', 'K-007'], mode: 'AUTO_LOW_RISK' })
+  const bothWithUnsafe = await checkRelease(unsafe, { changedFiles: changed, briefIds: ['K-004', 'K-997'], mode: 'AUTO_LOW_RISK' })
   assert.equal(bothWithUnsafe.decision, 'HUMAN_REVIEW_REQUIRED')
   const untargetedUnsafe = await checkRelease(unsafe, { changedFiles: changed, briefIds: ['K-004'], mode: 'AUTO_LOW_RISK' })
   assert.equal(untargetedUnsafe.decision, 'REJECTED')
@@ -311,11 +311,11 @@ test('release gate fails closed on high risk, publication policy, QA, missing ev
 
 test('out-of-target Evidence, Candidate, and generated pages are rejected', async () => {
   const data = await loadKnowledge(root)
-  const briefs = [...data.briefs, { ...data.briefs.find((brief) => brief.id === 'K-004'), id: 'K-007', slug: 'another-fixture-brief' }]
-  const candidates = [...data.candidates, { ...data.candidates[0], id: 'KC-another-brief', brief_id: 'K-007' }]
+  const briefs = [...data.briefs, { ...data.briefs.find((brief) => brief.id === 'K-004'), id: 'K-997', slug: 'another-fixture-brief' }]
+  const candidates = [...data.candidates, { ...data.candidates[0], id: 'KC-another-brief', brief_id: 'K-997' }]
   const files = ['knowledge/content/briefs/K-004.json']
   const release = (extraFile) => checkRelease({ ...data, briefs, candidates }, { changedFiles: [...files, extraFile], briefIds: ['K-004'] })
-  assert.ok((await release('knowledge/content/evidence/K-007.json')).reasons.includes('EVIDENCE_OUTSIDE_RELEASE_TARGETS:K-007'))
+  assert.ok((await release('knowledge/content/evidence/K-997.json')).reasons.includes('EVIDENCE_OUTSIDE_RELEASE_TARGETS:K-997'))
   assert.ok((await release('knowledge/content/candidates/KC-another-brief.json')).reasons.includes('CANDIDATE_OUTSIDE_RELEASE_TARGETS:KC-another-brief'))
   assert.ok((await release('archive/web/public/knowledge/another-fixture-brief/index.html')).reasons.includes('GENERATED_PAGE_OUTSIDE_RELEASE_TARGETS:another-fixture-brief'))
 })
