@@ -57,9 +57,9 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           BEFORE_SHA: ${{ github.event.before }}
           CURRENT_SHA: ${{ github.sha }}
-          DISPATCH_RELEASE_ID: ${{ inputs.release_id }}
-          DISPATCH_SOURCE_COMMIT: ${{ inputs.source_commit }}
-          DISPATCH_IDENTITY_PATH: ${{ inputs.identity_path }}
+          DISPATCH_RELEASE_ID: ${{ github.event.inputs.release_id }}
+          DISPATCH_SOURCE_COMMIT: ${{ github.event.inputs.source_commit }}
+          DISPATCH_IDENTITY_PATH: ${{ github.event.inputs.identity_path }}
         run: |
           output="$RUNNER_TEMP/illustration-handoff-request.json"
           if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
