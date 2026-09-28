@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { publicKnowledgeInventory, scanKnowledge, bootstrapKnowledge } from './knowledge-scan.mjs'
 import { loadKnowledge, validateKnowledge, publicationEligibility, root } from './knowledge-content.mjs'
+import { checkContentOnly, checkRelease, verifyProductionPublication } from './knowledge-release.mjs'
 
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex')
 const manifestRef = 'archive/content/transcripts/C03-AFTERFALL/S99/SESSION_001/SOURCE_MANIFEST.json'
@@ -100,8 +101,8 @@ test('golden fixtures satisfy content contract and policy gate', async () => {
     assert.equal(brief.publication_policy, 'HUMAN_APPROVED')
     assert.equal(publicationEligibility(brief, data.evidence.get(brief.id), data.config), 'HUMAN_REVIEW')
   }
-  const brief = { ...data.briefs[0], id: 'K-999', slug: 'test-only', status: 'READY', publication_policy: 'AUTO_LOW_RISK' }
-  const evidence = data.evidence.get('K-002')
+  const brief = { ...data.briefs.find((item) => item.id === 'K-004'), status: 'READY', publication_policy: 'AUTO_LOW_RISK' }
+  const evidence = data.evidence.get('K-004')
   assert.equal(publicationEligibility(brief, evidence, data.config), 'AUTO_PUBLISH_ELIGIBLE')
   assert.equal(publicationEligibility({ ...brief, risk_level: 'HIGH' }, evidence, data.config), 'HUMAN_REVIEW')
   assert.equal(publicationEligibility({ ...brief, content_type: 'GUIDE' }, evidence, data.config), 'HUMAN_REVIEW')
@@ -130,9 +131,9 @@ test('Reader backfill survives unrelated BOOK growth and rejects referenced chap
 })
 test('AUTO_LOW_RISK READY and PUBLISHED must pass the same publication gate', async () => {
   const data = await loadKnowledge(root)
-  const auto = { ...data.briefs[0], publication_policy: 'AUTO_LOW_RISK' }
+  const auto = { ...data.briefs.find((item) => item.id === 'K-004'), publication_policy: 'AUTO_LOW_RISK' }
   const withAuto = (patch = {}, evidence = data.evidence) => ({
-    ...data, briefs: [{ ...auto, ...patch }, ...data.briefs.slice(1)], evidence,
+    ...data, briefs: data.briefs.map((item) => item.id === auto.id ? { ...auto, ...patch } : item), evidence,
   })
   const pack = data.evidence.get(auto.id)
 
@@ -152,6 +153,55 @@ test('AUTO_LOW_RISK READY and PUBLISHED must pass the same publication gate', as
   await assert.rejects(validateKnowledge(withAuto({ status: 'PUBLISHED', risk_level: 'HIGH' })), /publication eligibility/)
   await assert.rejects(validateKnowledge(withAuto({ status: 'PUBLISHED', risk_domains: ['WATER_PURIFCATION'] })), /risk domains/)
   await assert.rejects(validateKnowledge(withAuto({ status: 'READY', risk_domains: ['UNCLASSIFIED'] })), /risk domains/)
+})
+
+test('release gate covers PR_ONLY, shadow, AUTO, and the content-only boundary', async () => {
+  const data = await loadKnowledge(root)
+  const allowedFile = 'knowledge/content/briefs/K-004.json'
+  const prOnly = await checkRelease(data, { changedFiles: [allowedFile], briefIds: ['K-004'], mode: 'PR_ONLY' })
+  assert.equal(prOnly.decision, 'PR_ONLY')
+  assert.equal(prOnly.requires_human, false)
+
+  const shadow = await checkRelease(data, { changedFiles: [allowedFile], briefIds: ['K-004'] })
+  assert.equal(shadow.decision, 'WOULD_AUTO_PUBLISH')
+  assert.equal(shadow.requires_human, false)
+
+  const autoData = { ...data, config: { ...data.config, auto_publish_enabled: true } }
+  const automatic = await checkRelease(autoData, { changedFiles: [allowedFile], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK' })
+  assert.equal(automatic.decision, 'AUTO_PUBLISH_ELIGIBLE')
+  assert.equal(automatic.requires_human, false)
+
+  const codeDiff = await checkRelease(autoData, { changedFiles: ['archive/scripts/knowledge-release.mjs'], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK' })
+  assert.equal(codeDiff.decision, 'REJECTED')
+  assert.deepEqual(codeDiff.content_only.rejected, ['archive/scripts/knowledge-release.mjs'])
+  assert.equal(checkContentOnly(['archive/web/public/knowledge/knowledge.css']).allowed, false)
+})
+
+test('release gate fails closed for risk, conflicts, missing evidence, unknown domains, and duplicate candidates', async () => {
+  const data = await loadKnowledge(root)
+  const files = ['knowledge/content/briefs/K-004.json']
+  const release = (input, briefIds = ['K-004']) => checkRelease(input, { changedFiles: files, briefIds, mode: 'AUTO_LOW_RISK_SHADOW' })
+  const highRisk = { ...data, briefs: data.briefs.map((brief) => brief.id === 'K-004' ? { ...brief, risk_level: 'HIGH' } : brief) }
+  assert.equal((await release(highRisk)).decision, 'HUMAN_REVIEW_REQUIRED')
+
+  const conflictEvidence = new Map(data.evidence)
+  conflictEvidence.set('K-004', { ...conflictEvidence.get('K-004'), conflicts: ['source conflict'] })
+  assert.equal((await release({ ...data, evidence: conflictEvidence })).decision, 'HOLD')
+
+  const noEvidence = new Map(data.evidence)
+  noEvidence.delete('K-004')
+  assert.equal((await release({ ...data, evidence: noEvidence })).decision, 'HOLD')
+
+  const unknownDomain = { ...data, briefs: data.briefs.map((brief) => brief.id === 'K-004' ? { ...brief, risk_domains: ['UNKNOWN_DOMAIN'] } : brief) }
+  assert.equal((await release(unknownDomain)).decision, 'HUMAN_REVIEW_REQUIRED')
+
+  const duplicate = { ...data, candidates: [...data.candidates, { ...data.candidates[0], id: 'KC-duplicate', question: data.candidates[0].question }] }
+  assert.equal((await release(duplicate)).decision, 'HUMAN_REVIEW_REQUIRED')
+})
+
+test('production publication is complete only when deploy, page, index, and sitemap match', () => {
+  assert.deepEqual(verifyProductionPublication({ deployStatus: 'READY', deployCommitSha: 'abc123', mergeSha: 'abc123', pageReachable: true, indexContains: true, sitemapContains: true }), { status: 'PUBLISHED', reasons: [] })
+  assert.equal(verifyProductionPublication({ deployStatus: 'READY', deployCommitSha: 'oldsha', mergeSha: 'abc123', pageReachable: true, indexContains: true, sitemapContains: true }).status, 'AUTO_PUBLISH_INCOMPLETE')
 })
 test('duplicate identity, broken relations and missing downloads fail validation', async () => {
   const data = await loadKnowledge(root)

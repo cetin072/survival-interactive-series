@@ -12,6 +12,7 @@ const localPath = (value) => typeof value === 'string' && /^\/knowledge\/[a-z0-9
 const lowRiskDomains = new Set(['GENERAL_PREPAREDNESS', 'FOOD_STORAGE', 'COMMUNICATION', 'EVACUATION'])
 const highRiskDomains = new Set(['MEDICAL', 'MEDICATION', 'FIRST_AID_PROCEDURE', 'WATER_PURIFICATION', 'GENERATOR', 'COMBUSTION_CO', 'ELECTRICAL', 'RESCUE', 'SHELTER_STRUCTURAL', 'OTHER_SEVERE_HARM'])
 const allowedRiskDomains = new Set([...lowRiskDomains, ...highRiskDomains])
+const publicationModes = new Set(['PR_ONLY', 'AUTO_LOW_RISK_SHADOW', 'AUTO_LOW_RISK'])
 const readerBookRef = 'archive/content/stories/C03-AFTERFALL/BOOK.json'
 
 async function verifiedReaderReference(item, base, label) {
@@ -44,7 +45,8 @@ export async function loadKnowledge(base = root) {
 
 export async function validateKnowledge(data) {
   const { briefs, candidates, evidence, topics, guides, stories, config, base } = data
-  fail(config.publication_mode === 'PR_ONLY', 'V1 only supports PR_ONLY')
+  fail(publicationModes.has(config.publication_mode), 'unknown publication mode')
+  fail(typeof config.auto_publish_enabled === 'boolean', 'invalid auto_publish_enabled flag')
   fail(/^https:\/\/[^/]+$/.test(config.site_origin), 'invalid site origin')
   const ids = new Set(), slugs = new Set(), topicIds = new Set()
   const guideIds = new Set(), storyIds = new Set()
@@ -128,9 +130,10 @@ export async function validateKnowledge(data) {
 }
 
 export function publicationEligibility(brief, pack, config) {
-  if (config.publication_mode !== 'PR_ONLY') return 'HOLD'
+  if (!publicationModes.has(config.publication_mode)) return 'HOLD'
   if (!pack || !Array.isArray(pack.claims) || !pack.claims.length || !brief.sources?.length || !brief.source_checked_at) return 'HOLD'
-  if (pack.conflicts?.length || pack.unknowns?.length || pack.copyright_status !== 'CLEAR' || pack.story_source_status === 'UNCLEAR') return 'HOLD'
+  if (!Array.isArray(pack.conflicts) || !Array.isArray(pack.unknowns) || pack.conflicts.length || pack.unknowns.length || pack.copyright_status !== 'CLEAR') return 'HOLD'
+  if (!['VERIFIED_PUBLIC_READER_BACKFILL', 'VERIFIED_PUBLIC_ARCHIVE'].includes(pack.story_source_status)) return 'HUMAN_REVIEW'
   if (brief.content_type !== 'BRIEF' || brief.risk_level !== 'LOW' || brief.publication_policy !== 'AUTO_LOW_RISK') return 'HUMAN_REVIEW'
   if (!Array.isArray(brief.risk_domains) || brief.risk_domains.length === 0 || brief.risk_domains.some((domain) => !lowRiskDomains.has(domain))) return 'HUMAN_REVIEW'
   if (brief.semantic_qa_status !== 'PASS' || !['READY', 'PUBLISHED'].includes(brief.status)) return 'HUMAN_REVIEW'
