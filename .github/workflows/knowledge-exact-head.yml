@@ -193,16 +193,16 @@ jobs:
           )"
           echo "merge_sha=$MERGE_SHA" >> "$GITHUB_OUTPUT"
 
-      - name: Verify exact Netlify Production publication
+      - name: Record batched Production handoff
         if: steps.authority.outputs.auto_publish == 'true'
         working-directory: .
         env:
-          BRIEF_ID: ${{ inputs.brief_id }}
           MERGE_SHA: ${{ steps.merge.outputs.merge_sha }}
         run: |
-          node archive/scripts/knowledge-production-verify.mjs \
-            --brief "$BRIEF_ID" \
-            --merge-sha "$MERGE_SHA"
+          test -n "$MERGE_SHA"
+          echo "PRODUCTION_RELEASE=QUEUED"
+          echo "MERGE_SHA=$MERGE_SHA"
+          echo "Production is verified by the batched Archive release workflow, not by each Knowledge merge."
 
       - name: Record AUTO publication success on PR
         if: steps.authority.outputs.auto_publish == 'true'
@@ -214,5 +214,5 @@ jobs:
           EXPECTED_SHA: ${{ inputs.expected_sha }}
           MERGE_SHA: ${{ steps.merge.outputs.merge_sha }}
         run: |
-          BODY="$(printf 'AUTO publication PASS for `%s`. Prepared head `%s` passed exact-head validation, merged as `%s`, and Netlify Production was verified at the exact merge SHA with article/index/sitemap present.' "$BRIEF_ID" "$EXPECTED_SHA" "$MERGE_SHA")"
+          BODY="$(printf 'AUTO content merge PASS for `%s`. Prepared head `%s` passed exact-head validation and merged as `%s`. Netlify Production is queued for the batched Archive release gate; that gate will verify the exact release SHA before considering the batch published.' "$BRIEF_ID" "$EXPECTED_SHA" "$MERGE_SHA")"
           gh pr comment "$PR_NUMBER" --body "$BODY"

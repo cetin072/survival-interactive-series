@@ -328,8 +328,6 @@ async function waitForProductionDeploy(site, expectedCommit, candidate) {
 async function autoPublish(result, candidate, base) {
   const preview = previewGate(result.pr, result.commit, base)
   await verifySite(preview, candidate.additions[0].id, `${candidate.source.entry.session_id}/PART_001.md`)
-  // Validate the read-only Netlify API credential and site identity before the irreversible merge.
-  const productionSite = await netlifyProductionSite()
   insist(git('rev-parse', 'origin/main') === base, 'BASE_MOVED_HUMAN_REVIEW_REQUIRED')
   gh('pr', 'merge', result.pr, '--repo', 'cetin072/survival-interactive-series',
     '--squash', '--match-head-commit', result.commit)
@@ -337,7 +335,8 @@ async function autoPublish(result, candidate, base) {
     '--json', 'state,mergeCommit'))
   insist(merged.state === 'MERGED' && /^[a-f0-9]{40}$/.test(merged.mergeCommit?.oid),
     'MERGE_NOT_CONFIRMED')
-  return await waitForProductionDeploy(productionSite, merged.mergeCommit.oid, candidate)
+  return { status: 'PRODUCTION_QUEUED', merge_sha: merged.mergeCommit.oid,
+    production_release: 'BATCHED_RELEASE_GATE' }
 }
 
 export async function runDaily(args) {
