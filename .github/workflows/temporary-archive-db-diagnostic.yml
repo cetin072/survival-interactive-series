@@ -166,11 +166,13 @@ jobs:
             --output "$ca"
           printf '%s  %s\n' '700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7' "$ca" | sha256sum --check --status
           echo "NODE_EXTRA_CA_CERTS=$ca" >> "$GITHUB_ENV"
-      - name: Expose Archive gate output for this temporary diagnostic
+      - name: Prepare ignored Archive diagnostic copy
         run: |
+          printf '%s\n' 'archive/scripts/run-daily-archive-debug.mjs' >> .git/info/exclude
+          cp archive/scripts/run-daily-archive.mjs archive/scripts/run-daily-archive-debug.mjs
           python - <<'PY'
           from pathlib import Path
-          path = Path('archive/scripts/run-daily-archive.mjs')
+          path = Path('archive/scripts/run-daily-archive-debug.mjs')
           text = path.read_text(encoding='utf-8')
           old = "{ cwd, stdio: 'ignore', timeout: 300_000 }"
           new = "{ cwd, stdio: 'inherit', timeout: 300_000 }"
@@ -178,34 +180,10 @@ jobs:
               raise SystemExit('gate stdio marker not found')
           path.write_text(text.replace(old, new, 1), encoding='utf-8')
           PY
-      - name: Run real SHADOW Archive cycle with safe diagnostics
+          test -z "$(git status --porcelain)"
+      - name: Run real SHADOW Archive cycle with gate output
         env:
           ARCHIVE_EXPORT_DATABASE_URL: ${{ secrets.ARCHIVE_EXPORT_DATABASE_URL }}
           GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-        run: |
-          node --input-type=module <<'NODE'
-          import { runDaily } from './archive/scripts/run-daily-archive.mjs'
-          try {
-            console.log(JSON.stringify(await runDaily(['--apply'])))
-          } catch (error) {
-            const secret = process.env.ARCHIVE_EXPORT_DATABASE_URL ?? ''
-            const sanitize = (value) => {
-              let text = String(value ?? '')
-              if (secret) text = text.split(secret).join('[REDACTED_URL]')
-              text = text.replace(/postgres(?:ql)?:\/\/[^@\s]+@/gi, 'postgresql://[REDACTED]@')
-              return text.slice(0, 1000)
-            }
-            console.error(JSON.stringify({
-              diagnostic: 'ARCHIVE_APPLY_THROWN',
-              name: error?.name ?? null,
-              code: error?.code ?? null,
-              status: error?.status ?? null,
-              signal: error?.signal ?? null,
-              message: sanitize(error?.message),
-              stderr: sanitize(error?.stderr),
-              stdout: sanitize(error?.stdout)
-            }))
-            process.exit(1)
-          }
-          NODE
+        run: node archive/scripts/run-daily-archive-debug.mjs --apply
