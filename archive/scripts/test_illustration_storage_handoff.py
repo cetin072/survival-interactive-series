@@ -64,6 +64,7 @@ class IllustrationStorageHandoffTests(unittest.TestCase):
             self.assertEqual(row["visibility"], "PLAYER_ARCHIVE")
             self.assertEqual(row["source"]["generation_key"], point["generation_key"])
             self.assertEqual(row["generation_meta"]["source_sha256"], record["source_sha256"])
+            self.assertEqual(row["generation_meta"]["storage_provider"], "supabase")
             self.assertEqual(row["object_path"], f"survival-archive-originals/{path}")
             self.assertIsNone(row["image_url"])
             self.assertFalse(row["generation_meta"]["unattended_generation_proven"])
