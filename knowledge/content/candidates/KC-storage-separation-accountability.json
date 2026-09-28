@@ -1,0 +1,11 @@
+{
+  "id": "KC-storage-separation-accountability",
+  "question": "공동 비상창고에서 관리 성격이 다른 물품을 왜 구역과 장부로 나눠 관리해야 하는가",
+  "topic_id": "community-emergency-resource-management",
+  "status": "BRIEF_PROPOSED",
+  "disposition_note": "S03 PUBLIC_ARCHIVE의 보관업 장면에서 고객 보관품, 길드 운영재고, 위탁판매 물품을 섞지 않고 별도 기록·구역으로 다루는 질문을 추출했습니다. 기존 K-004는 여러 거점에 분산된 공동 비상재고의 위치·수량·이동·보충 기록에 초점을 두므로 의미 중복으로 보지 않았습니다. FEMA Resource Inventorying과 FEMA Logistics 자료에서 최신 재고 유지, 입고 기록, 소모품과 accountable property의 구분·분리 관리 원칙을 확인했습니다. 위험물 보관, 법적 보관계약, 소유권·대리권 판단은 이 글의 범위에서 제외합니다.",
+  "brief_id": "K-005",
+  "source_kind": "PUBLIC_ARCHIVE",
+  "source_manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_001/SOURCE_MANIFEST.json",
+  "source_manifest_sha256": "a617c59d3b48a328056121ec13e759acb2be80a1201c28a911a4be375b92e89d"
+}
