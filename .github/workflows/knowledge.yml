@@ -45,6 +45,7 @@ jobs:
         run: |
           node --check ../scripts/knowledge-publish-prepare.mjs
           node --check ../scripts/knowledge-production-verify.mjs
+          node --check ../scripts/write-deploy-meta.mjs
       - name: Verify checked-in static pages, sitemap and source inventory
         run: npm run knowledge:check
       - name: Archive Reader public-source regression
