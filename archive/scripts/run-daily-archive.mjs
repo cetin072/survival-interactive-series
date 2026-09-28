@@ -12,6 +12,7 @@ import { createBatch, fingerprint } from './lib/publication-plan.mjs'
 import { byteHash, graphBytes, reconcileReaderOnlyGraph } from './lib/publication-graph.mjs'
 import { compileVisualCatalog, validateVisualCatalog, visualByteHash, visualBytes } from './lib/visual-compiler.mjs'
 import { publicKnowledgeInventory, scanKnowledge } from './lib/knowledge-scan.mjs'
+import { findProductionSite, findReadyProductionDeploy } from './lib/netlify-production.mjs'
 
 const root = resolve(import.meta.dirname, '..', '..')
 const seasonRoot = 'archive/content/transcripts/C03-AFTERFALL/S03'
@@ -167,6 +168,7 @@ function gates() {
   const run = (executable, args, cwd = root) => execFileSync(executable === 'npm' && process.platform === 'win32' ? 'npm.cmd' : executable, args,
     { cwd, stdio: 'ignore', timeout: 300_000 })
   run('node', ['--test', 'archive/scripts/lib/archive-daily-core.test.mjs'])
+  run('node', ['--test', 'archive/scripts/lib/netlify-production.test.mjs'])
   run('node', ['--test', 'archive/scripts/lib/reader-batch.test.mjs',
     'archive/scripts/lib/publication-graph.test.mjs', 'archive/scripts/lib/visual-compiler.test.mjs'])
   run('npm', ['ci'], absolute('archive/web'))
@@ -277,9 +279,53 @@ async function verifySite(url, chapterId, rawRef) {
   'SITE_CONTENT_NOT_READY')
 }
 
+async function netlifyApi(path) {
+  insist(process.env.NETLIFY_AUTH_TOKEN, 'NETLIFY_AUTH_TOKEN_SETUP_REQUIRED')
+  let response
+  try {
+    response = await fetch(`https://api.netlify.com/api/v1${path}`, {
+      headers: { authorization: `Bearer ${process.env.NETLIFY_AUTH_TOKEN}` },
+      signal: AbortSignal.timeout(15000),
+    })
+  } catch { throw new Error('AUTO_PUBLISH_INCOMPLETE') }
+  if (!response.ok) throw new Error('AUTO_PUBLISH_INCOMPLETE')
+  try { return await response.json() }
+  catch { throw new Error('AUTO_PUBLISH_INCOMPLETE') }
+}
+
+async function netlifyProductionSite() {
+  const sites = await netlifyApi('/sites?name=survival-diary-archive&per_page=100')
+  const site = findProductionSite(sites)
+  return site
+}
+
+async function waitForProductionDeploy(site, expectedCommit, candidate) {
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const query = new URLSearchParams({ production: 'true', per_page: '100' })
+    const deploys = await netlifyApi(`/sites/${encodeURIComponent(site.id)}/deploys?${query}`)
+    if (!Array.isArray(deploys)) throw new Error('AUTO_PUBLISH_INCOMPLETE')
+    const matching = deploys.find((deploy) => deploy?.context === 'production'
+      && deploy.commit_ref === expectedCommit && deploy.draft !== true)
+    if (matching?.state === 'error') throw new Error('AUTO_PUBLISH_INCOMPLETE')
+    const ready = findReadyProductionDeploy(deploys, expectedCommit)
+    if (ready) {
+      try {
+        await verifySite('https://survival-diary-archive.netlify.app/',
+          candidate.additions[0].id, `${candidate.source.entry.session_id}/PART_001.md`)
+        return { status: 'PRODUCTION_VERIFIED', merge_sha: expectedCommit,
+          production: 'https://survival-diary-archive.netlify.app/', netlify_deploy_id: ready.id }
+      } catch { /* The matching deploy may be ready before its CDN content is visible. */ }
+    }
+    if (attempt < 29) await new Promise((resolve) => setTimeout(resolve, 20000))
+  }
+  throw new Error('AUTO_PUBLISH_INCOMPLETE')
+}
+
 async function autoPublish(result, candidate, base) {
   const preview = previewGate(result.pr, result.commit, base)
   await verifySite(preview, candidate.additions[0].id, `${candidate.source.entry.session_id}/PART_001.md`)
+  // Validate the read-only Netlify API credential and site identity before the irreversible merge.
+  const productionSite = await netlifyProductionSite()
   insist(git('rev-parse', 'origin/main') === base, 'BASE_MOVED_HUMAN_REVIEW_REQUIRED')
   gh('pr', 'merge', result.pr, '--repo', 'cetin072/survival-interactive-series',
     '--squash', '--match-head-commit', result.commit)
@@ -287,16 +333,7 @@ async function autoPublish(result, candidate, base) {
     '--json', 'state,mergeCommit'))
   insist(merged.state === 'MERGED' && /^[a-f0-9]{40}$/.test(merged.mergeCommit?.oid),
     'MERGE_NOT_CONFIRMED')
-  const production = 'https://survival-diary-archive.netlify.app/'
-  for (let attempt = 0; attempt < 30; attempt++) {
-    try {
-      await verifySite(production, candidate.additions[0].id, `${candidate.source.entry.session_id}/PART_001.md`)
-      return { status: 'PRODUCTION_VERIFIED', merge_sha: merged.mergeCommit.oid, production }
-    } catch (error) {
-      if (attempt === 29) throw new Error('PRODUCTION_VERIFICATION_REQUIRED')
-      await new Promise((resolve) => setTimeout(resolve, 20000))
-    }
-  }
+  return await waitForProductionDeploy(productionSite, merged.mergeCommit.oid, candidate)
 }
 
 export async function runDaily(args) {
@@ -334,7 +371,9 @@ if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.m
   try { process.stdout.write(JSON.stringify(await runDaily(process.argv.slice(2))) + '\n') }
   catch (error) {
     const code = /^[A-Z][A-Z0-9_]{3,100}$/.test(error.message) ? error.message : 'ARCHIVE_DAILY_FAILED'
-    process.stderr.write(JSON.stringify({ status: code, database_writes: 0 }) + '\n')
+    process.stderr.write(JSON.stringify({ status: code,
+      ...(code === 'AUTO_PUBLISH_INCOMPLETE' ? { human_review_required: true } : {}),
+      database_writes: 0 }) + '\n')
     process.exitCode = 1
   }
 }

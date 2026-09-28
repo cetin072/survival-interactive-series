@@ -50,4 +50,5 @@ jobs:
         env:
           ARCHIVE_EXPORT_DATABASE_URL: ${{ secrets.ARCHIVE_EXPORT_DATABASE_URL }}
           GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         run: node archive/scripts/run-daily-archive.mjs --apply
