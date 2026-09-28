@@ -87,7 +87,7 @@ FRESH/BACKFILL 이후 단계는 동일하다.
 7. semantic QA
 8. Knowledge-only PR
 9. repository tests/CI
-10. SHADOW release gate
+10. repository release gate
 
 현실 claim은 게임/Archive를 사실 근거로 사용하지 않는다.
 
@@ -103,12 +103,17 @@ AUTO_LOW_RISK 후보는 원칙적으로 authoritative external source 2개 이�
 
 현재:
 
-- `publication_mode = AUTO_LOW_RISK_SHADOW`
-- `auto_publish_enabled = false`
-- automatic merge = OFF
-- Production automatic publish = OFF
+- `publication_mode = AUTO_LOW_RISK`
+- `auto_publish_enabled = true`
+- LOW-risk eligible BRIEF만 automatic merge 허용
+- exact prepared-head validation 필수
+- merge 직전 current main 재확인 필수
+- merge 후 Netlify Production `commit_ref == merge SHA` 검증 필수
+- article / Knowledge index / sitemap 실제 반영 검증 필수
 
-Worker는 PR 생성과 검증까지 자동화한다.
+Semantic Worker는 직접 merge하지 않는다. Worker는 검증된 Knowledge PR에 publication-preparation label을 부여하고, GitHub Actions가 READY→PUBLISHED 준비, exact-head 재검증, exact-SHA merge, Production 검증을 수행한다.
+
+고위험·충돌·unknown·중복·source 변경·권리 불명확·검증 실패는 기존대로 fail-closed 한다.
 
 ## 8. Scheduler
 

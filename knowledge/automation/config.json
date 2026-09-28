@@ -1,5 +1,5 @@
 {
-  "publication_mode": "AUTO_LOW_RISK_SHADOW",
-  "auto_publish_enabled": false,
+  "publication_mode": "AUTO_LOW_RISK",
+  "auto_publish_enabled": true,
   "site_origin": "https://survival-diary-archive.netlify.app"
 }
