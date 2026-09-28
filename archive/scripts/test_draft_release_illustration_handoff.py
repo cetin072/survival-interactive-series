@@ -45,7 +45,7 @@ class DraftReleaseHandoffTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "SOURCE_COMMIT_INVALID"):
             handoff.expected_release_tag(self.record, "not-a-commit")
 
-    def test_release_requires_draft_and_exact_source_commit_tag(self):
+    def test_unpublished_draft_release_accepts_missing_git_tag(self):
         release = {"id": 42, "draft": True, "prerelease": False,
                    "tag_name": handoff.expected_release_tag(self.record, self.source_commit)}
 
@@ -53,7 +53,22 @@ class DraftReleaseHandoffTests(unittest.TestCase):
             def release(self, _release_id):
                 return release
 
-            def tag_commit(self, _tag):
+            def tag_commit_if_exists(self, _tag):
+                return None
+
+        actual, tag = handoff.validate_release(FakeApi(), 42, self.record, self.source_commit)
+        self.assertIs(actual, release)
+        self.assertEqual(tag, release["tag_name"])
+
+    def test_release_rejects_a_tag_pointing_to_another_commit(self):
+        release = {"id": 42, "draft": True, "prerelease": False,
+                   "tag_name": handoff.expected_release_tag(self.record, self.source_commit)}
+
+        class FakeApi:
+            def release(self, _release_id):
+                return release
+
+            def tag_commit_if_exists(self, _tag):
                 return "b" * 40
 
         with self.assertRaisesRegex(ValueError, "DRAFT_RELEASE_SOURCE_COMMIT_MISMATCH"):
