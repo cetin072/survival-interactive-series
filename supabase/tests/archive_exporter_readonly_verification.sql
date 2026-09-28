@@ -72,7 +72,7 @@ begin
 
   if message_policy is null or message_policy not like '%worldline_id%AFTERFALL%'
      or message_policy not like '%chronicle_id%C03%'
-     or message_policy not like '%public_safe%true%'
+     or message_policy not ilike '%public_safe%true%'
      or message_policy ilike '%exists%' then
     raise exception 'message RLS policy does not permit optional state links safely';
   end if;
