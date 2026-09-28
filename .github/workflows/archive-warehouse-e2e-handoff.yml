@@ -30,7 +30,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install pinned envelope library
-        run: python -m pip install --only-binary=:all: cryptography==50.0.1
+        run: 'python -m pip install --only-binary=:all: cryptography==50.0.1'
       - name: Check one-image identity and registry binding offline
         run: python archive/scripts/test_illustration_storage_handoff.py
       - name: Issue one-object encrypted upload token
