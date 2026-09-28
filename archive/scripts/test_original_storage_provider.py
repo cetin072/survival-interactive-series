@@ -1,15 +1,12 @@
 """Offline tests for the private original-storage provider boundary."""
-import importlib.util
-import os
+import sys
 from pathlib import Path
 import unittest
 
 
 ROOT = Path(__file__).resolve().parents[2]
-MODULE_PATH = ROOT / "archive/scripts/original_storage_provider.py"
-spec = importlib.util.spec_from_file_location("original_storage_provider", MODULE_PATH)
-storage = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(storage)
+sys.path.insert(0, str(ROOT / "archive/scripts"))
+import original_storage_provider as storage
 
 
 class DummyOpener:
