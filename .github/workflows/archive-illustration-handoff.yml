@@ -1,0 +1,62 @@
+name: Private Archive illustration handoff
+
+on:
+  push:
+    branches:
+      - codex/illustration-automation-b
+    paths:
+      - archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_*.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: afterfall-illustration-private-handoff
+  cancel-in-progress: false
+
+jobs:
+  private-handoff:
+    if: github.repository == 'cetin072/survival-interactive-series' && github.ref == 'refs/heads/codex/illustration-automation-b'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned handoff dependency
+        run: 'python -m pip install --only-binary=:all: cryptography==50.0.1'
+      - name: Resolve exactly one identity changed in this push
+        id: target
+        shell: bash
+        run: |
+          mapfile -t identities < <(git diff --name-only HEAD^ HEAD -- 'archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_*.json')
+          if [[ "${#identities[@]}" -ne 1 ]]; then
+            echo "Expected one changed illustration identity; found ${#identities[@]}" >&2
+            exit 1
+          fi
+          printf 'identity=%s\n' "${identities[0]}" >> "$GITHUB_OUTPUT"
+      - name: Validate illustration handoff contracts
+        run: python archive/scripts/test_illustration_storage_handoff.py
+      - name: Issue one-object encrypted upload token
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          IDENTITY_PATH: ${{ steps.target.outputs.identity }}
+        run: python archive/scripts/illustration_storage_handoff.py --issue --identity "$IDENTITY_PATH" --envelope "$RUNNER_TEMP/illustration-signed-upload.json"
+      - name: Keep only encrypted token material for the local one-time upload
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: illustration-signed-upload-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/illustration-signed-upload.json
+          if-no-files-found: warn
+          retention-days: 1
+      - name: Verify private readback and reconcile one READY visual
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          IDENTITY_PATH: ${{ steps.target.outputs.identity }}
+        run: python archive/scripts/illustration_storage_handoff.py --verify-register --identity "$IDENTITY_PATH"

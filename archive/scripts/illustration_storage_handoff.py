@@ -210,8 +210,15 @@ def registry_read_error(error):
     return ValueError(f"REGISTRY_READ_FAILED_HTTP_{error.code}:{body[:4000]}")
 
 
-def read_registry_rows(url, profile_headers):
-    request = Request(f"{url}?select=*&worldline_id=eq.AFTERFALL&limit=1000", headers=profile_headers)
+def registry_rpc_headers(headers):
+    return {**headers, "Content-Profile": "public", "Content-Type": "application/json"}
+
+
+def read_registry_rows(registry_url, headers, record):
+    url = f"{registry_url}/rest/v1/rpc/archive_visual_asset_readback"
+    payload = {"p_point_id": record["point_id"], "p_generation_key": record["generation_key"]}
+    request = Request(url, data=json.dumps(payload).encode(), method="POST",
+                      headers=registry_rpc_headers(headers))
     try:
         with OPENER.open(request, timeout=30) as response:
             return json.loads(response.read(2_000_001))
@@ -221,26 +228,48 @@ def read_registry_rows(url, profile_headers):
         raise ValueError("REGISTRY_READ_FAILED_NETWORK") from None
 
 
+def reconcile_registry_row(registry_url, headers, expected):
+    url = f"{registry_url}/rest/v1/rpc/archive_visual_asset_reconcile"
+    request = Request(url, data=json.dumps({"p_row": expected}).encode(), method="POST",
+                      headers=registry_rpc_headers(headers))
+    try:
+        with OPENER.open(request, timeout=30) as response:
+            return json.loads(response.read(2_000_001))
+    except HTTPError as error:
+        body = error.read(4097).decode("utf-8", errors="replace")[:4000]
+        raise ValueError(f"REGISTRY_RECONCILE_FAILED_HTTP_{error.code}:{body}") from None
+    except URLError:
+        raise ValueError("REGISTRY_RECONCILE_FAILED_NETWORK") from None
+
+
 def diagnose_registry(identity_path=IDENTITY):
-    record, _, _, _ = identity(identity_path, allow_published=True)
+    record, _, _, object_path = identity(identity_path, allow_published=True)
     registry_url, headers = registry_credentials()
-    url = f"{registry_url}/rest/v1/visual_assets"
-    profile_headers = {**headers, "Accept-Profile": "survival_rpg"}
-    rows = read_registry_rows(url, profile_headers)
-    demand(isinstance(rows, list) and len(rows) < 1000, "REGISTRY_SCAN_INCOMPLETE")
+    rows = read_registry_rows(registry_url, headers, record)
+    demand(isinstance(rows, list) and len(rows) <= 2, "REGISTRY_SCAN_INCOMPLETE")
     matches = [row for row in rows if row.get("source", {}).get("point_id") == record["point_id"]
                or row.get("source", {}).get("generation_key") == record["generation_key"]]
+    demand(len(matches) == 1, "REGISTRY_DIAGNOSTIC_MATCH_COUNT_INVALID")
+    row = matches[0]
+    expected_object_path = storage_provider().registry_object_path(object_path)
+    observed_storage_provider = row.get("generation_meta", {}).get("storage_provider")
+    demand(row.get("source", {}).get("point_id") == record["point_id"]
+           and row.get("source", {}).get("generation_key") == record["generation_key"]
+           and row.get("source", {}).get("source_sha256") == record["source_sha256"]
+           and row.get("object_path") == expected_object_path
+           and observed_storage_provider in (None, "supabase"),
+           "REGISTRY_DIAGNOSTIC_BINDING_INVALID")
     return {
         "status": "REGISTRY_READBACK_DIAGNOSTIC_PASS",
         "point_id": record["point_id"],
         "generation_key": record["generation_key"],
-        "matches": [{"point_id": row.get("source", {}).get("point_id"),
-                     "generation_key": row.get("source", {}).get("generation_key"),
-                     "source_sha256": row.get("source", {}).get("source_sha256"),
-                     "object_path": row.get("object_path"),
-                     "storage_provider": row.get("generation_meta", {}).get("storage_provider")}
-                    for row in matches],
-        "duplicate_count": max(0, len(matches) - 1),
+        "source_sha256": row["source"]["source_sha256"],
+        "object_path": row["object_path"],
+        "storage_provider": observed_storage_provider,
+        "storage_provider_inferred": ("supabase" if observed_storage_provider is None
+                                       and row["object_path"].startswith("survival-archive-originals/")
+                                       else observed_storage_provider),
+        "duplicate_count": 0,
     }
 
 
@@ -250,10 +279,8 @@ def verify_register(identity_path=IDENTITY):
     source = provider.readback(path)
     demand(source is not None and digest(source) == record["source_sha256"], "STORAGE_ORIGINAL_SHA_MISMATCH")
     registry_url, headers = registry_credentials()
-    url = f"{registry_url}/rest/v1/visual_assets"
-    profile_headers = {**headers, "Accept-Profile": "survival_rpg"}
-    rows = read_registry_rows(url, profile_headers)
-    demand(isinstance(rows, list) and len(rows) < 1000, "REGISTRY_SCAN_INCOMPLETE")
+    rows = read_registry_rows(registry_url, headers, record)
+    demand(isinstance(rows, list) and len(rows) <= 2, "REGISTRY_SCAN_INCOMPLETE")
     expected = registry_row(record, catalog, point, path)
     matched = [row for row in rows if row.get("source", {}).get("point_id") == record["point_id"]
                or row.get("source", {}).get("generation_key") == record["generation_key"]]
@@ -262,29 +289,16 @@ def verify_register(identity_path=IDENTITY):
                "REGISTRY_EXISTING_ASSET_CONFLICT")
         return {"status": "EXISTING_READY_ASSET_REUSED", "asset_id": expected["asset_id"],
                 "registry_writes": 0, "storage_readback_sha256": digest(source)}
-    post_headers = {**profile_headers, "Content-Profile": "survival_rpg",
-                    "Content-Type": "application/json", "Prefer": "return=minimal"}
-    try:
-        with OPENER.open(Request(url, data=json.dumps(expected).encode(), method="POST", headers=post_headers), timeout=30) as response:
-            demand(response.status in (200, 201, 204), "REGISTRY_INSERT_FAILED")
-    except HTTPError as error:
-        if error.code not in (409,) and error.code < 500:
-            raise ValueError("REGISTRY_INSERT_FAILED") from None
-    except URLError:
-        pass
-    # Whether the response arrived or not, reconcile from a fresh DB read before reporting success.
-    return verify_registry_readback(headers, expected, url, profile_headers, digest(source))
+    reconcile_registry_row(registry_url, headers, expected)
+    # Reconcile only inserts when no matching row exists. Confirm its result with a fresh RPC read.
+    return verify_registry_readback(headers, expected, registry_url, digest(source))
 
 
-def verify_registry_readback(headers, expected, url, profile_headers, source_sha):
-    request = Request(f"{url}?select=*&worldline_id=eq.AFTERFALL&limit=1000", headers=profile_headers)
-    try:
-        with OPENER.open(request, timeout=30) as response:
-            rows = json.loads(response.read(2_000_001))
-    except HTTPError as error:
-        raise registry_read_error(error) from None
-    except URLError:
-        raise ValueError("REGISTRY_READ_FAILED_NETWORK") from None
+def verify_registry_readback(headers, expected, registry_url, source_sha):
+    record = {"point_id": expected["source"]["point_id"],
+              "generation_key": expected["source"]["generation_key"]}
+    rows = read_registry_rows(registry_url, headers, record)
+    demand(isinstance(rows, list) and len(rows) <= 2, "REGISTRY_SCAN_INCOMPLETE")
     matches = [row for row in rows if row.get("source", {}).get("point_id") == expected["source"]["point_id"]
                or row.get("source", {}).get("generation_key") == expected["source"]["generation_key"]]
     demand(len(matches) == 1 and all(matches[0].get(key) == value for key, value in expected.items()),
@@ -322,10 +336,13 @@ if __name__ == "__main__":
     except Exception as error:
         code = ("REGISTRY_READ_FAILED" if isinstance(error, ValueError)
                 and str(error).startswith("REGISTRY_READ_FAILED_HTTP_") else
+                "REGISTRY_RECONCILE_FAILED" if isinstance(error, ValueError)
+                and str(error).startswith("REGISTRY_RECONCILE_FAILED_HTTP_") else
                 str(error) if isinstance(error, ValueError) and str(error).isupper()
                 and str(error).replace("_", "").isalnum() else "HANDOFF_UNEXPECTED_ERROR")
         result = {"status": "IMAGE_HANDOFF_REJECTED", "code": code}
-        if isinstance(error, ValueError) and str(error).startswith("REGISTRY_READ_FAILED_HTTP_"):
+        if isinstance(error, ValueError) and str(error).startswith(("REGISTRY_READ_FAILED_HTTP_",
+                                                                    "REGISTRY_RECONCILE_FAILED_HTTP_")):
             prefix, response = str(error).split(":", 1)
             result["http_status"] = int(prefix.rsplit("_", 1)[1])
             result["response"] = response

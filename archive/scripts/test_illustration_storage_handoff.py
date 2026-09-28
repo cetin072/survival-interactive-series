@@ -7,6 +7,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "archive/scripts"))
@@ -101,6 +102,61 @@ class IllustrationStorageHandoffTests(unittest.TestCase):
                                   io.BytesIO(b'{"code":"PGRST106"}'))
         diagnostic = handoff.registry_read_error(error)
         self.assertEqual(str(diagnostic), 'REGISTRY_READ_FAILED_HTTP_406:{"code":"PGRST106"}')
+
+    def test_trusted_registry_read_uses_public_rpc_with_explicit_identity(self):
+        class Response:
+            status = 200
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_):
+                return False
+
+            def read(self, _limit):
+                return b'[]'
+
+        class CapturingOpener:
+            def open(self, request, timeout):
+                self.request = request
+                self.timeout = timeout
+                return Response()
+
+        opener = CapturingOpener()
+        original_opener = handoff.OPENER
+        handoff.OPENER = opener
+        try:
+            record = {"point_id": "point-test", "generation_key": "generation-test"}
+            rows = handoff.read_registry_rows("https://example.supabase.co", {"apikey": "test"}, record)
+        finally:
+            handoff.OPENER = original_opener
+        self.assertEqual(rows, [])
+        self.assertEqual(opener.request.full_url,
+                         "https://example.supabase.co/rest/v1/rpc/archive_visual_asset_readback")
+        self.assertEqual(opener.request.get_method(), "POST")
+        self.assertEqual(opener.request.get_header("Content-profile"), "public")
+        self.assertIsNone(opener.request.get_header("Accept-profile"))
+        self.assertEqual(json.loads(opener.request.data),
+                         {"p_point_id": record["point_id"],
+                          "p_generation_key": record["generation_key"]})
+
+    def test_registry_diagnostic_validates_legacy_warehouse_binding(self):
+        record = json.loads(handoff.IDENTITY.read_text(encoding="utf-8"))
+        _, _, _, path = handoff.identity(allow_published=True)
+        registry_row = {
+            "source": {"point_id": record["point_id"],
+                       "generation_key": record["generation_key"],
+                       "source_sha256": record["source_sha256"]},
+            "object_path": f"survival-archive-originals/{path}",
+            "generation_meta": {},
+        }
+        with patch.object(handoff, "registry_credentials", return_value=("https://example.invalid", {})), \
+             patch.object(handoff, "read_registry_rows", return_value=[registry_row]):
+            result = handoff.diagnose_registry()
+        self.assertEqual(result["status"], "REGISTRY_READBACK_DIAGNOSTIC_PASS")
+        self.assertIsNone(result["storage_provider"])
+        self.assertEqual(result["storage_provider_inferred"], "supabase")
+        self.assertEqual(result["duplicate_count"], 0)
 
 
 if __name__ == "__main__":

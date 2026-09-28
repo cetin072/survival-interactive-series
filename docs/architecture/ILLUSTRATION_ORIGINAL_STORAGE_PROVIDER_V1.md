@@ -50,6 +50,15 @@ Provider responsibilities:
 
 The current `illustration_storage_handoff.py` calls this provider boundary rather than implementing Supabase Storage directly.
 
+## Trusted registry API boundary
+
+The PostgREST API currently exposes `public` and `graphql_public`; keep the `survival_rpg` schema private. The trusted worker reaches `survival_rpg.visual_assets` through two narrowly scoped RPCs in `public`:
+
+- `archive_visual_asset_readback(point_id, generation_key)` returns at most two matching AFTERFALL rows so the worker can detect duplicates.
+- `archive_visual_asset_reconcile(row)` inserts only when neither identity key exists, serializes retries for the point, never overwrites, and returns matching rows for exact readback.
+
+Both functions use `SECURITY INVOKER` and an empty `search_path`. Revoke `EXECUTE` from `PUBLIC`, `anon`, and `authenticated`; grant it only to `service_role`. The functions rely on the existing service-role table privileges and RLS configuration; do not expose `survival_rpg`, grant access to gameplay roles, or weaken RLS to support the trusted handoff.
+
 ## R2 readiness
 
 Reserved selector:
