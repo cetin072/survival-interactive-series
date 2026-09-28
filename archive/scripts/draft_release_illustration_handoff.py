@@ -74,12 +74,19 @@ def validate_source(identity_path, source_commit, workflow_commit):
            "CATALOG_CHANGED_SINCE_SOURCE_COMMIT")
     record, catalog, point, object_path = handoff.identity(identity_path)
     demand(record == source_record, "IDENTITY_SOURCE_COMMIT_MISMATCH")
+    demand(isinstance(record.get("subject_id"), str)
+           and re.fullmatch(r"(?:char|loc|event)-[a-z0-9]+(?:-[a-z0-9]+)*",
+                            record["subject_id"]) is not None,
+           "IDENTITY_SUBJECT_ID_INVALID")
     demand(re.fullmatch(r"[a-f0-9]{64}", record.get("source_sha256", "")) is not None,
            "IDENTITY_SOURCE_SHA_INVALID")
     demand(isinstance(record.get("original_bytes"), int)
+           and not isinstance(record.get("original_bytes"), bool)
            and 0 < record["original_bytes"] <= LIMIT
-           and isinstance(record.get("original_width"), int) and record["original_width"] > 0
-           and isinstance(record.get("original_height"), int) and record["original_height"] > 0,
+           and isinstance(record.get("original_width"), int)
+           and not isinstance(record.get("original_width"), bool) and record["original_width"] > 0
+           and isinstance(record.get("original_height"), int)
+           and not isinstance(record.get("original_height"), bool) and record["original_height"] > 0,
            "IDENTITY_ORIGINAL_METADATA_INVALID")
     return record, catalog, point, object_path
 
@@ -172,6 +179,14 @@ class GitHubApi:
 
 
 def expected_release_tag(record, source_commit):
+    demand(isinstance(record.get("subject_id"), str)
+           and re.fullmatch(r"(?:char|loc|event)-[a-z0-9]+(?:-[a-z0-9]+)*",
+                            record["subject_id"]) is not None,
+           "IDENTITY_SUBJECT_ID_INVALID")
+    demand(re.fullmatch(r"[a-f0-9]{40}", source_commit or "") is not None,
+           "SOURCE_COMMIT_INVALID")
+    demand(re.fullmatch(r"[a-f0-9]{64}", record.get("source_sha256", "")) is not None,
+           "IDENTITY_SOURCE_SHA_INVALID")
     return (f"codex-private-image-{record['subject_id']}-"
             f"{source_commit[:12]}-{record['source_sha256'][:12]}")
 

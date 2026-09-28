@@ -37,6 +37,14 @@ class DraftReleaseHandoffTests(unittest.TestCase):
             f"afterfall-original-{self.record['subject_id']}-{self.record['source_sha256']}.png",
         )
 
+    def test_release_tag_rejects_unsafe_subject_and_incomplete_commit(self):
+        self.record["subject_id"] = "loc-test\ncleanup_ready=false"
+        with self.assertRaisesRegex(ValueError, "IDENTITY_SUBJECT_ID_INVALID"):
+            handoff.expected_release_tag(self.record, self.source_commit)
+        self.record["subject_id"] = "loc-test"
+        with self.assertRaisesRegex(ValueError, "SOURCE_COMMIT_INVALID"):
+            handoff.expected_release_tag(self.record, "not-a-commit")
+
     def test_release_requires_draft_and_exact_source_commit_tag(self):
         release = {"id": 42, "draft": True, "prerelease": False,
                    "tag_name": handoff.expected_release_tag(self.record, self.source_commit)}

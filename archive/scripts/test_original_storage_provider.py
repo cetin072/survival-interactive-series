@@ -3,6 +3,7 @@ import sys
 import json
 from pathlib import Path
 import unittest
+from urllib.error import HTTPError, URLError
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -148,6 +149,65 @@ class OriginalStorageProviderTests(unittest.TestCase):
                     "bucket": "private-originals", "public": False,
                 })
             self.assertIn("/storage/v1/bucket/private-originals", opener.request.full_url)
+
+    def test_exact_existing_object_is_reused_without_upload(self):
+        import hashlib
+        png = b"\x89PNG\r\n\x1a\nmatching-existing-bytes"
+
+        class ExistingOpener:
+            def __init__(self):
+                self.requests = []
+
+            def open(self, request, timeout):
+                self.requests.append(request)
+                return DummyResponse(200, png)
+
+        opener = ExistingOpener()
+        provider = storage.build_original_storage_provider(
+            opener, 20 * 1024 * 1024,
+            env={"ARCHIVE_ORIGINAL_STORAGE_PROVIDER": "supabase",
+                 "ARCHIVE_SUPABASE_URL": "https://example.supabase.co",
+                 "ARCHIVE_ORIGINAL_STORAGE_BUCKET": "private-originals",
+                 "ARCHIVE_SUPABASE_SERVICE_ROLE_KEY": "synthetic-service-role-value-12345"},
+        )
+        result = provider.upload_original("AFTERFALL/p/g/sha.png", png,
+                                          hashlib.sha256(png).hexdigest())
+        self.assertEqual(result["status"], "EXISTING_OBJECT_REUSED")
+        self.assertEqual(len(opener.requests), 1)
+        self.assertEqual(opener.requests[0].get_header("Authorization"),
+                         "Bearer synthetic-service-role-value-12345")
+
+    def test_lost_upload_response_uses_one_readback_and_never_retries(self):
+        import hashlib
+        png = b"\x89PNG\r\n\x1a\nresponse-lost-after-store"
+
+        class LostResponseOpener:
+            def __init__(self):
+                self.reads = 0
+                self.uploads = 0
+
+            def open(self, request, timeout):
+                if request.get_method() == "GET":
+                    self.reads += 1
+                    if self.reads == 1:
+                        raise HTTPError(request.full_url, 404, "Missing", {}, None)
+                    return DummyResponse(200, png)
+                self.uploads += 1
+                raise URLError("synthetic lost response")
+
+        opener = LostResponseOpener()
+        provider = storage.build_original_storage_provider(
+            opener, 20 * 1024 * 1024,
+            env={"ARCHIVE_ORIGINAL_STORAGE_PROVIDER": "supabase",
+                 "ARCHIVE_SUPABASE_URL": "https://example.supabase.co",
+                 "ARCHIVE_ORIGINAL_STORAGE_BUCKET": "private-originals",
+                 "ARCHIVE_SUPABASE_SERVICE_ROLE_KEY": "synthetic-service-role-value-12345"},
+        )
+        result = provider.upload_original("AFTERFALL/p/g/sha.png", png,
+                                          hashlib.sha256(png).hexdigest())
+        self.assertEqual(result["status"], "UPLOAD_CONFIRMED_BY_READBACK")
+        self.assertEqual(opener.uploads, 1)
+        self.assertEqual(opener.reads, 2)
 
 
 if __name__ == "__main__":
