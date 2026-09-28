@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { archiveNodes } from './archiveData'
 import { buildPositions, buildVisibleGraph } from './ArchiveApp'
+import { nodeById } from './ExplorerView'
 
 const allTypes = {
   character: true,
@@ -16,7 +16,8 @@ describe('AFTERFALL graph exploration', () => {
 
     expect(visible.has('char-jinwoo')).toBe(true)
     expect(graph.visibleIds.length).toBeGreaterThanOrEqual(5)
-    expect(graph.visibleIds.every((id) => archiveNodes.some((node) => node.id === id))).toBe(true)
+    expect(graph.visibleIds.every((id) => nodeById.has(id))).toBe(true)
+    expect(nodeById.get('loc-guild-rear-warehouse')?.label).toBe('길드 뒤편 창고')
     expect(graph.visibleEdges.length).toBeGreaterThan(0)
     expect(graph.visibleEdges.every((edge) => visible.has(edge.from) && visible.has(edge.to))).toBe(true)
   })

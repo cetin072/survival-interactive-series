@@ -95,7 +95,9 @@ describe('Reader Edition V1.1', () => {
     expect(c03[1].body).toContain('## 14:14 — 병원 밖')
     expect(c03[8].body).toContain('## 10월 23일 17:36')
     expect(c03.slice(1, 9).every((chapter) => !/(?:^|\n)#{1,4}\s*(?:다음 선택|다음 판단|현재 선택지|\d+[.)])|자유행동/.test(chapter.body))).toBe(true)
-    expect(c03.slice(9).map((chapter) => chapter.id)).toEqual(Array.from({ length: 24 }, (_, i) => `c03-afterfall-chapter-${String(i + 1).padStart(2, '0')}`))
+    expect(c03.slice(9, 33).map((chapter) => chapter.id)).toEqual(Array.from({ length: 24 }, (_, i) => `c03-afterfall-chapter-${String(i + 1).padStart(2, '0')}`))
+    expect(c03[33]).toMatchObject({ seasonId: 'S03', archiveSourceRefs: ['archive/content/transcripts/C03-AFTERFALL/S03/SESSION_001/PART_001.md'] })
+    expect(c03[33].body).not.toMatch(/## USER|### 다음 판단/)
     expect(chronicleBooks.find((book) => book.chronicleId === 'C03-AFTERFALL')).toMatchObject({ beginningStatus: 'OPENING_PLAY_RECOVERED' })
   })
   it('rejects a stale or incomplete generated manifest before it reaches the Reader', () => {

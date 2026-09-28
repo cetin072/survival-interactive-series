@@ -23,8 +23,8 @@ describe('Chronicle-isolated public transcript catalog', () => {
   it('publishes only verified C03 raw while retaining every known gap and session boundary', () => {
     expect(activeChronicle).toMatchObject({ id: 'C03-AFTERFALL', active: true, transcriptStatus: 'partial' })
     const c03 = transcriptPartsFor('C03-AFTERFALL')
-    expect(c03).toHaveLength(39)
-    expect(c03.filter((part) => part.status === 'verified_transcript')).toHaveLength(35)
+    expect(c03).toHaveLength(41)
+    expect(c03.filter((part) => part.status === 'verified_transcript')).toHaveLength(36)
     expect(c03.slice(0, 2)).toMatchObject([
       { id: 'c03-s01-opening-001', range: '2026-09-18 13:42 → 14:12', status: 'verified_transcript' },
       { id: 'c03-s01-missing-before', status: 'verified_transcript' },
@@ -37,7 +37,9 @@ describe('Chronicle-isolated public transcript catalog', () => {
     expect(c03.filter((part) => part.status === 'missing_transcript').map((part) => part.id)).toEqual([
       'c03-s02-session-001-gap',
       'c03-s02-session-002-gap',
+      'c03-s03-session-001-gap',
     ])
+    expect(c03.find((part) => part.id === 'c03-s03-session-001-001')).toMatchObject({ seasonId: 'S03', status: 'verified_transcript', sourceVerified: true })
     expect(new Set(c03.filter((part) => part.seasonId === 'S02').map((part) => part.sessionId))).toEqual(new Set([
       'SESSION_001', 'SESSION_002', 'SESSION_003', 'SESSION_004', 'SESSION_005',
       'SESSION_006', 'SESSION_007', 'SESSION_008', 'SESSION_009',

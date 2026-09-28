@@ -1,0 +1,57 @@
+{
+  "version": "public-graph-facts-v1",
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "season_id": "S03",
+  "visibility": "PUBLIC_ARCHIVE",
+  "anchor": {
+    "save_version": 258,
+    "game_time": "2027-04-11 17:20"
+  },
+  "nodes": [
+    {
+      "id": "loc-guild-rear-warehouse",
+      "label": "길드 뒤편 창고",
+      "type": "location",
+      "subtitle": "2027년 4월 11일부터 6개월 독점사용",
+      "summary": "폐쇄 체육시설 본관 뒤편의 창고. 진우 측은 배종필과 6개월 독점사용에 합의했고, 첫 60일 동안 미리 정한 조건으로 우선 매입할 수 있다. 창고는 아직 길드 소유가 아니다.",
+      "tags": [
+        "S03",
+        "창고",
+        "보관업"
+      ],
+      "source": "S03 turn 20 GM, message order 49; APPLIED state link save 258",
+      "meta": {
+        "상태": "길드 독점사용",
+        "소유": "길드 소유 아님"
+      }
+    },
+    {
+      "id": "event-guild-warehouse-option",
+      "label": "뒤편 창고 사용 합의",
+      "type": "event",
+      "subtitle": "2027년 4월 10–11일",
+      "summary": "진우와 배종필은 창고의 6개월 독점사용과 첫 60일의 우선매입 조건에 합의했다. 계약 후 보관품 일부가 뒤편 창고로 옮겨졌다.",
+      "tags": [
+        "S03",
+        "보관업",
+        "계약"
+      ],
+      "source": "S03 turn 20 GM, message order 49; APPLIED state link save 258"
+    }
+  ],
+  "relations": [
+    {
+      "from": "char-jinwoo",
+      "to": "event-guild-warehouse-option",
+      "kind": "participated_in",
+      "label": "창고 사용 조건 합의"
+    },
+    {
+      "from": "event-guild-warehouse-option",
+      "to": "loc-guild-rear-warehouse",
+      "kind": "occurred_at",
+      "label": "뒤편 창고 사용 합의"
+    }
+  ]
+}

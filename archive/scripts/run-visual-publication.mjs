@@ -41,13 +41,17 @@ function approvedJSON(sha, path, section, season) {
 export async function prepareVisualPublication(snapshot, { factsRef = null, appearancesRef = null, mapRef = null } = {}) {
   const batch = createBatch(snapshot), sha = currentHead()
   demand(batch.snapshot.source_revision === sha, 'VISUAL_SNAPSHOT_CHECKOUT_MISMATCH')
-  const preparedGraph = await prepareGraphPublication(snapshot, factsRef)
+  const savedOutput = await existingOutput()
+  const historicalReadOnly = savedOutput && JSON.parse(savedOutput).anchor.save_version > snapshot.source_save_version
+  const preparedGraph = await prepareGraphPublication(snapshot, factsRef, { historicalReadOnly: Boolean(historicalReadOnly) })
   // Only this reviewed S02 editorial decision has a default. Other snapshots
   // still require an explicit dated appearance input when the legacy UI drifts.
-  const reviewedAppearanceRef = appearancesRef ?? (snapshot.season_id === 'S02' ? APPROVED_S02_APPEARANCE_REF : null)
+  // The dated S02 approval remains valid for unchanged appearances in a later batch.
+  const reviewedAppearanceRef = appearancesRef ?? APPROVED_S02_APPEARANCE_REF
   let appearances
   if (reviewedAppearanceRef) {
-    const loaded = approvedJSON(sha, reviewedAppearanceRef, 'public-facts', snapshot.season_id)
+    const appearanceSeason = reviewedAppearanceRef === APPROVED_S02_APPEARANCE_REF ? 'S02' : snapshot.season_id
+    const loaded = approvedJSON(sha, reviewedAppearanceRef, 'public-facts', appearanceSeason)
     demand(Array.isArray(loaded.data.records), 'MISSING_APPEARANCE_RECORDS')
     appearances = { ...loaded.data, records: loaded.data.records.map((item) => {
       demand(!Object.hasOwn(item, 'evidence'), 'CALLER_APPEARANCE_EVIDENCE_REJECTED')
@@ -69,13 +73,13 @@ export async function prepareVisualPublication(snapshot, { factsRef = null, appe
   }
   const catalog = compileVisualCatalog({ batch, graph: preparedGraph.graph, appearances, publicMap })
   validateVisualCatalog(catalog)
-  const actualBytes = await existingOutput()
+  const actualBytes = historicalReadOnly ? null : savedOutput
   if (actualBytes) {
     const previous = JSON.parse(actualBytes); validateVisualCatalog(previous)
     demand(previous.anchor.save_version <= catalog.anchor.save_version && previous.anchor.game_time <= catalog.anchor.game_time, 'STALE_VISUAL_CATALOG_WRITE')
   }
   const candidateBytes = Buffer.from(visualBytes(catalog))
-  return { catalog, actualBytes, candidateBytes, report: {
+  return { catalog, actualBytes, candidateBytes, historicalReadOnly: Boolean(historicalReadOnly), report: {
     mode: 'LOCAL_VISUAL_BRIEF_COMPILER', batch_id: batch.batch_id, source_revision: sha,
     source_save_version: catalog.anchor.save_version, status: actualBytes?.equals(candidateBytes) ? 'NOOP' : 'READY_TO_UPDATE_LOCAL_VISUAL_CATALOG',
     point_count: catalog.points.length, by_type: Object.fromEntries(['CHARACTER', 'LOCATION', 'EVENT', 'ENVIRONMENT', 'MAP'].map((t) => [t, catalog.points.filter((p) => p.point_type === t).length])),
@@ -104,6 +108,7 @@ export async function runVisualCli(args) {
     options = { factsRef: flags.get('--facts'), appearancesRef: flags.get('--appearances') ?? null, mapRef: flags.get('--map') ?? null }
   }
   const prepared = await prepareVisualPublication(snapshot, options)
+  demand(!prepared.historicalReadOnly || mode === '--check', 'STALE_VISUAL_CATALOG_WRITE')
   if (mode === '--apply') Object.assign(prepared.report, await writeGraphAtomically(resolve(root, outputRef), prepared.actualBytes, prepared.candidateBytes))
   if (prepared.report.status === 'UPDATED_LOCAL_GRAPH') prepared.report.status = 'UPDATED_LOCAL_VISUAL_CATALOG'
   return JSON.stringify(prepared.report, null, 2) + '\n'

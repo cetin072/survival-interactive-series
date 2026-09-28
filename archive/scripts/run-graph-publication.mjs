@@ -29,7 +29,7 @@ async function localGraph() {
   try { demand((await lstat(resolve(root, graphRef))).isFile(), 'INVALID_GRAPH_FILE'); return await readFile(resolve(root, graphRef)) }
   catch (e) { if (e.code === 'ENOENT') return null; throw e }
 }
-export async function prepareGraphPublication(snapshot, factsRef = null) {
+export async function prepareGraphPublication(snapshot, factsRef = null, { historicalReadOnly = false } = {}) {
   const batch = createBatch(snapshot), sha = headSHA()
   demand(batch.snapshot.source_revision === sha, 'GRAPH_SNAPSHOT_CHECKOUT_MISMATCH')
   demand(batch.snapshot.chronicle_id === 'C03-AFTERFALL', 'GRAPH_CHRONICLE_UNSUPPORTED')
@@ -47,7 +47,7 @@ export async function prepareGraphPublication(snapshot, factsRef = null) {
   const bookSource = { source_ref: bookRef, source_sha256: byteHash(bookBytes) }
   const seedSource = { source_ref: seedRef, source_sha256: byteHash(seedBytes) }
   const actualBytes = await localGraph()
-  let previous = actualBytes ? JSON.parse(actualBytes) : null
+  let previous = actualBytes && !historicalReadOnly ? JSON.parse(actualBytes) : null
   let bootstrap = { nodes: 0, relations: 0 }
   if (!previous) {
     const seedBatch = createBatch(snapshotFromPublishedS02(JSON.parse(pinned(sha, manifestRef)), sha))

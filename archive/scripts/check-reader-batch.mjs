@@ -31,6 +31,7 @@ const temporary = await mkdtemp(join(tmpdir(), 'reader-git-e2e-'))
 try {
   const copy = join(temporary, 'repo')
   command('git', ['clone', '--local', '--no-hardlinks', '--quiet', '--no-checkout', root, copy])
+  command('git', ['config', 'core.autocrlf', 'false'], copy)
   command('git', ['checkout', '--detach', head], copy)
   const relative = 'archive/content/transcripts/C03-AFTERFALL/S99/SESSION_001'
   await mkdir(resolve(copy, relative), { recursive: true })
