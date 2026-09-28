@@ -1,34 +1,48 @@
 -- Keep the Archive exporter limited to public AFTERFALL transcript reads.
+-- The role itself is created/hardened by earlier tracked migrations. This
+-- migration intentionally does not CREATE/ALTER roles because hosted Supabase
+-- migration execution may not have cluster-level role-management privileges.
 -- The operator sets the login password outside migrations and stores its URL
 -- in the ARCHIVE_EXPORT_DATABASE_URL repository secret.
 
 do $$
-begin
-  if not exists (select 1 from pg_roles where rolname = 'archive_exporter') then
-    create role archive_exporter login;
-  end if;
-end;
-$$;
-
-alter role archive_exporter
-  login nosuperuser nobypassrls nocreatedb nocreaterole noreplication noinherit;
-alter role archive_exporter set default_transaction_read_only = 'on';
-alter role archive_exporter set statement_timeout = '10s';
-
-do $$
 declare
-  membership record;
+  role_row record;
 begin
-  for membership in
-    select granted.rolname
+  select rolcanlogin, rolsuper, rolbypassrls, rolcreatedb, rolcreaterole,
+         rolreplication, rolinherit, rolconfig
+    into role_row
+    from pg_roles
+    where rolname = 'archive_exporter';
+
+  if not found then
+    raise exception 'archive_exporter role is missing; apply earlier Archive exporter role migrations first';
+  end if;
+
+  if role_row.rolcanlogin is not true
+     or role_row.rolsuper is true
+     or role_row.rolbypassrls is true
+     or role_row.rolcreatedb is true
+     or role_row.rolcreaterole is true
+     or role_row.rolreplication is true
+     or role_row.rolinherit is true
+     or not coalesce('default_transaction_read_only=on' = any(role_row.rolconfig), false)
+     or not coalesce('statement_timeout=10s' = any(role_row.rolconfig), false) then
+    raise exception 'archive_exporter role does not satisfy the restricted read-only contract';
+  end if;
+
+  if exists (
+    select 1
     from pg_auth_members m
     join pg_roles member_role on member_role.oid = m.member
-    join pg_roles granted on granted.oid = m.roleid
     where member_role.rolname = 'archive_exporter'
-  loop
-    execute format('revoke %I from archive_exporter', membership.rolname);
-  end loop;
-  execute format('grant connect on database %I to archive_exporter', current_database());
+  ) then
+    raise exception 'archive_exporter must not inherit membership from another role';
+  end if;
+
+  if not has_database_privilege('archive_exporter', current_database(), 'CONNECT') then
+    raise exception 'archive_exporter CONNECT privilege is missing';
+  end if;
 end;
 $$;
 

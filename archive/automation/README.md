@@ -4,9 +4,9 @@ The runner defaults to `SHADOW`. It reads source rows through `archive_exporter`
 
 ## Supabase exporter
 
-Apply `supabase/migrations/20260928050000_archive_exporter_readonly.sql` through the repository's normal Supabase migration process. It grants `SELECT` on only the three transcript tables and scopes their RLS policies to public C03 AFTERFALL data. Message eligibility does not depend on a state link. No password is stored in the migration.
+Apply `supabase/migrations/20260928050000_archive_exporter_readonly.sql` through the repository's normal Supabase migration process. The `archive_exporter` role is created and hardened by earlier tracked Archive migrations; this migration checks that role contract fail-closed, then grants `SELECT` on only the three transcript tables and scopes their RLS policies to public C03 AFTERFALL data. Message eligibility does not depend on a state link. The migration does not create, alter, or password-manage database roles.
 
-Set an operator generated password for `archive_exporter` from a trusted `psql` session with `\password archive_exporter`. Put the resulting connection URL directly into the repository Actions secret `ARCHIVE_EXPORT_DATABASE_URL`; require TLS and URL encode credentials. Do not put the password or URL in source, workflow output, PR text, or chat.
+Set an operator generated password for `archive_exporter` from a trusted SQL session. Put the resulting connection URL directly into the repository Actions secret `ARCHIVE_EXPORT_DATABASE_URL`; require TLS and URL encode credentials. Do not put the password or URL in source, workflow output, PR text, or chat.
 
 Run `supabase/tests/archive_exporter_readonly_verification.sql` with a trusted PostgreSQL role after the migration, in a disposable verification database. It creates fixtures inside a transaction and rolls them back. It briefly drops and restores the `public_safe` check as `NOT VALID` inside that same transaction so the RLS policy can be tested against a false row.
 
