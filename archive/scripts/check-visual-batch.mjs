@@ -5,7 +5,7 @@ import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { prepareVisualPublication, APPROVED_S02_APPEARANCE_REF } from './run-visual-publication.mjs'
-import { snapshotFromPublishedS02 } from './dry-run-publication.mjs'
+import { fingerprint } from './lib/publication-plan.mjs'
 import { legacyPublicAppearance, planVisualSelection, visualByteHash } from './lib/visual-compiler.mjs'
 import { POLICY } from './lib/publication-plan.mjs'
 import { characterAppearanceByNodeId } from '../web/src/archive/characterAppearance.ts'
@@ -13,19 +13,21 @@ import { characterAppearanceByNodeId } from '../web/src/archive/characterAppeara
 const root = resolve(import.meta.dirname, '..', '..')
 const command = (exe, args, cwd = root) => execFileSync(exe, args, { cwd, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] })
 const head = command('git', ['rev-parse', 'HEAD']).trim()
-const snapshot = snapshotFromPublishedS02(JSON.parse(await readFile(resolve(root, 'archive/content/transcripts/C03-AFTERFALL/S02/MANIFEST.json'))), head)
-const approvedBytes = await readFile(resolve(root, APPROVED_S02_APPEARANCE_REF))
+const source = JSON.parse(await readFile(resolve(root, 'archive/content/transcripts/C03-AFTERFALL/S03/MANIFEST.json'))).sessions[0]
+const factsRefS03 = 'archive/content/public-facts/C03-AFTERFALL/S03/FACTS.json'
+const snapshot = { version: 'publication-snapshot-v1', chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', season_id: 'S03', visibility: 'PUBLIC_ARCHIVE', source_revision: head, source_save_version: 258, source_game_time: '2027-04-11 17:20', source_checkpoint: 'worldlines/AFTERFALL/seasons/S03/CURRENT_CHECKPOINT_2027-04-08.md', coverage_status: 'PARTIAL', sources: [{ session_id: source.session_id, source_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_001/SOURCE_MANIFEST.json', source_digest: fingerprint(source), visibility: source.visibility, capture_quality: source.capture_quality, atomic_pairing_complete: source.atomic_pairing_complete, captured_message_range: source.captured_message_range, user_messages: source.user_messages, gm_public_blocks: source.gm_public_blocks }] }
+const approvedBytes = execFileSync('git', ['show', `${head}:${APPROVED_S02_APPEARANCE_REF}`], { cwd: root })
 const approvedInput = JSON.parse(approvedBytes)
 assert.equal(approvedInput.records.length, 18)
 for (const record of approvedInput.records) {
   assert.deepEqual(record.visual, characterAppearanceByNodeId[record.node_id].visual)
   assert.equal(record.status, characterAppearanceByNodeId[record.node_id].status)
 }
-const initial = await prepareVisualPublication(snapshot), repeat = await prepareVisualPublication(snapshot)
+const initial = await prepareVisualPublication(snapshot, { factsRef: factsRefS03 }), repeat = await prepareVisualPublication(snapshot, { factsRef: factsRefS03 })
 assert.ok(initial.candidateBytes.equals(repeat.candidateBytes))
-assert.equal(initial.report.point_count, 34)
+assert.equal(initial.report.point_count, 36)
 assert.equal(initial.report.by_type.CHARACTER, 18)
-assert.equal(initial.report.by_type.LOCATION, 10)
+assert.equal(initial.report.by_type.LOCATION, 11)
 assert.equal(initial.report.by_type.MAP, 0)
 assert.equal(initial.report.skipped, 4)
 const portraits = initial.catalog.points.filter((p) => p.point_type === 'CHARACTER')
@@ -69,16 +71,20 @@ const temporary = await mkdtemp(join(tmpdir(), 'visual-git-e2e-'))
 try {
   const copy = join(temporary, 'repo')
   command('git', ['clone', '--local', '--no-hardlinks', '--quiet', '--no-checkout', root, copy])
+  command('git', ['config', 'core.autocrlf', 'false'], copy)
   command('git', ['checkout', '--detach', head], copy)
   const run = (args) => JSON.parse(command('node', ['--experimental-strip-types', 'archive/scripts/run-visual-publication.mjs', ...args], copy))
   const before = {}
   for (const path of ['archive/content/stories/C01-HAN-JUNHO/BOOK.json', 'archive/content/stories/C02-STRONGHOLD/BOOK.json', 'archive/content/stories/C03-AFTERFALL/BOOK.json', 'archive/web/src/archive/archiveData.ts', 'archive/web/src/archive/characterAppearance.ts']) before[path] = visualByteHash(await readFile(resolve(copy, path)))
-  const first = run(['--demo-s02', '--apply'])
-  assert.equal(first.status, 'UPDATED_LOCAL_VISUAL_CATALOG')
-  assert.equal(first.files_written, 1)
+  const s03SnapshotFile = join(temporary, 's03-snapshot.json')
+  await writeFile(s03SnapshotFile, JSON.stringify(snapshot))
+  const s03Args = ['--snapshot', s03SnapshotFile, '--facts', factsRefS03, '--apply']
+  const first = run(s03Args)
+  assert.equal(first.status, 'NOOP')
+  assert.equal(first.files_written, 0)
   const outputPath = resolve(copy, 'archive/content/visuals/C03-AFTERFALL/VISUALS.json')
   assert.ok(initial.candidateBytes.equals(await readFile(outputPath)))
-  assert.equal(run(['--demo-s02', '--apply']).status, 'NOOP')
+  assert.equal(run(s03Args).status, 'NOOP')
   assert.equal(command('git', ['diff', '--name-only'], copy).trim(), '')
 
   // Publicly approved synthetic sources prove new environment and map-layers work. Not real Canon.
@@ -103,12 +109,12 @@ try {
   const laterSnapshot = { version: 'publication-snapshot-v1', ...publicNamespace, season_id: 'S99', source_revision: command('git', ['rev-parse', 'HEAD'], copy).trim(), source_save_version: boundary.save_version, source_game_time: boundary.game_time, source_checkpoint: 'worldlines/AFTERFALL/seasons/S99/END_CHECKPOINT_2099-01-01.md', coverage_status: 'PARTIAL', sources: [] }
   const snapshotFile = join(temporary, 'snapshot.json')
   await writeFile(snapshotFile, JSON.stringify(laterSnapshot))
-  // Outside the specifically reviewed S02 decision, no dated input means fail closed.
-  assert.throws(() => run(['--snapshot', snapshotFile, '--facts', factsRef, '--map', mapRef, '--apply']))
+  // An unapproved explicit appearance path still fails closed.
+  assert.throws(() => run(['--snapshot', snapshotFile, '--facts', factsRef, '--appearances', factsRef, '--map', mapRef, '--apply']))
   assert.ok(initial.candidateBytes.equals(await readFile(outputPath)))
   const args = ['--snapshot', snapshotFile, '--facts', factsRef, '--appearances', appearancesRef, '--map', mapRef, '--apply']
   const later = run(args)
-  assert.equal(later.point_count, 36)
+  assert.equal(later.point_count, 38)
   assert.equal(later.by_type.MAP, 1)
   const goodBytes = await readFile(outputPath), catalog = JSON.parse(goodBytes)
   assert.equal(catalog.points.find((p) => p.subject_id === 'event-test-visual').brief.art_direction.mood, 'RED_HORIZON')
@@ -125,7 +131,7 @@ try {
   assert.throws(() => run(args))
   assert.ok(goodBytes.equals(await readFile(outputPath)))
   for (const [path, hash] of Object.entries(before)) assert.equal(visualByteHash(await readFile(resolve(copy, path))), hash)
-  assert.equal(command('git', ['diff', '--name-only'], copy).trim(), '')
+  assert.equal(command('git', ['diff', '--name-only'], copy).trim(), 'archive/content/visuals/C03-AFTERFALL/VISUALS.json')
   console.log(JSON.stringify({ real_visual_catalog: initial.report,
     sample_character_brief: firstPortrait.brief,
     current_public_appearance_fields_preserved: true, deterministic_double_compile: true,

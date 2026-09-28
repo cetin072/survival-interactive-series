@@ -39,6 +39,10 @@ const c03S02Manifests = import.meta.glob(
   '../../../content/transcripts/C03-AFTERFALL/S02/MANIFEST.json',
   { eager: true, import: 'default' },
 ) as Record<string, unknown>
+const c03S03Raw = import.meta.glob(
+  '../../../content/transcripts/C03-AFTERFALL/S03/SESSION_*/PART_*.md',
+  { eager: true, query: '?raw', import: 'default' },
+) as Record<string, string>
 
 import { activeChronicle, chronicleRegistry, getChronicle, partitionChronicles, type Chronicle, type ChronicleId, type ChronicleTranscriptStatus } from './chronicleRegistry'
 export { activeChronicle, getChronicle, partitionChronicles, type Chronicle, type ChronicleId, type ChronicleTranscriptStatus }
@@ -108,6 +112,23 @@ const c03S02TranscriptParts: TranscriptPart[] = Object.entries(c03S02Raw)
       source: `worldlines/AFTERFALL/seasons/S02/raw_transcript/${sessionId}/${partFile}`,
       sourceVerified: true,
       content,
+    })
+  })
+
+const c03S03TranscriptParts: TranscriptPart[] = Object.entries(c03S03Raw)
+  .sort(([left], [right]) => left.localeCompare(right))
+  .map(([path, content]) => {
+    const match = path.match(/S03\/(SESSION_\d{3})\/(PART_(\d{3})\.md)$/)
+    if (!match) throw new Error('Unexpected C03 S03 Archive transcript path: ' + path)
+    const [, sessionId, partFile, partNumber] = match
+    return c03({
+      id: `c03-s03-${sessionId.toLowerCase().replace(/_/g, '-')}-${partNumber}`,
+      seasonId: 'S03', sessionId, number: Number(partNumber),
+      title: `2027년 4월 보관업 · PART ${partNumber}`,
+      range: '2027-04-08 11:30 → 2027-04-11 17:20 · 원본 순서 42–49',
+      status: 'verified_transcript',
+      source: `archive/content/transcripts/C03-AFTERFALL/S03/${sessionId}/${partFile}`,
+      sourceVerified: true, content,
     })
   })
 
@@ -241,6 +262,8 @@ export const transcriptParts: TranscriptPart[] = [
   c03({ id: 'c03-s02-session-001-gap', seasonId: 'S02', sessionId: 'SESSION_001', number: 0, title: '세션 001 직접 확인 전 구간', range: '2026-11-22 industrial-fire response 이전', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/SOURCE_INDEX.md', sourceVerified: true }),
   c03({ id: 'c03-s02-session-002-gap', seasonId: 'S02', sessionId: 'SESSION_002', number: 0, title: '세션 002 직접 확인 전 구간', range: '2027-01-04 first-winter discussion 이전', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/SOURCE_INDEX.md', sourceVerified: true }),
   ...c03S02TranscriptParts,
+  c03({ id: 'c03-s03-session-001-gap', seasonId: 'S03', sessionId: 'SESSION_001', number: 0, title: 'S03 원본 순서 0–41', range: '첫 게시 배치 이전 · 아직 Archive에 보존되지 않은 구간', status: 'missing_transcript', source: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_001/SOURCE_INDEX.md', sourceVerified: true }),
+  ...c03S03TranscriptParts,
 ]
 
 export function transcriptPartsFor(chronicleId: ChronicleId) { return transcriptParts.filter((part) => part.chronicleId === chronicleId) }
