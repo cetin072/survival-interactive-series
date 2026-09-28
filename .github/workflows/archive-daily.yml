@@ -3,8 +3,8 @@ name: AFTERFALL daily Archive
 on:
   workflow_dispatch:
   schedule:
-    # 19:30 UTC is 04:30 KST on the following day.
-    - cron: '30 19 * * *'
+    # 23:40 UTC is 08:40 KST on the following day.
+    - cron: '40 23 * * *'
 
 permissions:
   contents: write
