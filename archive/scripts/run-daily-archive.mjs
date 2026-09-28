@@ -181,9 +181,13 @@ function proposal({ discovery, candidate, base, mode }) {
   insist(git('rev-parse', 'origin/main') === base, 'STALE_BASE_HUMAN_REVIEW_REQUIRED')
   const digest = candidate.source.segmentId.slice(8, 20)
   const branch = `codex/archive-daily-${discovery.startOrder}-${discovery.endOrder}-${digest}`
-  const changed = git('status', '--short').split('\n').filter(Boolean)
-  insist(changed.every((line) => [candidate.prefix, `${seasonRoot}/MANIFEST.json`, bookRef,
-    graphRef, visualRef].some((ref) => line.slice(3).startsWith(ref))), 'OWNERSHIP_VIOLATION')
+  const changed = [...new Set([
+    ...git('diff', 'HEAD', '--name-only').split('\n'),
+    ...git('ls-files', '--others', '--exclude-standard').split('\n'),
+  ].filter(Boolean))]
+  const owned = [candidate.prefix, `${seasonRoot}/MANIFEST.json`, bookRef, graphRef, visualRef]
+  insist(changed.every((path) => owned.some((ref) => path === ref || path.startsWith(`${ref}/`))),
+    'OWNERSHIP_VIOLATION')
   git('switch', '-c', branch)
   git('add', `${seasonRoot}/MANIFEST.json`, candidate.prefix, bookRef, graphRef, visualRef)
   git('-c', 'user.name=archive-daily', '-c', 'user.email=archive-daily@users.noreply.github.com',
