@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "mode": "BATCHED",
+  "site": "survival-diary-archive",
+  "production_interval_days": 2,
+  "release_hour_kst": 23,
+  "max_production_deploys_per_day": 1
+}
