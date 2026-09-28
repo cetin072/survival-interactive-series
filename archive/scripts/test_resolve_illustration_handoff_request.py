@@ -28,8 +28,9 @@ class IllustrationHandoffRequestTests(unittest.TestCase):
             resolver.normalized("1", "a" * 40, "../../secret.json")
 
     def test_request_shape_is_strict(self):
-        with tempfile.TemporaryDirectory(dir=ROOT / "archive/automation") as directory:
-            path = Path(directory) / "request.json"
+        path = ROOT / "archive/automation/illustration-handoff-requests/test-bad-shape.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        try:
             path.write_text(json.dumps({
                 "version": resolver.REQUEST_VERSION,
                 "release_id": 1,
@@ -37,8 +38,10 @@ class IllustrationHandoffRequestTests(unittest.TestCase):
                 "identity_path": "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_BAEKUN.json",
                 "unexpected": True,
             }), encoding="utf-8")
-            with self.assertRaisesRegex(ValueError, "HANDOFF_REQUEST_PATH_INVALID"):
+            with self.assertRaisesRegex(ValueError, "HANDOFF_REQUEST_SHAPE_INVALID"):
                 resolver.from_request(path)
+        finally:
+            path.unlink(missing_ok=True)
 
     def test_checked_in_request_resolves(self):
         path = ROOT / "archive/automation/illustration-handoff-requests/test-request.json"
@@ -55,7 +58,6 @@ class IllustrationHandoffRequestTests(unittest.TestCase):
             self.assertEqual(result["request_path"], path.relative_to(ROOT).as_posix())
         finally:
             path.unlink(missing_ok=True)
-            path.parent.rmdir()
 
 
 if __name__ == "__main__":
