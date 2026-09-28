@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { verifyProductionPublication } from './lib/knowledge-release.mjs'
+import { isExactProductionDeployMeta } from './lib/knowledge-production.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 const shaPattern = /^[a-f0-9]{40}$/
@@ -37,10 +38,7 @@ for (let attempt = 0; attempt < 48; attempt += 1) {
     const response = await publicResponse('/deploy-meta.json')
     if (response.ok) {
       const candidate = await response.json()
-      if (candidate?.version === 1
-        && candidate.provider === 'netlify'
-        && candidate.context === 'production'
-        && candidate.commit_ref === options.mergeSha) {
+      if (isExactProductionDeployMeta(candidate, options.mergeSha)) {
         deployMeta = candidate
         break
       }
