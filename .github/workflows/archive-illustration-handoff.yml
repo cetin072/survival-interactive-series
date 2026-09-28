@@ -5,6 +5,9 @@ on:
     branches:
       - codex/illustration-automation-b
     paths:
+      - .github/workflows/archive-illustration-handoff.yml
+      - archive/scripts/illustration_storage_handoff.py
+      - archive/scripts/test_illustration_storage_handoff.py
       - archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_*.json
 
 permissions:
@@ -33,21 +36,34 @@ jobs:
         shell: bash
         run: |
           mapfile -t identities < <(git diff --name-only HEAD^ HEAD -- 'archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_*.json')
-          if [[ "${#identities[@]}" -ne 1 ]]; then
+          if [[ "${#identities[@]}" -eq 0 ]]; then
+            printf 'mode=diagnostic\n' >> "$GITHUB_OUTPUT"
+            printf 'identity=archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_WAREHOUSE.json\n' >> "$GITHUB_OUTPUT"
+          elif [[ "${#identities[@]}" -eq 1 ]]; then
+            printf 'mode=handoff\n' >> "$GITHUB_OUTPUT"
+            printf 'identity=%s\n' "${identities[0]}" >> "$GITHUB_OUTPUT"
+          else
             echo "Expected one changed illustration identity; found ${#identities[@]}" >&2
             exit 1
           fi
-          printf 'identity=%s\n' "${identities[0]}" >> "$GITHUB_OUTPUT"
       - name: Validate illustration handoff contracts
         run: python archive/scripts/test_illustration_storage_handoff.py
+      - name: Read back the existing warehouse row through the trusted REST route
+        if: steps.target.outputs.mode == 'diagnostic'
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          IDENTITY_PATH: ${{ steps.target.outputs.identity }}
+        run: python archive/scripts/illustration_storage_handoff.py --registry-diagnostic --identity "$IDENTITY_PATH"
       - name: Issue one-object encrypted upload token
+        if: steps.target.outputs.mode == 'handoff'
         env:
           ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
           ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
           IDENTITY_PATH: ${{ steps.target.outputs.identity }}
         run: python archive/scripts/illustration_storage_handoff.py --issue --identity "$IDENTITY_PATH" --envelope "$RUNNER_TEMP/illustration-signed-upload.json"
       - name: Keep only encrypted token material for the local one-time upload
-        if: always()
+        if: always() && steps.target.outputs.mode == 'handoff'
         uses: actions/upload-artifact@v4
         with:
           name: illustration-signed-upload-${{ github.run_id }}-${{ github.run_attempt }}
@@ -55,6 +71,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 1
       - name: Verify private readback and reconcile one READY visual
+        if: steps.target.outputs.mode == 'handoff'
         env:
           ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
           ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
