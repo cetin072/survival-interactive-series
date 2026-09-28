@@ -50,5 +50,10 @@
       "decision": "ACCEPT",
       "review_summary": "No vegetation; dry matte surfaces; restrained cool blue-gray hand-painted illustration matching the archive reference."
     }
-  ]
+  ],
+  "accepted_review": {
+    "vegetation": "NONE_OBSERVED",
+    "surface": "DRY_MATTE",
+    "style": "PAINTERLY_AFTERFALL_ARCHIVE_V1"
+  }
 }
