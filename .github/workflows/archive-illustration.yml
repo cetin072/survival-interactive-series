@@ -11,8 +11,6 @@ on:
     branches: [main]
     paths:
       - archive/content/visuals/**/VISUALS.json
-      - archive/content/visuals/**/SITE_ASSETS.json
-      - archive/content/visuals/**/ILLUSTRATION_RECEIPTS.json
       - archive/scripts/run-illustration-worker.mjs
       - archive/scripts/lib/illustration-worker.mjs
       - .github/workflows/archive-illustration.yml
