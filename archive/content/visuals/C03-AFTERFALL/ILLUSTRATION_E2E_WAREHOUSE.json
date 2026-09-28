@@ -1,0 +1,22 @@
+{
+  "version": "illustration-e2e-identity-v1",
+  "subject_id": "loc-guild-rear-warehouse",
+  "point_id": "point-df6dfecbd13bcd0d2fc7de0a0b44d2d4f87c5343b7fa4b343bdaaa67e59e67b5",
+  "generation_key": "generation-3743c065c28f7621e2c6d3cc01fd4860af12f16f3430481663ed37dc4a2c0f1b",
+  "catalog_ref": "d6bdeb8ee2a687b23fb7bbca31a9156cf8222692",
+  "provider": "image_gen.imagegen",
+  "provider_model": null,
+  "tool": "image_gen.imagegen",
+  "surface": "CODEX_NATIVE_IMAGEGEN",
+  "tool_result_id": "0f4b2622-6c31-47f6-aec5-4d7eda94cdc9",
+  "source_sha256": "2eb7736605c96f23d089af36cbad001b06954989678a296db7a27696fc43e810",
+  "original_bytes": 2157851,
+  "original_width": 1536,
+  "original_height": 1024,
+  "content_review": "MATCHES_INTENDED_BRIEF",
+  "review_summary": "Abstract painterly public overview; no text, people, interior inventory, route, or identifiable architecture.",
+  "generation_attempts": 3,
+  "accepted_image_count": 1,
+  "paid_api_calls": 0,
+  "unattended_generation_proven": false
+}
