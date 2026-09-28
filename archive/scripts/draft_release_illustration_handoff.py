@@ -148,6 +148,14 @@ class GitHubApi:
             obj = value.get("object", {})
         raise ValueError("DRAFT_RELEASE_TAG_CHAIN_TOO_DEEP")
 
+    def tag_commit_if_exists(self, tag_name):
+        try:
+            return self.tag_commit(tag_name)
+        except ValueError as error:
+            if str(error) == "GITHUB_API_HTTP_404":
+                return None
+            raise
+
     def asset_bytes(self, asset_id):
         demand(isinstance(asset_id, int) and asset_id > 0, "DRAFT_RELEASE_ASSET_ID_INVALID")
         status, final_url, content = self.request(
@@ -201,7 +209,9 @@ def validate_release(api, release_id, record, source_commit, set_cleanup_output=
     demand(release.get("draft") is True and release.get("prerelease") is False,
            "DRAFT_RELEASE_REQUIRED")
     demand(release.get("tag_name") == tag, "DRAFT_RELEASE_TAG_MISMATCH")
-    demand(api.tag_commit(tag) == source_commit, "DRAFT_RELEASE_SOURCE_COMMIT_MISMATCH")
+    tag_commit = api.tag_commit_if_exists(tag)
+    demand(tag_commit is None or tag_commit == source_commit,
+           "DRAFT_RELEASE_SOURCE_COMMIT_MISMATCH")
     if set_cleanup_output:
         output = os.environ.get("GITHUB_OUTPUT")
         if output:
@@ -288,17 +298,18 @@ def cleanup(args):
     demand(release.get("tag_name") == tag, "CLEANUP_RELEASE_MISMATCH")
     demand(release.get("draft") is True, "CLEANUP_DRAFT_RELEASE_REQUIRED")
     demand(release.get("id") == int(args.release_id), "CLEANUP_RELEASE_ID_MISMATCH")
-    demand(api.tag_commit(tag) == args.source_commit, "CLEANUP_SOURCE_COMMIT_MISMATCH")
+    tag_commit = api.tag_commit_if_exists(tag)
+    demand(tag_commit is None or tag_commit == args.source_commit,
+           "CLEANUP_SOURCE_COMMIT_MISMATCH")
     status, _, _ = api.request(f"releases/{args.release_id}", method="DELETE")
     demand(status in (200, 202, 204), "DRAFT_RELEASE_CLEANUP_FAILED")
-    try:
+    tag_cleanup = "absent"
+    if tag_commit is not None:
         status, _, _ = api.request(f"git/refs/tags/{quote(tag, safe='-._')}", method="DELETE")
         demand(status in (200, 202, 204), "DRAFT_RELEASE_TAG_CLEANUP_FAILED")
-    except ValueError as error:
-        if str(error) != "GITHUB_API_HTTP_404":
-            raise
+        tag_cleanup = "deleted"
     return {"status": "DRAFT_RELEASE_CLEANUP_PASS", "release_id": int(args.release_id),
-            "tag_name": tag}
+            "tag_name": tag, "tag_cleanup": tag_cleanup}
 
 
 def main():
