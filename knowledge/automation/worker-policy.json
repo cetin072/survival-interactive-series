@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "worker_enabled": true,
+  "execution_mode": "EXTERNAL_CHATGPT_SCHEDULED",
+  "scan_order": "OLDEST_PENDING_FIRST",
+  "max_sources_per_run": 1,
+  "max_new_briefs_per_source": 1,
+  "candidate_policy": {
+    "auto_candidate_risk_level": "LOW",
+    "allowed_auto_risk_domains": [
+      "GENERAL_PREPAREDNESS",
+      "FOOD_STORAGE",
+      "COMMUNICATION",
+      "EVACUATION"
+    ],
+    "high_risk_domains": [
+      "MEDICAL",
+      "MEDICATION",
+      "FIRST_AID_PROCEDURE",
+      "WATER_PURIFICATION",
+      "GENERATOR",
+      "COMBUSTION_CO",
+      "ELECTRICAL",
+      "RESCUE",
+      "SHELTER_STRUCTURAL",
+      "OTHER_SEVERE_HARM"
+    ],
+    "prefer_distinct_nonduplicate_question": true,
+    "never_downgrade_risk_to_make_auto_eligible": true
+  },
+  "research_policy": {
+    "story_source_is_narrative_provenance_only": true,
+    "authoritative_external_source_required_for_reality_claims": true,
+    "minimum_authoritative_sources_per_brief": 2,
+    "record_context_limitations_conflicts_unknowns": true
+  },
+  "publication_policy": {
+    "required_repository_mode": "AUTO_LOW_RISK_SHADOW",
+    "required_auto_publish_enabled": false,
+    "create_knowledge_pr": true,
+    "auto_merge": false,
+    "production_publish": false
+  },
+  "source_policy": {
+    "require_verified_public_archive": true,
+    "pin_source_manifest_sha256": true,
+    "leave_other_pending_sources_unprocessed": true
+  },
+  "notification_policy": {
+    "notify_on": [
+      "PR_CREATED",
+      "HUMAN_REVIEW_REQUIRED",
+      "BLOCKING_FAILURE"
+    ],
+    "silent_on": [
+      "NO_PENDING",
+      "ORDINARY_HOLD"
+    ]
+  }
+}
