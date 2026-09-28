@@ -2,19 +2,11 @@ name: Batched Archive Production release
 
 on:
   schedule:
-    # Check daily at 23:30 KST. Policy currently permits one Production release every 2 days.
+    # Check daily at 23:30 KST. The runner enforces the two-day Production interval.
     - cron: '30 14 * * *'
-  workflow_dispatch:
-    inputs:
-      force:
-        description: Force an immediate Production release even inside the batching window
-        required: false
-        default: false
-        type: boolean
 
 permissions:
   contents: write
-  actions: read
 
 concurrency:
   group: archive-production-release
@@ -22,6 +14,7 @@ concurrency:
 
 jobs:
   release:
+    if: github.repository == 'cetin072/survival-interactive-series'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -30,65 +23,15 @@ jobs:
           GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
         run: |
           test -n "$GH_TOKEN" || { echo "ARCHIVE_GITHUB_TOKEN_REQUIRED"; exit 1; }
-
       - name: Checkout current main
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
           token: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-
-      - name: Prepare release marker if due
-        id: prepare
-        shell: bash
-        env:
-          FORCE_RELEASE: ${{ github.event.inputs.force }}
-        run: |
-          args=(--apply)
-          if [[ "$FORCE_RELEASE" == "true" ]]; then args+=(--force); fi
-          node archive/scripts/prepare-production-release.mjs "${args[@]}" > "$RUNNER_TEMP/release.json"
-          cat "$RUNNER_TEMP/release.json"
-          node --input-type=module <<'NODE' >> "$GITHUB_OUTPUT"
-          import { readFileSync } from 'node:fs'
-          const result = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/release.json', 'utf8'))
-          console.log(`status=${result.status}`)
-          if (result.source_main_sha) console.log(`source_sha=${result.source_main_sha}`)
-          NODE
-
-      - name: Commit one batched Production trigger
-        if: steps.prepare.outputs.status == 'RELEASE_PREPARED'
-        id: commit
-        env:
-          SOURCE_SHA: ${{ steps.prepare.outputs.source_sha }}
-        run: |
-          git add archive/web/public/release/production.json
-          git config user.name "archive-release-bot"
-          git config user.email "archive-release-bot@users.noreply.github.com"
-          git commit -m "release: publish batched Production for ${SOURCE_SHA:0:12}"
-          RELEASE_SHA="$(git rev-parse HEAD)"
-          git fetch origin main
-          test "$(git rev-parse HEAD^)" = "$(git rev-parse origin/main)" || {
-            echo "MAIN_MOVED_RELEASE_ABORTED"
-            exit 1
-          }
-          git push origin HEAD:main
-          echo "release_sha=$RELEASE_SHA" >> "$GITHUB_OUTPUT"
-
-      - name: Verify exact Netlify Production release
-        if: steps.prepare.outputs.status == 'RELEASE_PREPARED'
-        env:
-          SOURCE_SHA: ${{ steps.prepare.outputs.source_sha }}
-          RELEASE_SHA: ${{ steps.commit.outputs.release_sha }}
-        run: |
-          node archive/scripts/verify-production-release.mjs \
-            --source-sha "$SOURCE_SHA" \
-            --release-sha "$RELEASE_SHA"
-
-      - name: Summarize no-op
-        if: steps.prepare.outputs.status != 'RELEASE_PREPARED'
-        run: echo "No Production deploy needed: ${{ steps.prepare.outputs.status }}"
+      - name: Run one batched Production release cycle
+        run: node archive/scripts/run-production-release.mjs
