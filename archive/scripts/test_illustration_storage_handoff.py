@@ -1,6 +1,7 @@
 """Offline contract checks; no Storage or database calls are made."""
 import contextlib
 import importlib.util
+import io
 import json
 import sys
 import tempfile
@@ -72,6 +73,34 @@ class IllustrationStorageHandoffTests(unittest.TestCase):
     def test_published_target_is_rejected_from_new_handoff(self):
         with self.assertRaisesRegex(ValueError, "SITE_ASSET_ALREADY_EXISTS"):
             handoff.identity()
+
+    def test_identity_path_is_explicit_and_diagnostic_can_read_published_asset(self):
+        record = json.loads(handoff.IDENTITY.read_text(encoding="utf-8"))
+        with self.assertRaisesRegex(ValueError, "SITE_ASSET_ALREADY_EXISTS"):
+            handoff.identity(handoff.IDENTITY)
+        resolved, _, _, _ = handoff.identity(handoff.IDENTITY, allow_published=True)
+        self.assertEqual(resolved["point_id"], record["point_id"])
+
+    def test_identity_argument_accepts_a_different_ready_visual_subject(self):
+        catalog = json.loads(handoff.CATALOG.read_text(encoding="utf-8"))
+        point = next(item for item in catalog["points"] if item.get("subject_id") == "loc-baekun")
+        record = json.loads(handoff.IDENTITY.read_text(encoding="utf-8"))
+        record.update({"subject_id": point["subject_id"], "point_id": point["point_id"],
+                       "generation_key": point["generation_key"], "source_sha256": "a" * 64,
+                       "tool_result_id": "native-generation-test"})
+        with tempfile.TemporaryDirectory() as directory:
+            identity_path = Path(directory) / "baekun.json"
+            identity_path.write_text(json.dumps(record), encoding="utf-8")
+            resolved, _, resolved_point, object_path = handoff.identity(identity_path)
+        self.assertEqual(resolved_point["subject_id"], "loc-baekun")
+        self.assertEqual(resolved["point_id"], point["point_id"])
+        self.assertTrue(object_path.endswith("/" + "a" * 64 + ".png"))
+
+    def test_registry_http_error_preserves_status_and_response(self):
+        error = handoff.HTTPError("https://example.invalid", 406, "Not Acceptable", {},
+                                  io.BytesIO(b'{"code":"PGRST106"}'))
+        diagnostic = handoff.registry_read_error(error)
+        self.assertEqual(str(diagnostic), 'REGISTRY_READ_FAILED_HTTP_406:{"code":"PGRST106"}')
 
 
 if __name__ == "__main__":
