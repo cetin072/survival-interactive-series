@@ -47,7 +47,7 @@ jobs:
         id: prepare
         shell: bash
         env:
-          FORCE_RELEASE: ${{ inputs.force }}
+          FORCE_RELEASE: ${{ github.event.inputs.force }}
         run: |
           args=(--apply)
           if [[ "$FORCE_RELEASE" == "true" ]]; then args+=(--force); fi
