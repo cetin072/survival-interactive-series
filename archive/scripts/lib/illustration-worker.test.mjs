@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { appendIllustrationReceipt, createProvider, createShadowReport, selectIllustrationCandidates } from './illustration-worker.mjs'
+import { appendIllustrationReceipt, createProvider, createShadowReport, kstCalendarDay, selectIllustrationCandidates } from './illustration-worker.mjs'
 
 const point = (id, priority = 10, overrides = {}) => ({
   point_id: `point-${id.repeat(64)}`,
@@ -17,7 +17,9 @@ const point = (id, priority = 10, overrides = {}) => ({
 })
 const receipt = (p, status, last_run_at = '2026-09-28T01:00:00.000Z', attempt_count = 1) => ({
   point_id: p.point_id, generation_key: p.generation_key, subject_id: p.subject_id,
-  attempt_count, last_status: status, last_run_at,
+  mode: 'LIVE_MANUAL', provider: 'manual_import', attempt_count, last_status: status, last_run_at,
+  output_sha256: ['SUCCEEDED', 'PUBLISHED'].includes(status) ? 'a'.repeat(64) : null,
+  published_asset_ref: status === 'PUBLISHED' ? `/visual-assets/${'b'.repeat(64)}.png` : null,
 })
 const select = ({ points, assets = [], attempts = [], batchLimit = 3, now = new Date('2026-09-28T05:00:00.000Z'), subjectIds = null }) => selectIllustrationCandidates({
   catalog: { points }, siteAssets: { assets }, receipts: { version: 'illustration-receipts-v1', attempts }, now, batchLimit, subjectIds,
@@ -51,9 +53,15 @@ test('generation key changes create a new identity candidate', () => {
   assert.equal(plan.candidates[0].generation_key, revised.generation_key)
 })
 
-test('orders higher priority first and enforces the batch limit', () => {
-  const plan = select({ points: [point('a', 1), point('b', 25), point('c', 15), point('d', 30)], batchLimit: 3 })
-  assert.deepEqual(plan.candidates.map((item) => item.priority), [30, 25, 15])
+test('orders the authoritative priority values ascending with deterministic ties', () => {
+  const points = [point('e', 30), point('c', 20), point('a', 0), point('d', 25), point('b', 10)]
+  const firstBatch = select({ points, batchLimit: 3 })
+  assert.deepEqual(firstBatch.candidates.map((item) => item.priority), [0, 10, 20])
+  const publishedFirstBatch = firstBatch.candidates.map(({ point_id, generation_key }) => ({ point_id, generation_key }))
+  const rest = select({ points, assets: publishedFirstBatch, batchLimit: 3 })
+  assert.deepEqual([...firstBatch.candidates, ...rest.candidates].map((item) => item.priority), [0, 10, 20, 25, 30])
+  const ties = select({ points: [point('b', 10), point('a', 10)] })
+  assert.deepEqual(ties.candidates.map((item) => item.point_id), [point('a').point_id, point('b').point_id])
 })
 
 test('applies the daily attempt cap across identities', () => {
@@ -105,6 +113,48 @@ test('records manual attempts within retry caps and rejects live auto', () => {
   assert.equal(third.attempts.length, 3)
   assert.throws(() => appendIllustrationReceipt(third, candidate, { provider: 'manual_import', status: 'FAILED' }), /RETRY_CAP_REACHED/)
   assert.throws(() => appendIllustrationReceipt(empty, candidate, { mode: 'LIVE_AUTO', provider: 'manual_import', status: 'IMPORTED' }), /INVALID_ILLUSTRATION_ATTEMPT/)
+})
+
+test('rejects malformed receipts before success, retry, or daily cap decisions', () => {
+  const candidate = point('a')
+  const valid = receipt(candidate, 'FAILED')
+  const corruptions = [
+    { point_id: 'bad' },
+    { generation_key: 'bad' },
+    { subject_id: '  ' },
+    { mode: 'SHADOW' },
+    { provider: 'unknown' },
+    { attempt_count: 2 },
+    { last_status: 'SUCCESSISH' },
+    { last_run_at: '2026-09-28' },
+    { output_sha256: 'bad' },
+    { published_asset_ref: '../private/original.png' },
+  ]
+  for (const corrupt of corruptions) {
+    const attempt = { ...valid, ...corrupt }
+    assert.throws(() => select({ points: [candidate], attempts: [attempt] }), /INVALID_ILLUSTRATION_RECEIPT_ENTRY/)
+  }
+  const successWithoutOutputHash = { ...receipt(candidate, 'SUCCEEDED'), output_sha256: null }
+  assert.throws(() => select({ points: [candidate], attempts: [successWithoutOutputHash] }), /INVALID_ILLUSTRATION_RECEIPT_ENTRY/)
+  const publishedWithoutRef = { ...receipt(candidate, 'PUBLISHED'), published_asset_ref: null }
+  assert.throws(() => select({ points: [candidate], attempts: [publishedWithoutRef] }), /INVALID_ILLUSTRATION_RECEIPT_ENTRY/)
+})
+
+test('resets the daily counter at the Asia/Seoul calendar boundary', () => {
+  const points = Array.from({ length: 6 }, (_, index) => point(String.fromCharCode(97 + index)))
+  const attempts = points.map((item) => receipt(item, 'FAILED', '2026-09-28T14:59:00.000Z')) // 23:59 KST
+  const beforeMidnight = new Date('2026-09-28T14:59:00.000Z')
+  const afterMidnight = new Date('2026-09-28T15:01:00.000Z') // next day 00:01 KST
+  assert.equal(kstCalendarDay(beforeMidnight), '2026-09-28')
+  assert.equal(kstCalendarDay(afterMidnight), '2026-09-29')
+  assert.equal(select({ points, attempts, now: beforeMidnight }).attempt_count_today, 6)
+  const nextDayPlan = select({ points, attempts, now: afterMidnight })
+  assert.equal(nextDayPlan.attempt_count_today, 0)
+  assert.equal(nextDayPlan.daily_capacity_remaining, 6)
+  const nextDayReceipt = appendIllustrationReceipt({ version: 'illustration-receipts-v1', attempts }, points[0], {
+    provider: 'manual_import', status: 'FAILED', now: afterMidnight,
+  })
+  assert.equal(nextDayReceipt.attempts.length, 7)
 })
 
 test('preserves the three real published images and the siteVisualFor path contract', async () => {

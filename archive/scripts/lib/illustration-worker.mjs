@@ -5,6 +5,8 @@ export const DAILY_ATTEMPT_CAP = 6
 export const MAX_ASSET_ATTEMPTS = 3
 export const DEFAULT_PROVIDER = 'shadow'
 export const SUPPORTED_PROVIDERS = ['shadow', 'native_chatgpt', 'api_openai', 'manual_import']
+export const RECEIPT_MODES = ['LIVE_MANUAL']
+export const RECEIPT_STATUSES = ['FAILED', 'SUCCEEDED', 'PUBLISHED']
 
 const ID = {
   point: /^point-[a-f0-9]{64}$/,
@@ -12,7 +14,22 @@ const ID = {
 }
 
 const sameIdentity = (left, right) => left.point_id === right.point_id && left.generation_key === right.generation_key
-const dayOf = (timestamp) => typeof timestamp === 'string' ? timestamp.slice(0, 10) : ''
+const isoUTC = (value) => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)
+  && Number.isFinite(Date.parse(value)) && new Date(value).toISOString() === value
+const sha256OrNull = (value) => value === null || (typeof value === 'string' && /^[a-f0-9]{64}$/.test(value))
+const safePublishedAssetRef = (value) => value === null
+  || (typeof value === 'string' && /^\/visual-assets\/[a-f0-9]{64}\.png$/.test(value))
+
+const KST_DATE = new Intl.DateTimeFormat('en', {
+  timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit',
+})
+
+export function kstCalendarDay(value) {
+  const date = value instanceof Date ? value : new Date(value)
+  if (!Number.isFinite(date.valueOf())) throw new Error('INVALID_ILLUSTRATION_TIMESTAMP')
+  const parts = Object.fromEntries(KST_DATE.formatToParts(date).map(({ type, value: part }) => [type, part]))
+  return `${parts.year}-${parts.month}-${parts.day}`
+}
 
 export async function readJson(path) {
   return JSON.parse(await readFile(path, 'utf8'))
@@ -23,9 +40,15 @@ export function validateReceipts(receipts) {
     throw new Error('INVALID_ILLUSTRATION_RECEIPTS')
   }
   for (const attempt of receipts.attempts) {
-    if (!ID.point.test(attempt.point_id) || !ID.generation.test(attempt.generation_key)
-      || typeof attempt.subject_id !== 'string' || !Number.isInteger(attempt.attempt_count)
-      || attempt.attempt_count !== 1 || typeof attempt.last_status !== 'string') {
+    if (!attempt || typeof attempt !== 'object' || Array.isArray(attempt)
+      || !ID.point.test(attempt.point_id ?? '') || !ID.generation.test(attempt.generation_key ?? '')
+      || typeof attempt.subject_id !== 'string' || attempt.subject_id.trim().length === 0
+      || !RECEIPT_MODES.includes(attempt.mode) || !SUPPORTED_PROVIDERS.includes(attempt.provider)
+      || attempt.attempt_count !== 1 || !RECEIPT_STATUSES.includes(attempt.last_status)
+      || !isoUTC(attempt.last_run_at) || !sha256OrNull(attempt.output_sha256)
+      || !safePublishedAssetRef(attempt.published_asset_ref)
+      || (attempt.last_status === 'SUCCEEDED' && !/^[a-f0-9]{64}$/.test(attempt.output_sha256 ?? ''))
+      || (attempt.last_status === 'PUBLISHED' && (!/^[a-f0-9]{64}$/.test(attempt.output_sha256 ?? '') || !attempt.published_asset_ref))) {
       throw new Error('INVALID_ILLUSTRATION_RECEIPT_ENTRY')
     }
   }
@@ -34,15 +57,15 @@ export function validateReceipts(receipts) {
 
 export function appendIllustrationReceipt(receipts, point, { mode = 'LIVE_MANUAL', provider, status, outputSha256 = null, publishedAssetRef = null, now = new Date() }) {
   validateReceipts(receipts)
-  if (!validPoint(point) || mode !== 'LIVE_MANUAL' || !SUPPORTED_PROVIDERS.includes(provider)
-    || typeof status !== 'string' || !status || (outputSha256 !== null && !/^[a-f0-9]{64}$/.test(outputSha256))) {
+  if (!validPoint(point) || !RECEIPT_MODES.includes(mode) || !SUPPORTED_PROVIDERS.includes(provider)
+    || !RECEIPT_STATUSES.includes(status) || !sha256OrNull(outputSha256) || !safePublishedAssetRef(publishedAssetRef)) {
     throw new Error('INVALID_ILLUSTRATION_ATTEMPT')
   }
   const identityHistory = receipts.attempts.filter((attempt) => sameIdentity(attempt, point))
   if (identityHistory.some((attempt) => ['SUCCEEDED', 'PUBLISHED'].includes(attempt.last_status))) throw new Error('ILLUSTRATION_ALREADY_SUCCEEDED')
   if (identityHistory.length >= MAX_ASSET_ATTEMPTS) throw new Error('ILLUSTRATION_RETRY_CAP_REACHED')
-  const today = now.toISOString().slice(0, 10)
-  const todayCount = receipts.attempts.filter((attempt) => dayOf(attempt.last_run_at) === today)
+  const today = kstCalendarDay(now)
+  const todayCount = receipts.attempts.filter((attempt) => kstCalendarDay(attempt.last_run_at) === today)
     .reduce((sum, attempt) => sum + attempt.attempt_count, 0)
   if (todayCount >= DAILY_ATTEMPT_CAP) throw new Error('ILLUSTRATION_DAILY_CAP_REACHED')
   const attempt = {
@@ -57,6 +80,7 @@ export function appendIllustrationReceipt(receipts, point, { mode = 'LIVE_MANUAL
     output_sha256: outputSha256,
     published_asset_ref: publishedAssetRef,
   }
+  validateReceipts({ version: receipts.version, attempts: [attempt] })
   return { ...receipts, attempts: [...receipts.attempts, attempt] }
 }
 
@@ -102,8 +126,8 @@ export function selectIllustrationCandidates({ catalog, siteAssets, receipts, no
   const ready = catalog.points.filter((point) => point.status === 'READY')
   const published = siteAssets.assets
   const attempts = receipts.attempts
-  const today = now.toISOString().slice(0, 10)
-  const attemptCountToday = attempts.filter((attempt) => dayOf(attempt.last_run_at) === today)
+  const today = kstCalendarDay(now)
+  const attemptCountToday = attempts.filter((attempt) => kstCalendarDay(attempt.last_run_at) === today)
     .reduce((sum, attempt) => sum + attempt.attempt_count, 0)
   const requested = subjectIds ? new Set(subjectIds) : null
   const counts = {
@@ -129,7 +153,7 @@ export function selectIllustrationCandidates({ catalog, siteAssets, receipts, no
     eligible.push(point)
   }
 
-  let ordered = eligible.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0)
+  let ordered = eligible.sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0)
     || a.point_id.localeCompare(b.point_id))
   if (requested) ordered = ordered.filter((point) => requested.has(point.subject_id))
   const dailyCapacity = Math.max(0, DAILY_ATTEMPT_CAP - attemptCountToday)
