@@ -31,8 +31,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -51,7 +49,7 @@ jobs:
           python3 ../scripts/test_draft_release_illustration_handoff.py
           python3 ../scripts/test_resolve_illustration_handoff_request.py
           node --check ../scripts/run-production-release.mjs
-          python3 -m py_compile ../scripts/original_storage_provider.py ../scripts/illustration_storage_handoff.py ../scripts/draft_release_illustration_handoff.py ../scripts/resolve_illustration_handoff_request.py
+          python3 -m py_compile ../scripts/original_storage_provider.py ../scripts/illustration_storage_handoff.py ../scripts/draft_release_illustration_handoff.py ../scripts/resolve_illustration_handoff_request.py ../scripts/execute_trusted_illustration_handoff.py
       - name: Verify deterministic S02 dry-run (no external services)
         run: |
           node ../scripts/dry-run-publication.mjs --demo-s02 --source-revision "$GITHUB_SHA" > "$RUNNER_TEMP/publication-first.json"
@@ -92,101 +90,3 @@ jobs:
           ARCHIVE_AFTERFALL_SOURCE_REF: origin/worldline/afterfall-rpg
       - name: Build
         run: npm run build
-
-      - name: Resolve trusted illustration handoff request on main
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        id: handoff_request
-        working-directory: .
-        shell: bash
-        env:
-          BEFORE_SHA: ${{ github.event.before }}
-          CURRENT_SHA: ${{ github.sha }}
-        run: |
-          if [[ -z "$BEFORE_SHA" || "$BEFORE_SHA" =~ ^0+$ ]]; then
-            echo "HANDOFF_REQUEST_BEFORE_SHA_INVALID" >&2
-            exit 1
-          fi
-          mapfile -t changed < <(
-            git diff --name-status "$BEFORE_SHA" "$CURRENT_SHA" -- \
-              'archive/automation/illustration-handoff-requests/*.json'
-          )
-          if [[ "${#changed[@]}" -eq 0 ]]; then
-            echo "has_request=false" >> "$GITHUB_OUTPUT"
-            echo "No trusted illustration handoff request in this main push."
-            exit 0
-          fi
-          if [[ "${#changed[@]}" -ne 1 ]]; then
-            echo "HANDOFF_REQUEST_CHANGE_COUNT_INVALID: ${#changed[@]}" >&2
-            exit 1
-          fi
-          status="${changed[0]%%\t'*}"
-          request_path="${changed[0]#*\t'}"
-          if [[ "$status" != "A" ]]; then
-            echo "HANDOFF_REQUEST_MUST_BE_IMMUTABLE_ADD: $status" >&2
-            exit 1
-          fi
-          output="$RUNNER_TEMP/illustration-handoff-request.json"
-          python archive/scripts/resolve_illustration_handoff_request.py \
-            --request "$request_path" > "$output"
-          cat "$output"
-          echo "has_request=true" >> "$GITHUB_OUTPUT"
-          python - <<'PY' >> "$GITHUB_OUTPUT"
-          import json
-          import os
-          from pathlib import Path
-          value = json.loads((Path(os.environ["RUNNER_TEMP"]) / "illustration-handoff-request.json").read_text())
-          for key in ("release_id", "source_commit", "identity_path"):
-              print(f"{key}={value[key]}")
-          PY
-
-      - name: Install trusted handoff PNG validator
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.handoff_request.outputs.has_request == 'true'
-        working-directory: .
-        run: python -m pip install --only-binary=:all: Pillow==12.3.0
-
-      - name: Validate exact source identity and private Draft Release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.handoff_request.outputs.has_request == 'true'
-        id: handoff_prepare
-        working-directory: .
-        env:
-          GITHUB_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
-          RELEASE_ID: ${{ steps.handoff_request.outputs.release_id }}
-          SOURCE_COMMIT: ${{ steps.handoff_request.outputs.source_commit }}
-          IDENTITY_PATH: ${{ steps.handoff_request.outputs.identity_path }}
-        run: >-
-          python archive/scripts/draft_release_illustration_handoff.py
-          --prepare --release-id "$RELEASE_ID"
-          --source-commit "$SOURCE_COMMIT" --identity "$IDENTITY_PATH"
-
-      - name: Upload private original and reconcile exact registry row
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.handoff_request.outputs.has_request == 'true'
-        id: handoff_process
-        working-directory: .
-        env:
-          GITHUB_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
-          RELEASE_ID: ${{ steps.handoff_request.outputs.release_id }}
-          SOURCE_COMMIT: ${{ steps.handoff_request.outputs.source_commit }}
-          IDENTITY_PATH: ${{ steps.handoff_request.outputs.identity_path }}
-          ARCHIVE_ORIGINAL_STORAGE_PROVIDER: supabase
-          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
-          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
-          ARCHIVE_ORIGINAL_STORAGE_BUCKET: survival-archive-originals
-        run: >-
-          python archive/scripts/draft_release_illustration_handoff.py
-          --process --release-id "$RELEASE_ID"
-          --source-commit "$SOURCE_COMMIT" --identity "$IDENTITY_PATH"
-
-      - name: Cleanup successfully handed-off temporary Draft Release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.handoff_process.outcome == 'success'
-        working-directory: .
-        env:
-          GITHUB_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
-          RELEASE_ID: ${{ steps.handoff_request.outputs.release_id }}
-          SOURCE_COMMIT: ${{ steps.handoff_request.outputs.source_commit }}
-          IDENTITY_PATH: ${{ steps.handoff_request.outputs.identity_path }}
-          TAG_NAME: ${{ steps.handoff_prepare.outputs.tag_name }}
-        run: >-
-          python archive/scripts/draft_release_illustration_handoff.py
-          --cleanup --release-id "$RELEASE_ID"
-          --source-commit "$SOURCE_COMMIT" --identity "$IDENTITY_PATH"
-          --tag-name "$TAG_NAME"
