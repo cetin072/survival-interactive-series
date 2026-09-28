@@ -2,11 +2,13 @@
 import contextlib
 import importlib.util
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "archive/scripts"))
 spec = importlib.util.spec_from_file_location("handoff", ROOT / "archive/scripts/illustration_storage_handoff.py")
 handoff = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(handoff)
@@ -43,6 +45,9 @@ class IllustrationStorageHandoffTests(unittest.TestCase):
         with pre_delivery_site_assets():
             record, _, _, path = handoff.identity()
             envelope = handoff.encrypt_token("test-upload-token-123456789", path, record["source_sha256"])
+            self.assertEqual(envelope["version"], 2)
+            self.assertEqual(envelope["provider"], "supabase")
+            self.assertEqual(envelope["bucket"], "survival-archive-originals")
             private_path = Path(__file__).resolve().parents[2] / ".github/warehouse-e2e-upload-public.pem"
             # The private key is never in the repository. The test instead verifies that mismatched
             # identity metadata is rejected before attempting decryption.
