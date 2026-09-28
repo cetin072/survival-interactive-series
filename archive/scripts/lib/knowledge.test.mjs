@@ -1,5 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { mkdtemp, mkdir, readFile, writeFile, rm, copyFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -158,7 +159,8 @@ test('AUTO_LOW_RISK READY and PUBLISHED must pass the same publication gate', as
 test('release gate covers PR_ONLY, shadow, AUTO, and the content-only boundary', async () => {
   const data = await loadKnowledge(root)
   const allowedFile = 'knowledge/content/briefs/K-004.json'
-  const prOnly = await checkRelease(data, { changedFiles: [allowedFile], briefIds: ['K-004'], mode: 'PR_ONLY' })
+  const prOnlyData = { ...data, config: { ...data.config, publication_mode: 'PR_ONLY' } }
+  const prOnly = await checkRelease(prOnlyData, { changedFiles: [allowedFile], briefIds: ['K-004'], mode: 'PR_ONLY' })
   assert.equal(prOnly.decision, 'PR_ONLY')
   assert.equal(prOnly.requires_human, false)
 
@@ -166,7 +168,11 @@ test('release gate covers PR_ONLY, shadow, AUTO, and the content-only boundary',
   assert.equal(shadow.decision, 'WOULD_AUTO_PUBLISH')
   assert.equal(shadow.requires_human, false)
 
-  const autoData = { ...data, config: { ...data.config, auto_publish_enabled: true } }
+  const escalation = await checkRelease(data, { changedFiles: [allowedFile], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK' })
+  assert.equal(escalation.decision, 'REJECTED')
+  assert.ok(escalation.reasons.includes('REQUESTED_MODE_MISMATCH'))
+
+  const autoData = { ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK', auto_publish_enabled: true } }
   const automatic = await checkRelease(autoData, { changedFiles: [allowedFile], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK' })
   assert.equal(automatic.decision, 'AUTO_PUBLISH_ELIGIBLE')
   assert.equal(automatic.requires_human, false)
@@ -175,6 +181,62 @@ test('release gate covers PR_ONLY, shadow, AUTO, and the content-only boundary',
   assert.equal(codeDiff.decision, 'REJECTED')
   assert.deepEqual(codeDiff.content_only.rejected, ['archive/scripts/knowledge-release.mjs'])
   assert.equal(checkContentOnly(['archive/web/public/knowledge/knowledge.css']).allowed, false)
+})
+
+test('publication mode config is authoritative and internally consistent', async () => {
+  const data = await loadKnowledge(root)
+  await assert.rejects(validateKnowledge({ ...data, config: { ...data.config, auto_publish_enabled: true } }), /auto_publish_enabled must be false outside AUTO_LOW_RISK mode/)
+  await assert.rejects(validateKnowledge({ ...data, config: { ...data.config, publication_mode: 'PR_ONLY', auto_publish_enabled: true } }), /auto_publish_enabled must be false outside AUTO_LOW_RISK mode/)
+  assert.equal(await validateKnowledge({ ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK', auto_publish_enabled: true } }), true)
+  const inconsistent = await checkRelease({ ...data, config: { ...data.config, auto_publish_enabled: true } }, {
+    changedFiles: ['knowledge/content/briefs/K-004.json'], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK',
+  })
+  assert.equal(inconsistent.decision, 'HUMAN_REVIEW_REQUIRED')
+  assert.ok(inconsistent.reasons.some((reason) => reason.startsWith('INVALID_PUBLICATION_CONFIG:')))
+  const cliOutput = execFileSync(process.execPath, [join(root, 'archive/scripts/knowledge-release-check.mjs'), '--brief', 'K-004', '--mode', 'AUTO_LOW_RISK', '--changed-file', 'knowledge/content/briefs/K-004.json'], { cwd: root, encoding: 'utf8' })
+  assert.equal(JSON.parse(cliOutput).decision, 'REJECTED')
+})
+
+test('every changed brief is bound to the exact release targets and must pass independently', async () => {
+  const data = await loadKnowledge(root)
+  const k004 = data.briefs.find((brief) => brief.id === 'K-004')
+  const k007 = { ...k004, id: 'K-007', slug: 'another-fixture-brief', title: 'A second verified test brief' }
+  const k007Evidence = { ...data.evidence.get('K-004'), brief_id: 'K-007', question: k007.title }
+  const k007Candidate = { ...data.candidates[0], id: 'KC-second-brief', brief_id: 'K-007', question: 'A second verified test question' }
+  const evidence = new Map(data.evidence)
+  evidence.set('K-007', k007Evidence)
+  const bothBriefs = { ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK', auto_publish_enabled: true },
+    briefs: [...data.briefs, k007], evidence, candidates: [...data.candidates, k007Candidate] }
+  const changed = ['knowledge/content/briefs/K-004.json', 'knowledge/content/briefs/K-007.json']
+
+  const firstOnly = await checkRelease(bothBriefs, { changedFiles: changed, briefIds: ['K-004'], mode: 'AUTO_LOW_RISK' })
+  assert.equal(firstOnly.decision, 'REJECTED')
+  assert.ok(firstOnly.reasons.includes('CHANGED_BRIEF_NOT_TARGETED:K-007'))
+
+  const both = await checkRelease(bothBriefs, { changedFiles: changed, briefIds: ['K-004', 'K-007'], mode: 'AUTO_LOW_RISK' })
+  assert.equal(both.decision, 'AUTO_PUBLISH_ELIGIBLE')
+  assert.deepEqual(both.brief_ids, ['K-004', 'K-007'])
+
+  const withSupportingRecords = await checkRelease(bothBriefs, {
+    changedFiles: [...changed, 'knowledge/content/evidence/K-007.json', 'knowledge/content/candidates/KC-second-brief.json'],
+    briefIds: ['K-004', 'K-007'], mode: 'AUTO_LOW_RISK',
+  })
+  assert.equal(withSupportingRecords.decision, 'AUTO_PUBLISH_ELIGIBLE')
+  const unsupportedEvidence = await checkRelease(bothBriefs, {
+    changedFiles: [...changed, 'knowledge/content/evidence/K-007.json'], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK',
+  })
+  assert.equal(unsupportedEvidence.decision, 'REJECTED')
+  const unsupportedCandidate = await checkRelease(bothBriefs, {
+    changedFiles: [...changed, 'knowledge/content/candidates/KC-second-brief.json'], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK',
+  })
+  assert.equal(unsupportedCandidate.decision, 'REJECTED')
+
+  const unsafeK007 = { ...k007, publication_policy: 'HUMAN_APPROVED' }
+  const unsafe = { ...bothBriefs, briefs: [...data.briefs, unsafeK007] }
+  const bothWithUnsafe = await checkRelease(unsafe, { changedFiles: changed, briefIds: ['K-004', 'K-007'], mode: 'AUTO_LOW_RISK' })
+  assert.equal(bothWithUnsafe.decision, 'HUMAN_REVIEW_REQUIRED')
+  const untargetedUnsafe = await checkRelease(unsafe, { changedFiles: changed, briefIds: ['K-004'], mode: 'AUTO_LOW_RISK' })
+  assert.equal(untargetedUnsafe.decision, 'REJECTED')
 })
 
 test('release gate fails closed for risk, conflicts, missing evidence, unknown domains, and duplicate candidates', async () => {
@@ -186,11 +248,15 @@ test('release gate fails closed for risk, conflicts, missing evidence, unknown d
 
   const conflictEvidence = new Map(data.evidence)
   conflictEvidence.set('K-004', { ...conflictEvidence.get('K-004'), conflicts: ['source conflict'] })
-  assert.equal((await release({ ...data, evidence: conflictEvidence })).decision, 'HOLD')
+  const conflictResult = await release({ ...data, evidence: conflictEvidence })
+  assert.equal(conflictResult.decision, 'HOLD')
+  assert.equal(conflictResult.requires_human, true)
 
   const noEvidence = new Map(data.evidence)
   noEvidence.delete('K-004')
-  assert.equal((await release({ ...data, evidence: noEvidence })).decision, 'HOLD')
+  const ordinaryHold = await release({ ...data, evidence: noEvidence })
+  assert.equal(ordinaryHold.decision, 'HOLD')
+  assert.equal(ordinaryHold.requires_human, false)
 
   const unknownDomain = { ...data, briefs: data.briefs.map((brief) => brief.id === 'K-004' ? { ...brief, risk_domains: ['UNKNOWN_DOMAIN'] } : brief) }
   assert.equal((await release(unknownDomain)).decision, 'HUMAN_REVIEW_REQUIRED')
@@ -200,8 +266,13 @@ test('release gate fails closed for risk, conflicts, missing evidence, unknown d
 })
 
 test('production publication is complete only when deploy, page, index, and sitemap match', () => {
-  assert.deepEqual(verifyProductionPublication({ deployStatus: 'READY', deployCommitSha: 'abc123', mergeSha: 'abc123', pageReachable: true, indexContains: true, sitemapContains: true }), { status: 'PUBLISHED', reasons: [] })
+  const valid = { deployCommitSha: 'abc123', mergeSha: 'abc123', pageReachable: true, indexContains: true, sitemapContains: true }
+  assert.deepEqual(verifyProductionPublication({ ...valid, deployStatus: 'ready' }), { status: 'PUBLISHED', reasons: [] })
+  assert.deepEqual(verifyProductionPublication({ ...valid, deployStatus: 'READY' }), { status: 'PUBLISHED', reasons: [] })
+  assert.equal(verifyProductionPublication({ ...valid, deployStatus: 'building' }).status, 'AUTO_PUBLISH_INCOMPLETE')
+  assert.equal(verifyProductionPublication({ ...valid, deployStatus: 'error' }).status, 'AUTO_PUBLISH_INCOMPLETE')
   assert.equal(verifyProductionPublication({ deployStatus: 'READY', deployCommitSha: 'oldsha', mergeSha: 'abc123', pageReachable: true, indexContains: true, sitemapContains: true }).status, 'AUTO_PUBLISH_INCOMPLETE')
+  for (const field of ['pageReachable', 'indexContains', 'sitemapContains']) assert.equal(verifyProductionPublication({ ...valid, deployStatus: 'ready', [field]: false }).status, 'AUTO_PUBLISH_INCOMPLETE')
 })
 test('duplicate identity, broken relations and missing downloads fail validation', async () => {
   const data = await loadKnowledge(root)

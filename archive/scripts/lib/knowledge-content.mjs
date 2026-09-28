@@ -43,10 +43,16 @@ export async function loadKnowledge(base = root) {
     config: await readJson(join(base, 'knowledge/automation/config.json')), base }
 }
 
+export function publicationConfigIssue(config) {
+  if (!publicationModes.has(config?.publication_mode)) return 'unknown publication mode'
+  if (typeof config.auto_publish_enabled !== 'boolean') return 'invalid auto_publish_enabled flag'
+  if (config.publication_mode !== 'AUTO_LOW_RISK' && config.auto_publish_enabled !== false) return 'auto_publish_enabled must be false outside AUTO_LOW_RISK mode'
+  return null
+}
+
 export async function validateKnowledge(data) {
   const { briefs, candidates, evidence, topics, guides, stories, config, base } = data
-  fail(publicationModes.has(config.publication_mode), 'unknown publication mode')
-  fail(typeof config.auto_publish_enabled === 'boolean', 'invalid auto_publish_enabled flag')
+  fail(publicationConfigIssue(config) === null, publicationConfigIssue(config))
   fail(/^https:\/\/[^/]+$/.test(config.site_origin), 'invalid site origin')
   const ids = new Set(), slugs = new Set(), topicIds = new Set()
   const guideIds = new Set(), storyIds = new Set()
