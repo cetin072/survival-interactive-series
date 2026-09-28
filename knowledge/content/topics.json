@@ -22,5 +22,13 @@
     "guide_id": null,
     "tools": [],
     "story_refs": []
+  },
+  {
+    "id": "community-information-sharing",
+    "title": "공동체 정보 전달",
+    "brief_ids": ["K-007"],
+    "guide_id": null,
+    "tools": [],
+    "story_refs": []
   }
 ]
