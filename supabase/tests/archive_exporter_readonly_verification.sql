@@ -39,7 +39,7 @@ begin
     where table_schema = 'survival_rpg'
       and table_name in ('transcript_messages','transcript_sessions','transcript_turn_state_links')
       and has_column_privilege('archive_exporter',
-        format('%I.%I.%I', table_schema, table_name, column_name),
+        format('%I.%I', table_schema, table_name), column_name,
         'INSERT,UPDATE,REFERENCES')
   ) then
     raise exception 'archive_exporter has an unexpected column write privilege';
