@@ -22,7 +22,14 @@ jobs:
       - name: Install archive script dependencies
         run: npm ci
         working-directory: archive/scripts
-      - name: Diagnose restricted database connection
+      - name: Fetch and inspect Supabase root CA
+        run: |
+          curl --fail --silent --show-error --location \
+            https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt \
+            --output /tmp/prod-ca-2021.crt
+          sha256sum /tmp/prod-ca-2021.crt
+          openssl x509 -in /tmp/prod-ca-2021.crt -noout -subject -issuer -dates -fingerprint -sha256
+      - name: Diagnose restricted database connection with pinned CA
         working-directory: archive/scripts
         env:
           ARCHIVE_EXPORT_DATABASE_URL: ${{ secrets.ARCHIVE_EXPORT_DATABASE_URL }}
@@ -30,6 +37,7 @@ jobs:
           node --input-type=module <<'NODE'
           import dns from 'node:dns/promises'
           import net from 'node:net'
+          import { readFile } from 'node:fs/promises'
           import { Client } from 'pg'
 
           const raw = process.env.ARCHIVE_EXPORT_DATABASE_URL
@@ -62,7 +70,7 @@ jobs:
             const addresses = await dns.lookup(host, { all: true })
             console.log(JSON.stringify({ stage: 'dns', ok: true, addresses: addresses.map(x => ({ address: x.address, family: x.family })) }))
           } catch (error) {
-            console.error(JSON.stringify({ stage: 'dns', ok: false, name: error.name, code: error.code ?? null, message: String(error.message ?? '').slice(0, 200) }))
+            console.error(JSON.stringify({ stage: 'dns', ok: false, code: error.code ?? null }))
             process.exit(1)
           }
 
@@ -78,20 +86,18 @@ jobs:
                 socket.end()
                 resolve()
               })
-              socket.once('error', (error) => {
-                clearTimeout(timer)
-                reject(error)
-              })
+              socket.once('error', reject)
             })
             console.log(JSON.stringify({ stage: 'tcp', ok: true }))
           } catch (error) {
-            console.error(JSON.stringify({ stage: 'tcp', ok: false, name: error.name, code: error.code ?? null, errno: error.errno ?? null, syscall: error.syscall ?? null, message: String(error.message ?? '').slice(0, 200) }))
+            console.error(JSON.stringify({ stage: 'tcp', ok: false, code: error.code ?? null }))
             process.exit(1)
           }
 
+          const ca = await readFile('/tmp/prod-ca-2021.crt', 'utf8')
           const client = new Client({
             connectionString: raw,
-            ssl: { rejectUnauthorized: true },
+            ssl: { rejectUnauthorized: true, ca },
             connectionTimeoutMillis: 10000
           })
 
@@ -114,8 +120,6 @@ jobs:
               ok: false,
               name: error.name,
               code: error.code ?? null,
-              errno: error.errno ?? null,
-              syscall: error.syscall ?? null,
               severity: error.severity ?? null,
               message: safeMessage
             }))
