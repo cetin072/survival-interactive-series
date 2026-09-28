@@ -1,0 +1,39 @@
+name: Plan Archive illustrations
+
+on:
+  workflow_dispatch:
+    inputs:
+      subjects:
+        description: Optional comma-separated subject IDs to plan (for example, the two guild warehouse subjects)
+        required: false
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - archive/content/visuals/**/VISUALS.json
+      - archive/scripts/run-illustration-worker.mjs
+      - archive/scripts/lib/illustration-worker.mjs
+      - .github/workflows/archive-illustration.yml
+
+permissions:
+  contents: read
+
+jobs:
+  shadow-plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Plan illustration handoffs
+        env:
+          SUBJECTS: ${{ inputs.subjects }}
+        shell: bash
+        run: |
+          args=(--mode SHADOW --provider shadow)
+          if [[ -n "$SUBJECTS" ]]; then args+=(--subjects "$SUBJECTS"); fi
+          node archive/scripts/run-illustration-worker.mjs "${args[@]}"

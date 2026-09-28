@@ -37,6 +37,8 @@ jobs:
           cache-dependency-path: archive/web/package-lock.json
       - name: Test offline publication planning
         run: node --test ../scripts/lib/publication-plan.test.mjs
+      - name: Test illustration worker controls
+        run: node --test ../scripts/lib/illustration-worker.test.mjs
       - name: Verify deterministic S02 dry-run (no external services)
         run: |
           node ../scripts/dry-run-publication.mjs --demo-s02 --source-revision "$GITHUB_SHA" > "$RUNNER_TEMP/publication-first.json"
