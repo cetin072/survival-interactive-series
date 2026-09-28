@@ -150,15 +150,13 @@ jobs:
           BODY="$(printf 'Exact publication-head validation PASS for `%s` at `%s`. Knowledge tests/check/build, release gate, article/index/sitemap verification all passed. SHADOW mode: no merge or Production publication was performed.' "$BRIEF_ID" "$EXPECTED_SHA")"
           gh pr comment "$PR_NUMBER" --body "$BODY"
 
-      - name: Require AUTO publication credentials
+      - name: Require AUTO publication merge credential
         if: steps.authority.outputs.auto_publish == 'true'
         working-directory: .
         env:
           AUTO_GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         run: |
           test -n "$AUTO_GH_TOKEN" || { echo "ARCHIVE_GITHUB_TOKEN_REQUIRED"; exit 1; }
-          test -n "$NETLIFY_AUTH_TOKEN" || { echo "NETLIFY_AUTH_TOKEN_REQUIRED"; exit 1; }
 
       - name: Recheck exact PR head and merge
         if: steps.authority.outputs.auto_publish == 'true'
@@ -199,7 +197,6 @@ jobs:
         if: steps.authority.outputs.auto_publish == 'true'
         working-directory: .
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           BRIEF_ID: ${{ inputs.brief_id }}
           MERGE_SHA: ${{ steps.merge.outputs.merge_sha }}
         run: |
