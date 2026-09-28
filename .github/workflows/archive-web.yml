@@ -31,6 +31,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -91,35 +93,10 @@ jobs:
       - name: Build
         run: npm run build
 
-
-  trusted_illustration_handoff:
-    name: Trusted illustration handoff
-    needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.build.result == 'success'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    outputs:
-      has_request: ${{ steps.request.outputs.has_request }}
-      cleanup_ready: ${{ steps.prepare.outputs.cleanup_ready }}
-      release_id: ${{ steps.prepare.outputs.release_id }}
-      tag_name: ${{ steps.prepare.outputs.tag_name }}
-      source_commit: ${{ steps.request.outputs.source_commit }}
-      identity_path: ${{ steps.request.outputs.identity_path }}
-    steps:
-      - name: Checkout trusted main commit and full history
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          persist-credentials: false
-          fetch-depth: 0
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Resolve one newly-added handoff request if present
-        id: request
+      - name: Resolve trusted illustration handoff request on main
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        id: handoff_request
+        working-directory: .
         shell: bash
         env:
           BEFORE_SHA: ${{ github.event.before }}
@@ -142,8 +119,8 @@ jobs:
             echo "HANDOFF_REQUEST_CHANGE_COUNT_INVALID: ${#changed[@]}" >&2
             exit 1
           fi
-          status="${changed[0]%%$'\t'*}"
-          request_path="${changed[0]#*$'\t'}"
+          status="${changed[0]%%\t'*}"
+          request_path="${changed[0]#*\t'}"
           if [[ "$status" != "A" ]]; then
             echo "HANDOFF_REQUEST_MUST_BE_IMMUTABLE_ADD: $status" >&2
             exit 1
@@ -161,28 +138,35 @@ jobs:
           for key in ("release_id", "source_commit", "identity_path"):
               print(f"{key}={value[key]}")
           PY
-      - name: Install pinned PNG validator
-        if: steps.request.outputs.has_request == 'true'
+
+      - name: Install trusted handoff PNG validator
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.handoff_request.outputs.has_request == 'true'
+        working-directory: .
         run: python -m pip install --only-binary=:all: Pillow==12.3.0
-      - name: Validate exact source, identity, and private Draft Release
-        if: steps.request.outputs.has_request == 'true'
-        id: prepare
+
+      - name: Validate exact source identity and private Draft Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.handoff_request.outputs.has_request == 'true'
+        id: handoff_prepare
+        working-directory: .
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_ID: ${{ steps.request.outputs.release_id }}
-          SOURCE_COMMIT: ${{ steps.request.outputs.source_commit }}
-          IDENTITY_PATH: ${{ steps.request.outputs.identity_path }}
+          GITHUB_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          RELEASE_ID: ${{ steps.handoff_request.outputs.release_id }}
+          SOURCE_COMMIT: ${{ steps.handoff_request.outputs.source_commit }}
+          IDENTITY_PATH: ${{ steps.handoff_request.outputs.identity_path }}
         run: >-
           python archive/scripts/draft_release_illustration_handoff.py
           --prepare --release-id "$RELEASE_ID"
           --source-commit "$SOURCE_COMMIT" --identity "$IDENTITY_PATH"
+
       - name: Upload private original and reconcile exact registry row
-        if: steps.request.outputs.has_request == 'true'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.handoff_request.outputs.has_request == 'true'
+        id: handoff_process
+        working-directory: .
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_ID: ${{ steps.request.outputs.release_id }}
-          SOURCE_COMMIT: ${{ steps.request.outputs.source_commit }}
-          IDENTITY_PATH: ${{ steps.request.outputs.identity_path }}
+          GITHUB_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          RELEASE_ID: ${{ steps.handoff_request.outputs.release_id }}
+          SOURCE_COMMIT: ${{ steps.handoff_request.outputs.source_commit }}
+          IDENTITY_PATH: ${{ steps.handoff_request.outputs.identity_path }}
           ARCHIVE_ORIGINAL_STORAGE_PROVIDER: supabase
           ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
           ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
@@ -192,34 +176,15 @@ jobs:
           --process --release-id "$RELEASE_ID"
           --source-commit "$SOURCE_COMMIT" --identity "$IDENTITY_PATH"
 
-  cleanup_trusted_illustration_handoff:
-    name: Cleanup trusted illustration handoff
-    if: always() && needs.trusted_illustration_handoff.outputs.cleanup_ready == 'true'
-    needs: trusted_illustration_handoff
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout trusted main commit
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          persist-credentials: false
-          fetch-depth: 0
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install pinned PNG validator
-        run: python -m pip install --only-binary=:all: Pillow==12.3.0
-      - name: Delete verified temporary Draft Release and tag
+      - name: Cleanup successfully handed-off temporary Draft Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.handoff_process.outcome == 'success'
+        working-directory: .
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_ID: ${{ needs.trusted_illustration_handoff.outputs.release_id }}
-          SOURCE_COMMIT: ${{ needs.trusted_illustration_handoff.outputs.source_commit }}
-          IDENTITY_PATH: ${{ needs.trusted_illustration_handoff.outputs.identity_path }}
-          TAG_NAME: ${{ needs.trusted_illustration_handoff.outputs.tag_name }}
+          GITHUB_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          RELEASE_ID: ${{ steps.handoff_request.outputs.release_id }}
+          SOURCE_COMMIT: ${{ steps.handoff_request.outputs.source_commit }}
+          IDENTITY_PATH: ${{ steps.handoff_request.outputs.identity_path }}
+          TAG_NAME: codex-private-image-loc-baekun-fb2d1d9664f8-325913999ae7
         run: >-
           python archive/scripts/draft_release_illustration_handoff.py
           --cleanup --release-id "$RELEASE_ID"
