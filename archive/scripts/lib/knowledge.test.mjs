@@ -501,3 +501,28 @@ test('publish preparation accepts only exact release decisions and promotes READ
   assert.throws(() => promoteBriefRecord({ ...ready, semantic_qa_status: 'REVIEW' }, '2026-09-28'), /semantic QA/)
   assert.throws(() => promoteBriefRecord({ ...ready, status: 'PUBLISHED' }, '2026-09-28'), /status must be READY/)
 })
+
+
+test('worker publication policy requires exact-head and exact Production verification in live AUTO mode', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  assert.equal(validateWorkerPolicy(policy), true)
+  assert.equal(policy.publication_policy.required_repository_mode, 'AUTO_LOW_RISK')
+  assert.equal(policy.publication_policy.required_auto_publish_enabled, true)
+  assert.equal(policy.publication_policy.auto_merge, true)
+  assert.equal(policy.publication_policy.production_publish, true)
+  assert.equal(policy.publication_policy.exact_head_validation_required, true)
+  assert.equal(policy.publication_policy.production_exact_sha_required, true)
+
+  assert.throws(() => validateWorkerPolicy({
+    ...policy,
+    publication_policy: { ...policy.publication_policy, exact_head_validation_required: false },
+  }), /exact-head validation required/)
+  assert.throws(() => validateWorkerPolicy({
+    ...policy,
+    publication_policy: { ...policy.publication_policy, required_auto_publish_enabled: false },
+  }), /publication enabled flag/)
+  assert.throws(() => validateWorkerPolicy({
+    ...policy,
+    publication_policy: { ...policy.publication_policy, production_publish: false },
+  }), /Production publish must match publication mode/)
+})
