@@ -1,0 +1,8 @@
+{
+  "name": "afterfall-archive-daily-runner",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "pg": "8.16.3"
+  }
+}
