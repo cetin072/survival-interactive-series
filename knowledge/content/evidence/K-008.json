@@ -1,0 +1,23 @@
+{
+  "brief_id": "K-008",
+  "question": "How should multiple locations distinguish verified facts, reports, requests, and confirmations when sharing information during communication disruptions?",
+  "claims": [
+    {
+      "claim": "Ready.gov recommends planning communication in advance and keeping contact information available when normal networks may be unreliable.",
+      "source_ids": ["S1"],
+      "context": "General household preparedness guidance in the United States.",
+      "limitation": "This is not an official workflow for multi-location operations; the status fields in the brief are an editorial adaptation."
+    },
+    {
+      "claim": "FEMA NIMS training describes gathering information, verifying accuracy, coordinating for consistency, and disseminating accurate and timely information.",
+      "source_ids": ["S2"],
+      "context": "Professional incident public-information training.",
+      "limitation": "Small groups do not need to reproduce the FEMA organizational model; the brief borrows only the general verification principle."
+    }
+  ],
+  "conflicts": [],
+  "unknowns": [],
+  "risk_notes": ["LOW RISK communication and general preparedness only.", "Professional safety judgments are out of scope.", "Narrative material is provenance only, not reality evidence."],
+  "story_source_status": "VERIFIED_PUBLIC_ARCHIVE",
+  "copyright_status": "CLEAR"
+}

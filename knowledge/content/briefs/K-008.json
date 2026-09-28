@@ -1,0 +1,97 @@
+{
+  "content_type": "BRIEF",
+  "topic_id": "community-information-sharing",
+  "status": "READY",
+  "risk_level": "LOW",
+  "publication_policy": "AUTO_LOW_RISK",
+  "semantic_qa_status": "PASS",
+  "risk_domains": ["GENERAL_PREPAREDNESS", "COMMUNICATION"],
+  "source_checked_at": "2026-09-28",
+  "published_at": "2026-09-28",
+  "updated_at": "2026-09-28",
+  "guide_id": null,
+  "story_refs": [],
+  "ai_assisted": true,
+  "editorial_note": "Derived from verified PUBLIC_ARCHIVE SESSION_003. READY for AUTO_LOW_RISK_SHADOW evaluation only; no automatic merge or production publication.",
+  "id": "K-008",
+  "slug": "verify-information-handoff",
+  "label": "Information handoff",
+  "title": "How can people distinguish verified facts, reports, requests, and confirmations when sharing information?",
+  "summary": "A simple way to keep source, verification status, and confirmation state separate when information is passed between people or locations.",
+  "meta_description": "Ready.gov and FEMA guidance adapted into a low-risk checklist for distinguishing verified information, reports, requests, and confirmations.",
+  "lead": "Information can change as it passes through several people. Keeping content separate from its verification or confirmation state helps reduce confusion.",
+  "scope": "Low-risk preparedness communication and information handoff",
+  "basis": "Ready.gov communication planning + FEMA NIMS information verification + verified S03 PUBLIC_ARCHIVE",
+  "footer": "This is general information-management guidance. Follow current official instructions during an actual disaster and use qualified authorities for professional safety judgments.",
+  "sections": [
+    {
+      "heading": "Record content and status separately",
+      "blocks": [
+        {
+          "type": "prose",
+          "text": "FEMA NIMS training emphasizes gathering information, verifying accuracy, coordinating for consistency, and then disseminating accurate and timely information. A small group can adapt that principle by marking whether an item is a report, verified fact, request, confirmation, or still unknown."
+        },
+        {
+          "type": "table",
+          "headers": ["Status", "Meaning"],
+          "rows": [
+            ["Report", "Received from another person but not independently confirmed"],
+            ["Verified", "Confirmed directly or with a responsible source"],
+            ["Request", "Asked for, but not yet accepted or confirmed"],
+            ["Confirmed", "Accepted with a defined scope or condition"],
+            ["Unknown", "Important information that is still unresolved"]
+          ]
+        },
+        {
+          "type": "note",
+          "text": "These status names are an editorial adaptation, not an official FEMA classification table."
+        }
+      ]
+    },
+    {
+      "heading": "Keep source and time with the information",
+      "blocks": [
+        {
+          "type": "unordered_list",
+          "items": ["Source or confirming party", "Last checked date or time", "Scope of what was confirmed", "Current status", "What needs to be checked again"]
+        }
+      ]
+    },
+    {
+      "heading": "Keep an offline copy when networks may be unreliable",
+      "blocks": [
+        {
+          "type": "prose",
+          "text": "Ready.gov communication-planning guidance recommends preparing contact information in advance and keeping paper copies because normal communication networks may be unreliable."
+        }
+      ]
+    },
+    {
+      "heading": "Question from Survival Diary",
+      "blocks": [
+        {
+          "type": "prose",
+          "text": "The verified SESSION_003 Archive distinguishes an introduction from a confirmed reservation and keeps second-hand information labeled as unverified. That scene prompted the general question of how to preserve information status during handoff."
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Ready.gov · Family Emergency Communication Plan",
+      "url": "https://www.ready.gov/sites/default/files/2020-03/family-emergency-communication-planning-document.pdf",
+      "note": "Communication planning and offline contact copies when normal networks may be unreliable.",
+      "checked_at": "2026-09-28"
+    },
+    {
+      "id": "S2",
+      "title": "FEMA Independent Study · NIMS Joint Information System cycle",
+      "url": "https://emilms.fema.gov/_is0700b/groups/139.html",
+      "note": "Gathering, verifying, coordinating, and disseminating accurate and timely information.",
+      "checked_at": "2026-09-28"
+    }
+  ],
+  "related_brief_ids": ["K-003", "K-006"],
+  "tools": []
+}
