@@ -8,6 +8,7 @@ import { join, dirname } from 'node:path'
 import { publicKnowledgeInventory, scanKnowledge, bootstrapKnowledge } from './knowledge-scan.mjs'
 import { loadKnowledge, validateKnowledge, publicationEligibility, root } from './knowledge-content.mjs'
 import { checkContentOnly, checkRelease, verifyProductionPublication } from './knowledge-release.mjs'
+import { planWorkerRun, validateProviderConfig, validateWorkerPolicy } from './knowledge-worker-config.mjs'
 
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex')
 const manifestRef = 'archive/content/transcripts/C03-AFTERFALL/S99/SESSION_001/SOURCE_MANIFEST.json'
@@ -421,4 +422,45 @@ test('generated golden pages remain static, searchable, linked and downloadable'
     for (const tool of brief.tools) assert.ok(page.includes(`href="${tool.path}" download`))
     assert.doesNotMatch(page, /<script(?! type="application\/ld\+json")/)
   }
+})
+
+
+test('worker V2 dispatcher prefers FRESH and uses one daily BACKFILL window', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const providerConfig = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
+  assert.equal(validateWorkerPolicy(policy), true)
+  assert.equal(validateProviderConfig(providerConfig), true)
+
+  const pending = [{ source_manifest_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_999/SOURCE_MANIFEST.json' }]
+  assert.equal(planWorkerRun({ policy, providerConfig, pendingSources: pending, openWorkerPr: false, localHour: 6 }).decision, 'FRESH')
+  assert.equal(planWorkerRun({ policy, providerConfig, pendingSources: [], openWorkerPr: false, localHour: 6 }).decision, 'BACKFILL')
+  assert.equal(planWorkerRun({ policy, providerConfig, pendingSources: [], openWorkerPr: false, localHour: 12 }).decision, 'NOOP_WAIT')
+  assert.equal(planWorkerRun({ policy, providerConfig, pendingSources: pending, openWorkerPr: true, localHour: 6 }).decision, 'NOOP_OPEN_WORKER_PR')
+})
+
+test('worker provider can switch without changing dispatcher or repository safety contracts', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const providerConfig = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
+  const switched = {
+    ...providerConfig,
+    active_provider: 'OPENAI_API',
+    providers: {
+      ...providerConfig.providers,
+      CHATGPT_SCHEDULED: { ...providerConfig.providers.CHATGPT_SCHEDULED, enabled: false },
+      OPENAI_API: { ...providerConfig.providers.OPENAI_API, enabled: true },
+    },
+  }
+  assert.equal(validateProviderConfig(switched), true)
+  const plan = planWorkerRun({ policy, providerConfig: switched, pendingSources: [{ id: 'fresh' }], openWorkerPr: false, localHour: 0 })
+  assert.equal(plan.decision, 'FRESH')
+  assert.equal(plan.provider, 'OPENAI_API')
+
+  const leaked = {
+    ...switched,
+    providers: {
+      ...switched.providers,
+      OPENAI_API: { ...switched.providers.OPENAI_API, api_key: 'forbidden' },
+    },
+  }
+  assert.throws(() => validateProviderConfig(leaked), /checked-in secret forbidden/)
 })
