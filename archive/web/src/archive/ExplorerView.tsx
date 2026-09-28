@@ -4,6 +4,7 @@ import publicGraph from '../../../content/graphs/C03-AFTERFALL/GRAPH.json'
 import { archiveArticleByNodeId } from './archiveArticleData'
 import { confirmedAppearanceFor } from './characterAppearance'
 import { chapterForNode } from './storyData'
+import { siteVisualFor } from './siteVisual'
 
 const typeLabel: Record<ArchiveNodeType, string> = { character: '인물', location: '지역', event: '사건', reference: '자료' }
 const typeOrder: ArchiveNodeType[] = ['character', 'location', 'event', 'reference']
@@ -71,8 +72,9 @@ function GraphExplorer({ root, selected, onSelect, onFocus }: { root: ArchiveNod
 }
 
 function DetailArticle({ selected, onSelect, onOpenStory }: { selected: ArchiveNode; onSelect: (id: string) => void; onOpenStory: (chapterId: string) => void }) {
-  const article = archiveArticleByNodeId[selected.id]; const neighbors = getNeighbors(selected.id); const chapter = chapterForNode(selected.id); const basics = basicInfoRows(selected)
+  const article = archiveArticleByNodeId[selected.id]; const neighbors = getNeighbors(selected.id); const chapter = chapterForNode(selected.id); const basics = basicInfoRows(selected); const visual = siteVisualFor(selected.id)
   return <article className="archive-detail" id="archive-detail"><header className="archive-detail-header"><div><p className="archive-eyebrow">선택된 기록 · {typeLabel[selected.type]}</p><h1>{selected.label}</h1><p>{selected.subtitle}</p></div></header>
+    {visual && <figure className="detail-visual"><img src={visual.public_path} width={visual.width} height={visual.height} alt={`${selected.label} 삽화`} loading="lazy" /><figcaption>{selected.label} · 기록 삽화</figcaption></figure>}
     <nav className="detail-toc" aria-label={selected.label + ' 목차'}><a href="#detail-basics">기본 정보</a><a href="#detail-overview">개요</a><a href="#detail-history">주요 행적 · 기록</a><a href="#detail-relations">핵심 관계</a><a href="#detail-stories">관련 이야기 · 참조</a></nav>
     <section className="detail-section" id="detail-basics"><h2>기본 정보</h2><dl className="detail-meta detail-meta-wide">{basics.map((item) => <div className={item.appearance ? 'detail-appearance' : undefined} key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl></section>
     <section className="detail-section detail-prose" id="detail-overview"><h2>개요</h2>{(article?.lead ?? [selected.summary]).map((paragraph, index) => <p key={index}>{paragraph}</p>)}</section>
