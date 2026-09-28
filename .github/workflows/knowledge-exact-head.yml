@@ -150,15 +150,13 @@ jobs:
           BODY="$(printf 'Exact publication-head validation PASS for `%s` at `%s`. Knowledge tests/check/build, release gate, article/index/sitemap verification all passed. SHADOW mode: no merge or Production publication was performed.' "$BRIEF_ID" "$EXPECTED_SHA")"
           gh pr comment "$PR_NUMBER" --body "$BODY"
 
-      - name: Require AUTO publication credentials
+      - name: Require AUTO merge credential
         if: steps.authority.outputs.auto_publish == 'true'
         working-directory: .
         env:
           AUTO_GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         run: |
           test -n "$AUTO_GH_TOKEN" || { echo "ARCHIVE_GITHUB_TOKEN_REQUIRED"; exit 1; }
-          test -n "$NETLIFY_AUTH_TOKEN" || { echo "NETLIFY_AUTH_TOKEN_REQUIRED"; exit 1; }
 
       - name: Recheck exact PR head and merge
         if: steps.authority.outputs.auto_publish == 'true'
@@ -195,19 +193,7 @@ jobs:
           )"
           echo "merge_sha=$MERGE_SHA" >> "$GITHUB_OUTPUT"
 
-      - name: Verify exact Netlify Production publication
-        if: steps.authority.outputs.auto_publish == 'true'
-        working-directory: .
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          BRIEF_ID: ${{ inputs.brief_id }}
-          MERGE_SHA: ${{ steps.merge.outputs.merge_sha }}
-        run: |
-          node archive/scripts/knowledge-production-verify.mjs \
-            --brief "$BRIEF_ID" \
-            --merge-sha "$MERGE_SHA"
-
-      - name: Record AUTO publication success on PR
+      - name: Record AUTO merge pending Production verification on PR
         if: steps.authority.outputs.auto_publish == 'true'
         working-directory: .
         env:
@@ -217,5 +203,5 @@ jobs:
           EXPECTED_SHA: ${{ inputs.expected_sha }}
           MERGE_SHA: ${{ steps.merge.outputs.merge_sha }}
         run: |
-          BODY="$(printf 'AUTO publication PASS for `%s`. Prepared head `%s` passed exact-head validation, merged as `%s`, and Netlify Production was verified at the exact merge SHA with article/index/sitemap present.' "$BRIEF_ID" "$EXPECTED_SHA" "$MERGE_SHA")"
+          BODY="$(printf 'AUTO merge PASS for `%s`. Prepared head `%s` passed exact-head validation and merged as `%s`. Production verification is pending the Knowledge Worker V2 Netlify connector check; success requires Netlify production state READY, commit_ref == merge SHA, and live article/index/sitemap verification.' "$BRIEF_ID" "$EXPECTED_SHA" "$MERGE_SHA")"
           gh pr comment "$PR_NUMBER" --body "$BODY"
