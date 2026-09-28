@@ -19,9 +19,14 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
 
+from original_storage_provider import (
+    DEFAULT_SUPABASE_URL,
+    build_original_storage_provider,
+    load_original_storage_selection,
+)
 
-BASE_URL = "https://jgsxpdflgkqroecfjzxq.supabase.co"
-BUCKET = "survival-archive-originals"
+
+REGISTRY_BASE_URL = DEFAULT_SUPABASE_URL
 ROOT = Path(__file__).resolve().parents[2]
 IDENTITY = ROOT / "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_WAREHOUSE.json"
 CATALOG = ROOT / "archive/content/visuals/C03-AFTERFALL/VISUALS.json"
@@ -78,95 +83,85 @@ def identity():
     return record, catalog, point, path
 
 
-def credentials():
+def storage_provider():
+    return build_original_storage_provider(OPENER, LIMIT)
+
+
+def registry_credentials():
     url = os.environ.get("ARCHIVE_SUPABASE_URL", "").rstrip("/")
     key = os.environ.get("ARCHIVE_SUPABASE_SERVICE_ROLE_KEY", "")
-    demand(url == BASE_URL and len(key) >= 20, "STORAGE_CREDENTIALS_REQUIRED")
-    return {"apikey": key, "Authorization": f"Bearer {key}"}
+    demand(url == REGISTRY_BASE_URL and len(key) >= 20, "REGISTRY_CREDENTIALS_REQUIRED")
+    return url, {"apikey": key, "Authorization": f"Bearer {key}"}
 
 
-def readback(headers, path, missing_ok=False):
-    url = f"{BASE_URL}/storage/v1/object/authenticated/{BUCKET}/{quote(path, safe='/')}"
-    try:
-        with OPENER.open(Request(url, headers=headers), timeout=30) as response:
-            demand(response.status == 200, "STORAGE_READBACK_FAILED")
-            data = response.read(LIMIT + 1)
-    except HTTPError as error:
-        if missing_ok and error.code in (400, 404):
-            return None
-        raise ValueError(f"STORAGE_HTTP_ERROR_{error.code}") from None
-    except URLError:
-        raise ValueError("STORAGE_NETWORK_ERROR") from None
-    demand(len(data) <= LIMIT, "STORAGE_OBJECT_TOO_LARGE")
-    return data
+def envelope_aad(provider, bucket, path, sha):
+    return f"{provider}:{bucket}/{path}:{sha}".encode()
 
 
 def encrypt_token(token, path, sha):
+    selection = load_original_storage_selection()
     public = load_pem_public_key(PUBLIC_KEY.read_bytes())
     key, nonce = os.urandom(32), os.urandom(12)
-    aad = f"{BUCKET}/{path}:{sha}".encode()
+    aad = envelope_aad(selection.provider, selection.bucket, path, sha)
     wrapped = public.encrypt(key, padding.OAEP(mgf=padding.MGF1(hashes.SHA256()),
                                                algorithm=hashes.SHA256(), label=None))
-    return {"version": 1, "bucket": BUCKET, "path": path, "source_sha256": sha,
+    return {"version": 2, "provider": selection.provider, "bucket": selection.bucket,
+            "path": path, "source_sha256": sha,
             "wrapped_key": base64.b64encode(wrapped).decode("ascii"),
             "nonce": base64.b64encode(nonce).decode("ascii"),
             "ciphertext": base64.b64encode(AESGCM(key).encrypt(nonce, token.encode(), aad)).decode("ascii")}
 
 
 def decrypt_token(envelope, private_path, path, sha):
-    demand(set(envelope) == {"version", "bucket", "path", "source_sha256", "wrapped_key", "nonce", "ciphertext"}
-           and envelope.get("version") == 1 and envelope.get("bucket") == BUCKET
-           and envelope.get("path") == path and envelope.get("source_sha256") == sha,
+    selection = load_original_storage_selection()
+    demand(set(envelope) == {"version", "provider", "bucket", "path", "source_sha256",
+                             "wrapped_key", "nonce", "ciphertext"}
+           and envelope.get("version") == 2
+           and envelope.get("provider") == selection.provider
+           and envelope.get("bucket") == selection.bucket
+           and envelope.get("path") == path
+           and envelope.get("source_sha256") == sha,
            "SIGNED_TOKEN_ENVELOPE_INVALID")
     decode = lambda key: base64.b64decode(envelope[key], validate=True)
     private = load_pem_private_key(Path(private_path).read_bytes(), password=None)
     key = private.decrypt(decode("wrapped_key"), padding.OAEP(mgf=padding.MGF1(hashes.SHA256()),
                                                               algorithm=hashes.SHA256(), label=None))
-    token = AESGCM(key).decrypt(decode("nonce"), decode("ciphertext"), f"{BUCKET}/{path}:{sha}".encode()).decode("ascii")
+    aad = envelope_aad(selection.provider, selection.bucket, path, sha)
+    token = AESGCM(key).decrypt(decode("nonce"), decode("ciphertext"), aad).decode("ascii")
     demand(20 <= len(token) <= 4096, "SIGNED_TOKEN_INVALID")
     return token
 
 
 def issue(envelope_path):
     record, _, _, path = identity()
-    headers = credentials()
-    existing = readback(headers, path, missing_ok=True)
+    provider = storage_provider()
+    existing = provider.readback(path, missing_ok=True)
     if existing is not None:
         demand(digest(existing) == record["source_sha256"], "STORAGE_EXISTING_OBJECT_SHA_MISMATCH")
         Path(envelope_path).write_text(json.dumps({"version": 0, "status": "EXISTING_OBJECT_REUSED",
+                                                   "storage_provider": provider.provider_id,
                                                    "source_sha256": digest(existing)}), encoding="utf-8")
-        return {"status": "EXISTING_OBJECT_REUSED", "source_sha256": digest(existing), "storage_uploads": 0}
-    url = f"{BASE_URL}/storage/v1/object/upload/sign/{BUCKET}/{quote(path, safe='/')}"
-    request = Request(url, data=b"{}", method="POST",
-                      headers={**headers, "Content-Type": "application/json"})
-    try:
-        with OPENER.open(request, timeout=30) as response:
-            demand(response.status in (200, 201), "STORAGE_SIGN_FAILED")
-            payload = response.read(8193)
-    except HTTPError as error:
-        raise ValueError(f"STORAGE_HTTP_ERROR_{error.code}") from None
-    except URLError:
-        raise ValueError("STORAGE_NETWORK_ERROR") from None
-    demand(len(payload) <= 8192, "STORAGE_SIGN_RESPONSE_INVALID")
-    signed = urlparse(json.loads(payload).get("url", ""))
-    demand(not signed.scheme and not signed.netloc
-           and signed.path == f"/object/upload/sign/{BUCKET}/{path}", "STORAGE_SIGN_RESPONSE_INVALID")
-    tokens = parse_qs(signed.query).get("token", [])
-    demand(len(tokens) == 1, "STORAGE_SIGN_RESPONSE_INVALID")
-    Path(envelope_path).write_text(json.dumps(encrypt_token(tokens[0], path, record["source_sha256"])), encoding="utf-8")
-    return {"status": "SIGNED_UPLOAD_READY", "source_sha256": record["source_sha256"],
+        return {"status": "EXISTING_OBJECT_REUSED", "storage_provider": provider.provider_id,
+                "source_sha256": digest(existing), "storage_uploads": 0}
+    grant = provider.issue_upload_grant(path)
+    Path(envelope_path).write_text(
+        json.dumps(encrypt_token(grant, path, record["source_sha256"])),
+        encoding="utf-8",
+    )
+    return {"status": "SIGNED_UPLOAD_READY", "storage_provider": provider.provider_id,
+            "source_sha256": record["source_sha256"],
             "storage_object_path": path, "storage_uploads": 0}
 
 
 def upload(image_path, envelope_path, private_key):
     record, _, _, path = identity()
+    provider = storage_provider()
     original = Path(image_path).read_bytes()
-    demand(0 < len(original) <= LIMIT and original.startswith(b"\x89PNG\r\n\x1a\n")
+    demand(0 < len(original) <= LIMIT and original.startswith(b"\\x89PNG\\r\\n\\x1a\\n")
            and digest(original) == record["source_sha256"], "LOCAL_ORIGINAL_SHA_MISMATCH")
     envelope = json.loads(Path(envelope_path).read_text(encoding="utf-8"))
-    token = decrypt_token(envelope, private_key, path, record["source_sha256"])
-    url = (f"{BASE_URL}/storage/v1/object/upload/sign/{BUCKET}/{quote(path, safe='/')}"
-           f"?token={quote(token, safe='')}")
+    grant = decrypt_token(envelope, private_key, path, record["source_sha256"])
+    url = provider.upload_url(path, grant)
     request = Request(url, data=original, method="PUT",
                       headers={"Content-Type": "image/png", "x-upsert": "false"})
     try:
@@ -174,12 +169,14 @@ def upload(image_path, envelope_path, private_key):
             demand(response.status in (200, 201), "STORAGE_UPLOAD_OUTCOME_UNKNOWN")
     except HTTPError as error:
         if error.code == 409:
-            return {"status": "OBJECT_EXISTS_REQUIRES_TRUSTED_READBACK", "upload_attempts": 1}
+            return {"status": "OBJECT_EXISTS_REQUIRES_TRUSTED_READBACK",
+                    "storage_provider": provider.provider_id, "upload_attempts": 1}
         raise ValueError("STORAGE_UPLOAD_OUTCOME_UNKNOWN" if error.code >= 500
                          else f"STORAGE_HTTP_ERROR_{error.code}") from None
     except URLError:
         raise ValueError("STORAGE_UPLOAD_OUTCOME_UNKNOWN") from None
-    return {"status": "UPLOAD_SUBMITTED_REQUIRES_TRUSTED_READBACK", "upload_attempts": 1,
+    return {"status": "UPLOAD_SUBMITTED_REQUIRES_TRUSTED_READBACK",
+            "storage_provider": provider.provider_id, "upload_attempts": 1,
             "source_sha256": record["source_sha256"], "storage_object_path": path}
 
 
@@ -198,7 +195,7 @@ def registry_row(record, catalog, point, path):
         "brief": point["brief"], "prompt_snapshot": None,
         "provider": record["provider"], "provider_model": None,
         "provider_asset_id": record["tool_result_id"],
-        "object_path": f"{BUCKET}/{path}", "image_url": None,
+        "object_path": storage_provider().registry_object_path(path), "image_url": None,
         "generation_meta": {"source_sha256": record["source_sha256"], "content_review": record["content_review"],
                             "storage_verified": True, "tool": record["tool"],
                             "surface": record["surface"], "tool_result_id": record["tool_result_id"],
@@ -209,10 +206,11 @@ def registry_row(record, catalog, point, path):
 
 def verify_register():
     record, catalog, point, path = identity()
-    headers = credentials()
-    source = readback(headers, path)
+    provider = storage_provider()
+    source = provider.readback(path)
     demand(source is not None and digest(source) == record["source_sha256"], "STORAGE_ORIGINAL_SHA_MISMATCH")
-    url = f"{BASE_URL}/rest/v1/visual_assets"
+    registry_url, headers = registry_credentials()
+    url = f"{registry_url}/rest/v1/visual_assets"
     profile_headers = {**headers, "Accept-Profile": "survival_rpg"}
     get = Request(f"{url}?select=*&worldline_id=eq.AFTERFALL&limit=1000", headers=profile_headers)
     try:
