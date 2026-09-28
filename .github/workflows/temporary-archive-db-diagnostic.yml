@@ -29,6 +29,7 @@ jobs:
             --output /tmp/prod-ca-2021.crt
           sha256sum /tmp/prod-ca-2021.crt
           openssl x509 -in /tmp/prod-ca-2021.crt -noout -subject -issuer -dates -fingerprint -sha256
+          echo "NODE_EXTRA_CA_CERTS=/tmp/prod-ca-2021.crt" >> "$GITHUB_ENV"
       - name: Diagnose restricted database connection with pinned CA
         working-directory: archive/scripts
         env:
@@ -128,3 +129,8 @@ jobs:
             await client.end().catch(() => {})
           }
           NODE
+
+      - name: Verify real Archive reader path with trusted Supabase CA
+        env:
+          ARCHIVE_EXPORT_DATABASE_URL: ${{ secrets.ARCHIVE_EXPORT_DATABASE_URL }}
+        run: node archive/scripts/run-daily-archive.mjs --check
