@@ -1,0 +1,126 @@
+name: Temporary Archive DB Diagnostic
+
+on:
+  push:
+    branches:
+      - debug/archive-daily-db-20260928
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: archive/scripts/package-lock.json
+      - name: Install archive script dependencies
+        run: npm ci
+        working-directory: archive/scripts
+      - name: Diagnose restricted database connection
+        working-directory: archive/scripts
+        env:
+          ARCHIVE_EXPORT_DATABASE_URL: ${{ secrets.ARCHIVE_EXPORT_DATABASE_URL }}
+        run: |
+          node --input-type=module <<'NODE'
+          import dns from 'node:dns/promises'
+          import net from 'node:net'
+          import { Client } from 'pg'
+
+          const raw = process.env.ARCHIVE_EXPORT_DATABASE_URL
+          if (!raw) {
+            console.error(JSON.stringify({ stage: 'secret', ok: false, code: 'MISSING_SECRET' }))
+            process.exit(1)
+          }
+
+          let parsed
+          try {
+            parsed = new URL(raw)
+          } catch (error) {
+            console.error(JSON.stringify({ stage: 'parse', ok: false, name: error.name, code: error.code ?? null, message: 'INVALID_CONNECTION_URL' }))
+            process.exit(1)
+          }
+
+          const host = parsed.hostname
+          const port = Number(parsed.port || 5432)
+          console.log(JSON.stringify({
+            stage: 'parse',
+            ok: true,
+            protocol: parsed.protocol,
+            host,
+            port,
+            database: parsed.pathname.replace(/^\//, ''),
+            username_suffix_ok: parsed.username.endsWith('.jgsxpdflgkqroecfjzxq')
+          }))
+
+          try {
+            const addresses = await dns.lookup(host, { all: true })
+            console.log(JSON.stringify({ stage: 'dns', ok: true, addresses: addresses.map(x => ({ address: x.address, family: x.family })) }))
+          } catch (error) {
+            console.error(JSON.stringify({ stage: 'dns', ok: false, name: error.name, code: error.code ?? null, message: String(error.message ?? '').slice(0, 200) }))
+            process.exit(1)
+          }
+
+          try {
+            await new Promise((resolve, reject) => {
+              const socket = net.createConnection({ host, port })
+              const timer = setTimeout(() => {
+                socket.destroy()
+                reject(Object.assign(new Error('TCP_TIMEOUT'), { code: 'TCP_TIMEOUT' }))
+              }, 10000)
+              socket.once('connect', () => {
+                clearTimeout(timer)
+                socket.end()
+                resolve()
+              })
+              socket.once('error', (error) => {
+                clearTimeout(timer)
+                reject(error)
+              })
+            })
+            console.log(JSON.stringify({ stage: 'tcp', ok: true }))
+          } catch (error) {
+            console.error(JSON.stringify({ stage: 'tcp', ok: false, name: error.name, code: error.code ?? null, errno: error.errno ?? null, syscall: error.syscall ?? null, message: String(error.message ?? '').slice(0, 200) }))
+            process.exit(1)
+          }
+
+          const client = new Client({
+            connectionString: raw,
+            ssl: { rejectUnauthorized: true },
+            connectionTimeoutMillis: 10000
+          })
+
+          try {
+            await client.connect()
+            const result = await client.query(`
+              select
+                current_user::text as current_user,
+                session_user::text as session_user,
+                current_setting('transaction_read_only')::text as read_only
+            `)
+            console.log(JSON.stringify({ stage: 'postgres', ok: true, result: result.rows[0] }))
+          } catch (error) {
+            const safeMessage = String(error.message ?? '')
+              .replace(raw, '[REDACTED_URL]')
+              .replace(/:[^:@/]+@/g, ':[REDACTED]@')
+              .slice(0, 300)
+            console.error(JSON.stringify({
+              stage: 'postgres',
+              ok: false,
+              name: error.name,
+              code: error.code ?? null,
+              errno: error.errno ?? null,
+              syscall: error.syscall ?? null,
+              severity: error.severity ?? null,
+              message: safeMessage
+            }))
+            process.exitCode = 1
+          } finally {
+            await client.end().catch(() => {})
+          }
+          NODE
