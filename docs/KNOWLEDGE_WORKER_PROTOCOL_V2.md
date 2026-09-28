@@ -114,10 +114,12 @@ AUTO_LOW_RISK 후보는 원칙적으로 authoritative external source 2개 이�
 - LOW-risk eligible BRIEF만 automatic merge 허용
 - exact prepared-head validation 필수
 - merge 직전 current main 재확인 필수
-- merge 후 Netlify Production `commit_ref == merge SHA` 검증 필수
-- article / Knowledge index / sitemap 실제 반영 검증 필수
+- merge 후 Production은 즉시 배포하지 않고 batched Archive release gate로 인계
+- Production release는 현재 2일 간격 정책으로 묶어서 배포
+- release marker commit의 exact SHA를 Netlify Production `commit_ref`와 검증
+- 공개 release marker / archive release manifest까지 실제 반영 검증
 
-Semantic Worker는 직접 merge하지 않는다. Worker는 검증된 Knowledge PR에 publication-preparation label을 부여하고, GitHub Actions가 READY→PUBLISHED 준비, exact-head 재검증, exact-SHA merge, Production 검증을 수행한다.
+Semantic Worker는 직접 merge하지 않는다. Worker는 검증된 Knowledge PR에 publication-preparation label을 부여하고, GitHub Actions가 READY→PUBLISHED 준비, exact-head 재검증, exact-head merge까지 수행한 뒤 Production을 batched Archive release gate에 인계한다.
 
 고위험·충돌·unknown·중복·source 변경·권리 불명확·검증 실패는 기존대로 fail-closed 한다.
 
@@ -138,13 +140,16 @@ Semantic Worker는 직접 merge하지 않는다. Worker는 검증된 Knowledge P
 
 Netlify Production verification does not require a Netlify API token.
 
-Netlify automatically exposes build metadata including `COMMIT_REF` and `CONTEXT` during builds. The site build writes these values to `deploy-meta.json` in the generated site. The post-merge verifier polls the public Production origin and requires:
+Netlify automatically exposes build metadata including `COMMIT_REF` and `CONTEXT` during builds. The site build writes these values to `deploy-meta.json` in the generated site.
+
+Knowledge merge는 Production을 직접 트리거하지 않는다. A/B/C의 main 변경은 누적되고, batched Archive release workflow가 release marker commit을 만들 때 Netlify Production이 실행된다.
+
+Production verifier는 다음을 요구한다.
 
 - `provider = netlify`
 - `context = production`
-- `commit_ref == exact merge SHA`
-- target article reachable
-- Knowledge index contains the article
-- sitemap contains the article
+- `commit_ref == exact release marker commit SHA`
+- 공개 `release/production.json`이 배치 대상 source main SHA와 일치
+- Archive release manifest가 실제 Production에 존재
 
 This keeps the exact-SHA publication guarantee while avoiding an additional Netlify secret in GitHub Actions.
