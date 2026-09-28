@@ -161,16 +161,17 @@ test('AUTO_LOW_RISK READY and PUBLISHED must pass the same publication gate', as
 test('release gate covers PR_ONLY, shadow, AUTO, and the content-only boundary', async () => {
   const data = await loadKnowledge(root)
   const allowedFile = 'knowledge/content/briefs/K-004.json'
-  const prOnlyData = { ...data, config: { ...data.config, publication_mode: 'PR_ONLY' } }
+  const prOnlyData = { ...data, config: { ...data.config, publication_mode: 'PR_ONLY', auto_publish_enabled: false } }
   const prOnly = await checkRelease(prOnlyData, { changedFiles: [allowedFile], briefIds: ['K-004'], mode: 'PR_ONLY' })
   assert.equal(prOnly.decision, 'PR_ONLY')
   assert.equal(prOnly.requires_human, false)
 
-  const shadow = await checkRelease(data, { changedFiles: [allowedFile], briefIds: ['K-004'] })
+  const shadowData = { ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK_SHADOW', auto_publish_enabled: false } }
+  const shadow = await checkRelease(shadowData, { changedFiles: [allowedFile], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK_SHADOW' })
   assert.equal(shadow.decision, 'WOULD_AUTO_PUBLISH')
   assert.equal(shadow.requires_human, false)
 
-  const escalation = await checkRelease(data, { changedFiles: [allowedFile], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK' })
+  const escalation = await checkRelease(shadowData, { changedFiles: [allowedFile], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK' })
   assert.equal(escalation.decision, 'REJECTED')
   assert.ok(escalation.reasons.includes('REQUESTED_MODE_MISMATCH'))
 
@@ -187,15 +188,16 @@ test('release gate covers PR_ONLY, shadow, AUTO, and the content-only boundary',
 
 test('publication mode config is authoritative and internally consistent', async () => {
   const data = await loadKnowledge(root)
-  await assert.rejects(validateKnowledge({ ...data, config: { ...data.config, auto_publish_enabled: true } }), /auto_publish_enabled must be false outside AUTO_LOW_RISK mode/)
+  const shadowData = { ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK_SHADOW', auto_publish_enabled: false } }
+  await assert.rejects(validateKnowledge({ ...shadowData, config: { ...shadowData.config, auto_publish_enabled: true } }), /auto_publish_enabled must be false outside AUTO_LOW_RISK mode/)
   await assert.rejects(validateKnowledge({ ...data, config: { ...data.config, publication_mode: 'PR_ONLY', auto_publish_enabled: true } }), /auto_publish_enabled must be false outside AUTO_LOW_RISK mode/)
   assert.equal(await validateKnowledge({ ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK', auto_publish_enabled: true } }), true)
-  const inconsistent = await checkRelease({ ...data, config: { ...data.config, auto_publish_enabled: true } }, {
-    changedFiles: ['knowledge/content/briefs/K-004.json'], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK',
+  const inconsistent = await checkRelease({ ...shadowData, config: { ...shadowData.config, auto_publish_enabled: true } }, {
+    changedFiles: ['knowledge/content/briefs/K-004.json'], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK_SHADOW',
   })
   assert.equal(inconsistent.decision, 'HUMAN_REVIEW_REQUIRED')
   assert.ok(inconsistent.reasons.some((reason) => reason.startsWith('INVALID_PUBLICATION_CONFIG:')))
-  const cliOutput = execFileSync(process.execPath, [join(root, 'archive/scripts/knowledge-release-check.mjs'), '--brief', 'K-004', '--mode', 'AUTO_LOW_RISK', '--changed-file', 'knowledge/content/briefs/K-004.json'], { cwd: root, encoding: 'utf8' })
+  const cliOutput = execFileSync(process.execPath, [join(root, 'archive/scripts/knowledge-release-check.mjs'), '--brief', 'K-004', '--mode', 'AUTO_LOW_RISK_SHADOW', '--changed-file', 'knowledge/content/briefs/K-004.json'], { cwd: root, encoding: 'utf8' })
   assert.equal(JSON.parse(cliOutput).decision, 'REJECTED')
 })
 
@@ -244,7 +246,8 @@ test('every changed brief is bound to the exact release targets and must pass in
 test('release gate fails closed for risk, conflicts, missing evidence, unknown domains, and duplicate candidates', async () => {
   const data = await loadKnowledge(root)
   const files = ['knowledge/content/briefs/K-004.json']
-  const release = (input, briefIds = ['K-004']) => checkRelease(input, { changedFiles: files, briefIds, mode: 'AUTO_LOW_RISK_SHADOW' })
+  const shadowConfig = { ...data.config, publication_mode: 'AUTO_LOW_RISK_SHADOW', auto_publish_enabled: false }
+  const release = (input, briefIds = ['K-004']) => checkRelease({ ...input, config: shadowConfig }, { changedFiles: files, briefIds, mode: 'AUTO_LOW_RISK_SHADOW' })
   const highRisk = { ...data, briefs: data.briefs.map((brief) => brief.id === 'K-004' ? { ...brief, risk_level: 'HIGH' } : brief) }
   assert.equal((await release(highRisk)).decision, 'HUMAN_REVIEW_REQUIRED')
 
@@ -330,7 +333,7 @@ test('source manifest bytes are pinned and unavailable or invalid sources requir
   const hash = createHash('sha256').update(bytes).digest('hex')
   const original = data.candidates.find((candidate) => candidate.brief_id === 'K-004')
   const archiveCandidate = { ...original, source_kind: 'PUBLIC_ARCHIVE', source_manifest_ref: sourceRef, source_manifest_sha256: hash }
-  const withCandidate = (candidate = archiveCandidate) => ({ ...data, base, candidates: [candidate] })
+  const withCandidate = (candidate = archiveCandidate) => ({ ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK_SHADOW', auto_publish_enabled: false }, base, candidates: [candidate] })
   const options = { changedFiles: ['knowledge/content/briefs/K-004.json'], briefIds: ['K-004'] }
   try {
     await mkdir(dirname(sourcePath), { recursive: true })
