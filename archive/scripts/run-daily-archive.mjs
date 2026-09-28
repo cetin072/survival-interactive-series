@@ -253,9 +253,11 @@ function previewGate(pr, expectedHead, expectedBase) {
     : ['SUCCESS', 'NEUTRAL', 'SKIPPED'].includes(item.conclusion)), 'PR_CHECK_FAILED')
   const preview = checks.find((item) => item.__typename === 'StatusContext'
     && item.context === 'netlify/survival-diary-archive/deploy-preview')
-  insist(preview?.state === 'SUCCESS' && /^https:\/\/deploy-preview-\d+--survival-diary-archive\.netlify\.app\/?$/.test(preview.targetUrl),
+  insist(preview?.state === 'SUCCESS' && /^https:\/\/app\.netlify\.com\/projects\/survival-diary-archive\/deploys\/[a-f0-9]+\/?$/.test(preview.targetUrl),
     'PREVIEW_NOT_READY')
-  return preview.targetUrl
+  const number = Number(new URL(pr).pathname.match(/\/pull\/(\d+)\/?$/)?.[1])
+  insist(Number.isSafeInteger(number) && number > 0, 'INVALID_PREVIEW_PR')
+  return `https://deploy-preview-${number}--survival-diary-archive.netlify.app/`
 }
 
 async function verifySite(url, chapterId, rawRef) {
