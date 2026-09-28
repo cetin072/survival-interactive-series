@@ -11,6 +11,7 @@ on:
       - 'archive/web/package.json'
       - '.github/workflows/knowledge.yml'
       - '.github/workflows/knowledge-publish-prepare.yml'
+      - '.github/workflows/knowledge-exact-head.yml'
   push:
     branches: [main]
     paths:
@@ -22,6 +23,7 @@ on:
       - 'archive/web/package.json'
       - '.github/workflows/knowledge.yml'
       - '.github/workflows/knowledge-publish-prepare.yml'
+      - '.github/workflows/knowledge-exact-head.yml'
 
 jobs:
   knowledge:

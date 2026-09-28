@@ -1,0 +1,135 @@
+name: Validate Knowledge exact publication head
+
+on:
+  workflow_dispatch:
+    inputs:
+      brief_id:
+        description: Exact Knowledge BRIEF ID
+        required: true
+        type: string
+      expected_sha:
+        description: Exact prepared publication commit SHA
+        required: true
+        type: string
+      pr_number:
+        description: Source Knowledge PR number
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: knowledge-exact-head-${{ inputs.pr_number }}-${{ inputs.expected_sha }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: archive/web
+    steps:
+      - name: Checkout exact prepared SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.expected_sha }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: archive/web/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Verify exact checked-out SHA and fetch main
+        working-directory: .
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA" || {
+            echo "Checked-out SHA does not match expected prepared SHA."
+            exit 1
+          }
+          git fetch origin main:refs/remotes/origin/main
+          test "$(git merge-base origin/main HEAD)" = "$(git rev-parse origin/main)" || {
+            echo "Prepared publication head is not based on current main."
+            exit 1
+          }
+
+      - name: Verify target BRIEF is PUBLISHED and low-risk eligible
+        working-directory: .
+        env:
+          BRIEF_ID: ${{ inputs.brief_id }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs'
+          const id = process.env.BRIEF_ID
+          if (!/^K-\d+$/.test(id)) throw new Error('invalid BRIEF id')
+          const brief = JSON.parse(readFileSync(`knowledge/content/briefs/${id}.json`, 'utf8'))
+          if (brief.id !== id) throw new Error('BRIEF identity mismatch')
+          if (brief.status !== 'PUBLISHED') throw new Error(`expected PUBLISHED, got ${brief.status}`)
+          if (brief.risk_level !== 'LOW') throw new Error('expected LOW risk')
+          if (brief.publication_policy !== 'AUTO_LOW_RISK') throw new Error('expected AUTO_LOW_RISK')
+          if (brief.semantic_qa_status !== 'PASS') throw new Error('expected semantic QA PASS')
+          console.log(JSON.stringify({ id, slug: brief.slug, status: brief.status }))
+          NODE
+
+      - name: Run exact-head Knowledge tests and site build
+        run: |
+          npm run knowledge:test
+          npm run knowledge:check
+          npm run build
+
+      - name: Re-run release gate against exact prepared SHA
+        id: gate
+        working-directory: .
+        env:
+          BRIEF_ID: ${{ inputs.brief_id }}
+        run: |
+          node archive/scripts/knowledge-release-check.mjs             --brief "$BRIEF_ID"             --base origin/main             --head HEAD > "$RUNNER_TEMP/release.json"
+          cat "$RUNNER_TEMP/release.json"
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs'
+          const result = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/release.json', 'utf8'))
+          const allowed = new Set(['WOULD_AUTO_PUBLISH', 'AUTO_PUBLISH_ELIGIBLE'])
+          if (!allowed.has(result.decision)) throw new Error(`release decision not eligible: ${result.decision}`)
+          if (result.requires_human !== false) throw new Error('human review required')
+          if (result.content_only?.allowed !== true) throw new Error('content-only boundary failed')
+          if (!Array.isArray(result.reasons) || result.reasons.length !== 0) throw new Error('release reasons not empty')
+          console.log('EXACT_HEAD_RELEASE_GATE=PASS')
+          NODE
+
+      - name: Verify expected article/index/sitemap files
+        working-directory: .
+        env:
+          BRIEF_ID: ${{ inputs.brief_id }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync, existsSync } from 'node:fs'
+          const id = process.env.BRIEF_ID
+          const brief = JSON.parse(readFileSync(`knowledge/content/briefs/${id}.json`, 'utf8'))
+          const article = `archive/web/public/knowledge/${brief.slug}/index.html`
+          if (!existsSync(article)) throw new Error('article page missing')
+          const index = readFileSync('archive/web/public/knowledge/index.html', 'utf8')
+          const sitemap = readFileSync('archive/web/public/sitemap.xml', 'utf8')
+          const path = `/knowledge/${brief.slug}/`
+          if (!index.includes(path)) throw new Error('Knowledge index missing article')
+          if (!sitemap.includes(path)) throw new Error('sitemap missing article')
+          console.log(JSON.stringify({ article, path }))
+          NODE
+
+      - name: Record exact-head validation on PR
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          BRIEF_ID: ${{ inputs.brief_id }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          gh pr comment "$PR_NUMBER" --body "Exact publication-head validation PASS for `$BRIEF_ID` at `$EXPECTED_SHA`. Knowledge tests/check/build, release gate, article/index/sitemap verification all passed. This validation does not merge or deploy Production."
