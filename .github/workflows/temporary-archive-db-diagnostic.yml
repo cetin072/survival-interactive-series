@@ -166,6 +166,18 @@ jobs:
             --output "$ca"
           printf '%s  %s\n' '700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7' "$ca" | sha256sum --check --status
           echo "NODE_EXTRA_CA_CERTS=$ca" >> "$GITHUB_ENV"
+      - name: Expose Archive gate output for this temporary diagnostic
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('archive/scripts/run-daily-archive.mjs')
+          text = path.read_text(encoding='utf-8')
+          old = "{ cwd, stdio: 'ignore', timeout: 300_000 }"
+          new = "{ cwd, stdio: 'inherit', timeout: 300_000 }"
+          if old not in text:
+              raise SystemExit('gate stdio marker not found')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
       - name: Run real SHADOW Archive cycle with safe diagnostics
         env:
           ARCHIVE_EXPORT_DATABASE_URL: ${{ secrets.ARCHIVE_EXPORT_DATABASE_URL }}
