@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node ../scripts/build-knowledge.mjs --check && node ../scripts/knowledge-scan.mjs --check && tsc --noEmit && vite build",
+    "build": "node ../scripts/build-knowledge.mjs --check && node ../scripts/knowledge-scan.mjs --check && tsc --noEmit && vite build && node ../scripts/write-deploy-meta.mjs",
     "build:verified": "npm run reader:check && npm run build",
     "test": "vitest run",
     "reader:build": "node ../scripts/build-reader-edition.mjs",
