@@ -9,6 +9,7 @@ import { publicKnowledgeInventory, scanKnowledge, bootstrapKnowledge } from './k
 import { loadKnowledge, validateKnowledge, publicationEligibility, root } from './knowledge-content.mjs'
 import { checkContentOnly, checkRelease, verifyProductionPublication } from './knowledge-release.mjs'
 import { planWorkerRun, validateProviderConfig, validateWorkerPolicy } from './knowledge-worker-config.mjs'
+import { assertReleaseReady, expectedReleaseDecision, promoteBriefRecord } from './knowledge-publish.mjs'
 
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex')
 const manifestRef = 'archive/content/transcripts/C03-AFTERFALL/S99/SESSION_001/SOURCE_MANIFEST.json'
@@ -463,4 +464,40 @@ test('worker provider can switch without changing dispatcher or repository safet
     },
   }
   assert.throws(() => validateProviderConfig(leaked), /checked-in secret forbidden/)
+})
+
+
+test('publish preparation accepts only exact release decisions and promotes READY low-risk brief', () => {
+  assert.equal(expectedReleaseDecision('AUTO_LOW_RISK_SHADOW'), 'WOULD_AUTO_PUBLISH')
+  assert.equal(expectedReleaseDecision('AUTO_LOW_RISK'), 'AUTO_PUBLISH_ELIGIBLE')
+  assert.equal(expectedReleaseDecision('PR_ONLY'), null)
+
+  const passing = {
+    decision: 'WOULD_AUTO_PUBLISH',
+    requires_human: false,
+    content_only: { allowed: true },
+    reasons: [],
+  }
+  assert.equal(assertReleaseReady(passing, 'AUTO_LOW_RISK_SHADOW'), true)
+  assert.throws(() => assertReleaseReady({ ...passing, decision: 'HOLD' }, 'AUTO_LOW_RISK_SHADOW'), /release decision/)
+  assert.throws(() => assertReleaseReady({ ...passing, requires_human: true }, 'AUTO_LOW_RISK_SHADOW'), /human review/)
+  assert.throws(() => assertReleaseReady({ ...passing, content_only: { allowed: false } }, 'AUTO_LOW_RISK_SHADOW'), /content-only/)
+
+  const ready = {
+    content_type: 'BRIEF',
+    id: 'K-999',
+    status: 'READY',
+    risk_level: 'LOW',
+    publication_policy: 'AUTO_LOW_RISK',
+    semantic_qa_status: 'PASS',
+    published_at: '2026-09-20',
+    updated_at: '2026-09-20',
+  }
+  const promoted = promoteBriefRecord(ready, '2026-09-28')
+  assert.equal(promoted.status, 'PUBLISHED')
+  assert.equal(promoted.published_at, '2026-09-20')
+  assert.equal(promoted.updated_at, '2026-09-28')
+  assert.throws(() => promoteBriefRecord({ ...ready, risk_level: 'HIGH' }, '2026-09-28'), /risk must be LOW/)
+  assert.throws(() => promoteBriefRecord({ ...ready, semantic_qa_status: 'REVIEW' }, '2026-09-28'), /semantic QA/)
+  assert.throws(() => promoteBriefRecord({ ...ready, status: 'PUBLISHED' }, '2026-09-28'), /status must be READY/)
 })

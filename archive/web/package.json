@@ -12,7 +12,8 @@
     "reader:check": "node ../scripts/check-reader-edition.mjs",
     "knowledge:build": "node ../scripts/build-knowledge.mjs",
     "knowledge:check": "node ../scripts/build-knowledge.mjs --check && node ../scripts/knowledge-scan.mjs --check",
-    "knowledge:test": "node --test ../scripts/lib/knowledge.test.mjs"
+    "knowledge:test": "node --test ../scripts/lib/knowledge.test.mjs",
+    "knowledge:publish-prepare": "node ../scripts/knowledge-publish-prepare.mjs"
   },
   "dependencies": {
     "react": "19.2.8",
