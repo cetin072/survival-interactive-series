@@ -13,6 +13,7 @@ export const GENERATION_PROVIDERS = ['native_chatgpt', 'api_openai']
 export const RECEIPT_STATUSES = ['FAILED', 'SUCCEEDED']
 export const RECEIPT_REASON_CODES = ['GENERATION_FAILED', 'PROVIDER_UNAVAILABLE']
 export const RECEIPT_VERSION = 'illustration-receipts-v2'
+const ALLOWED_PRIORITIES = [0, 10, 20, 25, 30]
 
 const ID = {
   point: /^point-[a-f0-9]{64}$/,
@@ -249,12 +250,14 @@ export function selectIllustrationCandidates({ catalog, siteAssets, receipts, no
     skipped_previous_success: 0,
     skipped_retry_cap: 0,
     skipped_invalid_identity: 0,
+    skipped_invalid_priority: 0,
     skipped_daily_cap: 0,
   }
   const eligible = []
 
   for (const point of ready) {
     if (!validPoint(point)) { counts.skipped_invalid_identity++; continue }
+    if (!ALLOWED_PRIORITIES.includes(point.priority)) { counts.skipped_invalid_priority++; continue }
     if (published.some((asset) => sameIdentity(asset, point))) { counts.skipped_existing_assets++; continue }
     const history = attempts.filter((attempt) => sameIdentity(attempt, point))
     if (history.some((attempt) => attempt.status === 'SUCCEEDED')) {
@@ -266,7 +269,7 @@ export function selectIllustrationCandidates({ catalog, siteAssets, receipts, no
     eligible.push(point)
   }
 
-  let ordered = eligible.sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0)
+  let ordered = eligible.sort((a, b) => a.priority - b.priority
     || a.point_id.localeCompare(b.point_id))
   if (requested) ordered = ordered.filter((point) => requested.has(point.subject_id))
   const dailyCapacity = Math.max(0, DAILY_GENERATION_CAP - generationAttemptsToday)
@@ -276,7 +279,7 @@ export function selectIllustrationCandidates({ catalog, siteAssets, receipts, no
     point_id: point.point_id,
     subject_id: point.subject_id,
     generation_key: point.generation_key,
-    priority: point.priority ?? 0,
+    priority: point.priority,
     handoff: handoffContract(point),
   }))
 

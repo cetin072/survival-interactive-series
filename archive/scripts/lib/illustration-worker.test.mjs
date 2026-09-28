@@ -88,6 +88,32 @@ test('orders priorities 0, 10, 20, 25, 30 ascending with deterministic ties', ()
   assert.deepEqual(ties.candidates.map((item) => item.point_id), [point('a').point_id, point('b').point_id])
 })
 
+test('missing priority fails closed instead of falling back to priority zero', () => {
+  const missing = point('a')
+  delete missing.priority
+  const plan = select({ points: [missing] })
+  assert.equal(plan.candidates.length, 0)
+  assert.equal(plan.counts.skipped_invalid_priority, 1)
+})
+
+test('null priority fails closed', () => {
+  const plan = select({ points: [point('a', 10, { priority: null })] })
+  assert.equal(plan.candidates.length, 0)
+  assert.equal(plan.counts.skipped_invalid_priority, 1)
+})
+
+test('numeric priorities outside the allowlist fail closed', () => {
+  const plan = select({ points: [point('a', 5), point('b', 40), point('c', Number.NaN)] })
+  assert.equal(plan.candidates.length, 0)
+  assert.equal(plan.counts.skipped_invalid_priority, 3)
+})
+
+test('string priority fails closed', () => {
+  const plan = select({ points: [point('a', 10, { priority: '10' })] })
+  assert.equal(plan.candidates.length, 0)
+  assert.equal(plan.counts.skipped_invalid_priority, 1)
+})
+
 test('batch and actual-generation daily caps are both three', () => {
   const candidates = Array.from({ length: 6 }, (_, index) => point(String.fromCharCode(97 + index)))
   const threeAttempts = candidates.slice(0, 3).map((item) => receipt(item, 'FAILED'))
