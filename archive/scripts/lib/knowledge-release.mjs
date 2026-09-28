@@ -78,28 +78,37 @@ function hasAuthoritativeClaimSupport(brief, pack, siteOrigin) {
       const hostname = new URL(source.url).hostname.toLowerCase()
       return hostname.endsWith('.gov') || hostname.endsWith('.gov.kr') || hostname.endsWith('.go.kr') || hostname === 'who.int' || hostname.endsWith('.who.int')
     })
-    // A claim grounded only in the verified Reader is narrative provenance, not real-world advice.
-    const readerContext = cited.every((source) => new URL(source.url).hostname.toLowerCase() === siteHost)
-    return authoritative || readerContext
+    // Reader-only citations pass only when both evidence fields explicitly identify fictional story context.
+    const readerOnly = cited.every((source) => new URL(source.url).hostname.toLowerCase() === siteHost)
+    const narrativeMarker = /이야기|서사|허구|\bfiction(?:al)?\b|\bnarrative\b/i
+    const explicitlyNarrative = narrativeMarker.test(claim.context) && narrativeMarker.test(claim.limitation)
+    return authoritative || (readerOnly && explicitlyNarrative)
   })
+}
+
+function normalizeQuestion(question) {
+  return question.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim().replace(/\s+/g, ' ')
 }
 
 function candidateFor(brief, candidates) {
   const matches = candidates.filter((candidate) => candidate.brief_id === brief.id)
   if (matches.length !== 1) return { ok: false, reason: matches.length ? 'UNRESOLVED_DUPLICATE' : 'CANDIDATE_MISSING' }
   const candidate = matches[0]
-  if (candidate.status !== 'BRIEF_PROPOSED' || !candidate.disposition_note?.trim()) return { ok: false, reason: 'CANDIDATE_NOT_RESOLVED' }
-  const normalizedQuestion = candidate.question.toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim()
-  const duplicate = candidates.some((other) => other.id !== candidate.id && other.question.toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim() === normalizedQuestion)
+  if (typeof candidate.question !== 'string' || !candidate.question.trim() || candidate.status !== 'BRIEF_PROPOSED' || typeof candidate.disposition_note !== 'string' || !candidate.disposition_note.trim()) return { ok: false, reason: 'CANDIDATE_NOT_RESOLVED' }
+  const normalizedQuestion = normalizeQuestion(candidate.question)
+  const duplicate = candidates.some((other) => other.id !== candidate.id && typeof other.question === 'string' && normalizeQuestion(other.question) === normalizedQuestion)
   if (duplicate) return { ok: false, reason: 'UNRESOLVED_DUPLICATE' }
   return { ok: true, candidate }
 }
 
 async function sourceIsCurrent(candidate, base) {
-  if (candidate.source_kind !== 'PUBLIC_ARCHIVE') return true
-  if (!/^archive\/content\/transcripts\/C03-AFTERFALL\/S\d{2,3}\/SESSION_\d{3}\/SOURCE_MANIFEST\.json$/.test(candidate.source_manifest_ref) || !/^[a-f0-9]{64}$/.test(candidate.source_manifest_sha256)) return false
+  if (candidate.source_kind === 'PUBLIC_READER') return { current: true }
+  if (candidate.source_kind !== 'PUBLIC_ARCHIVE') return { current: false, reason: 'SOURCE_KIND_INVALID' }
+  if (!/^archive\/content\/transcripts\/C03-AFTERFALL\/S\d{2,3}\/SESSION_\d{3}\/SOURCE_MANIFEST\.json$/.test(candidate.source_manifest_ref)) return { current: false, reason: 'SOURCE_PATH_INVALID' }
+  if (!/^[a-f0-9]{64}$/.test(candidate.source_manifest_sha256)) return { current: false, reason: 'SOURCE_HASH_INVALID' }
   const bytes = await readFile(resolve(base, candidate.source_manifest_ref))
   return createHash('sha256').update(bytes).digest('hex') === candidate.source_manifest_sha256
+    ? { current: true } : { current: false, reason: 'SOURCE_CHANGED' }
 }
 
 export async function checkRelease(data, { changedFiles, briefIds, mode = data.config.publication_mode, base = data.base } = {}) {
@@ -137,7 +146,8 @@ export async function checkRelease(data, { changedFiles, briefIds, mode = data.c
     const candidateResult = candidateFor(brief, data.candidates)
     if (!candidateResult.ok) { reasons.push(`${candidateResult.reason}:${id}`); decision = candidateResult.reason === 'UNRESOLVED_DUPLICATE' ? 'HUMAN_REVIEW_REQUIRED' : 'HOLD'; continue }
     try {
-      if (!await sourceIsCurrent(candidateResult.candidate, base)) { reasons.push(`SOURCE_CHANGED:${id}`); decision = 'HUMAN_REVIEW_REQUIRED' }
+      const source = await sourceIsCurrent(candidateResult.candidate, base)
+      if (!source.current) { reasons.push(`${source.reason}:${id}`); decision = 'HUMAN_REVIEW_REQUIRED' }
     } catch {
       reasons.push(`SOURCE_UNAVAILABLE:${id}`); decision = 'HUMAN_REVIEW_REQUIRED'
     }

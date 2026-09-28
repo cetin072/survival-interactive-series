@@ -265,6 +265,126 @@ test('release gate fails closed for risk, conflicts, missing evidence, unknown d
   assert.equal((await release(duplicate)).decision, 'HUMAN_REVIEW_REQUIRED')
 })
 
+test('release gate fails closed on high risk, publication policy, QA, missing evidence details, and out-of-scope files', async () => {
+  const data = await loadKnowledge(root)
+  const files = ['knowledge/content/briefs/K-004.json']
+  const release = (input) => checkRelease(input, { changedFiles: files, briefIds: ['K-004'] })
+  for (const patch of [
+    { risk_level: 'HIGH' },
+    { risk_domains: ['MEDICAL'] },
+    { publication_policy: 'HUMAN_APPROVED' },
+    { semantic_qa_status: 'REVIEW' },
+  ]) {
+    const mutated = { ...data, briefs: data.briefs.map((brief) => brief.id === 'K-004' ? { ...brief, ...patch } : brief) }
+    assert.notEqual((await release(mutated)).decision, 'WOULD_AUTO_PUBLISH')
+  }
+
+  const pack = data.evidence.get('K-004')
+  const incompletePacks = [
+    new Map([...data.evidence].filter(([id]) => id !== 'K-004')),
+    new Map(data.evidence).set('K-004', { ...pack, claims: [] }),
+    new Map(data.evidence).set('K-004', { ...pack, claims: pack.claims.map((claim) => ({ ...claim, source_ids: [] })) }),
+  ]
+  for (const evidence of incompletePacks.slice(0, 2)) assert.equal((await release({ ...data, evidence })).decision, 'HOLD')
+  assert.equal((await release({ ...data, evidence: incompletePacks[2] })).decision, 'HUMAN_REVIEW_REQUIRED')
+  const noSources = { ...data, briefs: data.briefs.map((brief) => brief.id === 'K-004' ? { ...brief, sources: [] } : brief) }
+  assert.equal((await release(noSources)).decision, 'HOLD')
+  const noCheckedDate = { ...data, briefs: data.briefs.map((brief) => brief.id === 'K-004' ? { ...brief, source_checked_at: '' } : brief) }
+  assert.equal((await release(noCheckedDate)).decision, 'HOLD')
+  const rightsUnknown = new Map(data.evidence).set('K-004', { ...pack, copyright_status: 'UNKNOWN' })
+  const rightsResult = await release({ ...data, evidence: rightsUnknown })
+  assert.equal(rightsResult.decision, 'HOLD')
+  assert.equal(rightsResult.requires_human, true)
+  const withUnknowns = new Map(data.evidence).set('K-004', { ...pack, unknowns: ['The source does not resolve this point.'] })
+  const unknownResult = await release({ ...data, evidence: withUnknowns })
+  assert.equal(unknownResult.decision, 'HOLD')
+  assert.equal(unknownResult.requires_human, true)
+
+  for (const path of [
+    'archive/scripts/knowledge-release.mjs',
+    '.github/workflows/knowledge.yml',
+    'archive/scripts/package.json',
+    'knowledge/automation/config.json',
+  ]) assert.equal((await checkRelease(data, { changedFiles: [...files, path], briefIds: ['K-004'] })).decision, 'REJECTED')
+})
+
+test('out-of-target Evidence, Candidate, and generated pages are rejected', async () => {
+  const data = await loadKnowledge(root)
+  const briefs = [...data.briefs, { ...data.briefs.find((brief) => brief.id === 'K-004'), id: 'K-007', slug: 'another-fixture-brief' }]
+  const candidates = [...data.candidates, { ...data.candidates[0], id: 'KC-another-brief', brief_id: 'K-007' }]
+  const files = ['knowledge/content/briefs/K-004.json']
+  const release = (extraFile) => checkRelease({ ...data, briefs, candidates }, { changedFiles: [...files, extraFile], briefIds: ['K-004'] })
+  assert.ok((await release('knowledge/content/evidence/K-007.json')).reasons.includes('EVIDENCE_OUTSIDE_RELEASE_TARGETS:K-007'))
+  assert.ok((await release('knowledge/content/candidates/KC-another-brief.json')).reasons.includes('CANDIDATE_OUTSIDE_RELEASE_TARGETS:KC-another-brief'))
+  assert.ok((await release('archive/web/public/knowledge/another-fixture-brief/index.html')).reasons.includes('GENERATED_PAGE_OUTSIDE_RELEASE_TARGETS:another-fixture-brief'))
+})
+
+test('source manifest bytes are pinned and unavailable or invalid sources require human review', async () => {
+  const data = await loadKnowledge(root)
+  const base = await mkdtemp(join(tmpdir(), 'knowledge-release-source-'))
+  const sourceRef = 'archive/content/transcripts/C03-AFTERFALL/S99/SESSION_001/SOURCE_MANIFEST.json'
+  const sourcePath = join(base, sourceRef)
+  const bytes = Buffer.from('{"source":"verified fixture"}\n')
+  const hash = createHash('sha256').update(bytes).digest('hex')
+  const original = data.candidates.find((candidate) => candidate.brief_id === 'K-004')
+  const archiveCandidate = { ...original, source_kind: 'PUBLIC_ARCHIVE', source_manifest_ref: sourceRef, source_manifest_sha256: hash }
+  const withCandidate = (candidate = archiveCandidate) => ({ ...data, base, candidates: [candidate] })
+  const options = { changedFiles: ['knowledge/content/briefs/K-004.json'], briefIds: ['K-004'] }
+  try {
+    await mkdir(dirname(sourcePath), { recursive: true })
+    await writeFile(sourcePath, bytes)
+    assert.equal((await checkRelease(withCandidate(), options)).decision, 'WOULD_AUTO_PUBLISH')
+
+    await writeFile(sourcePath, Buffer.from('{"source":"changed fixture"}\n'))
+    const changed = await checkRelease(withCandidate(), options)
+    assert.equal(changed.decision, 'HUMAN_REVIEW_REQUIRED')
+    assert.ok(changed.reasons.includes('SOURCE_CHANGED:K-004'))
+
+    await rm(sourcePath)
+    const unavailable = await checkRelease(withCandidate(), options)
+    assert.equal(unavailable.decision, 'HUMAN_REVIEW_REQUIRED')
+    assert.ok(unavailable.reasons.includes('SOURCE_UNAVAILABLE:K-004'))
+
+    const invalidPath = await checkRelease(withCandidate({ ...archiveCandidate, source_manifest_ref: 'worldlines/AFTERFALL/raw/SOURCE_MANIFEST.json' }), options)
+    assert.equal(invalidPath.decision, 'HUMAN_REVIEW_REQUIRED')
+    assert.ok(invalidPath.reasons.includes('SOURCE_PATH_INVALID:K-004'))
+  } finally { await rm(base, { recursive: true, force: true }) }
+})
+
+test('candidate absence, bad status, missing disposition, link errors, and normalized duplicates never pass', async () => {
+  const data = await loadKnowledge(root)
+  const candidate = data.candidates[0]
+  const release = (candidates) => checkRelease({ ...data, candidates }, {
+    changedFiles: ['knowledge/content/briefs/K-004.json'], briefIds: ['K-004'],
+  })
+  const missing = await release([])
+  assert.equal(missing.decision, 'HOLD')
+  assert.equal(missing.requires_human, false)
+
+  for (const mutation of [
+    { status: 'DISCOVERED' },
+    { disposition_note: '' },
+    { brief_id: 'K-999' },
+  ]) assert.equal((await release([{ ...candidate, ...mutation }])).decision, 'HOLD')
+
+  const duplicate = { ...candidate, id: 'KC-normalized-duplicate', brief_id: 'K-999', question: candidate.question.replace('비상 물자를', '비상-물자를').replace('여러 거점', '여러  거점') }
+  const duplicateResult = await release([candidate, duplicate])
+  assert.equal(duplicateResult.decision, 'HUMAN_REVIEW_REQUIRED')
+  assert.ok(duplicateResult.reasons.includes('UNRESOLVED_DUPLICATE:K-004'))
+})
+
+test('Reader-only claims require explicit narrative scope and limitation markers', async () => {
+  const data = await loadKnowledge(root)
+  const pack = data.evidence.get('K-004')
+  const changedClaims = pack.claims.map((claim, index) => index === 0 ? { ...claim, source_ids: ['S2'] } : claim)
+  const evidence = new Map(data.evidence).set('K-004', { ...pack, claims: changedClaims })
+  const result = await checkRelease({ ...data, evidence }, {
+    changedFiles: ['knowledge/content/briefs/K-004.json'], briefIds: ['K-004'],
+  })
+  assert.equal(result.decision, 'HUMAN_REVIEW_REQUIRED')
+  assert.ok(result.reasons.includes('AUTHORITATIVE_SUPPORT_MISSING:K-004'))
+})
+
 test('production publication is complete only when deploy, page, index, and sitemap match', () => {
   const valid = { deployCommitSha: 'abc123', mergeSha: 'abc123', pageReachable: true, indexContains: true, sitemapContains: true }
   assert.deepEqual(verifyProductionPublication({ ...valid, deployStatus: 'ready' }), { status: 'PUBLISHED', reasons: [] })
