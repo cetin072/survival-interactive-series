@@ -7,6 +7,7 @@ on:
 permissions:
   contents: write
   pull-requests: read
+  actions: write
 
 concurrency:
   group: knowledge-publish-prepare-${{ github.event.pull_request.number }}
@@ -98,6 +99,7 @@ jobs:
           test "$rejected" -eq 0
 
       - name: Commit prepared publication back to PR branch
+        id: prepared
         working-directory: .
         env:
           BRIEF_ID: ${{ steps.target.outputs.brief }}
@@ -111,4 +113,18 @@ jobs:
           git config user.name "knowledge-publish-bot"
           git config user.email "knowledge-publish-bot@users.noreply.github.com"
           git commit -m "knowledge: prepare $BRIEF_ID publication [shadow]"
+          PREPARED_SHA="$(git rev-parse HEAD)"
           git push origin "HEAD:$HEAD_REF"
+          echo "prepared_sha=$PREPARED_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Dispatch exact-head validation for prepared commit
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          BRIEF_ID: ${{ steps.target.outputs.brief }}
+          PREPARED_SHA: ${{ steps.prepared.outputs.prepared_sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          test -n "$PREPARED_SHA"
+          gh workflow run knowledge-exact-head.yml             --ref "$HEAD_REF"             -f brief_id="$BRIEF_ID"             -f expected_sha="$PREPARED_SHA"             -f pr_number="$PR_NUMBER"
