@@ -17,6 +17,17 @@ export function validateWorkerPolicy(policy) {
   fail(Number.isInteger(d.backfill.run_hour_local) && d.backfill.run_hour_local >= 0 && d.backfill.run_hour_local <= 23, 'backfill run hour')
   fail(d.backfill.max_new_briefs_per_run === 1, 'backfill max briefs')
   fail(typeof policy.provider_config_ref === 'string' && policy.provider_config_ref === 'knowledge/automation/provider-config.json', 'provider config ref')
+  const publication = policy.publication_policy
+  fail(['AUTO_LOW_RISK_SHADOW', 'AUTO_LOW_RISK'].includes(publication?.required_repository_mode), 'publication mode')
+  const live = publication.required_repository_mode === 'AUTO_LOW_RISK'
+  fail(publication.required_auto_publish_enabled === live, 'publication enabled flag')
+  fail(publication.create_knowledge_pr === true, 'Knowledge PR creation must stay enabled')
+  fail(publication.auto_merge === live, 'auto merge must match publication mode')
+  fail(publication.production_publish === live, 'Production publish must match publication mode')
+  if (live) {
+    fail(publication.exact_head_validation_required === true, 'exact-head validation required')
+    fail(publication.production_exact_sha_required === true, 'Production exact-SHA verification required')
+  }
   return true
 }
 

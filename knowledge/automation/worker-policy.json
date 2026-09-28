@@ -46,11 +46,13 @@
     "record_context_limitations_conflicts_unknowns": true
   },
   "publication_policy": {
-    "required_repository_mode": "AUTO_LOW_RISK_SHADOW",
-    "required_auto_publish_enabled": false,
+    "required_repository_mode": "AUTO_LOW_RISK",
+    "required_auto_publish_enabled": true,
     "create_knowledge_pr": true,
-    "auto_merge": false,
-    "production_publish": false
+    "auto_merge": true,
+    "production_publish": true,
+    "exact_head_validation_required": true,
+    "production_exact_sha_required": true
   },
   "source_policy": {
     "require_verified_public_archive": true,
@@ -60,6 +62,7 @@
   "notification_policy": {
     "notify_on": [
       "PR_CREATED",
+      "PRODUCTION_PUBLISHED",
       "HUMAN_REVIEW_REQUIRED",
       "BLOCKING_FAILURE"
     ],
