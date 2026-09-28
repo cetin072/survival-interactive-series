@@ -8,6 +8,14 @@
       "processed_at": "2026-09-28T10:24:00.000Z",
       "candidate_ids": ["KC-storage-separation-accountability"],
       "brief_ids": ["K-005"]
+    },
+    {
+      "source_manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_002/SOURCE_MANIFEST.json",
+      "source_manifest_sha256": "2e4fae645bc259c353524b8f287d6c1b7e7bf20445240c45bd069e4e10c61cd1",
+      "status": "PROCESSED",
+      "processed_at": "2026-09-28T11:30:00.000Z",
+      "candidate_ids": ["KC-waypoint-assessment"],
+      "brief_ids": ["K-006"]
     }
   ]
 }
