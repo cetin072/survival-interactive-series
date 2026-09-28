@@ -10,6 +10,7 @@ on:
       - 'archive/web/public/sitemap.xml'
       - 'archive/web/package.json'
       - '.github/workflows/knowledge.yml'
+      - '.github/workflows/knowledge-publish-prepare.yml'
   push:
     branches: [main]
     paths:
@@ -20,6 +21,7 @@ on:
       - 'archive/web/public/sitemap.xml'
       - 'archive/web/package.json'
       - '.github/workflows/knowledge.yml'
+      - '.github/workflows/knowledge-publish-prepare.yml'
 
 jobs:
   knowledge:
