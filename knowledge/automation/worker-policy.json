@@ -1,10 +1,21 @@
 {
-  "version": 1,
+  "version": 2,
   "worker_enabled": true,
-  "execution_mode": "EXTERNAL_CHATGPT_SCHEDULED",
-  "scan_order": "OLDEST_PENDING_FIRST",
-  "max_sources_per_run": 1,
-  "max_new_briefs_per_source": 1,
+  "provider_config_ref": "knowledge/automation/provider-config.json",
+  "dispatcher": {
+    "trigger_interval_hours": 6,
+    "timezone": "Asia/Seoul",
+    "fresh_priority": true,
+    "max_sources_per_run": 1,
+    "open_worker_pr_guard": true,
+    "backfill": {
+      "enabled": true,
+      "only_when_no_fresh": true,
+      "cadence_hours": 24,
+      "run_hour_local": 6,
+      "max_new_briefs_per_run": 1
+    }
+  },
   "candidate_policy": {
     "auto_candidate_risk_level": "LOW",
     "allowed_auto_risk_domains": [
@@ -54,7 +65,8 @@
     ],
     "silent_on": [
       "NO_PENDING",
-      "ORDINARY_HOLD"
+      "ORDINARY_HOLD",
+      "OPEN_WORKER_PR_EXISTS"
     ]
   }
 }
