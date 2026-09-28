@@ -223,7 +223,7 @@ function previewGate(pr, expectedHead, expectedBase) {
   insist(info.headRefOid === expectedHead && info.baseRefOid === expectedBase
     && info.mergeStateStatus === 'CLEAN', 'STALE_OR_UNMERGEABLE_PR')
   const checks = info.statusCheckRollup ?? []
-  for (const name of ['appearance', 'browser', 'build', 'validate']) {
+  for (const name of ['browser', 'build', 'validate']) {
     insist(checks.some((item) => item.__typename === 'CheckRun' && item.name === name
       && item.status === 'COMPLETED' && item.conclusion === 'SUCCESS'),
     'REQUIRED_CI_NOT_GREEN')

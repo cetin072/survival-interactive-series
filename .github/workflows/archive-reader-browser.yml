@@ -4,12 +4,14 @@ on:
   pull_request:
     paths:
       - 'archive/web/**'
+      - 'archive/content/**'
       - 'archive/scripts/check-reader-browser.py'
       - '.github/workflows/archive-reader-browser.yml'
   push:
     branches: [main]
     paths:
       - 'archive/web/**'
+      - 'archive/content/**'
       - 'archive/scripts/check-reader-browser.py'
       - '.github/workflows/archive-reader-browser.yml'
 
