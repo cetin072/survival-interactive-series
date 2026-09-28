@@ -126,3 +126,19 @@ Semantic Worker는 직접 merge하지 않는다. Worker는 검증된 Knowledge P
 06:00 실행만 BACKFILL window 역할을 겸한다.
 
 이 스케줄 자체는 교체 가능하다. 향후 GitHub event/cron 또는 외부 orchestrator가 동일 Dispatcher/Provider 계약을 호출해도 Knowledge 본체는 변경하지 않는다.
+
+
+## 9. Tokenless Production verification
+
+Netlify Production verification does not require a Netlify API token.
+
+Netlify automatically exposes build metadata including `COMMIT_REF` and `CONTEXT` during builds. The site build writes these values to `deploy-meta.json` in the generated site. The post-merge verifier polls the public Production origin and requires:
+
+- `provider = netlify`
+- `context = production`
+- `commit_ref == exact merge SHA`
+- target article reachable
+- Knowledge index contains the article
+- sitemap contains the article
+
+This keeps the exact-SHA publication guarantee while avoiding an additional Netlify secret in GitHub Actions.
