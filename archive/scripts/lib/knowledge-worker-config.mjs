@@ -6,7 +6,7 @@ export function validateWorkerPolicy(policy) {
   fail(policy?.version === 2, 'worker policy version')
   fail(policy.worker_enabled === true, 'worker must be enabled')
   const d = policy.dispatcher
-  fail(d?.trigger_interval_hours === 6, 'dispatcher trigger interval must be 6 hours')
+  fail(d?.trigger_interval_hours === 12, 'dispatcher trigger interval must be 12 hours')
   fail(d.timezone === 'Asia/Seoul', 'dispatcher timezone')
   fail(d.fresh_priority === true, 'fresh priority must be enabled')
   fail(d.max_sources_per_run === 1, 'max sources per run')
@@ -17,6 +17,9 @@ export function validateWorkerPolicy(policy) {
   fail(Number.isInteger(d.backfill.run_hour_local) && d.backfill.run_hour_local >= 0 && d.backfill.run_hour_local <= 23, 'backfill run hour')
   fail(d.backfill.max_new_briefs_per_run === 1, 'backfill max briefs')
   fail(typeof policy.provider_config_ref === 'string' && policy.provider_config_ref === 'knowledge/automation/provider-config.json', 'provider config ref')
+  fail(policy.editorial_spec_ref === 'docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V1.md', 'editorial spec ref')
+  fail(Number.isInteger(policy.research_policy?.minimum_authoritative_sources_per_brief) && policy.research_policy.minimum_authoritative_sources_per_brief >= 2, 'minimum authoritative sources')
+  fail(Number.isInteger(policy.research_policy?.preferred_authoritative_sources_per_brief) && policy.research_policy.preferred_authoritative_sources_per_brief >= policy.research_policy.minimum_authoritative_sources_per_brief, 'preferred authoritative sources')
   const publication = policy.publication_policy
   fail(['AUTO_LOW_RISK_SHADOW', 'AUTO_LOW_RISK'].includes(publication?.required_repository_mode), 'publication mode')
   const live = publication.required_repository_mode === 'AUTO_LOW_RISK'
