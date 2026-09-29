@@ -163,7 +163,16 @@ export function planWorkerPreflight({
   if (openWorkerPrs.length > 1) return { result: 'BLOCKED_CONTRACT', reason: 'MULTIPLE_OPEN_WORKER_PRS', pr_numbers: openWorkerPrs.map((pr) => pr.number) }
   if (openWorkerPrs.length === 1) {
     const pr = openWorkerPrs[0]
-    return classifyWorkerPr({ policy, pr, checks: checksByPr[pr.number] ?? [], now })
+    const ref = headRef(pr)
+    const branchInfo = branchInventory.find((item) => item.name === ref)
+    if (!branchInfo || !Number.isInteger(branchInfo.ahead_by) || !Number.isInteger(branchInfo.behind_by)) {
+      return { result: 'BLOCKED_CONTRACT', reason: 'OPEN_PR_BRANCH_INVENTORY_REQUIRED', pr_number: pr.number, branch: ref }
+    }
+    const classified = classifyWorkerPr({ policy, pr, checks: checksByPr[pr.number] ?? [], now })
+    if (classified.result === 'RESUME_PR' && branchInfo.behind_by > 0) {
+      return { ...classified, action: 'SYNC_CURRENT_MAIN_THEN_RECHECK', behind_by: branchInfo.behind_by, ahead_by: branchInfo.ahead_by }
+    }
+    return classified
   }
 
   const prHeads = new Map()

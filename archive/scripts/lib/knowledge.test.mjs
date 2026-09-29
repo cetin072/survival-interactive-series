@@ -797,3 +797,33 @@ test('content Worker PR requires phase marker and handles Draft exact-head gate 
   assert.equal(human.result, 'HUMAN_REVIEW_REQUIRED')
   assert.equal(human.reason, 'PUBLICATION_LABEL_REMOVED_AFTER_HANDOFF')
 })
+
+
+test('open Worker PR with green checks syncs current main before publication handoff', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const provider = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
+  const runtime = { version: 1, backfill: { last_attempted_at: null, last_work_key: null, last_result: null, reviewed_items: [] } }
+  const pr = {
+    number: 777,
+    state: 'open',
+    head_ref: 'knowledge/worker/backfill-deadbeef1234',
+    head_sha: 'd'.repeat(40),
+    updated_at: '2026-09-29T20:00:00.000Z',
+    draft: true,
+    body: workerPhaseMarker(policy, 'PACKAGE_READY'),
+    labels: [],
+  }
+  const result = planWorkerPreflight({
+    policy,
+    providerConfig: provider,
+    runtimeState: runtime,
+    scannerResult: { status: 'NOOP', sources: [] },
+    pullRequests: [pr],
+    checksByPr: { 777: [{ name: 'Validate Knowledge worker gate', status: 'completed', conclusion: 'success' }] },
+    branchInventory: [{ name: pr.head_ref, head_sha: pr.head_sha, ahead_by: 1, behind_by: 2 }],
+    now: '2026-09-29T21:00:00.000Z',
+  })
+  assert.equal(result.result, 'RESUME_PR')
+  assert.equal(result.action, 'SYNC_CURRENT_MAIN_THEN_RECHECK')
+  assert.equal(result.behind_by, 2)
+})
