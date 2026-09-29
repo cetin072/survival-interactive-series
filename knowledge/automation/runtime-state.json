@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "backfill": {
+    "last_attempted_at": null,
+    "last_work_key": null,
+    "last_result": null,
+    "reviewed_items": []
+  }
+}
