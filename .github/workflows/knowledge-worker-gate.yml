@@ -97,17 +97,61 @@ jobs:
             --base "$PR_BASE_SHA" \
             --head HEAD > "$RUNNER_TEMP/worker-release.json"
           cat "$RUNNER_TEMP/worker-release.json"
-          node --input-type=module <<'NODE'
+          node --input-type=module <<'NODE' >> "$GITHUB_OUTPUT"
           import { readFileSync } from 'node:fs'
           const result = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/worker-release.json', 'utf8'))
-          if (result.decision !== 'AUTO_PUBLISH_ELIGIBLE') throw new Error(`WORKER_GATE_DECISION:${result.decision}`)
-          if (result.requires_human !== false) throw new Error('WORKER_GATE_HUMAN_REVIEW')
           if (result.content_only?.allowed !== true) throw new Error('WORKER_GATE_CONTENT_BOUNDARY')
-          if (!Array.isArray(result.reasons) || result.reasons.length !== 0) throw new Error('WORKER_GATE_REASONS_NOT_EMPTY')
-          console.log('WORKER_GATE=AUTO_PUBLISH_ELIGIBLE')
+          if (result.decision === 'AUTO_PUBLISH_ELIGIBLE') {
+            if (result.requires_human !== false) throw new Error('WORKER_GATE_HUMAN_REVIEW_CONTRADICTION')
+            if (!Array.isArray(result.reasons) || result.reasons.length !== 0) throw new Error('WORKER_GATE_REASONS_NOT_EMPTY')
+            console.log('mode=auto')
+            console.log('decision=AUTO_PUBLISH_ELIGIBLE')
+          } else if (result.decision === 'HUMAN_REVIEW_REQUIRED' || (result.decision === 'HOLD' && result.requires_human === true)) {
+            console.log('mode=human_review')
+            console.log(`decision=${result.decision}`)
+          } else {
+            throw new Error(`WORKER_GATE_DECISION:${result.decision}`)
+          }
           NODE
 
+      - name: Enqueue exact-head human review
+        if: steps.gate.outputs.mode == 'human_review'
+        working-directory: .
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          BRIEF_ID: ${{ steps.target.outputs.brief }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          node archive/scripts/knowledge-review-sync.mjs \
+            --brief "$BRIEF_ID" \
+            --base "$PR_BASE_SHA" \
+            --head HEAD \
+            --pr-number "$PR_NUMBER" \
+            --pr-head-ref "$PR_HEAD_REF"
+
+      - name: Record human-review queue marker on PR
+        if: steps.gate.outputs.mode == 'human_review'
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          MARKER="<!-- knowledge-worker-human-review-v1:$HEAD_SHA -->"
+          if gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments?per_page=100" --paginate \
+            --jq '.[].body' | grep -Fqx "$MARKER"; then
+            echo "Human-review marker already exists."
+          else
+            gh pr comment "$PR_NUMBER" --body "$MARKER"
+          fi
+
       - name: Record exact-head gate marker on PR
+        if: steps.gate.outputs.mode == 'auto'
         working-directory: .
         env:
           GH_TOKEN: ${{ github.token }}
@@ -125,6 +169,7 @@ jobs:
           fi
 
       - name: Check current-main freshness for automatic handoff
+        if: steps.gate.outputs.mode == 'auto'
         id: freshness
         working-directory: .
         env:
