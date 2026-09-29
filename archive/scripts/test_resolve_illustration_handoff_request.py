@@ -59,6 +59,30 @@ class IllustrationHandoffRequestTests(unittest.TestCase):
         finally:
             path.unlink(missing_ok=True)
 
+    def test_checked_in_staged_request_resolves(self):
+        path = ROOT / "archive/automation/illustration-handoff-requests/test-staged-request.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            path.write_text(json.dumps({
+                "version": resolver.STAGED_REQUEST_VERSION,
+                "staging_id": "taehoon-v6-4512f65157aa",
+                "source_commit": "b" * 40,
+                "identity_path": "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_BAEKUN.json",
+            }), encoding="utf-8")
+            result = resolver.from_request(path)
+            self.assertEqual(result["staging_id"], "taehoon-v6-4512f65157aa")
+            self.assertEqual(result["request_version"], resolver.STAGED_REQUEST_VERSION)
+        finally:
+            path.unlink(missing_ok=True)
+
+    def test_bad_staging_id_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "HANDOFF_REQUEST_STAGING_ID_INVALID"):
+            resolver.normalized_staged(
+                "../../unsafe",
+                "c" * 40,
+                "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_BAEKUN.json",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
