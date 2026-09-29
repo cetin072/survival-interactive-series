@@ -101,7 +101,7 @@ Draft PR의 exact HEAD에서 required CI와 Worker gate가 PASS하면 GitHub Act
 
 branch가 뒤처졌으면 자동 handoff를 하지 않고 Draft/`PACKAGE_READY` 상태로 남긴다. 다음 Scheduled Worker는 같은 deterministic branch의 최종 package를 current main 위에 재구성하고 checks를 다시 실행한다. **current main과 동기화된 exact HEAD에서 gate가 다시 PASS한 경우에만** GitHub Actions가 publication handoff를 시작한다.
 
-Worker gate 자체는 `PACKAGE_READY` phase에서만 실행한다. CI가 실행되는 동안 main이 움직이는 경쟁조건을 피하기 위해 PR 이벤트의 exact base SHA에 대해 package와 release eligibility를 검증한다. gate가 PASS한 뒤 같은 workflow가 current main freshness를 다시 확인하고 자동 handoff를 수행한다. `ready_for_review` 이벤트는 Worker gate를 재실행하지 않는다. `PUBLICATION_HANDOFF` 이후 prepared commit은 exact-head publication workflow가 전담한다.
+Worker gate 자체는 `PACKAGE_READY` phase에서만 실행한다. CI가 실행되는 동안 main이 움직이는 경쟁조건을 피하기 위해 PR 이벤트의 exact base SHA에 대해 package와 release eligibility를 검증한다. gate가 PASS한 뒤 같은 workflow가 current main freshness를 다시 확인하고 자동 handoff를 수행한다. Draft→Ready 전환과 PR mutation에는 기존 trusted `ARCHIVE_GITHUB_TOKEN`을 사용하며, credential이 없으면 fail-closed 한다. `ready_for_review` 이벤트는 Worker gate를 재실행하지 않는다. `PUBLICATION_HANDOFF` 이후 prepared commit은 exact-head publication workflow가 전담한다.
 
 ## 7. HOLD / HUMAN_REVIEW disposition
 
