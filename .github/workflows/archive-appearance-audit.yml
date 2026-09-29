@@ -63,8 +63,20 @@ jobs:
       - name: Verify exact Preview commit and all 18 profiles
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         run: python archive/scripts/check-character-appearance.py --url https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app --wait-assets
-      - name: Verify exact Production commit and all 18 profiles
+      - name: Detect a batched Production release commit
+        id: production_release
         if: github.event_name == 'push'
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          git fetch --no-tags --depth=1 origin "$BEFORE_SHA"
+          if git diff --quiet "$BEFORE_SHA" "$GITHUB_SHA" -- archive/web/public/release/production.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Verify exact Production commit and all 18 profiles
+        if: github.event_name == 'push' && steps.production_release.outputs.changed == 'true'
         run: python archive/scripts/check-character-appearance.py --url https://survival-diary-archive.netlify.app --wait-assets
       - name: Preserve mobile appearance screenshots
         if: always()
