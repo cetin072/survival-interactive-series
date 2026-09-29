@@ -49,6 +49,33 @@ Provider responsibilities:
 
 The current `illustration_storage_handoff.py` calls this provider boundary rather than implementing Supabase Storage directly. Service-role credentials remain only in the trusted GitHub Actions workflow; no private key, signed upload token, or upload grant is passed to the local machine.
 
+## Primary private renderer handoff
+
+For isolated ChatGPT renderer output, the preferred temporary transport is now
+private Supabase staging rather than a GitHub Draft Release.
+
+1. The isolated renderer writes an accepted PNG to the private user Library.
+2. The handoff worker transfers the PNG as bounded base64 chunks into
+   `survival_ops.illustration_binary_staging*`.
+3. `archive_illustration_staging_finalize` reconstructs the exact bytes inside
+   Postgres and verifies byte count, SHA-256, PNG signature and dimensions.
+4. One immutable `illustration-staged-handoff-request-v1` on main identifies
+   only the staging ID, exact source commit and identity path.
+5. The trusted GitHub workflow uses its existing Supabase service-role secret to
+   read the private chunks, reconstruct and independently verify the PNG, then
+   executes the existing create-only private Storage upload and registry
+   reconcile/readback.
+6. After complete Storage + registry verification, the trusted workflow deletes
+   the temporary staging row/chunks.
+
+The staging tables are operational transport only. They are private, temporary,
+not Canon, not a public site dependency, and never replace the private original
+in `survival-archive-originals`.
+
+The Draft Release transport below remains supported for existing receipts and
+compatibility, but new isolated renderer output should prefer private Supabase
+staging when no private GitHub binary-upload surface is available.
+
 ## Temporary private image handoff
 
 The routine path uses a GitHub Draft Release as a short-lived staging handoff:
