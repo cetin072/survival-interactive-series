@@ -97,7 +97,9 @@ open Worker PR이 2개 이상이면 `BLOCKED_CONTRACT:MULTIPLE_OPEN_WORKER_PRS`.
 - `PACKAGE_READY`: atomic package commit이 있고 Draft PR이 열린 상태. 실제 CI/checker를 기다린다.
 - `PUBLICATION_HANDOFF`: exact current-head gate가 통과해 publication handoff가 시작된 상태.
 
-Draft PR의 exact HEAD에서 required CI와 Worker gate가 PASS하면 Worker가 PR을 ready-for-review로 전환한 뒤 publication label을 붙인다. Draft 상태에서는 publication workflow가 실행되지 않아야 한다.
+Draft PR의 exact HEAD에서 required CI와 Worker gate가 PASS하면 먼저 current main과 branch 관계를 다시 확인한다. branch가 뒤처졌으면 같은 deterministic branch의 최종 package를 current main 위에 재구성하고 checks를 다시 실행한다. **current main과 동기화된 exact HEAD에서 gate가 다시 PASS한 경우에만** Worker가 PR을 ready-for-review로 전환한 뒤 publication label을 붙인다. Draft 상태에서는 publication workflow가 실행되지 않아야 한다.
+
+Worker gate 자체는 CI가 실행되는 동안 main이 움직이는 경쟁조건을 피하기 위해 PR 이벤트의 exact base SHA에 대해 package와 release eligibility를 검증한다. current-main freshness는 publication handoff 직전에 별도로 강제한다.
 
 ## 7. HOLD / HUMAN_REVIEW disposition
 
