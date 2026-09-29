@@ -13,6 +13,7 @@
   ↓
 Runtime preflight
   ├─ 열린 Worker PR → WAITING / RESUME / STALLED / BLOCKED
+  ├─ PR 없는 deterministic Worker branch → RESUME_BRANCH / SALVAGE_BRANCH
   ├─ PENDING / SOURCE_CHANGED → FRESH 1건
   ├─ FRESH 없음 + BACKFILL cadence due → BACKFILL 최대 1건
   └─ 그 외 → NOOP
@@ -123,7 +124,7 @@ HOLD/HUMAN_REVIEW처럼 콘텐츠 PR을 남길 필요가 없는 결과는 `knowl
 - release marker commit의 exact SHA를 Netlify Production `commit_ref`와 검증
 - 공개 release marker / archive release manifest까지 실제 반영 검증
 
-Semantic Worker는 직접 merge하지 않는다. Worker는 검증된 Knowledge PR에 publication-preparation label을 부여하고, GitHub Actions가 READY→PUBLISHED 준비, exact-head 재검증, exact-head merge까지 수행한 뒤 Production을 batched Archive release gate에 인계한다.
+Semantic Worker는 직접 merge하지 않으며 정상적인 publication handoff도 수행하지 않는다. `PACKAGE_READY` Draft PR의 exact-head Worker Gate가 PASS하고 branch가 current main과 동기화되어 있으면 GitHub Actions가 자동으로 Draft를 해제하고 `PUBLICATION_HANDOFF` phase, publication-preparation label, publication marker를 설정한다. 이후 GitHub Actions가 READY→PUBLISHED 준비, exact-head 재검증, exact-head merge까지 수행한 뒤 Production을 batched Archive release gate에 인계한다. branch가 current main보다 뒤처졌으면 handoff하지 않고 Scheduled Worker가 동일 deterministic branch를 current main에 재동기화한다.
 
 고위험·충돌·unknown·중복·source 변경·권리 불명확·검증 실패는 기존대로 fail-closed 한다.
 
