@@ -1,0 +1,11 @@
+{
+  "id": "KC-community-role-delegation",
+  "question": "비상 운영에서 일이 몇 사람에게 몰릴 때 역할과 승인 권한을 어떻게 나눠야 할까",
+  "topic_id": "community-continuity-roles",
+  "status": "BRIEF_PROPOSED",
+  "disposition_note": "검증된 PUBLIC_ARCHIVE S03/SESSION_004에서 신규 확장을 멈춘 뒤 접수·기록과 보관·물류의 반복 업무를 분리하고, 시험근무자에게 제한된 업무만 맡기면서 최종 정산·예외 승인·최종 반출은 기존 책임자가 유지하는 장면에서 질문을 추출했습니다. K-004/K-005는 비상물자 재고·보관, K-007은 정보 상태 인계, K-008은 대피 결정과 사전계획에 초점이 있어 의미 중복으로 보지 않았습니다. 현실 근거는 Ready.gov의 비즈니스 연속성 계획, FEMA Continuity Guidance Circular, FEMA NIMS의 관리범위·조직 확장 원칙, USFA/FEMA의 인력·자원관리 자료를 교차검토했습니다. 작품은 질문의 서사적 출처로만 사용하며 법적·금전적 권한, 의료·치안·위험물·구조 등 전문 업무 위임은 이 글의 범위에서 제외합니다.",
+  "brief_id": "K-009",
+  "source_kind": "PUBLIC_ARCHIVE",
+  "source_manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_004/SOURCE_MANIFEST.json",
+  "source_manifest_sha256": "84d4f2b2033a079335ed0c50786e378be6f4f5fbbc2d88375f95614f8c7557ff"
+}
