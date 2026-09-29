@@ -647,6 +647,9 @@ test('open Worker PR lifecycle distinguishes running, resumable, blocked and sta
     head_ref: 'knowledge/worker/fresh-abc123',
     head_sha: 'a'.repeat(40),
     updated_at: '2026-09-29T00:00:00.000Z',
+    state: 'open',
+    draft: true,
+    body: workerPhaseMarker(policy, 'PACKAGE_READY'),
     labels: [],
   }
   assert.equal(classifyWorkerPr({
