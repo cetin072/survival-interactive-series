@@ -2,7 +2,7 @@ name: Validate Knowledge worker gate
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened]
     paths:
       - 'knowledge/content/briefs/**'
       - 'knowledge/content/candidates/**'
@@ -14,6 +14,7 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  issues: write
 
 concurrency:
   group: knowledge-worker-gate-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
@@ -63,10 +64,12 @@ jobs:
         id: target
         working-directory: .
         shell: bash
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           set -euo pipefail
           mapfile -t ids < <(
-            git diff --name-only origin/main...HEAD |
+            git diff --name-only "$PR_BASE_SHA"...HEAD |
               sed -n 's#^knowledge/content/briefs/\(K-[0-9][0-9]*\)\.json$#\1#p' |
               sort -u
           )
@@ -89,7 +92,10 @@ jobs:
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           set -euo pipefail
-          node archive/scripts/knowledge-release-check.mjs             --brief "$BRIEF_ID"             --base "$PR_BASE_SHA"             --head HEAD > "$RUNNER_TEMP/worker-release.json"
+          node archive/scripts/knowledge-release-check.mjs \
+            --brief "$BRIEF_ID" \
+            --base "$PR_BASE_SHA" \
+            --head HEAD > "$RUNNER_TEMP/worker-release.json"
           cat "$RUNNER_TEMP/worker-release.json"
           node --input-type=module <<'NODE'
           import { readFileSync } from 'node:fs'
@@ -107,11 +113,110 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           set -euo pipefail
-          MARKER="<!-- knowledge-worker-gate-v1:$HEAD_SHA:${{ github.event.pull_request.base.sha }}:AUTO_PUBLISH_ELIGIBLE -->"
-          if gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments?per_page=100" --paginate             --jq '.[].body' | grep -Fqx "$MARKER"; then
+          MARKER="<!-- knowledge-worker-gate-v1:$HEAD_SHA:$PR_BASE_SHA:AUTO_PUBLISH_ELIGIBLE -->"
+          if gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments?per_page=100" --paginate \
+            --jq '.[].body' | grep -Fqx "$MARKER"; then
             echo "Gate marker already exists."
           else
             gh pr comment "$PR_NUMBER" --body "$MARKER"
           fi
+
+      - name: Check current-main freshness for automatic handoff
+        id: freshness
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+          EXPECTED_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          git fetch origin main:refs/remotes/origin/main
+          CURRENT_MAIN="$(git rev-parse origin/main)"
+          echo "current_main=$CURRENT_MAIN" >> "$GITHUB_OUTPUT"
+          if [ "$CURRENT_MAIN" != "$EXPECTED_BASE" ]; then
+            echo "auto_handoff=false" >> "$GITHUB_OUTPUT"
+            echo "reason=MAIN_MOVED" >> "$GITHUB_OUTPUT"
+            echo "AUTO_HANDOFF=DEFERRED_MAIN_MOVED"
+            exit 0
+          fi
+
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > "$RUNNER_TEMP/handoff-pr.json"
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs'
+          const pr = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/handoff-pr.json', 'utf8'))
+          if (pr.state !== 'open') throw new Error('HANDOFF_PR_NOT_OPEN')
+          if (pr.draft !== true) throw new Error('HANDOFF_PR_NOT_DRAFT')
+          if (pr.base?.ref !== 'main') throw new Error('HANDOFF_PR_BASE_NOT_MAIN')
+          if (pr.base?.sha !== process.env.EXPECTED_BASE) throw new Error('HANDOFF_PR_BASE_CHANGED')
+          if (pr.head?.sha !== process.env.EXPECTED_HEAD) throw new Error('HANDOFF_PR_HEAD_CHANGED')
+          if (!pr.body?.includes('<!-- knowledge-worker-phase-v1:PACKAGE_READY -->')) throw new Error('HANDOFF_PACKAGE_PHASE_REQUIRED')
+          const labels = new Set((pr.labels ?? []).map((item) => item.name))
+          if (labels.has('knowledge-publish-prepare')) throw new Error('HANDOFF_PUBLICATION_LABEL_ALREADY_PRESENT')
+          NODE
+          echo "auto_handoff=true" >> "$GITHUB_OUTPUT"
+          echo "reason=ELIGIBLE" >> "$GITHUB_OUTPUT"
+
+      - name: Automatic publication handoff
+        if: steps.freshness.outputs.auto_handoff == 'true'
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+          EXPECTED_BASE: ${{ github.event.pull_request.base.sha }}
+          PUBLICATION_LABEL: knowledge-publish-prepare
+        run: |
+          set -euo pipefail
+
+          # Final race check immediately before mutating the PR.
+          git fetch origin main:refs/remotes/origin/main
+          test "$(git rev-parse origin/main)" = "$EXPECTED_BASE" || {
+            echo "AUTO_HANDOFF=DEFERRED_MAIN_MOVED_FINAL_CHECK"
+            exit 0
+          }
+
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > "$RUNNER_TEMP/pre-handoff-pr.json"
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs'
+          const pr = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/pre-handoff-pr.json', 'utf8'))
+          if (pr.state !== 'open' || pr.draft !== true) throw new Error('HANDOFF_PR_STATE_CHANGED')
+          if (pr.head?.sha !== process.env.EXPECTED_HEAD) throw new Error('HANDOFF_PR_HEAD_CHANGED')
+          if (pr.base?.sha !== process.env.EXPECTED_BASE) throw new Error('HANDOFF_PR_BASE_CHANGED')
+          const from = '<!-- knowledge-worker-phase-v1:PACKAGE_READY -->'
+          const to = '<!-- knowledge-worker-phase-v1:PUBLICATION_HANDOFF -->'
+          if (!pr.body?.includes(from)) throw new Error('HANDOFF_PACKAGE_PHASE_REQUIRED')
+          const nextBody = pr.body.replace(from, to)
+          writeFileSync(process.env.RUNNER_TEMP + '/handoff-update.json', JSON.stringify({ body: nextBody }))
+          NODE
+
+          # Make the PR reviewable first. ready_for_review no longer re-triggers the Worker gate.
+          gh pr ready "$PR_NUMBER"
+
+          # Move the phase before the publication label is applied.
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" \
+            --input "$RUNNER_TEMP/handoff-update.json" > "$RUNNER_TEMP/handoff-updated-pr.json"
+
+          # Recheck current main one last time. If it moved during the two PR mutations,
+          # do not start publication; the Scheduled Worker will sync the branch later.
+          git fetch origin main:refs/remotes/origin/main
+          if [ "$(git rev-parse origin/main)" != "$EXPECTED_BASE" ]; then
+            echo "AUTO_HANDOFF=DEFERRED_MAIN_MOVED_AFTER_PHASE"
+            exit 0
+          fi
+
+          gh api --method POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/labels" \
+            -f "labels[]=$PUBLICATION_LABEL" > "$RUNNER_TEMP/handoff-label.json"
+
+          PUBLICATION_MARKER="<!-- knowledge-worker-publication-v1:$EXPECTED_HEAD -->"
+          if gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments?per_page=100" --paginate \
+            --jq '.[].body' | grep -Fqx "$PUBLICATION_MARKER"; then
+            echo "Publication marker already exists."
+          else
+            gh pr comment "$PR_NUMBER" --body "$PUBLICATION_MARKER"
+          fi
+
+          echo "AUTO_HANDOFF=PUBLICATION_INITIATED"

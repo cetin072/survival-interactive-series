@@ -97,9 +97,11 @@ open Worker PR이 2개 이상이면 `BLOCKED_CONTRACT:MULTIPLE_OPEN_WORKER_PRS`.
 - `PACKAGE_READY`: atomic package commit이 있고 Draft PR이 열린 상태. 실제 CI/checker를 기다린다.
 - `PUBLICATION_HANDOFF`: exact current-head gate가 통과해 publication handoff가 시작된 상태.
 
-Draft PR의 exact HEAD에서 required CI와 Worker gate가 PASS하면 먼저 current main과 branch 관계를 다시 확인한다. branch가 뒤처졌으면 같은 deterministic branch의 최종 package를 current main 위에 재구성하고 checks를 다시 실행한다. **current main과 동기화된 exact HEAD에서 gate가 다시 PASS한 경우에만** Worker가 PR을 ready-for-review로 전환한 뒤 publication label을 붙인다. Draft 상태에서는 publication workflow가 실행되지 않아야 한다.
+Draft PR의 exact HEAD에서 required CI와 Worker gate가 PASS하면 GitHub Actions가 current main과 branch 관계를 다시 확인한다. branch가 current main과 동기화되어 있으면 GitHub Actions가 자동으로 PR을 ready-for-review로 전환하고 phase를 `PUBLICATION_HANDOFF`로 바꾼 뒤 publication label과 marker를 기록한다. Scheduled AI는 정상적인 publication handoff를 더 이상 수행하지 않는다.
 
-Worker gate 자체는 `PACKAGE_READY` phase에서만 실행한다. CI가 실행되는 동안 main이 움직이는 경쟁조건을 피하기 위해 PR 이벤트의 exact base SHA에 대해 package와 release eligibility를 검증한다. `PUBLICATION_HANDOFF` 이후 prepared commit은 exact-head publication workflow가 전담하며 Worker gate를 다시 실행하지 않는다. current-main freshness는 publication handoff 직전에 별도로 강제한다.
+branch가 뒤처졌으면 자동 handoff를 하지 않고 Draft/`PACKAGE_READY` 상태로 남긴다. 다음 Scheduled Worker는 같은 deterministic branch의 최종 package를 current main 위에 재구성하고 checks를 다시 실행한다. **current main과 동기화된 exact HEAD에서 gate가 다시 PASS한 경우에만** GitHub Actions가 publication handoff를 시작한다.
+
+Worker gate 자체는 `PACKAGE_READY` phase에서만 실행한다. CI가 실행되는 동안 main이 움직이는 경쟁조건을 피하기 위해 PR 이벤트의 exact base SHA에 대해 package와 release eligibility를 검증한다. gate가 PASS한 뒤 같은 workflow가 current main freshness를 다시 확인하고 자동 handoff를 수행한다. `ready_for_review` 이벤트는 Worker gate를 재실행하지 않는다. `PUBLICATION_HANDOFF` 이후 prepared commit은 exact-head publication workflow가 전담한다.
 
 ## 7. HOLD / HUMAN_REVIEW disposition
 
@@ -162,7 +164,7 @@ system-wide contract failure처럼 PR이 존재하지 않는 blocker는 반복�
 
 ## 11. Publication handoff
 
-Worker는 merge하지 않는다.
+Worker는 merge하지 않는다. 정상적인 publication handoff의 소유자는 GitHub Actions다. Scheduled AI는 Draft/package 생성, stale branch 동기화, BLOCKED/HUMAN_REVIEW 복구만 담당한다.
 
 `knowledge-publish-prepare` label은:
 - 현재 PR HEAD가 변하지 않았고
