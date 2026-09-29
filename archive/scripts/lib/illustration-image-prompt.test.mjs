@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import {
   compileIllustrationImagePrompt,
+  compileIllustrationRendererText,
   ILLUSTRATION_IMAGE_PROMPT_VERSION,
   validateIllustrationImagePrompt,
 } from './illustration-image-prompt.mjs'
@@ -86,4 +87,15 @@ test('provider prompt validation rejects extra operational fields and contaminat
   assert.strictEqual(validateIllustrationImagePrompt(structuredClone(prompt)).contract_version, prompt.contract_version)
   assert.throws(() => validateIllustrationImagePrompt({ ...prompt, provider: 'native_chatgpt' }), /INVALID_ILLUSTRATION_IMAGE_PROMPT/)
   assert.throws(() => validateIllustrationImagePrompt({ ...prompt, positive_prompt: `${prompt.positive_prompt}. Netlify.` }), /ILLUSTRATION_PROMPT_OPERATIONAL_CONTEXT_REJECTED/)
+})
+
+
+test('renderer text is visual-only and omits operational/report vocabulary', () => {
+  const text = compileIllustrationRendererText(pointFor('char-taehoon'))
+  for (const phrase of [
+    '40대 초반', '한국 남성', '낡은 남색 작업조끼', '회화적 반실사',
+    '글자, 숫자, 라벨, 워터마크 또는 인터페이스 요소는 넣지 않는다',
+  ]) assert.ok(text.includes(phrase), `Missing renderer phrase: ${phrase}`)
+  assert.doesNotMatch(text, /github|supabase|netlify|workflow|provider|storage|registry|handoff|scheduler|automation|report|dashboard|json|sha|\bci\b|\bpr\b|api|deploy|receipt/i)
+  assert.ok(text.length < 6000)
 })

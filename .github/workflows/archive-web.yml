@@ -11,6 +11,8 @@ on:
       - '.github/workflows/archive-daily.yml'
       - '.github/workflows/archive-production-release.yml'
       - '.github/workflows/archive-site-derivative.yml'
+      - '.github/workflows/archive-illustration-finalizer.yml'
+      - '.github/workflows/archive-illustration-prep.yml'
   push:
     branches:
       - main
@@ -56,7 +58,8 @@ jobs:
           python3 ../scripts/test_resolve_illustration_handoff_request.py
           python3 ../scripts/test_prepare_site_derivative.py
           node --check ../scripts/run-production-release.mjs
-          python3 -m py_compile ../scripts/original_storage_provider.py ../scripts/illustration_storage_handoff.py ../scripts/draft_release_illustration_handoff.py ../scripts/staged_illustration_handoff.py ../scripts/resolve_illustration_handoff_request.py ../scripts/execute_trusted_illustration_handoff.py ../scripts/prepare_site_derivative.py
+          node --check ../scripts/prepare-illustration-render-job.mjs
+          python3 -m py_compile ../scripts/original_storage_provider.py ../scripts/illustration_storage_handoff.py ../scripts/draft_release_illustration_handoff.py ../scripts/staged_illustration_handoff.py ../scripts/resolve_illustration_handoff_request.py ../scripts/execute_trusted_illustration_handoff.py ../scripts/prepare_site_derivative.py ../scripts/finalize-illustration-job.py
       - name: Verify deterministic S02 dry-run (no external services)
         run: |
           node ../scripts/dry-run-publication.mjs --demo-s02 --source-revision "$GITHUB_SHA" > "$RUNNER_TEMP/publication-first.json"
