@@ -1,5 +1,5 @@
 import type { ActionState, LiveState } from '../state/liveState'
-import { advanceClock, movePartyMember, moveVehicle, setResourceBand } from '../state/transitions'
+import { addBaseCapability, advanceClock, movePartyMember, moveVehicle, setResourceBand } from '../state/transitions'
 import type { ActionOutcome, ActionQueueResult, QueuedAction, StateChangeProposal } from '../validator/types'
 import { validateAction } from '../validator/validateAction'
 
@@ -13,6 +13,9 @@ function applyProposal(state: LiveState, proposal: StateChangeProposal): LiveSta
   }
   for (const change of proposal.resource_changes) {
     next = setResourceBand(next, change.resource_id, change.to)
+  }
+  for (const change of proposal.base_capability_changes ?? []) {
+    next = addBaseCapability(next, change.base_id, change.add)
   }
   if (proposal.world_changes.length > 0) {
     const publicWorld = { ...next.public_world }

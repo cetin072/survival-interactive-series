@@ -77,29 +77,41 @@ function resultLog(result: ActionExecutionResult, id: number): LogEntry {
   }
 }
 
+export function commitPublicRuntimeAction(
+  checkpoint: PublicRuntimeCheckpoint,
+  input: LogEntry,
+  action: QueuedAction,
+  nextScene: (state: LiveState, result: ActionExecutionResult) => PublicRuntimeScene,
+): PublicRuntimeCheckpoint {
+  const queue = runActionQueue(checkpoint.public_state, [action])
+  const result = queue.results[0]
+  const scene = nextScene(queue.state, result)
+  const state = { ...queue.state, scene_id: scene.id }
+  const logId = checkpoint.committed_turn.log.length
+  const log = [...checkpoint.committed_turn.log, { ...input, id: logId }, resultLog(result, logId + 1)]
+
+  return createPublicRuntimeCheckpoint({
+    ...checkpoint,
+    public_state: state,
+    current_scene: scene,
+    recent_visible_change: result.outcome === 'success' || result.outcome === 'partial_success'
+      ? action.label
+      : `처리되지 않음: ${action.label}`,
+    committed_turn: {
+      number: result.outcome === 'success' || result.outcome === 'partial_success'
+        ? checkpoint.committed_turn.number + 1
+        : checkpoint.committed_turn.number,
+      log,
+    },
+  })
+}
+
 export function commitPublicRuntimeChoice(
   checkpoint: PublicRuntimeCheckpoint,
   choice: Choice & { action: QueuedAction },
   nextScene: (state: LiveState, result: ActionExecutionResult) => PublicRuntimeScene,
 ): PublicRuntimeCheckpoint {
-  const queue = runActionQueue(checkpoint.public_state, [choice.action])
-  const result = queue.results[0]
-  const logId = checkpoint.committed_turn.log.length
-  const log = [
-    ...checkpoint.committed_turn.log,
-    choiceLog(choice, logId),
-    resultLog(result, logId + 1),
-  ]
-
-  return createPublicRuntimeCheckpoint({
-    ...checkpoint,
-    public_state: queue.state,
-    current_scene: nextScene(queue.state, result),
-    recent_visible_change: result.outcome === 'success' || result.outcome === 'partial_success'
-      ? choice.label
-      : `처리되지 않음: ${choice.label}`,
-    committed_turn: { number: checkpoint.committed_turn.number + 1, log },
-  })
+  return commitPublicRuntimeAction(checkpoint, choiceLog(choice, 0), choice.action, nextScene)
 }
 
 /** No provider is called in Phase 2. Free text remains visible, but cannot mutate state without an interpreted proposal. */
