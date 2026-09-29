@@ -1,3 +1,5 @@
+import { resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 const repo = 'cetin072/survival-interactive-series'
 const shaPattern = /^[a-f0-9]{40}$/
 const briefPattern = /^K-\d+$/
@@ -177,7 +179,7 @@ async function main() {
   throw new Error('USAGE: knowledge-review-consumer.mjs inspect | record --item-id UUID --decided-at ISO --outcome OUTCOME [--result-json JSON]')
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
   main().catch((error) => {
     process.stderr.write(JSON.stringify({ status: 'KNOWLEDGE_REVIEW_CONSUMER_FAILED', error: error.message }) + '\n')
     process.exitCode = 1
