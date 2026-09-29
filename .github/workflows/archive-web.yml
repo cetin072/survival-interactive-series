@@ -73,6 +73,8 @@ jobs:
         run: node --test ../scripts/lib/archive-daily-core.test.mjs
       - name: Test exact Netlify production deploy identity
         run: node --test ../scripts/lib/netlify-production.test.mjs
+      - name: Test Archive CSP security boundary
+        run: node --test ../scripts/lib/archive-security.test.mjs
       - name: Test batched Production release policy
         run: node --test ../scripts/lib/production-release.test.mjs
       - name: Verify real Reader roundtrip and isolated new-RAW publication
