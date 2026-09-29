@@ -160,11 +160,23 @@ jobs:
           echo "auto_handoff=true" >> "$GITHUB_OUTPUT"
           echo "reason=ELIGIBLE" >> "$GITHUB_OUTPUT"
 
+      - name: Require automatic handoff credential
+        if: steps.freshness.outputs.auto_handoff == 'true'
+        working-directory: .
+        env:
+          AUTO_GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$AUTO_GH_TOKEN" || {
+            echo "ARCHIVE_GITHUB_TOKEN_REQUIRED"
+            exit 1
+          }
+
       - name: Automatic publication handoff
         if: steps.freshness.outputs.auto_handoff == 'true'
         working-directory: .
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
           EXPECTED_BASE: ${{ github.event.pull_request.base.sha }}
