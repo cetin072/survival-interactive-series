@@ -8,6 +8,8 @@ declare
   inbox_result jsonb;
   approved jsonb;
   receipt jsonb;
+  decision_result jsonb;
+  decided_at_value timestamptz;
   head_sha text := repeat('b', 40);
   idempotency text := 'TEST:archive-review-hardening:' || head_sha;
 begin
@@ -76,7 +78,8 @@ begin
   perform set_config('request.jwt.claim.sub',actor_id::text,true);
   perform set_config('request.jwt.claims',jsonb_build_object('role','authenticated','sub',actor_id)::text,true);
   execute 'set local role authenticated';
-  perform public.archive_operator_decide_review_item(item_id,'APPROVED','rollback-only hardening verification');
+  decision_result := public.archive_operator_decide_review_item(item_id,'APPROVED','rollback-only hardening verification');
+  decided_at_value := (decision_result->>'decided_at')::timestamptz;
   inbox_result := public.archive_operator_review_inbox();
   if exists (
     select 1 from jsonb_array_elements(inbox_result->'items') item
@@ -100,7 +103,7 @@ begin
 
   receipt := public.archive_worker_record_review_consumption(
     item_id,
-    (select decided_at from survival_ops.archive_review_items where id=item_id),
+    decided_at_value,
     'CONSUMED',
     jsonb_build_object('test_only',true,'merge_sha',repeat('c',40))
   );
