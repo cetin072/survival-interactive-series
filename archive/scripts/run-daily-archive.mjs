@@ -282,11 +282,15 @@ async function previewGate(pr, expectedHead, expectedBase) {
     : ['SUCCESS', 'NEUTRAL', 'SKIPPED'].includes(item.conclusion)), 'PR_CHECK_FAILED')
   const preview = checks.find((item) => item.__typename === 'StatusContext'
     && item.context === 'netlify/survival-diary-archive/deploy-preview')
-  insist(preview?.state === 'SUCCESS' && /^https:\/\/app\.netlify\.com\/projects\/survival-diary-archive\/deploys\/[a-f0-9]+\/?$/.test(preview.targetUrl),
-    'PREVIEW_NOT_READY')
   const number = Number(new URL(pr).pathname.match(/\/pull\/(\d+)\/?$/)?.[1])
   insist(Number.isSafeInteger(number) && number > 0, 'INVALID_PREVIEW_PR')
-  return `https://deploy-preview-${number}--survival-diary-archive.netlify.app/`
+  const previewUrl = `https://deploy-preview-${number}--survival-diary-archive.netlify.app/`
+  const knownTarget = typeof preview?.targetUrl === 'string' && (
+    /^https:\/\/app\.netlify\.com\/projects\/survival-diary-archive\/deploys\/[a-f0-9]+\/?$/.test(preview.targetUrl)
+    || preview.targetUrl.replace(/\/$/, '') === previewUrl.replace(/\/$/, '')
+  )
+  insist(preview?.state === 'SUCCESS' && knownTarget, 'PREVIEW_NOT_READY')
+  return previewUrl
 }
 
 async function verifySite(url, chapterId, rawRef) {
