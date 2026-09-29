@@ -94,6 +94,8 @@
       "NOOP",
       "FRESH_READY",
       "BACKFILL_READY",
+      "RESUME_BRANCH",
+      "SALVAGE_BRANCH",
       "RESUME_PR",
       "WAITING_PR",
       "STALLED_PR",
@@ -105,6 +107,18 @@
       "PR_CREATED",
       "PUBLICATION_INITIATED"
     ],
-    "publication_marker_prefix": "knowledge-worker-publication-v1"
+    "publication_marker_prefix": "knowledge-worker-publication-v1",
+    "require_pr_inventory": true,
+    "require_check_inventory": true,
+    "require_branch_inventory": true,
+    "early_draft_pr": true,
+    "atomic_package_commit_required": true,
+    "pr_phase_marker_prefix": "knowledge-worker-phase-v1",
+    "pr_phases": [
+      "PACKAGE_READY",
+      "PUBLICATION_HANDOFF"
+    ],
+    "salvage_when_behind_commits": 12,
+    "max_recovery_attempts": 2
   }
 }
