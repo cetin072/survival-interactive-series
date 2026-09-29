@@ -14,7 +14,7 @@ import { isExactProductionDeployMeta } from './knowledge-production.mjs'
 import {
   RUN_RESULT_CODES, backfillDue, classifyWorkerPr, deterministicBackfillBranch,
   deterministicFreshBranch, deterministicStateBranch, notificationMarker,
-  planWorkerPreflight, recordBackfillResult, validateRuntimeState,
+  planWorkerPreflight, recordBackfillResult, validateRuntimeState, workerPhaseMarker,
 } from './knowledge-worker-runtime.mjs'
 
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex')
@@ -683,14 +683,15 @@ test('canonical preflight blocks duplicate Worker PRs and respects actual provid
   }] }
 
   const fresh = planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime, scannerResult: scanner,
-    openPrs: [], checksByPr: {}, now: '2026-09-29T21:00:00.000Z' })
+    pullRequests: [], checksByPr: {}, branchInventory: [], now: '2026-09-29T21:00:00.000Z' })
   assert.equal(fresh.result, 'FRESH_READY')
   assert.ok(fresh.branch.startsWith('knowledge/worker/fresh-'))
 
-  const pr = (number) => ({ number, head_ref: `knowledge/worker/fresh-${number}`, head_sha: String(number).padStart(40, 'a').slice(-40),
-    updated_at: '2026-09-29T20:00:00.000Z', labels: [] })
+  const pr = (number) => ({ number, state: 'open', head_ref: `knowledge/worker/fresh-${number}`,
+    head_sha: String(number).padStart(40, 'a').slice(-40), updated_at: '2026-09-29T20:00:00.000Z',
+    draft: true, body: workerPhaseMarker(policy, 'PACKAGE_READY'), labels: [] })
   const blocked = planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime, scannerResult: { status: 'NOOP', sources: [] },
-    openPrs: [pr(1), pr(2)], checksByPr: {}, now: '2026-09-29T21:00:00.000Z' })
+    pullRequests: [pr(1), pr(2)], checksByPr: {}, branchInventory: [], now: '2026-09-29T21:00:00.000Z' })
   assert.equal(blocked.result, 'BLOCKED_CONTRACT')
   assert.equal(blocked.reason, 'MULTIPLE_OPEN_WORKER_PRS')
 
@@ -698,7 +699,8 @@ test('canonical preflight blocks duplicate Worker PRs and respects actual provid
     providers: { ...provider.providers, CHATGPT_SCHEDULED: { ...provider.providers.CHATGPT_SCHEDULED, enabled: false },
       OPENAI_API: { ...provider.providers.OPENAI_API, enabled: true } } }
   assert.equal(planWorkerPreflight({ policy, providerConfig: otherProvider, runtimeState: runtime,
-    scannerResult: { status: 'NOOP', sources: [] }, openPrs: [], now: '2026-09-29T21:00:00.000Z' }).result, 'PROVIDER_NOT_ACTIVE')
+    scannerResult: { status: 'NOOP', sources: [] }, pullRequests: [], checksByPr: {}, branchInventory: [],
+    now: '2026-09-29T21:00:00.000Z' }).result, 'PROVIDER_NOT_ACTIVE')
 })
 
 test('notification markers and RUN_RESULT contract are deterministic', async () => {
@@ -714,4 +716,81 @@ test('publication handoff marker prefix is fixed for human-removal detection', a
   const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
   assert.equal(policy.runtime.publication_marker_prefix, 'knowledge-worker-publication-v1')
   assert.equal(validateWorkerPolicy(policy), true)
+})
+
+
+test('preflight fails closed when PR, check or branch inventory is omitted', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const provider = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
+  const runtime = { version: 1, backfill: { last_attempted_at: null, last_work_key: null, last_result: null, reviewed_items: [] } }
+  const scannerResult = { status: 'NOOP', sources: [] }
+  assert.equal(planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime, scannerResult,
+    checksByPr: {}, branchInventory: [], now: '2026-09-29T21:00:00.000Z' }).reason, 'PR_INVENTORY_REQUIRED')
+  assert.equal(planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime, scannerResult,
+    pullRequests: [], branchInventory: [], now: '2026-09-29T21:00:00.000Z' }).reason, 'CHECK_INVENTORY_REQUIRED')
+  assert.equal(planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime, scannerResult,
+    pullRequests: [], checksByPr: {}, now: '2026-09-29T21:00:00.000Z' }).reason, 'BRANCH_INVENTORY_REQUIRED')
+})
+
+test('orphan deterministic branches are resumed or salvaged before new work', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const provider = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
+  const runtime = { version: 1, backfill: { last_attempted_at: null, last_work_key: null, last_result: null, reviewed_items: [] } }
+  const base = { name: 'knowledge/worker/backfill-deadbeef1234', head_sha: 'a'.repeat(40), ahead_by: 1 }
+  const resume = planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime,
+    scannerResult: { status: 'NOOP', sources: [] }, pullRequests: [], checksByPr: {},
+    branchInventory: [{ ...base, behind_by: 2 }], now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(resume.result, 'RESUME_BRANCH')
+  assert.equal(resume.action, 'VALIDATE_PACKAGE_THEN_OPEN_DRAFT_PR')
+
+  const salvage = planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime,
+    scannerResult: { status: 'NOOP', sources: [] }, pullRequests: [], checksByPr: {},
+    branchInventory: [{ ...base, behind_by: policy.runtime.salvage_when_behind_commits + 1 }],
+    now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(salvage.result, 'SALVAGE_BRANCH')
+  assert.equal(salvage.action, 'REBUILD_SAME_BRANCH_ON_CURRENT_MAIN_THEN_OPEN_DRAFT_PR')
+})
+
+test('closed unmerged deterministic Worker branch is never resurrected automatically', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const provider = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
+  const runtime = { version: 1, backfill: { last_attempted_at: null, last_work_key: null, last_result: null, reviewed_items: [] } }
+  const source = {
+    source_manifest_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_901/SOURCE_MANIFEST.json',
+    source_manifest_sha256: '9'.repeat(64), status: 'PENDING',
+  }
+  const name = deterministicFreshBranch(policy, source)
+  const result = planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime,
+    scannerResult: { status: 'PENDING', sources: [source] },
+    pullRequests: [{ number: 501, state: 'closed', merged_at: null, head_ref: name, head_sha: 'b'.repeat(40),
+      updated_at: '2026-09-29T20:00:00.000Z', labels: [], body: workerPhaseMarker(policy, 'PACKAGE_READY'), draft: true }],
+    checksByPr: {}, branchInventory: [{ name, head_sha: 'b'.repeat(40), ahead_by: 1, behind_by: 1 }],
+    now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(result.result, 'BLOCKED_CONTRACT')
+  assert.equal(result.reason, 'CLOSED_UNMERGED_WORKER_BRANCH')
+})
+
+test('content Worker PR requires phase marker and handles Draft exact-head gate safely', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const base = {
+    number: 601, state: 'open', head_ref: 'knowledge/worker/fresh-deadbeef1234',
+    head_sha: 'c'.repeat(40), updated_at: '2026-09-29T20:00:00.000Z', draft: true, labels: [],
+  }
+  const missing = classifyWorkerPr({ policy, pr: { ...base, body: '' },
+    checks: [{ name: 'Validate Knowledge worker gate', status: 'completed', conclusion: 'success' }],
+    now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(missing.result, 'BLOCKED_CONTRACT')
+  assert.equal(missing.reason, 'MISSING_WORKER_PR_PHASE')
+
+  const ready = classifyWorkerPr({ policy, pr: { ...base, body: workerPhaseMarker(policy, 'PACKAGE_READY') },
+    checks: [{ name: 'Validate Knowledge worker gate', status: 'completed', conclusion: 'success' }],
+    now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(ready.result, 'RESUME_PR')
+  assert.equal(ready.action, 'MARK_READY_THEN_PUBLICATION_HANDOFF')
+
+  const human = classifyWorkerPr({ policy, pr: { ...base, draft: false, body: workerPhaseMarker(policy, 'PUBLICATION_HANDOFF') },
+    checks: [{ name: 'Validate Knowledge worker gate', status: 'completed', conclusion: 'success' }],
+    now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(human.result, 'HUMAN_REVIEW_REQUIRED')
+  assert.equal(human.reason, 'PUBLICATION_LABEL_REMOVED_AFTER_HANDOFF')
 })
