@@ -50,8 +50,13 @@ export default function OperatorConsole() {
   useEffect(() => {
     if (!supabaseClient) { setReady(true); return }
     let alive = true
-    void supabaseClient.auth.getUser().then(({ data }) => {
-      if (alive) { setUser(data.user); setReady(true) }
+    // Restore cached session state without blocking the console on an auth-network round trip.
+    // Database RPCs still perform the authoritative role/capability checks.
+    void supabaseClient.auth.getSession().then(({ data, error: sessionError }) => {
+      if (alive) {
+        if (sessionError) setError('인증 상태를 확인하지 못했습니다. 다시 로그인하세요.')
+        setUser(data.session?.user ?? null); setReady(true)
+      }
     }).catch(() => { if (alive) setReady(true) })
     const { data: listener } = supabaseClient.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)

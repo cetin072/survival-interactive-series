@@ -84,7 +84,8 @@ def browser_audit(base: str):
                     folder.mkdir(exist_ok=True)
                     page.screenshot(path=str(folder / (node_id + '.png')))
             # Actual search selection, not only direct links, also shows appearance on one tap.
-            page.goto(base)
+            # The Chronicle Hub is the home route; inspect search in C03's character index.
+            page.goto(base.rstrip('/') + '/?' + urlencode({'view': 'chronicle', 'chronicle': 'C03-AFTERFALL', 'section': 'characters'}))
             page.locator('.archive-search input').fill('문하진')
             result = page.locator('.result-list button').filter(has_text='문하진').first
             result.scroll_into_view_if_needed()

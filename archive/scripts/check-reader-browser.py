@@ -190,7 +190,8 @@ def audit_extra(page, base: str, width: int):
     expect(page.locator('.transcript-gm').first).to_be_visible()
     report('S02 finale / season switch / missing and fragment preserved', width=width)
 
-    page.goto(base)
+    # The Chronicle Hub is the home route. Open C03's character index before using Explorer search.
+    page.goto(query_url(base, view='chronicle', chronicle='C03-AFTERFALL', section='characters'))
     search = page.locator('.archive-search input')
     search.fill('체육')
     expect(page.locator('.result-list button').first).to_be_visible()
