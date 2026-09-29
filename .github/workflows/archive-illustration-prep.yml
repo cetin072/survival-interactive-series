@@ -50,4 +50,4 @@ jobs:
             echo RENDER_PROMPT_RUNTIME_TREE_INVALID
             exit 1
           }
-          git push --force origin HEAD:refs/heads/runtime/automation-b-render-prompt
+          git push --force origin HEAD:refs/heads/automation-b-render-prompt
