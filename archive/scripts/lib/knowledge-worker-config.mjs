@@ -1,3 +1,5 @@
+import { RUN_RESULT_CODES } from './knowledge-worker-runtime.mjs'
+
 const fail = (condition, message) => { if (!condition) throw new Error(`KNOWLEDGE_WORKER_CONFIG: ${message}`) }
 
 export const SUPPORTED_PROVIDERS = Object.freeze(['CHATGPT_SCHEDULED', 'OPENAI_API', 'OTHER_LLM_API'])
@@ -32,7 +34,8 @@ export function validateWorkerPolicy(policy) {
   fail(runtime.external_text_is_untrusted_data === true, 'untrusted external text boundary')
   fail(runtime.require_actual_check_evidence === true, 'actual check evidence required')
   fail(runtime.state_only_auto_merge === true, 'state-only auto merge')
-  fail(Array.isArray(runtime.run_result_codes) && runtime.run_result_codes.includes('NOOP') && runtime.run_result_codes.includes('BLOCKED_CONTRACT'), 'run result codes')
+  fail(Array.isArray(runtime.run_result_codes)
+    && JSON.stringify([...runtime.run_result_codes].sort()) === JSON.stringify([...RUN_RESULT_CODES].sort()), 'run result codes')
   const publication = policy.publication_policy
   fail(['AUTO_LOW_RISK_SHADOW', 'AUTO_LOW_RISK'].includes(publication?.required_repository_mode), 'publication mode')
   const live = publication.required_repository_mode === 'AUTO_LOW_RISK'
