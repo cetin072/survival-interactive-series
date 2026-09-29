@@ -71,6 +71,45 @@ function assertNoOutputContamination(positivePrompt, negativePrompt, checklist) 
   for (const item of checklist) assertNoOperationalText(item)
 }
 
+export function compileIllustrationRendererText(point) {
+  const source = requireRecord(point)
+  const prompt = compileIllustrationImagePrompt(source)
+  const brief = requireRecord(source.brief)
+  const art = requireRecord(brief.art_direction)
+  const safeguards = requireTextList(brief.safeguards)
+
+  const exclusions = [...requireTextList(art.avoid)]
+  for (const safeguard of safeguards) {
+    if (/^(Do not|Unspecified)/.test(safeguard)) exclusions.push(safeguard)
+  }
+  if (source.subject_id === 'loc-baekun') {
+    exclusions.push(
+      'no vegetation', 'no trees', 'no shrubs', 'no grass', 'no vines', 'no moss', 'no ivy', 'no overgrowth',
+      'no invented weather', 'no invented security details', 'no invented layout details',
+    )
+  }
+  if (source.subject_id === 'char-taehoon') {
+    exclusions.push(
+      'no military uniform', 'no firearms', 'no tactical equipment', 'no rank insignia',
+      'no scars', 'no tattoos', 'no added accessories', 'no invented occupation',
+      'no additional people', 'no identifiable location',
+    )
+  }
+
+  const deduped = [...new Set(exclusions)]
+  for (const item of deduped) assertNoOperationalText(item)
+
+  const text = [
+    prompt.positive_prompt,
+    deduped.length ? `제외 요소: ${deduped.join('; ')}` : '',
+    '글자, 숫자, 라벨, 워터마크 또는 인터페이스 요소는 넣지 않는다',
+  ].filter(Boolean).join('. ')
+
+  assertNoOperationalText(text)
+  if (text.length < 40 || text.length > 6000) throw new Error('ILLUSTRATION_RENDERER_PROMPT_LENGTH_INVALID')
+  return text
+}
+
 export function validateIllustrationImagePrompt(prompt) {
   const contract = requireRecord(prompt)
   const expectedKeys = [
