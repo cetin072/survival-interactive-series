@@ -31,6 +31,7 @@ export function validateWorkerPolicy(policy) {
   fail(runtime.publication_label === 'knowledge-publish-prepare', 'publication label')
   fail(Number.isInteger(runtime.stalled_after_hours) && runtime.stalled_after_hours >= 1 && runtime.stalled_after_hours <= 48, 'stalled timeout')
   fail(runtime.notification_marker_prefix === 'knowledge-worker-notify-v1', 'notification marker prefix')
+  fail(runtime.publication_marker_prefix === 'knowledge-worker-publication-v1', 'publication marker prefix')
   fail(runtime.external_text_is_untrusted_data === true, 'untrusted external text boundary')
   fail(runtime.require_actual_check_evidence === true, 'actual check evidence required')
   fail(runtime.state_only_auto_merge === true, 'state-only auto merge')

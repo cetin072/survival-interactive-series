@@ -104,6 +104,7 @@
       "HUMAN_REVIEW_REQUIRED",
       "PR_CREATED",
       "PUBLICATION_INITIATED"
-    ]
+    ],
+    "publication_marker_prefix": "knowledge-worker-publication-v1"
   }
 }
