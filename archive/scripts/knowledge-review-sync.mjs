@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
-export function buildReviewQueuePayload({ brief, result, headSha }) {
+export function buildReviewQueuePayload({ brief, result, headSha, prNumber = null, headRef = null }) {
   if (!/^K-\d{3,}$/.test(brief?.id ?? '') || !/^[a-f0-9]{40}$/.test(headSha ?? '')) throw new Error('REVIEW_QUEUE_TARGET_INVALID')
   const sourceIds = Array.isArray(brief.sources) ? brief.sources.map((source) => source.id).filter((id) => typeof id === 'string') : []
   return {
@@ -25,6 +25,8 @@ export function buildReviewQueuePayload({ brief, result, headSha }) {
       reason_codes: result.reasons,
       risk_domains: brief.risk_domains ?? [],
       source_ids: sourceIds,
+      ...(Number.isInteger(prNumber) && prNumber > 0 ? { pr_number: prNumber } : {}),
+      ...(typeof headRef === 'string' && headRef.startsWith('knowledge/worker/') ? { head_ref: headRef } : {}),
     },
   }
 }
@@ -50,9 +52,13 @@ async function main() {
     if (key === '--brief') options.briefId = value
     else if (key === '--base') options.baseRef = value
     else if (key === '--head') options.headRef = value
+    else if (key === '--pr-number') options.prNumber = Number(value)
+    else if (key === '--pr-head-ref') options.prHeadRef = value
     else throw new Error(`Unknown argument: ${key}`)
   }
-  if (!options.briefId || !options.headRef) throw new Error('Usage: knowledge-review-sync.mjs --brief K-... --base REF --head REF')
+  if (!options.briefId || !options.headRef) throw new Error('Usage: knowledge-review-sync.mjs --brief K-... --base REF --head REF [--pr-number N --pr-head-ref REF]')
+  if (options.prNumber != null && (!Number.isInteger(options.prNumber) || options.prNumber <= 0)) throw new Error('INVALID_PR_NUMBER')
+  if (options.prHeadRef != null && !options.prHeadRef.startsWith('knowledge/worker/')) throw new Error('INVALID_PR_HEAD_REF')
   const data = await loadKnowledge(root)
   await validateKnowledge(data)
   const changedFiles = changedFilesFromGit({ baseRef: options.baseRef, headRef: options.headRef, cwd: root })
@@ -64,7 +70,7 @@ async function main() {
     return
   }
   const exactSha = execFileSync('git', ['rev-parse', options.headRef], { cwd: root, encoding: 'utf8' }).trim()
-  const payload = buildReviewQueuePayload({ brief, result, headSha: exactSha })
+  const payload = buildReviewQueuePayload({ brief, result, headSha: exactSha, prNumber: options.prNumber, headRef: options.prHeadRef })
   const item = await enqueueReview(payload, {
     projectUrl: process.env.ARCHIVE_SUPABASE_URL,
     serviceRoleKey: process.env.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY,
