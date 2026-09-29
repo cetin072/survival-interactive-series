@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { archiveRouteUrl, parseArchiveRoute, rawProgressKey, resolveReaderRoute, savedReaderId, selectReaderItem, storyProgressKey, type ReaderStorage } from './readerNavigation'
+import { archiveRouteUrl, parseArchiveRoute, rawProgressKey, resolveReaderRoute, savedReaderId, selectReaderItem, storyProgressKey, type ArchiveRoute, type ReaderStorage } from './readerNavigation'
 import { chaptersForChronicle } from './storyData'
 import { transcriptPartsFor } from './transcriptData'
 import { messagesFromRaw } from './RawTranscriptReader'
 
 const memory = (values: Record<string, string>): ReaderStorage => ({ getItem: (key) => values[key] ?? null })
 const ids = ['C01-HAN-JUNHO', 'C02-STRONGHOLD', 'C03-AFTERFALL'] as const
+const bookRoute = (route: ArchiveRoute) => { if (route.view !== 'book') throw new Error('Expected book route'); return route }
+const rawRoute = (route: ArchiveRoute) => { if (route.view !== 'raw') throw new Error('Expected RAW route'); return route }
 
 describe('one-source Reader navigation', () => {
   it('gives an explicit item priority over an older bookmark', () => {
@@ -22,17 +24,17 @@ describe('one-source Reader navigation', () => {
       const selected = chapters[1].id
       const stored = chapters.at(-1)!.id
       const storage = memory({ [storyProgressKey(id)]: stored })
-      expect(parseArchiveRoute(`?view=story&chronicle=${id}&chapter=${selected}`, storage).chapterId).toBe(selected)
-      expect(parseArchiveRoute(`?view=story&chronicle=${id}`, storage).chapterId).toBe(stored)
-      expect(resolveReaderRoute({ view: 'book', chronicleId: id, chapterId: selected }, storage).chapterId).toBe(selected)
+      expect(bookRoute(parseArchiveRoute(`?view=story&chronicle=${id}&chapter=${selected}`, storage)).chapterId).toBe(selected)
+      expect(bookRoute(parseArchiveRoute(`?view=story&chronicle=${id}`, storage)).chapterId).toBe(stored)
+      expect(bookRoute(resolveReaderRoute({ view: 'book', chronicleId: id, chapterId: selected }, storage)).chapterId).toBe(selected)
     })
     it(`${id}: explicit PART wins and legacy reader links stay compatible`, () => {
       const parts = transcriptPartsFor(id)
       const requested = parts[1].id
       const storage = memory({ [rawProgressKey(id)]: JSON.stringify({ partId: parts.at(-1)!.id, scrollY: 400 }) })
-      expect(parseArchiveRoute(`?view=raw&chronicle=${id}&part=${requested}`, storage).partId).toBe(requested)
+      expect(rawRoute(parseArchiveRoute(`?view=raw&chronicle=${id}&part=${requested}`, storage)).partId).toBe(requested)
       expect(parseArchiveRoute(`?view=reader&chronicle=${id}&part=${requested}`, storage)).toMatchObject({ view: 'raw', chronicleId: id, partId: requested })
-      expect(parseArchiveRoute(`?view=raw&chronicle=${id}`, storage).partId).toBe(parts.at(-1)!.id)
+      expect(rawRoute(parseArchiveRoute(`?view=raw&chronicle=${id}`, storage)).partId).toBe(parts.at(-1)!.id)
     })
   }
   it('does not treat corrupt, null or non-string RAW bookmark data as an ID', () => {
@@ -42,19 +44,39 @@ describe('one-source Reader navigation', () => {
   })
   it('keeps navigation usable when storage access is denied', () => {
     const blocked: ReaderStorage = { getItem: () => { throw new Error('SecurityError') } }
-    expect(parseArchiveRoute('?view=story&chronicle=C01-HAN-JUNHO', blocked).chapterId).toBe(chaptersForChronicle('C01-HAN-JUNHO')[0].id)
-    expect(parseArchiveRoute('?view=raw&chronicle=C03-AFTERFALL', blocked).partId).toBe(transcriptPartsFor('C03-AFTERFALL')[0].id)
+    expect(bookRoute(parseArchiveRoute('?view=story&chronicle=C01-HAN-JUNHO', blocked)).chapterId).toBe(chaptersForChronicle('C01-HAN-JUNHO')[0].id)
+    expect(rawRoute(parseArchiveRoute('?view=raw&chronicle=C03-AFTERFALL', blocked)).partId).toBe(transcriptPartsFor('C03-AFTERFALL')[0].id)
   })
   it('does not borrow another Chronicle bookmark', () => {
     const storage = memory({ [storyProgressKey('C01-HAN-JUNHO')]: chaptersForChronicle('C01-HAN-JUNHO')[2].id })
-    expect(parseArchiveRoute('?view=story&chronicle=C02-STRONGHOLD', storage).chapterId).toBe(chaptersForChronicle('C02-STRONGHOLD')[0].id)
+    expect(bookRoute(parseArchiveRoute('?view=story&chronicle=C02-STRONGHOLD', storage)).chapterId).toBe(chaptersForChronicle('C02-STRONGHOLD')[0].id)
   })
   it('canonicalizes invalid links safely and preserves the legacy bookshelf', () => {
     expect(parseArchiveRoute('?view=past').view).toBe('story')
     expect(parseArchiveRoute('?view=story').view).toBe('story')
     const parsed = parseArchiveRoute('?view=story&chronicle=INVALID&chapter=missing')
     expect(parsed.chronicleId).toBe('C03-AFTERFALL')
-    expect(parsed.chapterId).toBe(chaptersForChronicle('C03-AFTERFALL')[0].id)
+    expect(bookRoute(parsed).chapterId).toBe(chaptersForChronicle('C03-AFTERFALL')[0].id)
+  })
+  it('routes the root to the Chronicle hub and keeps shared and operator routes distinct', () => {
+    expect(parseArchiveRoute('').view).toBe('home')
+    expect(parseArchiveRoute('?view=story').view).toBe('story')
+    expect(parseArchiveRoute('?view=tools').view).toBe('tools')
+    expect(parseArchiveRoute('?view=media').view).toBe('media')
+    expect(parseArchiveRoute('', undefined, '/operator/')).toMatchObject({ view: 'operator' })
+    expect(parseArchiveRoute('?view=chronicle&chronicle=C01-HAN-JUNHO').view).toBe('chronicle')
+    expect(parseArchiveRoute('?view=chronicle&chronicle=C03-AFTERFALL&section=not-a-section')).toMatchObject({ view: 'chronicle', section: 'overview' })
+  })
+  it('preserves old graph links and writes Chronicle room routes without replacing Reader URLs', () => {
+    const explorer = parseArchiveRoute('?view=archive&node=char-jinwoo')
+    expect(explorer).toMatchObject({ view: 'archive', chronicleId: 'C03-AFTERFALL', nodeId: 'char-jinwoo' })
+    const room = parseArchiveRoute('?view=chronicle&chronicle=C02-STRONGHOLD&section=reader')
+    const url = archiveRouteUrl(room, 'https://archive.example/old?view=story#section')
+    expect(url.pathname).toBe('/')
+    expect(url.search).toBe('?view=chronicle&chronicle=C02-STRONGHOLD&section=reader')
+    const oldReader = archiveRouteUrl(parseArchiveRoute('?view=story&chronicle=C01-HAN-JUNHO'), 'https://archive.example/')
+    expect(oldReader.search).toContain('view=story')
+    expect(oldReader.search).toContain('chronicle=C01-HAN-JUNHO')
   })
   it('roundtrips a chapter/PART without retaining a stale article hash', () => {
     for (const query of ['?view=story&chronicle=C02-STRONGHOLD', '?view=raw&chronicle=C03-AFTERFALL']) {

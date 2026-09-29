@@ -40,20 +40,25 @@ def asset_names(html: str) -> set[str]:
 
 
 def wait_for_deploy(url: str):
-    expected = asset_names((DIST / 'index.html').read_text(encoding='utf-8'))
+    local_html = (DIST / 'index.html').read_text(encoding='utf-8')
+    expected = asset_names(local_html)
     assert expected, 'No local production JS/CSS asset fingerprints'
+    expected_ref = re.search(r'<meta name="archive-build-ref" content="([a-f0-9]{40})"', local_html)
+    assert expected_ref, 'Local build has no exact commit ref marker'
     deadline = time.monotonic() + 240
     last = ''
     while time.monotonic() < deadline:
         try:
-            actual = asset_names(get(url))
-            if actual == expected:
+            deployed_html = get(url)
+            actual = asset_names(deployed_html)
+            deployed_ref = re.search(r'<meta name="archive-build-ref" content="([a-f0-9]{40})"', deployed_html)
+            if deployed_ref and deployed_ref.group(1) == expected_ref.group(1) and actual:
                 for asset in actual:
                     with urllib.request.urlopen(url.rstrip('/') + asset, timeout=20) as response:
                         assert response.status == 200
-                report('deployed JS/CSS matches tested build', url=url, assets=sorted(actual))
+                report('deployed commit matches tested build and JS/CSS load', url=url, commit=expected_ref.group(1), assets=sorted(actual))
                 return
-            last = f'assets still differ: {sorted(actual)}'
+            last = f'deployed commit ref differs: {deployed_ref.group(1) if deployed_ref else "missing"}; assets={sorted(actual)}'
         except Exception as error:
             last = str(error)
         time.sleep(5)
@@ -103,8 +108,13 @@ def selected_raw(page, part_id: str):
 
 def audit_book(page, base: str, chronicle: str, width: int):
     mobile = width < 700
-    chapters = BOOKS[chronicle]['chapters']
+    all_chapters = BOOKS[chronicle]['chapters']
     key = 'survival-diary-archive:story-progress:v1:' + chronicle
+    page.goto(query_url(base, view='story', chronicle=chronicle))
+    published_ids = set(page.locator('.book-toc [data-chapter-id]').evaluate_all(
+        '(items) => items.map((item) => item.getAttribute("data-chapter-id"))'))
+    chapters = [chapter for chapter in all_chapters if chapter['id'] in published_ids]
+    assert len(chapters) >= 4, f'Not enough publicly available Reader chapters for {chronicle}'
     page.evaluate('([key,id]) => localStorage.setItem(key,id)', [key, chapters[-1]['id']])
     page.goto(query_url(base, view='story', chronicle=chronicle, chapter=chapters[0]['id']))
     selected_book(page, chapters[0], chronicle)  # explicit link beats stored last chapter
@@ -190,7 +200,8 @@ def audit_extra(page, base: str, width: int):
     expect(page.locator('.transcript-gm').first).to_be_visible()
     report('S02 finale / season switch / missing and fragment preserved', width=width)
 
-    page.goto(base)
+    # The Chronicle Hub is the home route. Open C03's character index before using Explorer search.
+    page.goto(query_url(base, view='chronicle', chronicle='C03-AFTERFALL', section='explorer'))
     search = page.locator('.archive-search input')
     search.fill('체육')
     expect(page.locator('.result-list button').first).to_be_visible()

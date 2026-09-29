@@ -49,6 +49,7 @@ jobs:
         working-directory: archive/web
         env:
           ARCHIVE_AFTERFALL_SOURCE_REF: origin/worldline/afterfall-rpg
+          ARCHIVE_BUILD_REF: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           npm ci
           npm test
@@ -59,10 +60,10 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Check all 18 rendered appearances at four viewport widths
         run: python archive/scripts/check-character-appearance.py
-      - name: Verify exact Preview assets and all 18 profiles
+      - name: Verify exact Preview commit and all 18 profiles
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         run: python archive/scripts/check-character-appearance.py --url https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app --wait-assets
-      - name: Verify exact Production assets and all 18 profiles
+      - name: Verify exact Production commit and all 18 profiles
         if: github.event_name == 'push'
         run: python archive/scripts/check-character-appearance.py --url https://survival-diary-archive.netlify.app --wait-assets
       - name: Preserve mobile appearance screenshots

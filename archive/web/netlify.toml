@@ -25,6 +25,24 @@ command = "npm run build:verified"
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
 
+[[redirects]]
+  from = "/operator"
+  to = "/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/operator/*"
+  to = "/index.html"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/operator*"
+
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+
 [[headers]]
   for = "/index.html"
 
