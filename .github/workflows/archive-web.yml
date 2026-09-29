@@ -57,6 +57,7 @@ jobs:
           python3 ../scripts/test_staged_illustration_handoff.py
           python3 ../scripts/test_resolve_illustration_handoff_request.py
           python3 ../scripts/test_prepare_site_derivative.py
+          python3 ../scripts/test_finalize_illustration_job.py
           node --check ../scripts/run-production-release.mjs
           node --check ../scripts/prepare-illustration-render-job.mjs
           python3 -m py_compile ../scripts/original_storage_provider.py ../scripts/illustration_storage_handoff.py ../scripts/draft_release_illustration_handoff.py ../scripts/staged_illustration_handoff.py ../scripts/resolve_illustration_handoff_request.py ../scripts/execute_trusted_illustration_handoff.py ../scripts/prepare_site_derivative.py ../scripts/finalize-illustration-job.py
