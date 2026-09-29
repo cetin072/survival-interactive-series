@@ -2,6 +2,12 @@ name: Batched Archive Production release
 
 on:
   workflow_dispatch:
+    inputs:
+      force:
+        description: One-time maintenance override for the batching window
+        required: false
+        default: false
+        type: boolean
   schedule:
     # Check daily at 23:30 KST. The runner enforces the two-day Production interval.
     - cron: '30 14 * * *'
@@ -35,4 +41,10 @@ jobs:
         with:
           node-version: '22'
       - name: Run one batched Production release cycle
-        run: node archive/scripts/run-production-release.mjs
+        env:
+          FORCE_RELEASE: ${{ github.event_name == 'workflow_dispatch' && inputs.force == true && 'true' || 'false' }}
+        shell: bash
+        run: |
+          args=()
+          if [[ "$FORCE_RELEASE" == "true" ]]; then args+=(--force); fi
+          node archive/scripts/run-production-release.mjs "${args[@]}"
