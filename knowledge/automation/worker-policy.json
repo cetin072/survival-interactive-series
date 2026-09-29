@@ -118,6 +118,9 @@
       "PACKAGE_READY",
       "PUBLICATION_HANDOFF"
     ],
-    "salvage_when_behind_commits": 12
+    "salvage_when_behind_commits": 12,
+    "publication_handoff_owner": "GITHUB_ACTIONS",
+    "automatic_publication_handoff": true,
+    "scheduled_ai_publication_handoff": false
   }
 }
