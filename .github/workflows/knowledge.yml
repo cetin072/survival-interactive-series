@@ -14,8 +14,6 @@ on:
       - '.github/workflows/knowledge-exact-head.yml'
       - '.github/workflows/knowledge-worker-state.yml'
       - 'docs/KNOWLEDGE_WORKER_*.md'
-      - '.github/workflows/knowledge-worker-state.yml'
-      - 'docs/KNOWLEDGE_WORKER_*.md'
   push:
     branches: [main]
     paths:
@@ -28,6 +26,8 @@ on:
       - '.github/workflows/knowledge.yml'
       - '.github/workflows/knowledge-publish-prepare.yml'
       - '.github/workflows/knowledge-exact-head.yml'
+      - '.github/workflows/knowledge-worker-state.yml'
+      - 'docs/KNOWLEDGE_WORKER_*.md'
 
 jobs:
   knowledge:
