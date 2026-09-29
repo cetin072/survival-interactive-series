@@ -40,20 +40,25 @@ def asset_names(html: str) -> set[str]:
 
 
 def wait_for_deploy(url: str):
-    expected = asset_names((DIST / 'index.html').read_text(encoding='utf-8'))
+    local_html = (DIST / 'index.html').read_text(encoding='utf-8')
+    expected = asset_names(local_html)
     assert expected, 'No local production JS/CSS asset fingerprints'
+    expected_ref = re.search(r'<meta name="archive-build-ref" content="([a-f0-9]{40})"', local_html)
+    assert expected_ref, 'Local build has no exact commit ref marker'
     deadline = time.monotonic() + 240
     last = ''
     while time.monotonic() < deadline:
         try:
-            actual = asset_names(get(url))
-            if actual == expected:
+            deployed_html = get(url)
+            actual = asset_names(deployed_html)
+            deployed_ref = re.search(r'<meta name="archive-build-ref" content="([a-f0-9]{40})"', deployed_html)
+            if deployed_ref and deployed_ref.group(1) == expected_ref.group(1) and actual:
                 for asset in actual:
                     with urllib.request.urlopen(url.rstrip('/') + asset, timeout=20) as response:
                         assert response.status == 200
-                report('deployed JS/CSS matches tested build', url=url, assets=sorted(actual))
+                report('deployed commit matches tested build and JS/CSS load', url=url, commit=expected_ref.group(1), assets=sorted(actual))
                 return
-            last = f'assets still differ: {sorted(actual)}'
+            last = f'deployed commit ref differs: {deployed_ref.group(1) if deployed_ref else "missing"}; assets={sorted(actual)}'
         except Exception as error:
             last = str(error)
         time.sleep(5)

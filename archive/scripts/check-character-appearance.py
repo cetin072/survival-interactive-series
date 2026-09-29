@@ -9,7 +9,6 @@ import argparse
 import functools
 import hashlib
 import http.server
-import importlib.util
 import json
 import os
 from pathlib import Path
@@ -99,6 +98,40 @@ def browser_audit(base: str):
         browser.close()
 
 
+def wait_for_deploy(url: str):
+    import re
+    import time
+    import urllib.request
+    local_html = (ROOT / 'archive/web/dist/index.html').read_text(encoding='utf-8')
+    expected_ref = re.search(r'<meta name="archive-build-ref" content="([a-f0-9]{40})"', local_html)
+    assert expected_ref, 'Local build has no exact commit ref marker'
+    expected_assets = asset_urls(local_html)
+    deadline = time.monotonic() + 240
+    last = ''
+    while time.monotonic() < deadline:
+        try:
+            with urllib.request.urlopen(url, timeout=15) as response:
+                deployed_html = response.read().decode('utf-8')
+            deployed_ref = re.search(r'<meta name="archive-build-ref" content="([a-f0-9]{40})"', deployed_html)
+            actual_assets = asset_urls(deployed_html)
+            if deployed_ref and deployed_ref.group(1) == expected_ref.group(1) and actual_assets:
+                for asset in actual_assets:
+                    with urllib.request.urlopen(url.rstrip('/') + asset, timeout=20) as response:
+                        assert response.status == 200
+                print(json.dumps({'check':'deployed commit matches tested build and JS/CSS load','commit':expected_ref.group(1),'assets':sorted(actual_assets),'result':'PASS'}, ensure_ascii=False), flush=True)
+                return
+            last = f'deployed commit ref differs: {deployed_ref.group(1) if deployed_ref else "missing"}; assets={sorted(actual_assets)}; local_assets={sorted(expected_assets)}'
+        except Exception as error:
+            last = str(error)
+        time.sleep(5)
+    raise AssertionError(f'Deployment not ready for tested build: {last}')
+
+
+def asset_urls(html: str) -> set[str]:
+    import re
+    return set(re.findall(r'(?:src|href)=["\']([^"\']*/assets/[^"\']+\.(?:js|css))["\']', html))
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--ref', default='origin/worldline/afterfall-rpg')
@@ -118,10 +151,7 @@ def main():
         base = f'http://127.0.0.1:{server.server_port}'
     try:
         if args.wait_assets:
-            spec = importlib.util.spec_from_file_location('reader_browser', ROOT / 'archive/scripts/check-reader-browser.py')
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            module.wait_for_deploy(base)
+            wait_for_deploy(base)
         browser_audit(base)
         if os.environ.get('GITHUB_STEP_SUMMARY'):
             with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:

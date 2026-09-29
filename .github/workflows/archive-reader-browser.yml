@@ -47,6 +47,7 @@ jobs:
         run: npm run build:verified
         env:
           ARCHIVE_AFTERFALL_SOURCE_REF: origin/worldline/afterfall-rpg
+          ARCHIVE_BUILD_REF: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Install browser test tooling (not a runtime dependency)
         run: |
           python -m pip install playwright==1.55.0
