@@ -70,6 +70,41 @@ test('approved exact head is READY only when current main is its ancestor', asyn
   assert.equal(calls.length, 4)
 })
 
+
+test('prepared human-review commit is resumable instead of treated as stale', async () => {
+  const prepared = 'c'.repeat(40)
+  const result = await inspectApprovedReview({
+    projectUrl: 'https://project.supabase.co',
+    serviceRoleKey: 'server-key',
+    githubToken: 'github-token',
+    fetchImpl: async (url) => {
+      if (url.includes('archive_worker_list_approved_reviews')) return response([item])
+      if (url.endsWith('/pulls/321')) return response({
+        state: 'open',
+        body: '<!-- knowledge-worker-phase-v1:PUBLICATION_HANDOFF -->',
+        base: { ref: 'main' },
+        head: { sha: prepared, ref: 'knowledge/worker/fresh-example', repo: { full_name: 'cetin072/survival-interactive-series' } },
+      })
+      if (url.endsWith('/git/ref/heads/main')) return response({ object: { sha: 'b'.repeat(40) } })
+      if (url.includes('/compare/' + 'a'.repeat(40) + '...' + prepared)) return response({
+        status: 'ahead',
+        ahead_by: 1,
+        behind_by: 0,
+        commits: [{ commit: { message: 'knowledge: prepare K-104 human-approved publication' } }],
+        files: [
+          { filename: 'knowledge/content/briefs/K-104.json' },
+          { filename: 'archive/web/public/knowledge/example/index.html' },
+          { filename: 'archive/web/public/knowledge/index.html' },
+          { filename: 'archive/web/public/sitemap.xml' },
+        ],
+      })
+      throw new Error('unexpected URL: ' + url)
+    },
+  })
+  assert.equal(result.status, 'RESUME_PREPARED')
+  assert.equal(result.prepared_head_sha, prepared)
+})
+
 test('main drift blocks a stale approval', async () => {
   const result = await inspectApprovedReview({
     projectUrl: 'https://project.supabase.co',
