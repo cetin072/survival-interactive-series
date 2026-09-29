@@ -67,12 +67,16 @@
       "PR_CREATED",
       "PRODUCTION_PUBLISHED",
       "HUMAN_REVIEW_REQUIRED",
-      "BLOCKING_FAILURE"
+      "BLOCKING_FAILURE",
+      "STALLED_PR",
+      "BLOCKED_CONTRACT"
     ],
     "silent_on": [
       "NO_PENDING",
       "ORDINARY_HOLD",
-      "OPEN_WORKER_PR_EXISTS"
+      "OPEN_WORKER_PR_EXISTS",
+      "NOOP",
+      "WAITING_PR"
     ]
   },
   "editorial_spec_ref": "docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V1.md",
