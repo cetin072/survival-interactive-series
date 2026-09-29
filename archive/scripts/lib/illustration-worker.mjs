@@ -2,6 +2,7 @@ import { mkdir, open, readFile, rename, unlink, writeFile } from 'node:fs/promis
 import { dirname, join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { createGenerationProvider } from './illustration-generation-provider.mjs'
+import { compileIllustrationImagePrompt } from './illustration-image-prompt.mjs'
 
 export const DEFAULT_BATCH_LIMIT = 3
 export const DAILY_GENERATION_CAP = 3
@@ -213,6 +214,7 @@ function handoffContract(point) {
     point_id: point.point_id,
     generation_key: point.generation_key,
     subject_id: point.subject_id,
+    image_prompt: compileIllustrationImagePrompt(point),
     subject_label: brief.subject?.label ?? point.title ?? point.subject_id,
     brief: structuredClone(brief),
     canonical_facts: structuredClone(brief.canon_facts ?? {}),
@@ -301,6 +303,7 @@ export function createProvider(provider) {
     return {
       name: provider,
       async generateIllustration(request) {
+        compileIllustrationImagePrompt(request)
         const identity = { point_id: request.point_id, generation_key: request.generation_key }
         return { ...identity, provider, status: 'WOULD_GENERATE', original_ref: null, width: null, height: null,
           mime_type: null, sha256: null, metadata: { calls_made: 0, cost: 0, counts_toward_daily_generation_cap: false } }
@@ -311,7 +314,9 @@ export function createProvider(provider) {
   return {
     name: provider,
     async generateIllustration(request) {
-      const result = await adapter.generateIllustration(request)
+      const prompt = compileIllustrationImagePrompt(request)
+      const providerContext = request.imported_result === undefined ? {} : { imported_result: request.imported_result }
+      const result = await adapter.generateIllustration(prompt, providerContext)
       return {
         point_id: result.point_id,
         generation_key: result.generation_key,

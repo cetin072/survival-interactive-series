@@ -41,6 +41,7 @@ jobs:
         run: node --test ../scripts/lib/publication-plan.test.mjs
       - name: Test illustration worker controls
         run: |
+          node --test ../scripts/lib/illustration-image-prompt.test.mjs
           node --test ../scripts/lib/illustration-generation-provider.test.mjs
           node --test ../scripts/lib/illustration-worker.test.mjs
       - name: Test original image storage provider boundary

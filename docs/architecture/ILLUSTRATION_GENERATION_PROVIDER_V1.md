@@ -1,6 +1,6 @@
 # AFTERFALL Illustration Generation Provider v1
 
-Status: provider boundary implemented; active provider remains ChatGPT scheduled native generation.
+Status: provider boundary implemented; pure image prompt contract is compiled before provider invocation; active provider remains ChatGPT scheduled native generation.
 
 ## Goal
 
@@ -74,15 +74,19 @@ The scheduler is only a trigger.
 
 ```text
 Scheduler
+→ Candidate Selection
+→ Image Prompt Compiler
 → read active_provider
-→ invoke selected Generation Provider
+→ invoke selected Generation Provider with only illustration-image-prompt-v1
 → normalized result
 → common Quality Gate
 → common trusted handoff
 → common Storage / Registry / Publication
 ```
 
-Therefore changing the scheduler does not require changing the generation adapter, and changing the generation vendor does not require changing the downstream pipeline.
+The compiler reads the current READY visual brief and emits only point identity, positive and negative visual prompts, and a review checklist. Workflow, provider, storage, registry, report, and other operating context never enters the image prompt. The provider validates the exact prompt contract and rejects extra request fields. The review checklist is retained for the common quality gate; only positive and negative visual prompt text is intended for image generation.
+
+Therefore changing the scheduler does not require changing the generation adapter, and changing the generation vendor does not require changing the prompt compiler or downstream pipeline. See [ILLUSTRATION_IMAGE_PROMPT_ISOLATION_V1.md](ILLUSTRATION_IMAGE_PROMPT_ISOLATION_V1.md) for the compiler contract and rejection rules.
 
 Current trigger:
 
@@ -133,10 +137,11 @@ The scheduled ChatGPT worker should:
 1. load latest repository state;
 2. read the active generation-provider config;
 3. choose the eligible READY candidate;
-4. invoke the active provider;
-5. apply the existing AFTERFALL Visual Brief / Canon review;
-6. produce normalized provenance and exact source identity;
-7. pass the accepted original into the common trusted handoff path.
+4. compile that point's public visual brief into `illustration-image-prompt-v1`;
+5. pass only the compiled prompt contract to the selected provider;
+6. apply the existing AFTERFALL Visual Brief / Canon review using the review checklist;
+7. produce normalized provenance and exact source identity;
+8. pass the accepted original into the common trusted handoff path.
 
 The scheduled prompt must not hardcode ChatGPT as a permanent architectural dependency. It is only the currently selected provider.
 

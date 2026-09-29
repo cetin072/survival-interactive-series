@@ -7,13 +7,14 @@
 ## 흐름
 
 1. 작업자는 archive/content/visuals/C03-AFTERFALL/VISUALS.json에서 READY인 후보 하나를 고릅니다. 이미 처리 중이거나 공개된 point/generation은 다시 처리하지 않습니다.
-2. 고정된 AFTERFALL 브리프와 기존 자산의 시각 기준을 읽습니다. 최대 3회 생성하며, 조건을 통과한 원본 하나만 수용합니다. 금지 조건 위반 또는 브리프와의 불일치는 HOLD로 기록합니다.
-3. 정확한 point, generation, 도구 결과 ID, PNG 크기·치수·SHA-256, 시도와 검토 결과를 identity JSON에 기록합니다. 비밀값은 이미지 작업자에게 전달하지 않습니다.
-4. identity가 main에 합쳐진 정확한 source commit을 사용합니다. 비공개 GitHub Draft Release에 해당 원본 PNG 하나만 첨부하고, release tag는 trusted workflow가 요구하는 식별 규칙으로 만듭니다.
-5. main의 .github/workflows/archive-draft-release-image-handoff.yml을 실행합니다. trusted workflow가 source commit과 identity 일치, private draft asset, PNG 형식·치수·bytes·SHA-256을 확인한 뒤 Supabase service-role을 서버 측에서만 사용합니다.
-6. workflow가 비공개 원본을 직접 저장하고 정확한 byte/SHA readback, registry reconcile/readback을 수행합니다. 성공 후 같은 workflow가 임시 Draft Release와 tag를 삭제합니다.
-7. 검증된 여러 자산은 한 publication batch에서 파생 이미지를 만들고 SITE_ASSETS.json과 함께 하나의 publication PR로 제안합니다. 공개 웹에는 파생 PNG만 들어갑니다.
-8. Production은 #217의 2일 배치 release 정책을 따릅니다. 개별 이미지 작업자는 Production 배포를 직접 실행하지 않습니다.
+2. 고정된 AFTERFALL 브리프와 기존 자산의 시각 기준을 읽고 `illustration-image-prompt-v1`을 컴파일합니다. malformed brief나 운영 문맥 오염은 fail closed 합니다.
+3. 이미지 생성 provider에는 컴파일된 순수 prompt contract만 전달합니다. 최대 3회 생성하며, 조건을 통과한 원본 하나만 수용합니다. 금지 조건 위반 또는 브리프와의 불일치는 HOLD로 기록합니다.
+4. 정확한 point, generation, 도구 결과 ID, PNG 크기·치수·SHA-256, 시도와 검토 결과를 identity JSON에 기록합니다. 비밀값은 이미지 작업자에게 전달하지 않습니다.
+5. identity가 main에 합쳐진 정확한 source commit을 사용합니다. 비공개 GitHub Draft Release에 해당 원본 PNG 하나만 첨부하고, release tag는 trusted workflow가 요구하는 식별 규칙으로 만듭니다.
+6. main의 .github/workflows/archive-draft-release-image-handoff.yml을 실행합니다. trusted workflow가 source commit과 identity 일치, private draft asset, PNG 형식·치수·bytes·SHA-256을 확인한 뒤 Supabase service-role을 서버 측에서만 사용합니다.
+7. workflow가 비공개 원본을 직접 저장하고 정확한 byte/SHA readback, registry reconcile/readback을 수행합니다. 성공 후 같은 workflow가 임시 Draft Release와 tag를 삭제합니다.
+8. 검증된 여러 자산은 한 publication batch에서 파생 이미지를 만들고 SITE_ASSETS.json과 함께 하나의 publication PR로 제안합니다. 공개 웹에는 파생 PNG만 들어갑니다.
+9. Production은 #217의 2일 배치 release 정책을 따릅니다. 개별 이미지 작업자는 Production 배포를 직접 실행하지 않습니다.
 
 ## 경계와 신뢰
 

@@ -23,7 +23,22 @@ const point = (id, priority = 10, overrides = {}) => ({
   priority,
   status: 'READY',
   title: `Subject ${id}`,
-  brief: { subject: { label: `Subject ${id}` }, canon_facts: { fact: 'source' }, safeguards: ['Do not invent facts.'] },
+  brief: {
+    version: 'visual-brief-v1',
+    point_type: 'CHARACTER',
+    subject: { label: `Subject ${id}`, node_id: `subject-${id}` },
+    canon_facts: { fact: 'source' },
+    art_direction: {
+      composition: 'single-subject master portrait; simple non-identifying background',
+      mood: 'QUIET_DECAY',
+      mood_rules: ['cool blue-gray; no invented weather'],
+      rendering: ['non-photorealistic painterly illustration'],
+      avoid: ['embedded typography, labels or numbers'],
+      style_version: 'AFTERFALL_ARCHIVE_V1',
+      theme: 'Quiet survival, not spectacle.',
+    },
+    safeguards: ['Do not invent facts.'],
+  },
   ...overrides,
 })
 const receipt = (p, status, occurred_at = '2026-09-28T01:00:00.000Z', attempt_no = 1, overrides = {}) => ({
@@ -147,6 +162,10 @@ test('builds provider-independent handoffs and normalized provider results', asy
   assert.equal(handoff.contract_version, 'illustration-handoff-v1')
   assert.equal(handoff.canonical_facts.fact, 'source')
   assert.equal(handoff.output_spec.original_visibility, 'PRIVATE')
+  assert.equal(handoff.image_prompt.contract_version, 'illustration-image-prompt-v1')
+  assert.deepEqual(Object.keys(handoff.image_prompt).sort(), [
+    'contract_version', 'generation_key', 'negative_prompt', 'point_id', 'positive_prompt', 'review_checklist', 'subject_id',
+  ])
   const result = await createProvider('shadow').generateIllustration(candidate)
   assert.deepEqual(Object.keys(result).sort(), ['generation_key', 'height', 'metadata', 'mime_type', 'original_ref', 'point_id', 'provider', 'sha256', 'status', 'width'])
   assert.equal(result.status, 'WOULD_GENERATE')
