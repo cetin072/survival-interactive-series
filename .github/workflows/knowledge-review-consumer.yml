@@ -1,0 +1,374 @@
+name: Consume Knowledge human review
+
+on:
+  schedule:
+    # Keep the approval-to-action window short without adding Netlify Production deploys.
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: knowledge-human-review-consumer
+  cancel-in-progress: false
+
+jobs:
+  consume:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Require server-only credentials
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$GH_TOKEN" || { echo "ARCHIVE_GITHUB_TOKEN_REQUIRED"; exit 1; }
+          test -n "$ARCHIVE_SUPABASE_URL" || { echo "ARCHIVE_SUPABASE_URL_REQUIRED"; exit 1; }
+          test -n "$ARCHIVE_SUPABASE_SERVICE_ROLE_KEY" || { echo "ARCHIVE_SUPABASE_SERVICE_ROLE_KEY_REQUIRED"; exit 1; }
+
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: archive/web/package-lock.json
+
+      - name: Inspect one approved review
+        id: inspect
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          node archive/scripts/knowledge-review-consumer.mjs inspect > "$RUNNER_TEMP/review.json"
+          cat "$RUNNER_TEMP/review.json"
+          node --input-type=module <<'NODE' >> "$GITHUB_OUTPUT"
+          import { readFileSync } from 'node:fs'
+          const result = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/review.json', 'utf8'))
+          const fields = ['status','reason','item_id','decided_at','brief_id','approved_head_sha','prepared_head_sha','pr_number','head_ref','current_main','merge_sha']
+          for (const field of fields) {
+            if (result[field] !== undefined && result[field] !== null) console.log(`${field}=${result[field]}`)
+          }
+          NODE
+
+      - name: Record blocked approval
+        if: steps.inspect.outputs.status == 'BLOCKED'
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          ITEM_ID: ${{ steps.inspect.outputs.item_id }}
+          DECIDED_AT: ${{ steps.inspect.outputs.decided_at }}
+          REASON: ${{ steps.inspect.outputs.reason }}
+          CURRENT_MAIN: ${{ steps.inspect.outputs.current_main }}
+        run: |
+          set -euo pipefail
+          RESULT_JSON="$(node --input-type=module <<'NODE'
+          console.log(JSON.stringify({
+            reason: process.env.REASON,
+            current_main: process.env.CURRENT_MAIN || null,
+          }))
+          NODE
+          )"
+          node archive/scripts/knowledge-review-consumer.mjs record \
+            --item-id "$ITEM_ID" \
+            --decided-at "$DECIDED_AT" \
+            --outcome BLOCKED \
+            --result-json "$RESULT_JSON"
+
+      - name: Recover already-merged approval receipt
+        if: steps.inspect.outputs.status == 'RECOVER_CONSUMED'
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          ITEM_ID: ${{ steps.inspect.outputs.item_id }}
+          DECIDED_AT: ${{ steps.inspect.outputs.decided_at }}
+          BRIEF_ID: ${{ steps.inspect.outputs.brief_id }}
+          PREPARED_SHA: ${{ steps.inspect.outputs.prepared_head_sha }}
+          MERGE_SHA: ${{ steps.inspect.outputs.merge_sha }}
+        run: |
+          set -euo pipefail
+          RESULT_JSON="$(node --input-type=module <<'NODE'
+          console.log(JSON.stringify({
+            status: 'RECOVERED_AFTER_MERGE',
+            brief_id: process.env.BRIEF_ID,
+            prepared_sha: process.env.PREPARED_SHA,
+            merge_sha: process.env.MERGE_SHA,
+          }))
+          NODE
+          )"
+          node archive/scripts/knowledge-review-consumer.mjs record \
+            --item-id "$ITEM_ID" \
+            --decided-at "$DECIDED_AT" \
+            --outcome CONSUMED \
+            --result-json "$RESULT_JSON"
+
+      - name: Checkout approved Worker branch
+        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.inspect.outputs.head_ref }}
+          fetch-depth: 0
+          token: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+
+      - name: Verify approval and current-main identity
+        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
+        env:
+          APPROVED_SHA: ${{ steps.inspect.outputs.approved_head_sha }}
+          PREPARED_SHA: ${{ steps.inspect.outputs.prepared_head_sha }}
+          INSPECTED_MAIN: ${{ steps.inspect.outputs.current_main }}
+          REVIEW_STATUS: ${{ steps.inspect.outputs.status }}
+        run: |
+          set -euo pipefail
+          git fetch origin main:refs/remotes/origin/main
+          test "$(git rev-parse origin/main)" = "$INSPECTED_MAIN" || {
+            echo "MAIN_MOVED_AFTER_APPROVAL_INSPECTION"
+            exit 1
+          }
+          if [ "$REVIEW_STATUS" = "READY" ]; then
+            test "$(git rev-parse HEAD)" = "$APPROVED_SHA"
+          else
+            test "$(git rev-parse HEAD)" = "$PREPARED_SHA"
+          fi
+          test "$(git merge-base origin/main HEAD)" = "$(git rev-parse origin/main)" || {
+            echo "APPROVED_BRANCH_NOT_BASED_ON_CURRENT_MAIN"
+            exit 1
+          }
+
+      - name: Install Knowledge dependencies
+        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
+        working-directory: archive/web
+        run: npm ci
+
+      - name: Revalidate approved source package
+        if: steps.inspect.outputs.status == 'READY'
+        working-directory: archive/web
+        run: |
+          npm run knowledge:test
+          npm run knowledge:check
+          node --test ../scripts/lib/knowledge-human-approved.test.mjs
+          node --test ../scripts/lib/knowledge-review-consumer.test.mjs
+
+      - name: Prepare human-approved publication
+        if: steps.inspect.outputs.status == 'READY'
+        working-directory: .
+        env:
+          BRIEF_ID: ${{ steps.inspect.outputs.brief_id }}
+        run: |
+          set -euo pipefail
+          node archive/scripts/knowledge-human-approved-prepare.mjs \
+            --brief "$BRIEF_ID" \
+            --base origin/main \
+            --head HEAD
+
+      - name: Verify human-approved publication paths
+        if: steps.inspect.outputs.status == 'READY'
+        env:
+          BRIEF_ID: ${{ steps.inspect.outputs.brief_id }}
+        run: |
+          set -euo pipefail
+          rejected=0
+          while IFS= read -r path; do
+            case "$path" in
+              "knowledge/content/briefs/$BRIEF_ID.json"|\
+              archive/web/public/knowledge/index.html|\
+              archive/web/public/knowledge/*/index.html|\
+              archive/web/public/sitemap.xml)
+                ;;
+              *)
+                echo "HUMAN_APPROVED_REJECTED_PATH:$path"
+                rejected=1
+                ;;
+            esac
+          done < <(git diff --name-only)
+          test "$rejected" -eq 0
+
+      - name: Move Worker PR to publication handoff phase
+        if: steps.inspect.outputs.status == 'READY'
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.inspect.outputs.pr_number }}
+          APPROVED_SHA: ${{ steps.inspect.outputs.approved_head_sha }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > "$RUNNER_TEMP/review-pr.json"
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs'
+          const pr = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/review-pr.json', 'utf8'))
+          if (pr.state !== 'open') throw new Error('HUMAN_REVIEW_PR_NOT_OPEN')
+          if (pr.head?.sha !== process.env.APPROVED_SHA) throw new Error('HUMAN_REVIEW_PR_HEAD_CHANGED')
+          if (pr.base?.ref !== 'main') throw new Error('HUMAN_REVIEW_PR_BASE_NOT_MAIN')
+          const packageMarker = '<!-- knowledge-worker-phase-v1:PACKAGE_READY -->'
+          const handoffMarker = '<!-- knowledge-worker-phase-v1:PUBLICATION_HANDOFF -->'
+          let body = pr.body ?? ''
+          if (body.includes(packageMarker)) body = body.replace(packageMarker, handoffMarker)
+          else if (!body.includes(handoffMarker)) throw new Error('HUMAN_REVIEW_PACKAGE_PHASE_REQUIRED')
+          writeFileSync(process.env.RUNNER_TEMP + '/review-pr-update.json', JSON.stringify({ body }))
+          NODE
+          if gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.draft' | grep -qx true; then
+            gh pr ready "$PR_NUMBER"
+          fi
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" \
+            --input "$RUNNER_TEMP/review-pr-update.json" > "$RUNNER_TEMP/review-pr-updated.json"
+
+      - name: Commit prepared human-approved publication
+        if: steps.inspect.outputs.status == 'READY'
+        id: prepared
+        env:
+          BRIEF_ID: ${{ steps.inspect.outputs.brief_id }}
+          HEAD_REF: ${{ steps.inspect.outputs.head_ref }}
+        run: |
+          set -euo pipefail
+          git add "knowledge/content/briefs/$BRIEF_ID.json" archive/web/public/knowledge archive/web/public/sitemap.xml
+          git diff --cached --quiet && { echo "HUMAN_APPROVED_PREPARE_NO_CHANGES"; exit 1; }
+          git config user.name "knowledge-human-review-bot"
+          git config user.email "knowledge-human-review-bot@users.noreply.github.com"
+          git commit -m "knowledge: prepare $BRIEF_ID human-approved publication"
+          PREPARED_SHA="$(git rev-parse HEAD)"
+          git push origin "HEAD:$HEAD_REF"
+          echo "sha=$PREPARED_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve prepared head
+        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
+        id: head
+        env:
+          NEW_SHA: ${{ steps.prepared.outputs.sha }}
+          RESUME_SHA: ${{ steps.inspect.outputs.prepared_head_sha }}
+        run: |
+          set -euo pipefail
+          PREPARED_SHA="${NEW_SHA:-$RESUME_SHA}"
+          test -n "$PREPARED_SHA"
+          test "$(git rev-parse HEAD)" = "$PREPARED_SHA"
+          echo "sha=$PREPARED_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Exact-head machine revalidation
+        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
+        working-directory: archive/web
+        env:
+          BRIEF_ID: ${{ steps.inspect.outputs.brief_id }}
+          PREPARED_SHA: ${{ steps.head.outputs.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$PREPARED_SHA"
+          npm run knowledge:test
+          npm run knowledge:check
+          npm run build
+          cd ../..
+          node archive/scripts/knowledge-human-approved-release-check.mjs \
+            --brief "$BRIEF_ID" \
+            --base origin/main \
+            --head HEAD > "$RUNNER_TEMP/human-approved-release.json"
+          cat "$RUNNER_TEMP/human-approved-release.json"
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs'
+          const result = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/human-approved-release.json', 'utf8'))
+          if (result.decision !== 'HUMAN_APPROVED_ELIGIBLE') throw new Error(`HUMAN_APPROVED_GATE:${result.decision}`)
+          if (result.requires_human !== false || result.content_only?.allowed !== true || result.reasons?.length) {
+            throw new Error('HUMAN_APPROVED_MACHINE_REVALIDATION_FAILED')
+          }
+          NODE
+
+      - name: Wait for prepared PR checks
+        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.inspect.outputs.pr_number }}
+          PREPARED_SHA: ${{ steps.head.outputs.sha }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            HEAD_SHA="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.head.sha')"
+            [ "$HEAD_SHA" = "$PREPARED_SHA" ] && break
+            [ "$attempt" -eq 30 ] && { echo "PREPARED_HEAD_NOT_VISIBLE"; exit 1; }
+            sleep 2
+          done
+          gh pr checks "$PR_NUMBER" --watch --interval 10
+
+      - name: Recheck current main and exact PR head
+        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.inspect.outputs.pr_number }}
+          PREPARED_SHA: ${{ steps.head.outputs.sha }}
+        run: |
+          set -euo pipefail
+          git fetch origin main:refs/remotes/origin/main
+          test "$(git merge-base origin/main "$PREPARED_SHA")" = "$(git rev-parse origin/main)" || {
+            echo "MAIN_MOVED_HUMAN_APPROVAL_REVALIDATION_REQUIRED"
+            exit 1
+          }
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > "$RUNNER_TEMP/final-review-pr.json"
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs'
+          const pr = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/final-review-pr.json', 'utf8'))
+          if (pr.state !== 'open') throw new Error('FINAL_REVIEW_PR_NOT_OPEN')
+          if (pr.draft !== false) throw new Error('FINAL_REVIEW_PR_STILL_DRAFT')
+          if (pr.base?.ref !== 'main') throw new Error('FINAL_REVIEW_PR_BASE_NOT_MAIN')
+          if (pr.head?.sha !== process.env.PREPARED_SHA) throw new Error('FINAL_REVIEW_PR_HEAD_CHANGED')
+          if (!pr.body?.includes('<!-- knowledge-worker-phase-v1:PUBLICATION_HANDOFF -->')) throw new Error('FINAL_REVIEW_PHASE_INVALID')
+          NODE
+
+      - name: Merge exact human-approved head
+        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
+        id: merge
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.inspect.outputs.pr_number }}
+          PREPARED_SHA: ${{ steps.head.outputs.sha }}
+        run: |
+          set -euo pipefail
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/merge" \
+            -f merge_method=squash \
+            -f sha="$PREPARED_SHA" > "$RUNNER_TEMP/human-review-merge.json"
+          cat "$RUNNER_TEMP/human-review-merge.json"
+          MERGE_SHA="$(node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs'
+          const result = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/human-review-merge.json', 'utf8'))
+          if (result.merged !== true || !/^[a-f0-9]{40}$/.test(result.sha ?? '')) throw new Error('HUMAN_REVIEW_AUTO_MERGE_FAILED')
+          process.stdout.write(result.sha)
+          NODE
+          )"
+          echo "sha=$MERGE_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Record consumed human review
+        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          ITEM_ID: ${{ steps.inspect.outputs.item_id }}
+          DECIDED_AT: ${{ steps.inspect.outputs.decided_at }}
+          BRIEF_ID: ${{ steps.inspect.outputs.brief_id }}
+          PREPARED_SHA: ${{ steps.head.outputs.sha }}
+          MERGE_SHA: ${{ steps.merge.outputs.sha }}
+        run: |
+          set -euo pipefail
+          RESULT_JSON="$(node --input-type=module <<'NODE'
+          console.log(JSON.stringify({
+            status: 'CONSUMED',
+            brief_id: process.env.BRIEF_ID,
+            prepared_sha: process.env.PREPARED_SHA,
+            merge_sha: process.env.MERGE_SHA,
+            production: 'BATCHED_RELEASE_GATE',
+          }))
+          NODE
+          )"
+          node archive/scripts/knowledge-review-consumer.mjs record \
+            --item-id "$ITEM_ID" \
+            --decided-at "$DECIDED_AT" \
+            --outcome CONSUMED \
+            --result-json "$RESULT_JSON"
+
+      - name: Summarize no-op
+        if: steps.inspect.outputs.status == 'NOOP'
+        run: echo "No approved human-review item is waiting."
