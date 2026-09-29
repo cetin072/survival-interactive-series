@@ -5,11 +5,28 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import draft_release_illustration_handoff as draft
+import staged_illustration_handoff as staged
 import resolve_illustration_handoff_request as resolver
 
 
 def execute(request_path):
     request = resolver.from_request(Path(request_path))
+
+    if request["request_version"] == resolver.STAGED_REQUEST_VERSION:
+        args = SimpleNamespace(
+            staging_id=request["staging_id"],
+            source_commit=request["source_commit"],
+            identity=request["identity_path"],
+        )
+        processed = staged.process(args)
+        return {
+            "status": "TRUSTED_ILLUSTRATION_HANDOFF_COMPLETE",
+            "transport": "SUPABASE_PRIVATE_STAGING",
+            "request": request,
+            "processed": processed,
+            "cleanup": processed.get("staging_cleanup"),
+        }
+
     args = SimpleNamespace(
         release_id=request["release_id"],
         source_commit=request["source_commit"],
@@ -27,6 +44,7 @@ def execute(request_path):
     cleaned = draft.cleanup(cleanup_args)
     return {
         "status": "TRUSTED_ILLUSTRATION_HANDOFF_COMPLETE",
+        "transport": "GITHUB_DRAFT_RELEASE",
         "request": request,
         "prepared": prepared,
         "processed": processed,
