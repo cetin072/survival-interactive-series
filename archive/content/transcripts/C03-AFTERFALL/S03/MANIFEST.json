@@ -75,6 +75,29 @@
       },
       "user_messages": 2,
       "gm_public_blocks": 2
+    },
+    {
+      "session_id": "SESSION_004",
+      "source_type": "SUPABASE_ROLLING_RAW_SEGMENT",
+      "source_session_uuid": "8ef127f7-4729-4161-9784-49123171ad2a",
+      "visibility": "PUBLIC_ARCHIVE",
+      "status": "PARTIAL",
+      "capture_quality": "VERIFIED_CONTIGUOUS_TURN_PAIRS",
+      "atomic_pairing_complete": true,
+      "source_manifest": "SESSION_004/SOURCE_MANIFEST.json",
+      "coverage_basis": "captured_message_range",
+      "captured_message_range": {
+        "start": "2027-05-03 16:50",
+        "end": "2027-06-18 15:10"
+      },
+      "source_message_order": {
+        "min": 68,
+        "max": 75,
+        "contiguous": true,
+        "archive_offset": 68
+      },
+      "user_messages": 4,
+      "gm_public_blocks": 4
     }
   ],
   "source_policy": "Only listed immutable verified segments are published. Each SOURCE_MANIFEST is sealed."
