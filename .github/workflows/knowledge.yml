@@ -12,6 +12,7 @@ on:
       - '.github/workflows/knowledge.yml'
       - '.github/workflows/knowledge-publish-prepare.yml'
       - '.github/workflows/knowledge-exact-head.yml'
+      - '.github/workflows/knowledge-review-consumer.yml'
       - '.github/workflows/knowledge-worker-state.yml'
       - '.github/workflows/knowledge-worker-gate.yml'
       - 'docs/KNOWLEDGE_WORKER_*.md'
@@ -27,6 +28,7 @@ on:
       - '.github/workflows/knowledge.yml'
       - '.github/workflows/knowledge-publish-prepare.yml'
       - '.github/workflows/knowledge-exact-head.yml'
+      - '.github/workflows/knowledge-review-consumer.yml'
       - '.github/workflows/knowledge-worker-state.yml'
       - 'docs/KNOWLEDGE_WORKER_*.md'
 
