@@ -1,9 +1,15 @@
 {
   "version": 1,
   "backfill": {
-    "last_attempted_at": null,
-    "last_work_key": null,
-    "last_result": null,
-    "reviewed_items": []
+    "last_attempted_at": "2026-09-30T01:10:00.000+09:00",
+    "last_work_key": "PUBLIC_READER:c03-afterfall-prelude-07:150e28ec1809490010bf960d1ff2c9caaf5edfc88cc26b18cb3bbdac995ba6bc",
+    "last_result": "PROCESSED",
+    "reviewed_items": [
+      {
+        "work_key": "PUBLIC_READER:c03-afterfall-prelude-07:150e28ec1809490010bf960d1ff2c9caaf5edfc88cc26b18cb3bbdac995ba6bc",
+        "status": "PROCESSED",
+        "processed_at": "2026-09-30T01:10:00.000+09:00"
+      }
+    ]
   }
 }
