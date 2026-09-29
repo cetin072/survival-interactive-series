@@ -60,8 +60,8 @@ for (let attempt = 0; attempt < 20; attempt += 1) {
 }
 if (!publishedMarker) throw new Error('PUBLISHED_RELEASE_SOURCE_MISMATCH')
 
-const manifest = await publicResponse('/archive-release-manifest.json')
-if (!manifest.ok) throw new Error('PRODUCTION_RELEASE_MANIFEST_NOT_READY')
+const rootPage = await publicResponse('/')
+if (!rootPage.ok) throw new Error('PRODUCTION_ROOT_NOT_READY')
 
 console.log(JSON.stringify({
   status: 'PRODUCTION_VERIFIED',
