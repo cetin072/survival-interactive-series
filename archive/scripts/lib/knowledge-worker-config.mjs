@@ -43,7 +43,6 @@ export function validateWorkerPolicy(policy) {
   fail(runtime.pr_phase_marker_prefix === 'knowledge-worker-phase-v1', 'PR phase marker prefix')
   fail(JSON.stringify(runtime.pr_phases) === JSON.stringify(['PACKAGE_READY', 'PUBLICATION_HANDOFF']), 'PR phases')
   fail(Number.isInteger(runtime.salvage_when_behind_commits) && runtime.salvage_when_behind_commits >= 1, 'salvage threshold')
-  fail(runtime.max_recovery_attempts === 2, 'max recovery attempts')
   fail(Array.isArray(runtime.run_result_codes)
     && JSON.stringify([...runtime.run_result_codes].sort()) === JSON.stringify([...RUN_RESULT_CODES].sort()), 'run result codes')
   const publication = policy.publication_policy
