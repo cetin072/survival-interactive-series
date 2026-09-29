@@ -1,0 +1,90 @@
+name: Validate Knowledge worker state
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'knowledge/automation/state.json'
+      - 'knowledge/automation/runtime-state.json'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: knowledge-worker-state-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate-and-merge:
+    if: startsWith(github.head_ref, 'knowledge/worker/state-')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact state PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify state-only diff
+        run: |
+          set -euo pipefail
+          git fetch origin main:refs/remotes/origin/main
+          mapfile -t files < <(git diff --name-only origin/main...HEAD)
+          test "${#files[@]}" -ge 1
+          for file in "${files[@]}"; do
+            case "$file" in
+              knowledge/automation/state.json|knowledge/automation/runtime-state.json) ;;
+              *)
+                echo "STATE_PR_OUTSIDE_ALLOWLIST:$file"
+                exit 1
+                ;;
+            esac
+          done
+
+      - name: Validate worker state contracts
+        run: node archive/scripts/knowledge-worker-state-check.mjs
+
+      - name: Recheck exact main and PR head
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          test -n "$GH_TOKEN" || { echo "ARCHIVE_GITHUB_TOKEN_REQUIRED"; exit 1; }
+          git fetch origin main:refs/remotes/origin/main
+          test "$(git merge-base origin/main "$EXPECTED_SHA")" = "$(git rev-parse origin/main)" || {
+            echo "MAIN_MOVED_STATE_MERGE_ABORTED"
+            exit 1
+          }
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > "$RUNNER_TEMP/pr.json"
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs'
+          const pr = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/pr.json', 'utf8'))
+          if (pr.state !== 'open') throw new Error('PR_NOT_OPEN')
+          if (pr.base?.ref !== 'main') throw new Error('PR_BASE_NOT_MAIN')
+          if (pr.head?.sha !== process.env.EXPECTED_SHA) throw new Error('PR_HEAD_CHANGED')
+          if (!pr.head?.ref?.startsWith('knowledge/worker/state-')) throw new Error('STATE_BRANCH_REQUIRED')
+          NODE
+
+      - name: Merge exact validated state head
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/merge"             -f merge_method=squash             -f sha="$EXPECTED_SHA" > "$RUNNER_TEMP/merge.json"
+          cat "$RUNNER_TEMP/merge.json"
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs'
+          const result = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/merge.json', 'utf8'))
+          if (result.merged !== true || !/^[a-f0-9]{40}$/.test(result.sha ?? '')) throw new Error('STATE_AUTO_MERGE_FAILED')
+          NODE

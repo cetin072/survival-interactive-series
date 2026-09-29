@@ -5,12 +5,17 @@ import { createHash } from 'node:crypto'
 import { mkdtemp, mkdir, readFile, writeFile, rm, copyFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
-import { publicKnowledgeInventory, scanKnowledge, bootstrapKnowledge } from './knowledge-scan.mjs'
+import { publicKnowledgeInventory, scanKnowledge, bootstrapKnowledge, recordKnowledgeDisposition } from './knowledge-scan.mjs'
 import { loadKnowledge, validateKnowledge, publicationEligibility, root } from './knowledge-content.mjs'
 import { checkContentOnly, checkRelease, verifyProductionPublication } from './knowledge-release.mjs'
 import { planWorkerRun, validateProviderConfig, validateWorkerPolicy } from './knowledge-worker-config.mjs'
 import { assertReleaseReady, expectedReleaseDecision, promoteBriefRecord } from './knowledge-publish.mjs'
 import { isExactProductionDeployMeta } from './knowledge-production.mjs'
+import {
+  RUN_RESULT_CODES, backfillDue, classifyWorkerPr, deterministicBackfillBranch,
+  deterministicFreshBranch, deterministicStateBranch, notificationMarker,
+  planWorkerPreflight, recordBackfillResult, validateRuntimeState,
+} from './knowledge-worker-runtime.mjs'
 
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex')
 const manifestRef = 'archive/content/transcripts/C03-AFTERFALL/S99/SESSION_001/SOURCE_MANIFEST.json'
@@ -580,4 +585,126 @@ test('editorial policy reference and quality target fail closed', async () => {
     ...policy,
     dispatcher: { ...policy.dispatcher, trigger_interval_hours: 6 },
   }), /dispatcher trigger interval must be 12 hours/)
+})
+
+
+test('fresh HOLD and HUMAN_REVIEW dispositions are durable scanner terminal states', () => {
+  const source = {
+    source_manifest_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_999/SOURCE_MANIFEST.json',
+    source_manifest_sha256: 'a'.repeat(64),
+  }
+  for (const status of ['HOLD', 'HUMAN_REVIEW']) {
+    const state = { version: 1, sources: [] }
+    recordKnowledgeDisposition(state, {
+      sourceManifestRef: source.source_manifest_ref,
+      sourceManifestSha256: source.source_manifest_sha256,
+      status,
+      processedAt: '2026-09-29T00:00:00.000Z',
+      dispositionCode: status === 'HOLD' ? 'NO_STRONG_TOPIC' : 'RISK_REVIEW_REQUIRED',
+      dispositionNote: 'fixture disposition',
+    })
+    assert.equal(state.sources[0].status, status)
+    const scan = scanKnowledge([source], state)
+    assert.equal(scan.status, 'NOOP')
+    assert.equal(scan.sources.length, 0)
+
+    const changed = scanKnowledge([{ ...source, source_manifest_sha256: 'b'.repeat(64) }], state)
+    assert.equal(changed.status, 'SOURCE_CHANGED_RESCAN_REQUIRED')
+  }
+})
+
+test('runtime state makes BACKFILL durable and allows late retry without wall-clock-only logic', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const runtime = { version: 1, backfill: { last_attempted_at: null, last_work_key: null, last_result: null, reviewed_items: [] } }
+  assert.equal(validateRuntimeState(runtime), true)
+
+  const sixKst = '2026-09-29T21:00:00.000Z'
+  const eighteenKst = '2026-09-30T09:00:00.000Z'
+  assert.equal(backfillDue({ policy, runtimeState: runtime, now: sixKst }), true)
+  assert.equal(backfillDue({ policy, runtimeState: runtime, now: eighteenKst }), false)
+
+  recordBackfillResult(runtime, { workKey: 'PUBLIC_READER:chapter-1:sha-a', status: 'NO_CANDIDATE', now: sixKst })
+  assert.equal(backfillDue({ policy, runtimeState: runtime, now: eighteenKst }), false)
+  assert.equal(backfillDue({ policy, runtimeState: runtime, now: '2026-10-01T09:00:01.000Z' }), true)
+  assert.deepEqual(runtime.backfill.reviewed_items.map((item) => item.work_key), ['PUBLIC_READER:chapter-1:sha-a'])
+})
+
+test('worker branches are deterministic and separated by work identity', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const a = { source_manifest_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_100/SOURCE_MANIFEST.json', source_manifest_sha256: 'a'.repeat(64) }
+  const b = { ...a, source_manifest_sha256: 'b'.repeat(64) }
+  assert.equal(deterministicFreshBranch(policy, a), deterministicFreshBranch(policy, a))
+  assert.notEqual(deterministicFreshBranch(policy, a), deterministicFreshBranch(policy, b))
+  assert.ok(deterministicFreshBranch(policy, a).startsWith('knowledge/worker/fresh-'))
+  assert.ok(deterministicBackfillBranch(policy, 'reader:chapter-1').startsWith('knowledge/worker/backfill-'))
+  assert.ok(deterministicStateBranch(policy, 'fresh:hold:chapter-1').startsWith('knowledge/worker/state-'))
+})
+
+test('open Worker PR lifecycle distinguishes running, resumable, blocked and stalled states', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const base = {
+    number: 99,
+    head_ref: 'knowledge/worker/fresh-abc123',
+    head_sha: 'a'.repeat(40),
+    updated_at: '2026-09-29T00:00:00.000Z',
+    labels: [],
+  }
+  assert.equal(classifyWorkerPr({
+    policy, pr: base, now: '2026-09-29T01:00:00.000Z',
+    checks: [{ name: 'Knowledge', status: 'in_progress', conclusion: null }],
+  }).result, 'WAITING_PR')
+
+  assert.equal(classifyWorkerPr({
+    policy, pr: base, now: '2026-09-29T01:00:00.000Z',
+    checks: [{ name: 'Knowledge', status: 'completed', conclusion: 'success' }],
+  }).result, 'RESUME_PR')
+
+  assert.equal(classifyWorkerPr({
+    policy, pr: base, now: '2026-09-29T01:00:00.000Z',
+    checks: [{ name: 'Knowledge', status: 'completed', conclusion: 'failure' }],
+  }).result, 'BLOCKED_PR')
+
+  assert.equal(classifyWorkerPr({
+    policy,
+    pr: { ...base, labels: ['knowledge-publish-prepare'] },
+    now: '2026-09-29T07:00:01.000Z',
+    checks: [{ name: 'Knowledge', status: 'completed', conclusion: 'success' }],
+  }).result, 'STALLED_PR')
+})
+
+test('canonical preflight blocks duplicate Worker PRs and respects actual provider binding', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const provider = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
+  const runtime = { version: 1, backfill: { last_attempted_at: null, last_work_key: null, last_result: null, reviewed_items: [] } }
+  const scanner = { status: 'PENDING', sources: [{
+    source_manifest_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_100/SOURCE_MANIFEST.json',
+    source_manifest_sha256: 'a'.repeat(64),
+    status: 'PENDING',
+  }] }
+
+  const fresh = planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime, scannerResult: scanner,
+    openPrs: [], checksByPr: {}, now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(fresh.result, 'FRESH_READY')
+  assert.ok(fresh.branch.startsWith('knowledge/worker/fresh-'))
+
+  const pr = (number) => ({ number, head_ref: `knowledge/worker/fresh-${number}`, head_sha: String(number).padStart(40, 'a').slice(-40),
+    updated_at: '2026-09-29T20:00:00.000Z', labels: [] })
+  const blocked = planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime, scannerResult: { status: 'NOOP', sources: [] },
+    openPrs: [pr(1), pr(2)], checksByPr: {}, now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(blocked.result, 'BLOCKED_CONTRACT')
+  assert.equal(blocked.reason, 'MULTIPLE_OPEN_WORKER_PRS')
+
+  const otherProvider = { ...provider, active_provider: 'OPENAI_API',
+    providers: { ...provider.providers, CHATGPT_SCHEDULED: { ...provider.providers.CHATGPT_SCHEDULED, enabled: false },
+      OPENAI_API: { ...provider.providers.OPENAI_API, enabled: true } } }
+  assert.equal(planWorkerPreflight({ policy, providerConfig: otherProvider, runtimeState: runtime,
+    scannerResult: { status: 'NOOP', sources: [] }, openPrs: [], now: '2026-09-29T21:00:00.000Z' }).result, 'PROVIDER_NOT_ACTIVE')
+})
+
+test('notification markers and RUN_RESULT contract are deterministic', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  assert.deepEqual([...policy.runtime.run_result_codes].sort(), [...RUN_RESULT_CODES].sort())
+  const marker = notificationMarker(policy, { result: 'STALLED_PR', prNumber: 123, headSha: 'a'.repeat(40) })
+  assert.equal(marker, notificationMarker(policy, { result: 'STALLED_PR', prNumber: 123, headSha: 'a'.repeat(40) }))
+  assert.match(marker, /knowledge-worker-notify-v1:STALLED_PR:123:/)
 })

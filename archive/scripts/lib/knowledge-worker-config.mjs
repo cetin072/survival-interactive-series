@@ -1,3 +1,5 @@
+import { RUN_RESULT_CODES } from './knowledge-worker-runtime.mjs'
+
 const fail = (condition, message) => { if (!condition) throw new Error(`KNOWLEDGE_WORKER_CONFIG: ${message}`) }
 
 export const SUPPORTED_PROVIDERS = Object.freeze(['CHATGPT_SCHEDULED', 'OPENAI_API', 'OTHER_LLM_API'])
@@ -14,12 +16,26 @@ export function validateWorkerPolicy(policy) {
   fail(d.backfill?.enabled === true, 'backfill must be enabled')
   fail(d.backfill.only_when_no_fresh === true, 'backfill must yield to fresh')
   fail(d.backfill.cadence_hours === 24, 'backfill cadence must be 24 hours')
-  fail(Number.isInteger(d.backfill.run_hour_local) && d.backfill.run_hour_local >= 0 && d.backfill.run_hour_local <= 23, 'backfill run hour')
+  fail(Number.isInteger(d.backfill.preferred_hour_local) && d.backfill.preferred_hour_local >= 0 && d.backfill.preferred_hour_local <= 23, 'backfill preferred hour')
+  fail(d.backfill.allow_late_retry === true, 'backfill late retry must be enabled')
+  fail(d.backfill.bootstrap_only_at_preferred_hour === true, 'backfill bootstrap hour guard')
   fail(d.backfill.max_new_briefs_per_run === 1, 'backfill max briefs')
   fail(typeof policy.provider_config_ref === 'string' && policy.provider_config_ref === 'knowledge/automation/provider-config.json', 'provider config ref')
   fail(policy.editorial_spec_ref === 'docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V1.md', 'editorial spec ref')
   fail(Number.isInteger(policy.research_policy?.minimum_authoritative_sources_per_brief) && policy.research_policy.minimum_authoritative_sources_per_brief >= 2, 'minimum authoritative sources')
   fail(Number.isInteger(policy.research_policy?.preferred_authoritative_sources_per_brief) && policy.research_policy.preferred_authoritative_sources_per_brief >= policy.research_policy.minimum_authoritative_sources_per_brief, 'preferred authoritative sources')
+  const runtime = policy.runtime
+  fail(runtime?.scheduler_provider === 'CHATGPT_SCHEDULED', 'runtime scheduler provider')
+  fail(runtime.worker_pr_branch_prefix === 'knowledge/worker/', 'worker PR branch prefix')
+  fail(runtime.state_pr_branch_prefix === 'knowledge/worker/state-', 'state PR branch prefix')
+  fail(runtime.publication_label === 'knowledge-publish-prepare', 'publication label')
+  fail(Number.isInteger(runtime.stalled_after_hours) && runtime.stalled_after_hours >= 1 && runtime.stalled_after_hours <= 48, 'stalled timeout')
+  fail(runtime.notification_marker_prefix === 'knowledge-worker-notify-v1', 'notification marker prefix')
+  fail(runtime.external_text_is_untrusted_data === true, 'untrusted external text boundary')
+  fail(runtime.require_actual_check_evidence === true, 'actual check evidence required')
+  fail(runtime.state_only_auto_merge === true, 'state-only auto merge')
+  fail(Array.isArray(runtime.run_result_codes)
+    && JSON.stringify([...runtime.run_result_codes].sort()) === JSON.stringify([...RUN_RESULT_CODES].sort()), 'run result codes')
   const publication = policy.publication_policy
   fail(['AUTO_LOW_RISK_SHADOW', 'AUTO_LOW_RISK'].includes(publication?.required_repository_mode), 'publication mode')
   const live = publication.required_repository_mode === 'AUTO_LOW_RISK'
@@ -65,7 +81,7 @@ export function planWorkerRun({ policy, providerConfig, pendingSources = [], ope
     source: pendingSources[0],
     max_sources: 1,
   }
-  if (localHour === policy.dispatcher.backfill.run_hour_local) return {
+  if (localHour === policy.dispatcher.backfill.preferred_hour_local) return {
     decision: 'BACKFILL',
     provider: providerConfig.active_provider,
     max_new_briefs: 1,
