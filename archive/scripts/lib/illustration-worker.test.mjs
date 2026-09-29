@@ -327,7 +327,11 @@ test('preserves three approved images and validates the warehouse site asset con
   assert.deepEqual(assets.map((asset) => asset.subject_id), [
     'char-jinwoo', 'char-eunchae', 'char-seojin', 'loc-guild-rear-warehouse',
   ])
-  assert.equal(manifest.visual_catalog_sha256, catalog.content_sha256)
+  // SITE_ASSETS pins the visual catalog used when those assets were published.
+  // Archive A may advance VISUALS without republishing unchanged approved assets,
+  // so validate current point identity rather than requiring the whole-catalog hash to stay equal.
+  assert.match(manifest.visual_catalog_sha256, /^[a-f0-9]{64}$/)
+  const catalogBySubject = new Map(catalog.points.map((point) => [point.subject_id, point]))
   const stable = (value) => Array.isArray(value) ? value.map(stable)
     : value && typeof value === 'object'
       ? Object.fromEntries(Object.keys(value).sort().map((key) => [key, stable(value[key])]))
@@ -342,6 +346,10 @@ test('preserves three approved images and validates the warehouse site asset con
   for (const asset of assets) {
     assert.match(asset.point_id, /^point-[a-f0-9]{64}$/)
     assert.match(asset.generation_key, /^generation-[a-f0-9]{64}$/)
+    const currentPoint = catalogBySubject.get(asset.subject_id)
+    assert.ok(currentPoint, `missing current visual point for ${asset.subject_id}`)
+    assert.equal(currentPoint.point_id, asset.point_id)
+    assert.equal(currentPoint.generation_key, asset.generation_key)
     assert.match(asset.public_path, /^\/visual-assets\/[a-f0-9]{64}\.png$/)
     const bytes = await readFile(resolve(root, 'archive/web/public', asset.public_path.slice(1)))
     assert.equal(bytes.length, asset.bytes)
