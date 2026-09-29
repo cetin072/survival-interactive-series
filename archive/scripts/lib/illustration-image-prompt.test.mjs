@@ -99,3 +99,29 @@ test('renderer text is visual-only and omits operational/report vocabulary', () 
   assert.doesNotMatch(text, /github|supabase|netlify|workflow|provider|storage|registry|handoff|scheduler|automation|report|dashboard|json|sha|\bci\b|\bpr\b|api|deploy|receipt/i)
   assert.ok(text.length < 6000)
 })
+
+
+test('location renderer omits narrative role/conflict and fails closed to a minimal visual scene', () => {
+  const text = compileIllustrationRendererText(pointFor('loc-west-road'))
+  for (const phrase of [
+    '장소 서쪽길의 넓은 환경 일러스트레이션',
+    '일반적인 현대 한국 생활환경 범위만 최소한으로 표현',
+    '전경 인물이나 초상 구도는 사용하지 않는다',
+    '명시되지 않은 폐허, 대규모 파괴',
+    '글자, 숫자, 라벨, 워터마크 또는 인터페이스 요소는 넣지 않는다',
+  ]) assert.ok(text.includes(phrase), `Missing location safety phrase: ${phrase}`)
+  for (const phrase of ['관리조', '야간순찰', '통행기여', '자발성', '강제성', '갈등', 'damaged world', 'QUIET_DECAY']) {
+    assert.ok(!text.includes(phrase), `Narrative/nonvisual fact leaked into renderer text: ${phrase}`)
+  }
+})
+
+test('location renderer uses explicit visual_facts when a future brief provides them', () => {
+  const point = structuredClone(pointFor('loc-west-road'))
+  point.brief.visual_facts = {
+    surface: '포장도로',
+    maintenance: '부분적인 노면 보수 흔적',
+  }
+  const text = compileIllustrationRendererText(point)
+  assert.ok(text.includes('포장도로'))
+  assert.ok(text.includes('부분적인 노면 보수 흔적'))
+})
