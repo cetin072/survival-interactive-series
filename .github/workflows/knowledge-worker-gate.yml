@@ -46,13 +46,15 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Fetch current main and require exact ancestry
+      - name: Require exact PR base ancestry
         working-directory: .
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           set -euo pipefail
-          git fetch origin main:refs/remotes/origin/main
-          test "$(git merge-base origin/main HEAD)" = "$(git rev-parse origin/main)" || {
-            echo "WORKER_BRANCH_NOT_BASED_ON_CURRENT_MAIN"
+          git cat-file -e "$PR_BASE_SHA^{commit}"
+          test "$(git merge-base "$PR_BASE_SHA" HEAD)" = "$PR_BASE_SHA" || {
+            echo "WORKER_BRANCH_NOT_BASED_ON_PR_BASE"
             exit 1
           }
 
@@ -83,9 +85,10 @@ jobs:
         working-directory: .
         env:
           BRIEF_ID: ${{ steps.target.outputs.brief }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           set -euo pipefail
-          node archive/scripts/knowledge-release-check.mjs             --brief "$BRIEF_ID"             --base origin/main             --head HEAD > "$RUNNER_TEMP/worker-release.json"
+          node archive/scripts/knowledge-release-check.mjs             --brief "$BRIEF_ID"             --base "$PR_BASE_SHA"             --head HEAD > "$RUNNER_TEMP/worker-release.json"
           cat "$RUNNER_TEMP/worker-release.json"
           node --input-type=module <<'NODE'
           import { readFileSync } from 'node:fs'
@@ -105,7 +108,7 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
-          MARKER="<!-- knowledge-worker-gate-v1:$HEAD_SHA:AUTO_PUBLISH_ELIGIBLE -->"
+          MARKER="<!-- knowledge-worker-gate-v1:$HEAD_SHA:${{ github.event.pull_request.base.sha }}:AUTO_PUBLISH_ELIGIBLE -->"
           if gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments?per_page=100" --paginate             --jq '.[].body' | grep -Fqx "$MARKER"; then
             echo "Gate marker already exists."
           else
