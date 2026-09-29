@@ -112,6 +112,13 @@ export function createSyntheticMockProvider(): GMProvider {
         : { status: 'unavailable', message: '선택지를 찾지 못했습니다.' }
     }
 
+    if (input.kind === 'ordered-choices') {
+      const selected = input.choice_ids.map((choiceId) => checkpoint.current_scene.choices.find((item) => item.id === choiceId))
+      if (selected.some((choice) => !choice)) return { status: 'unavailable', message: '복수 선택 중 일부 선택지를 찾지 못했습니다.' }
+      const orderedActions = selected.flatMap((choice) => choice ? [choice.action] : [])
+      return { status: 'proposal', proposal: mockProposal(checkpoint, orderedActions, `선택한 ${orderedActions.length}개 행동을 지정한 순서대로 제안합니다.`) }
+    }
+
     if (input.text.includes('통신 상태를 확인하고 가족 차량으로 학교에 간다')) {
       const communications = checkpoint.current_scene.choices.find((item) => item.id === 2)?.action
       const school = checkpoint.current_scene.choices.find((item) => item.id === 1)?.action

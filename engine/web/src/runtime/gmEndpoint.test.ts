@@ -4,9 +4,10 @@ import { MockProvider, NullProvider } from './gmProvider'
 import { runGMProviderTurn } from './gmTurnRuntime'
 import { HttpGMProvider } from './gmTransport'
 import { createSyntheticPublicRuntimeFixture } from './syntheticPublicRuntimeFixture'
+import { createSyntheticMockProvider } from './syntheticPublicRuntimeFixture'
 
 function endpointFetch(provider?: MockProvider | NullProvider) {
-  return async (_input: RequestInfo | URL, init?: RequestInit) => handleGMRequest(new Request('https://example.test/api/gm', init), provider)
+  return async (_input: RequestInfo | URL, init?: RequestInit) => handleGMRequest(new Request('https://example.test/api/gm', init), provider ?? createSyntheticMockProvider())
 }
 
 describe('/api/gm synthetic transport', () => {
@@ -40,6 +41,20 @@ describe('/api/gm synthetic transport', () => {
 
     expect(next.public_state).toEqual(initial.public_state)
     expect(next.committed_turn.number).toBe(0)
+  })
+
+  it('returns only safe diagnostics for synthetic deploy-preview requests', async () => {
+    const initial = createSyntheticPublicRuntimeFixture()
+    const unavailable = new MockProvider(() => ({ status: 'unavailable' as const, message: 'safe', diagnostic: { key_present: true, failure_category: 'auth_or_config' } }))
+    const preview = await handleGMRequest(new Request('https://example.test/api/gm', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ input: { kind: 'free-action', text: '통신 상태를 확인한다' }, checkpoint: initial }),
+    }), unavailable, 'deploy-preview')
+    expect(await preview.json()).toEqual({ status: 'unavailable', message: 'safe [auth_or_config]', diagnostic: { key_present: true, failure_category: 'auth_or_config' } })
+
+    const production = await handleGMRequest(new Request('https://example.test/api/gm', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ input: { kind: 'free-action', text: '통신 상태를 확인한다' }, checkpoint: initial }),
+    }), unavailable, 'production')
+    expect(await production.json()).toEqual({ status: 'unavailable', message: 'safe' })
   })
 
   it('rejects malformed backend proposal before it reaches the browser engine', async () => {

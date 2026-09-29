@@ -90,6 +90,15 @@ function validateFromValues(state: LiveState, proposal: StateChangeProposal): Va
     }
   }
 
+  for (const change of proposal.base_capability_changes ?? []) {
+    const base = state.bases[change.base_id]
+    if (!base) {
+      issues.push(issue('UNKNOWN_ENTITY', `Unknown base: ${change.base_id}`))
+    } else if (base.capabilities.includes(change.add)) {
+      issues.push(issue('FROM_STATE_MISMATCH', `base:${change.base_id} already has ${change.add}`))
+    }
+  }
+
   for (const change of proposal.world_changes) {
     if (!jsonEquals(state.public_world[change.key], change.from)) {
       issues.push(issue('FROM_STATE_MISMATCH', `public_world:${change.key} no longer matches the proposal`))

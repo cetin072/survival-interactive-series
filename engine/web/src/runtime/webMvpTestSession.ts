@@ -1,0 +1,226 @@
+import { commitPublicRuntimeAction, createPublicRuntimeCheckpoint, keepPublicRuntimeSafeAfterFreeAction, type PublicRuntimeCheckpoint, type PublicRuntimeScene } from './publicRuntimeCheckpoint'
+import type { LiveState } from '../state/liveState'
+import type { Choice, LogEntry } from '../types'
+import type { ActionExecutionResult, QueuedAction } from '../validator/types'
+
+export const WEB_MVP_TEST_SESSION_STORAGE_KEY = 'survival-web-mvp-test-session-v2'
+export const WEB_MVP_TEST_SESSION_CHECKPOINT_ID = 'web-mvp-test-session-v2'
+
+type TestChoice = Choice & { action: QueuedAction }
+
+function action(id: string, label: string, proposal: QueuedAction['proposal']): QueuedAction {
+  return { id, label, actors: ['player'], proposal }
+}
+
+function createTestState(): LiveState {
+  return {
+    version: 1,
+    season_id: 'WEB_MVP_TEST_SESSION',
+    scene_id: 'test-arrival',
+    clock: { day: 1, date: '2030-01-01', time: '09:00', phase: 'NON_CANONICAL_TEST' },
+    party: {
+      player: { name: '한준호', location: '테스트 관측소', with: [], status: '판단 대기' },
+      wife: { name: '서윤', location: '테스트 관측소', with: [], status: '독립 판단 중' },
+      son: { name: '민석', location: '테스트 관측소', with: [], status: '통신 장비 점검 중' },
+      father: { name: '정호', location: '테스트 거점', with: [], status: '생활 점검 중' },
+    },
+    vehicles: {},
+    bases: { test_base: { name: '테스트 거점', location: '비정식 검증 구역', status: '운영 중', capabilities: ['기본 대피 공간'] } },
+    resources: {
+      water: { name: '물', icon: '💧', band: '보통' },
+      communications: { name: '통신', icon: '📡', band: '불안정' },
+    },
+    institutions: {}, routes_known: {}, active_actions: [], completed_actions: [],
+    public_world: { test_session: true }, last_change: {}, renderer_flags: { show_status: true },
+  }
+}
+
+function choice(id: number, label: string, queued: QueuedAction, description?: string): TestChoice {
+  return {
+    id,
+    label,
+    description: description ?? `${label}를 중심으로 다음 판단에 필요한 정보를 확인합니다.`,
+    action: queued,
+  }
+}
+
+function communicationsLoopScene(state: LiveState, sceneId: string): PublicRuntimeScene {
+  const loopStep = state.completed_actions.length + 1
+  const variants = [
+    {
+      narrative: '무전기에서 짧은 잡음이 반복됩니다. 민석은 수신 상태를 다시 분류하고, 서윤은 물 사용 기록을 확인합니다.',
+      first: '통신 로그를 다시 확인한다',
+      second: '물 사용 기록을 대조한다',
+      event: '통신 잡음과 물 사용량을 교차 점검합니다.',
+    },
+    {
+      narrative: '거점 밖의 소음이 잠시 줄었습니다. 가족은 이 틈에 장비와 생활 물자의 우선순위를 다시 맞춥니다.',
+      first: '장비 상태를 짧게 점검한다',
+      second: '생활 물자 목록을 다시 본다',
+      event: '안정 구간을 짧게 활용해 다음 압력에 대비합니다.',
+    },
+    {
+      narrative: '민석이 이전 기록과 다른 통신 패턴을 표시합니다. 확정 정보는 아니지만 다음 판단 전에 확인할 가치가 있습니다.',
+      first: '새 통신 패턴을 확인한다',
+      second: '기존 물자 점검을 우선한다',
+      event: '확정되지 않은 변화와 기존 준비 사이에서 우선순위를 선택합니다.',
+    },
+    {
+      narrative: '가족의 점검 결과가 한 번 더 모였습니다. 큰 이상은 없지만 같은 방식으로만 버티면 정보가 낡기 시작합니다.',
+      first: '외부 상태 확인 순서를 갱신한다',
+      second: '거점 내부 점검을 한 번 더 한다',
+      event: '반복 점검을 압축하고 다음 변화를 찾는 단계입니다.',
+    },
+  ] as const
+  const variant = variants[(loopStep - 1) % variants.length]
+
+  return {
+    id: sceneId,
+    narrative: `연속 점검 ${loopStep} · ${variant.narrative}`,
+    choices: [
+      choice(1, `${loopStep}. ${variant.first}`, action(`test-finish-check-${loopStep}`, `연속 점검 ${loopStep} · ${variant.first}`, {
+        time_delta_min: 10, moves: [], resource_changes: [], world_changes: [{ key: `review_${loopStep}`, from: undefined, to: 'complete' }],
+      })),
+      choice(2, `${loopStep}. ${variant.second}`, action(`test-recheck-water-${loopStep}`, `연속 점검 ${loopStep} · ${variant.second}`, {
+        time_delta_min: 5, moves: [], resource_changes: [], world_changes: [{ key: `water_recheck_${loopStep}`, from: undefined, to: 'complete' }],
+      })),
+    ],
+    presentation_blocks: [{ type: 'EVENT', message: `점검 ${loopStep} · ${variant.event}` }],
+  }
+}
+
+function sceneFor(state: LiveState, sceneId: string): PublicRuntimeScene {
+  const common: Pick<PublicRuntimeScene, 'id'> = { id: sceneId }
+  switch (sceneId) {
+    case 'test-water-check':
+      return {
+        ...common,
+        narrative: '물 저장 용기를 확인했습니다. 이 장면은 UI와 엔진 검증용이며 실제 S02 사건이 아닙니다.',
+        choices: [
+          choice(1, '저장 점검표를 설치한다', action('test-install-water-ledger', '저장 점검표 설치', {
+            time_delta_min: 20, moves: [], resource_changes: [{ resource_id: 'water', from: '보통', to: '안정' }],
+            base_capability_changes: [{ base_id: 'test_base', add: '물 저장 점검표' }], world_changes: [],
+          })),
+          choice(2, '가족의 제안을 듣는다', action('test-hear-family', '가족 제안 확인', {
+            time_delta_min: 10, moves: [], resource_changes: [], world_changes: [{ key: 'family_plan', from: undefined, to: 'requested' }],
+          })),
+        ],
+        presentation_blocks: [{ type: 'EVENT', message: '물 상태와 거점 능력은 테스트 세션 안에서만 변경됩니다.' }],
+      }
+    case 'test-family-response':
+      return {
+        ...common,
+        narrative: '서윤은 "점검표는 동의하지만 물 관리는 내가 맡을게"라고 수정 제안을 합니다. 민석은 이미 통신 목록을 따로 정리하기 시작했습니다.',
+        choices: [
+          choice(1, '수정 제안을 반영한다', action('test-accept-family-plan', '가족 수정 제안 반영', {
+            time_delta_min: 15, moves: [], resource_changes: [{ resource_id: 'communications', from: '불안정', to: '점검 중' }],
+            world_changes: [{ key: 'family_plan', from: 'requested', to: 'modified-and-accepted' }],
+          })),
+          choice(2, '혼자 우선순위를 정한다', action('test-solo-priority', '개인 우선순위 정리', {
+            time_delta_min: 10, moves: [], resource_changes: [], world_changes: [{ key: 'family_plan', from: 'requested', to: 'deferred' }],
+          })),
+        ],
+        presentation_blocks: [{ type: 'EVENT', message: '가족은 직접 조종 대상이 아니라, 테스트 규칙에 따라 독립적으로 수정 제안을 했습니다.' }],
+      }
+    case 'test-base-ready':
+      return {
+        ...common,
+        narrative: '테스트 거점의 점검표가 보이기 시작했습니다. 물 상태와 거점 능력의 변화가 공개 상태판에 반영됩니다.',
+        choices: [
+          choice(1, '통신 목록을 확인한다', action('test-check-comms', '통신 목록 확인', {
+            time_delta_min: 10, moves: [], resource_changes: [{ resource_id: 'communications', from: '불안정', to: '점검 중' }], world_changes: [],
+          })),
+          choice(2, '다음 점검으로 넘어간다', action('test-next-check', '다음 점검 진행', {
+            time_delta_min: 15, moves: [], resource_changes: [], world_changes: [{ key: 'next_check', from: undefined, to: 'ready' }],
+          })),
+        ],
+        presentation_blocks: [{ type: 'PHASE CHANGE', message: 'TEST SESSION · 거점 점검 단계' }],
+      }
+    case 'test-communications':
+      return communicationsLoopScene(state, sceneId)
+    default:
+      return {
+        ...common,
+        narrative: '테스트 세션의 첫 장면입니다. 제한된 공개 baseline만 사용하며, 실제 S02 상태나 사건을 나타내지 않습니다.',
+        choices: [
+          choice(1, '물 상태를 확인한다', action('test-check-water', '물 상태 확인', {
+            time_delta_min: 10, moves: [], resource_changes: [], world_changes: [{ key: 'water_check', from: undefined, to: 'complete' }],
+          }), '현재 확보한 물의 상태와 관리 여건부터 확인합니다. 가족의 다음 행동을 정하기 전에 기본 생존 자원을 먼저 파악하는 선택입니다.'),
+          choice(2, '가족에게 점검 계획을 제안한다', action('test-request-family-plan', '가족 점검 계획 요청', {
+            time_delta_min: 10, moves: [], resource_changes: [], world_changes: [{ key: 'family_plan', from: undefined, to: 'requested' }],
+          }), '서윤과 민석에게 지금 확인할 항목과 역할을 제안합니다. 가족의 판단과 수정 의견을 받아 이후 행동을 함께 정하려는 선택입니다.'),
+          choice(3, '통신 상태를 확인한다', action('test-initial-comms', '통신 상태 확인', {
+            time_delta_min: 10, moves: [], resource_changes: [{ resource_id: 'communications', from: '불안정', to: '점검 중' }], world_changes: [],
+          }), '휴대전화와 무전기 등 현재 사용할 수 있는 통신 수단을 점검합니다. 외부 정보와 가족 간 연락 가능성을 먼저 확인하려는 선택입니다.'),
+          choice(4, '주변 상황을 직접 살핀다', action('test-initial-area-review', '주변 상황 확인', {
+            time_delta_min: 10, moves: [], resource_changes: [], world_changes: [{ key: 'area_review', from: undefined, to: 'complete' }],
+          }), '관측소 주변에서 눈으로 확인할 수 있는 변화와 이동 여건을 살핍니다. 장비 정보만 믿지 않고 현장의 실제 상태를 파악하려는 선택입니다.'),
+        ],
+        presentation_blocks: [{ type: 'EVENT', message: 'WEB MVP TEST SESSION 시작 · NON-CANONICAL' }],
+      }
+  }
+}
+
+function nextSceneId(current: string, actionId: string): string {
+  if (current === 'test-arrival' && actionId === 'test-check-water') return 'test-water-check'
+  if (current === 'test-arrival' && actionId === 'test-request-family-plan') return 'test-family-response'
+  if (current === 'test-arrival') return 'test-communications'
+  if (current === 'test-water-check' && actionId === 'test-install-water-ledger') return 'test-base-ready'
+  if (current === 'test-water-check') return 'test-family-response'
+  if (current === 'test-family-response') return 'test-communications'
+  return 'test-communications'
+}
+
+function nextScene(current: string, actionId: string) {
+  return (state: LiveState, result: ActionExecutionResult) => {
+    if (result.outcome !== 'success' && result.outcome !== 'partial_success') return sceneFor(state, current)
+    const sceneId = nextSceneId(current, actionId)
+    return sceneFor({ ...state, scene_id: sceneId }, sceneId)
+  }
+}
+
+export function createWebMvpTestSession(): PublicRuntimeCheckpoint {
+  const state = createTestState()
+  return createPublicRuntimeCheckpoint({
+    payload_visibility: 'public', source_kind: 'synthetic-fixture', checkpoint_id: WEB_MVP_TEST_SESSION_CHECKPOINT_ID,
+    season_id: state.season_id, phase: state.clock.phase, active_visible_pressure: '정해진 점검 순서를 마치고 다음 변화를 찾아야 하는 테스트 압력',
+    recent_visible_change: '비정식 테스트 세션을 시작했습니다.', current_scene: sceneFor(state, state.scene_id),
+    committed_turn: { number: 0, log: [{ id: 0, kind: 'scene', text: 'TURN 0 · WEB MVP TEST SESSION 시작' }] }, public_state: state,
+  })
+}
+
+export function commitWebMvpChoice(checkpoint: PublicRuntimeCheckpoint, choiceId: number): PublicRuntimeCheckpoint {
+  const selected = checkpoint.current_scene.choices.find((item) => item.id === choiceId)
+  if (!selected) return keepPublicRuntimeSafeAfterFreeAction(checkpoint, `선택 ${choiceId}`)
+  const log: LogEntry = { id: 0, kind: 'choice', text: `선택 ${selected.id}. ${selected.label}` }
+  return commitPublicRuntimeAction(checkpoint, log, selected.action, nextScene(checkpoint.current_scene.id, selected.action.id))
+}
+
+export function submitWebMvpFreeAction(checkpoint: PublicRuntimeCheckpoint, text: string): PublicRuntimeCheckpoint {
+  const normalized = text.trim().replace(/\s+/g, ' ')
+  const supported = checkpoint.current_scene.choices.find((item) =>
+    (normalized === '물 상태를 확인한다' && item.action.id === 'test-check-water')
+    || (normalized === '통신 상태를 확인한다' && item.action.id === 'test-initial-comms'),
+  )
+  if (!supported) {
+    const safe = keepPublicRuntimeSafeAfterFreeAction(checkpoint, text)
+    return createPublicRuntimeCheckpoint({
+      ...safe,
+      current_scene: { ...safe.current_scene, narrative: 'AI GM 연결 전 테스트 세션에서는 이 자유행동을 해석할 수 없습니다. 상태를 바꾸지 않았습니다.' },
+      committed_turn: {
+        ...safe.committed_turn,
+        log: [...safe.committed_turn.log.slice(0, -1), { id: safe.committed_turn.log.length - 1, kind: 'system', text: 'AI GM 연결 전 테스트 세션에서는 이 자유행동을 해석할 수 없습니다.' }],
+      },
+    })
+  }
+  return commitPublicRuntimeAction(
+    checkpoint,
+    { id: 0, kind: 'free-action', text: `자유행동: ${text}` },
+    supported.action,
+    nextScene(checkpoint.current_scene.id, supported.action.id),
+  )
+}
+
+export function resetWebMvpTestSession(): PublicRuntimeCheckpoint {
+  return createWebMvpTestSession()
+}

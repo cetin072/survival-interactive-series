@@ -75,3 +75,17 @@ export function setResourceBand(state: LiveState, resourceId: string, band: stri
     },
   }
 }
+
+export function addBaseCapability(state: LiveState, baseId: string, capability: string): LiveState {
+  const base = state.bases[baseId]
+  if (!base) throw new RangeError(`Unknown base: ${baseId}`)
+  if (base.capabilities.includes(capability)) return state
+
+  return {
+    ...state,
+    bases: {
+      ...state.bases,
+      [baseId]: { ...base, capabilities: [...base.capabilities, capability] },
+    },
+  }
+}
