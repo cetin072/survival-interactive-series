@@ -65,6 +65,28 @@ function githubHeaders(token) {
   }
 }
 
+const allowedPreparedPath = (path, briefId) =>
+  path === `knowledge/content/briefs/${briefId}.json`
+  || path === 'archive/web/public/knowledge/index.html'
+  || path === 'archive/web/public/sitemap.xml'
+  || /^archive\/web\/public\/knowledge\/[a-z0-9]+(?:-[a-z0-9]+)*\/index\.html$/.test(path)
+
+async function preparedContinuation({ approvedHead, preparedHead, briefId, prBody, githubToken, fetchImpl }) {
+  if (!shaPattern.test(preparedHead ?? '') || preparedHead === approvedHead) return { ok: false }
+  if (!prBody?.includes('<!-- knowledge-worker-phase-v1:PUBLICATION_HANDOFF -->')) return { ok: false }
+  const compare = await jsonFetch(
+    `https://api.github.com/repos/${repo}/compare/${approvedHead}...${preparedHead}`,
+    { headers: githubHeaders(githubToken) },
+    fetchImpl,
+  )
+  const commits = Array.isArray(compare.commits) ? compare.commits : []
+  const files = Array.isArray(compare.files) ? compare.files.map((file) => file.filename) : []
+  const exactCommit = compare.status === 'ahead' && compare.ahead_by === 1 && compare.behind_by === 0 && commits.length === 1
+  const exactMessage = commits[0]?.commit?.message?.startsWith(`knowledge: prepare ${briefId} human-approved publication`)
+  const exactFiles = files.length >= 1 && files.every((path) => allowedPreparedPath(path, briefId))
+  return { ok: Boolean(exactCommit && exactMessage && exactFiles), files }
+}
+
 export function validateReviewIdentity(item) {
   if (!item || item.decision !== 'APPROVED') return { ok: false, reason: 'REVIEW_NOT_APPROVED' }
   if (!itemPattern.test(item.id ?? '')) return { ok: false, reason: 'REVIEW_ITEM_ID_INVALID' }
@@ -103,15 +125,59 @@ export async function inspectApprovedReview({ projectUrl, serviceRoleKey, github
     return { status: 'BLOCKED', reason: 'CURRENT_MAIN_INVALID', item_id: item.id, decided_at: item.decided_at }
   }
 
-  const checks = [
-    [pr.state === 'open', 'REVIEW_PR_NOT_OPEN'],
+  const baseChecks = [
     [pr.base?.ref === 'main', 'REVIEW_PR_BASE_NOT_MAIN'],
     [pr.head?.repo?.full_name === repo, 'REVIEW_PR_REPOSITORY_MISMATCH'],
-    [pr.head?.sha === identity.headSha, 'REVIEW_PR_HEAD_CHANGED'],
     [pr.head?.ref === identity.headRef, 'REVIEW_PR_REF_CHANGED'],
   ]
-  const failed = checks.find(([ok]) => !ok)
-  if (failed) return { status: 'BLOCKED', reason: failed[1], item_id: item.id, decided_at: item.decided_at }
+  const failedBase = baseChecks.find(([ok]) => !ok)
+  if (failedBase) return { status: 'BLOCKED', reason: failedBase[1], item_id: item.id, decided_at: item.decided_at }
+
+  if (pr.head?.sha !== identity.headSha) {
+    const continuation = await preparedContinuation({
+      approvedHead: identity.headSha,
+      preparedHead: pr.head?.sha,
+      briefId: identity.briefId,
+      prBody: pr.body,
+      githubToken,
+      fetchImpl,
+    })
+    if (!continuation.ok) {
+      return { status: 'BLOCKED', reason: 'REVIEW_PR_HEAD_CHANGED', item_id: item.id, decided_at: item.decided_at }
+    }
+    if (pr.state === 'closed' && pr.merged_at && shaPattern.test(pr.merge_commit_sha ?? '')) {
+      return {
+        status: 'RECOVER_CONSUMED',
+        item_id: item.id,
+        decided_at: item.decided_at,
+        brief_id: identity.briefId,
+        approved_head_sha: identity.headSha,
+        prepared_head_sha: pr.head.sha,
+        pr_number: identity.prNumber,
+        head_ref: identity.headRef,
+        merge_sha: pr.merge_commit_sha,
+        current_main: currentMain,
+      }
+    }
+    if (pr.state !== 'open') {
+      return { status: 'BLOCKED', reason: 'REVIEW_PR_NOT_OPEN', item_id: item.id, decided_at: item.decided_at }
+    }
+    return {
+      status: 'RESUME_PREPARED',
+      item_id: item.id,
+      decided_at: item.decided_at,
+      brief_id: identity.briefId,
+      approved_head_sha: identity.headSha,
+      prepared_head_sha: pr.head.sha,
+      pr_number: identity.prNumber,
+      head_ref: identity.headRef,
+      current_main: currentMain,
+    }
+  }
+
+  if (pr.state !== 'open') {
+    return { status: 'BLOCKED', reason: 'REVIEW_PR_NOT_OPEN', item_id: item.id, decided_at: item.decided_at }
+  }
 
   const compare = await jsonFetch(
     `https://api.github.com/repos/${repo}/compare/${currentMain}...${identity.headSha}`,
