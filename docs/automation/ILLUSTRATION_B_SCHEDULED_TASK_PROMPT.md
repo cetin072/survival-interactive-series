@@ -4,6 +4,7 @@
 
 ## 수행 순서
 
+0. 실행 시작 즉시 고유 `run_id`를 만들고 `illustration-worker-run-receipt-v1` 영수증을 Supabase `survival_ops.illustration_worker_runs`에 `STARTED`로 기록한다. 이후 각 단계가 끝날 때 같은 `run_id`를 갱신한다. 생성 시도별 `generation_status`, `review_status`, `rejection_codes`, `source_sha256`, `transferable_original`을 남기며, 실패 시 `blocker.code`와 `blocker.stage`를 반드시 기록한다. 최종 성공은 trusted handoff, Storage readback, registry, cleanup이 모두 `SUCCEEDED`일 때만 허용한다.
 1. 저장소의 archive/content/visuals/C03-AFTERFALL/VISUALS.json과 현재 B identity 파일을 확인한다. main의 최신 상태를 기준으로 하며, 사용자 변경을 덮어쓰지 않는다.
 2. 이미 identity, 비공개 보관 성공, registry READY 또는 공개 자산이 있는 point/generation은 다시 처리하지 않는다. READY 후보가 없으면 변경 없이 종료한다.
 3. 후보의 public visual brief를 `archive/scripts/lib/illustration-image-prompt.mjs`의 compiler로 처리하고 `illustration-image-prompt-v1` 결과를 확인한다. malformed brief 또는 운영 문맥 오염이면 fail closed 한다.
@@ -24,3 +25,4 @@
 - 비공개 원본을 공개 저장소·사이트·manifest에 넣지 않는다.
 - 백운과 장태훈처럼 별도 대상의 brief/Canon 사실을 섞지 않는다.
 - 기존 READY backlog를 묶음 처리하지 않는다.
+- 실행 영수증 없이 성공/실패를 주장하지 않는다.

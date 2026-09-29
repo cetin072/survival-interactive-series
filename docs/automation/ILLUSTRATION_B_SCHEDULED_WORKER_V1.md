@@ -6,6 +6,7 @@
 
 ## 흐름
 
+0. 실행 시작 즉시 `illustration-worker-run-receipt-v1` 영수증을 `survival_ops.illustration_worker_runs`에 `STARTED`로 기록합니다. 이후 후보 선택, prompt compiler, 생성 시도, 품질 검수, PNG 전달, identity PR, trusted handoff, Storage readback, registry, cleanup 상태를 같은 `run_id`로 갱신합니다. 실패해도 마지막 성공 지점과 정확한 blocker code/stage를 반드시 남깁니다.
 1. 작업자는 archive/content/visuals/C03-AFTERFALL/VISUALS.json에서 READY인 후보 하나를 고릅니다. 이미 처리 중이거나 공개된 point/generation은 다시 처리하지 않습니다.
 2. 고정된 AFTERFALL 브리프와 기존 자산의 시각 기준을 읽고 `illustration-image-prompt-v1`을 컴파일합니다. malformed brief나 운영 문맥 오염은 fail closed 합니다.
 3. 이미지 생성 provider에는 컴파일된 순수 prompt contract만 전달합니다. 최대 3회 생성하며, 조건을 통과한 원본 하나만 수용합니다. 금지 조건 위반 또는 브리프와의 불일치는 HOLD로 기록합니다.
@@ -18,7 +19,7 @@
 
 ## 경계와 신뢰
 
-- ChatGPT 예약 작업은 콘텐츠 선택·순수 이미지 프롬프트 컴파일·native 이미지 생성·품질 검수를 담당합니다. trusted handoff는 immutable request가 main에 반영되면 GitHub Actions가 자동 실행합니다.
+- ChatGPT 예약 작업은 콘텐츠 선택·순수 이미지 프롬프트 컴파일·native 이미지 생성·품질 검수와 실행 영수증 갱신을 담당합니다. trusted handoff는 immutable request가 main에 반영되면 GitHub Actions가 자동 실행합니다.
 - Supabase service-role 키는 GitHub Actions secret에만 남습니다. 작업 프롬프트, repo 파일, Draft Release asset, Codex 대화에 복사하거나 입력하지 않습니다.
 - 기존 encrypted signed-upload routine은 기본 handoff로 사용하지 않습니다.
 - Draft Release는 임시 비공개 handoff입니다. 검증 후 삭제가 확인되지 않으면 해당 작업은 완료로 표시하지 않습니다.
@@ -28,6 +29,7 @@
 
 | 단계 | 실행 방식 |
 |---|---|
+| 실행 영수증 STARTED/최종 상태 기록 | `survival_ops.illustration_worker_runs` + service-role-only receipt RPC |
 | 후보 상태·중복 확인, 브리프 읽기 | 예약 작업이 수행할 절차 |
 | 기본 이미지 생성 및 기계적 PNG 메타데이터 기록 | 예약 실행에서 native 생성까지 실증됨 |
 | 이미지 품질 수용 | 자동 Quality Gate; 애매한 주관적 품질만 HUMAN_REVIEW |
