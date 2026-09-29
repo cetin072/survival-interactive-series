@@ -72,6 +72,16 @@ jobs:
           npm run knowledge:test
           npm run knowledge:check
 
+      - name: Enqueue Automation C items that require human review
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node ../scripts/knowledge-review-sync.mjs \
+            --brief "${{ steps.target.outputs.brief }}" \
+            --base origin/main \
+            --head HEAD
+
       - name: Prepare publication in repository SHADOW/AUTO mode
         run: |
           node ../scripts/knowledge-publish-prepare.mjs             --brief "${{ steps.target.outputs.brief }}"             --base origin/main             --head HEAD

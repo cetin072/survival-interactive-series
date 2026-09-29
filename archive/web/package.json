@@ -13,9 +13,11 @@
     "knowledge:build": "node ../scripts/build-knowledge.mjs",
     "knowledge:check": "node ../scripts/build-knowledge.mjs --check && node ../scripts/knowledge-scan.mjs --check",
     "knowledge:test": "node --test ../scripts/lib/knowledge.test.mjs",
-    "knowledge:publish-prepare": "node ../scripts/knowledge-publish-prepare.mjs"
+    "knowledge:publish-prepare": "node ../scripts/knowledge-publish-prepare.mjs",
+    "knowledge:review-sync": "node ../scripts/knowledge-review-sync.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.117.1",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
