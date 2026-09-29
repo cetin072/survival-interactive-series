@@ -118,7 +118,6 @@
       "PACKAGE_READY",
       "PUBLICATION_HANDOFF"
     ],
-    "salvage_when_behind_commits": 12,
-    "max_recovery_attempts": 2
+    "salvage_when_behind_commits": 12
   }
 }
