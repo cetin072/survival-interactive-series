@@ -51,9 +51,10 @@ jobs:
           python3 ../scripts/test_illustration_storage_handoff.py
           python3 -m pip install --only-binary=:all: Pillow==12.3.0
           python3 ../scripts/test_draft_release_illustration_handoff.py
+          python3 ../scripts/test_staged_illustration_handoff.py
           python3 ../scripts/test_resolve_illustration_handoff_request.py
           node --check ../scripts/run-production-release.mjs
-          python3 -m py_compile ../scripts/original_storage_provider.py ../scripts/illustration_storage_handoff.py ../scripts/draft_release_illustration_handoff.py ../scripts/resolve_illustration_handoff_request.py ../scripts/execute_trusted_illustration_handoff.py
+          python3 -m py_compile ../scripts/original_storage_provider.py ../scripts/illustration_storage_handoff.py ../scripts/draft_release_illustration_handoff.py ../scripts/staged_illustration_handoff.py ../scripts/resolve_illustration_handoff_request.py ../scripts/execute_trusted_illustration_handoff.py
       - name: Verify deterministic S02 dry-run (no external services)
         run: |
           node ../scripts/dry-run-publication.mjs --demo-s02 --source-revision "$GITHUB_SHA" > "$RUNNER_TEMP/publication-first.json"
