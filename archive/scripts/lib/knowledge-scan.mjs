@@ -46,6 +46,8 @@ export function validateKnowledgeState(state) {
     assert(/^[a-f0-9]{64}$/.test(item.source_manifest_sha256) && stateStatuses.has(item.status), 'invalid state sha/status')
     assert(typeof item.processed_at === 'string' && !Number.isNaN(Date.parse(item.processed_at)), 'invalid state time')
     assert(Array.isArray(item.candidate_ids) && Array.isArray(item.brief_ids), 'invalid state result refs')
+    if (item.disposition_code !== undefined) assert(typeof item.disposition_code === 'string' && item.disposition_code.length > 0, 'invalid disposition code')
+    if (item.disposition_note !== undefined) assert(typeof item.disposition_note === 'string' && item.disposition_note.length > 0, 'invalid disposition note')
   }
 }
 
@@ -80,4 +82,42 @@ export async function bootstrapKnowledge(root, inventory, state, now) {
     await writeFile(join(root, 'knowledge/automation/state.json'), JSON.stringify(state, null, 2) + '\n')
   }
   return additions.length
+}
+
+
+export function recordKnowledgeDisposition(state, {
+  sourceManifestRef, sourceManifestSha256, status, processedAt,
+  candidateIds = [], briefIds = [], dispositionCode, dispositionNote,
+}) {
+  validateKnowledgeState(state)
+  assert(['PROCESSED', 'HOLD', 'HUMAN_REVIEW'].includes(status), 'invalid disposition status')
+  assert(typeof sourceManifestRef === 'string' && sourceManifestRef.startsWith('archive/content/transcripts/C03-AFTERFALL/'), 'invalid disposition ref')
+  assert(/^[a-f0-9]{64}$/.test(sourceManifestSha256 ?? ''), 'invalid disposition sha')
+  assert(typeof processedAt === 'string' && !Number.isNaN(Date.parse(processedAt)), 'invalid disposition time')
+  assert(Array.isArray(candidateIds) && Array.isArray(briefIds), 'invalid disposition refs')
+  if (status !== 'PROCESSED') {
+    assert(typeof dispositionCode === 'string' && dispositionCode.length > 0, 'disposition code required')
+    assert(typeof dispositionNote === 'string' && dispositionNote.length > 0, 'disposition note required')
+  }
+
+  const previousIndex = state.sources.findIndex((item) => item.source_manifest_ref === sourceManifestRef)
+  if (previousIndex >= 0) {
+    const previous = state.sources[previousIndex]
+    assert(previous.source_manifest_sha256 !== sourceManifestSha256
+      || ['HUMAN_REVIEW', 'HOLD'].includes(previous.status), 'refusing to overwrite settled source disposition')
+    state.sources.splice(previousIndex, 1)
+  }
+  state.sources.push({
+    source_manifest_ref: sourceManifestRef,
+    source_manifest_sha256: sourceManifestSha256,
+    status,
+    processed_at: processedAt,
+    candidate_ids: candidateIds,
+    brief_ids: briefIds,
+    ...(dispositionCode ? { disposition_code: dispositionCode } : {}),
+    ...(dispositionNote ? { disposition_note: dispositionNote } : {}),
+  })
+  state.sources.sort((a, b) => a.source_manifest_ref.localeCompare(b.source_manifest_ref))
+  validateKnowledgeState(state)
+  return state
 }
