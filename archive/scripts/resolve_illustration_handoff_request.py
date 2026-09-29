@@ -11,6 +11,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 REQUEST_VERSION = "illustration-handoff-request-v1"
+STAGED_REQUEST_VERSION = "illustration-staged-handoff-request-v1"
+STAGING_ID_RE = re.compile(r"[a-z0-9][a-z0-9._:-]{7,159}")
 IDENTITY_RE = re.compile(
     r"archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_[A-Z0-9_-]+\.json"
 )
@@ -40,6 +42,23 @@ def normalized(release_id, source_commit, identity_path):
     }
 
 
+def normalized_staged(staging_id, source_commit, identity_path):
+    demand(STAGING_ID_RE.fullmatch(staging_id or "") is not None,
+           "HANDOFF_REQUEST_STAGING_ID_INVALID")
+    demand(SHA_RE.fullmatch(source_commit or "") is not None,
+           "HANDOFF_REQUEST_SOURCE_COMMIT_INVALID")
+    demand(IDENTITY_RE.fullmatch(identity_path or "") is not None,
+           "HANDOFF_REQUEST_IDENTITY_PATH_INVALID")
+    path = (ROOT / identity_path).resolve()
+    demand(path.is_relative_to(ROOT) and path.is_file(),
+           "HANDOFF_REQUEST_IDENTITY_NOT_FOUND")
+    return {
+        "staging_id": staging_id,
+        "source_commit": source_commit,
+        "identity_path": identity_path,
+    }
+
+
 def from_request(path):
     request_path = Path(path).resolve()
     demand(request_path.is_relative_to(ROOT), "HANDOFF_REQUEST_PATH_INVALID")
@@ -50,17 +69,30 @@ def from_request(path):
     ) is not None, "HANDOFF_REQUEST_PATH_INVALID")
     demand(request_path.is_file(), "HANDOFF_REQUEST_NOT_FOUND")
     value = json.loads(request_path.read_text(encoding="utf-8"))
-    demand(isinstance(value, dict) and set(value) == {
-        "version", "release_id", "source_commit", "identity_path"
-    }, "HANDOFF_REQUEST_SHAPE_INVALID")
-    demand(value.get("version") == REQUEST_VERSION, "HANDOFF_REQUEST_VERSION_INVALID")
-    result = normalized(
-        value.get("release_id"),
-        value.get("source_commit"),
-        value.get("identity_path"),
-    )
+    demand(isinstance(value, dict), "HANDOFF_REQUEST_SHAPE_INVALID")
+    version = value.get("version")
+    if version == REQUEST_VERSION:
+        demand(set(value) == {
+            "version", "release_id", "source_commit", "identity_path"
+        }, "HANDOFF_REQUEST_SHAPE_INVALID")
+        result = normalized(
+            value.get("release_id"),
+            value.get("source_commit"),
+            value.get("identity_path"),
+        )
+    elif version == STAGED_REQUEST_VERSION:
+        demand(set(value) == {
+            "version", "staging_id", "source_commit", "identity_path"
+        }, "HANDOFF_REQUEST_SHAPE_INVALID")
+        result = normalized_staged(
+            value.get("staging_id"),
+            value.get("source_commit"),
+            value.get("identity_path"),
+        )
+    else:
+        raise ValueError("HANDOFF_REQUEST_VERSION_INVALID")
     result["request_path"] = relative
-    result["request_version"] = REQUEST_VERSION
+    result["request_version"] = version
     return result
 
 
