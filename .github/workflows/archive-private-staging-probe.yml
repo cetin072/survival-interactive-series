@@ -1,0 +1,28 @@
+name: Archive private staging access probe
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'archive/automation/private-staging-probes/*.json'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check private staging repository access
+        env:
+          ARCHIVE_GITHUB_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          code="$(curl -sS -o /dev/null -w '%{http_code}'             -H "Authorization: Bearer $ARCHIVE_GITHUB_TOKEN"             -H 'Accept: application/vnd.github+json'             -H 'X-GitHub-Api-Version: 2022-11-28'             https://api.github.com/repos/cetin072/ai-development-system/contents/README.md?ref=main)"
+          if [[ "$code" != "200" ]]; then
+            echo "PRIVATE_STAGING_ACCESS=FAIL HTTP=$code"
+            exit 1
+          fi
+          echo "PRIVATE_STAGING_ACCESS=PASS"
