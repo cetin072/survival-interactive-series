@@ -40,7 +40,9 @@ jobs:
       - name: Test offline publication planning
         run: node --test ../scripts/lib/publication-plan.test.mjs
       - name: Test illustration worker controls
-        run: node --test ../scripts/lib/illustration-worker.test.mjs
+        run: |
+          node --test ../scripts/lib/illustration-generation-provider.test.mjs
+          node --test ../scripts/lib/illustration-worker.test.mjs
       - name: Test original image storage provider boundary
         run: |
           python3 ../scripts/test_original_storage_provider.py
