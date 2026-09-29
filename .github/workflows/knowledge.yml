@@ -13,6 +13,7 @@ on:
       - '.github/workflows/knowledge-publish-prepare.yml'
       - '.github/workflows/knowledge-exact-head.yml'
       - '.github/workflows/knowledge-worker-state.yml'
+      - '.github/workflows/knowledge-worker-gate.yml'
       - 'docs/KNOWLEDGE_WORKER_*.md'
   push:
     branches: [main]
