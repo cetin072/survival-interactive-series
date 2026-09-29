@@ -3,7 +3,7 @@
   "chronicle_id": "C03-AFTERFALL",
   "worldline_id": "AFTERFALL",
   "visibility": "PUBLIC_ARCHIVE",
-  "visual_catalog_sha256": "73ee46c08d77f451da9804affa09e9a71f5283f46fd15ede19ed76f0faeed85e",
+  "visual_catalog_sha256": "f8bc74f53812b662adf9a4fa52d7cceab28b2da391dd0d20a20cf2cd23a0f60a",
   "assets": [
     {
       "point_id": "point-e33f848046b1245234e579828dadc03939faf10d609c15bff315b8c421be1a72",
@@ -69,7 +69,23 @@
       "width": 512,
       "height": 512,
       "mime_type": "image/png"
+    },
+    {
+      "point_id": "point-3beb3cc8ead3a017e195293baffdb851657fbe8def4e9552a597fb43ddecac26",
+      "generation_key": "generation-731831a3f5dbd4922a5d3e38a920f64a5d8976788987339aa8342768cf670fec",
+      "subject_id": "char-taehoon",
+      "source_sha256": "4512f65157aa85929ff3ba6d7157f6a5774a313fb4ea4972f611bf1342670cd7",
+      "storage_bucket": "survival-archive-originals",
+      "storage_object_path": "AFTERFALL/point-3beb3cc8ead3a017e195293baffdb851657fbe8def4e9552a597fb43ddecac26/generation-731831a3f5dbd4922a5d3e38a920f64a5d8976788987339aa8342768cf670fec/4512f65157aa85929ff3ba6d7157f6a5774a313fb4ea4972f611bf1342670cd7.png",
+      "registry_asset_id": "AF-CHAR-3BEB3CC8EAD3A017E195293B",
+      "derivative_version": "site-png-512-v1",
+      "public_path": "/visual-assets/f35470ce584756cd9c8a590af6167b06f35a5acdc5e5b6106f9ca8ddbe87b02c.png",
+      "sha256": "f35470ce584756cd9c8a590af6167b06f35a5acdc5e5b6106f9ca8ddbe87b02c",
+      "bytes": 190844,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png"
     }
   ],
-  "content_sha256": "46bd76a8a6ee663be33bb82da64f035e8d459762bc40517a95d8f68369286964"
+  "content_sha256": "a9b4cce12e6ecea654365e81a4248acd8dd4cc144038619876a990021594bf58"
 }
