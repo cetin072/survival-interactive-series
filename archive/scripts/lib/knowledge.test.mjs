@@ -827,3 +827,12 @@ test('open Worker PR with green checks syncs current main before publication han
   assert.equal(result.action, 'SYNC_CURRENT_MAIN_THEN_RECHECK')
   assert.equal(result.behind_by, 2)
 })
+
+
+test('GitHub Actions owns automatic publication handoff', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  assert.equal(policy.runtime.publication_handoff_owner, 'GITHUB_ACTIONS')
+  assert.equal(policy.runtime.automatic_publication_handoff, true)
+  assert.equal(policy.runtime.scheduled_ai_publication_handoff, false)
+  assert.equal(validateWorkerPolicy(policy), true)
+})
