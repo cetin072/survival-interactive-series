@@ -27,6 +27,33 @@ class DraftReleaseHandoffTests(unittest.TestCase):
                        "original_bytes": len(image), "original_width": 7, "original_height": 5}
         self.source_commit = "a" * 40
 
+    def test_target_point_stability_ignores_unrelated_catalog_changes(self):
+        source_catalog = {
+            "content_sha256": "old",
+            "points": [
+                {"point_id": "point-" + "b" * 64, "subject_id": "char-test", "brief": {"v": 1}},
+                {"point_id": "point-" + "c" * 64, "subject_id": "char-other", "brief": {"v": 1}},
+            ],
+        }
+        current_catalog = {
+            "content_sha256": "new",
+            "points": [
+                {"point_id": "point-" + "b" * 64, "subject_id": "char-test", "brief": {"v": 1}},
+                {"point_id": "point-" + "c" * 64, "subject_id": "char-other", "brief": {"v": 2}},
+            ],
+        }
+        point_id = "point-" + "b" * 64
+        source_point = next(item for item in source_catalog["points"] if item["point_id"] == point_id)
+        current_point = next(item for item in current_catalog["points"] if item["point_id"] == point_id)
+        self.assertEqual(source_point, current_point)
+        self.assertNotEqual(source_catalog["content_sha256"], current_catalog["content_sha256"])
+
+    def test_target_point_change_is_detectable(self):
+        point_id = "point-" + "b" * 64
+        source_point = {"point_id": point_id, "brief": {"v": 1}}
+        current_point = {"point_id": point_id, "brief": {"v": 2}}
+        self.assertNotEqual(source_point, current_point)
+
     def test_release_tag_and_asset_name_bind_identity_and_source_commit(self):
         self.assertEqual(
             handoff.expected_release_tag(self.record, self.source_commit),
