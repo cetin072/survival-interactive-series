@@ -1,6 +1,6 @@
 export const ILLUSTRATION_WORKER_RUN_RECEIPT_VERSION = 'illustration-worker-run-receipt-v1'
 
-const RUN_ID = /^[a-z0-9][a-z0-9._:-]{7,159}$/i
+const RUN_ID = /^[a-z0-9][a-z0-9._:+-]{7,159}$/i
 const MAIN_SHA = /^[a-f0-9]{40}$/
 const POINT_ID = /^point-[a-f0-9]{64}$/
 const GENERATION_KEY = /^generation-[a-f0-9]{64}$/
