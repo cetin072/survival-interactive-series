@@ -70,8 +70,13 @@ def validate_source(identity_path, source_commit, workflow_commit):
     demand(source_record == current_record, "IDENTITY_SOURCE_COMMIT_MISMATCH")
     source_catalog = json.loads(git_bytes("show", f"{source_commit}:{VISUALS_PATH}"))
     current_catalog = json.loads((ROOT / VISUALS_PATH).read_text(encoding="utf-8"))
-    demand(source_catalog.get("content_sha256") == current_catalog.get("content_sha256"),
-           "CATALOG_CHANGED_SINCE_SOURCE_COMMIT")
+    source_point = next((item for item in source_catalog.get("points", [])
+                         if item.get("point_id") == source_record.get("point_id")), None)
+    current_point = next((item for item in current_catalog.get("points", [])
+                          if item.get("point_id") == source_record.get("point_id")), None)
+    demand(source_point is not None and current_point is not None
+           and source_point == current_point,
+           "CATALOG_POINT_CHANGED_SINCE_SOURCE_COMMIT")
     record, catalog, point, object_path = handoff.identity(identity_path)
     demand(record == source_record, "IDENTITY_SOURCE_COMMIT_MISMATCH")
     demand(isinstance(record.get("subject_id"), str)
