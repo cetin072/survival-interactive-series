@@ -23,7 +23,8 @@ jobs:
   gate:
     if: >-
       startsWith(github.head_ref, 'knowledge/worker/') &&
-      !startsWith(github.head_ref, 'knowledge/worker/state-')
+      !startsWith(github.head_ref, 'knowledge/worker/state-') &&
+      contains(github.event.pull_request.body, 'knowledge-worker-phase-v1:PACKAGE_READY')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
