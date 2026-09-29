@@ -21,8 +21,10 @@ function runNode(...args) {
   })
 }
 
-export async function runProductionRelease() {
-  const decision = await prepare(['--apply'])
+export async function runProductionRelease(args = []) {
+  const prepareArgs = ['--apply']
+  if (args.includes('--force')) prepareArgs.push('--force')
+  const decision = await prepare(prepareArgs)
   process.stdout.write(`${JSON.stringify(decision, null, 2)}\\n`)
 
   if (decision.status !== 'RELEASE_PREPARED') {
@@ -61,7 +63,7 @@ export async function runProductionRelease() {
 
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
   try {
-    const result = await runProductionRelease()
+    const result = await runProductionRelease(process.argv.slice(2))
     process.stdout.write(`${JSON.stringify(result, null, 2)}\\n`)
   } catch (error) {
     process.stderr.write(`${JSON.stringify({ status: error.message ?? 'PRODUCTION_RELEASE_FAILED' })}\\n`)
