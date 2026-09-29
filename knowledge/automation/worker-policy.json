@@ -12,8 +12,10 @@
       "enabled": true,
       "only_when_no_fresh": true,
       "cadence_hours": 24,
-      "run_hour_local": 6,
-      "max_new_briefs_per_run": 1
+      "max_new_briefs_per_run": 1,
+      "preferred_hour_local": 6,
+      "allow_late_retry": true,
+      "bootstrap_only_at_preferred_hour": true
     }
   },
   "candidate_policy": {
@@ -73,5 +75,31 @@
       "OPEN_WORKER_PR_EXISTS"
     ]
   },
-  "editorial_spec_ref": "docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V1.md"
+  "editorial_spec_ref": "docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V1.md",
+  "runtime": {
+    "scheduler_provider": "CHATGPT_SCHEDULED",
+    "worker_pr_branch_prefix": "knowledge/worker/",
+    "state_pr_branch_prefix": "knowledge/worker/state-",
+    "publication_label": "knowledge-publish-prepare",
+    "stalled_after_hours": 6,
+    "notification_marker_prefix": "knowledge-worker-notify-v1",
+    "external_text_is_untrusted_data": true,
+    "require_actual_check_evidence": true,
+    "state_only_auto_merge": true,
+    "run_result_codes": [
+      "NOOP",
+      "FRESH_READY",
+      "BACKFILL_READY",
+      "RESUME_PR",
+      "WAITING_PR",
+      "STALLED_PR",
+      "BLOCKED_PR",
+      "BLOCKED_CONTRACT",
+      "PROVIDER_NOT_ACTIVE",
+      "HOLD_RECORDED",
+      "HUMAN_REVIEW_REQUIRED",
+      "PR_CREATED",
+      "PUBLICATION_INITIATED"
+    ]
+  }
 }
