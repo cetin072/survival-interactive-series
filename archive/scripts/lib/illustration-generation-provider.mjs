@@ -1,3 +1,5 @@
+import { validateIllustrationImagePrompt } from './illustration-image-prompt.mjs'
+
 export const GENERATION_PROVIDER_CONFIG_VERSION = 'illustration-generation-provider-v1'
 export const GENERATION_PROVIDER_IDS = ['native_chatgpt', 'api_openai', 'manual_import']
 export const GENERATION_RESULT_VERSION = 'illustration-generation-result-v1'
@@ -91,7 +93,13 @@ export function createGenerationProvider(provider) {
   if (!GENERATION_PROVIDER_IDS.includes(provider)) throw new Error('ILLUSTRATION_GENERATION_PROVIDER_UNSUPPORTED')
   return {
     name: provider,
-    async generateIllustration(request) {
+    async generateIllustration(imagePrompt, context = {}) {
+      validateIllustrationImagePrompt(imagePrompt)
+      if (!context || typeof context !== 'object' || Array.isArray(context)
+        || Object.keys(context).some((key) => key !== 'imported_result')) {
+        throw new Error('ILLUSTRATION_GENERATION_REQUEST_INVALID')
+      }
+      const request = imagePrompt
       if (provider === 'native_chatgpt') {
         return normalizedGenerationResult({
           provider,
@@ -116,7 +124,7 @@ export function createGenerationProvider(provider) {
           },
         })
       }
-      const imported = request.imported_result
+      const imported = context.imported_result
       if (!imported || typeof imported.original_ref !== 'string' || !Number.isInteger(imported.width)
         || !Number.isInteger(imported.height) || imported.mime_type !== 'image/png'
         || !/^[a-f0-9]{64}$/.test(imported.sha256 ?? '')) {

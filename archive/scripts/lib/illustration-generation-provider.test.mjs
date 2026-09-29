@@ -1,5 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { compileIllustrationImagePrompt } from './illustration-image-prompt.mjs'
 import {
   createGenerationProvider,
   normalizedGenerationResult,
@@ -38,6 +39,25 @@ const request = {
   generation_key: `generation-${'b'.repeat(64)}`,
   subject_id: 'char-test',
 }
+const imagePrompt = compileIllustrationImagePrompt({
+  ...request,
+  brief: {
+    version: 'visual-brief-v1',
+    point_type: 'CHARACTER',
+    subject: { label: 'Test subject', node_id: request.subject_id },
+    canon_facts: { appearance: { description: 'source fact' } },
+    art_direction: {
+      composition: 'single-subject master portrait; simple non-identifying background',
+      mood: 'QUIET_DECAY',
+      mood_rules: ['cool blue-gray'],
+      rendering: ['non-photorealistic painterly illustration'],
+      avoid: ['embedded typography'],
+      style_version: 'AFTERFALL_ARCHIVE_V1',
+      theme: 'Quiet survival.',
+    },
+    safeguards: ['Do not invent facts.'],
+  },
+})
 
 test('defaults to native ChatGPT with no fallback', () => {
   const valid = validateGenerationProviderConfig(structuredClone(config))
@@ -66,14 +86,15 @@ test('paid provider stays fail-closed until separately approved and enabled', ()
 })
 
 test('all providers return the same normalized generation result contract', async () => {
-  const native = await createGenerationProvider('native_chatgpt').generateIllustration(request)
+  const native = await createGenerationProvider('native_chatgpt').generateIllustration(imagePrompt)
   assert.equal(native.contract_version, 'illustration-generation-result-v1')
   assert.equal(native.provider, 'native_chatgpt')
   assert.equal(native.subject_id, 'char-test')
   assert.equal(native.status, 'STUBBED')
 
   const imported = await createGenerationProvider('manual_import').generateIllustration({
-    ...request,
+    ...imagePrompt,
+  }, {
     imported_result: {
       original_ref: 'private/original.png',
       width: 1024,
@@ -85,6 +106,27 @@ test('all providers return the same normalized generation result contract', asyn
   assert.equal(imported.contract_version, native.contract_version)
   assert.equal(imported.status, 'IMPORTED')
   assert.equal(imported.sha256, 'c'.repeat(64))
+})
+
+test('every provider consumes the same prompt contract without operational request fields', async () => {
+  const original = JSON.stringify(imagePrompt)
+  for (const providerId of ['native_chatgpt', 'api_openai', 'manual_import']) {
+    const provider = createGenerationProvider(providerId)
+    const context = providerId === 'manual_import'
+      ? { imported_result: { original_ref: 'private/original.png', width: 512, height: 512, mime_type: 'image/png', sha256: 'e'.repeat(64) } }
+      : {}
+    const result = await provider.generateIllustration(imagePrompt, context)
+    assert.equal(result.point_id, imagePrompt.point_id)
+    assert.equal(result.generation_key, imagePrompt.generation_key)
+    assert.equal(JSON.stringify(imagePrompt), original)
+  }
+  await assert.rejects(() => createGenerationProvider('native_chatgpt').generateIllustration({
+    ...imagePrompt,
+    execution_surface: 'CHATGPT_SCHEDULED_TASK',
+  }), /INVALID_ILLUSTRATION_IMAGE_PROMPT/)
+  await assert.rejects(() => createGenerationProvider('native_chatgpt').generateIllustration(imagePrompt, {
+    workflow: 'daily',
+  }), /ILLUSTRATION_GENERATION_REQUEST_INVALID/)
 })
 
 test('successful results require transferable PNG identity', () => {
