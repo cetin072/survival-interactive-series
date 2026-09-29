@@ -108,8 +108,13 @@ def selected_raw(page, part_id: str):
 
 def audit_book(page, base: str, chronicle: str, width: int):
     mobile = width < 700
-    chapters = BOOKS[chronicle]['chapters']
+    all_chapters = BOOKS[chronicle]['chapters']
     key = 'survival-diary-archive:story-progress:v1:' + chronicle
+    page.goto(query_url(base, view='story', chronicle=chronicle))
+    published_ids = set(page.locator('.book-toc [data-chapter-id]').evaluate_all(
+        '(items) => items.map((item) => item.getAttribute("data-chapter-id"))'))
+    chapters = [chapter for chapter in all_chapters if chapter['id'] in published_ids]
+    assert len(chapters) >= 4, f'Not enough publicly available Reader chapters for {chronicle}'
     page.evaluate('([key,id]) => localStorage.setItem(key,id)', [key, chapters[-1]['id']])
     page.goto(query_url(base, view='story', chronicle=chronicle, chapter=chapters[0]['id']))
     selected_book(page, chapters[0], chronicle)  # explicit link beats stored last chapter
