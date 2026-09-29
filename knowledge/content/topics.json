@@ -52,5 +52,15 @@
     "guide_id": null,
     "tools": [],
     "story_refs": []
+  },
+  {
+    "id": "community-continuity-roles",
+    "title": "공동체 운영 지속성과 역할 분담",
+    "brief_ids": [
+      "K-009"
+    ],
+    "guide_id": null,
+    "tools": [],
+    "story_refs": []
   }
 ]
