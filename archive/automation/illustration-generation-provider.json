@@ -1,0 +1,25 @@
+{
+  "version": "illustration-generation-provider-v1",
+  "active_provider": "native_chatgpt",
+  "fallback_provider": null,
+  "providers": {
+    "native_chatgpt": {
+      "enabled": true,
+      "execution_surface": "CHATGPT_SCHEDULED_TASK",
+      "paid": false,
+      "requires_explicit_paid_approval": false
+    },
+    "api_openai": {
+      "enabled": false,
+      "execution_surface": "EXTERNAL_API",
+      "paid": true,
+      "requires_explicit_paid_approval": true
+    },
+    "manual_import": {
+      "enabled": true,
+      "execution_surface": "MANUAL_IMPORT",
+      "paid": false,
+      "requires_explicit_paid_approval": false
+    }
+  }
+}
