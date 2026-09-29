@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { readFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { compileIllustrationRendererText, ILLUSTRATION_IMAGE_PROMPT_VERSION } from './lib/illustration-image-prompt.mjs'
@@ -99,7 +99,17 @@ export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   try {
-    process.stdout.write(JSON.stringify(await prepareRenderJob(), null, 2) + '\n')
+    const result = await prepareRenderJob()
+    const promptOutput = process.env.RENDER_PROMPT_OUTPUT
+    if (promptOutput) {
+      let promptText = ''
+      if (result.active_provider === 'native_chatgpt') {
+        const current = await rpc('archive_illustration_render_prompt', {})
+        if (typeof current === 'string') promptText = current.trim()
+      }
+      await writeFile(resolve(promptOutput), promptText ? `${promptText}\n` : '', 'utf8')
+    }
+    process.stdout.write(JSON.stringify(result, null, 2) + '\n')
   } catch (error) {
     process.stderr.write(JSON.stringify({
       status: 'ILLUSTRATION_PREP_FAILED',
