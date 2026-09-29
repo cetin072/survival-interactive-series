@@ -708,3 +708,10 @@ test('notification markers and RUN_RESULT contract are deterministic', async () 
   assert.equal(marker, notificationMarker(policy, { result: 'STALLED_PR', prNumber: 123, headSha: 'a'.repeat(40) }))
   assert.match(marker, /knowledge-worker-notify-v1:STALLED_PR:123:/)
 })
+
+
+test('publication handoff marker prefix is fixed for human-removal detection', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  assert.equal(policy.runtime.publication_marker_prefix, 'knowledge-worker-publication-v1')
+  assert.equal(validateWorkerPolicy(policy), true)
+})
