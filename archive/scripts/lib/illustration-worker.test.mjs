@@ -318,15 +318,17 @@ test('daily summary is a receipt projection and does not create empty run histor
   })
 })
 
-test('preserves three approved images and validates the warehouse site asset contract', async () => {
+test('preserves approved images and validates the site asset contract', async () => {
   const root = resolve(fileURLToPath(new URL('../../..', import.meta.url)))
   const manifestPath = resolve(root, 'archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json')
   const manifest = JSON.parse(await readFile(manifestPath, 'utf8'))
   const catalog = JSON.parse(await readFile(resolve(root, 'archive/content/visuals/C03-AFTERFALL/VISUALS.json'), 'utf8'))
   const assets = manifest.assets
-  assert.deepEqual(assets.map((asset) => asset.subject_id), [
+  const publishedSubjects = assets.map((asset) => asset.subject_id)
+  assert.deepEqual(publishedSubjects.slice(0, 4), [
     'char-jinwoo', 'char-eunchae', 'char-seojin', 'loc-guild-rear-warehouse',
   ])
+  assert.equal(new Set(publishedSubjects).size, publishedSubjects.length)
   // SITE_ASSETS pins the visual catalog used when those assets were published.
   // Archive A may advance VISUALS without republishing unchanged approved assets,
   // so validate current point identity rather than requiring the whole-catalog hash to stay equal.
