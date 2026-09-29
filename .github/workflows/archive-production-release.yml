@@ -1,6 +1,7 @@
 name: Batched Archive Production release
 
 on:
+  workflow_dispatch:
   schedule:
     # Check daily at 23:30 KST. The runner enforces the two-day Production interval.
     - cron: '30 14 * * *'
