@@ -1,0 +1,113 @@
+name: Validate Knowledge worker gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'knowledge/content/briefs/**'
+      - 'knowledge/content/candidates/**'
+      - 'knowledge/content/evidence/**'
+      - 'knowledge/content/topics.json'
+      - 'knowledge/content/stories.json'
+      - 'knowledge/automation/state.json'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: knowledge-worker-gate-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    if: >-
+      startsWith(github.head_ref, 'knowledge/worker/') &&
+      !startsWith(github.head_ref, 'knowledge/worker/state-')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: archive/web
+    steps:
+      - name: Checkout exact Worker PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: archive/web/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Fetch current main and require exact ancestry
+        working-directory: .
+        run: |
+          set -euo pipefail
+          git fetch origin main:refs/remotes/origin/main
+          test "$(git merge-base origin/main HEAD)" = "$(git rev-parse origin/main)" || {
+            echo "WORKER_BRANCH_NOT_BASED_ON_CURRENT_MAIN"
+            exit 1
+          }
+
+      - name: Resolve exact single BRIEF target
+        id: target
+        working-directory: .
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t ids < <(
+            git diff --name-only origin/main...HEAD |
+              sed -n 's#^knowledge/content/briefs/\(K-[0-9][0-9]*\)\.json$#\1#p' |
+              sort -u
+          )
+          test "${#ids[@]}" -eq 1 || {
+            printf 'WORKER_BRIEF_TARGET_COUNT=%s:%s\n' "${#ids[@]}" "${ids[*]-}"
+            exit 1
+          }
+          echo "brief=${ids[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Run exact-head Knowledge validation
+        run: |
+          npm run knowledge:test
+          npm run knowledge:check
+
+      - name: Run exact-head release checker
+        id: gate
+        working-directory: .
+        env:
+          BRIEF_ID: ${{ steps.target.outputs.brief }}
+        run: |
+          set -euo pipefail
+          node archive/scripts/knowledge-release-check.mjs             --brief "$BRIEF_ID"             --base origin/main             --head HEAD > "$RUNNER_TEMP/worker-release.json"
+          cat "$RUNNER_TEMP/worker-release.json"
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs'
+          const result = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/worker-release.json', 'utf8'))
+          if (result.decision !== 'AUTO_PUBLISH_ELIGIBLE') throw new Error(`WORKER_GATE_DECISION:${result.decision}`)
+          if (result.requires_human !== false) throw new Error('WORKER_GATE_HUMAN_REVIEW')
+          if (result.content_only?.allowed !== true) throw new Error('WORKER_GATE_CONTENT_BOUNDARY')
+          if (!Array.isArray(result.reasons) || result.reasons.length !== 0) throw new Error('WORKER_GATE_REASONS_NOT_EMPTY')
+          console.log('WORKER_GATE=AUTO_PUBLISH_ELIGIBLE')
+          NODE
+
+      - name: Record exact-head gate marker on PR
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          MARKER="<!-- knowledge-worker-gate-v1:$HEAD_SHA:AUTO_PUBLISH_ELIGIBLE -->"
+          if gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments?per_page=100" --paginate             --jq '.[].body' | grep -Fqx "$MARKER"; then
+            echo "Gate marker already exists."
+          else
+            gh pr comment "$PR_NUMBER" --body "$MARKER"
+          fi

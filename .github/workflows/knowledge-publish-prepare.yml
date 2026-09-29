@@ -17,6 +17,7 @@ jobs:
   prepare:
     if: >-
       github.event.label.name == 'knowledge-publish-prepare' &&
+      github.event.pull_request.draft == false &&
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     defaults:
