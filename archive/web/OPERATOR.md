@@ -18,3 +18,18 @@ A repository-owned scheduled consumer checks at most one approved item per run. 
 If main or the reviewed PR identity has moved, the approval fails closed instead of publishing stale content. Netlify Production remains controlled by the existing batched release gate.
 
 The Archive CSP permits browser connections only to the exact configured Supabase project origin for Operator Auth/RPC. It does not permit wildcard network origins.
+
+
+## Google sign-in
+
+The Operator login surface prefers Supabase Google OAuth. The browser redirects to Google's official sign-in flow; the Archive never receives or stores the user's Google password.
+
+The OAuth return target is the exact production Operator URL:
+
+`https://survival-diary-archive.netlify.app/operator/`
+
+Localhost development keeps its own `/operator/` callback. Deploy Preview Google sign-in intentionally returns to Production rather than requiring a broad Netlify wildcard redirect allowlist.
+
+Email/password sign-in remains available inside a collapsed fallback while Google OAuth is being verified in production. Google authentication does not grant Operator authority by itself: the existing `survival_archive.review` capability RPC checks still decide access.
+
+Supabase Auth automatically links a new OAuth identity to an existing user when the verified email matches, subject to Supabase's identity-linking rules. If no authorized profile is linked, login may succeed but Operator RPC access remains denied.
