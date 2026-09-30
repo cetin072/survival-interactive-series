@@ -22,7 +22,7 @@ The Archive CSP permits browser connections only to the exact configured Supabas
 
 ## GitHub sign-in
 
-The Operator login surface prefers Supabase GitHub OAuth. The browser redirects to Google's official sign-in flow; the Archive never receives or stores the user's GitHub password.
+The Operator login surface prefers Supabase GitHub OAuth. The browser redirects to GitHub's official sign-in flow; the Archive never receives or stores the user's GitHub password.
 
 The OAuth return target is the exact production Operator URL:
 
