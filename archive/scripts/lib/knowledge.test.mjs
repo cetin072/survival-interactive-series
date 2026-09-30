@@ -211,8 +211,10 @@ test('every changed brief is bound to the exact release targets and must pass in
   const data = await loadKnowledge(root)
   const k004 = data.briefs.find((brief) => brief.id === 'K-004')
   const k007 = { ...k004, id: 'K-997', slug: 'another-fixture-brief', title: 'A second verified test brief' }
+  const k004Candidate = data.candidates.find((candidate) => candidate.brief_id === 'K-004')
+  assert.ok(k004Candidate)
   const k007Evidence = { ...data.evidence.get('K-004'), brief_id: 'K-997', question: k007.title }
-  const k007Candidate = { ...data.candidates[0], id: 'KC-second-brief', brief_id: 'K-997', question: 'A second verified test question' }
+  const k007Candidate = { ...k004Candidate, id: 'KC-second-brief', brief_id: 'K-997', question: 'A second verified test question' }
   const evidence = new Map(data.evidence)
   evidence.set('K-997', k007Evidence)
   const bothBriefs = { ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK', auto_publish_enabled: true },
@@ -272,7 +274,9 @@ test('release gate fails closed for risk, conflicts, missing evidence, unknown d
   const unknownDomain = { ...data, briefs: data.briefs.map((brief) => brief.id === 'K-004' ? { ...brief, risk_domains: ['UNKNOWN_DOMAIN'] } : brief) }
   assert.equal((await release(unknownDomain)).decision, 'HUMAN_REVIEW_REQUIRED')
 
-  const duplicate = { ...data, candidates: [...data.candidates, { ...data.candidates[0], id: 'KC-duplicate', question: data.candidates[0].question }] }
+  const k004Candidate = data.candidates.find((candidate) => candidate.brief_id === 'K-004')
+  assert.ok(k004Candidate)
+  const duplicate = { ...data, candidates: [...data.candidates, { ...k004Candidate, id: 'KC-duplicate', question: k004Candidate.question }] }
   assert.equal((await release(duplicate)).decision, 'HUMAN_REVIEW_REQUIRED')
 })
 
@@ -321,8 +325,10 @@ test('release gate fails closed on high risk, publication policy, QA, missing ev
 
 test('out-of-target Evidence, Candidate, and generated pages are rejected', async () => {
   const data = await loadKnowledge(root)
+  const k004Candidate = data.candidates.find((candidate) => candidate.brief_id === 'K-004')
+  assert.ok(k004Candidate)
   const briefs = [...data.briefs, { ...data.briefs.find((brief) => brief.id === 'K-004'), id: 'K-997', slug: 'another-fixture-brief' }]
-  const candidates = [...data.candidates, { ...data.candidates[0], id: 'KC-another-brief', brief_id: 'K-997' }]
+  const candidates = [...data.candidates, { ...k004Candidate, id: 'KC-another-brief', brief_id: 'K-997' }]
   const files = ['knowledge/content/briefs/K-004.json']
   const release = (extraFile) => checkRelease({ ...data, briefs, candidates }, { changedFiles: [...files, extraFile], briefIds: ['K-004'] })
   assert.ok((await release('knowledge/content/evidence/K-997.json')).reasons.includes('EVIDENCE_OUTSIDE_RELEASE_TARGETS:K-997'))
@@ -364,7 +370,8 @@ test('source manifest bytes are pinned and unavailable or invalid sources requir
 
 test('candidate absence, bad status, missing disposition, link errors, and normalized duplicates never pass', async () => {
   const data = await loadKnowledge(root)
-  const candidate = data.candidates[0]
+  const candidate = data.candidates.find((item) => item.brief_id === 'K-004')
+  assert.ok(candidate)
   const release = (candidates) => checkRelease({ ...data, candidates }, {
     changedFiles: ['knowledge/content/briefs/K-004.json'], briefIds: ['K-004'],
   })
