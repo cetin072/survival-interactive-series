@@ -225,6 +225,25 @@ def audit_extra(page, base: str, width: int):
     report('Explorer search / empty result recovery / filter / Story-to-Wiki route', width=width)
 
 
+def audit_operator_google_oauth(browser, base: str):
+    context = browser.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
+    page = context.new_page()
+    page.goto(base.rstrip('/') + '/operator/')
+    expect(page.get_by_role('button', name='Google로 로그인')).to_be_visible()
+    expect(page.locator('.operator-login-fallback summary')).to_contain_text('기존 이메일')
+
+    authorize_prefix = 'https://jgsxpdflgkqroecfjzxq.supabase.co/auth/v1/authorize'
+    with page.expect_response(lambda response: response.url.startswith(authorize_prefix), timeout=15000) as response_info:
+        tap(page.get_by_role('button', name='Google로 로그인'), True)
+    response = response_info.value
+    assert 300 <= response.status < 400, f'Google OAuth provider did not redirect: {response.status} {response.url}'
+    params = parse_qs(urlparse(response.url).query)
+    assert params.get('provider') == ['google'], f'Unexpected OAuth provider: {params}'
+    assert params.get('redirect_to') == ['https://survival-diary-archive.netlify.app/operator/'], f'Unexpected OAuth redirect: {params}'
+    report('Operator Google OAuth provider redirect', status=response.status, redirect_to=params['redirect_to'][0])
+    context.close()
+
+
 def probe_original(browser, url: str):
     context = browser.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
     page = context.new_page()
@@ -280,6 +299,8 @@ def main():
                 assert not failures, f'HTTP failures: {failures}'
                 report('no runtime exceptions or same-site HTTP errors', width=width)
                 context.close()
+            if args.url and 'netlify.app' in urlparse(base).hostname:
+                audit_operator_google_oauth(browser, base)
             blocked = browser.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
             blocked.add_init_script("Object.defineProperty(window, 'localStorage', { get() { throw new DOMException('blocked', 'SecurityError'); } });")
             page = blocked.new_page()
