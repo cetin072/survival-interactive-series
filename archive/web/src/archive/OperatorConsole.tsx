@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { chronicleRegistry } from './chronicleRegistry'
 import { supabaseClient } from './supabaseClient'
+import { googleOAuthErrorMessage, oauthRedirectError, operatorOAuthRedirectUrl } from './operatorAuth'
 
 type ReviewItem = {
   id: string; source_worker: string; item_type: string; chronicle_id: string | null
@@ -48,6 +49,11 @@ export default function OperatorConsole() {
   }, [])
 
   useEffect(() => {
+    const redirectError = oauthRedirectError(window.location)
+    if (redirectError) {
+      setError(redirectError)
+      window.history.replaceState({}, '', '/operator/')
+    }
     if (!supabaseClient) { setReady(true); return }
     let alive = true
     // Restore cached session state without blocking the console on an auth-network round trip.
@@ -67,6 +73,19 @@ export default function OperatorConsole() {
   }, [refresh])
 
   useEffect(() => { if (user) void refresh() }, [user, refresh])
+
+  async function signInWithGoogle() {
+    if (!supabaseClient) return
+    setBusy(true); setError('')
+    const { error: authError } = await supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: operatorOAuthRedirectUrl(window.location.origin) },
+    })
+    if (authError) {
+      setError(googleOAuthErrorMessage(authError.message))
+      setBusy(false)
+    }
+  }
 
   async function signIn(event: FormEvent) {
     event.preventDefault()
@@ -99,9 +118,11 @@ export default function OperatorConsole() {
 
   if (!supabaseClient) return <section className="operator-page"><p className="archive-eyebrow">OPERATOR</p><h1>운영자 설정 필요</h1><p>VITE_SUPABASE_URL과 VITE_SUPABASE_PUBLISHABLE_KEY를 설정하면 기존 Supabase Auth로 로그인할 수 있습니다.</p></section>
   if (!ready) return <section className="operator-page" aria-live="polite">인증 상태를 확인하는 중…</section>
-  if (!user) return <section className="operator-page operator-login"><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>운영자 로그인</h1><p>활성 운영 계정으로 로그인하세요. 계정 등록은 이 화면에서 제공하지 않습니다.</p>
+  if (!user) return <section className="operator-page operator-login"><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>운영자 로그인</h1><p>Google 계정으로 로그인한 뒤에도 서버가 실제 운영자 권한을 다시 확인합니다.</p>
     {error && <p className="operator-error" role="alert">{error}</p>}
-    <form onSubmit={signIn}><label>이메일<input type="email" autoComplete="username" required value={email} onChange={(event) => setEmail(event.target.value)} /></label><label>비밀번호<input type="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} /></label><button disabled={busy}>{busy ? '확인 중…' : '로그인'}</button></form>
+    <button className="operator-google-login" disabled={busy} onClick={() => void signInWithGoogle()}><span aria-hidden="true">G</span>{busy ? 'Google 로그인 연결 중…' : 'Google로 로그인'}</button>
+    <p className="operator-login-help">Google 비밀번호는 이 사이트에 입력하지 않습니다. Google 공식 로그인 화면에서만 인증합니다.</p>
+    <details className="operator-login-fallback"><summary>기존 이메일 운영자 로그인 사용</summary><form onSubmit={signIn}><label>이메일<input type="email" autoComplete="username" required value={email} onChange={(event) => setEmail(event.target.value)} /></label><label>비밀번호<input type="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} /></label><button disabled={busy}>{busy ? '확인 중…' : '이메일로 로그인'}</button></form></details>
   </section>
 
   return <section className="operator-page"><header className="operator-heading"><div><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>Review Inbox</h1><p>{user.email} · 데이터 변경은 권한 검사를 거치는 서버 RPC로 처리됩니다.</p></div><button className="operator-secondary" disabled={busy} onClick={() => void signOut()}>로그아웃</button></header>
