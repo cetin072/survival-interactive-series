@@ -9,15 +9,15 @@ export function operatorOAuthRedirectUrl(origin?: string) {
   return OPERATOR_PRODUCTION_URL
 }
 
-export function googleOAuthErrorMessage(message?: string | null) {
-  if (!message) return 'Google 로그인에 실패했습니다. 잠시 후 다시 시도하거나 기존 운영자 로그인을 사용하세요.'
+export function githubOAuthErrorMessage(message?: string | null) {
+  if (!message) return 'GitHub 로그인에 실패했습니다. 잠시 후 다시 시도하거나 기존 운영자 로그인을 사용하세요.'
   if (/provider.*not.*enabled|unsupported provider/i.test(message)) {
-    return 'Google 로그인이 아직 Supabase Auth에 활성화되지 않았습니다. 기존 운영자 로그인으로 들어가거나 Google provider 설정을 확인하세요.'
+    return 'GitHub 로그인이 아직 Supabase Auth에 활성화되지 않았습니다. 기존 운영자 로그인으로 들어가거나 GitHub provider 설정을 확인하세요.'
   }
   if (/redirect/i.test(message)) {
-    return 'Google 로그인 반환 주소가 허용되지 않았습니다. Supabase Auth Redirect URL 설정을 확인하세요.'
+    return 'GitHub 로그인 반환 주소가 허용되지 않았습니다. Supabase Auth Redirect URL 설정을 확인하세요.'
   }
-  return 'Google 로그인에 실패했습니다. 잠시 후 다시 시도하거나 기존 운영자 로그인을 사용하세요.'
+  return 'GitHub 로그인에 실패했습니다. 잠시 후 다시 시도하거나 기존 운영자 로그인을 사용하세요.'
 }
 
 export function oauthRedirectError(location: Pick<Location, 'hash' | 'search'>) {
@@ -25,7 +25,7 @@ export function oauthRedirectError(location: Pick<Location, 'hash' | 'search'>) 
   for (const source of sources) {
     const params = new URLSearchParams(source)
     const error = params.get('error_description') ?? params.get('error')
-    if (error) return googleOAuthErrorMessage(error)
+    if (error) return githubOAuthErrorMessage(error)
   }
   return null
 }
