@@ -2,6 +2,7 @@
 import importlib.util
 import pathlib
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 PATH = ROOT / "archive/scripts/finalize-illustration-job.py"
@@ -56,6 +57,40 @@ class FinalizerIdentityTests(unittest.TestCase):
         job["provider_asset_id"] = None
         with self.assertRaisesRegex(ValueError, "FINALIZER_IDENTITY_JOB_INCOMPLETE"):
             MODULE.identity_payload(job)
+
+    def test_finalizer_heartbeat_renews_current_job_lease(self):
+        MODULE.CURRENT_JOB = {"job_id": "illustration-test-0001"}
+        MODULE.LEASE_TOKEN = "00000000-0000-0000-0000-000000000001"
+        with mock.patch.object(MODULE, "rpc", return_value={"status": "LEASE_RENEWED"}) as rpc:
+            MODULE.heartbeat()
+        rpc.assert_called_once_with("archive_illustration_render_job_lease_heartbeat", {
+            "p_job_id": "illustration-test-0001",
+            "p_lease_token": MODULE.LEASE_TOKEN,
+            "p_lease_seconds": 7200,
+        })
+
+    def test_heartbeat_loss_kills_wait_and_prevents_later_side_effects(self):
+        class Process:
+            def __init__(self):
+                self.returncode = None
+                self.killed = False
+            def poll(self): return self.returncode
+            def kill(self): self.killed = True; self.returncode = -9
+            def wait(self): return self.returncode
+
+        process = Process()
+        MODULE.CURRENT_JOB = {"job_id": "illustration-test-0001"}
+        MODULE.LEASE_TOKEN = "00000000-0000-0000-0000-000000000001"
+        MODULE.LEASE_LOST = False
+        heartbeat = mock.Mock(side_effect=[None, ValueError("lease expired")])
+        with mock.patch.object(MODULE, "heartbeat", heartbeat), \
+             mock.patch.object(MODULE.subprocess, "Popen", return_value=process), \
+             mock.patch.object(MODULE, "HEARTBEAT_INTERVAL_SECONDS", 0), \
+             mock.patch.object(MODULE, "run") as later_side_effect:
+            with self.assertRaisesRegex(ValueError, "FINALIZER_LEASE_LOST"):
+                MODULE.run_with_heartbeat(["gh", "run", "watch", "123"], capture=False)
+            later_side_effect.assert_not_called()
+        self.assertTrue(process.killed)
 
 
 if __name__ == "__main__":
