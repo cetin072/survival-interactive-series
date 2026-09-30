@@ -312,10 +312,12 @@ def wait_derivative_pr(branch):
 
 
 CURRENT_JOB = None
+LEASE_TOKEN = None
 
 
 def finalize(job_id):
-    global CURRENT_JOB
+    global CURRENT_JOB, LEASE_TOKEN
+    LEASE_TOKEN = None
     if not SAFE_JOB.fullmatch(job_id):
         fail("FINALIZER_JOB_ID_INVALID")
 
@@ -332,8 +334,19 @@ def finalize(job_id):
         if not job.get(key):
             fail("FINALIZER_JOB_BINDING_INCOMPLETE")
 
+    lease = rpc("archive_illustration_render_job_lease_acquire", {
+        "p_job_id": job_id,
+        "p_owner": f"gha-{os.environ.get('GITHUB_RUN_ID', job_id)}-{os.environ.get('GITHUB_RUN_ATTEMPT', '1')}",
+        "p_lease_seconds": 7200,
+    })
+    if not isinstance(lease, dict) or lease.get("status") != "LEASE_ACQUIRED":
+        fail("FINALIZER_LEASE_NOT_ACQUIRED")
+    LEASE_TOKEN = lease.get("lease_token")
+    if not isinstance(LEASE_TOKEN, str) or not re.fullmatch(r"[0-9a-f-]{36}", LEASE_TOKEN):
+        fail("FINALIZER_LEASE_TOKEN_INVALID")
+
     rpc("archive_illustration_render_job_finish", {
-        "p_job_id": job_id, "p_status": "FINALIZING", "p_summary": {},
+        "p_job_id": job_id, "p_status": "FINALIZING", "p_summary": {"lease_token": LEASE_TOKEN},
     })
 
     identity_path, source_commit = ensure_identity(job)
@@ -406,7 +419,7 @@ def finalize(job_id):
     rpc("archive_illustration_render_job_finish", {
         "p_job_id": job_id,
         "p_status": "SUCCEEDED",
-        "p_summary": {},
+        "p_summary": {"lease_token": LEASE_TOKEN},
     })
     return {
         "status": "AUTOMATION_B_FINALIZED",
@@ -442,11 +455,12 @@ if __name__ == "__main__":
         code = str(error).split(":", 1)[0] if isinstance(error, ValueError) else "FINALIZER_UNEXPECTED_ERROR"
         if job_id and SAFE_JOB.fullmatch(job_id):
             try:
-                rpc("archive_illustration_render_job_finish", {
-                    "p_job_id": job_id,
-                    "p_status": "BLOCKED",
-                    "p_summary": {"blocker_code": code, "blocker_stage": "PROGRAM_FINALIZER"},
-                })
+                if LEASE_TOKEN:
+                    rpc("archive_illustration_render_job_finish", {
+                        "p_job_id": job_id,
+                        "p_status": "BLOCKED",
+                        "p_summary": {"blocker_code": code, "blocker_stage": "PROGRAM_FINALIZER", "lease_token": LEASE_TOKEN},
+                    })
             except Exception:
                 pass
         print(json.dumps({"status": "AUTOMATION_B_FINALIZER_BLOCKED", "code": code}))
