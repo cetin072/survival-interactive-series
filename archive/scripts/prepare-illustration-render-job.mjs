@@ -8,6 +8,8 @@ import { readJson, selectIllustrationCandidates } from './lib/illustration-worke
 const root = resolve(fileURLToPath(new URL('../..', import.meta.url)))
 const visualPath = resolve(root, 'archive/content/visuals/C03-AFTERFALL/VISUALS.json')
 const assetsPath = resolve(root, 'archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json')
+const manualAssetsPath = resolve(root, 'archive/content/visuals/C03-AFTERFALL/MANUAL_SITE_ASSETS.json')
+const visualProfilesPath = resolve(root, 'archive/content/public-facts/C03-AFTERFALL/S03/RECORD_VISUAL_PROFILES_20260930.json')
 const receiptsPath = resolve(root, 'archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_RECEIPTS.json')
 const providerPath = resolve(root, 'archive/automation/illustration-generation-provider.json')
 const sha256 = (value) => createHash('sha256').update(value).digest('hex')
@@ -41,9 +43,18 @@ async function rpc(name, body) {
 
 export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}) {
   demand(/^[a-f0-9]{40}$/.test(mainSha ?? ''), 'ILLUSTRATION_PREP_MAIN_SHA_INVALID')
-  const [catalog, siteAssets, receipts, providerConfig] = await Promise.all([
-    readJson(visualPath), readJson(assetsPath), readJson(receiptsPath), readJson(providerPath),
+  const [catalog, siteAssets, manualAssets, visualProfiles, receipts, providerConfig] = await Promise.all([
+    readJson(visualPath), readJson(assetsPath), readJson(manualAssetsPath), readJson(visualProfilesPath),
+    readJson(receiptsPath), readJson(providerPath),
   ])
+  demand(manualAssets?.version === 'archive-manual-site-assets-v1' && Array.isArray(manualAssets.assets),
+    'ILLUSTRATION_PREP_MANUAL_ASSETS_INVALID')
+  demand(visualProfiles?.version === 'record-visual-profile-v1' && Array.isArray(visualProfiles.records),
+    'ILLUSTRATION_PREP_VISUAL_PROFILES_INVALID')
+  const profileByNode = new Map(visualProfiles.records.map((record) => [record.node_id, record]))
+  demand(profileByNode.size === visualProfiles.records.length,
+    'ILLUSTRATION_PREP_VISUAL_PROFILE_DUPLICATE')
+  const effectiveSiteAssets = { ...siteAssets, assets: [...manualAssets.assets, ...siteAssets.assets] }
 
   const activeProvider = providerConfig.active_provider
   const provider = providerConfig.providers?.[activeProvider]
@@ -58,7 +69,7 @@ export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}
   }
 
   const plan = selectIllustrationCandidates({
-    catalog, siteAssets, receipts, batchLimit: 3,
+    catalog, siteAssets: effectiveSiteAssets, receipts, batchLimit: 3,
   })
   if (!plan.candidates.length) {
     return { status: 'NO_CANDIDATE', active_provider: activeProvider }
@@ -67,7 +78,8 @@ export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}
   for (const candidate of plan.candidates) {
     const point = catalog.points.find((item) => item.point_id === candidate.point_id)
     demand(point, 'ILLUSTRATION_PREP_POINT_NOT_FOUND')
-    const promptText = compileIllustrationRendererText(point)
+    const profile = profileByNode.get(candidate.subject_id) ?? null
+    const promptText = compileIllustrationRendererText(point, profile)
     const promptSha256 = sha256(promptText)
     const safeSubject = candidate.subject_id.replace(/[^a-z0-9-]/g, '-')
     const generationSuffix = candidate.generation_key.slice('generation-'.length, 'generation-'.length + 12)
