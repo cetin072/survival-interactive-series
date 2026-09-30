@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { chronicleRegistry } from './chronicleRegistry'
 import { supabaseClient } from './supabaseClient'
+import { operatorPasswordRedirectUrl, validatePasswordChange } from './operatorPassword'
 
 type ReviewItem = {
   id: string; source_worker: string; item_type: string; chronicle_id: string | null
@@ -23,6 +24,10 @@ export default function OperatorConsole() {
   const [ready, setReady] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [recoveryMode, setRecoveryMode] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [inbox, setInbox] = useState<Inbox>(emptyInbox)
   const [selected, setSelected] = useState<ReviewDetail | null>(null)
   const [note, setNote] = useState('')
@@ -58,7 +63,8 @@ export default function OperatorConsole() {
         setUser(data.session?.user ?? null); setReady(true)
       }
     }).catch(() => { if (alive) setReady(true) })
-    const { data: listener } = supabaseClient.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') setRecoveryMode(true)
       setUser(session?.user ?? null)
       if (session?.user) queueMicrotask(() => void refresh())
       else { setInbox(emptyInbox); setSelected(null) }
@@ -76,6 +82,33 @@ export default function OperatorConsole() {
     setPassword('')
     if (authError) setError('로그인할 수 없습니다. 계정과 비밀번호를 확인하세요.')
     else setUser(data.user)
+    setBusy(false)
+  }
+
+  async function requestPasswordReset() {
+    if (!supabaseClient) return
+    const target = email.trim()
+    if (!target) { setError('비밀번호 재설정 메일을 받을 이메일을 먼저 입력하세요.'); return }
+    setBusy(true); setError(''); setResetSent(false)
+    const { error: resetError } = await supabaseClient.auth.resetPasswordForEmail(target, {
+      redirectTo: operatorPasswordRedirectUrl(window.location.origin),
+    })
+    if (resetError) setError('비밀번호 재설정 메일을 보내지 못했습니다. 이메일을 확인하고 다시 시도하세요.')
+    else setResetSent(true)
+    setBusy(false)
+  }
+
+  async function finishPasswordRecovery(event: FormEvent) {
+    event.preventDefault()
+    if (!supabaseClient) return
+    const validation = validatePasswordChange('', newPassword, confirmPassword, true)
+    if (validation) { setError(validation); return }
+    setBusy(true); setError('')
+    const { error: updateError } = await supabaseClient.auth.updateUser({ password: newPassword })
+    if (updateError) setError('새 비밀번호를 저장하지 못했습니다. 다시 시도하세요.')
+    else {
+      setNewPassword(''); setConfirmPassword(''); setRecoveryMode(false)
+    }
     setBusy(false)
   }
 
@@ -99,9 +132,16 @@ export default function OperatorConsole() {
 
   if (!supabaseClient) return <section className="operator-page"><p className="archive-eyebrow">OPERATOR</p><h1>운영자 설정 필요</h1><p>VITE_SUPABASE_URL과 VITE_SUPABASE_PUBLISHABLE_KEY를 설정하면 기존 Supabase Auth로 로그인할 수 있습니다.</p></section>
   if (!ready) return <section className="operator-page" aria-live="polite">인증 상태를 확인하는 중…</section>
-  if (!user) return <section className="operator-page operator-login"><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>운영자 로그인</h1><p>활성 운영 계정으로 로그인하세요. 계정 등록은 이 화면에서 제공하지 않습니다.</p>
+  if (recoveryMode) return <section className="operator-page operator-login"><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>새 비밀번호 설정</h1><p>재설정 링크 인증이 완료되었습니다. 새 비밀번호를 직접 설정하세요.</p>
     {error && <p className="operator-error" role="alert">{error}</p>}
+    <form onSubmit={finishPasswordRecovery}><label>새 비밀번호<input type="password" minLength={10} autoComplete="new-password" required value={newPassword} onChange={(event) => setNewPassword(event.target.value)} /></label><label>새 비밀번호 확인<input type="password" minLength={10} autoComplete="new-password" required value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} /></label><button disabled={busy}>{busy ? '저장 중…' : '새 비밀번호 저장'}</button></form>
+  </section>
+
+  if (!user) return <section className="operator-page operator-login"><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>운영자 로그인</h1><p>활성 운영 계정의 이메일과 비밀번호로 로그인하세요.</p>
+    {error && <p className="operator-error" role="alert">{error}</p>}
+    {resetSent && <p className="operator-success" role="status">비밀번호 재설정 메일을 요청했습니다. 메일의 링크를 열어 새 비밀번호를 설정하세요.</p>}
     <form onSubmit={signIn}><label>이메일<input type="email" autoComplete="username" required value={email} onChange={(event) => setEmail(event.target.value)} /></label><label>비밀번호<input type="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} /></label><button disabled={busy}>{busy ? '확인 중…' : '로그인'}</button></form>
+    <button type="button" className="operator-reset-link" disabled={busy} onClick={() => void requestPasswordReset()}>비밀번호를 모르겠어요 · 재설정 메일 받기</button>
   </section>
 
   return <section className="operator-page"><header className="operator-heading"><div><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>Review Inbox</h1><p>{user.email} · 데이터 변경은 권한 검사를 거치는 서버 RPC로 처리됩니다.</p></div><button className="operator-secondary" disabled={busy} onClick={() => void signOut()}>로그아웃</button></header>
