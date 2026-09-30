@@ -81,7 +81,9 @@ jobs:
           node ../scripts/knowledge-review-sync.mjs \
             --brief "${{ steps.target.outputs.brief }}" \
             --base origin/main \
-            --head HEAD
+            --head HEAD \
+            --pr-number "${{ github.event.pull_request.number }}" \
+            --pr-head-ref "${{ github.event.pull_request.head.ref }}"
 
       - name: Prepare publication in repository SHADOW/AUTO mode
         run: |

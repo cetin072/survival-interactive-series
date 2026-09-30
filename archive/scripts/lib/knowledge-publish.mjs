@@ -30,3 +30,28 @@ export function promoteBriefRecord(brief, today) {
     updated_at: brief.updated_at >= today ? brief.updated_at : today,
   }
 }
+
+
+export function assertHumanApprovedReleaseReady(result) {
+  fail(result?.decision === 'HUMAN_APPROVED_ELIGIBLE', `human-approved release decision ${result?.decision ?? 'missing'}`)
+  fail(result.requires_human === false, 'human-approved machine gate still requires review')
+  fail(result.content_only?.allowed === true, 'human-approved content-only boundary failed')
+  fail(Array.isArray(result.reasons) && result.reasons.length === 0, 'human-approved release reasons not empty')
+  return true
+}
+
+export function promoteHumanApprovedBriefRecord(brief, today) {
+  fail(brief?.content_type === 'BRIEF', 'target must be BRIEF')
+  fail(brief.status === 'READY', `brief status must be READY, got ${brief.status}`)
+  fail(['LOW', 'HIGH'].includes(brief.risk_level), 'brief risk must be LOW or HIGH')
+  fail(['AUTO_LOW_RISK', 'HUMAN_APPROVED'].includes(brief.publication_policy), 'brief policy must be reviewable')
+  fail(brief.semantic_qa_status === 'PASS', 'semantic QA must PASS')
+  fail(typeof today === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(today), 'invalid publication date')
+  return {
+    ...brief,
+    status: 'PUBLISHED',
+    publication_policy: 'HUMAN_APPROVED',
+    published_at: brief.published_at || today,
+    updated_at: brief.updated_at >= today ? brief.updated_at : today,
+  }
+}

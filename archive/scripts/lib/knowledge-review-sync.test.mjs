@@ -14,6 +14,22 @@ test('Automation C queue payload is metadata-only and stable for an exact brief/
   assert.equal(JSON.stringify(first).includes('private note'), false)
 })
 
+
+test('queue payload can bind an approval to the exact worker PR identity', () => {
+  const brief = { id: 'K-104', title: 'Needs review', risk_level: 'HIGH', risk_domains: ['GENERATOR'], sources: [{ id: 'S1' }] }
+  const result = { decision: 'HUMAN_REVIEW_REQUIRED', reasons: ['ELIGIBILITY_REQUIRES_REVIEW:K-104'] }
+  const payload = buildReviewQueuePayload({
+    brief,
+    result,
+    headSha: 'b'.repeat(40),
+    prNumber: 321,
+    headRef: 'knowledge/worker/fresh-example',
+  })
+  assert.equal(payload.p_payload.pr_number, 321)
+  assert.equal(payload.p_payload.head_ref, 'knowledge/worker/fresh-example')
+  assert.equal(payload.p_payload.head_sha, 'b'.repeat(40))
+})
+
 test('enqueue uses the server-only key in headers and returns a safe response', async () => {
   let request
   const result = await enqueueReview({ p_idempotency_key: 'C_KNOWLEDGE:K-004:abc' }, {

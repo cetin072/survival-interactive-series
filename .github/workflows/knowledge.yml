@@ -12,6 +12,7 @@ on:
       - '.github/workflows/knowledge.yml'
       - '.github/workflows/knowledge-publish-prepare.yml'
       - '.github/workflows/knowledge-exact-head.yml'
+      - '.github/workflows/knowledge-review-consumer.yml'
       - '.github/workflows/knowledge-worker-state.yml'
       - '.github/workflows/knowledge-worker-gate.yml'
       - 'docs/KNOWLEDGE_WORKER_*.md'
@@ -27,6 +28,7 @@ on:
       - '.github/workflows/knowledge.yml'
       - '.github/workflows/knowledge-publish-prepare.yml'
       - '.github/workflows/knowledge-exact-head.yml'
+      - '.github/workflows/knowledge-review-consumer.yml'
       - '.github/workflows/knowledge-worker-state.yml'
       - 'docs/KNOWLEDGE_WORKER_*.md'
 
@@ -46,13 +48,19 @@ jobs:
       - run: npm ci
       - name: Knowledge scanner, contract, generator and gate tests
         run: npm run knowledge:test
-      - name: Automation C Review Queue adapter contract
-        run: node --test ../scripts/lib/knowledge-review-sync.test.mjs
+      - name: Automation C Review Queue contracts
+        run: |
+          node --test ../scripts/lib/knowledge-review-sync.test.mjs
+          node --test ../scripts/lib/knowledge-review-consumer.test.mjs
+          node --test ../scripts/lib/knowledge-human-approved.test.mjs
       - name: Syntax-check Knowledge publication executors
         run: |
           node --check ../scripts/knowledge-publish-prepare.mjs
           node --check ../scripts/knowledge-production-verify.mjs
           node --check ../scripts/knowledge-review-sync.mjs
+          node --check ../scripts/knowledge-review-consumer.mjs
+          node --check ../scripts/knowledge-human-approved-prepare.mjs
+          node --check ../scripts/knowledge-human-approved-release-check.mjs
           node --check ../scripts/write-deploy-meta.mjs
           node --check ../scripts/knowledge-worker-preflight.mjs
           node --check ../scripts/knowledge-worker-disposition.mjs
