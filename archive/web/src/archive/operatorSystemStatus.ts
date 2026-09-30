@@ -66,3 +66,53 @@ export function visualStatusTone(status?: string | null) {
 export function productionStatusTone(context?: string | null) {
   return context === 'production' ? 'ok' : 'neutral'
 }
+
+
+const statusKorean: Record<string, string> = {
+  AUTO: '자동 운영',
+  BLOCKED: '작업 중단',
+  SUCCESS: '성공',
+  PASS: '통과',
+  COMPLETED: '완료',
+  PUBLISHED: '게시 완료',
+  FAILED: '실패',
+  ERROR: '오류',
+  REJECTED: '거절됨',
+  PROCESSED: '처리 완료',
+  PENDING: '대기 중',
+  READY: '준비 완료',
+}
+
+const blockerKorean: Record<string, string> = {
+  NO_ACCEPTABLE_CANDIDATE: '사용할 수 있는 결과가 없음',
+  QUALITY_GATE: '품질 검수 단계',
+  PROVIDER_NOT_ACTIVE: '작업 제공 기능이 비활성화됨',
+  HUMAN_REVIEW_REQUIRED: '사람의 검토가 필요함',
+}
+
+const knownSubjects: Record<string, string> = {
+  'char-taehoon': '장태훈',
+}
+
+export function statusWithKorean(value?: string | null) {
+  if (!value) return '기록 없음'
+  const code = value.toUpperCase()
+  const ko = statusKorean[code]
+  return ko ? `${value} · ${ko}` : value
+}
+
+export function explainMachineCode(value?: string | null) {
+  if (!value) return null
+  return blockerKorean[value.toUpperCase()] ?? null
+}
+
+export function subjectWithKorean(value?: string | null) {
+  if (!value) return '없음'
+  const ko = knownSubjects[value]
+  return ko ? `${ko} · ${value}` : value
+}
+
+export function timezoneWithKorean(value?: string | null) {
+  if (!value) return '시간대 미설정'
+  return value === 'Asia/Seoul' ? '한국시간 · Asia/Seoul' : value
+}
