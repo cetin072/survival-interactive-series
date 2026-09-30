@@ -63,5 +63,15 @@
     "guide_id": null,
     "tools": [],
     "story_refs": []
+  },
+  {
+    "id": "power-outage-food-safety",
+    "title": "정전 시 식품 안전",
+    "brief_ids": [
+      "K-011"
+    ],
+    "guide_id": null,
+    "tools": [],
+    "story_refs": []
   }
 ]
