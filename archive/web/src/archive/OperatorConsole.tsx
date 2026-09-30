@@ -4,10 +4,14 @@ import { chronicleRegistry } from './chronicleRegistry'
 import { supabaseClient } from './supabaseClient'
 import { operatorPasswordRedirectUrl, validatePasswordChange } from './operatorPassword'
 import {
+  explainMachineCode,
   formatOperatorTime,
   operatorStaticStatus,
   productionStatusTone,
   shortSha,
+  statusWithKorean,
+  subjectWithKorean,
+  timezoneWithKorean,
   visualStatusTone,
 } from './operatorSystemStatus'
 
@@ -203,52 +207,52 @@ export default function OperatorConsole() {
   return <section className="operator-page"><header className="operator-heading"><div><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>Operator Dashboard</h1><p>{user.email} · 실제 자동화 상태와 검토 대기 항목을 한곳에서 확인합니다.</p></div><button className="operator-secondary" disabled={busy} onClick={() => void signOut()}>로그아웃</button></header>
     {error && <p className="operator-error" role="alert">{error}</p>}
     {statusError && <p className="operator-error" role="alert">{statusError}</p>}
-    <div className="operator-counts"><article><span>Human Review</span><strong>{inbox.pending_count}</strong></article><article><span>Automation Error</span><strong>{inbox.automation_error_count}</strong></article><article><span>Security Alert</span><strong className="operator-unwired">미연결</strong></article><article><span>Cost Alert</span><strong className="operator-unwired">미연결</strong></article></div>
+    <div className="operator-counts"><article><span>사람 검토 · Human Review</span><strong>{inbox.pending_count}</strong></article><article><span>자동화 오류 · Automation Error</span><strong>{inbox.automation_error_count}</strong></article><article><span>보안 알림 · Security</span><strong className="operator-unwired">미연결</strong></article><article><span>비용 알림 · Cost</span><strong className="operator-unwired">미연결</strong></article></div>
 
     <section className="operator-system">
       <header><div><p className="archive-eyebrow">SYSTEM STATUS</p><h2>자동화 상태</h2></div><button className="operator-secondary" disabled={busy} onClick={() => void refresh()}>상태 새로고침</button></header>
       <div className="operator-system-grid">
         <article className="operator-system-card">
-          <div className="operator-system-title"><h3>A · Archive</h3><span className="operator-status-badge neutral">{archiveRunCount ? (archiveLatest?.status ?? '기록 있음') : '실행이력 미수집'}</span></div>
+          <div className="operator-system-title"><h3>A · Archive <small>아카이브</small></h3><span className="operator-status-badge neutral">{archiveRunCount ? statusWithKorean(archiveLatest?.status ?? '기록 있음') : '실행이력 미수집'}</span></div>
           <dl>
-            <div><dt>모드</dt><dd>{operatorStaticStatus.archive.mode}</dd></div>
+            <div><dt>모드</dt><dd>{statusWithKorean(operatorStaticStatus.archive.mode)}</dd></div>
             <div><dt>DB 실행기록</dt><dd>{archiveRunCount}건</dd></div>
-            <div><dt>최근 결과</dt><dd>{archiveLatest?.status ?? '기록 없음'}</dd></div>
+            <div><dt>최근 결과</dt><dd>{statusWithKorean(archiveLatest?.status)}</dd></div>
             <div><dt>최근 시각</dt><dd>{formatOperatorTime(archiveLatest?.finished_at ?? archiveLatest?.completed_at ?? archiveLatest?.updated_at)}</dd></div>
           </dl>
         </article>
 
         <article className="operator-system-card">
-          <div className="operator-system-title"><h3>B · Visual</h3><span className={`operator-status-badge ${visualStatusTone(visualLatest?.final_status)}`}>{visualLatest?.final_status ?? '실행이력 없음'}</span></div>
+          <div className="operator-system-title"><h3>B · Visual <small>이미지</small></h3><span className={`operator-status-badge ${visualStatusTone(visualLatest?.final_status)}`}>{visualLatest?.final_status ? statusWithKorean(visualLatest.final_status) : '실행이력 없음'}</span></div>
           <dl>
             <div><dt>실행기록</dt><dd>{systemStatus?.visual.run_count ?? 0}건</dd></div>
-            <div><dt>최근 대상</dt><dd>{visualLatest?.target_subject_id ?? '없음'}</dd></div>
+            <div><dt>최근 대상</dt><dd>{subjectWithKorean(visualLatest?.target_subject_id)}</dd></div>
             <div><dt>최근 시각</dt><dd>{formatOperatorTime(visualLatest?.finished_at ?? visualLatest?.started_at)}</dd></div>
-            <div><dt>상세</dt><dd>{visualLatest?.blocker_code ? `${visualLatest.blocker_code} · ${visualLatest.blocker_stage ?? '단계 미상'}` : `accepted ${visualLatest?.accepted_count ?? 0}`}</dd></div>
+            <div><dt>상세</dt><dd>{visualLatest?.blocker_code ? <><code>{visualLatest.blocker_code}</code>{explainMachineCode(visualLatest.blocker_code) && <small className="operator-code-help">{explainMachineCode(visualLatest.blocker_code)}</small>}{visualLatest.blocker_stage && <><code>{visualLatest.blocker_stage}</code>{explainMachineCode(visualLatest.blocker_stage) && <small className="operator-code-help">{explainMachineCode(visualLatest.blocker_stage)}</small>}</>}</> : <>채택 결과 {visualLatest?.accepted_count ?? 0}건</>}</dd></div>
           </dl>
         </article>
 
         <article className="operator-system-card">
-          <div className="operator-system-title"><h3>C · Knowledge</h3><span className={`operator-status-badge ${knowledgeNeedsReview ? 'warning' : 'ok'}`}>{knowledgeNeedsReview ? '검토 필요' : operatorStaticStatus.knowledge.workerEnabled ? '정상' : '중지'}</span></div>
+          <div className="operator-system-title"><h3>C · Knowledge <small>생존 지식</small></h3><span className={`operator-status-badge ${knowledgeNeedsReview ? 'warning' : 'ok'}`}>{knowledgeNeedsReview ? '검토 필요' : operatorStaticStatus.knowledge.workerEnabled ? '정상' : '중지'}</span></div>
           <dl>
             <div><dt>최근 처리</dt><dd>{knowledgeLatestBrief}</dd></div>
             <div><dt>처리 시각</dt><dd>{formatOperatorTime(operatorStaticStatus.knowledge.latestProcessedAt)}</dd></div>
-            <div><dt>Review 대기</dt><dd>{inbox.pending_count}건</dd></div>
-            <div><dt>주기</dt><dd>{operatorStaticStatus.knowledge.triggerIntervalHours}시간 · {operatorStaticStatus.knowledge.timezone}</dd></div>
+            <div><dt>검토 대기</dt><dd>{inbox.pending_count}건</dd></div>
+            <div><dt>주기</dt><dd>{operatorStaticStatus.knowledge.triggerIntervalHours}시간 · {timezoneWithKorean(operatorStaticStatus.knowledge.timezone)}</dd></div>
           </dl>
         </article>
 
         <article className="operator-system-card">
-          <div className="operator-system-title"><h3>Production</h3><span className={`operator-status-badge ${productionStatusTone(productionContext)}`}>{productionContext === 'production' ? '정상' : productionContext ?? '확인 필요'}</span></div>
+          <div className="operator-system-title"><h3>Production <small>실사이트 배포</small></h3><span className={`operator-status-badge ${productionStatusTone(productionContext)}`}>{productionContext === 'production' ? '정상' : productionContext ?? '확인 필요'}</span></div>
           <dl>
-            <div><dt>Source SHA</dt><dd><code>{shortSha(productionStatus.release?.source_main_sha)}</code></dd></div>
-            <div><dt>Deploy SHA</dt><dd><code>{shortSha(productionStatus.deploy?.commit_ref)}</code></dd></div>
+            <div><dt>원본 기준</dt><dd><code>{shortSha(productionStatus.release?.source_main_sha)}</code><small className="operator-code-help">Source SHA · 배포에 포함된 원본 코드 기준값</small></dd></div>
+            <div><dt>배포 기준</dt><dd><code>{shortSha(productionStatus.deploy?.commit_ref)}</code><small className="operator-code-help">Deploy SHA · 실제 사이트에 올라간 코드 버전</small></dd></div>
             <div><dt>최근 배치</dt><dd>{productionStatus.release?.released_on_kst ?? '기록 없음'}</dd></div>
             <div><dt>정책</dt><dd>{operatorStaticStatus.release.productionIntervalDays}일 배치 · {operatorStaticStatus.release.releaseHourKst}시 · 일 최대 {operatorStaticStatus.release.maxProductionDeploysPerDay}회</dd></div>
           </dl>
         </article>
       </div>
-      <p className="operator-muted">A의 DB 실행 이력은 아직 수집되지 않아 AUTO 설정과 기록 유무만 표시합니다. B는 Supabase worker receipt, C는 현재 Production에 포함된 Knowledge state, Production은 release/deploy 메타를 읽습니다.</p>
+      <p className="operator-muted">A는 자동 운영 설정과 실행기록 수집 여부를 보여줍니다. B는 이미지 자동화의 실제 최근 결과, C는 생존 지식 자동화의 최근 처리 상태를 보여줍니다. Production은 현재 실사이트에 올라간 코드 버전을 표시합니다.</p>
     </section>
 
     <div className="operator-grid"><section className="operator-panel"><header><h2>대기 항목</h2><button className="operator-secondary" disabled={busy} onClick={() => void refresh()}>새로고침</button></header>
