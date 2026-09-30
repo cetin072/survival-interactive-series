@@ -6,7 +6,9 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 import time
+from contextlib import suppress
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -70,6 +72,72 @@ def rpc(name, payload):
     return json.loads(body) if body else None
 
 
+HEARTBEAT_INTERVAL_SECONDS = 30
+
+
+def heartbeat():
+    global LEASE_LOST, LAST_HEARTBEAT
+    if not CURRENT_JOB or not LEASE_TOKEN:
+        LEASE_LOST = True
+        fail("FINALIZER_LEASE_LOST")
+    try:
+        result = rpc("archive_illustration_render_job_lease_heartbeat", {
+            "p_job_id": CURRENT_JOB["job_id"],
+            "p_lease_token": LEASE_TOKEN,
+            "p_lease_seconds": 7200,
+        })
+    except Exception:
+        LEASE_LOST = True
+        fail("FINALIZER_LEASE_LOST")
+    if not isinstance(result, dict) or result.get("status") != "LEASE_RENEWED":
+        LEASE_LOST = True
+        fail("FINALIZER_LEASE_LOST")
+    LAST_HEARTBEAT = time.monotonic()
+
+
+def heartbeat_if_due():
+    if time.monotonic() - LAST_HEARTBEAT >= HEARTBEAT_INTERVAL_SECONDS:
+        heartbeat()
+
+
+def run_with_heartbeat(args, *, capture=True, check=True):
+    """Poll a long-running command while renewing the lease; terminate on lease loss."""
+    output_file = tempfile.TemporaryFile(mode="w+t") if capture else None
+    proc = subprocess.Popen(
+        args, cwd=ROOT, text=True,
+        stdout=output_file,
+        stderr=subprocess.STDOUT if capture else None,
+        env=os.environ,
+    )
+    heartbeat()
+    last_heartbeat = time.monotonic()
+    try:
+        while proc.poll() is None:
+            if time.monotonic() - last_heartbeat >= HEARTBEAT_INTERVAL_SECONDS:
+                try:
+                    heartbeat()
+                except Exception:
+                    proc.kill()
+                    proc.wait()
+                    fail("FINALIZER_LEASE_LOST")
+                last_heartbeat = time.monotonic()
+                globals()["LAST_HEARTBEAT"] = last_heartbeat
+            time.sleep(1)
+        if output_file:
+            output_file.seek(0)
+        output = (output_file.read() if output_file else "") or ""
+        if check and proc.returncode != 0:
+            fail(f"COMMAND_FAILED:{args[0]}:{output.strip()[-4000:]}")
+        return proc.returncode, output.strip()
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            with suppress(Exception):
+                proc.wait()
+        if output_file:
+            output_file.close()
+
+
 def checkout_main():
     run("git", "fetch", "origin", "main")
     run("git", "checkout", "-B", "main", "origin/main")
@@ -99,9 +167,10 @@ def find_open_pr(branch):
 
 
 def wait_pr_and_merge(number):
-    run("gh", "pr", "checks", str(number), "--repo", REPO, "--watch",
-        "--fail-fast", "--interval", "10", capture=False)
+    run_with_heartbeat(["gh", "pr", "checks", str(number), "--repo", REPO, "--watch",
+        "--fail-fast", "--interval", "10"], capture=False)
     for _ in range(20):
+        heartbeat()
         view = gh_json(
             "pr", "view", str(number), "--repo", REPO,
             "--json", "state,mergeable,headRefOid,mergeCommit",
@@ -111,6 +180,7 @@ def wait_pr_and_merge(number):
         if view["state"] != "OPEN":
             fail("FINALIZER_PR_NOT_OPEN")
         if view["mergeable"] == "MERGEABLE":
+            heartbeat()
             result = gh_json(
                 "api", "--method", "PUT", f"repos/{REPO}/pulls/{number}/merge",
                 "-f", "merge_method=squash", "-f", f"sha={view['headRefOid']}",
@@ -125,6 +195,7 @@ def wait_pr_and_merge(number):
 
 
 def ensure_json_request(path, payload, branch, title, body):
+    heartbeat()
     checkout_main()
     if main_has(path):
         return commit_for_path(path)
@@ -144,7 +215,9 @@ def ensure_json_request(path, payload, branch, title, body):
     run("git", "config", "user.name", "archive-illustration-bot")
     run("git", "config", "user.email", "archive-illustration-bot@users.noreply.github.com")
     run("git", "commit", "-m", title)
+    heartbeat()
     run("git", "push", "--force-with-lease", "origin", f"HEAD:{branch}")
+    heartbeat()
     created = run(
         "gh", "pr", "create", "--repo", REPO, "--base", "main", "--head", branch,
         "--title", title, "--body", body,
@@ -224,6 +297,7 @@ def ensure_identity(job):
 def wait_workflow(workflow, commit_sha, retry_storage_network=False):
     run_id = None
     for _ in range(60):
+        heartbeat_if_due()
         runs = gh_json(
             "run", "list", "--repo", REPO, "--workflow", workflow,
             "--commit", commit_sha, "--limit", "10",
@@ -237,26 +311,25 @@ def wait_workflow(workflow, commit_sha, retry_storage_network=False):
     if run_id is None:
         fail("FINALIZER_WORKFLOW_NOT_TRIGGERED")
 
-    watched = subprocess.run(
+    watched_code, watched_output = run_with_heartbeat(
         ["gh", "run", "watch", str(run_id), "--repo", REPO, "--exit-status"],
-        cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-        env=os.environ,
+        capture=True, check=False,
     )
-    if watched.returncode == 0:
+    if watched_code == 0:
         return run_id
 
     if retry_storage_network:
         logs = run("gh", "run", "view", str(run_id), "--repo", REPO, "--log-failed", check=False)
         if "STORAGE_NETWORK_ERROR" in logs or "STORAGE_UPLOAD_OUTCOME_UNKNOWN" in logs:
+            heartbeat()
             run("gh", "run", "rerun", str(run_id), "--repo", REPO, "--failed")
-            retry = subprocess.run(
+            retry_code, _ = run_with_heartbeat(
                 ["gh", "run", "watch", str(run_id), "--repo", REPO, "--exit-status"],
-                cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                env=os.environ,
+                capture=True, check=False,
             )
-            if retry.returncode == 0:
+            if retry_code == 0:
                 return run_id
-    raise ValueError(f"FINALIZER_WORKFLOW_FAILED:{workflow}:{(watched.stdout or '')[-3000:]}")
+    raise ValueError(f"FINALIZER_WORKFLOW_FAILED:{workflow}:{watched_output[-3000:]}")
 
 
 def verify_storage_registry(identity_path, expected_sha):
@@ -298,6 +371,7 @@ def site_asset(job):
 
 def wait_derivative_pr(branch):
     for _ in range(80):
+        heartbeat_if_due()
         prs = gh_json(
             "pr", "list", "--repo", REPO, "--head", branch, "--state", "open",
             "--json", "number,headRefOid",
@@ -312,10 +386,16 @@ def wait_derivative_pr(branch):
 
 
 CURRENT_JOB = None
+LEASE_TOKEN = None
+LEASE_LOST = False
+LAST_HEARTBEAT = 0
 
 
 def finalize(job_id):
-    global CURRENT_JOB
+    global CURRENT_JOB, LEASE_TOKEN, LEASE_LOST, LAST_HEARTBEAT
+    LEASE_TOKEN = None
+    LEASE_LOST = False
+    LAST_HEARTBEAT = time.monotonic()
     if not SAFE_JOB.fullmatch(job_id):
         fail("FINALIZER_JOB_ID_INVALID")
 
@@ -332,8 +412,19 @@ def finalize(job_id):
         if not job.get(key):
             fail("FINALIZER_JOB_BINDING_INCOMPLETE")
 
+    lease = rpc("archive_illustration_render_job_lease_acquire", {
+        "p_job_id": job_id,
+        "p_owner": f"gha-{os.environ.get('GITHUB_RUN_ID', job_id)}-{os.environ.get('GITHUB_RUN_ATTEMPT', '1')}",
+        "p_lease_seconds": 7200,
+    })
+    if not isinstance(lease, dict) or lease.get("status") != "LEASE_ACQUIRED":
+        fail("FINALIZER_LEASE_NOT_ACQUIRED")
+    LEASE_TOKEN = lease.get("lease_token")
+    if not isinstance(LEASE_TOKEN, str) or not re.fullmatch(r"[0-9a-f-]{36}", LEASE_TOKEN):
+        fail("FINALIZER_LEASE_TOKEN_INVALID")
+
     rpc("archive_illustration_render_job_finish", {
-        "p_job_id": job_id, "p_status": "FINALIZING", "p_summary": {},
+        "p_job_id": job_id, "p_status": "FINALIZING", "p_summary": {"lease_token": LEASE_TOKEN},
     })
 
     identity_path, source_commit = ensure_identity(job)
@@ -348,6 +439,7 @@ def finalize(job_id):
         "p_handoff_staging_id": handoff_staging_id,
         "p_source_commit": source_commit,
         "p_identity_path": identity_path,
+        "p_lease_token": LEASE_TOKEN,
     })
     if not isinstance(promoted, dict) or promoted.get("status") != "HANDOFF_STAGING_READY":
         fail("FINALIZER_REVIEW_STAGING_PROMOTE_FAILED")
@@ -397,6 +489,8 @@ def finalize(job_id):
         fail("FINALIZER_SITE_ASSET_NOT_PUBLISHED")
 
     cleanup = rpc("archive_illustration_review_staging_cleanup", {
+        "p_job_id": job_id,
+        "p_lease_token": LEASE_TOKEN,
         "p_staging_id": job["review_staging_id"],
         "p_source_sha256": job["output_sha256"],
     })
@@ -406,7 +500,7 @@ def finalize(job_id):
     rpc("archive_illustration_render_job_finish", {
         "p_job_id": job_id,
         "p_status": "SUCCEEDED",
-        "p_summary": {},
+        "p_summary": {"lease_token": LEASE_TOKEN},
     })
     return {
         "status": "AUTOMATION_B_FINALIZED",
@@ -442,11 +536,12 @@ if __name__ == "__main__":
         code = str(error).split(":", 1)[0] if isinstance(error, ValueError) else "FINALIZER_UNEXPECTED_ERROR"
         if job_id and SAFE_JOB.fullmatch(job_id):
             try:
-                rpc("archive_illustration_render_job_finish", {
-                    "p_job_id": job_id,
-                    "p_status": "BLOCKED",
-                    "p_summary": {"blocker_code": code, "blocker_stage": "PROGRAM_FINALIZER"},
-                })
+                if LEASE_TOKEN and not LEASE_LOST:
+                    rpc("archive_illustration_render_job_finish", {
+                        "p_job_id": job_id,
+                        "p_status": "BLOCKED",
+                        "p_summary": {"blocker_code": code, "blocker_stage": "PROGRAM_FINALIZER", "lease_token": LEASE_TOKEN},
+                    })
             except Exception:
                 pass
         print(json.dumps({"status": "AUTOMATION_B_FINALIZER_BLOCKED", "code": code}))

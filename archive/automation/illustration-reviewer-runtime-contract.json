@@ -1,0 +1,106 @@
+{
+  "version": "illustration-reviewer-runtime-contract-v1",
+  "lease_acquire": {
+    "rpc": "archive_illustration_render_job_lease_acquire",
+    "request": {
+      "p_job_id": "<job_id>",
+      "p_owner": "chatgpt-reviewer-<run-id>",
+      "p_lease_seconds": 600
+    },
+    "required_response": {
+      "status": "LEASE_ACQUIRED",
+      "lease_token": "<uuid>",
+      "lease_until": "<timestamp>"
+    },
+    "allowed_job_statuses": ["PREPARED", "INGESTING", "READY_FOR_REVIEW"],
+    "lease_held_behavior": "Stop this run without mutating the job. Do not reuse another run's token."
+  },
+  "mutations": [
+    {
+      "rpc": "archive_illustration_review_staging_begin",
+      "request": {
+        "p_meta": {
+          "job_id": "<job_id>",
+          "lease_token": "<lease_token_from_acquire>",
+          "staging_id": "<staging_id>",
+          "point_id": "<point_id>",
+          "generation_key": "<generation_key>",
+          "subject_id": "<subject_id>",
+          "source_sha256": "<sha256>",
+          "byte_count": 1,
+          "width": 1,
+          "height": 1,
+          "mime_type": "image/png",
+          "chunk_count": 1,
+          "provider_asset_id": "<provider_asset_id>"
+        }
+      },
+      "required_job_status": "PREPARED",
+      "token_path": "p_meta.lease_token"
+    },
+    {
+      "rpc": "archive_illustration_review_staging_chunk_put",
+      "request": {
+        "p_job_id": "<job_id>",
+        "p_lease_token": "<lease_token_from_acquire>",
+        "p_staging_id": "<staging_id>",
+        "p_chunk_index": 0,
+        "p_chunk_b64": "<base64_chunk>"
+      },
+      "required_job_status": ["PREPARED", "INGESTING", "READY_FOR_REVIEW"],
+      "token_path": "p_lease_token"
+    },
+    {
+      "rpc": "archive_illustration_review_staging_finalize",
+      "request": {
+        "p_job_id": "<job_id>",
+        "p_lease_token": "<lease_token_from_acquire>",
+        "p_staging_id": "<staging_id>"
+      },
+      "required_job_status": ["PREPARED", "INGESTING", "READY_FOR_REVIEW"],
+      "token_path": "p_lease_token"
+    },
+    {
+      "rpc": "archive_illustration_review_complete",
+      "request": {
+        "p_review": {
+          "job_id": "<job_id>",
+          "lease_token": "<lease_token_from_acquire>",
+          "decision": "<PASS|REJECT|HUMAN_REVIEW>",
+          "review_provider": "native_chatgpt_vision",
+          "output_sha256": "<sha256>",
+          "output_bytes": 1,
+          "output_width": 1,
+          "output_height": 1,
+          "rejection_codes": []
+        }
+      },
+      "required_job_status": "PREPARED",
+      "token_path": "p_review.lease_token"
+    }
+  ],
+  "decision_lifecycle": {
+    "HUMAN_REVIEW": {
+      "final_status": "HUMAN_REVIEW",
+      "lease_owner": null,
+      "lease_token": null,
+      "lease_until": "decision_time + 7 days",
+      "worker_may_acquire_during_sla": false,
+      "attempt_no_effect": "Unchanged"
+    },
+    "REJECT": {
+      "final_status": "REVIEW_REJECTED",
+      "lease_owner": null,
+      "lease_token": null,
+      "lease_until": null,
+      "attempt_no_effect": "The current attempt_no is unchanged; only a later queued semantic retry receives the next attempt number."
+    },
+    "PASS": {
+      "final_status": "FINALIZE_QUEUED",
+      "lease_owner": null,
+      "lease_token": null,
+      "lease_until": null,
+      "next_owner": "Program Finalizer must acquire a fresh lease before mutation."
+    }
+  }
+}

@@ -87,11 +87,14 @@ export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}
       },
     })
     if (result?.status === 'PREPARED' || result?.status === 'WAITING_EXISTING_JOB'
-      || result?.status === 'DAILY_JOB_CAP_REACHED') {
+      || result?.status === 'DAILY_JOB_CAP_REACHED' || result?.status === 'FINALIZE_QUEUED'
+      || result?.status === 'INGESTING' || result?.status === 'READY_FOR_REVIEW') {
       return { ...result, active_provider: activeProvider }
     }
     if (result?.status === 'ILLUSTRATION_ALREADY_SUCCEEDED'
-      || result?.status === 'ILLUSTRATION_RETRY_CAP_REACHED') continue
+      || result?.status === 'ILLUSTRATION_RETRY_CAP_REACHED'
+      || result?.status === 'ILLUSTRATION_INFRA_RETRY_CAP_REACHED'
+      || result?.status === 'HUMAN_REVIEW_REQUIRED') continue
     throw new Error('ILLUSTRATION_PREP_ENQUEUE_UNEXPECTED')
   }
   return { status: 'NO_ELIGIBLE_AFTER_QUEUE_GATES', active_provider: activeProvider }
