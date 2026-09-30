@@ -5,7 +5,7 @@ import { createGenerationProvider } from './illustration-generation-provider.mjs
 import { compileIllustrationImagePrompt } from './illustration-image-prompt.mjs'
 
 export const DEFAULT_BATCH_LIMIT = 3
-export const DAILY_GENERATION_CAP = 3
+export const DAILY_GENERATION_CAP = 6
 export const BATCH_GENERATION_CAP = 3
 export const MAX_ASSET_ATTEMPTS = 3
 export const DEFAULT_PROVIDER = 'shadow'
