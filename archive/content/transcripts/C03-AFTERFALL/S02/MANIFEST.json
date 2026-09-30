@@ -208,21 +208,5 @@
     "policy": "Preserve public_safe rows verbatim; incomplete pairs remain explicit gaps.",
     "final_captured_game_time": "2027-03-23 17:50",
     "final_captured_save_version": 253
-  },
-  "supplemental_recoveries": [
-    {
-      "recovery_id": "S02_SHARED_CHAT_20261001_SESSION_004",
-      "source_type": "CHATGPT_SHARED_CONVERSATION",
-      "source_url": "https://chatgpt.com/share/6abd160b-2cf4-83ee-b4d0-98c7ede8dc3e?ogimg=plain",
-      "source_title": "진우 시즌 2 04 (종료)",
-      "target_session_id": "SESSION_004",
-      "target_missing_role": "GM",
-      "status": "VERIFIED_PARTIAL_FRAGMENT",
-      "raw_file": "SHARED_CHAT_RECOVERY/PART_RECOVERY_001.md",
-      "pairing_complete": false,
-      "reader_edition_eligible": false,
-      "overlap": "SESSION_005 and later verified atomic pairs already preserved; not duplicated.",
-      "policy": "Only directly verified public GM text is retained; unrecovered middle text remains explicit gaps."
-    }
-  ]
+  }
 }
