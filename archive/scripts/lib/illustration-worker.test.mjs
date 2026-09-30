@@ -114,28 +114,34 @@ test('string priority fails closed', () => {
   assert.equal(plan.counts.skipped_invalid_priority, 1)
 })
 
-test('batch and actual-generation daily caps are both three', () => {
-  const candidates = Array.from({ length: 6 }, (_, index) => point(String.fromCharCode(97 + index)))
-  const threeAttempts = candidates.slice(0, 3).map((item) => receipt(item, 'FAILED'))
-  const plan = select({ points: candidates, attempts: threeAttempts })
+test('batch limit is three while actual-generation daily cap is six', () => {
+  const candidates = Array.from({ length: 9 }, (_, index) => point(String.fromCharCode(97 + index)))
+  const batchPlan = select({ points: candidates })
+  assert.equal(batchPlan.batch_limit, 3)
+  assert.equal(batchPlan.candidates.length, 3)
+  const sixAttempts = candidates.slice(0, 6).map((item) => receipt(item, 'FAILED'))
+  const plan = select({ points: candidates, attempts: sixAttempts })
   assert.equal(plan.batch_limit, 3)
-  assert.equal(plan.daily_generation_cap, 3)
-  assert.equal(plan.generation_attempts_today, 3)
+  assert.equal(plan.daily_generation_cap, 6)
+  assert.equal(plan.generation_attempts_today, 6)
   assert.equal(plan.daily_capacity_remaining, 0)
   assert.equal(plan.candidates.length, 0)
-  assert.equal(plan.counts.skipped_daily_cap, candidates.length)
+  assert.equal(plan.counts.skipped_daily_cap, 6)
 })
 
-test('each failed retry consumes daily capacity and fourth actual attempt is blocked', () => {
+test('each failed retry consumes daily capacity and seventh actual attempt is blocked', () => {
   const first = point('a'), second = point('b')
   let receipts = emptyReceipts()
   receipts = appendIllustrationReceipt(receipts, first, { provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'GENERATION_FAILED', now: new Date('2026-09-28T01:00:00Z') })
   receipts = appendIllustrationReceipt(receipts, first, { provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'GENERATION_FAILED', now: new Date('2026-09-28T02:00:00Z') })
   receipts = appendIllustrationReceipt(receipts, second, { provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'PROVIDER_UNAVAILABLE', now: new Date('2026-09-28T03:00:00Z') })
-  assert.deepEqual(receipts.attempts.map((item) => item.attempt_no), [1, 2, 1])
-  assert.equal(dailyGenerationUsed(receipts, '2026-09-28'), 3)
-  assert.throws(() => appendIllustrationReceipt(receipts, point('c'), {
-    provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'GENERATION_FAILED', now: new Date('2026-09-28T04:00:00Z'),
+  for (const id of ['c', 'd', 'e']) {
+    receipts = appendIllustrationReceipt(receipts, point(id), { provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'GENERATION_FAILED', now: new Date('2026-09-28T04:00:00Z') })
+  }
+  assert.deepEqual(receipts.attempts.map((item) => item.attempt_no), [1, 2, 1, 1, 1, 1])
+  assert.equal(dailyGenerationUsed(receipts, '2026-09-28'), 6)
+  assert.throws(() => appendIllustrationReceipt(receipts, point('f'), {
+    provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'GENERATION_FAILED', now: new Date('2026-09-28T05:00:00Z'),
   }), /DAILY_CAP_REACHED/)
 })
 
@@ -230,16 +236,16 @@ test('receipt validation rejects corrupt entries and unknown status/provider/rea
 })
 
 test('KST 23:59 attempts count for that day and reset at next-day 00:01', () => {
-  const points = Array.from({ length: 3 }, (_, index) => point(String.fromCharCode(97 + index)))
+  const points = Array.from({ length: 6 }, (_, index) => point(String.fromCharCode(97 + index)))
   const attempts = points.map((item) => receipt(item, 'FAILED', '2026-09-28T14:59:00.000Z'))
   const beforeMidnight = new Date('2026-09-28T14:59:00.000Z')
   const afterMidnight = new Date('2026-09-28T15:01:00.000Z')
   assert.equal(kstCalendarDay(beforeMidnight), '2026-09-28')
   assert.equal(kstCalendarDay(afterMidnight), '2026-09-29')
-  assert.equal(select({ points, attempts, now: beforeMidnight }).generation_attempts_today, 3)
+  assert.equal(select({ points, attempts, now: beforeMidnight }).generation_attempts_today, 6)
   const nextDay = select({ points, attempts, now: afterMidnight })
   assert.equal(nextDay.generation_attempts_today, 0)
-  assert.equal(nextDay.daily_capacity_remaining, 3)
+  assert.equal(nextDay.daily_capacity_remaining, 6)
   const retry = appendIllustrationReceipt({ ...emptyReceipts(), attempts }, points[0], {
     provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'GENERATION_FAILED', now: afterMidnight,
   })
@@ -251,35 +257,38 @@ test('durably appends actual failures and reconciles a daily summary without los
   const directory = await mkdtemp(join(tmpdir(), 'illustration-attempts-'))
   const receiptsPath = join(directory, 'ILLUSTRATION_RECEIPTS.json')
   await writeFile(receiptsPath, `${JSON.stringify(emptyReceipts(), null, 2)}\n`)
-  const points = [point('a'), point('b'), point('c')]
+  const points = Array.from({ length: 6 }, (_, index) => point(String.fromCharCode(97 + index)))
   const outcomes = [
     { status: 'FAILED', reasonCode: 'GENERATION_FAILED' },
     { status: 'SUCCEEDED', reasonCode: null, outputSha256: 'f'.repeat(64) },
     { status: 'FAILED', reasonCode: 'PROVIDER_UNAVAILABLE' },
+    { status: 'FAILED', reasonCode: 'GENERATION_FAILED' },
+    { status: 'SUCCEEDED', reasonCode: null, outputSha256: 'e'.repeat(64) },
+    { status: 'FAILED', reasonCode: 'PROVIDER_UNAVAILABLE' },
   ]
   try {
-    for (let index = 0; index < 3; index++) {
+    for (let index = 0; index < 6; index++) {
       await persistIllustrationAttempt({
         receiptsPath,
         point: points[index],
         provider: 'native_chatgpt',
         ...outcomes[index],
-        now: new Date(`2026-09-28T0${index + 1}:00:00.000Z`),
+        now: new Date(`2026-09-28T${String(index + 1).padStart(2, '0')}:00:00.000Z`),
         deferredCandidates: [point('d'), point('e')],
       })
     }
     const storedReceipts = JSON.parse(await readFile(receiptsPath, 'utf8'))
     const summaryPath = join(directory, 'illustration-runs', '2026-09-28.json')
     const summary = JSON.parse(await readFile(summaryPath, 'utf8'))
-    assert.equal(storedReceipts.attempts.length, 3)
-    assert.equal(summary.generation_attempts, 3)
-    assert.equal(summary.failed, 2)
-    assert.equal(summary.succeeded, 1)
+    assert.equal(storedReceipts.attempts.length, 6)
+    assert.equal(summary.generation_attempts, 6)
+    assert.equal(summary.failed, 4)
+    assert.equal(summary.succeeded, 2)
     assert.equal(summary.deferred, 2)
-    assert.equal(summary.daily_generation_cap, 3)
+    assert.equal(summary.daily_generation_cap, 6)
     assert.equal(summary.cap_exhausted, true)
-    assert.deepEqual(summary.results.map((item) => item.attempt_no), [1, 1, 1])
-    assert.deepEqual(summary.results.map((item) => item.status), ['FAILED', 'SUCCEEDED', 'FAILED'])
+    assert.deepEqual(summary.results.map((item) => item.attempt_no), [1, 1, 1, 1, 1, 1])
+    assert.deepEqual(summary.results.map((item) => item.status), ['FAILED', 'SUCCEEDED', 'FAILED', 'FAILED', 'SUCCEEDED', 'FAILED'])
     assert.ok(summary.results.every((item) => !Object.hasOwn(item, 'brief')))
     assert.throws(() => appendIllustrationReceipt(storedReceipts, point('f'), {
       provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'GENERATION_FAILED', now: new Date('2026-09-28T04:00:00Z'),
@@ -294,7 +303,7 @@ test('daily summary is a receipt projection and does not create empty run histor
   const summary = buildDailyRunSummary(receipts, '2026-09-28')
   assert.deepEqual(summary, {
     date_kst: '2026-09-28', generation_attempts: 0, succeeded: 0, failed: 0, deferred: 0,
-    daily_generation_cap: 3, cap_exhausted: false, results: [],
+    daily_generation_cap: 6, cap_exhausted: false, results: [],
   })
 })
 

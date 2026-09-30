@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 
 export const DEFAULT_BATCH_LIMIT = 3
-export const DAILY_GENERATION_CAP = 3
+export const DAILY_GENERATION_CAP = 6
 export const BATCH_GENERATION_CAP = 3
 export const MAX_ASSET_ATTEMPTS = 3
 export const DEFAULT_PROVIDER = 'shadow'
