@@ -1,0 +1,11 @@
+{
+  "id": "KC-community-mutual-aid-agreement",
+  "question": "재난 대응에서 여러 조직이 자원과 비용을 함께 부담할 때 무엇을 미리 합의해야 할까",
+  "topic_id": "community-emergency-resource-management",
+  "status": "BRIEF_PROPOSED",
+  "disposition_note": "검증된 PUBLIC_ARCHIVE S03/SESSION_005에서 독립된 두 조직이 평소 유지비와 비정상 사고를 구분하고, 제공 가능한 자원·작업·기록 범위와 비용부담을 사건별로 협의하는 장면에서 질문을 추출했습니다. 기존 K-005는 분산 비축과 재고책임, K-009는 한 조직 내부의 역할·승인 권한 분담이 중심이라 의미 중복으로 보지 않았습니다. 현실 근거는 FEMA/USFA의 mutual aid 및 자원관리 안내와 행정안전부의 재난관리자원 통합관리·재난대비훈련 자료를 교차검토했습니다. 작품은 질문의 서사적 출처로만 사용하며, 도로 복구 방법·홍수 대응 기술·법적 계약 효력·전문 자격 업무는 이 글의 범위에서 제외합니다.",
+  "brief_id": "K-010",
+  "source_kind": "PUBLIC_ARCHIVE",
+  "source_manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_005/SOURCE_MANIFEST.json",
+  "source_manifest_sha256": "1d7513ee6981ace5be8ef3d8164c6816d10f3d291037c6f1d4d4f169e52c5550"
+}

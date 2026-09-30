@@ -48,6 +48,18 @@
       "brief_ids": [
         "K-009"
       ]
+    },
+    {
+      "source_manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_005/SOURCE_MANIFEST.json",
+      "source_manifest_sha256": "1d7513ee6981ace5be8ef3d8164c6816d10f3d291037c6f1d4d4f169e52c5550",
+      "status": "PROCESSED",
+      "processed_at": "2026-09-30T08:58:01.000Z",
+      "candidate_ids": [
+        "KC-community-mutual-aid-agreement"
+      ],
+      "brief_ids": [
+        "K-010"
+      ]
     }
   ]
 }
