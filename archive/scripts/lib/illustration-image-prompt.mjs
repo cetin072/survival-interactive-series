@@ -71,7 +71,21 @@ function assertNoOutputContamination(positivePrompt, negativePrompt, checklist) 
   for (const item of checklist) assertNoOperationalText(item)
 }
 
-function compileLocationRendererText(source, brief, art) {
+function profileVisualCues(source, profile) {
+  if (profile === null || profile === undefined) return []
+  const record = requireRecord(profile)
+  if (record.node_id !== source.subject_id || record.type !== source.brief?.point_type?.toLowerCase()) {
+    throw new Error('ILLUSTRATION_VISUAL_PROFILE_BINDING_INVALID')
+  }
+  if (!Array.isArray(record.render_cues) || record.render_cues.length > 40) {
+    throw new Error('ILLUSTRATION_VISUAL_PROFILE_INVALID')
+  }
+  const cues = record.render_cues.map((item) => requireText(item, { maxLength: 800 }))
+  for (const cue of cues) assertNoOperationalText(cue)
+  return cues
+}
+
+function compileLocationRendererText(source, brief, art, profile = null) {
   const subject = requireRecord(brief.subject)
   const label = requireText(subject.label)
   const composition = requireText(art.composition)
@@ -80,6 +94,7 @@ function compileLocationRendererText(source, brief, art) {
   const visualFacts = brief.visual_facts === undefined
     ? []
     : visualFactLines(requireRecord(brief.visual_facts))
+  const profileCues = profileVisualCues(source, profile)
 
   for (const text of [label, composition, ...rendering, ...moodRules, ...visualFacts]) {
     assertNoOperationalText(text)
@@ -90,29 +105,30 @@ function compileLocationRendererText(source, brief, art) {
     visualFacts.length
       ? `명시된 시각 사실: ${visualFacts.join('; ')}`
       : '세부 시각 사실이 따로 명시되지 않았으므로 장소 이름이 직접 가리키는 기본 유형과 일반적인 현대 한국 생활환경 범위만 최소한으로 표현한다',
+    profileCues.length ? `보강 시각 묘사: ${profileCues.join('; ')}` : '',
     `구도: ${composition}`,
     `분위기: ${moodRules.join('; ')}`,
     `화풍: ${STYLE_VERSION}; 회화적 반실사; ${rendering.join('; ')}`,
     '사람이 꼭 필요할 때만 아주 작고 비식별적인 배경 인물로 표현하며 전경 인물이나 초상 구도는 사용하지 않는다',
     '명시되지 않은 폐허, 대규모 파괴, 기념물, 깃발, 벽화, 선전문구, 표지판 문구, 극적인 일몰, 날씨, 계절, 식생, 건물 손상, 보안시설, 이동경로를 추가하지 않는다',
     '글자, 숫자, 라벨, 워터마크 또는 인터페이스 요소는 넣지 않는다',
-  ].join('. ')
+  ].filter(Boolean).join('. ')
 
   assertNoOperationalText(text)
   if (text.length < 40 || text.length > 6000) throw new Error('ILLUSTRATION_RENDERER_PROMPT_LENGTH_INVALID')
   return text
 }
 
-export function compileIllustrationRendererText(point) {
+export function compileIllustrationRendererText(point, profile = null) {
   const source = requireRecord(point)
   const brief = requireRecord(source.brief)
   const art = requireRecord(brief.art_direction)
 
   if (brief.point_type === 'LOCATION') {
-    return compileLocationRendererText(source, brief, art)
+    return compileLocationRendererText(source, brief, art, profile)
   }
 
-  const prompt = compileIllustrationImagePrompt(source)
+  const prompt = compileIllustrationImagePrompt(source, profile)
   const safeguards = requireTextList(brief.safeguards)
   const exclusions = [...requireTextList(art.avoid)]
   for (const safeguard of safeguards) {
@@ -159,7 +175,7 @@ export function validateIllustrationImagePrompt(prompt) {
   return contract
 }
 
-export function compileIllustrationImagePrompt(point) {
+export function compileIllustrationImagePrompt(point, profile = null) {
   const source = requireRecord(point)
   if (!POINT_ID.test(source.point_id ?? '') || !GENERATION_KEY.test(source.generation_key ?? '')
     || !SUBJECT_ID.test(source.subject_id ?? '')) throw new Error('INVALID_ILLUSTRATION_VISUAL_BRIEF')
@@ -184,6 +200,7 @@ export function compileIllustrationImagePrompt(point) {
   const subjectLabel = requireText(subject.label)
   const factLines = visualFactLines(canonFacts)
   if (factLines.length === 0) throw new Error('INVALID_ILLUSTRATION_VISUAL_BRIEF')
+  const profileCues = profileVisualCues(source, profile)
 
   for (const text of [subjectLabel, composition, mood, theme, ...moodRules, ...rendering, ...avoid, ...safeguards]) {
     assertNoOperationalText(text)
@@ -195,6 +212,7 @@ export function compileIllustrationImagePrompt(point) {
   const positivePrompt = [
     subjectDescription,
     `공개 시각 사실: ${factLines.join('; ')}`,
+    profileCues.length ? `보강 시각 묘사: ${profileCues.join('; ')}` : '',
     `구도: ${composition}`,
     `분위기: ${mood}; ${moodRules.join('; ')}`,
     `화풍: ${STYLE_VERSION}; 회화적 반실사, painterly semi-realistic illustration; ${rendering.join('; ')}`,
