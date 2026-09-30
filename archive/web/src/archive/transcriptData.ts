@@ -39,6 +39,7 @@ const c03S02Manifests = import.meta.glob(
   '../../../content/transcripts/C03-AFTERFALL/S02/MANIFEST.json',
   { eager: true, import: 'default' },
 ) as Record<string, unknown>
+import c03S02SharedRecovery from '../../../content/transcripts/C03-AFTERFALL/S02/SHARED_CHAT_RECOVERY/PART_RECOVERY_001.md?raw'
 const c03S03Raw = import.meta.glob(
   '../../../content/transcripts/C03-AFTERFALL/S03/SESSION_*/PART_*.md',
   { eager: true, query: '?raw', import: 'default' },
@@ -118,6 +119,24 @@ const c03S02TranscriptParts: TranscriptPart[] = Object.entries(c03S02Raw)
       content,
     })
   })
+
+const c03S02SharedRecoveryPart = c03({
+  id: 'c03-s02-session-004-recovery-001',
+  seasonId: 'S02',
+  sessionId: 'SESSION_004',
+  number: 2,
+  tocLabel: 'RECOVERY',
+  title: 'SESSION_004 · 공유채팅 복구 조각',
+  range: '2027-01-16 09:29 · 누락 GM 응답 일부',
+  status: 'verified_fragment',
+  source: 'archive/content/transcripts/C03-AFTERFALL/S02/SHARED_CHAT_RECOVERY/PART_RECOVERY_001.md',
+  sourceVerified: true,
+  content: c03S02SharedRecovery,
+  contentFormat: 'raw_fragment',
+})
+const c03S02TranscriptPartsWithRecovery = c03S02TranscriptParts.flatMap((part) =>
+  part.sessionId === 'SESSION_004' ? [part, c03S02SharedRecoveryPart] : [part],
+)
 
 type C03S03Session = {
   session_id: string
@@ -313,7 +332,7 @@ export const transcriptParts: TranscriptPart[] = [
   c03({ id: 'c03-s01-010', seasonId: 'S01', number: 10, title: '저장 완료 공개 보고', range: '시즌 종료 저장 완료 공개 보고', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_010.md', sourceVerified: true, content: c03S01Part10 }),
   c03({ id: 'c03-s02-session-001-gap', seasonId: 'S02', sessionId: 'SESSION_001', number: 0, title: '세션 001 직접 확인 전 구간', range: '2026-11-22 industrial-fire response 이전', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/SOURCE_INDEX.md', sourceVerified: true }),
   c03({ id: 'c03-s02-session-002-gap', seasonId: 'S02', sessionId: 'SESSION_002', number: 0, title: '세션 002 직접 확인 전 구간', range: '2027-01-04 first-winter discussion 이전', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/SOURCE_INDEX.md', sourceVerified: true }),
-  ...c03S02TranscriptParts,
+  ...c03S02TranscriptPartsWithRecovery,
   c03({ id: 'c03-s03-session-001-gap', seasonId: 'S03', sessionId: 'SESSION_001', number: 0, title: 'S03 원본 순서 0–41', range: '첫 게시 배치 이전 · 아직 Archive에 보존되지 않은 구간', status: 'missing_transcript', source: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_001/SOURCE_INDEX.md', sourceVerified: true }),
   ...c03S03TranscriptParts,
 ]

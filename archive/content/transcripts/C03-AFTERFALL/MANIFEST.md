@@ -12,6 +12,7 @@ checkpoint, event, state, or summary material is presented as dialogue.
 | S02, SESSION_001 | `PARTIAL` | `worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/` | 31 USER / 89 GM public blocks, from the industrial-fire response to the source cutoff. |
 | S02, SESSION_002 | `PARTIAL` | `worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/` | 13 USER / 16 GM public blocks, from the first-winter discussion to the source cutoff. |
 | S02, SESSION_003–004 | `PARTIAL_CAPTURE_INCOMPLETE_PAIRING` | `survival_rpg.transcript_messages` → durable S02 archive | One GM-only and one USER-only capture are retained as incomplete fragments; no counterpart is reconstructed. |
+| S02, SESSION_004 shared-chat recovery | `VERIFIED PARTIAL FRAGMENT` | user-provided ChatGPT shared conversation | Missing GM reply beginning at 2027-01-16 09:29 is partially recovered; unrecovered middle remains explicit gaps and SESSION_004 stays incomplete. |
 | S02, SESSION_005–009 | `PARTIAL / VERIFIED DB SPANS` | `survival_rpg.transcript_messages` → durable S02 archive | Exact public USER→GM captures through the 2027-03-23 17:50 / save 253 finale. The season remains PARTIAL because earlier source-room gaps remain. |
 
 S02 session namespaces are retained separately. Their small exact USER overlap

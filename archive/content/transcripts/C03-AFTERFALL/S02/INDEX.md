@@ -91,3 +91,16 @@ This cold archive is not a normal game boot input.
 8. `SESSION_008`
 9. `SESSION_009`
 
+
+
+## Shared-chat gap recovery — 2026-10-01
+
+사용자가 제공한 ChatGPT 공유 원본 `진우 시즌 2 04 (종료)`를 기존 S02 RAW와 대조했다.
+
+- Source: <https://chatgpt.com/share/6abd160b-2cf4-83ee-b4d0-98c7ede8dc3e?ogimg=plain>
+- `SESSION_005` 이후의 신하영 합류·정보원 병렬·도로관리집단 접촉 구간은 기존 atomic RAW와 겹치므로 중복 보존하지 않았다.
+- 새로 보강 가능한 지점은 `SESSION_004`의 누락 GM 상대 메시지다.
+- 공유 원본에서 직접 다시 확인된 GM 문장만 `SHARED_CHAT_RECOVERY/PART_RECOVERY_001.md`에 보존했다.
+- 답변 전체가 회수된 것은 아니므로 `SESSION_004`의 `PARTIAL_CAPTURE_INCOMPLETE_PAIRING` 판정은 유지한다.
+- 확인되지 않은 중간은 `[원문 확인 불가 구간]`으로 남긴다.
+- 복구 조각은 RAW Vault에는 공개하지만 Reader Edition 서사 본문에는 자동 편입하지 않는다.
