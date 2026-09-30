@@ -3,6 +3,13 @@ import type { User } from '@supabase/supabase-js'
 import { chronicleRegistry } from './chronicleRegistry'
 import { supabaseClient } from './supabaseClient'
 import { operatorPasswordRedirectUrl, validatePasswordChange } from './operatorPassword'
+import {
+  formatOperatorTime,
+  operatorStaticStatus,
+  productionStatusTone,
+  shortSha,
+  visualStatusTone,
+} from './operatorSystemStatus'
 
 type ReviewItem = {
   id: string; source_worker: string; item_type: string; chronicle_id: string | null
@@ -15,9 +22,40 @@ type ReviewDetail = ReviewItem & {
   decision_note: string | null; decision_history: Decision[]
 }
 type Inbox = { pending_count: number; automation_error_count: number; items: ReviewItem[] }
+type ArchiveRun = {
+  scheduled_date?: string | null; status?: string | null; attempt_count?: number | null
+  last_error_code?: string | null; started_at?: string | null; finished_at?: string | null
+  task_id?: string | null; task_kind?: string | null; chronicle_id?: string | null
+  season_id?: string | null; updated_at?: string | null; completed_at?: string | null
+}
+type VisualRun = {
+  run_id?: string | null; started_at?: string | null; finished_at?: string | null
+  final_status?: string | null; blocker_code?: string | null; blocker_stage?: string | null
+  target_subject_id?: string | null; accepted_count?: number | null
+  registry_status?: string | null; cleanup_status?: string | null; main_sha?: string | null
+}
+type SystemStatus = {
+  archive: { daily_run_count: number; task_count: number; latest_daily_run: ArchiveRun | null; latest_task: ArchiveRun | null }
+  visual: { run_count: number; latest_run: VisualRun | null }
+  review: { pending_count: number; automation_error_count: number }
+}
+type ReleaseMarker = {
+  source_main_sha?: string; released_on_kst?: string; interval_days?: number
+  release_attempt?: number; policy?: string
+}
+type DeployMeta = { context?: string; commit_ref?: string; build_id?: string; provider?: string }
+type ProductionStatus = { release: ReleaseMarker | null; deploy: DeployMeta | null }
 
 const emptyInbox: Inbox = { pending_count: 0, automation_error_count: 0, items: [] }
 const rpcError = (error: { message: string }) => error.message.replace(/^.*SURVIVAL_ARCHIVE_/, '권한 또는 요청 오류: SURVIVAL_ARCHIVE_')
+const readJson = async <T,>(path: string): Promise<T | null> => {
+  try {
+    const response = await fetch(path, { cache: 'no-store' })
+    return response.ok ? await response.json() as T : null
+  } catch {
+    return null
+  }
+}
 
 export default function OperatorConsole() {
   const [user, setUser] = useState<User | null>(null)
@@ -29,6 +67,9 @@ export default function OperatorConsole() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [inbox, setInbox] = useState<Inbox>(emptyInbox)
+  const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null)
+  const [productionStatus, setProductionStatus] = useState<ProductionStatus>({ release: null, deploy: null })
+  const [statusError, setStatusError] = useState('')
   const [selected, setSelected] = useState<ReviewDetail | null>(null)
   const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
@@ -36,10 +77,18 @@ export default function OperatorConsole() {
 
   const refresh = useCallback(async () => {
     if (!supabaseClient) return
-    setBusy(true); setError('')
-    const { data, error: inboxError } = await supabaseClient.rpc('archive_operator_review_inbox')
-    if (inboxError) setError(rpcError(inboxError))
-    else setInbox((data ?? emptyInbox) as Inbox)
+    setBusy(true); setError(''); setStatusError('')
+    const [inboxResult, systemResult, release, deploy] = await Promise.all([
+      supabaseClient.rpc('archive_operator_review_inbox'),
+      supabaseClient.rpc('archive_operator_system_status'),
+      readJson<ReleaseMarker>('/release/production.json'),
+      readJson<DeployMeta>('/deploy-meta.json'),
+    ])
+    if (inboxResult.error) setError(rpcError(inboxResult.error))
+    else setInbox((inboxResult.data ?? emptyInbox) as Inbox)
+    if (systemResult.error) setStatusError('자동화 실행 상태를 불러오지 못했습니다.')
+    else setSystemStatus(systemResult.data as SystemStatus)
+    setProductionStatus({ release, deploy })
     setBusy(false)
   }, [])
 
@@ -144,9 +193,64 @@ export default function OperatorConsole() {
     <button type="button" className="operator-reset-link" disabled={busy} onClick={() => void requestPasswordReset()}>비밀번호를 모르겠어요 · 재설정 메일 받기</button>
   </section>
 
-  return <section className="operator-page"><header className="operator-heading"><div><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>Review Inbox</h1><p>{user.email} · 데이터 변경은 권한 검사를 거치는 서버 RPC로 처리됩니다.</p></div><button className="operator-secondary" disabled={busy} onClick={() => void signOut()}>로그아웃</button></header>
+  const archiveRunCount = (systemStatus?.archive.daily_run_count ?? 0) + (systemStatus?.archive.task_count ?? 0)
+  const archiveLatest = systemStatus?.archive.latest_daily_run ?? systemStatus?.archive.latest_task ?? null
+  const visualLatest = systemStatus?.visual.latest_run ?? null
+  const knowledgeLatestBrief = operatorStaticStatus.knowledge.latestBriefIds.at(-1) ?? '없음'
+  const knowledgeNeedsReview = inbox.pending_count > 0
+  const productionContext = productionStatus.deploy?.context ?? null
+
+  return <section className="operator-page"><header className="operator-heading"><div><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>Operator Dashboard</h1><p>{user.email} · 실제 자동화 상태와 검토 대기 항목을 한곳에서 확인합니다.</p></div><button className="operator-secondary" disabled={busy} onClick={() => void signOut()}>로그아웃</button></header>
     {error && <p className="operator-error" role="alert">{error}</p>}
-    <div className="operator-counts"><article><span>Human Review</span><strong>{inbox.pending_count}</strong></article><article><span>Automation Error</span><strong>{inbox.automation_error_count}</strong></article><article><span>Security Alert</span><strong>—</strong></article><article><span>Cost Alert</span><strong>—</strong></article></div>
+    {statusError && <p className="operator-error" role="alert">{statusError}</p>}
+    <div className="operator-counts"><article><span>Human Review</span><strong>{inbox.pending_count}</strong></article><article><span>Automation Error</span><strong>{inbox.automation_error_count}</strong></article><article><span>Security Alert</span><strong className="operator-unwired">미연결</strong></article><article><span>Cost Alert</span><strong className="operator-unwired">미연결</strong></article></div>
+
+    <section className="operator-system">
+      <header><div><p className="archive-eyebrow">SYSTEM STATUS</p><h2>자동화 상태</h2></div><button className="operator-secondary" disabled={busy} onClick={() => void refresh()}>상태 새로고침</button></header>
+      <div className="operator-system-grid">
+        <article className="operator-system-card">
+          <div className="operator-system-title"><h3>A · Archive</h3><span className="operator-status-badge neutral">{archiveRunCount ? (archiveLatest?.status ?? '기록 있음') : '실행이력 미수집'}</span></div>
+          <dl>
+            <div><dt>모드</dt><dd>{operatorStaticStatus.archive.mode}</dd></div>
+            <div><dt>DB 실행기록</dt><dd>{archiveRunCount}건</dd></div>
+            <div><dt>최근 결과</dt><dd>{archiveLatest?.status ?? '기록 없음'}</dd></div>
+            <div><dt>최근 시각</dt><dd>{formatOperatorTime(archiveLatest?.finished_at ?? archiveLatest?.completed_at ?? archiveLatest?.updated_at)}</dd></div>
+          </dl>
+        </article>
+
+        <article className="operator-system-card">
+          <div className="operator-system-title"><h3>B · Visual</h3><span className={`operator-status-badge ${visualStatusTone(visualLatest?.final_status)}`}>{visualLatest?.final_status ?? '실행이력 없음'}</span></div>
+          <dl>
+            <div><dt>실행기록</dt><dd>{systemStatus?.visual.run_count ?? 0}건</dd></div>
+            <div><dt>최근 대상</dt><dd>{visualLatest?.target_subject_id ?? '없음'}</dd></div>
+            <div><dt>최근 시각</dt><dd>{formatOperatorTime(visualLatest?.finished_at ?? visualLatest?.started_at)}</dd></div>
+            <div><dt>상세</dt><dd>{visualLatest?.blocker_code ? `${visualLatest.blocker_code} · ${visualLatest.blocker_stage ?? '단계 미상'}` : `accepted ${visualLatest?.accepted_count ?? 0}`}</dd></div>
+          </dl>
+        </article>
+
+        <article className="operator-system-card">
+          <div className="operator-system-title"><h3>C · Knowledge</h3><span className={`operator-status-badge ${knowledgeNeedsReview ? 'warning' : 'ok'}`}>{knowledgeNeedsReview ? '검토 필요' : operatorStaticStatus.knowledge.workerEnabled ? '정상' : '중지'}</span></div>
+          <dl>
+            <div><dt>최근 처리</dt><dd>{knowledgeLatestBrief}</dd></div>
+            <div><dt>처리 시각</dt><dd>{formatOperatorTime(operatorStaticStatus.knowledge.latestProcessedAt)}</dd></div>
+            <div><dt>Review 대기</dt><dd>{inbox.pending_count}건</dd></div>
+            <div><dt>주기</dt><dd>{operatorStaticStatus.knowledge.triggerIntervalHours}시간 · {operatorStaticStatus.knowledge.timezone}</dd></div>
+          </dl>
+        </article>
+
+        <article className="operator-system-card">
+          <div className="operator-system-title"><h3>Production</h3><span className={`operator-status-badge ${productionStatusTone(productionContext)}`}>{productionContext === 'production' ? '정상' : productionContext ?? '확인 필요'}</span></div>
+          <dl>
+            <div><dt>Source SHA</dt><dd><code>{shortSha(productionStatus.release?.source_main_sha)}</code></dd></div>
+            <div><dt>Deploy SHA</dt><dd><code>{shortSha(productionStatus.deploy?.commit_ref)}</code></dd></div>
+            <div><dt>최근 배치</dt><dd>{productionStatus.release?.released_on_kst ?? '기록 없음'}</dd></div>
+            <div><dt>정책</dt><dd>{operatorStaticStatus.release.productionIntervalDays}일 배치 · {operatorStaticStatus.release.releaseHourKst}시 · 일 최대 {operatorStaticStatus.release.maxProductionDeploysPerDay}회</dd></div>
+          </dl>
+        </article>
+      </div>
+      <p className="operator-muted">A의 DB 실행 이력은 아직 수집되지 않아 AUTO 설정과 기록 유무만 표시합니다. B는 Supabase worker receipt, C는 현재 Production에 포함된 Knowledge state, Production은 release/deploy 메타를 읽습니다.</p>
+    </section>
+
     <div className="operator-grid"><section className="operator-panel"><header><h2>대기 항목</h2><button className="operator-secondary" disabled={busy} onClick={() => void refresh()}>새로고침</button></header>
       {busy && <p className="operator-muted" aria-live="polite">처리 중…</p>}{!inbox.items.length && <p className="operator-empty">현재 대기 중인 검토 항목이 없습니다.</p>}
       <ul className="operator-inbox">{inbox.items.map((item) => <li key={item.id}><button className={selected?.id === item.id ? 'selected' : ''} onClick={() => void loadDetail(item.id)}><span><b>{item.priority}</b><b>{item.item_type}</b><b>{item.risk_level}</b></span><strong>{item.title}</strong><small>{item.source_worker} · {item.status} · {item.chronicle_id ?? '공용'}</small><p>{item.summary}</p></button></li>)}</ul>
@@ -157,6 +261,6 @@ export default function OperatorConsole() {
       {selected.status === 'PENDING' && <div className="operator-decision"><label>검토 메모<textarea maxLength={1000} value={note} onChange={(event) => setNote(event.target.value)} /></label><div><button disabled={busy} onClick={() => void decide('APPROVED')}>승인</button><button className="operator-secondary" disabled={busy} onClick={() => void decide('HOLD')}>보류</button><button className="operator-danger" disabled={busy} onClick={() => void decide('REJECTED')}>거절</button></div></div>}
     </>}</section></div>
     <section className="operator-panel operator-chronicles"><h2>Chronicles</h2><div>{chronicleRegistry.map((item) => <span key={item.id}>C{String(item.number).padStart(2,'0')} · {item.title}</span>)}</div></section>
-    <p className="operator-muted">A Archive · B Visual · C Knowledge · 검토 결정은 Supabase에만 기록되며 GitHub merge 또는 Netlify 배포를 실행하지 않습니다.</p>
+    <p className="operator-muted">검토 결정은 Supabase에 기록되고, 승인된 C 항목만 기존 GitHub CI와 Batched Production 흐름으로 이어집니다. Security/Cost는 실제 데이터원이 연결될 때까지 미연결로 표시합니다.</p>
   </section>
 }
