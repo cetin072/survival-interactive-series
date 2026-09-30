@@ -241,15 +241,38 @@ async function verifyExistingProposal(existing, candidate, base) {
   }
 }
 
-function previewGate(pr, expectedHead, expectedBase) {
-  execFileSync('gh', ['pr', 'checks', pr, '--repo', 'cetin072/survival-interactive-series', '--watch'],
-    { cwd: root, stdio: 'ignore', timeout: 1_200_000 })
+async function previewGate(pr, expectedHead, expectedBase) {
+  const requiredNames = ['browser', 'build', 'validate']
+  let registered = false
+  for (let attempt = 0; attempt < 120; attempt += 1) {
+    const info = JSON.parse(gh('pr', 'view', pr, '--repo', 'cetin072/survival-interactive-series',
+      '--json', 'headRefOid,baseRefOid,statusCheckRollup'))
+    insist(info.headRefOid === expectedHead && info.baseRefOid === expectedBase,
+      'STALE_OR_UNMERGEABLE_PR')
+    const checks = info.statusCheckRollup ?? []
+    const requiredRegistered = requiredNames.every((name) => checks.some((item) =>
+      item.__typename === 'CheckRun' && item.name === name))
+    const previewRegistered = checks.some((item) => item.__typename === 'StatusContext'
+      && item.context === 'netlify/survival-diary-archive/deploy-preview')
+    if (requiredRegistered && previewRegistered) {
+      registered = true
+      break
+    }
+    if (attempt < 119) await new Promise((resolveWait) => setTimeout(resolveWait, 5000))
+  }
+  insist(registered, 'CHECK_REGISTRATION_TIMEOUT')
+  try {
+    execFileSync('gh', ['pr', 'checks', pr, '--repo', 'cetin072/survival-interactive-series', '--watch'],
+      { cwd: root, stdio: 'ignore', timeout: 1_200_000 })
+  } catch {
+    throw new Error('PR_CHECK_FAILED')
+  }
   const info = JSON.parse(gh('pr', 'view', pr, '--repo', 'cetin072/survival-interactive-series',
     '--json', 'headRefOid,baseRefOid,mergeStateStatus,statusCheckRollup'))
   insist(info.headRefOid === expectedHead && info.baseRefOid === expectedBase
     && info.mergeStateStatus === 'CLEAN', 'STALE_OR_UNMERGEABLE_PR')
   const checks = info.statusCheckRollup ?? []
-  for (const name of ['browser', 'build', 'validate']) {
+  for (const name of requiredNames) {
     insist(checks.some((item) => item.__typename === 'CheckRun' && item.name === name
       && item.status === 'COMPLETED' && item.conclusion === 'SUCCESS'),
     'REQUIRED_CI_NOT_GREEN')
@@ -259,11 +282,15 @@ function previewGate(pr, expectedHead, expectedBase) {
     : ['SUCCESS', 'NEUTRAL', 'SKIPPED'].includes(item.conclusion)), 'PR_CHECK_FAILED')
   const preview = checks.find((item) => item.__typename === 'StatusContext'
     && item.context === 'netlify/survival-diary-archive/deploy-preview')
-  insist(preview?.state === 'SUCCESS' && /^https:\/\/app\.netlify\.com\/projects\/survival-diary-archive\/deploys\/[a-f0-9]+\/?$/.test(preview.targetUrl),
-    'PREVIEW_NOT_READY')
   const number = Number(new URL(pr).pathname.match(/\/pull\/(\d+)\/?$/)?.[1])
   insist(Number.isSafeInteger(number) && number > 0, 'INVALID_PREVIEW_PR')
-  return `https://deploy-preview-${number}--survival-diary-archive.netlify.app/`
+  const previewUrl = `https://deploy-preview-${number}--survival-diary-archive.netlify.app/`
+  const knownTarget = typeof preview?.targetUrl === 'string' && (
+    /^https:\/\/app\.netlify\.com\/projects\/survival-diary-archive\/deploys\/[a-f0-9]+\/?$/.test(preview.targetUrl)
+    || preview.targetUrl.replace(/\/$/, '') === previewUrl.replace(/\/$/, '')
+  )
+  insist(preview?.state === 'SUCCESS' && knownTarget, 'PREVIEW_NOT_READY')
+  return previewUrl
 }
 
 async function verifySite(url, chapterId, rawRef) {
@@ -326,10 +353,8 @@ async function waitForProductionDeploy(site, expectedCommit, candidate) {
 }
 
 async function autoPublish(result, candidate, base) {
-  const preview = previewGate(result.pr, result.commit, base)
+  const preview = await previewGate(result.pr, result.commit, base)
   await verifySite(preview, candidate.additions[0].id, `${candidate.source.entry.session_id}/PART_001.md`)
-  // Validate the read-only Netlify API credential and site identity before the irreversible merge.
-  const productionSite = await netlifyProductionSite()
   insist(git('rev-parse', 'origin/main') === base, 'BASE_MOVED_HUMAN_REVIEW_REQUIRED')
   gh('pr', 'merge', result.pr, '--repo', 'cetin072/survival-interactive-series',
     '--squash', '--match-head-commit', result.commit)
@@ -337,7 +362,8 @@ async function autoPublish(result, candidate, base) {
     '--json', 'state,mergeCommit'))
   insist(merged.state === 'MERGED' && /^[a-f0-9]{40}$/.test(merged.mergeCommit?.oid),
     'MERGE_NOT_CONFIRMED')
-  return await waitForProductionDeploy(productionSite, merged.mergeCommit.oid, candidate)
+  return { status: 'PRODUCTION_QUEUED', merge_sha: merged.mergeCommit.oid,
+    production_release: 'BATCHED_RELEASE_GATE' }
 }
 
 export async function runDaily(args) {

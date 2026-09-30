@@ -1,5 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
@@ -22,7 +23,22 @@ const point = (id, priority = 10, overrides = {}) => ({
   priority,
   status: 'READY',
   title: `Subject ${id}`,
-  brief: { subject: { label: `Subject ${id}` }, canon_facts: { fact: 'source' }, safeguards: ['Do not invent facts.'] },
+  brief: {
+    version: 'visual-brief-v1',
+    point_type: 'CHARACTER',
+    subject: { label: `Subject ${id}`, node_id: `subject-${id}` },
+    canon_facts: { fact: 'source' },
+    art_direction: {
+      composition: 'single-subject master portrait; simple non-identifying background',
+      mood: 'QUIET_DECAY',
+      mood_rules: ['cool blue-gray; no invented weather'],
+      rendering: ['non-photorealistic painterly illustration'],
+      avoid: ['embedded typography, labels or numbers'],
+      style_version: 'AFTERFALL_ARCHIVE_V1',
+      theme: 'Quiet survival, not spectacle.',
+    },
+    safeguards: ['Do not invent facts.'],
+  },
   ...overrides,
 })
 const receipt = (p, status, occurred_at = '2026-09-28T01:00:00.000Z', attempt_no = 1, overrides = {}) => ({
@@ -114,34 +130,28 @@ test('string priority fails closed', () => {
   assert.equal(plan.counts.skipped_invalid_priority, 1)
 })
 
-test('batch limit is three while actual-generation daily cap is six', () => {
-  const candidates = Array.from({ length: 9 }, (_, index) => point(String.fromCharCode(97 + index)))
-  const batchPlan = select({ points: candidates })
-  assert.equal(batchPlan.batch_limit, 3)
-  assert.equal(batchPlan.candidates.length, 3)
-  const sixAttempts = candidates.slice(0, 6).map((item) => receipt(item, 'FAILED'))
-  const plan = select({ points: candidates, attempts: sixAttempts })
+test('batch and actual-generation daily caps are both three', () => {
+  const candidates = Array.from({ length: 6 }, (_, index) => point(String.fromCharCode(97 + index)))
+  const threeAttempts = candidates.slice(0, 3).map((item) => receipt(item, 'FAILED'))
+  const plan = select({ points: candidates, attempts: threeAttempts })
   assert.equal(plan.batch_limit, 3)
-  assert.equal(plan.daily_generation_cap, 6)
-  assert.equal(plan.generation_attempts_today, 6)
+  assert.equal(plan.daily_generation_cap, 3)
+  assert.equal(plan.generation_attempts_today, 3)
   assert.equal(plan.daily_capacity_remaining, 0)
   assert.equal(plan.candidates.length, 0)
-  assert.equal(plan.counts.skipped_daily_cap, 6)
+  assert.equal(plan.counts.skipped_daily_cap, candidates.length)
 })
 
-test('each failed retry consumes daily capacity and seventh actual attempt is blocked', () => {
+test('each failed retry consumes daily capacity and fourth actual attempt is blocked', () => {
   const first = point('a'), second = point('b')
   let receipts = emptyReceipts()
   receipts = appendIllustrationReceipt(receipts, first, { provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'GENERATION_FAILED', now: new Date('2026-09-28T01:00:00Z') })
   receipts = appendIllustrationReceipt(receipts, first, { provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'GENERATION_FAILED', now: new Date('2026-09-28T02:00:00Z') })
   receipts = appendIllustrationReceipt(receipts, second, { provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'PROVIDER_UNAVAILABLE', now: new Date('2026-09-28T03:00:00Z') })
-  for (const id of ['c', 'd', 'e']) {
-    receipts = appendIllustrationReceipt(receipts, point(id), { provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'GENERATION_FAILED', now: new Date('2026-09-28T04:00:00Z') })
-  }
-  assert.deepEqual(receipts.attempts.map((item) => item.attempt_no), [1, 2, 1, 1, 1, 1])
-  assert.equal(dailyGenerationUsed(receipts, '2026-09-28'), 6)
-  assert.throws(() => appendIllustrationReceipt(receipts, point('f'), {
-    provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'GENERATION_FAILED', now: new Date('2026-09-28T05:00:00Z'),
+  assert.deepEqual(receipts.attempts.map((item) => item.attempt_no), [1, 2, 1])
+  assert.equal(dailyGenerationUsed(receipts, '2026-09-28'), 3)
+  assert.throws(() => appendIllustrationReceipt(receipts, point('c'), {
+    provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'GENERATION_FAILED', now: new Date('2026-09-28T04:00:00Z'),
   }), /DAILY_CAP_REACHED/)
 })
 
@@ -152,6 +162,10 @@ test('builds provider-independent handoffs and normalized provider results', asy
   assert.equal(handoff.contract_version, 'illustration-handoff-v1')
   assert.equal(handoff.canonical_facts.fact, 'source')
   assert.equal(handoff.output_spec.original_visibility, 'PRIVATE')
+  assert.equal(handoff.image_prompt.contract_version, 'illustration-image-prompt-v1')
+  assert.deepEqual(Object.keys(handoff.image_prompt).sort(), [
+    'contract_version', 'generation_key', 'negative_prompt', 'point_id', 'positive_prompt', 'review_checklist', 'subject_id',
+  ])
   const result = await createProvider('shadow').generateIllustration(candidate)
   assert.deepEqual(Object.keys(result).sort(), ['generation_key', 'height', 'metadata', 'mime_type', 'original_ref', 'point_id', 'provider', 'sha256', 'status', 'width'])
   assert.equal(result.status, 'WOULD_GENERATE')
@@ -236,16 +250,16 @@ test('receipt validation rejects corrupt entries and unknown status/provider/rea
 })
 
 test('KST 23:59 attempts count for that day and reset at next-day 00:01', () => {
-  const points = Array.from({ length: 6 }, (_, index) => point(String.fromCharCode(97 + index)))
+  const points = Array.from({ length: 3 }, (_, index) => point(String.fromCharCode(97 + index)))
   const attempts = points.map((item) => receipt(item, 'FAILED', '2026-09-28T14:59:00.000Z'))
   const beforeMidnight = new Date('2026-09-28T14:59:00.000Z')
   const afterMidnight = new Date('2026-09-28T15:01:00.000Z')
   assert.equal(kstCalendarDay(beforeMidnight), '2026-09-28')
   assert.equal(kstCalendarDay(afterMidnight), '2026-09-29')
-  assert.equal(select({ points, attempts, now: beforeMidnight }).generation_attempts_today, 6)
+  assert.equal(select({ points, attempts, now: beforeMidnight }).generation_attempts_today, 3)
   const nextDay = select({ points, attempts, now: afterMidnight })
   assert.equal(nextDay.generation_attempts_today, 0)
-  assert.equal(nextDay.daily_capacity_remaining, 6)
+  assert.equal(nextDay.daily_capacity_remaining, 3)
   const retry = appendIllustrationReceipt({ ...emptyReceipts(), attempts }, points[0], {
     provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'GENERATION_FAILED', now: afterMidnight,
   })
@@ -257,38 +271,35 @@ test('durably appends actual failures and reconciles a daily summary without los
   const directory = await mkdtemp(join(tmpdir(), 'illustration-attempts-'))
   const receiptsPath = join(directory, 'ILLUSTRATION_RECEIPTS.json')
   await writeFile(receiptsPath, `${JSON.stringify(emptyReceipts(), null, 2)}\n`)
-  const points = Array.from({ length: 6 }, (_, index) => point(String.fromCharCode(97 + index)))
+  const points = [point('a'), point('b'), point('c')]
   const outcomes = [
     { status: 'FAILED', reasonCode: 'GENERATION_FAILED' },
     { status: 'SUCCEEDED', reasonCode: null, outputSha256: 'f'.repeat(64) },
     { status: 'FAILED', reasonCode: 'PROVIDER_UNAVAILABLE' },
-    { status: 'FAILED', reasonCode: 'GENERATION_FAILED' },
-    { status: 'SUCCEEDED', reasonCode: null, outputSha256: 'e'.repeat(64) },
-    { status: 'FAILED', reasonCode: 'PROVIDER_UNAVAILABLE' },
   ]
   try {
-    for (let index = 0; index < 6; index++) {
+    for (let index = 0; index < 3; index++) {
       await persistIllustrationAttempt({
         receiptsPath,
         point: points[index],
         provider: 'native_chatgpt',
         ...outcomes[index],
-        now: new Date(`2026-09-28T${String(index + 1).padStart(2, '0')}:00:00.000Z`),
+        now: new Date(`2026-09-28T0${index + 1}:00:00.000Z`),
         deferredCandidates: [point('d'), point('e')],
       })
     }
     const storedReceipts = JSON.parse(await readFile(receiptsPath, 'utf8'))
     const summaryPath = join(directory, 'illustration-runs', '2026-09-28.json')
     const summary = JSON.parse(await readFile(summaryPath, 'utf8'))
-    assert.equal(storedReceipts.attempts.length, 6)
-    assert.equal(summary.generation_attempts, 6)
-    assert.equal(summary.failed, 4)
-    assert.equal(summary.succeeded, 2)
+    assert.equal(storedReceipts.attempts.length, 3)
+    assert.equal(summary.generation_attempts, 3)
+    assert.equal(summary.failed, 2)
+    assert.equal(summary.succeeded, 1)
     assert.equal(summary.deferred, 2)
-    assert.equal(summary.daily_generation_cap, 6)
+    assert.equal(summary.daily_generation_cap, 3)
     assert.equal(summary.cap_exhausted, true)
-    assert.deepEqual(summary.results.map((item) => item.attempt_no), [1, 1, 1, 1, 1, 1])
-    assert.deepEqual(summary.results.map((item) => item.status), ['FAILED', 'SUCCEEDED', 'FAILED', 'FAILED', 'SUCCEEDED', 'FAILED'])
+    assert.deepEqual(summary.results.map((item) => item.attempt_no), [1, 1, 1])
+    assert.deepEqual(summary.results.map((item) => item.status), ['FAILED', 'SUCCEEDED', 'FAILED'])
     assert.ok(summary.results.every((item) => !Object.hasOwn(item, 'brief')))
     assert.throws(() => appendIllustrationReceipt(storedReceipts, point('f'), {
       provider: 'native_chatgpt', status: 'FAILED', reasonCode: 'GENERATION_FAILED', now: new Date('2026-09-28T04:00:00Z'),
@@ -303,21 +314,59 @@ test('daily summary is a receipt projection and does not create empty run histor
   const summary = buildDailyRunSummary(receipts, '2026-09-28')
   assert.deepEqual(summary, {
     date_kst: '2026-09-28', generation_attempts: 0, succeeded: 0, failed: 0, deferred: 0,
-    daily_generation_cap: 6, cap_exhausted: false, results: [],
+    daily_generation_cap: 3, cap_exhausted: false, results: [],
   })
 })
 
-test('preserves the three real published images and the siteVisualFor path contract', async () => {
+test('preserves approved images and validates the site asset contract', async () => {
   const root = resolve(fileURLToPath(new URL('../../..', import.meta.url)))
   const manifestPath = resolve(root, 'archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json')
-  const assets = JSON.parse(await readFile(manifestPath, 'utf8')).assets
-  assert.deepEqual(assets.map((asset) => asset.subject_id).sort(), ['char-eunchae', 'char-jinwoo', 'char-seojin'])
+  const manifest = JSON.parse(await readFile(manifestPath, 'utf8'))
+  const catalog = JSON.parse(await readFile(resolve(root, 'archive/content/visuals/C03-AFTERFALL/VISUALS.json'), 'utf8'))
+  const assets = manifest.assets
+  const publishedSubjects = assets.map((asset) => asset.subject_id)
+  assert.deepEqual(publishedSubjects.slice(0, 4), [
+    'char-jinwoo', 'char-eunchae', 'char-seojin', 'loc-guild-rear-warehouse',
+  ])
+  assert.equal(new Set(publishedSubjects).size, publishedSubjects.length)
+  // SITE_ASSETS pins the visual catalog used when those assets were published.
+  // Archive A may advance VISUALS without republishing unchanged approved assets,
+  // so validate current point identity rather than requiring the whole-catalog hash to stay equal.
+  assert.match(manifest.visual_catalog_sha256, /^[a-f0-9]{64}$/)
+  const catalogBySubject = new Map(catalog.points.map((point) => [point.subject_id, point]))
+  const stable = (value) => Array.isArray(value) ? value.map(stable)
+    : value && typeof value === 'object'
+      ? Object.fromEntries(Object.keys(value).sort().map((key) => [key, stable(value[key])]))
+      : value
+  const { content_sha256: manifestSha, ...manifestBody } = manifest
+  assert.equal(createHash('sha256').update(JSON.stringify(stable(manifestBody))).digest('hex'), manifestSha)
+  const approvedDerivatives = {
+    'char-jinwoo': ['5112dc7b2e8901aed2fcbe2c4a34736af0fefed2394a5c82e7d08fa6f2d558c8', 153519],
+    'char-eunchae': ['d05543a3fb5f3ba23256c5d2d277074ee4650ea9708cd7980e79b7e4fa296314', 168453],
+    'char-seojin': ['4b8354b38fcdb4936b770cad7cb0afa733755f5099a6b14dd04b03e055b9b9ae', 172840],
+  }
   for (const asset of assets) {
     assert.match(asset.point_id, /^point-[a-f0-9]{64}$/)
     assert.match(asset.generation_key, /^generation-[a-f0-9]{64}$/)
+    const currentPoint = catalogBySubject.get(asset.subject_id)
+    assert.ok(currentPoint, `missing current visual point for ${asset.subject_id}`)
+    assert.equal(currentPoint.point_id, asset.point_id)
+    assert.equal(currentPoint.generation_key, asset.generation_key)
     assert.match(asset.public_path, /^\/visual-assets\/[a-f0-9]{64}\.png$/)
-    await readFile(resolve(root, 'archive/web/public', asset.public_path.slice(1)))
+    const bytes = await readFile(resolve(root, 'archive/web/public', asset.public_path.slice(1)))
+    assert.equal(bytes.length, asset.bytes)
+    assert.equal(createHash('sha256').update(bytes).digest('hex'), asset.sha256)
+    assert.equal(asset.width, 512)
+    assert.equal(asset.height, 512)
+    if (approvedDerivatives[asset.subject_id]) {
+      assert.deepEqual([asset.sha256, asset.bytes], approvedDerivatives[asset.subject_id])
+    }
   }
+  const warehouse = assets[3]
+  assert.equal(warehouse.point_id, 'point-df6dfecbd13bcd0d2fc7de0a0b44d2d4f87c5343b7fa4b343bdaaa67e59e67b5')
+  assert.equal(warehouse.generation_key, 'generation-3743c065c28f7621e2c6d3cc01fd4860af12f16f3430481663ed37dc4a2c0f1b')
+  assert.equal(warehouse.source_sha256, '2eb7736605c96f23d089af36cbad001b06954989678a296db7a27696fc43e810')
+  assert.ok(warehouse.bytes <= 200_000)
   const renderer = await readFile(resolve(root, 'archive/web/src/archive/siteVisual.ts'), 'utf8')
   assert.match(renderer, /manifest\.assets as SiteAsset\[\]/)
   assert.match(renderer, /export function siteVisualFor\(subjectId: string\)/)

@@ -1,7 +1,14 @@
 import { activeChronicle, transcriptPartsFor, type ChronicleId } from './transcriptData'
-import { chaptersForChronicle, chronicleBooks } from './storyData'
+import { chaptersForChronicle } from './storyData'
+import { chronicleRegistry } from './chronicleRegistry'
+import type { ChronicleSection } from './ChronicleRoom'
 
-export type ArchiveRoute = { view: 'archive' | 'story' | 'book' | 'raw'; chronicleId: ChronicleId; chapterId?: string; partId?: string; nodeId?: string }
+export type ArchiveRoute =
+  | { view: 'home' | 'story' | 'tools' | 'media' | 'operator'; chronicleId: ChronicleId }
+  | { view: 'chronicle'; chronicleId: ChronicleId; section?: ChronicleSection }
+  | { view: 'archive'; chronicleId: ChronicleId; nodeId?: string }
+  | { view: 'book'; chronicleId: ChronicleId; chapterId?: string }
+  | { view: 'raw'; chronicleId: ChronicleId; partId?: string }
 export type ReaderStorage = Pick<Storage, 'getItem'>
 export const storyProgressKey = (id: string) => 'survival-diary-archive:story-progress:v1:' + id
 export const rawProgressKey = (id: string) => 'survival-diary-archive:reader-progress:v5:' + id
@@ -38,26 +45,43 @@ export function resolveReaderRoute(route: ArchiveRoute, storage?: ReaderStorage)
   return route
 }
 
-export function parseArchiveRoute(search: string, storage?: ReaderStorage): ArchiveRoute {
+const sections = new Set<ChronicleSection>(['overview','reader','explorer','characters','locations','events','timeline','graph','map','visuals','raw'])
+
+export function parseArchiveRoute(search: string, storage?: ReaderStorage, pathname = '/'): ArchiveRoute {
   const params = new URLSearchParams(search)
   const requested = params.get('chronicle')
-  const chronicleId = chronicleBooks.find((book) => book.chronicleId === requested)?.chronicleId ?? activeChronicle.id
+  const chronicleId = chronicleRegistry.find((chronicle) => chronicle.id === requested)?.id ?? activeChronicle.id
+  if (pathname === '/operator' || pathname.startsWith('/operator/')) return { view: 'operator', chronicleId }
   const view = params.get('view')
   if (view === 'reader' || view === 'raw') return resolveReaderRoute({ view: 'raw', chronicleId, partId: params.get('part') ?? undefined }, storage)
   if (view === 'past') return { view: 'story', chronicleId }
   if (view === 'story' && requested) return resolveReaderRoute({ view: 'book', chronicleId, chapterId: params.get('chapter') ?? undefined }, storage)
   if (view === 'story') return { view: 'story', chronicleId }
-  return { view: 'archive', chronicleId, nodeId: params.get('node') ?? undefined }
+  if (view === 'chronicle' && chronicleRegistry.some((chronicle) => chronicle.id === requested)) {
+    const section = params.get('section') as ChronicleSection | null
+    return { view: 'chronicle', chronicleId, section: section && sections.has(section) ? section : 'overview' }
+  }
+  if (view === 'tools') return { view: 'tools', chronicleId }
+  if (view === 'media') return { view: 'media', chronicleId }
+  if (view === 'archive') return { view: 'archive', chronicleId: activeChronicle.id, nodeId: params.get('node') ?? undefined }
+  return { view: 'home', chronicleId: activeChronicle.id }
 }
 
 export function archiveRouteUrl(route: ArchiveRoute, href: string): URL {
   const url = new URL(href)
   url.search = ''; url.hash = ''
-  if (route.view === 'archive' && route.nodeId) {
+  if (route.view === 'operator') {
+    url.pathname = '/operator/'
+  } else if (route.view === 'archive') {
+    url.pathname = '/'
+    if (route.nodeId) {
     url.searchParams.set('view', 'archive'); url.searchParams.set('node', route.nodeId)
-  } else if (route.view !== 'archive') {
-    url.searchParams.set('view', route.view === 'book' ? 'story' : route.view)
-    if (route.view !== 'story') url.searchParams.set('chronicle', route.chronicleId)
+    }
+  } else {
+    url.pathname = '/'
+    if (route.view !== 'home') url.searchParams.set('view', route.view === 'book' ? 'story' : route.view)
+    if (route.view === 'chronicle' || route.view === 'book' || route.view === 'raw') url.searchParams.set('chronicle', route.chronicleId)
+    if (route.view === 'chronicle' && route.section && route.section !== 'overview') url.searchParams.set('section', route.section)
     if (route.view === 'book' && route.chapterId) url.searchParams.set('chapter', route.chapterId)
     if (route.view === 'raw' && route.partId) url.searchParams.set('part', route.partId)
   }

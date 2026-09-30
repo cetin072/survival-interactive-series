@@ -3,8 +3,9 @@ name: AFTERFALL daily Archive
 on:
   workflow_dispatch:
   schedule:
-    # 19:30 UTC is 04:30 KST on the following day.
-    - cron: '30 19 * * *'
+    # Secondary fallback: 20:07 UTC is 05:07 KST on the following day.
+    # Primary scheduling is handled by Supabase Cron at 04:37 KST.
+    - cron: '7 20 * * *'
 
 permissions:
   contents: write

@@ -156,6 +156,61 @@ export async function checkRelease(data, { changedFiles, briefIds, mode = data.c
   return { ...result, decision: mode === 'AUTO_LOW_RISK_SHADOW' ? 'WOULD_AUTO_PUBLISH' : 'AUTO_PUBLISH_ELIGIBLE', requires_human: false, reasons: [] }
 }
 
+
+export async function checkHumanApprovedRelease(data, { changedFiles, briefIds, base = data.base } = {}) {
+  const contentOnly = checkContentOnly(changedFiles)
+  const ids = briefIds?.length ? briefIds : []
+  const result = { mode: 'HUMAN_APPROVED', content_only: contentOnly, brief_ids: ids, requires_human: false, reasons: [] }
+  const blocked = (reasons) => ({ ...result, decision: 'HUMAN_APPROVED_BLOCKED', reasons: [...new Set(reasons)].sort() })
+
+  if (!contentOnly.allowed) return blocked(contentOnly.reasons)
+  if (!ids.length) return blocked(['HUMAN_APPROVAL_TARGET_REQUIRED'])
+  if (new Set(ids).size !== ids.length) return blocked(['DUPLICATE_RELEASE_TARGET'])
+
+  const bindingIssues = targetBindingIssues(changedFiles, ids, data.candidates, data.briefs)
+  if (bindingIssues.length) return blocked(bindingIssues)
+
+  const reasons = []
+  for (const id of ids) {
+    const brief = data.briefs.find((item) => item.id === id)
+    if (!brief) { reasons.push(`BRIEF_MISSING:${id}`); continue }
+    if (!['READY', 'PUBLISHED'].includes(brief.status)) reasons.push(`BRIEF_STATUS_INVALID:${id}`)
+    if (!['LOW', 'HIGH'].includes(brief.risk_level)) reasons.push(`RISK_LEVEL_INVALID:${id}`)
+    if (!['AUTO_LOW_RISK', 'HUMAN_APPROVED'].includes(brief.publication_policy)) reasons.push(`PUBLICATION_POLICY_INVALID:${id}`)
+    if (brief.semantic_qa_status !== 'PASS') reasons.push(`SEMANTIC_QA_NOT_PASS:${id}`)
+
+    const pack = data.evidence.get(id)
+    if (!pack || !Array.isArray(pack.claims) || !pack.claims.length || !brief.sources?.length) {
+      reasons.push(`EVIDENCE_OR_METADATA_INCOMPLETE:${id}`)
+      continue
+    }
+    if (pack.conflicts?.length) reasons.push(`EVIDENCE_CONFLICT:${id}`)
+    if (pack.unknowns?.length) reasons.push(`MATERIAL_UNKNOWNS:${id}`)
+    if (pack.copyright_status !== 'CLEAR') reasons.push(`COPYRIGHT_UNCLEAR:${id}`)
+    if (!['VERIFIED_PUBLIC_READER_BACKFILL', 'VERIFIED_PUBLIC_ARCHIVE'].includes(pack.story_source_status)) {
+      reasons.push(`STORY_SOURCE_NOT_VERIFIED:${id}`)
+    }
+    if (!hasAuthoritativeClaimSupport(brief, pack, data.config.site_origin)) {
+      reasons.push(`AUTHORITATIVE_SUPPORT_MISSING:${id}`)
+    }
+
+    const candidateResult = candidateFor(brief, data.candidates)
+    if (!candidateResult.ok) {
+      reasons.push(`${candidateResult.reason}:${id}`)
+      continue
+    }
+    try {
+      const source = await sourceIsCurrent(candidateResult.candidate, base)
+      if (!source.current) reasons.push(`${source.reason}:${id}`)
+    } catch {
+      reasons.push(`SOURCE_UNAVAILABLE:${id}`)
+    }
+  }
+
+  if (reasons.length) return blocked(reasons)
+  return { ...result, decision: 'HUMAN_APPROVED_ELIGIBLE', requires_human: false, reasons: [] }
+}
+
 export function verifyProductionPublication({ deployStatus, deployCommitSha, mergeSha, pageReachable, indexContains, sitemapContains }) {
   const reasons = []
   if (typeof deployStatus !== 'string' || deployStatus.trim().toUpperCase() !== 'READY') reasons.push('DEPLOY_NOT_READY')

@@ -1,0 +1,11 @@
+{
+  "id": "KC-information-status-handoff",
+  "question": "통신이 불안정할 때 여러 장소가 정보를 주고받으며 확인된 사실, 전언, 요청, 확정 상태를 어떻게 구분해 기록하면 좋은가",
+  "topic_id": "community-information-sharing",
+  "status": "BRIEF_PROPOSED",
+  "disposition_note": "검증된 PUBLIC_ARCHIVE S03/SESSION_003의 소개·예약 구분, 상태표 갱신, 직접 확인되지 않은 전언 분리 장면에서 질문을 추출했습니다. K-003의 가족 연락계획, K-006의 임시 경유지 조사와 의미 중복되지 않습니다. 현실 근거는 Ready.gov와 FEMA의 공식 통신·정보 검증 자료를 사용하며 작품은 질문의 서사적 출처로만 사용합니다.",
+  "brief_id": "K-007",
+  "source_kind": "PUBLIC_ARCHIVE",
+  "source_manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_003/SOURCE_MANIFEST.json",
+  "source_manifest_sha256": "c3ab077c6917a64d0eccfa2788f4e27db75245082462b2072ab1325dad0fa62a"
+}

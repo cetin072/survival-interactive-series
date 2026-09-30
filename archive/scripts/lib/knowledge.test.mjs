@@ -5,9 +5,17 @@ import { createHash } from 'node:crypto'
 import { mkdtemp, mkdir, readFile, writeFile, rm, copyFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
-import { publicKnowledgeInventory, scanKnowledge, bootstrapKnowledge } from './knowledge-scan.mjs'
+import { publicKnowledgeInventory, scanKnowledge, bootstrapKnowledge, recordKnowledgeDisposition } from './knowledge-scan.mjs'
 import { loadKnowledge, validateKnowledge, publicationEligibility, root } from './knowledge-content.mjs'
 import { checkContentOnly, checkRelease, verifyProductionPublication } from './knowledge-release.mjs'
+import { planWorkerRun, validateProviderConfig, validateWorkerPolicy } from './knowledge-worker-config.mjs'
+import { assertReleaseReady, expectedReleaseDecision, promoteBriefRecord } from './knowledge-publish.mjs'
+import { isExactProductionDeployMeta } from './knowledge-production.mjs'
+import {
+  RUN_RESULT_CODES, backfillDue, classifyWorkerPr, deterministicBackfillBranch,
+  deterministicFreshBranch, deterministicStateBranch, notificationMarker,
+  planWorkerPreflight, recordBackfillResult, validateRuntimeState, workerPhaseMarker,
+} from './knowledge-worker-runtime.mjs'
 
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex')
 const manifestRef = 'archive/content/transcripts/C03-AFTERFALL/S99/SESSION_001/SOURCE_MANIFEST.json'
@@ -159,16 +167,17 @@ test('AUTO_LOW_RISK READY and PUBLISHED must pass the same publication gate', as
 test('release gate covers PR_ONLY, shadow, AUTO, and the content-only boundary', async () => {
   const data = await loadKnowledge(root)
   const allowedFile = 'knowledge/content/briefs/K-004.json'
-  const prOnlyData = { ...data, config: { ...data.config, publication_mode: 'PR_ONLY' } }
+  const prOnlyData = { ...data, config: { ...data.config, publication_mode: 'PR_ONLY', auto_publish_enabled: false } }
   const prOnly = await checkRelease(prOnlyData, { changedFiles: [allowedFile], briefIds: ['K-004'], mode: 'PR_ONLY' })
   assert.equal(prOnly.decision, 'PR_ONLY')
   assert.equal(prOnly.requires_human, false)
 
-  const shadow = await checkRelease(data, { changedFiles: [allowedFile], briefIds: ['K-004'] })
+  const shadowData = { ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK_SHADOW', auto_publish_enabled: false } }
+  const shadow = await checkRelease(shadowData, { changedFiles: [allowedFile], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK_SHADOW' })
   assert.equal(shadow.decision, 'WOULD_AUTO_PUBLISH')
   assert.equal(shadow.requires_human, false)
 
-  const escalation = await checkRelease(data, { changedFiles: [allowedFile], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK' })
+  const escalation = await checkRelease(shadowData, { changedFiles: [allowedFile], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK' })
   assert.equal(escalation.decision, 'REJECTED')
   assert.ok(escalation.reasons.includes('REQUESTED_MODE_MISMATCH'))
 
@@ -185,45 +194,46 @@ test('release gate covers PR_ONLY, shadow, AUTO, and the content-only boundary',
 
 test('publication mode config is authoritative and internally consistent', async () => {
   const data = await loadKnowledge(root)
-  await assert.rejects(validateKnowledge({ ...data, config: { ...data.config, auto_publish_enabled: true } }), /auto_publish_enabled must be false outside AUTO_LOW_RISK mode/)
+  const shadowData = { ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK_SHADOW', auto_publish_enabled: false } }
+  await assert.rejects(validateKnowledge({ ...shadowData, config: { ...shadowData.config, auto_publish_enabled: true } }), /auto_publish_enabled must be false outside AUTO_LOW_RISK mode/)
   await assert.rejects(validateKnowledge({ ...data, config: { ...data.config, publication_mode: 'PR_ONLY', auto_publish_enabled: true } }), /auto_publish_enabled must be false outside AUTO_LOW_RISK mode/)
   assert.equal(await validateKnowledge({ ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK', auto_publish_enabled: true } }), true)
-  const inconsistent = await checkRelease({ ...data, config: { ...data.config, auto_publish_enabled: true } }, {
-    changedFiles: ['knowledge/content/briefs/K-004.json'], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK',
+  const inconsistent = await checkRelease({ ...shadowData, config: { ...shadowData.config, auto_publish_enabled: true } }, {
+    changedFiles: ['knowledge/content/briefs/K-004.json'], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK_SHADOW',
   })
   assert.equal(inconsistent.decision, 'HUMAN_REVIEW_REQUIRED')
   assert.ok(inconsistent.reasons.some((reason) => reason.startsWith('INVALID_PUBLICATION_CONFIG:')))
-  const cliOutput = execFileSync(process.execPath, [join(root, 'archive/scripts/knowledge-release-check.mjs'), '--brief', 'K-004', '--mode', 'AUTO_LOW_RISK', '--changed-file', 'knowledge/content/briefs/K-004.json'], { cwd: root, encoding: 'utf8' })
+  const cliOutput = execFileSync(process.execPath, [join(root, 'archive/scripts/knowledge-release-check.mjs'), '--brief', 'K-004', '--mode', 'AUTO_LOW_RISK_SHADOW', '--changed-file', 'knowledge/content/briefs/K-004.json'], { cwd: root, encoding: 'utf8' })
   assert.equal(JSON.parse(cliOutput).decision, 'REJECTED')
 })
 
 test('every changed brief is bound to the exact release targets and must pass independently', async () => {
   const data = await loadKnowledge(root)
   const k004 = data.briefs.find((brief) => brief.id === 'K-004')
-  const k007 = { ...k004, id: 'K-007', slug: 'another-fixture-brief', title: 'A second verified test brief' }
-  const k007Evidence = { ...data.evidence.get('K-004'), brief_id: 'K-007', question: k007.title }
-  const k007Candidate = { ...data.candidates[0], id: 'KC-second-brief', brief_id: 'K-007', question: 'A second verified test question' }
+  const k007 = { ...k004, id: 'K-997', slug: 'another-fixture-brief', title: 'A second verified test brief' }
+  const k007Evidence = { ...data.evidence.get('K-004'), brief_id: 'K-997', question: k007.title }
+  const k007Candidate = { ...data.candidates[0], id: 'KC-second-brief', brief_id: 'K-997', question: 'A second verified test question' }
   const evidence = new Map(data.evidence)
-  evidence.set('K-007', k007Evidence)
+  evidence.set('K-997', k007Evidence)
   const bothBriefs = { ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK', auto_publish_enabled: true },
     briefs: [...data.briefs, k007], evidence, candidates: [...data.candidates, k007Candidate] }
-  const changed = ['knowledge/content/briefs/K-004.json', 'knowledge/content/briefs/K-007.json']
+  const changed = ['knowledge/content/briefs/K-004.json', 'knowledge/content/briefs/K-997.json']
 
   const firstOnly = await checkRelease(bothBriefs, { changedFiles: changed, briefIds: ['K-004'], mode: 'AUTO_LOW_RISK' })
   assert.equal(firstOnly.decision, 'REJECTED')
-  assert.ok(firstOnly.reasons.includes('CHANGED_BRIEF_NOT_TARGETED:K-007'))
+  assert.ok(firstOnly.reasons.includes('CHANGED_BRIEF_NOT_TARGETED:K-997'))
 
-  const both = await checkRelease(bothBriefs, { changedFiles: changed, briefIds: ['K-004', 'K-007'], mode: 'AUTO_LOW_RISK' })
+  const both = await checkRelease(bothBriefs, { changedFiles: changed, briefIds: ['K-004', 'K-997'], mode: 'AUTO_LOW_RISK' })
   assert.equal(both.decision, 'AUTO_PUBLISH_ELIGIBLE')
-  assert.deepEqual(both.brief_ids, ['K-004', 'K-007'])
+  assert.deepEqual(both.brief_ids, ['K-004', 'K-997'])
 
   const withSupportingRecords = await checkRelease(bothBriefs, {
-    changedFiles: [...changed, 'knowledge/content/evidence/K-007.json', 'knowledge/content/candidates/KC-second-brief.json'],
-    briefIds: ['K-004', 'K-007'], mode: 'AUTO_LOW_RISK',
+    changedFiles: [...changed, 'knowledge/content/evidence/K-997.json', 'knowledge/content/candidates/KC-second-brief.json'],
+    briefIds: ['K-004', 'K-997'], mode: 'AUTO_LOW_RISK',
   })
   assert.equal(withSupportingRecords.decision, 'AUTO_PUBLISH_ELIGIBLE')
   const unsupportedEvidence = await checkRelease(bothBriefs, {
-    changedFiles: [...changed, 'knowledge/content/evidence/K-007.json'], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK',
+    changedFiles: [...changed, 'knowledge/content/evidence/K-997.json'], briefIds: ['K-004'], mode: 'AUTO_LOW_RISK',
   })
   assert.equal(unsupportedEvidence.decision, 'REJECTED')
   const unsupportedCandidate = await checkRelease(bothBriefs, {
@@ -233,7 +243,7 @@ test('every changed brief is bound to the exact release targets and must pass in
 
   const unsafeK007 = { ...k007, publication_policy: 'HUMAN_APPROVED' }
   const unsafe = { ...bothBriefs, briefs: [...data.briefs, unsafeK007] }
-  const bothWithUnsafe = await checkRelease(unsafe, { changedFiles: changed, briefIds: ['K-004', 'K-007'], mode: 'AUTO_LOW_RISK' })
+  const bothWithUnsafe = await checkRelease(unsafe, { changedFiles: changed, briefIds: ['K-004', 'K-997'], mode: 'AUTO_LOW_RISK' })
   assert.equal(bothWithUnsafe.decision, 'HUMAN_REVIEW_REQUIRED')
   const untargetedUnsafe = await checkRelease(unsafe, { changedFiles: changed, briefIds: ['K-004'], mode: 'AUTO_LOW_RISK' })
   assert.equal(untargetedUnsafe.decision, 'REJECTED')
@@ -242,7 +252,8 @@ test('every changed brief is bound to the exact release targets and must pass in
 test('release gate fails closed for risk, conflicts, missing evidence, unknown domains, and duplicate candidates', async () => {
   const data = await loadKnowledge(root)
   const files = ['knowledge/content/briefs/K-004.json']
-  const release = (input, briefIds = ['K-004']) => checkRelease(input, { changedFiles: files, briefIds, mode: 'AUTO_LOW_RISK_SHADOW' })
+  const shadowConfig = { ...data.config, publication_mode: 'AUTO_LOW_RISK_SHADOW', auto_publish_enabled: false }
+  const release = (input, briefIds = ['K-004']) => checkRelease({ ...input, config: shadowConfig }, { changedFiles: files, briefIds, mode: 'AUTO_LOW_RISK_SHADOW' })
   const highRisk = { ...data, briefs: data.briefs.map((brief) => brief.id === 'K-004' ? { ...brief, risk_level: 'HIGH' } : brief) }
   assert.equal((await release(highRisk)).decision, 'HUMAN_REVIEW_REQUIRED')
 
@@ -310,11 +321,11 @@ test('release gate fails closed on high risk, publication policy, QA, missing ev
 
 test('out-of-target Evidence, Candidate, and generated pages are rejected', async () => {
   const data = await loadKnowledge(root)
-  const briefs = [...data.briefs, { ...data.briefs.find((brief) => brief.id === 'K-004'), id: 'K-007', slug: 'another-fixture-brief' }]
-  const candidates = [...data.candidates, { ...data.candidates[0], id: 'KC-another-brief', brief_id: 'K-007' }]
+  const briefs = [...data.briefs, { ...data.briefs.find((brief) => brief.id === 'K-004'), id: 'K-997', slug: 'another-fixture-brief' }]
+  const candidates = [...data.candidates, { ...data.candidates[0], id: 'KC-another-brief', brief_id: 'K-997' }]
   const files = ['knowledge/content/briefs/K-004.json']
   const release = (extraFile) => checkRelease({ ...data, briefs, candidates }, { changedFiles: [...files, extraFile], briefIds: ['K-004'] })
-  assert.ok((await release('knowledge/content/evidence/K-007.json')).reasons.includes('EVIDENCE_OUTSIDE_RELEASE_TARGETS:K-007'))
+  assert.ok((await release('knowledge/content/evidence/K-997.json')).reasons.includes('EVIDENCE_OUTSIDE_RELEASE_TARGETS:K-997'))
   assert.ok((await release('knowledge/content/candidates/KC-another-brief.json')).reasons.includes('CANDIDATE_OUTSIDE_RELEASE_TARGETS:KC-another-brief'))
   assert.ok((await release('archive/web/public/knowledge/another-fixture-brief/index.html')).reasons.includes('GENERATED_PAGE_OUTSIDE_RELEASE_TARGETS:another-fixture-brief'))
 })
@@ -328,7 +339,7 @@ test('source manifest bytes are pinned and unavailable or invalid sources requir
   const hash = createHash('sha256').update(bytes).digest('hex')
   const original = data.candidates.find((candidate) => candidate.brief_id === 'K-004')
   const archiveCandidate = { ...original, source_kind: 'PUBLIC_ARCHIVE', source_manifest_ref: sourceRef, source_manifest_sha256: hash }
-  const withCandidate = (candidate = archiveCandidate) => ({ ...data, base, candidates: [candidate] })
+  const withCandidate = (candidate = archiveCandidate) => ({ ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK_SHADOW', auto_publish_enabled: false }, base, candidates: [candidate] })
   const options = { changedFiles: ['knowledge/content/briefs/K-004.json'], briefIds: ['K-004'] }
   try {
     await mkdir(dirname(sourcePath), { recursive: true })
@@ -417,8 +428,411 @@ test('generated golden pages remain static, searchable, linked and downloadable'
     assert.ok(page.includes('https://schema.org'))
     assert.ok(page.includes('rel="canonical"'))
     for (const source of brief.sources) assert.ok(page.includes(source.url.replace(/&/g, '&amp;')))
-    for (const related of brief.related_brief_ids) assert.ok(page.includes(`/knowledge/${data.briefs.find((item) => item.id === related).slug}/`))
+    for (const related of brief.related_brief_ids.map((id) => data.briefs.find((item) => item.id === id)).filter((item) => item?.status === 'PUBLISHED')) assert.ok(page.includes(`/knowledge/${related.slug}/`))
     for (const tool of brief.tools) assert.ok(page.includes(`href="${tool.path}" download`))
     assert.doesNotMatch(page, /<script(?! type="application\/ld\+json")/)
   }
+})
+
+
+test('worker V2 dispatcher prefers FRESH on twice-daily cadence and uses one daily BACKFILL window', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const providerConfig = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
+  assert.equal(validateWorkerPolicy(policy), true)
+  assert.equal(validateProviderConfig(providerConfig), true)
+  assert.equal(policy.dispatcher.trigger_interval_hours, 12)
+  assert.equal(policy.editorial_spec_ref, 'docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V1.md')
+  assert.equal(policy.research_policy.minimum_authoritative_sources_per_brief, 2)
+  assert.equal(policy.research_policy.preferred_authoritative_sources_per_brief, 3)
+
+  const pending = [{ source_manifest_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_999/SOURCE_MANIFEST.json' }]
+  assert.equal(planWorkerRun({ policy, providerConfig, pendingSources: pending, openWorkerPr: false, localHour: 6 }).decision, 'FRESH')
+  assert.equal(planWorkerRun({ policy, providerConfig, pendingSources: [], openWorkerPr: false, localHour: 6 }).decision, 'BACKFILL')
+  assert.equal(planWorkerRun({ policy, providerConfig, pendingSources: [], openWorkerPr: false, localHour: 12 }).decision, 'NOOP_WAIT')
+  assert.equal(planWorkerRun({ policy, providerConfig, pendingSources: pending, openWorkerPr: true, localHour: 6 }).decision, 'NOOP_OPEN_WORKER_PR')
+})
+
+test('worker provider can switch without changing dispatcher or repository safety contracts', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const providerConfig = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
+  const switched = {
+    ...providerConfig,
+    active_provider: 'OPENAI_API',
+    providers: {
+      ...providerConfig.providers,
+      CHATGPT_SCHEDULED: { ...providerConfig.providers.CHATGPT_SCHEDULED, enabled: false },
+      OPENAI_API: { ...providerConfig.providers.OPENAI_API, enabled: true },
+    },
+  }
+  assert.equal(validateProviderConfig(switched), true)
+  const plan = planWorkerRun({ policy, providerConfig: switched, pendingSources: [{ id: 'fresh' }], openWorkerPr: false, localHour: 0 })
+  assert.equal(plan.decision, 'FRESH')
+  assert.equal(plan.provider, 'OPENAI_API')
+
+  const leaked = {
+    ...switched,
+    providers: {
+      ...switched.providers,
+      OPENAI_API: { ...switched.providers.OPENAI_API, api_key: 'forbidden' },
+    },
+  }
+  assert.throws(() => validateProviderConfig(leaked), /checked-in secret forbidden/)
+})
+
+
+test('publish preparation accepts only exact release decisions and promotes READY low-risk brief', () => {
+  assert.equal(expectedReleaseDecision('AUTO_LOW_RISK_SHADOW'), 'WOULD_AUTO_PUBLISH')
+  assert.equal(expectedReleaseDecision('AUTO_LOW_RISK'), 'AUTO_PUBLISH_ELIGIBLE')
+  assert.equal(expectedReleaseDecision('PR_ONLY'), null)
+
+  const passing = {
+    decision: 'WOULD_AUTO_PUBLISH',
+    requires_human: false,
+    content_only: { allowed: true },
+    reasons: [],
+  }
+  assert.equal(assertReleaseReady(passing, 'AUTO_LOW_RISK_SHADOW'), true)
+  assert.throws(() => assertReleaseReady({ ...passing, decision: 'HOLD' }, 'AUTO_LOW_RISK_SHADOW'), /release decision/)
+  assert.throws(() => assertReleaseReady({ ...passing, requires_human: true }, 'AUTO_LOW_RISK_SHADOW'), /human review/)
+  assert.throws(() => assertReleaseReady({ ...passing, content_only: { allowed: false } }, 'AUTO_LOW_RISK_SHADOW'), /content-only/)
+
+  const ready = {
+    content_type: 'BRIEF',
+    id: 'K-999',
+    status: 'READY',
+    risk_level: 'LOW',
+    publication_policy: 'AUTO_LOW_RISK',
+    semantic_qa_status: 'PASS',
+    published_at: '2026-09-20',
+    updated_at: '2026-09-20',
+  }
+  const promoted = promoteBriefRecord(ready, '2026-09-28')
+  assert.equal(promoted.status, 'PUBLISHED')
+  assert.equal(promoted.published_at, '2026-09-20')
+  assert.equal(promoted.updated_at, '2026-09-28')
+  assert.throws(() => promoteBriefRecord({ ...ready, risk_level: 'HIGH' }, '2026-09-28'), /risk must be LOW/)
+  assert.throws(() => promoteBriefRecord({ ...ready, semantic_qa_status: 'REVIEW' }, '2026-09-28'), /semantic QA/)
+  assert.throws(() => promoteBriefRecord({ ...ready, status: 'PUBLISHED' }, '2026-09-28'), /status must be READY/)
+})
+
+
+test('worker publication policy requires exact-head and exact Production verification in live AUTO mode', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  assert.equal(validateWorkerPolicy(policy), true)
+  assert.equal(policy.publication_policy.required_repository_mode, 'AUTO_LOW_RISK')
+  assert.equal(policy.publication_policy.required_auto_publish_enabled, true)
+  assert.equal(policy.publication_policy.auto_merge, true)
+  assert.equal(policy.publication_policy.production_publish, true)
+  assert.equal(policy.publication_policy.exact_head_validation_required, true)
+  assert.equal(policy.publication_policy.production_exact_sha_required, true)
+
+  assert.throws(() => validateWorkerPolicy({
+    ...policy,
+    publication_policy: { ...policy.publication_policy, exact_head_validation_required: false },
+  }), /exact-head validation required/)
+  assert.throws(() => validateWorkerPolicy({
+    ...policy,
+    publication_policy: { ...policy.publication_policy, required_auto_publish_enabled: false },
+  }), /publication enabled flag/)
+  assert.throws(() => validateWorkerPolicy({
+    ...policy,
+    publication_policy: { ...policy.publication_policy, production_publish: false },
+  }), /Production publish must match publication mode/)
+})
+
+
+test('tokenless Production metadata requires Netlify production and exact merge SHA', () => {
+  const sha = 'a'.repeat(40)
+  assert.equal(isExactProductionDeployMeta({
+    version: 1,
+    provider: 'netlify',
+    context: 'production',
+    commit_ref: sha,
+  }, sha), true)
+  assert.equal(isExactProductionDeployMeta({
+    version: 1,
+    provider: 'netlify',
+    context: 'deploy-preview',
+    commit_ref: sha,
+  }, sha), false)
+  assert.equal(isExactProductionDeployMeta({
+    version: 1,
+    provider: 'github-actions',
+    context: 'production',
+    commit_ref: sha,
+  }, sha), false)
+  assert.equal(isExactProductionDeployMeta({
+    version: 1,
+    provider: 'netlify',
+    context: 'production',
+    commit_ref: 'b'.repeat(40),
+  }, sha), false)
+  assert.equal(isExactProductionDeployMeta(null, sha), false)
+})
+
+
+test('editorial policy reference and quality target fail closed', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  assert.throws(() => validateWorkerPolicy({
+    ...policy,
+    editorial_spec_ref: 'docs/WRONG.md',
+  }), /editorial spec ref/)
+  assert.throws(() => validateWorkerPolicy({
+    ...policy,
+    research_policy: { ...policy.research_policy, preferred_authoritative_sources_per_brief: 1 },
+  }), /preferred authoritative sources/)
+  assert.throws(() => validateWorkerPolicy({
+    ...policy,
+    dispatcher: { ...policy.dispatcher, trigger_interval_hours: 6 },
+  }), /dispatcher trigger interval must be 12 hours/)
+})
+
+
+test('fresh HOLD and HUMAN_REVIEW dispositions are durable scanner terminal states', () => {
+  const source = {
+    source_manifest_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_999/SOURCE_MANIFEST.json',
+    source_manifest_sha256: 'a'.repeat(64),
+  }
+  for (const status of ['HOLD', 'HUMAN_REVIEW']) {
+    const state = { version: 1, sources: [] }
+    recordKnowledgeDisposition(state, {
+      sourceManifestRef: source.source_manifest_ref,
+      sourceManifestSha256: source.source_manifest_sha256,
+      status,
+      processedAt: '2026-09-29T00:00:00.000Z',
+      dispositionCode: status === 'HOLD' ? 'NO_STRONG_TOPIC' : 'RISK_REVIEW_REQUIRED',
+      dispositionNote: 'fixture disposition',
+    })
+    assert.equal(state.sources[0].status, status)
+    const scan = scanKnowledge([source], state)
+    assert.equal(scan.status, 'NOOP')
+    assert.equal(scan.sources.length, 0)
+
+    const changed = scanKnowledge([{ ...source, source_manifest_sha256: 'b'.repeat(64) }], state)
+    assert.equal(changed.status, 'SOURCE_CHANGED_RESCAN_REQUIRED')
+  }
+})
+
+test('runtime state makes BACKFILL durable and allows late retry without wall-clock-only logic', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const runtime = { version: 1, backfill: { last_attempted_at: null, last_work_key: null, last_result: null, reviewed_items: [] } }
+  assert.equal(validateRuntimeState(runtime), true)
+
+  const sixKst = '2026-09-29T21:00:00.000Z'
+  const eighteenKst = '2026-09-30T09:00:00.000Z'
+  assert.equal(backfillDue({ policy, runtimeState: runtime, now: sixKst }), true)
+  assert.equal(backfillDue({ policy, runtimeState: runtime, now: eighteenKst }), false)
+
+  recordBackfillResult(runtime, { workKey: 'PUBLIC_READER:chapter-1:sha-a', status: 'NO_CANDIDATE', now: sixKst })
+  assert.equal(backfillDue({ policy, runtimeState: runtime, now: eighteenKst }), false)
+  assert.equal(backfillDue({ policy, runtimeState: runtime, now: '2026-10-01T09:00:01.000Z' }), true)
+  assert.deepEqual(runtime.backfill.reviewed_items.map((item) => item.work_key), ['PUBLIC_READER:chapter-1:sha-a'])
+})
+
+test('worker branches are deterministic and separated by work identity', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const a = { source_manifest_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_100/SOURCE_MANIFEST.json', source_manifest_sha256: 'a'.repeat(64) }
+  const b = { ...a, source_manifest_sha256: 'b'.repeat(64) }
+  assert.equal(deterministicFreshBranch(policy, a), deterministicFreshBranch(policy, a))
+  assert.notEqual(deterministicFreshBranch(policy, a), deterministicFreshBranch(policy, b))
+  assert.ok(deterministicFreshBranch(policy, a).startsWith('knowledge/worker/fresh-'))
+  assert.ok(deterministicBackfillBranch(policy, 'reader:chapter-1').startsWith('knowledge/worker/backfill-'))
+  assert.ok(deterministicStateBranch(policy, 'fresh:hold:chapter-1').startsWith('knowledge/worker/state-'))
+})
+
+test('open Worker PR lifecycle distinguishes running, resumable, blocked and stalled states', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const base = {
+    number: 99,
+    head_ref: 'knowledge/worker/fresh-abc123',
+    head_sha: 'a'.repeat(40),
+    updated_at: '2026-09-29T00:00:00.000Z',
+    state: 'open',
+    draft: true,
+    body: workerPhaseMarker(policy, 'PACKAGE_READY'),
+    labels: [],
+  }
+  assert.equal(classifyWorkerPr({
+    policy, pr: base, now: '2026-09-29T01:00:00.000Z',
+    checks: [{ name: 'Knowledge', status: 'in_progress', conclusion: null }],
+  }).result, 'WAITING_PR')
+
+  assert.equal(classifyWorkerPr({
+    policy, pr: base, now: '2026-09-29T01:00:00.000Z',
+    checks: [{ name: 'Knowledge', status: 'completed', conclusion: 'success' }],
+  }).result, 'RESUME_PR')
+
+  assert.equal(classifyWorkerPr({
+    policy, pr: base, now: '2026-09-29T01:00:00.000Z',
+    checks: [{ name: 'Knowledge', status: 'completed', conclusion: 'failure' }],
+  }).result, 'BLOCKED_PR')
+
+  assert.equal(classifyWorkerPr({
+    policy,
+    pr: { ...base, labels: ['knowledge-publish-prepare'] },
+    now: '2026-09-29T07:00:01.000Z',
+    checks: [{ name: 'Knowledge', status: 'completed', conclusion: 'success' }],
+  }).result, 'STALLED_PR')
+})
+
+test('canonical preflight blocks duplicate Worker PRs and respects actual provider binding', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const provider = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
+  const runtime = { version: 1, backfill: { last_attempted_at: null, last_work_key: null, last_result: null, reviewed_items: [] } }
+  const scanner = { status: 'PENDING', sources: [{
+    source_manifest_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_100/SOURCE_MANIFEST.json',
+    source_manifest_sha256: 'a'.repeat(64),
+    status: 'PENDING',
+  }] }
+
+  const fresh = planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime, scannerResult: scanner,
+    pullRequests: [], checksByPr: {}, branchInventory: [], now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(fresh.result, 'FRESH_READY')
+  assert.ok(fresh.branch.startsWith('knowledge/worker/fresh-'))
+
+  const pr = (number) => ({ number, state: 'open', head_ref: `knowledge/worker/fresh-${number}`,
+    head_sha: String(number).padStart(40, 'a').slice(-40), updated_at: '2026-09-29T20:00:00.000Z',
+    draft: true, body: workerPhaseMarker(policy, 'PACKAGE_READY'), labels: [] })
+  const blocked = planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime, scannerResult: { status: 'NOOP', sources: [] },
+    pullRequests: [pr(1), pr(2)], checksByPr: {}, branchInventory: [], now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(blocked.result, 'BLOCKED_CONTRACT')
+  assert.equal(blocked.reason, 'MULTIPLE_OPEN_WORKER_PRS')
+
+  const otherProvider = { ...provider, active_provider: 'OPENAI_API',
+    providers: { ...provider.providers, CHATGPT_SCHEDULED: { ...provider.providers.CHATGPT_SCHEDULED, enabled: false },
+      OPENAI_API: { ...provider.providers.OPENAI_API, enabled: true } } }
+  assert.equal(planWorkerPreflight({ policy, providerConfig: otherProvider, runtimeState: runtime,
+    scannerResult: { status: 'NOOP', sources: [] }, pullRequests: [], checksByPr: {}, branchInventory: [],
+    now: '2026-09-29T21:00:00.000Z' }).result, 'PROVIDER_NOT_ACTIVE')
+})
+
+test('notification markers and RUN_RESULT contract are deterministic', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  assert.deepEqual([...policy.runtime.run_result_codes].sort(), [...RUN_RESULT_CODES].sort())
+  const marker = notificationMarker(policy, { result: 'STALLED_PR', prNumber: 123, headSha: 'a'.repeat(40) })
+  assert.equal(marker, notificationMarker(policy, { result: 'STALLED_PR', prNumber: 123, headSha: 'a'.repeat(40) }))
+  assert.match(marker, /knowledge-worker-notify-v1:STALLED_PR:123:/)
+})
+
+
+test('publication handoff marker prefix is fixed for human-removal detection', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  assert.equal(policy.runtime.publication_marker_prefix, 'knowledge-worker-publication-v1')
+  assert.equal(validateWorkerPolicy(policy), true)
+})
+
+
+test('preflight fails closed when PR, check or branch inventory is omitted', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const provider = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
+  const runtime = { version: 1, backfill: { last_attempted_at: null, last_work_key: null, last_result: null, reviewed_items: [] } }
+  const scannerResult = { status: 'NOOP', sources: [] }
+  assert.equal(planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime, scannerResult,
+    checksByPr: {}, branchInventory: [], now: '2026-09-29T21:00:00.000Z' }).reason, 'PR_INVENTORY_REQUIRED')
+  assert.equal(planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime, scannerResult,
+    pullRequests: [], branchInventory: [], now: '2026-09-29T21:00:00.000Z' }).reason, 'CHECK_INVENTORY_REQUIRED')
+  assert.equal(planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime, scannerResult,
+    pullRequests: [], checksByPr: {}, now: '2026-09-29T21:00:00.000Z' }).reason, 'BRANCH_INVENTORY_REQUIRED')
+})
+
+test('orphan deterministic branches are resumed or salvaged before new work', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const provider = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
+  const runtime = { version: 1, backfill: { last_attempted_at: null, last_work_key: null, last_result: null, reviewed_items: [] } }
+  const base = { name: 'knowledge/worker/backfill-deadbeef1234', head_sha: 'a'.repeat(40), ahead_by: 1 }
+  const resume = planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime,
+    scannerResult: { status: 'NOOP', sources: [] }, pullRequests: [], checksByPr: {},
+    branchInventory: [{ ...base, behind_by: 2 }], now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(resume.result, 'RESUME_BRANCH')
+  assert.equal(resume.action, 'VALIDATE_PACKAGE_THEN_OPEN_DRAFT_PR')
+
+  const salvage = planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime,
+    scannerResult: { status: 'NOOP', sources: [] }, pullRequests: [], checksByPr: {},
+    branchInventory: [{ ...base, behind_by: policy.runtime.salvage_when_behind_commits + 1 }],
+    now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(salvage.result, 'SALVAGE_BRANCH')
+  assert.equal(salvage.action, 'REBUILD_SAME_BRANCH_ON_CURRENT_MAIN_THEN_OPEN_DRAFT_PR')
+})
+
+test('closed unmerged deterministic Worker branch is never resurrected automatically', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const provider = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
+  const runtime = { version: 1, backfill: { last_attempted_at: null, last_work_key: null, last_result: null, reviewed_items: [] } }
+  const source = {
+    source_manifest_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_901/SOURCE_MANIFEST.json',
+    source_manifest_sha256: '9'.repeat(64), status: 'PENDING',
+  }
+  const name = deterministicFreshBranch(policy, source)
+  const result = planWorkerPreflight({ policy, providerConfig: provider, runtimeState: runtime,
+    scannerResult: { status: 'PENDING', sources: [source] },
+    pullRequests: [{ number: 501, state: 'closed', merged_at: null, head_ref: name, head_sha: 'b'.repeat(40),
+      updated_at: '2026-09-29T20:00:00.000Z', labels: [], body: workerPhaseMarker(policy, 'PACKAGE_READY'), draft: true }],
+    checksByPr: {}, branchInventory: [{ name, head_sha: 'b'.repeat(40), ahead_by: 1, behind_by: 1 }],
+    now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(result.result, 'BLOCKED_CONTRACT')
+  assert.equal(result.reason, 'CLOSED_UNMERGED_WORKER_BRANCH')
+})
+
+test('content Worker PR requires phase marker and handles Draft exact-head gate safely', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const base = {
+    number: 601, state: 'open', head_ref: 'knowledge/worker/fresh-deadbeef1234',
+    head_sha: 'c'.repeat(40), updated_at: '2026-09-29T20:00:00.000Z', draft: true, labels: [],
+  }
+  const missing = classifyWorkerPr({ policy, pr: { ...base, body: '' },
+    checks: [{ name: 'Validate Knowledge worker gate', status: 'completed', conclusion: 'success' }],
+    now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(missing.result, 'BLOCKED_CONTRACT')
+  assert.equal(missing.reason, 'MISSING_WORKER_PR_PHASE')
+
+  const ready = classifyWorkerPr({ policy, pr: { ...base, body: workerPhaseMarker(policy, 'PACKAGE_READY') },
+    checks: [{ name: 'Validate Knowledge worker gate', status: 'completed', conclusion: 'success' }],
+    now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(ready.result, 'RESUME_PR')
+  assert.equal(ready.action, 'MARK_READY_THEN_PUBLICATION_HANDOFF')
+
+  const human = classifyWorkerPr({ policy, pr: { ...base, draft: false, body: workerPhaseMarker(policy, 'PUBLICATION_HANDOFF') },
+    checks: [{ name: 'Validate Knowledge worker gate', status: 'completed', conclusion: 'success' }],
+    now: '2026-09-29T21:00:00.000Z' })
+  assert.equal(human.result, 'HUMAN_REVIEW_REQUIRED')
+  assert.equal(human.reason, 'PUBLICATION_LABEL_REMOVED_AFTER_HANDOFF')
+})
+
+
+test('open Worker PR with green checks syncs current main before publication handoff', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  const provider = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
+  const runtime = { version: 1, backfill: { last_attempted_at: null, last_work_key: null, last_result: null, reviewed_items: [] } }
+  const pr = {
+    number: 777,
+    state: 'open',
+    head_ref: 'knowledge/worker/backfill-deadbeef1234',
+    head_sha: 'd'.repeat(40),
+    updated_at: '2026-09-29T20:00:00.000Z',
+    draft: true,
+    body: workerPhaseMarker(policy, 'PACKAGE_READY'),
+    labels: [],
+  }
+  const result = planWorkerPreflight({
+    policy,
+    providerConfig: provider,
+    runtimeState: runtime,
+    scannerResult: { status: 'NOOP', sources: [] },
+    pullRequests: [pr],
+    checksByPr: { 777: [{ name: 'Validate Knowledge worker gate', status: 'completed', conclusion: 'success' }] },
+    branchInventory: [{ name: pr.head_ref, head_sha: pr.head_sha, ahead_by: 1, behind_by: 2 }],
+    now: '2026-09-29T21:00:00.000Z',
+  })
+  assert.equal(result.result, 'RESUME_PR')
+  assert.equal(result.action, 'SYNC_CURRENT_MAIN_THEN_RECHECK')
+  assert.equal(result.behind_by, 2)
+})
+
+
+test('GitHub Actions owns automatic publication handoff', async () => {
+  const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
+  assert.equal(policy.runtime.publication_handoff_owner, 'GITHUB_ACTIONS')
+  assert.equal(policy.runtime.automatic_publication_handoff, true)
+  assert.equal(policy.runtime.scheduled_ai_publication_handoff, false)
+  assert.equal(validateWorkerPolicy(policy), true)
 })

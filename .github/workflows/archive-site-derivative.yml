@@ -1,0 +1,113 @@
+name: Prepare Archive site derivative
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'archive/automation/site-derivative-requests/*.json'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: archive-site-derivative
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.repository == 'cetin072/survival-interactive-series'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Verify proposal credential
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+        run: 'test -n "$GH_TOKEN" || { echo "ARCHIVE_GITHUB_TOKEN_REQUIRED"; exit 1; }'
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned image library
+        run: 'python -m pip install --only-binary=:all: Pillow==12.3.0'
+      - name: Resolve exactly one immutable derivative request
+        id: request
+        shell: bash
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(
+            git diff --name-status "$BEFORE_SHA" "$CURRENT_SHA" --               'archive/automation/site-derivative-requests/*.json'
+          )
+          test "${#changed[@]}" -eq 1 || {
+            echo "SITE_DERIVATIVE_REQUEST_CHANGE_COUNT_INVALID: ${#changed[@]}"
+            exit 1
+          }
+          status="${changed[0]%%$'\t'*}"
+          request_path="${changed[0]#*$'\t'}"
+          test "$status" = "A" || {
+            echo "SITE_DERIVATIVE_REQUEST_MUST_BE_IMMUTABLE_ADD: $status"
+            exit 1
+          }
+          stem="$(basename "$request_path" .json)"
+          [[ "$stem" =~ ^[a-z0-9][a-z0-9-]{3,100}$ ]] || {
+            echo "SITE_DERIVATIVE_REQUEST_NAME_INVALID"
+            exit 1
+          }
+          echo "path=$request_path" >> "$GITHUB_OUTPUT"
+          echo "branch=automation/site-derivative-$stem" >> "$GITHUB_OUTPUT"
+      - name: Prepare deterministic derivative on proposal branch
+        env:
+          ARCHIVE_ORIGINAL_STORAGE_PROVIDER: supabase
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          ARCHIVE_ORIGINAL_STORAGE_BUCKET: survival-archive-originals
+          REQUEST_PATH: ${{ steps.request.outputs.path }}
+          BRANCH: ${{ steps.request.outputs.branch }}
+        run: |
+          set -euo pipefail
+          git checkout -b "$BRANCH"
+          python archive/scripts/prepare_site_derivative.py             --request "$REQUEST_PATH" > "$RUNNER_TEMP/site-derivative.json"
+          cat "$RUNNER_TEMP/site-derivative.json"
+          python - <<'PY'
+          import json, os
+          result=json.load(open(os.environ["RUNNER_TEMP"]+"/site-derivative.json"))
+          if result.get("status") not in {"SITE_DERIVATIVE_PREPARED","SITE_DERIVATIVE_NOOP"}:
+              raise SystemExit("SITE_DERIVATIVE_PREPARE_FAILED")
+          PY
+      - name: Commit proposal and open PR
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          BRANCH: ${{ steps.request.outputs.branch }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          result="$RUNNER_TEMP/site-derivative.json"
+          status="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["status"])' "$result")"
+          if [[ "$status" == "SITE_DERIVATIVE_NOOP" ]]; then
+            echo "SITE_DERIVATIVE_PR=NOOP"
+            exit 0
+          fi
+          subject="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["subject_id"])' "$result")"
+          derivative_path="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["derivative_path"])' "$result")"
+          manifest_path="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["manifest_path"])' "$result")"
+          derivative_sha="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["derivative_sha256"])' "$result")"
+          git add "$derivative_path" "$manifest_path"
+          mapfile -t files < <(git diff --cached --name-only)
+          test "${#files[@]}" -eq 2 || {
+            printf 'SITE_DERIVATIVE_DIFF_INVALID:%s\n' "${files[*]}"
+            exit 1
+          }
+          git config user.name archive-illustration-bot
+          git config user.email archive-illustration-bot@users.noreply.github.com
+          git commit -m "archive: prepare site derivative for $subject"
+          git push origin "HEAD:$BRANCH"
+          gh pr create             --base main             --head "$BRANCH"             --title "archive: publish site derivative for $subject"             --body "Deterministic 512px derivative prepared from the trusted private original. Source/registry identity and Storage readback were verified before generation. Derivative SHA-256: \`$derivative_sha\`. Production remains controlled by the existing batched release gate."

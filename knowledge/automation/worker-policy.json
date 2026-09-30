@@ -1,0 +1,126 @@
+{
+  "version": 2,
+  "worker_enabled": true,
+  "provider_config_ref": "knowledge/automation/provider-config.json",
+  "dispatcher": {
+    "trigger_interval_hours": 12,
+    "timezone": "Asia/Seoul",
+    "fresh_priority": true,
+    "max_sources_per_run": 1,
+    "open_worker_pr_guard": true,
+    "backfill": {
+      "enabled": true,
+      "only_when_no_fresh": true,
+      "cadence_hours": 24,
+      "max_new_briefs_per_run": 1,
+      "preferred_hour_local": 6,
+      "allow_late_retry": true,
+      "bootstrap_only_at_preferred_hour": true
+    }
+  },
+  "candidate_policy": {
+    "auto_candidate_risk_level": "LOW",
+    "allowed_auto_risk_domains": [
+      "GENERAL_PREPAREDNESS",
+      "FOOD_STORAGE",
+      "COMMUNICATION",
+      "EVACUATION"
+    ],
+    "high_risk_domains": [
+      "MEDICAL",
+      "MEDICATION",
+      "FIRST_AID_PROCEDURE",
+      "WATER_PURIFICATION",
+      "GENERATOR",
+      "COMBUSTION_CO",
+      "ELECTRICAL",
+      "RESCUE",
+      "SHELTER_STRUCTURAL",
+      "OTHER_SEVERE_HARM"
+    ],
+    "prefer_distinct_nonduplicate_question": true,
+    "never_downgrade_risk_to_make_auto_eligible": true
+  },
+  "research_policy": {
+    "story_source_is_narrative_provenance_only": true,
+    "authoritative_external_source_required_for_reality_claims": true,
+    "minimum_authoritative_sources_per_brief": 2,
+    "record_context_limitations_conflicts_unknowns": true,
+    "preferred_authoritative_sources_per_brief": 3
+  },
+  "publication_policy": {
+    "required_repository_mode": "AUTO_LOW_RISK",
+    "required_auto_publish_enabled": true,
+    "create_knowledge_pr": true,
+    "auto_merge": true,
+    "production_publish": true,
+    "exact_head_validation_required": true,
+    "production_exact_sha_required": true
+  },
+  "source_policy": {
+    "require_verified_public_archive": true,
+    "pin_source_manifest_sha256": true,
+    "leave_other_pending_sources_unprocessed": true
+  },
+  "notification_policy": {
+    "notify_on": [
+      "PR_CREATED",
+      "PRODUCTION_PUBLISHED",
+      "HUMAN_REVIEW_REQUIRED",
+      "BLOCKING_FAILURE",
+      "STALLED_PR",
+      "BLOCKED_CONTRACT"
+    ],
+    "silent_on": [
+      "NO_PENDING",
+      "ORDINARY_HOLD",
+      "OPEN_WORKER_PR_EXISTS",
+      "NOOP",
+      "WAITING_PR"
+    ]
+  },
+  "editorial_spec_ref": "docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V1.md",
+  "runtime": {
+    "scheduler_provider": "CHATGPT_SCHEDULED",
+    "worker_pr_branch_prefix": "knowledge/worker/",
+    "state_pr_branch_prefix": "knowledge/worker/state-",
+    "publication_label": "knowledge-publish-prepare",
+    "stalled_after_hours": 6,
+    "notification_marker_prefix": "knowledge-worker-notify-v1",
+    "external_text_is_untrusted_data": true,
+    "require_actual_check_evidence": true,
+    "state_only_auto_merge": true,
+    "run_result_codes": [
+      "NOOP",
+      "FRESH_READY",
+      "BACKFILL_READY",
+      "RESUME_BRANCH",
+      "SALVAGE_BRANCH",
+      "RESUME_PR",
+      "WAITING_PR",
+      "STALLED_PR",
+      "BLOCKED_PR",
+      "BLOCKED_CONTRACT",
+      "PROVIDER_NOT_ACTIVE",
+      "HOLD_RECORDED",
+      "HUMAN_REVIEW_REQUIRED",
+      "PR_CREATED",
+      "PUBLICATION_INITIATED"
+    ],
+    "publication_marker_prefix": "knowledge-worker-publication-v1",
+    "require_pr_inventory": true,
+    "require_check_inventory": true,
+    "require_branch_inventory": true,
+    "early_draft_pr": true,
+    "atomic_package_commit_required": true,
+    "pr_phase_marker_prefix": "knowledge-worker-phase-v1",
+    "pr_phases": [
+      "PACKAGE_READY",
+      "PUBLICATION_HANDOFF"
+    ],
+    "salvage_when_behind_commits": 12,
+    "publication_handoff_owner": "GITHUB_ACTIONS",
+    "automatic_publication_handoff": true,
+    "scheduled_ai_publication_handoff": false
+  }
+}

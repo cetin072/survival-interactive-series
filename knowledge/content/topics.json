@@ -2,7 +2,10 @@
   {
     "id": "household-emergency-preparedness",
     "title": "가정의 비상 대비",
-    "brief_ids": ["K-002", "K-003"],
+    "brief_ids": [
+      "K-002",
+      "K-003"
+    ],
     "guide_id": null,
     "tools": [],
     "story_refs": []
@@ -10,9 +13,54 @@
   {
     "id": "community-emergency-resource-management",
     "title": "공동체 비상자원 관리",
-    "brief_ids": ["K-004"],
+    "brief_ids": [
+      "K-004",
+      "K-005"
+    ],
     "guide_id": null,
     "tools": [],
-    "story_refs": ["afterfall-two-site-reserve"]
+    "story_refs": [
+      "afterfall-two-site-reserve"
+    ]
+  },
+  {
+    "id": "community-evacuation-waypoints",
+    "title": "대피 경로와 임시 경유지",
+    "brief_ids": [
+      "K-006"
+    ],
+    "guide_id": null,
+    "tools": [],
+    "story_refs": []
+  },
+  {
+    "id": "community-information-sharing",
+    "title": "공동체 정보 전달",
+    "brief_ids": [
+      "K-007"
+    ],
+    "guide_id": null,
+    "tools": [],
+    "story_refs": []
+  },
+  {
+    "id": "evacuation-decision-planning",
+    "title": "대피 결정과 사전 계획",
+    "brief_ids": [
+      "K-008"
+    ],
+    "guide_id": null,
+    "tools": [],
+    "story_refs": []
+  },
+  {
+    "id": "community-continuity-roles",
+    "title": "공동체 운영 지속성과 역할 분담",
+    "brief_ids": [
+      "K-009"
+    ],
+    "guide_id": null,
+    "tools": [],
+    "story_refs": []
   }
 ]

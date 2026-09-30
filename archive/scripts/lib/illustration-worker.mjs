@@ -1,9 +1,11 @@
 import { mkdir, open, readFile, rename, unlink, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { randomUUID } from 'node:crypto'
+import { createGenerationProvider } from './illustration-generation-provider.mjs'
+import { compileIllustrationImagePrompt } from './illustration-image-prompt.mjs'
 
 export const DEFAULT_BATCH_LIMIT = 3
-export const DAILY_GENERATION_CAP = 6
+export const DAILY_GENERATION_CAP = 3
 export const BATCH_GENERATION_CAP = 3
 export const MAX_ASSET_ATTEMPTS = 3
 export const DEFAULT_PROVIDER = 'shadow'
@@ -212,6 +214,7 @@ function handoffContract(point) {
     point_id: point.point_id,
     generation_key: point.generation_key,
     subject_id: point.subject_id,
+    image_prompt: compileIllustrationImagePrompt(point),
     subject_label: brief.subject?.label ?? point.title ?? point.subject_id,
     brief: structuredClone(brief),
     canonical_facts: structuredClone(brief.canon_facts ?? {}),
@@ -296,32 +299,36 @@ export function selectIllustrationCandidates({ catalog, siteAssets, receipts, no
 
 export function createProvider(provider) {
   if (!SUPPORTED_PROVIDERS.includes(provider)) throw new Error('UNSUPPORTED_ILLUSTRATION_PROVIDER')
+  if (provider === 'shadow') {
+    return {
+      name: provider,
+      async generateIllustration(request) {
+        compileIllustrationImagePrompt(request)
+        const identity = { point_id: request.point_id, generation_key: request.generation_key }
+        return { ...identity, provider, status: 'WOULD_GENERATE', original_ref: null, width: null, height: null,
+          mime_type: null, sha256: null, metadata: { calls_made: 0, cost: 0, counts_toward_daily_generation_cap: false } }
+      },
+    }
+  }
+  const adapter = createGenerationProvider(provider)
   return {
     name: provider,
     async generateIllustration(request) {
-      const identity = { point_id: request.point_id, generation_key: request.generation_key }
-      if (provider === 'shadow') {
-        return { ...identity, provider, status: 'WOULD_GENERATE', original_ref: null, width: null, height: null,
-          mime_type: null, sha256: null, metadata: { calls_made: 0, cost: 0, counts_toward_daily_generation_cap: false } }
+      const prompt = compileIllustrationImagePrompt(request)
+      const providerContext = request.imported_result === undefined ? {} : { imported_result: request.imported_result }
+      const result = await adapter.generateIllustration(prompt, providerContext)
+      return {
+        point_id: result.point_id,
+        generation_key: result.generation_key,
+        provider: result.provider,
+        status: result.status,
+        original_ref: result.original_ref,
+        width: result.width,
+        height: result.height,
+        mime_type: result.mime_type,
+        sha256: result.sha256,
+        metadata: result.metadata,
       }
-      if (provider === 'native_chatgpt') {
-        return { ...identity, provider, status: 'STUBBED', original_ref: null, width: null, height: null,
-          mime_type: null, sha256: null, metadata: { support: 'HANDOFF_READY_NOT_PROVEN', calls_made: 0, counts_toward_daily_generation_cap: false } }
-      }
-      if (provider === 'api_openai') {
-        return { ...identity, provider, status: 'LIVE_DISABLED', original_ref: null, width: null, height: null,
-          mime_type: null, sha256: null, metadata: { reason: 'PAID_API_DISABLED_BY_ZERO_COST_POLICY', calls_made: 0, counts_toward_daily_generation_cap: false } }
-      }
-      const imported = request.imported_result
-      if (!imported || typeof imported.original_ref !== 'string' || !Number.isInteger(imported.width)
-        || !Number.isInteger(imported.height) || imported.mime_type !== 'image/png'
-        || !/^[a-f0-9]{64}$/.test(imported.sha256 ?? '')) {
-        return { ...identity, provider, status: 'AWAITING_IMPORT', original_ref: null, width: null, height: null,
-          mime_type: null, sha256: null, metadata: { calls_made: 0, counts_toward_daily_generation_cap: false } }
-      }
-      return { ...identity, provider, status: 'IMPORTED', original_ref: imported.original_ref,
-        width: imported.width, height: imported.height, mime_type: imported.mime_type,
-        sha256: imported.sha256, metadata: { calls_made: 0, counts_toward_daily_generation_cap: false } }
     },
   }
 }

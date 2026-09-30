@@ -5,6 +5,12 @@ command = "npm run build:verified"
 [build.environment]
   NODE_VERSION = "22"
 
+# Production is intentionally cost-gated. Ordinary main merges are accumulated
+# and only a release-marker commit is allowed to create a Production deploy.
+# Netlify ignore commands exit 0 to skip and 1 to continue.
+[context.production]
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- public/release/production.json"
+
 # Archive content lives outside this site's base directory. Keep Preview builds
 # when the Reader inputs or build scripts change.
 [context.deploy-preview]
@@ -14,10 +20,28 @@ command = "npm run build:verified"
   for = "/*"
 
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
+    Content-Security-Policy = "default-src 'self'; connect-src 'self' https://jgsxpdflgkqroecfjzxq.supabase.co; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
     Referrer-Policy = "no-referrer"
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
+
+[[redirects]]
+  from = "/operator"
+  to = "/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/operator/*"
+  to = "/index.html"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/operator*"
+
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
 
 [[headers]]
   for = "/index.html"

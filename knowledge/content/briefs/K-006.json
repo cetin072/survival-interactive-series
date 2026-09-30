@@ -1,0 +1,124 @@
+{
+  "content_type": "BRIEF",
+  "topic_id": "community-evacuation-waypoints",
+  "status": "READY",
+  "risk_level": "LOW",
+  "publication_policy": "AUTO_LOW_RISK",
+  "semantic_qa_status": "PASS",
+  "risk_domains": ["GENERAL_PREPAREDNESS", "EVACUATION"],
+  "source_checked_at": "2026-09-28",
+  "published_at": "2026-09-28",
+  "updated_at": "2026-09-28",
+  "guide_id": null,
+  "story_refs": [],
+  "ai_assisted": true,
+  "editorial_note": "S03 PUBLIC_ARCHIVE SESSION_002에서 추출한 두 번째 FRESH Knowledge Worker 실증 BRIEF입니다. 고위험 후보를 제외하고 저위험 대피·경유지 조사 주제만 선택했습니다. AUTO_LOW_RISK_SHADOW 검증용 READY 상태이며 실제 자동 병합이나 Production 게시를 승인하지 않습니다.",
+  "id": "K-006",
+  "slug": "assess-emergency-waypoint",
+  "label": "임시 경유지 조사",
+  "title": "재난 때 임시 경유지나 대피 거점을 확인할 때 무엇을 조사하고 기록해야 할까",
+  "summary": "이동 중 잠시 머물거나 다음 구간으로 넘어가기 위한 임시 경유지·대피 거점을 확인할 때, 접근 경로와 이용 조건, 수용 가능성, 자원 가용성, 운영 상태를 어떻게 나눠 기록할지 정리합니다.",
+  "meta_description": "Ready.gov와 FEMA 자료를 바탕으로 재난 시 임시 경유지나 대피 거점을 조사할 때 경로, 수용 가능성, 자원, 운영 상태와 미확인 정보를 기록하는 기본 원칙을 설명합니다.",
+  "lead": "재난 상황에서 어떤 장소가 '쓸 수 있어 보인다'는 인상과 실제로 이용 가능한지는 다릅니다. 이동 경로, 현재 운영 상태, 머물 수 있는 범위, 이용 가능한 자원과 미확인 사항을 나눠 적어두면 다음 판단이 쉬워집니다.",
+  "scope": "공동체·가정의 저위험 대피 계획과 임시 경유지 정보 정리",
+  "basis": "Ready.gov emergency planning + FEMA shelter facility/resource information + 검증된 S03 PUBLIC_ARCHIVE",
+  "footer": "이 글은 일반적인 재난 대비 정보정리 방법입니다. 정식 대피소 지정, 건물 구조안전, 수질·의료·전기·위험물 안전판정을 대신하지 않습니다. 실제 재난에서는 관할 당국의 최신 대피 지시와 공식 시설 정보를 우선하세요.",
+  "sections": [
+    {
+      "heading": "먼저 '갈 수 있는가'와 '머물 수 있는가'를 나눠 봅니다",
+      "blocks": [
+        {
+          "type": "prose",
+          "text": "Ready.gov는 비상계획에서 대피 계획과 대피 경로를 미리 정하도록 안내합니다. 경유지를 확인할 때도 장소 자체만 보는 것보다 현재 경로가 실제로 접근 가능한지, 다른 경로가 필요한지, 어떤 이동수단까지 확인됐는지를 따로 적어두는 편이 좋습니다."
+        },
+        {
+          "type": "table",
+          "headers": ["확인 영역", "기록할 내용의 예"],
+          "rows": [
+            ["접근", "현재 확인된 진입로, 우회 필요 여부, 확인한 이동수단 범위"],
+            ["운영 상태", "비어 있는지, 기존 운영자·이용자가 있는지, 이용 조건이 있는지"],
+            ["수용", "몇 명·몇 대가 머물 수 있는지에 대한 확인 범위와 한계"],
+            ["기본 자원", "물·화장실·충전 등 실제 확인된 항목과 제공 조건"],
+            ["연락·책임", "누구에게 확인했고 조건 변경 시 다시 확인할 연락선"],
+            ["미확인", "직접 보지 못했거나 전문판정이 필요한 항목"]
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "수용능력과 접근성은 현재 상태로 확인합니다",
+      "blocks": [
+        {
+          "type": "prose",
+          "text": "FEMA의 shelter 관련 자료는 잠재적 시설을 볼 때 예상 수용인원, 접근성, 교통과 기반시설 상태, 안전성과 보안 등을 따로 평가합니다. 작은 공동체의 임시 경유지 조사에서도 '사람이 들어갈 공간이 있다'와 '실제로 머물 수 있다'를 같은 뜻으로 두지 않는 것이 중요합니다."
+        },
+        {
+          "type": "note",
+          "text": "건물의 구조적 안전성, 전기 상태, 식수 적합성처럼 전문검사가 필요한 항목은 현장 인상만으로 '안전'이라고 표시하지 말고 미확인 또는 전문확인 필요로 남깁니다."
+        }
+      ]
+    },
+    {
+      "heading": "자원은 '있다/없다'보다 조건과 시점을 함께 적습니다",
+      "blocks": [
+        {
+          "type": "prose",
+          "text": "FEMA의 shelter 정보 체계는 시설 상태와 수용능력, 접근성 같은 정보를 별도 항목으로 관리합니다. 임시 경유지에서도 물이나 숙박공간이 있다는 사실만 적기보다, 누구에게 어떤 조건으로 제공되는지, 수량이나 운영시간이 제한되는지, 마지막으로 확인한 시점이 언제인지 함께 적으면 과도한 기대를 줄일 수 있습니다."
+        },
+        {
+          "type": "unordered_list",
+          "items": [
+            "항상 이용 가능인지, 조건부 이용인지",
+            "무료인지, 교환·유상 제공인지",
+            "수량이나 인원 제한이 있는지",
+            "기존 이용자나 운영자의 우선권이 있는지",
+            "마지막 확인 시점 이후 바뀔 가능성이 큰 정보인지"
+          ]
+        }
+      ]
+    },
+    {
+      "heading": "확인된 사실과 추정을 분리합니다",
+      "blocks": [
+        {
+          "type": "prose",
+          "text": "조사표에서는 직접 확인한 사실, 다른 사람에게 들은 정보, 아직 확인하지 못한 항목을 구분해 두는 편이 좋습니다. 예를 들어 '승합차 진입 확인'을 '모든 차량 통행 가능'으로 넓혀 쓰거나, '물을 거래할 수 있음'을 '언제나 무료 급수 가능'으로 바꾸지 않는 식입니다."
+        }
+      ]
+    },
+    {
+      "heading": "《생존일기》에서 시작한 질문",
+      "blocks": [
+        {
+          "type": "prose",
+          "text": "C03-AFTERFALL S03 SESSION_002의 공개 Archive에서는 동쪽 차고지를 조사하면서 차량 접근, 숙영 가능성, 물 이용 조건, 기존 운영집단의 존재를 각각 확인합니다. 특히 확인된 범위보다 넓게 단정하지 않는 장면에서, 재난 시 임시 경유지 정보를 어떤 항목과 확실성 수준으로 기록해야 하는가라는 현실 질문을 가져왔습니다."
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Ready.gov · 계획 세우기",
+      "url": "https://www.ready.gov/ko/plan",
+      "note": "비상계획을 세울 때 대피 계획, 대피 경로, 연락계획을 미리 논의하도록 안내하는 내용을 확인했습니다.",
+      "checked_at": "2026-09-28"
+    },
+    {
+      "id": "S2",
+      "title": "FEMA Resource Typing Library · Shelter resource definition",
+      "url": "https://rtlt.preptoolkit.fema.gov/Public/Resource/View/9-508-1197?p=22&s=Name",
+      "note": "대피소 시설 계획에서 예상 수용인원, 접근성 요구, 교통·기반시설 상태와 시설의 안전·접근·보안을 고려하는 내용을 확인했습니다.",
+      "checked_at": "2026-09-28"
+    },
+    {
+      "id": "S3",
+      "title": "FEMA National Shelter System",
+      "url": "https://gis.fema.gov/arcgis/rest/services/NSS/FEMA_NSS/MapServer",
+      "note": "대피소의 운영 상태, 수용능력, 접근성, 발전기·반려동물 수용 등 여러 운영 속성을 별도 데이터로 관리하는 구조를 확인했습니다.",
+      "checked_at": "2026-09-28"
+    }
+  ],
+  "related_brief_ids": [],
+  "tools": []
+}

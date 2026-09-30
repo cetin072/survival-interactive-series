@@ -1,0 +1,143 @@
+name: Prepare Knowledge publication
+
+on:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: read
+  actions: write
+
+concurrency:
+  group: knowledge-publish-prepare-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: >-
+      github.event.label.name == 'knowledge-publish-prepare' &&
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: archive/web
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: archive/web/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Fetch current main
+        working-directory: .
+        run: git fetch origin main:refs/remotes/origin/main
+
+      - name: Require branch to be based on current main
+        working-directory: .
+        run: |
+          test "$(git merge-base origin/main HEAD)" = "$(git rev-parse origin/main)" || {
+            echo "Knowledge publication preparation requires a branch based on current main."
+            exit 1
+          }
+
+      - name: Resolve exact single BRIEF target
+        id: target
+        working-directory: .
+        shell: bash
+        run: |
+          mapfile -t ids < <(
+            git diff --name-only origin/main...HEAD |
+              sed -n 's#^knowledge/content/briefs/\(K-[0-9][0-9]*\)\.json$#\1#p' |
+              sort -u
+          )
+          test "${#ids[@]}" -eq 1 || {
+            printf 'Expected exactly one changed BRIEF, got %s: %s\n' "${#ids[@]}" "${ids[*]-}"
+            exit 1
+          }
+          echo "brief=${ids[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Pre-promotion Knowledge validation
+        run: |
+          npm run knowledge:test
+          npm run knowledge:check
+
+      - name: Enqueue Automation C items that require human review
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node ../scripts/knowledge-review-sync.mjs \
+            --brief "${{ steps.target.outputs.brief }}" \
+            --base origin/main \
+            --head HEAD \
+            --pr-number "${{ github.event.pull_request.number }}" \
+            --pr-head-ref "${{ github.event.pull_request.head.ref }}"
+
+      - name: Prepare publication in repository SHADOW/AUTO mode
+        run: |
+          node ../scripts/knowledge-publish-prepare.mjs             --brief "${{ steps.target.outputs.brief }}"             --base origin/main             --head HEAD
+
+      - name: Post-promotion Knowledge validation
+        run: |
+          npm run knowledge:test
+          npm run knowledge:check
+
+      - name: Verify only publication content changed
+        working-directory: .
+        shell: bash
+        run: |
+          rejected=0
+          while IFS= read -r path; do
+            case "$path" in
+              knowledge/content/briefs/K-*.json|              knowledge/content/candidates/KC-*.json|              knowledge/content/evidence/K-*.json|              knowledge/content/topics.json|              knowledge/content/stories.json|              knowledge/automation/state.json|              archive/web/public/knowledge/index.html|              archive/web/public/knowledge/*/index.html|              archive/web/public/sitemap.xml)
+                ;;
+              *)
+                echo "Rejected publication path: $path"
+                rejected=1
+                ;;
+            esac
+          done < <(git diff --name-only origin/main...HEAD; git diff --name-only)
+          test "$rejected" -eq 0
+
+      - name: Commit prepared publication back to PR branch
+        id: prepared
+        working-directory: .
+        env:
+          BRIEF_ID: ${{ steps.target.outputs.brief }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git add "knowledge/content/briefs/$BRIEF_ID.json"                   archive/web/public/knowledge                   archive/web/public/sitemap.xml
+          if git diff --cached --quiet; then
+            echo "No publication preparation changes to commit."
+            exit 1
+          fi
+          git config user.name "knowledge-publish-bot"
+          git config user.email "knowledge-publish-bot@users.noreply.github.com"
+          git commit -m "knowledge: prepare $BRIEF_ID publication [shadow]"
+          PREPARED_SHA="$(git rev-parse HEAD)"
+          git push origin "HEAD:$HEAD_REF"
+          echo "prepared_sha=$PREPARED_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Dispatch exact-head validation for prepared commit
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          BRIEF_ID: ${{ steps.target.outputs.brief }}
+          PREPARED_SHA: ${{ steps.prepared.outputs.prepared_sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          test -n "$PREPARED_SHA"
+          gh workflow run knowledge-exact-head.yml             --ref "$HEAD_REF"             -f brief_id="$BRIEF_ID"             -f expected_sha="$PREPARED_SHA"             -f pr_number="$PR_NUMBER"

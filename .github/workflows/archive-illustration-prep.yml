@@ -1,0 +1,53 @@
+name: Prepare Automation B render job
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: afterfall-illustration-prep
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.repository == 'cetin072/survival-interactive-series'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare one render job
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          RENDER_PROMPT_OUTPUT: ${{ runner.temp }}/afterfall-render-prompt.txt
+        run: node archive/scripts/prepare-illustration-render-job.mjs
+      - name: Publish visual-only prompt transport
+        env:
+          PROMPT_FILE: ${{ runner.temp }}/afterfall-render-prompt.txt
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$PROMPT_FILE"
+          git config user.name archive-illustration-bot
+          git config user.email archive-illustration-bot@users.noreply.github.com
+          git switch --orphan runtime-prompt-publish
+          git rm -rf . >/dev/null 2>&1 || true
+          cp "$PROMPT_FILE" current.txt
+          git add current.txt
+          git commit -m "runtime: refresh Automation B visual prompt"
+          test "$(git ls-tree -r --name-only HEAD)" = "current.txt" || {
+            echo RENDER_PROMPT_RUNTIME_TREE_INVALID
+            exit 1
+          }
+          git push --force origin HEAD:refs/heads/automation-b-render-prompt

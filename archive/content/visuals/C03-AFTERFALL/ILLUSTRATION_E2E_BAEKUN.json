@@ -1,0 +1,60 @@
+{
+  "version": "illustration-e2e-identity-v1",
+  "subject_id": "loc-baekun",
+  "point_id": "point-3f63889d1502bade082b7a24cbca4c007a8e23b5b0ea5c7a471bfecb74b27cac",
+  "generation_key": "generation-196f123897cae91e88ca41799981234f3897d62967f5f1047cbc4c7d1857f477",
+  "catalog_ref": "7a594970bbc6d99263faea82ef88674819902eab",
+  "provider": "image_gen.imagegen",
+  "provider_model": null,
+  "tool": "image_gen.imagegen",
+  "surface": "CODEX_NATIVE_IMAGEGEN",
+  "tool_result_id": "c80441b8-667d-4baf-80b1-7b84c8f8eb16",
+  "source_sha256": "325913999ae74ef8b215a31199ed072aa2acffe0a10e01c3e8bfc105e543c39a",
+  "original_bytes": 1958931,
+  "original_width": 1672,
+  "original_height": 941,
+  "content_review": "MATCHES_INTENDED_BRIEF",
+  "review_summary": "Six candidates reviewed. The first three added vegetation. Recovery 4 had a photorealistic rendering that missed the painterly AFTERFALL baseline. Recovery 5 used reflective wet paving that implied unspecified weather. Recovery 6 matches the cool blue-gray painterly style, contains no vegetation, keeps the ground dry and matte, and adds no people, readable signs, landmarks, route, or security details.",
+  "generation_attempts": 6,
+  "accepted_image_count": 1,
+  "paid_api_calls": 0,
+  "unattended_generation_proven": false,
+  "recovery_attempts": [
+    {
+      "attempt": 4,
+      "tool_result_id": "5f696c7a-5087-4848-be6d-dd1d610ca289",
+      "source_sha256": "112e83dc35b3349f07d3233475266c20cbd582ea72dec7a34c14559d47854286",
+      "original_bytes": 2340567,
+      "original_width": 1536,
+      "original_height": 1024,
+      "decision": "REJECT_STYLE_MISMATCH",
+      "review_summary": "No vegetation; rendering was too photorealistic for the established painterly style."
+    },
+    {
+      "attempt": 5,
+      "tool_result_id": "c519f82d-30de-4b75-aeed-b0f8c5f481dc",
+      "source_sha256": "7ede7758e7809d1a3dbb4902cdaf6cc440df2b14919e1e0eb8c36610349daa21",
+      "original_bytes": 1986391,
+      "original_width": 1672,
+      "original_height": 941,
+      "decision": "REJECT_UNSPECIFIED_WEATHER",
+      "review_summary": "No vegetation and painterly palette, but reflective wet paving implied rain, which was unspecified."
+    },
+    {
+      "attempt": 6,
+      "tool_result_id": "c80441b8-667d-4baf-80b1-7b84c8f8eb16",
+      "source_sha256": "325913999ae74ef8b215a31199ed072aa2acffe0a10e01c3e8bfc105e543c39a",
+      "original_bytes": 1958931,
+      "original_width": 1672,
+      "original_height": 941,
+      "decision": "ACCEPT",
+      "review_summary": "No vegetation; dry matte surfaces; restrained cool blue-gray hand-painted illustration matching the archive reference."
+    }
+  ],
+  "accepted_review": {
+    "vegetation": "NONE_OBSERVED",
+    "surface": "DRY_MATTE",
+    "style": "PAINTERLY_AFTERFALL_ARCHIVE_V1",
+    "reference_style_asset_subject_id": "loc-guild-rear-warehouse"
+  }
+}

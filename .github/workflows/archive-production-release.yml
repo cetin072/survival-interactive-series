@@ -1,0 +1,50 @@
+name: Batched Archive Production release
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: One-time maintenance override for the batching window
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    # Check daily at 23:30 KST. The runner enforces the two-day Production interval.
+    - cron: '30 14 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: archive-production-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'cetin072/survival-interactive-series'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Verify release credential exists
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+        run: |
+          test -n "$GH_TOKEN" || { echo "ARCHIVE_GITHUB_TOKEN_REQUIRED"; exit 1; }
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run one batched Production release cycle
+        env:
+          FORCE_RELEASE: ${{ github.event_name == 'workflow_dispatch' && inputs.force == true && 'true' || 'false' }}
+        shell: bash
+        run: |
+          args=()
+          if [[ "$FORCE_RELEASE" == "true" ]]; then args+=(--force); fi
+          node archive/scripts/run-production-release.mjs "${args[@]}"

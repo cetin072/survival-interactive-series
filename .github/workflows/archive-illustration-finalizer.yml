@@ -1,0 +1,52 @@
+name: Finalize Automation B illustration
+
+on:
+  workflow_dispatch:
+    inputs:
+      job_id:
+        description: Exact Automation B render job id
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: afterfall-illustration-finalizer
+  cancel-in-progress: false
+
+jobs:
+  finalize:
+    if: github.repository == 'cetin072/survival-interactive-series'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Verify credentials
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          test -n "$GH_TOKEN" || { echo ARCHIVE_GITHUB_TOKEN_REQUIRED; exit 1; }
+          test -n "$SUPABASE_URL" || { echo ARCHIVE_SUPABASE_URL_REQUIRED; exit 1; }
+          test -n "$SUPABASE_KEY" || { echo ARCHIVE_SUPABASE_SERVICE_ROLE_KEY_REQUIRED; exit 1; }
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run program finalizer
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          ARCHIVE_ORIGINAL_STORAGE_PROVIDER: supabase
+          ARCHIVE_ORIGINAL_STORAGE_BUCKET: survival-archive-originals
+        run: python archive/scripts/finalize-illustration-job.py --job-id "${{ inputs.job_id }}"

@@ -84,9 +84,9 @@ function DetailArticle({ selected, onSelect, onOpenStory }: { selected: ArchiveN
   </article>
 }
 
-export function ExplorerView({ initialNodeId, onOpenStory }: { initialNodeId?: string; onOpenStory: (chapterId: string) => void }) {
+export function ExplorerView({ initialNodeId, initialFilter = 'all', onOpenStory }: { initialNodeId?: string; initialFilter?: 'all' | ArchiveNodeType; onOpenStory: (chapterId: string) => void }) {
   const firstNodeId = initialNodeId && nodeById.has(initialNodeId) ? initialNodeId : 'char-jinwoo'
-  const [selectedId, setSelectedId] = useState(firstNodeId); const [rootId, setRootId] = useState(firstNodeId); const [query, setQuery] = useState(''); const [filter, setFilter] = useState<'all' | ArchiveNodeType>('all')
+  const [selectedId, setSelectedId] = useState(firstNodeId); const [rootId, setRootId] = useState(firstNodeId); const [query, setQuery] = useState(''); const [filter, setFilter] = useState<'all' | ArchiveNodeType>(initialFilter)
   const selected = nodeById.get(selectedId) ?? archiveNodes[0]; const root = nodeById.get(rootId) ?? selected
   const results = archiveNodes.filter((node) => (filter === 'all' || node.type === filter) && [node.label, node.subtitle, node.summary, ...node.tags].join(' ').toLowerCase().includes(query.toLowerCase()))
   const select = (id: string, focus = false) => { setSelectedId(id); if (focus) setRootId(id) }

@@ -47,6 +47,7 @@ jobs:
         run: npm run build:verified
         env:
           ARCHIVE_AFTERFALL_SOURCE_REF: origin/worldline/afterfall-rpg
+          ARCHIVE_BUILD_REF: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Install browser test tooling (not a runtime dependency)
         run: |
           python -m pip install playwright==1.55.0
@@ -56,6 +57,19 @@ jobs:
       - name: Verify tested assets and navigation on Deploy Preview
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         run: python ../scripts/check-reader-browser.py --url https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app --wait-assets
-      - name: Verify tested assets and navigation on Production
+      - name: Detect a batched Production release commit
+        id: production_release
         if: github.event_name == 'push'
+        working-directory: .
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          git fetch --no-tags --depth=1 origin "$BEFORE_SHA"
+          if git diff --quiet "$BEFORE_SHA" "$GITHUB_SHA" -- archive/web/public/release/production.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Verify tested assets and navigation on Production
+        if: github.event_name == 'push' && steps.production_release.outputs.changed == 'true'
         run: python ../scripts/check-reader-browser.py --url https://survival-diary-archive.netlify.app --wait-assets
