@@ -1,0 +1,38 @@
+{
+  "version": "afterfall-s02-shared-chat-recovery-v1",
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "season_id": "S02",
+  "protagonist": "서진우",
+  "archive_class": "COLD_RAW_RECOVERY",
+  "visibility": "PUBLIC_ARCHIVE",
+  "status": "VERIFIED_PARTIAL_FRAGMENT",
+  "source": {
+    "kind": "CHATGPT_SHARED_CONVERSATION",
+    "url": "https://chatgpt.com/share/6abd160b-2cf4-83ee-b4d0-98c7ede8dc3e?ogimg=plain",
+    "conversation_id": "6abd160b-2cf4-83ee-b4d0-98c7ede8dc3e",
+    "title": "진우 시즌 2 04 (종료)"
+  },
+  "target_gap": {
+    "session_id": "SESSION_004",
+    "source_session_uuid": "f43f1b72-5fc3-4188-926d-866d4e065adc",
+    "existing_user_file": "../SESSION_004/PART_001.md",
+    "game_time": "2027-01-16 09:28",
+    "scene_id": "S02_NORTH_ROUTE_MIGRATION_RECONFIGURATION",
+    "save_version": 216,
+    "missing_role": "GM"
+  },
+  "recovery": {
+    "raw_file": "PART_RECOVERY_001.md",
+    "recovered_gm_game_time_start": "2027-01-16 09:29",
+    "contains_explicit_gap_markers": true,
+    "pairing_complete": false,
+    "next_existing_session": "SESSION_005",
+    "next_existing_game_time": "2027-01-16 10:18",
+    "overlap_policy": "Do not duplicate SESSION_005 or later verified atomic USER-GM pairs."
+  },
+  "canon_policy": {
+    "promote_to_canon": false,
+    "reason": "Historical RAW recovery is evidence only; it does not mutate current Canon or game state."
+  }
+}
