@@ -129,3 +129,10 @@ button { cursor: pointer; }
 @media (max-width: 760px) { .operator-counts { grid-template-columns: repeat(2,minmax(0,1fr)); }.operator-grid { grid-template-columns: 1fr; }.operator-heading { align-items: start; }.operator-page { padding-top: 25px; } }
 @media (max-width: 420px) { .operator-page { padding-bottom: 28px; }.operator-panel { padding: 14px; }.operator-detail dl div { grid-template-columns: 78px minmax(0,1fr); }.operator-heading { flex-direction: column; }.operator-login { margin-top: 25px; } }
 .reader-body h1, .reader-body h2, .reader-body h3 { font-family: ui-serif, "Noto Serif KR", Georgia, serif; color: #242429; line-height: 1.35; }.reader-body h1 { font-size: 1.7em; }.reader-body h2 { margin: 2.4em 0 1em; font-size: 1.35em; }.reader-body h3 { margin: 2em 0 .8em; font-size: 1.12em; }.reader-body blockquote { margin: 1.6em 0; padding: .25em 0 .25em 1.1em; border-left: 3px solid #b4b4bb; color: #565660; font-family: ui-serif, "Noto Serif KR", Georgia, serif; font-size: clamp(18px, 1.45vw, 20px); line-height: 2; }.reader-body ul, .reader-body ol { margin: 0 0 1.5em; padding-left: 1.5em; color: #303037; font-family: ui-serif, "Noto Serif KR", Georgia, serif; font-size: clamp(18px, 1.45vw, 20px); line-height: 2; }.scene-divider { width: 4.5em; margin: 2.6em auto; border: 0; border-top: 1px solid #9a9aa2; }
+
+
+/* Rich record visual profiles: compact index context + image-making reference layer. */
+.result-list .result-description { margin: 6px 0 0; color: #8a8a91; font-size: 12px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.visual-description-section h3 { margin: 20px 0 9px; color: #44444b; font-size: 14px; }
+.visual-cue-list { display: grid; gap: 7px; max-width: 760px; margin: 0; padding-left: 21px; color: #5e5e66; font-size: 14px; line-height: 1.65; }
+.visual-profile-note { max-width: 760px; margin-top: 16px !important; padding: 11px 13px; border-left: 3px solid #d2d2d7; background: #f8f8f9; color: #77777f !important; font-size: 13px !important; line-height: 1.6 !important; }
