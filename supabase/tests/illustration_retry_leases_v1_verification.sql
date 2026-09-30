@@ -296,9 +296,41 @@ begin
     if sqlerrm='ILLUSTRATION_WRONG_STATUS_DISPATCH_ACCEPTED' then raise; end if;
   end;
 
+  -- Match the cron entrypoint's postgres-owned sweep path without running its
+  -- Vault lookup or GitHub HTTP dispatch. The finalizer dispatcher is stubbed
+  -- transaction-locally above and restored by the final ROLLBACK.
+  update survival_ops.illustration_render_jobs set status='BLOCKED',lease_token=null,
+    lease_until=null,lease_owner=null where job_id='test-illustration-stale-dispatch-0007';
+  insert into survival_ops.illustration_render_jobs(
+    job_id,date_kst,main_sha,point_id,generation_key,subject_id,title,active_provider,
+    prompt_contract,prompt_text,prompt_sha256,attempt_no,status,lease_owner,lease_token,lease_until
+  ) values (
+    'test-illustration-cron-dispatch-0008','2098-01-12',repeat('a',40),'point-'||repeat('b',64),
+    'generation-'||repeat('c',64),'loc-cron-dispatch','Rollback-only cron dispatch fixture','native_chatgpt',
+    'illustration-image-prompt-v1','A deterministic rollback-only cron dispatch fixture.',repeat('d',64),
+    1,'FINALIZING','test-cron','00000000-0000-0000-0000-000000000009',clock_timestamp()-interval '1 second'
+  );
+  perform set_config('request.jwt.claim.role','',true);
+  if position('dispatch_afterfall_illustration_sweep' in pg_get_functiondef(
+       'archive_ops.dispatch_afterfall_illustration_prep()'::regprocedure))=0 then
+    raise exception 'ILLUSTRATION_PREP_CRON_SWEEP_PATH_MISSING';
+  end if;
+  sweep_result:=archive_ops.dispatch_afterfall_illustration_sweep();
+  select * into v_row from survival_ops.illustration_render_jobs
+    where job_id='test-illustration-cron-dispatch-0008';
+  if sweep_result->>'finalizer_dispatched'<>'1' or v_row.finalizer_dispatch_request_id<>-999
+     or v_row.status<>'FINALIZE_QUEUED' then
+    raise exception 'ILLUSTRATION_PGCRON_POSTGRES_DISPATCH_FAILED';
+  end if;
+
   if has_function_privilege('anon','public.archive_illustration_finalizer_dispatch_guarded(text)','EXECUTE')
      or has_function_privilege('authenticated','public.archive_illustration_finalizer_dispatch_guarded(text)','EXECUTE')
      or has_function_privilege('service_role','archive_ops.dispatch_afterfall_illustration_finalize(text)','EXECUTE')
+     or has_function_privilege('anon','archive_ops.dispatch_afterfall_illustration_prep()','EXECUTE')
+     or has_function_privilege('authenticated','archive_ops.dispatch_afterfall_illustration_prep()','EXECUTE')
+     or has_function_privilege('service_role','archive_ops.dispatch_afterfall_illustration_prep()','EXECUTE')
+     or has_function_privilege('service_role','archive_ops.dispatch_afterfall_illustration_sweep()','EXECUTE')
+     or not has_function_privilege('postgres','archive_ops.dispatch_afterfall_illustration_sweep()','EXECUTE')
      or not has_function_privilege('service_role','public.archive_illustration_finalizer_dispatch_guarded(text)','EXECUTE') then
     raise exception 'ILLUSTRATION_GUARDED_DISPATCH_GRANTS_INVALID';
   end if;
