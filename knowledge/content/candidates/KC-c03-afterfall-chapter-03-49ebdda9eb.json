@@ -1,0 +1,19 @@
+{
+  "id": "KC-c03-afterfall-chapter-03-49ebdda9eb",
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-011",
+  "question": "비상시 물류·정기이동 경로를 한 길에만 의존하지 않으려면 무엇을 미리 확인하고 기록해야 할까",
+  "topic_id": "emergency-route-redundancy",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_002.md"
+  ],
+  "source_hashes": [
+    "59b1e81c56e0de115a6748bb8ec8bae63a27c33c89fad95c4391ce17ade65e0e"
+  ],
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "disposition_note": "검증된 PUBLIC_READER 장면에서 평소 이용하던 외곽 도로의 통행조건이 달라졌지만, 별도 배수로·농로 우회경로를 이미 알고 있어 추가시간을 감수하고 이동을 계속하는 상황에서 질문을 추출했습니다. 기존 K-008은 위험지역에서 실제 대피를 결정하고 어디로 어떤 경로로 갈지 정하는 가족·개인 대피계획, K-006은 임시 경유지·대피 거점 자체의 접근성·자원·운영상태를 조사하는 내용이 중심입니다. 이번 글은 반복되는 보급·업무·정기이동 경로의 redundancy와 route continuity가 중심이라 의미상 구분됩니다. 현실 근거는 FEMA Supply Chain Resilience Guide, FEMA Distribution Management Plan Guide, FHWA Emergency Transportation Operations 자료를 교차검토했습니다. 도로봉쇄 돌파, 대치, 불법 통행, 위험지역 진입 같은 실행지침은 다루지 않습니다.",
+  "reader_chapter_id": "c03-afterfall-chapter-03",
+  "reader_book_sha256": "fbe55ce3f0c87abb3901ec2779fa2758f8d85edf5c1dad8bdd047717e32bb000",
+  "reader_chapter_sha256": "e4eebe9c9a08d32a0348f5583d88d4e481eee92959e9a1a81a959e1307ef5f39"
+}
