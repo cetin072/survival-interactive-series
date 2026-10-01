@@ -6,12 +6,14 @@ on:
       - 'supabase/migrations/**'
       - 'supabase/tests/archive_exporter_readonly_verification.sql'
       - '.github/workflows/archive-exporter-migration.yml'
+      - 'supabase/tests/knowledge_semantic_jobs_verification.sql'
   push:
     branches: [main]
     paths:
       - 'supabase/migrations/**'
       - 'supabase/tests/archive_exporter_readonly_verification.sql'
       - '.github/workflows/archive-exporter-migration.yml'
+      - 'supabase/tests/knowledge_semantic_jobs_verification.sql'
 
 permissions:
   contents: read
@@ -71,3 +73,28 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260928050000_archive_exporter_readonly.sql
       - name: Verify exporter grants, RLS scope, optional links, and denied writes
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/archive_exporter_readonly_verification.sql
+      - name: Prepare isolated database for Knowledge semantic jobs
+        run: |
+          createdb --owner=postgres knowledge_semantic_test
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE SCHEMA extensions;
+          CREATE EXTENSION pgcrypto WITH SCHEMA extensions;
+          CREATE SCHEMA survival_ops;
+          CREATE SCHEMA survival_rpg;
+          CREATE SCHEMA vault;
+          CREATE SCHEMA net;
+          CREATE SCHEMA cron;
+          CREATE TABLE vault.decrypted_secrets (name text, decrypted_secret text, created_at timestamptz);
+          CREATE TABLE cron.job (jobname text primary key, schedule text not null, active boolean not null);
+          CREATE FUNCTION cron.schedule(text,text,text) RETURNS bigint LANGUAGE plpgsql AS $fn$ BEGIN INSERT INTO cron.job(jobname,schedule,active) VALUES ($1,$2,true); RETURN 1; END $fn$;
+          CREATE FUNCTION net.http_post(url text, body jsonb, headers jsonb, timeout_milliseconds integer) RETURNS bigint LANGUAGE sql AS $fn$ SELECT 1::bigint $fn$;
+          CREATE FUNCTION survival_ops.private_require_archive_operator() RETURNS uuid LANGUAGE sql AS $fn$ SELECT '00000000-0000-4000-8000-000000000001'::uuid $fn$;
+          CREATE TABLE survival_rpg.archive_publication_daily_runs (scheduled_date date,status text,attempt_count integer,last_error_code text,started_at timestamptz,finished_at timestamptz,created_at timestamptz);
+          CREATE TABLE survival_rpg.archive_publication_tasks (task_id uuid,task_kind text,chronicle_id text,season_id text,status text,attempt_count integer,last_error_code text,updated_at timestamptz,completed_at timestamptz,created_at timestamptz);
+          CREATE TABLE survival_ops.illustration_worker_runs (run_id uuid,started_at timestamptz,finished_at timestamptz,final_status text,blocker_code text,blocker_stage text,target_subject_id text,accepted_count integer,registry_status text,cleanup_status text,main_sha text,created_at timestamptz);
+          CREATE TABLE survival_ops.archive_review_items (status text,item_type text);
+          SQL
+      - name: Apply and exercise Knowledge semantic-job lifecycle
+        run: |
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261001064358_knowledge_semantic_jobs_v1.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_jobs_verification.sql
