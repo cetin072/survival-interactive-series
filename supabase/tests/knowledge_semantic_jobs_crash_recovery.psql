@@ -1,0 +1,78 @@
+\set ON_ERROR_STOP on
+
+create function pg_temp.assert_true(p_ok boolean, p_message text)
+returns void language plpgsql as $function$
+begin
+  if not p_ok then raise exception '%',p_message; end if;
+end
+$function$;
+
+select public.archive_knowledge_semantic_job_prepare(
+  'FRESH_BRIEF',
+  'PUBLIC_ARCHIVE',
+  'synthetic://c3-ci/worker-crash-recovery',
+  repeat('a',64),
+  'synthetic-c3-worker-crash-recovery',
+  'c3-test-v1',
+  repeat('b',64),
+  '{"synthetic":true}'::jsonb,
+  repeat('1',40),
+  '{"source":{"kind":"PUBLIC_ARCHIVE"},"target":{"brief_id":"K-999"}}'::jsonb,
+  'PREPARED',
+  null
+) as prepared \gset
+select pg_temp.assert_true((:'prepared'::jsonb->>'status') = 'PREPARED','crash-recovery fixture was not prepared');
+select (:'prepared'::jsonb->>'job_id') as job_id \gset
+select pg_temp.assert_true(
+  (public.archive_knowledge_semantic_job_current()->'job'->>'job_id')::uuid = :'job_id'::uuid,
+  'first worker did not read prepared job'
+);
+
+\connect knowledge_semantic_test postgres
+create function pg_temp.assert_true(p_ok boolean, p_message text)
+returns void language plpgsql as $function$
+begin
+  if not p_ok then raise exception '%',p_message; end if;
+end
+$function$;
+
+select pg_temp.assert_true(
+  (public.archive_knowledge_semantic_job_current()->'job'->>'job_id')::uuid = :'job_id'::uuid,
+  'PREPARED job did not survive worker connection termination'
+);
+select public.archive_knowledge_semantic_job_submit(
+  :'job_id'::uuid,
+  'synthetic://c3-ci/worker-crash-recovery',
+  repeat('a',64),
+  jsonb_build_object(
+    'version','knowledge-semantic-result-v1',
+    'decision','HOLD',
+    'job_id',:'job_id',
+    'code','NO_DISTINCT_SAFE_QUESTION',
+    'note','cross-session crash recovery fixture'
+  )
+) as submitted \gset
+select pg_temp.assert_true((:'submitted'::jsonb->>'status') = 'ACCEPTED','recovery worker submit was not accepted');
+
+\connect knowledge_semantic_test postgres
+create function pg_temp.assert_true(p_ok boolean, p_message text)
+returns void language plpgsql as $function$
+begin
+  if not p_ok then raise exception '%',p_message; end if;
+end
+$function$;
+
+select pg_temp.assert_true(
+  public.archive_knowledge_semantic_job_current()->>'status' = 'NO_JOB',
+  'submitted job remained available to semantic worker'
+);
+select public.archive_knowledge_semantic_job_claim_finalizer() as claimed \gset
+select pg_temp.assert_true(
+  (:'claimed'::jsonb->>'job_id')::uuid = :'job_id'::uuid
+  and (:'claimed'::jsonb->>'status') = 'FINALIZING',
+  'finalizer did not recover the submitted job after worker termination'
+);
+select public.archive_knowledge_semantic_job_update(
+  :'job_id'::uuid,'FINALIZING','HOLD','SYNTHETIC_HOLD','CRASH_RECOVERY_TEST'
+) as finalized \gset
+select pg_temp.assert_true((:'finalized'::jsonb->>'status') = 'HOLD','recovered finalizer did not record terminal HOLD');

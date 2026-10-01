@@ -7,6 +7,7 @@ on:
       - 'supabase/tests/archive_exporter_readonly_verification.sql'
       - '.github/workflows/archive-exporter-migration.yml'
       - 'supabase/tests/knowledge_semantic_jobs_verification.sql'
+      - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
   push:
     branches: [main]
     paths:
@@ -14,6 +15,7 @@ on:
       - 'supabase/tests/archive_exporter_readonly_verification.sql'
       - '.github/workflows/archive-exporter-migration.yml'
       - 'supabase/tests/knowledge_semantic_jobs_verification.sql'
+      - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
 
 permissions:
   contents: read
@@ -98,3 +100,4 @@ jobs:
         run: |
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261001064358_knowledge_semantic_jobs_v1.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_jobs_verification.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_jobs_crash_recovery.psql

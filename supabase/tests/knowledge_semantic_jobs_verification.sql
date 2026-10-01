@@ -58,6 +58,12 @@ begin
       raise exception 'current job did not return prepared job %: %',v_job_id,v_current;
     end if;
 
+    -- Repeated current reads remain stable while a job is PREPARED.
+    v_current := public.archive_knowledge_semantic_job_current();
+    if v_current->>'status' <> 'PREPARED' or v_current->'job'->>'job_id' <> v_job_id::text then
+      raise exception 'pre-submit worker recovery did not preserve job %: %',v_job_id,v_current;
+    end if;
+
     v_second_prepare := public.archive_knowledge_semantic_job_prepare(
       'FRESH_BRIEF','PUBLIC_ARCHIVE',v_source_ref || '-second',repeat('c',64),
       'synthetic-c3-ci-second-' || lower(v_decision),'c3-test-v1',repeat('b',64),
@@ -109,6 +115,7 @@ begin
     if public.archive_knowledge_semantic_job_current()->>'status' <> 'NO_JOB' then
       raise exception 'submitted result remained visible as a PREPARED job';
     end if;
+    -- A submitted job is no longer exposed to the semantic worker; finalization is independent.
     v_claimed := public.archive_knowledge_semantic_job_claim_finalizer();
     if v_claimed->>'job_id' <> v_job_id::text or v_claimed->>'status' <> 'FINALIZING' then
       raise exception 'finalizer did not claim exactly submitted job %: %',v_job_id,v_claimed;
