@@ -14,6 +14,7 @@ Status: **PARTIAL / COLD ARCHIVE / NOT BOOT INPUT**
 
 | Session | Source | Verified chronological range | USER | GM public blocks | Verdict |
 | --- | --- | --- | ---: | ---: | --- |
+| `OPENING_SHARED_CHAT_RECOVERY` | ChatGPT shared conversation `6abd9e2b-8644-83e9-801c-ee8cba198262` | 2026-11-21 season opening → immediately before SESSION_001 first USER | 34 | 34 | VERIFIED exact pre-overlap span |
 | `SESSION_001` | PR #84 / `archive/afterfall-chronicle03-s02-room-20260925` | 2026-11-22 industrial-fire response through the archive-request cutoff | 31 | 89 | VERIFIED span, PARTIAL room |
 | `SESSION_002` | PR #83 / `archive/afterfall-s02-raw-room-20260925` | 2027-01-04 first-winter discussion through the archive-request cutoff | 13 | 16 | VERIFIED span, PARTIAL room |
 
@@ -38,8 +39,10 @@ fact of its originating room.
 
 ## Coverage and gaps
 
-- `SESSION_001`: everything before its first directly visible USER turn is
-  `MISSING_TRANSCRIPT`.
+- `SESSION_001`: its previously missing pre-span has been recovered from
+  `OPENING_SHARED_CHAT_RECOVERY/PART_OPENING_001.md`–`004.md`. The shared
+  source starts at the S02 opening and stops immediately before an exact duplicate
+  of the first USER block in `SESSION_001/PART_001.md`.
 - `SESSION_002`: everything before its first directly visible USER turn is
   `MISSING_TRANSCRIPT`.
 - The archive-operation replies after each source's preservation request are
@@ -51,8 +54,9 @@ source.
 
 ## Reading order
 
-1. `SESSION_001/PART_001.md` through `PART_004.md`
-2. `SESSION_002/PART_001.md` through `PART_004.md`
+1. `OPENING_SHARED_CHAT_RECOVERY/PART_OPENING_001.md` through `PART_OPENING_004.md`
+2. `SESSION_001/PART_001.md` through `PART_004.md`
+3. `SESSION_002/PART_001.md` through `PART_004.md`
 
 This cold archive is not a normal game boot input.
 
@@ -79,17 +83,18 @@ This cold archive is not a normal game boot input.
 ### Extended reading order
 
 기존:
-1. `SESSION_001`
-2. `SESSION_002`
+1. `OPENING_SHARED_CHAT_RECOVERY`
+2. `SESSION_001`
+3. `SESSION_002`
 
 추가:
-3. `SESSION_003`
-4. `SESSION_004`
-5. `SESSION_005`
-6. `SESSION_006`
-7. `SESSION_007`
-8. `SESSION_008`
-9. `SESSION_009`
+4. `SESSION_003`
+5. `SESSION_004`
+6. `SESSION_005`
+7. `SESSION_006`
+8. `SESSION_007`
+9. `SESSION_008`
+10. `SESSION_009`
 
 
 
@@ -104,3 +109,17 @@ This cold archive is not a normal game boot input.
 - 답변 전체가 회수된 것은 아니므로 `SESSION_004`의 `PARTIAL_CAPTURE_INCOMPLETE_PAIRING` 판정은 유지한다.
 - 확인되지 않은 중간은 `[원문 확인 불가 구간]`으로 남긴다.
 - 복구 조각은 RAW Vault에는 공개하지만 Reader Edition 서사 본문에는 자동 편입하지 않는다.
+
+
+## Opening shared-chat recovery — 2026-10-01
+
+사용자가 제공한 `시즌2 장면 시작` 공유 원본으로 기존 `SESSION_001` 이전의 빈 구간을 복구했다.
+
+- Source: <https://chatgpt.com/share/6abd9e2b-8644-83e9-801c-ee8cba198262?ogimg=plain>
+- 공유 페이지 내부 serialized `linear_conversation`을 직접 읽어 원문 문자열을 추출했다.
+- 새로 확보된 범위: source linear index **3..562**
+- 메시지: **34 USER + 34 assistant final**
+- source linear index **563**의 USER 문장이 기존 `SESSION_001/PART_001.md` 첫 USER와 정확히 일치한다.
+- 따라서 index 563 이후는 중복 보존하지 않았다.
+- 시스템·도구·비공개 추론·assistant commentary는 제외했다.
+- 현재 Canon/state는 변경하지 않는다.
