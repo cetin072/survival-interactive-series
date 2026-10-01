@@ -77,6 +77,14 @@ test('legacy branch guard ignores squash-integrated content but blocks a genuine
     const orphan = git(['rev-parse', 'HEAD'])
     git(['update-ref', 'refs/remotes/origin/knowledge/worker/orphan', orphan])
     assert.equal(detectLegacyWorkerBlocker({ openPrs: [], branchRows: [{ name: 'knowledge/worker/orphan' }], baseRef: current, cwd }), 'LEGACY_WORKER_BRANCH_UNMERGED:knowledge/worker/orphan')
+
+    git(['update-ref', 'refs/remotes/origin/knowledge/worker/semantic-287c20fb-7ad2-41e4-b9be-12426675d234', orphan])
+    assert.equal(detectLegacyWorkerBlocker({
+      openPrs: [{ state: 'OPEN', number: 501, headRefName: 'knowledge/worker/semantic-287c20fb-7ad2-41e4-b9be-12426675d234' }],
+      branchRows: [{ name: 'knowledge/worker/semantic-287c20fb-7ad2-41e4-b9be-12426675d234' }],
+      baseRef: current,
+      cwd,
+    }), null)
   } finally { await rm(cwd, { recursive: true, force: true }) }
 })
 
