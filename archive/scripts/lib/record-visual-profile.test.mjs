@@ -12,15 +12,14 @@ const graph = JSON.parse(await readFile(
   resolve(root, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'), 'utf8',
 ))
 
-test('rich visual profiles cover the complete 40-record public archive', () => {
+test('rich visual profiles cover the complete public archive', () => {
   assert.equal(profiles.version, 'record-visual-profile-v1')
-  assert.equal(profiles.record_count, 40)
-  assert.equal(profiles.records.length, 40)
-  assert.equal(graph.articles.length, 40)
+  assert.equal(profiles.record_count, graph.articles.length)
+  assert.equal(profiles.records.length, graph.articles.length)
 
   const graphIds = new Set(graph.articles.map((article) => article.id))
   const profileIds = new Set(profiles.records.map((record) => record.node_id))
-  assert.equal(profileIds.size, 40)
+  assert.equal(profileIds.size, graph.articles.length)
   assert.deepEqual([...profileIds].sort(), [...graphIds].sort())
 })
 
