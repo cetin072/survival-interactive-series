@@ -63,7 +63,7 @@ class FinalizerIdentityTests(unittest.TestCase):
         contract_path = ROOT / "archive/automation/illustration-reviewer-runtime-contract.json"
         contract = json.loads(contract_path.read_text(encoding="utf-8"))
         self.assertEqual(contract["version"], "illustration-reviewer-runtime-contract-v2")
-        self.assertFalse(contract["rollout_dependency"]["current_reservation_compatible"])
+        self.assertTrue(contract["rollout_dependency"]["current_reservation_compatible"])
         self.assertEqual(
             contract["binding_snapshot"]["required_fields"],
             [
