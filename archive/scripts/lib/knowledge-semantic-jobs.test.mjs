@@ -5,8 +5,9 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
-import { applySemanticPackage, buildSemanticContext, chapterHash, makeWorkKey, nextBriefId, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
+import { applySemanticPackage, buildSemanticContext, chapterHash, hashPolicyBytes, makeWorkKey, nextBriefId, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
 import { finalizerAction, semanticBranchRef, reconcilePullRequest, verifyPins } from '../knowledge-semantic-finalize.mjs'
+import { runPackage } from '../knowledge-semantic-finalize.mjs'
 import { detectLegacyWorkerBlocker, planSemanticPreparation } from '../knowledge-semantic-prepare.mjs'
 
 const digest = (value) => createHash('sha256').update(value).digest('hex')
@@ -205,4 +206,123 @@ test('C-FINALIZER package application persists one validated BRIEF_READY disposi
     const state = JSON.parse(await readFile(join(root, 'knowledge/automation/state.json'), 'utf8'))
     assert.equal(state.sources.find((item) => item.source_manifest_ref === sourceRef)?.status, 'PROCESSED')
   } finally { await rm(root, { recursive: true, force: true }) }
+})
+
+test('C-FINALIZER builds, gates, commits, and pushes one exact-target package to a worker branch', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'semantic-finalizer-package-git-'))
+  const remote = await mkdtemp(join(tmpdir(), 'semantic-finalizer-origin-'))
+  const repositoryRoot = resolve(import.meta.dirname, '../../..')
+  const git = (args, cwd = root) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
+  try {
+    await Promise.all([
+      cp(join(repositoryRoot, 'knowledge'), join(root, 'knowledge'), { recursive: true }),
+      cp(join(repositoryRoot, 'archive/content'), join(root, 'archive/content'), { recursive: true }),
+      cp(join(repositoryRoot, 'archive/web/public'), join(root, 'archive/web/public'), { recursive: true }),
+      cp(join(repositoryRoot, 'archive/scripts'), join(root, 'archive/scripts'), { recursive: true }),
+      cp(join(repositoryRoot, 'docs'), join(root, 'docs'), { recursive: true }),
+    ])
+    await mkdir(join(root, 'archive/web'), { recursive: true })
+    await writeFile(join(root, 'archive/web/package.json'), '{"private":true,"type":"module"}\n')
+
+    const sourceRef = 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_999/SOURCE_MANIFEST.json'
+    const sourceDir = join(root, 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_999')
+    await mkdir(sourceDir, { recursive: true })
+    const referenceManifest = JSON.parse(await readFile(join(root, 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_005/SOURCE_MANIFEST.json'), 'utf8'))
+    const partName = referenceManifest.parts[0]
+    const referencePart = join(root, 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_005', partName)
+    const partBytes = await readFile(referencePart)
+    await writeFile(join(sourceDir, partName), partBytes)
+    const sourceManifest = {
+      ...referenceManifest,
+      session_id: 'SESSION_999',
+      source_session_uuid: '90000000-0000-4000-8000-000000000999',
+      publication_segment_id: `segment-${digest(Buffer.from('semantic-finalizer-test'))}`,
+    }
+    const manifestBytes = Buffer.from(`${JSON.stringify(sourceManifest, null, 2)}\n`)
+    await writeFile(join(root, sourceRef), manifestBytes)
+    const sourceSha = digest(manifestBytes)
+    const partRef = `archive/content/transcripts/C03-AFTERFALL/S03/SESSION_999/${partName}`
+    const partSha = digest(partBytes)
+
+    const candidateId = 'KC-semantic-finalizer-git-fixture'
+    const question = '어떤 일반 물품 인계 목록을 미리 정해 두면 공동체 간 인수를 확인하기 쉬울까'
+    const templateBrief = JSON.parse(await readFile(join(root, 'knowledge/content/briefs/K-010.json'), 'utf8'))
+    const templateCandidate = JSON.parse(await readFile(join(root, 'knowledge/content/candidates/KC-community-mutual-aid-agreement.json'), 'utf8'))
+    const templateEvidence = JSON.parse(await readFile(join(root, 'knowledge/content/evidence/K-010.json'), 'utf8'))
+    const candidate = {
+      ...templateCandidate, id: candidateId, brief_id: 'K-011', question,
+      disposition_note: 'Synthetic package used only by the isolated C-FINALIZER Git integration test.',
+      source_manifest_ref: sourceRef, source_manifest_sha256: sourceSha,
+    }
+    const brief = {
+      ...templateBrief, id: 'K-011', slug: 'semantic-finalizer-git-fixture',
+      label: '공동 물품 인계 기록', title: question,
+      summary: '공동체 간 일반 물품의 약속 수량과 실제 인수량을 기록으로 확인하는 방법을 정리합니다.',
+      meta_description: '일반 물품 인계 목록과 실제 인수 기록을 구분해 관리하는 방법을 설명합니다.',
+      lead: '일반 물품을 여러 조직이 함께 다룰 때는 약속한 수량과 실제 인수량을 분리해 기록하면 확인이 쉬워집니다.',
+      status: 'READY', updated_at: '2026-10-01',
+    }
+    const evidence = { ...templateEvidence, brief_id: 'K-011', question }
+    const configBytes = await readFile(join(root, 'knowledge/automation/config.json'))
+    const config = JSON.parse(configBytes.toString('utf8'))
+    const policyBytes = await readFile(join(root, 'knowledge/automation/worker-policy.json'))
+    const editorialBytes = await readFile(join(root, 'docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V1.md'))
+    const policySha = hashPolicyBytes(policyBytes, configBytes, editorialBytes)
+    const job = {
+      ...baseJob,
+      status: 'FINALIZING', source_ref: sourceRef, source_sha256: sourceSha,
+      prepared_at: '2026-10-01T12:00:00.000Z', policy_sha256: policySha,
+      policy_pin: { sha256: policySha },
+      semantic_context: {
+        target: { brief_id: 'K-011', candidate_id: candidateId },
+        source: { kind: 'PUBLIC_ARCHIVE', ref: sourceRef, sha256: sourceSha, refs: [partRef], hashes: [partSha] },
+        policy: { publication_mode: config.publication_mode, auto_publish_enabled: config.auto_publish_enabled },
+      },
+    }
+    const result = { version: 'knowledge-semantic-result-v1', job_id: job.job_id, decision: 'BRIEF_READY', candidate, evidence, brief }
+
+    git(['init', '-b', 'main'])
+    git(['config', 'user.name', 'C3 integration test'])
+    git(['config', 'user.email', 'c3-integration@example.invalid'])
+    git(['config', 'core.autocrlf', 'false'])
+    git(['add', '.'])
+    git(['commit', '-m', 'test fixture base'])
+    const baseSha = git(['rev-parse', 'HEAD'])
+    execFileSync('git', ['init', '--bare', remote], { cwd: root, stdio: 'ignore' })
+    git(['remote', 'add', 'origin', remote])
+    git(['push', 'origin', 'main'])
+    git(['update-ref', 'refs/remotes/origin/main', baseSha])
+
+    const runCommand = (command, args, cwd, env = {}) => {
+      if (command !== 'npm') return execFileSync(command, args, { cwd, env: { ...process.env, ...env }, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
+      if (args[0] === 'ci' || (args[0] === 'run' && args[1] === 'knowledge:test')) return ''
+      if (args[0] === 'run' && args[1] === 'knowledge:build') {
+        return execFileSync(process.execPath, ['../scripts/build-knowledge.mjs'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
+      }
+      if (args[0] === 'run' && args[1] === 'knowledge:check') {
+        execFileSync(process.execPath, ['../scripts/build-knowledge.mjs', '--check'], { cwd, stdio: 'ignore' })
+        return execFileSync(process.execPath, ['../scripts/knowledge-scan.mjs', '--check'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
+      }
+      throw new Error(`Unexpected npm command in isolated test: ${args.join(' ')}`)
+    }
+    const headRef = semanticBranchRef(job.job_id)
+    const packaged = await runPackage(job, result, { currentMainSha: baseSha, headRef, currentRoot: root, runCommand })
+    assert.equal(packaged.release_decision, 'AUTO_PUBLISH_ELIGIBLE')
+    assert.equal(packaged.current_main_sha, baseSha)
+    assert.match(packaged.head_sha, /^[a-f0-9]{40}$/)
+    assert.equal(git(['rev-parse', `refs/heads/${headRef}`]), packaged.head_sha)
+    assert.equal(git(['--git-dir', remote, 'rev-parse', `refs/heads/${headRef}`]), packaged.head_sha)
+    const committedBrief = JSON.parse(git(['show', `${headRef}:knowledge/content/briefs/K-011.json`]))
+    assert.equal(committedBrief.status, 'READY')
+    assert.equal(committedBrief.id, 'K-011')
+    const committedState = JSON.parse(git(['show', `${headRef}:knowledge/automation/state.json`]))
+    assert.equal(committedState.sources.find((item) => item.source_manifest_ref === sourceRef)?.status, 'PROCESSED')
+    const committedPaths = git(['ls-tree', '-r', '--name-only', headRef]).split(/\r?\n/)
+    assert.ok(!committedPaths.includes('archive/web/public/knowledge/semantic-finalizer-git-fixture/index.html'))
+    const sitemap = git(['show', `${headRef}:archive/web/public/sitemap.xml`])
+    assert.ok(!sitemap.includes('/knowledge/semantic-finalizer-git-fixture/'))
+  } finally {
+    await rm(root, { recursive: true, force: true })
+    await rm(remote, { recursive: true, force: true })
+  }
 })

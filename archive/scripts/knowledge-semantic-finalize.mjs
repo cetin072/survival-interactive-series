@@ -99,11 +99,11 @@ export async function verifyPins(job, base) {
   return { context, config }
 }
 
-async function runPackage(job, result, { currentMainSha, headRef }) {
+export async function runPackage(job, result, { currentMainSha, headRef, currentRoot = root, runCommand = run }) {
   const temp = await mkdtemp(join(tmpdir(), `knowledge-semantic-${job.job_id}-`))
   let worktreeAdded = false
   try {
-    run('git', ['worktree', 'add', '--detach', temp, 'origin/main'], root)
+    runCommand('git', ['worktree', 'add', '--detach', temp, 'origin/main'], currentRoot)
     worktreeAdded = true
     const initial = await loadKnowledge(temp)
     await validateKnowledge(initial)
@@ -113,10 +113,10 @@ async function runPackage(job, result, { currentMainSha, headRef }) {
     await verifyPins(job, temp)
     const applied = await applySemanticPackage({ root: temp, job, result, now: new Date(job.submitted_at ?? job.prepared_at).toISOString() })
 
-    run('npm', ['ci'], join(temp, 'archive/web'))
-    run('npm', ['run', 'knowledge:test'], join(temp, 'archive/web'))
-    run('npm', ['run', 'knowledge:build'], join(temp, 'archive/web'))
-    run('npm', ['run', 'knowledge:check'], join(temp, 'archive/web'))
+    runCommand('npm', ['ci'], join(temp, 'archive/web'))
+    runCommand('npm', ['run', 'knowledge:test'], join(temp, 'archive/web'))
+    runCommand('npm', ['run', 'knowledge:build'], join(temp, 'archive/web'))
+    runCommand('npm', ['run', 'knowledge:check'], join(temp, 'archive/web'))
     const data = await loadKnowledge(temp)
     await validateKnowledge(data)
     const changedFiles = changedFilesFromGit({ baseRef: 'origin/main', headRef: 'HEAD', cwd: temp })
@@ -128,26 +128,26 @@ async function runPackage(job, result, { currentMainSha, headRef }) {
     if (result.decision === 'BRIEF_READY' && !['AUTO_PUBLISH_ELIGIBLE', 'WOULD_AUTO_PUBLISH', 'PR_ONLY'].includes(release.decision)) throw new Error(`SEMANTIC_MODE_GATE:${release.decision}:${release.reasons.join(',')}`)
     if (result.decision === 'HUMAN_REVIEW' && !['HUMAN_REVIEW_REQUIRED', 'PR_ONLY'].includes(release.decision)) throw new Error(`SEMANTIC_MODE_REVIEW_GATE:${release.decision}`)
 
-    run('git', ['checkout', '-b', headRef], temp)
-    run('git', ['add', '-A', '--', 'knowledge/content', 'knowledge/automation/state.json', 'knowledge/automation/runtime-state.json', 'archive/web/public/knowledge', 'archive/web/public/sitemap.xml'], temp)
-    const staged = run('git', ['diff', '--cached', '--name-only'], temp).split(/\r?\n/).filter(Boolean)
+    runCommand('git', ['checkout', '-b', headRef], temp)
+    runCommand('git', ['add', '-A', '--', 'knowledge/content', 'knowledge/automation/state.json', 'knowledge/automation/runtime-state.json', 'archive/web/public/knowledge', 'archive/web/public/sitemap.xml'], temp)
+    const staged = runCommand('git', ['diff', '--cached', '--name-only'], temp).split(/\r?\n/).filter(Boolean)
     const checked = await checkRelease(deterministicData, { changedFiles: staged, briefIds: [result.brief.id], mode: 'AUTO_LOW_RISK', base: temp })
     if (checked.content_only?.allowed !== true) throw new Error(`SEMANTIC_CONTENT_BOUNDARY:${checked.reasons.join(',')}`)
     const submittedAt = new Date(job.submitted_at ?? job.prepared_at).toISOString()
     const date = submittedAt.replace(/\.\d{3}Z$/, '+0000')
-    run('git', ['config', 'user.name', 'knowledge-semantic-finalizer'], temp)
-    run('git', ['config', 'user.email', 'knowledge-semantic-finalizer@users.noreply.github.com'], temp)
-    run('git', ['commit', '-m', `knowledge: prepare ${result.brief.id} semantic package`], temp, { GIT_AUTHOR_DATE: date, GIT_COMMITTER_DATE: date })
-    const headSha = run('git', ['rev-parse', 'HEAD'], temp)
-    const remote = run('git', ['ls-remote', '--heads', 'origin', `refs/heads/${headRef}`], temp)
+    runCommand('git', ['config', 'user.name', 'knowledge-semantic-finalizer'], temp)
+    runCommand('git', ['config', 'user.email', 'knowledge-semantic-finalizer@users.noreply.github.com'], temp)
+    runCommand('git', ['commit', '-m', `knowledge: prepare ${result.brief.id} semantic package`], temp, { GIT_AUTHOR_DATE: date, GIT_COMMITTER_DATE: date })
+    const headSha = runCommand('git', ['rev-parse', 'HEAD'], temp)
+    const remote = runCommand('git', ['ls-remote', '--heads', 'origin', `refs/heads/${headRef}`], temp)
     if (remote) {
       const remoteSha = remote.split(/\s+/)[0]
       if (remoteSha !== headSha) throw new Error('SEMANTIC_BRANCH_IDENTITY_CONFLICT')
-    } else run('git', ['push', 'origin', `HEAD:${headRef}`], temp)
+    } else runCommand('git', ['push', 'origin', `HEAD:${headRef}`], temp)
     return { ...applied, release_decision: release.decision, head_sha: headSha, current_main_sha: currentMainSha }
   } finally {
     if (worktreeAdded) {
-      try { run('git', ['worktree', 'remove', '--force', temp], root) } catch { }
+      try { runCommand('git', ['worktree', 'remove', '--force', temp], currentRoot) } catch { }
     }
     await rm(temp, { recursive: true, force: true })
   }
