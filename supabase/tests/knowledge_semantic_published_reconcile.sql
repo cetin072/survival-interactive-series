@@ -12,7 +12,7 @@ declare
   rejected jsonb;
   old_head text := repeat('a',40);
   prepared_head text := repeat('b',40);
-  merge_sha text := repeat('c',40);
+  v_merge_sha text := repeat('c',40);
 begin
   if has_function_privilege('service_role',
        'survival_ops.repair_knowledge_semantic_published(uuid,integer,text,text,text)',
@@ -72,31 +72,31 @@ begin
   end if;
 
   rejected := survival_ops.repair_knowledge_semantic_published(
-    v_job_id,302,repeat('d',40),prepared_head,merge_sha
+    v_job_id,302,repeat('d',40),prepared_head,v_merge_sha
   );
   if rejected->>'status' <> 'REJECTED' or rejected->>'reason' <> 'REPAIR_BINDING_MISMATCH' then
     raise exception 'wrong old head was not rejected: %',rejected;
   end if;
 
   repaired := survival_ops.repair_knowledge_semantic_published(
-    v_job_id,302,old_head,prepared_head,merge_sha
+    v_job_id,302,old_head,prepared_head,v_merge_sha
   );
   if repaired->>'status' <> 'PUBLISHED'
      or repaired->>'final_head_sha' <> prepared_head
-     or repaired->>'merge_sha' <> merge_sha then
+     or repaired->>'merge_sha' <> v_merge_sha then
     raise exception 'published repair failed: %',repaired;
   end if;
 
   if not exists (
     select 1 from survival_ops.knowledge_semantic_jobs j
     where j.job_id = v_job_id
-      and status='PUBLISHED'
-      and final_pr_number=302
-      and final_head_sha=prepared_head
-      and merge_sha=merge_sha
-      and blocker_code is null
-      and blocker_stage is null
-      and published_at is not null
+      and j.status='PUBLISHED'
+      and j.final_pr_number=302
+      and j.final_head_sha=prepared_head
+      and j.merge_sha=v_merge_sha
+      and j.blocker_code is null
+      and j.blocker_stage is null
+      and j.published_at is not null
   ) then
     raise exception 'published repair row state mismatch';
   end if;
