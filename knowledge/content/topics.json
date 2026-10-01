@@ -63,5 +63,15 @@
     "guide_id": null,
     "tools": [],
     "story_refs": []
+  },
+  {
+    "id": "emergency-route-redundancy",
+    "title": "비상 이동경로 이중화",
+    "brief_ids": [
+      "K-011"
+    ],
+    "guide_id": null,
+    "tools": [],
+    "story_refs": []
   }
 ]
