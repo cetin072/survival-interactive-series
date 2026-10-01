@@ -96,6 +96,33 @@ test('semantic context is compact and bounded', () => {
   const context = buildSemanticContext({ jobType: 'FRESH_BRIEF', source: { kind: 'PUBLIC_ARCHIVE', ref: sourceRef, sha256: sourceSha }, target: { brief_id: 'K-011', candidate_id: 'KC-test' }, existingKnowledge: data, policy: { version: 2, editorial_spec_ref: 'docs/spec.md', research_policy: { minimum_authoritative_sources_per_brief: 2 }, candidate_policy: { allowed_auto_risk_domains: [], high_risk_domains: [] } }, excerpt: 'x'.repeat(8000) })
   assert.equal(context.source.excerpt.length, 5000)
   assert.equal(context.policy.publication_mode, 'AUTO_LOW_RISK_SHADOW')
+
+  const readerContext = buildSemanticContext({
+    jobType: 'BACKFILL_BRIEF',
+    source: {
+      kind: 'PUBLIC_READER',
+      ref: 'archive/content/stories/C03-AFTERFALL/BOOK.json#ch-1',
+      sha256: '1'.repeat(64),
+      chapter_id: 'ch-1',
+      chapter_sha256: '1'.repeat(64),
+      reader_book_sha256: '3'.repeat(64),
+      refs: ['public/ref'],
+      hashes: ['2'.repeat(64)],
+    },
+    target: { brief_id: 'K-011', candidate_id: 'KC-reader-test' },
+    existingKnowledge: data,
+    policy: { version: 2, editorial_spec_ref: 'docs/spec.md', research_policy: { minimum_authoritative_sources_per_brief: 2 }, candidate_policy: { allowed_auto_risk_domains: [], high_risk_domains: [] } },
+    excerpt: 'reader',
+  })
+  assert.equal(readerContext.source.reader_book_sha256, '3'.repeat(64))
+  assert.throws(() => buildSemanticContext({
+    jobType: 'BACKFILL_BRIEF',
+    source: { kind: 'PUBLIC_READER', ref: 'archive/content/stories/C03-AFTERFALL/BOOK.json#ch-1', sha256: '1'.repeat(64), chapter_id: 'ch-1', chapter_sha256: '1'.repeat(64), refs: ['public/ref'], hashes: ['2'.repeat(64)] },
+    target: { brief_id: 'K-011', candidate_id: 'KC-reader-test' },
+    existingKnowledge: data,
+    policy: { version: 2, editorial_spec_ref: 'docs/spec.md', research_policy: { minimum_authoritative_sources_per_brief: 2 }, candidate_policy: { allowed_auto_risk_domains: [], high_risk_domains: [] } },
+    excerpt: 'reader',
+  }), /SEMANTIC_READER_BOOK_SHA_REQUIRED/)
 })
 
 test('result contract binds BRIEF_READY and HUMAN_REVIEW packages to one job and reserved target', () => {
