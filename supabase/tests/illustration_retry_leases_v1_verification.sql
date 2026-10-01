@@ -15,6 +15,8 @@ create schema if not exists vault;
 create table if not exists vault.decrypted_secrets(
   name text, decrypted_secret text, created_at timestamptz
 );
+insert into vault.decrypted_secrets(name,decrypted_secret,created_at)
+values('archive_github_dispatch_token',repeat('test-token-',4),clock_timestamp());
 -- Transaction-local safe finalizer dispatch sink: restored by ROLLBACK.
 create or replace function archive_ops.dispatch_afterfall_illustration_finalize(p_job_id text)
 returns bigint language sql volatile security definer set search_path=pg_catalog as $$
@@ -345,16 +347,7 @@ begin
        'archive_ops.dispatch_afterfall_illustration_prep()'::regprocedure))=0 then
     raise exception 'ILLUSTRATION_PREP_CRON_SWEEP_PATH_MISSING';
   end if;
-  begin
-    prep_request:=archive_ops.dispatch_afterfall_illustration_prep();
-  exception when others then
-    if sqlerrm='ARCHIVE_GITHUB_DISPATCH_TOKEN_MISSING' then
-      -- This ephemeral database has no test Vault token. The stale sweep ran first.
-      prep_request:=null;
-    else
-      raise;
-    end if;
-  end;
+  prep_request:=archive_ops.dispatch_afterfall_illustration_prep();
   select * into v_row from survival_ops.illustration_render_jobs
     where job_id='test-illustration-cron-dispatch-0008';
   if v_row.finalizer_dispatch_request_id<>-999
