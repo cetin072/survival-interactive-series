@@ -181,6 +181,9 @@ test('C-FINALIZER package application persists one validated BRIEF_READY disposi
       cp(join(repositoryRoot, 'archive/content'), join(root, 'archive/content'), { recursive: true }),
       cp(join(repositoryRoot, 'archive/web/public'), join(root, 'archive/web/public'), { recursive: true }),
     ])
+    const { loadKnowledge, validateKnowledge } = await import('./knowledge-content.mjs')
+    const fixtureData = await loadKnowledge(root)
+    const briefId = nextBriefId(fixtureData.briefs)
     const referenceBrief = JSON.parse(await readFile(join(root, 'knowledge/content/briefs/K-010.json'), 'utf8'))
     const referenceCandidate = JSON.parse(await readFile(join(root, 'knowledge/content/candidates/KC-community-mutual-aid-agreement.json'), 'utf8'))
     const referenceEvidence = JSON.parse(await readFile(join(root, 'knowledge/content/evidence/K-010.json'), 'utf8'))
@@ -194,21 +197,21 @@ test('C-FINALIZER package application persists one validated BRIEF_READY disposi
       source_ref: sourceRef,
       source_sha256: sourceSha,
       semantic_context: {
-        target: { brief_id: 'K-011', candidate_id: candidateId },
+        target: { brief_id: briefId, candidate_id: candidateId },
         source: { kind: 'PUBLIC_ARCHIVE', ref: sourceRef, sha256: sourceSha, refs: [], hashes: [] },
       },
     }
     const candidate = {
       ...referenceCandidate,
       id: candidateId,
-      brief_id: 'K-011',
+      brief_id: briefId,
       question,
       source_manifest_ref: sourceRef,
       source_manifest_sha256: sourceSha,
     }
     const brief = {
       ...referenceBrief,
-      id: 'K-011',
+      id: briefId,
       slug: 'semantic-worker-package-fixture',
       label: '공동 물품 인계 기록',
       title: question,
@@ -218,17 +221,16 @@ test('C-FINALIZER package application persists one validated BRIEF_READY disposi
       status: 'READY',
       updated_at: '2026-10-01',
     }
-    const evidence = { ...referenceEvidence, brief_id: 'K-011', question }
+    const evidence = { ...referenceEvidence, brief_id: briefId, question }
     const result = { version: 'knowledge-semantic-result-v1', job_id: syntheticJob.job_id, decision: 'BRIEF_READY', candidate, evidence, brief }
 
     const applied = await applySemanticPackage({ root, job: syntheticJob, result, now: '2026-10-01T12:00:00.000Z' })
-    assert.equal(applied.brief_id, 'K-011')
+    assert.equal(applied.brief_id, briefId)
     assert.equal(applied.candidate_id, candidateId)
-    const { loadKnowledge, validateKnowledge } = await import('./knowledge-content.mjs')
     const completed = await loadKnowledge(root)
     await validateKnowledge(completed)
-    assert.equal(completed.briefs.find((item) => item.id === 'K-011').status, 'READY')
-    assert.equal(completed.evidence.get('K-011').question, question)
+    assert.equal(completed.briefs.find((item) => item.id === briefId).status, 'READY')
+    assert.equal(completed.evidence.get(briefId).question, question)
     assert.ok(applied.changed_files.includes('knowledge/automation/state.json'))
     const state = JSON.parse(await readFile(join(root, 'knowledge/automation/state.json'), 'utf8'))
     assert.equal(state.sources.find((item) => item.source_manifest_ref === sourceRef)?.status, 'PROCESSED')
@@ -250,6 +252,10 @@ test('C-FINALIZER drives an exact-target package through a Git worker branch to 
     ])
     await mkdir(join(root, 'archive/web'), { recursive: true })
     await writeFile(join(root, 'archive/web/package.json'), '{"private":true,"type":"module"}\n')
+
+    const { loadKnowledge } = await import('./knowledge-content.mjs')
+    const fixtureData = await loadKnowledge(root)
+    const briefId = nextBriefId(fixtureData.briefs)
 
     const sourceRef = 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_999/SOURCE_MANIFEST.json'
     const sourceDir = join(root, 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_999')
@@ -277,19 +283,19 @@ test('C-FINALIZER drives an exact-target package through a Git worker branch to 
     const templateCandidate = JSON.parse(await readFile(join(root, 'knowledge/content/candidates/KC-community-mutual-aid-agreement.json'), 'utf8'))
     const templateEvidence = JSON.parse(await readFile(join(root, 'knowledge/content/evidence/K-010.json'), 'utf8'))
     const candidate = {
-      ...templateCandidate, id: candidateId, brief_id: 'K-011', question,
+      ...templateCandidate, id: candidateId, brief_id: briefId, question,
       disposition_note: 'Synthetic package used only by the isolated C-FINALIZER Git integration test.',
       source_manifest_ref: sourceRef, source_manifest_sha256: sourceSha,
     }
     const brief = {
-      ...templateBrief, id: 'K-011', slug: 'semantic-finalizer-git-fixture',
+      ...templateBrief, id: briefId, slug: 'semantic-finalizer-git-fixture',
       label: '공동 물품 인계 기록', title: question,
       summary: '공동체 간 일반 물품의 약속 수량과 실제 인수량을 기록으로 확인하는 방법을 정리합니다.',
       meta_description: '일반 물품 인계 목록과 실제 인수 기록을 구분해 관리하는 방법을 설명합니다.',
       lead: '일반 물품을 여러 조직이 함께 다룰 때는 약속한 수량과 실제 인수량을 분리해 기록하면 확인이 쉬워집니다.',
       status: 'READY', updated_at: '2026-10-01',
     }
-    const evidence = { ...templateEvidence, brief_id: 'K-011', question }
+    const evidence = { ...templateEvidence, brief_id: briefId, question }
     const configBytes = await readFile(join(root, 'knowledge/automation/config.json'))
     const config = JSON.parse(configBytes.toString('utf8'))
     const policyBytes = await readFile(join(root, 'knowledge/automation/worker-policy.json'))
@@ -301,7 +307,7 @@ test('C-FINALIZER drives an exact-target package through a Git worker branch to 
       prepared_at: '2026-10-01T12:00:00.000Z', policy_sha256: policySha,
       policy_pin: { sha256: policySha },
       semantic_context: {
-        target: { brief_id: 'K-011', candidate_id: candidateId },
+        target: { brief_id: briefId, candidate_id: candidateId },
         source: { kind: 'PUBLIC_ARCHIVE', ref: sourceRef, sha256: sourceSha, refs: [partRef], hashes: [partSha] },
         policy: { publication_mode: config.publication_mode, auto_publish_enabled: config.auto_publish_enabled },
       },
@@ -363,9 +369,9 @@ test('C-FINALIZER drives an exact-target package through a Git worker branch to 
     assert.equal(persisted.args.p_status, 'PR_OPEN')
     assert.equal(persisted.args.p_pr_number, 501)
     assert.equal(persisted.args.p_head_sha, outcome.head_sha)
-    const committedBrief = JSON.parse(git(['show', `${headRef}:knowledge/content/briefs/K-011.json`]))
+    const committedBrief = JSON.parse(git(['show', `${headRef}:knowledge/content/briefs/${briefId}.json`]))
     assert.equal(committedBrief.status, 'READY')
-    assert.equal(committedBrief.id, 'K-011')
+    assert.equal(committedBrief.id, briefId)
     const committedState = JSON.parse(git(['show', `${headRef}:knowledge/automation/state.json`]))
     assert.equal(committedState.sources.find((item) => item.source_manifest_ref === sourceRef)?.status, 'PROCESSED')
     const committedPaths = git(['ls-tree', '-r', '--name-only', headRef]).split(/\r?\n/)
