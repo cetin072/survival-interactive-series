@@ -101,7 +101,7 @@ jobs:
           rejected=0
           while IFS= read -r path; do
             case "$path" in
-              knowledge/content/briefs/K-*.json|              knowledge/content/candidates/KC-*.json|              knowledge/content/evidence/K-*.json|              knowledge/content/topics.json|              knowledge/content/stories.json|              knowledge/automation/state.json|              archive/web/public/knowledge/index.html|              archive/web/public/knowledge/*/index.html|              archive/web/public/sitemap.xml)
+              knowledge/content/briefs/K-*.json|              knowledge/content/candidates/KC-*.json|              knowledge/content/evidence/K-*.json|              knowledge/content/topics.json|              knowledge/content/stories.json|              knowledge/automation/state.json|              knowledge/automation/runtime-state.json|              archive/web/public/knowledge/index.html|              archive/web/public/knowledge/*/index.html|              archive/web/public/sitemap.xml)
                 ;;
               *)
                 echo "Rejected publication path: $path"
