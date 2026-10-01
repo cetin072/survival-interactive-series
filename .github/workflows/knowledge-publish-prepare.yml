@@ -130,6 +130,53 @@ jobs:
           git push origin "HEAD:$HEAD_REF"
           echo "prepared_sha=$PREPARED_SHA" >> "$GITHUB_OUTPUT"
 
+      - name: Bind C3 durable job to prepared head
+        if: contains(github.event.pull_request.body, '<!-- knowledge-semantic-job-v1:')
+        working-directory: .
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PREPARED_SHA: ${{ steps.prepared.outputs.prepared_sha }}
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          const body = process.env.PR_BODY ?? ''
+          const match = /<!-- knowledge-semantic-job-v1:([0-9a-f-]{36}) -->/i.exec(body)
+          if (!match) throw new Error('SEMANTIC_JOB_MARKER_INVALID')
+          if (!/^[a-f0-9]{40}$/.test(process.env.PREPARED_SHA ?? '')) throw new Error('SEMANTIC_PREPARED_SHA_INVALID')
+          if (!/^\d+$/.test(process.env.PR_NUMBER ?? '')) throw new Error('SEMANTIC_PR_NUMBER_INVALID')
+          const url = (process.env.ARCHIVE_SUPABASE_URL ?? '').replace(/\/$/, '')
+          const key = process.env.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY ?? ''
+          if (!url || !key) throw new Error('SEMANTIC_SUPABASE_CREDENTIAL_REQUIRED')
+          const response = await fetch(`${url}/rest/v1/rpc/archive_knowledge_semantic_job_update`, {
+            method: 'POST',
+            headers: {
+              apikey: key,
+              authorization: `Bearer ${key}`,
+              'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+              p_job_id: match[1],
+              p_expected_status: 'PR_OPEN',
+              p_status: 'PR_OPEN',
+              p_blocker_code: null,
+              p_blocker_stage: null,
+              p_pr_number: Number(process.env.PR_NUMBER),
+              p_head_ref: process.env.HEAD_REF,
+              p_head_sha: process.env.PREPARED_SHA,
+              p_merge_sha: null,
+            }),
+          })
+          const text = await response.text()
+          if (!response.ok) throw new Error(`SEMANTIC_PUBLICATION_HEAD_RPC_HTTP_${response.status}`)
+          const result = text ? JSON.parse(text) : null
+          if (result?.status !== 'PR_OPEN') throw new Error(`SEMANTIC_PUBLICATION_HEAD_BINDING_${result?.status ?? 'INVALID'}`)
+          console.log(JSON.stringify({ status: result.status, job_id: match[1], prepared_sha: process.env.PREPARED_SHA }))
+          NODE
+
       - name: Dispatch exact-head validation for prepared commit
         working-directory: .
         env:

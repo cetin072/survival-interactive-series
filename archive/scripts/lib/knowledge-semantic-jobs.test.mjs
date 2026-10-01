@@ -490,3 +490,13 @@ test('Knowledge publication workflow allows the C3 runtime-state package file', 
   assert.match(workflow, /knowledge\/automation\/runtime-state\.json/)
 })
 
+test('Knowledge publication binds a C3 durable job to the prepared exact head before validation', async () => {
+  const workflow = await readFile(resolve(import.meta.dirname, '../../../.github/workflows/knowledge-publish-prepare.yml'), 'utf8')
+  assert.match(workflow, /Bind C3 durable job to prepared head/)
+  assert.match(workflow, /archive_knowledge_semantic_job_update/)
+  assert.match(workflow, /p_expected_status: 'PR_OPEN'/)
+  assert.match(workflow, /p_status: 'PR_OPEN'/)
+  assert.match(workflow, /p_head_sha: process\.env\.PREPARED_SHA/)
+  assert.ok(workflow.indexOf('Bind C3 durable job to prepared head') < workflow.indexOf('Dispatch exact-head validation for prepared commit'))
+})
+
