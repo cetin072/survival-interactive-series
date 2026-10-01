@@ -107,6 +107,8 @@ jobs:
           CREATE ROLE anon NOLOGIN;
           CREATE ROLE authenticated NOLOGIN;
           CREATE ROLE service_role NOLOGIN BYPASSRLS;
+          CREATE SCHEMA survival_ops;
+          CREATE SCHEMA archive_ops;
           CREATE SCHEMA extensions;
           CREATE EXTENSION pgcrypto WITH SCHEMA extensions;
           CREATE SCHEMA vault;
