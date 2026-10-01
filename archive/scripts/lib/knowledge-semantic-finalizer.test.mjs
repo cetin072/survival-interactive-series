@@ -92,6 +92,20 @@ test('finalizer orchestration enqueues HUMAN_REVIEW after packaging and persists
   assert.ok(calls.some((call) => call[0] === 'rpc' && call[1] === 'archive_knowledge_semantic_job_update' && call[2].p_status === 'HUMAN_REVIEW'))
 })
 
+test('finalizer blocks a changed pinned source before packaging or opening a PR', async () => {
+  const result = packagedResult()
+  const { calls, requestRpc, shell } = finalizerHarness({ claimedJob: { ...job, status: 'FINALIZING', result_decision: result.decision, semantic_result: result } })
+  const outcome = await runSemanticFinalizer({
+    requestRpc, shell, mainSha: 'b'.repeat(40),
+    verifyPinsFn: async () => { throw new Error('SEMANTIC_SOURCE_SHA_CHANGED') },
+    packageSemantic: async () => assert.fail('changed source must not be packaged'),
+    createDraft: async () => assert.fail('changed source must not open a PR'),
+  })
+  assert.equal(outcome.status, 'BLOCKED')
+  assert.equal(outcome.blocker_code, 'SEMANTIC_SOURCE_SHA_CHANGED')
+  assert.ok(calls.some((call) => call[0] === 'rpc' && call[1] === 'archive_knowledge_semantic_job_update' && call[2].p_status === 'BLOCKED'))
+})
+
 test('no new submit reconciles an exact-head PR but blocks and closes when main moved', async () => {
   const submitted = { ...job, status: 'PR_OPEN', result_decision: 'BRIEF_READY', final_pr_number: 14, final_head_sha: 'e'.repeat(40) }
   const stalePr = { state: 'open', merged: false, head: { sha: 'e'.repeat(40) }, base: { ref: 'main', sha: 'f'.repeat(40) } }
