@@ -18,6 +18,7 @@ import {
 } from './knowledge-worker-runtime.mjs'
 
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex')
+const htmlEsc = (value) => String(value).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch])
 const manifestRef = 'archive/content/transcripts/C03-AFTERFALL/S99/SESSION_001/SOURCE_MANIFEST.json'
 const raw = Buffer.from('## USER 000\n\nTEST_INPUT\n\n## GM 001\n\n## 2099년 1월 1일 10:00\n\nTEST_GM_PROSE\n')
 async function fixture(edit = () => {}) {
@@ -430,12 +431,12 @@ test('generated golden pages remain static, searchable, linked and downloadable'
     const page = await readFile(join(root, 'archive/web/public/knowledge', brief.slug, 'index.html'), 'utf8')
     assert.match(index, new RegExp(`/knowledge/${brief.slug}/`))
     assert.match(sitemap, new RegExp(`/knowledge/${brief.slug}/`))
-    assert.ok(page.includes(`<h1>${brief.title}</h1>`))
-    assert.ok(page.includes(`<title>${brief.title} | 생존일기</title>`))
-    assert.ok(page.includes(brief.meta_description))
+    assert.ok(page.includes(`<h1>${htmlEsc(brief.title)}</h1>`))
+    assert.ok(page.includes(`<title>${htmlEsc(`${brief.title} | 생존일기`)}</title>`))
+    assert.ok(page.includes(htmlEsc(brief.meta_description)))
     assert.ok(page.includes('https://schema.org'))
     assert.ok(page.includes('rel="canonical"'))
-    for (const source of brief.sources) assert.ok(page.includes(source.url.replace(/&/g, '&amp;')))
+    for (const source of brief.sources) assert.ok(page.includes(htmlEsc(source.url)))
     for (const related of brief.related_brief_ids.map((id) => data.briefs.find((item) => item.id === id)).filter((item) => item?.status === 'PUBLISHED')) assert.ok(page.includes(`/knowledge/${related.slug}/`))
     for (const tool of brief.tools) assert.ok(page.includes(`href="${tool.path}" download`))
     assert.doesNotMatch(page, /<script(?! type="application\/ld\+json")/)
