@@ -14,12 +14,13 @@ const command = (exe, args, cwd = root) => execFileSync(exe, args, { cwd, encodi
 const head = command('git', ['rev-parse', 'HEAD']).trim()
 const source = JSON.parse(await readFile(resolve(root, 'archive/content/transcripts/C03-AFTERFALL/S03/MANIFEST.json'))).sessions[0]
 const factsRefS03 = 'archive/content/public-facts/C03-AFTERFALL/S03/FACTS.json'
+const aWikiFacts = JSON.parse(await readFile(resolve(root, 'archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_005_1d7513ee6981ace5be8ef3d8164c6816d10f3d291037c6f1d4d4f169e52c5550.json')))
 const snapshot = { version: 'publication-snapshot-v1', chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', season_id: 'S03', visibility: 'PUBLIC_ARCHIVE', source_revision: head, source_save_version: 258, source_game_time: '2027-04-11 17:20', source_checkpoint: 'worldlines/AFTERFALL/seasons/S03/CURRENT_CHECKPOINT_2027-04-08.md', coverage_status: 'PARTIAL', sources: [{ session_id: source.session_id, source_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_001/SOURCE_MANIFEST.json', source_digest: fingerprint(source), visibility: source.visibility, capture_quality: source.capture_quality, atomic_pairing_complete: source.atomic_pairing_complete, captured_message_range: source.captured_message_range, user_messages: source.user_messages, gm_public_blocks: source.gm_public_blocks }] }
 const initial = await prepareGraphPublication(snapshot, factsRefS03)
 const again = await prepareGraphPublication(snapshot, factsRefS03)
 assert.ok(initial.candidateBytes.equals(again.candidateBytes))
-assert.equal(initial.graph.nodes.length, archiveNodes.length + 2)
-assert.equal(initial.graph.relations.length, archiveEdges.length + 2)
+assert.equal(initial.graph.nodes.length, archiveNodes.length + 2 + aWikiFacts.nodes.length)
+assert.equal(initial.graph.relations.length, archiveEdges.length + 2 + aWikiFacts.relations.length)
 assert.ok(initial.graph.nodes.some((n) => n.id === 'loc-guild-rear-warehouse'))
 for (const source of archiveNodes) assert.deepEqual(initial.graph.nodes.find((n) => n.id === source.id).data, source)
 for (const source of archiveEdges) assert.ok(initial.graph.relations.some((r) => r.data.from === source.from && r.data.to === source.to && r.data.label === source.label && r.data.kind === 'published_relation'))
