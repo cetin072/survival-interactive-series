@@ -1,0 +1,166 @@
+{
+  "id": "K-011",
+  "lead": "비상상황에서는 평소보다 외부인의 도움 요청이나 임시 방문이 늘 수 있습니다. 이때 '들여보낸다'를 하나의 결정으로 보지 않고, 왜 들어오는지, 어디까지 갈 수 있는지, 얼마나 머무는지, 누가 내부에서 책임지는지를 나눠 정하면 장기 체류나 자유출입과 혼동을 줄일 수 있습니다.",
+  "slug": "emergency-temporary-access",
+  "basis": "CISA Facility Access Control + CISA Healthcare and Public Health Facility Annex + FEMA Continuity Guidance + 검증된 PUBLIC_READER 장면",
+  "label": "비상시 임시 출입",
+  "scope": "소규모 조직·거점이 비상상황에서 일반 방문자·지원인력의 제한적 임시 출입을 관리하기 위한 저위험 준비 체크항목",
+  "title": "비상시 외부인의 임시 출입을 허용할 때 목적·범위·기간·책임자를 어떻게 정해두면 좋을까",
+  "tools": [],
+  "footer": "이 글은 일반적인 비상대비 출입계획 정보입니다. 실제 신원확인, 개인정보 수집, 강제퇴거, 물리적 보안, 의료·구조 활동에는 별도 법규와 시설 규정, 담당기관의 기준을 우선하세요.",
+  "status": "READY",
+  "sources": [
+    {
+      "id": "S1",
+      "url": "https://www.cisa.gov/sites/default/files/2022-11/Facility%20Access%20Control%20-%20An%20Interagency%20Security%20Committee%20Best%20Practice.pdf",
+      "note": "시설 접근정책에서 이용자·방문자, 운영환경, 비상계획 등을 함께 고려하고 접근절차를 정하는 원칙을 확인했습니다.",
+      "title": "CISA · Facility Access Control: An ISC Best Practice",
+      "checked_at": "2026-10-01"
+    },
+    {
+      "id": "S2",
+      "url": "https://www.cisa.gov/sites/default/files/2024-08/Security-and-Resiliency-Guide-Healthcare-and-Public-Health-Facility-Annex.508.pdf",
+      "note": "제한구역에 임시 접근이 필요한 사람의 동행 또는 제한적 접근 허용 원칙을 확인했습니다.",
+      "title": "CISA · Security and Resiliency Guide: Healthcare and Public Health Facility Annex",
+      "checked_at": "2026-10-01"
+    },
+    {
+      "id": "S3",
+      "url": "https://www.fema.gov/pdf/about/org/ncp/coop/continuity_guidance_circular.pdf",
+      "note": "대체시설 사용 시 공간·서비스·담당 연락처·사용조건을 사전에 합의하고 검토하는 continuity 원칙을 확인했습니다.",
+      "title": "FEMA · Continuity Guidance Circular 1",
+      "checked_at": "2026-10-01"
+    },
+    {
+      "id": "S4",
+      "url": "https://survival-diary-archive.netlify.app/?view=story&chronicle=C03-AFTERFALL&chapter=c03-afterfall-prelude-04",
+      "note": "제한적 임시 출입이 장기 체류와 구분되어 판단되는 검증된 공개 Reader 장면을 narrative provenance로만 확인했습니다.",
+      "title": "생존일기 Reader · 첫 협력과 임시 출입",
+      "checked_at": "2026-10-01"
+    }
+  ],
+  "summary": "비상시 누군가를 잠깐 들이는 것과 장기 체류나 자유출입을 허용하는 것은 다른 결정입니다. 방문 목적, 허용구역, 체류시간, 내부 책임자, 제공 가능한 지원과 종료조건을 미리 구분해 두는 방법을 정리합니다.",
+  "guide_id": null,
+  "sections": [
+    {
+      "blocks": [
+        {
+          "text": "CISA의 접근통제 자료는 시설의 이용자와 방문자, 운영환경, 비상계획을 고려해 접근정책을 정하도록 안내합니다. 비상시에도 '한 번 들어온 사람은 어디든 갈 수 있다'고 보지 말고, 방문 목적에 맞는 제한된 범위를 정해두는 것이 기본입니다.",
+          "type": "prose"
+        },
+        {
+          "type": "unordered_list",
+          "items": [
+            "방문 목적: 물·휴식·물품 전달·업무 지원 등 왜 들어오는지",
+            "허용 범위: 공용공간만인지 특정 작업구역까지인지",
+            "체류 시간: 잠깐 머무는지 일정 시간 지원하는지",
+            "내부 책임자: 누가 안내하고 상황을 확인할지"
+          ]
+        }
+      ],
+      "heading": "임시 출입과 자유출입을 먼저 구분합니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "CISA의 의료·보건시설 가이드는 제한구역에 임시 접근이 필요한 사람에게 직원이 동행하거나 필요한 범위의 접근권한을 부여하는 방식을 설명합니다. 작은 조직에서는 복잡한 출입시스템보다 '누가 이 방문을 알고 있고, 어디까지 안내할 것인가'를 명확히 하는 것부터 시작할 수 있습니다.",
+          "type": "prose"
+        },
+        {
+          "text": "동행이나 담당자 지정은 방문자의 행동을 감시·제압하기 위한 전술이 아니라, 임시 출입의 목적과 범위를 내부에서도 혼동하지 않기 위한 운영 원칙으로 다룹니다.",
+          "type": "note"
+        }
+      ],
+      "heading": "임시 접근에는 내부 책임자를 붙입니다"
+    },
+    {
+      "blocks": [
+        {
+          "rows": [
+            [
+              "일반 지원",
+              "물, 휴식공간, 충전 등 실제 제공 가능한 범위"
+            ],
+            [
+              "공간",
+              "방문자가 이용할 수 있는 공용공간과 제한공간"
+            ],
+            [
+              "정보",
+              "알려줄 수 있는 운영정보와 공개하지 않을 내부정보"
+            ],
+            [
+              "시간",
+              "예상 체류시간과 연장 여부를 다시 판단할 시점"
+            ],
+            [
+              "종료",
+              "목적이 끝났을 때 퇴실·인계·다음 연락방법"
+            ]
+          ],
+          "type": "table",
+          "headers": [
+            "항목",
+            "미리 정할 내용"
+          ]
+        },
+        {
+          "text": "FEMA의 continuity guidance가 대체시설 사용에서 공간, 서비스, 담당 연락처와 사용조건을 사전에 정하도록 하는 것처럼, 임시 출입도 제공할 수 있는 것과 제공하지 않는 것을 미리 구분하면 현장에서 즉흥적으로 약속을 늘리는 일을 줄일 수 있습니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "제공 가능한 지원과 제공하지 않는 범위를 적습니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "소규모 상황에서는 복잡한 시스템보다 날짜·시간, 방문 목적, 내부 책임자, 허용범위, 퇴실 여부 정도의 최소 기록으로도 '누가 왜 들어왔는지'를 다시 확인하기 쉬워집니다. 다만 개인정보를 기록할 때는 필요한 최소 범위만 사용하고 조직의 개인정보·보안 기준을 따라야 합니다.",
+          "type": "prose"
+        },
+        {
+          "text": "이 기록항목은 공식기관의 의무 서식이 아니라 CISA·FEMA의 접근범위와 담당자·사용조건 원칙을 실무에 쓰기 쉽게 정리한 편집 제안입니다.",
+          "type": "note"
+        }
+      ],
+      "heading": "간단한 출입기록은 나중의 혼선을 줄입니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "잠깐 물을 마시거나 물품을 전달하기 위해 들어온 사람과, 장기간 시설을 함께 사용하는 사람은 필요한 합의가 다릅니다. 체류 목적이나 시간이 바뀌면 기존 임시 허가를 계속 연장하기보다 새로운 조건으로 다시 판단하도록 기준을 정해두는 편이 명확합니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "임시 출입을 장기 체류 결정으로 자동 전환하지 않습니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "공개 Reader의 허구 서사에서는 외부 인물이 거점에 장기 체류하러 온 것이 아닌 상황에서 물·휴식·상태 확인을 위한 임시 출입만 제한적으로 허용됩니다. 여기서 현실에서는 임시 방문의 목적과 범위를 어떻게 구분해 둘 것인지 질문을 가져왔으며, 작품 속 신뢰 판단이나 출입 결정은 현실 기준으로 사용하지 않았습니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "《생존일기》에서 시작한 질문"
+    }
+  ],
+  "topic_id": "emergency-temporary-access",
+  "risk_level": "LOW",
+  "story_refs": [],
+  "updated_at": "2026-10-01",
+  "ai_assisted": true,
+  "content_type": "BRIEF",
+  "published_at": "2026-10-01",
+  "risk_domains": [
+    "GENERAL_PREPAREDNESS"
+  ],
+  "editorial_note": "검증된 PUBLIC_READER 장면에서 질문만 가져오고, 현실 내용은 CISA와 FEMA 공식자료를 Evidence로 먼저 교차검토해 작성했습니다. 무장·제압·감시·신원조회 같은 고위험 보안운용을 제외한 저위험 임시 출입 계획에만 범위를 제한합니다.",
+  "meta_description": "CISA와 FEMA 공식자료를 바탕으로 비상시 외부인의 임시 출입에서 방문 목적, 허용범위, 체류시간, 내부 책임자와 종료조건을 정리하는 방법을 설명합니다.",
+  "related_brief_ids": [
+    "K-006",
+    "K-009",
+    "K-010"
+  ],
+  "source_checked_at": "2026-10-01",
+  "publication_policy": "AUTO_LOW_RISK",
+  "semantic_qa_status": "PASS"
+}

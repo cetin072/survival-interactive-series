@@ -63,5 +63,15 @@
     "guide_id": null,
     "tools": [],
     "story_refs": []
+  },
+  {
+    "id": "emergency-temporary-access",
+    "title": "비상시 임시 출입 관리",
+    "brief_ids": [
+      "K-011"
+    ],
+    "guide_id": null,
+    "tools": [],
+    "story_refs": []
   }
 ]

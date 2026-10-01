@@ -1,0 +1,19 @@
+{
+  "id": "KC-c03-afterfall-prelude-04-0b94adc59a",
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-011",
+  "question": "비상시 외부인의 임시 출입을 허용할 때 목적·범위·기간·책임자를 어떻게 정해두면 좋을까",
+  "topic_id": "emergency-temporary-access",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_004.md"
+  ],
+  "source_hashes": [
+    "4d2161d341c0377f13973f0d1b4db8cb9d2c6ef06365c5e74b820f589af7bef7"
+  ],
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "disposition_note": "검증된 PUBLIC_READER 장면에서 장기 체류나 자유출입이 아닌 물·휴식·상태 확인을 위한 제한적 임시 출입을 별도로 판단하는 상황에서 질문을 추출했습니다. 기존 K-006은 대피 거점 자체의 접근성·자원·운영상태 조사, K-009는 내부 역할·승인 권한, K-010은 조직 간 자원공유 합의가 중심이므로 의미상 중복되지 않습니다. 현실 근거는 CISA의 시설 접근통제 및 의료시설 임시 접근 지침, FEMA의 continuity facility 사용조건·담당자·공간·서비스 사전합의 원칙을 교차검토했습니다. 무장경비, 제압, 감시기술, 신원조회 절차 등 고위험 보안운용은 다루지 않습니다.",
+  "reader_chapter_id": "c03-afterfall-prelude-04",
+  "reader_book_sha256": "fbe55ce3f0c87abb3901ec2779fa2758f8d85edf5c1dad8bdd047717e32bb000",
+  "reader_chapter_sha256": "e4fdaaee2ebb6823b5a6803a030c5941e1bbcf5dc6266210178e179698bff9d7"
+}
