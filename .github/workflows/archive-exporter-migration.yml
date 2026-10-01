@@ -1,4 +1,4 @@
-name: Verify Archive exporter database contract
+name: Verify Archive, Illustration and Knowledge DB contracts
 
 on:
   pull_request:
@@ -29,7 +29,7 @@ permissions:
   contents: read
 
 jobs:
-  exporter-migration:
+  archive-db-contract:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -83,6 +83,34 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260928050000_archive_exporter_readonly.sql
       - name: Verify exporter grants, RLS scope, optional links, and denied writes
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/archive_exporter_readonly_verification.sql
+  knowledge-db-contract:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+      - name: Create Supabase API roles for Knowledge migrations
+        run: psql -v ON_ERROR_STOP=1 -c "CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE ROLE service_role NOLOGIN BYPASSRLS;"
       - name: Prepare isolated database for Knowledge semantic jobs
         run: |
           createdb --owner=postgres knowledge_semantic_test
@@ -134,7 +162,7 @@ jobs:
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261001233000_knowledge_semantic_published_reconcile_v1.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_published_reconcile.sql
 
-  illustration-shared-review-context:
+  illustration-db-contract:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     services:
@@ -196,4 +224,3 @@ jobs:
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261001180000_illustration_shared_review_context_v1.sql
       - name: Verify shared review context and legacy compatibility
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_shared_review_context_v1_verification.sql
-
