@@ -398,3 +398,8 @@ test('C-FINALIZER workflow accepts the dispatcher origin input', async () => {
   assert.match(workflow, /dispatch_origin:\s*\n\s+description: Scheduler origin\s*\n\s+required: false\s*\n\s+default: manual/)
 })
 
+test('Knowledge publication workflow allows the C3 runtime-state package file', async () => {
+  const workflow = await readFile(resolve(import.meta.dirname, '../../../.github/workflows/knowledge-publish-prepare.yml'), 'utf8')
+  assert.match(workflow, /knowledge\/automation\/runtime-state\.json/)
+})
+
