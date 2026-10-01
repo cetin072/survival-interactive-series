@@ -377,3 +377,10 @@ test('C-FINALIZER drives an exact-target package through a Git worker branch to 
     await rm(remote, { recursive: true, force: true })
   }
 })
+
+test('C-FINALIZER workflow accepts the dispatcher origin input', async () => {
+  const workflow = await readFile(resolve(import.meta.dirname, '../../../.github/workflows/knowledge-semantic-finalizer.yml'), 'utf8')
+  assert.match(workflow, /workflow_dispatch:\s*\n\s+inputs:\s*\n\s+dispatch_origin:/)
+  assert.match(workflow, /dispatch_origin:\s*\n\s+description: Scheduler origin\s*\n\s+required: false\s*\n\s+default: manual/)
+})
+
