@@ -1,5 +1,5 @@
 {
-  "version": "illustration-reviewer-runtime-contract-v1",
+  "version": "illustration-reviewer-runtime-contract-v2",
   "lease_acquire": {
     "rpc": "archive_illustration_render_job_lease_acquire",
     "request": {
@@ -12,7 +12,11 @@
       "lease_token": "<uuid>",
       "lease_until": "<timestamp>"
     },
-    "allowed_job_statuses": ["PREPARED", "INGESTING", "READY_FOR_REVIEW"],
+    "allowed_job_statuses": [
+      "PREPARED",
+      "INGESTING",
+      "READY_FOR_REVIEW"
+    ],
     "lease_held_behavior": "Stop this run without mutating the job. Do not reuse another run's token."
   },
   "mutations": [
@@ -47,7 +51,11 @@
         "p_chunk_index": 0,
         "p_chunk_b64": "<base64_chunk>"
       },
-      "required_job_status": ["PREPARED", "INGESTING", "READY_FOR_REVIEW"],
+      "required_job_status": [
+        "PREPARED",
+        "INGESTING",
+        "READY_FOR_REVIEW"
+      ],
       "token_path": "p_lease_token"
     },
     {
@@ -57,7 +65,11 @@
         "p_lease_token": "<lease_token_from_acquire>",
         "p_staging_id": "<staging_id>"
       },
-      "required_job_status": ["PREPARED", "INGESTING", "READY_FOR_REVIEW"],
+      "required_job_status": [
+        "PREPARED",
+        "INGESTING",
+        "READY_FOR_REVIEW"
+      ],
       "token_path": "p_lease_token"
     },
     {
@@ -72,11 +84,13 @@
           "output_bytes": 1,
           "output_width": 1,
           "output_height": 1,
-          "rejection_codes": []
+          "rejection_codes": [],
+          "review_context_sha256": "<exact_context_hash>"
         }
       },
       "required_job_status": "PREPARED",
-      "token_path": "p_review.lease_token"
+      "token_path": "p_review.lease_token",
+      "context_hash_path": "p_review.review_context_sha256"
     }
   ],
   "decision_lifecycle": {
@@ -102,5 +116,32 @@
       "lease_until": null,
       "next_owner": "Program Finalizer must acquire a fresh lease before mutation."
     }
+  },
+  "rollout_dependency": {
+    "reviewer_update_required": true,
+    "current_reservation_compatible": false
+  },
+  "binding_snapshot": {
+    "required_fields": [
+      "job_id",
+      "attempt_no",
+      "point_id",
+      "generation_key",
+      "subject_id",
+      "prompt_sha256",
+      "review_context_version",
+      "review_context_sha256"
+    ],
+    "authority": "job.review_context"
+  },
+  "review_context_authority": {
+    "version": "illustration-review-context-v1",
+    "context_path": "job.review_context",
+    "hash_path": "job.review_context_sha256",
+    "canon_facts": "CONFIRMED_PUBLIC_CANON",
+    "render_cues": "ALLOWED_NOT_REQUIRED_NOT_NEW_CANON"
+  },
+  "legacy_compatibility": {
+    "null_context_hash": "PRE_V2_PATH_ALLOWED"
   }
 }
