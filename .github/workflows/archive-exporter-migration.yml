@@ -6,6 +6,7 @@ on:
       - 'supabase/migrations/**'
       - 'supabase/tests/archive_exporter_readonly_verification.sql'
       - 'supabase/tests/illustration_shared_review_context_v1_verification.sql'
+      - 'supabase/tests/illustration_registry_dedup_v1_verification.sql'
       - '.github/workflows/archive-exporter-migration.yml'
       - 'supabase/tests/knowledge_semantic_jobs_verification.sql'
       - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
@@ -18,6 +19,7 @@ on:
       - 'supabase/migrations/**'
       - 'supabase/tests/archive_exporter_readonly_verification.sql'
       - 'supabase/tests/illustration_shared_review_context_v1_verification.sql'
+      - 'supabase/tests/illustration_registry_dedup_v1_verification.sql'
       - '.github/workflows/archive-exporter-migration.yml'
       - 'supabase/tests/knowledge_semantic_jobs_verification.sql'
       - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
@@ -197,6 +199,13 @@ jobs:
           CREATE ROLE service_role NOLOGIN BYPASSRLS;
           CREATE SCHEMA survival_ops;
           CREATE SCHEMA archive_ops;
+          CREATE SCHEMA survival_rpg;
+          CREATE TABLE survival_rpg.visual_assets(
+            status text,
+            source jsonb,
+            object_path text,
+            generation_meta jsonb
+          );
           CREATE SCHEMA extensions;
           CREATE EXTENSION pgcrypto WITH SCHEMA extensions;
           CREATE SCHEMA vault;
@@ -222,5 +231,8 @@ jobs:
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260930090002_illustration_retry_lease_hardening_v1.sql
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260930090003_illustration_retry_cron_dispatch_context_v1.sql
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261001180000_illustration_shared_review_context_v1.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261002083000_illustration_registry_dedup_v1.sql
       - name: Verify shared review context and legacy compatibility
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_shared_review_context_v1_verification.sql
+      - name: Verify Registry duplicate gate
+        run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_registry_dedup_v1_verification.sql

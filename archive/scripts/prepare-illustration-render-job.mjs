@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { readFile, writeFile } from 'node:fs/promises'
+import { readdir, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { compileIllustrationRendererText, ILLUSTRATION_IMAGE_PROMPT_VERSION } from './lib/illustration-image-prompt.mjs'
@@ -13,6 +13,7 @@ const manualAssetsPath = resolve(root, 'archive/content/visuals/C03-AFTERFALL/MA
 const visualProfilesPath = resolve(root, 'archive/content/public-facts/C03-AFTERFALL/S03/RECORD_VISUAL_PROFILES_20260930.json')
 const receiptsPath = resolve(root, 'archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_RECEIPTS.json')
 const providerPath = resolve(root, 'archive/automation/illustration-generation-provider.json')
+const acceptedIdentityDir = resolve(root, 'archive/content/visuals/C03-AFTERFALL')
 const sha256 = (value) => createHash('sha256').update(value).digest('hex')
 const kstDate = () => new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit',
@@ -20,6 +21,28 @@ const kstDate = () => new Intl.DateTimeFormat('en-CA', {
 
 function demand(ok, code) {
   if (!ok) throw new Error(code)
+}
+
+async function readAcceptedIdentityAssets() {
+  const names = (await readdir(acceptedIdentityDir))
+    .filter((name) => /^ILLUSTRATION_E2E_[A-Z0-9_-]+[.]json$/.test(name))
+    .sort()
+  const assets = []
+  for (const name of names) {
+    const identity = await readJson(resolve(acceptedIdentityDir, name))
+    demand(identity?.version === 'illustration-e2e-identity-v1'
+      && /^point-[a-f0-9]{64}$/.test(identity.point_id ?? '')
+      && /^generation-[a-f0-9]{64}$/.test(identity.generation_key ?? '')
+      && /^(char|loc|event)-[a-z0-9]+(-[a-z0-9]+)*$/.test(identity.subject_id ?? '')
+      && /^[a-f0-9]{64}$/.test(identity.source_sha256 ?? ''),
+    'ILLUSTRATION_PREP_ACCEPTED_IDENTITY_INVALID')
+    assets.push({
+      point_id: identity.point_id,
+      generation_key: identity.generation_key,
+      subject_id: identity.subject_id,
+    })
+  }
+  return assets
 }
 
 async function rpc(name, body) {
@@ -44,9 +67,9 @@ async function rpc(name, body) {
 
 export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}) {
   demand(/^[a-f0-9]{40}$/.test(mainSha ?? ''), 'ILLUSTRATION_PREP_MAIN_SHA_INVALID')
-  const [catalog, siteAssets, manualAssets, visualProfiles, receipts, providerConfig] = await Promise.all([
-    readJson(visualPath), readJson(assetsPath), readJson(manualAssetsPath), readJson(visualProfilesPath),
-    readJson(receiptsPath), readJson(providerPath),
+  const [catalog, siteAssets, manualAssets, acceptedIdentities, visualProfiles, receipts, providerConfig] = await Promise.all([
+    readJson(visualPath), readJson(assetsPath), readJson(manualAssetsPath), readAcceptedIdentityAssets(),
+    readJson(visualProfilesPath), readJson(receiptsPath), readJson(providerPath),
   ])
   demand(manualAssets?.version === 'archive-manual-site-assets-v1' && Array.isArray(manualAssets.assets),
     'ILLUSTRATION_PREP_MANUAL_ASSETS_INVALID')
@@ -54,7 +77,10 @@ export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}
     'ILLUSTRATION_PREP_VISUAL_PROFILES_INVALID')
   const profileBySubject = new Map(visualProfiles.records.map((profile) => [profile.node_id, profile]))
   demand(profileBySubject.size === visualProfiles.records.length, 'ILLUSTRATION_PREP_VISUAL_PROFILE_DUPLICATE')
-  const effectiveSiteAssets = { ...siteAssets, assets: [...manualAssets.assets, ...siteAssets.assets] }
+  const effectiveSiteAssets = {
+    ...siteAssets,
+    assets: [...manualAssets.assets, ...acceptedIdentities, ...siteAssets.assets],
+  }
 
   const activeProvider = providerConfig.active_provider
   const provider = providerConfig.providers?.[activeProvider]
@@ -108,7 +134,8 @@ export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}
       || result?.status === 'INGESTING' || result?.status === 'READY_FOR_REVIEW') {
       return { ...result, active_provider: activeProvider }
     }
-    if (result?.status === 'ILLUSTRATION_ALREADY_SUCCEEDED'
+    if (result?.status === 'ILLUSTRATION_ALREADY_REGISTERED'
+      || result?.status === 'ILLUSTRATION_ALREADY_SUCCEEDED'
       || result?.status === 'ILLUSTRATION_RETRY_CAP_REACHED'
       || result?.status === 'ILLUSTRATION_INFRA_RETRY_CAP_REACHED'
       || result?.status === 'HUMAN_REVIEW_REQUIRED') continue
@@ -125,9 +152,9 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
       let promptText = ''
       if (result.active_provider === 'native_chatgpt') {
         const current = await rpc('archive_illustration_render_prompt', {})
-        if (typeof current === 'string') promptText = current.trim()
+        if (typeof current === 'string') promptText = current
       }
-      await writeFile(resolve(promptOutput), promptText ? `${promptText}\n` : '', 'utf8')
+      await writeFile(resolve(promptOutput), promptText, 'utf8')
     }
     process.stdout.write(JSON.stringify(result, null, 2) + '\n')
   } catch (error) {
