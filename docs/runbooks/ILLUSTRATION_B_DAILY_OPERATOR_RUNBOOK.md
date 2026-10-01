@@ -1,5 +1,7 @@
 # Illustration B 운영 Runbook (매일 작업)
 
+Status: **SUPERSEDED — historical Draft Release handoff procedure.** 아래 workflow 이름과 수동 단계는 현재 실행 경로가 아니다. 현재 B 경로는 `archive-illustration-prep.yml` → `archive/scripts/prepare-illustration-render-job.mjs`, `archive-illustration-finalizer.yml` → `archive/scripts/finalize-illustration-job.py` 및 해당 코드를 확인한다.
+
 ## 사전 확인
 
 - main SHA와 VISUALS.json의 content_sha256를 기록합니다.

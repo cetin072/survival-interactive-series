@@ -1,5 +1,7 @@
 # Knowledge auto-publish handoff
 
+Status: **SUPERSEDED — historical control-plane handoff.** 아래의 checked-in default 설명은 당시 상태다. 현재 값은 [`knowledge/automation/config.json`](../knowledge/automation/config.json), C3 정상 경로는 [C3 architecture](KNOWLEDGE_AUTOMATION_C3_ARCHITECTURE_V1.md)를 확인한다.
+
 The repository control plane has three explicit publication modes:
 
 - `PR_ONLY` creates the existing review PR and never authorizes an unattended merge.

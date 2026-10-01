@@ -1,5 +1,7 @@
 # Knowledge Worker Protocol V2
 
+Status: **ACTIVE_REFERENCE — C1/V2 fallback contract.** 정상 C3 경로는 [C3 architecture](KNOWLEDGE_AUTOMATION_C3_ARCHITECTURE_V1.md)와 [semantic protocol](KNOWLEDGE_SEMANTIC_WORKER_PROTOCOL_V1.md)을 따른다. 현재 publication 설정은 [`knowledge/automation/config.json`](../knowledge/automation/config.json)이 결정한다.
+
 상태: **단일 예약 Dispatcher + FRESH 우선 + 24시간 BACKFILL + 교체 가능한 AI Provider**
 
 ## 1. 실행 구조

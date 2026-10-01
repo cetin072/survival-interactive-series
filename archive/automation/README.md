@@ -1,5 +1,7 @@
 # AFTERFALL daily Archive setup
 
+Status: **HISTORICAL setup guide.** 아래 `SHADOW` 기본값과 AUTO Production 직접 검증 설명은 초기 설정 기준이다. 현재 mode는 [`config.json`](config.json), 실행·병합 경계는 `archive-daily.yml`과 `archive/scripts/run-daily-archive.mjs`, Production은 `archive-production-release.yml`을 확인한다.
+
 The runner defaults to `SHADOW`. It reads source rows through `archive_exporter`, creates one proposal PR, and never writes to the gameplay database. Keep `archive/automation/config.json` at `SHADOW` until the first real source proposal has been reviewed.
 
 ## Supabase exporter
