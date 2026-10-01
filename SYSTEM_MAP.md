@@ -34,3 +34,13 @@
 | `docs/AUTOMATIC_ARCHIVE_PUBLICATION_AUDIT_2026-09-26.md`, `docs/AUTOMATIC_ARCHIVE_STEP*.md` | HISTORICAL | 당시 단계별 검증 기록; 현재 동작은 코드/config 확인 |
 
 분류하지 않은 설계 문서의 현재성은 `UNKNOWN`으로 두고, 코드·config·PR·해당 세계선 최신 handoff와 대조한 뒤 사용한다.
+
+## Illustration legacy / POC 실행 경계
+
+| 대상 | 분류 | 확인된 caller와 실행 경계 |
+| --- | --- | --- |
+| `archive-approved-image-readback.yml`, `deliver-approved-jinwoo.py`, `verify-eunchae-site.py`, `verify-seojin-site.py` | LEGACY_BUT_REFERENCED | workflow는 `codex/illustration-automation-v1` push에서만 실행하는 foreground readback proof이며 세 스크립트를 호출한다. |
+| `archive-eunchae-signed-upload.yml`, `eunchae_signed_handoff.py`, `test_eunchae_signed_handoff.py` | LEGACY_BUT_REFERENCED | workflow는 같은 branch의 push에서만 실행하는 Preview용 signed handoff proof이며 스크립트와 테스트를 호출한다. |
+| `prepare-image-poc.mjs`, `lib/image-poc-exchange.mjs`, 관련 테스트 | POC_TEST_ASSET | `archive-web.yml` CI가 POC 테스트와 `--check`를 실행한다. 실제 이미지 생성이나 Production 전달 경로가 아니다. |
+
+이 항목은 실행 참조가 남아 있으므로 삭제 대상으로 취급하지 않는다. 현재 B 운영 경로는 위의 Automation B 행에서 최신 workflow와 script를 확인한다.
