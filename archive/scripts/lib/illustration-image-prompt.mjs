@@ -1,3 +1,5 @@
+import { reviewContextRenderCues } from './illustration-review-context.mjs'
+
 export const ILLUSTRATION_IMAGE_PROMPT_VERSION = 'illustration-image-prompt-v1'
 
 const POINT_ID = /^point-[a-f0-9]{64}$/
@@ -71,7 +73,7 @@ function assertNoOutputContamination(positivePrompt, negativePrompt, checklist) 
   for (const item of checklist) assertNoOperationalText(item)
 }
 
-function compileLocationRendererText(source, brief, art) {
+function compileLocationRendererText(source, brief, art, reviewContextBundle = null) {
   const subject = requireRecord(brief.subject)
   const label = requireText(subject.label)
   const composition = requireText(art.composition)
@@ -80,8 +82,9 @@ function compileLocationRendererText(source, brief, art) {
   const visualFacts = brief.visual_facts === undefined
     ? []
     : visualFactLines(requireRecord(brief.visual_facts))
+  const reviewCues = reviewContextRenderCues(source, reviewContextBundle)
 
-  for (const text of [label, composition, ...rendering, ...moodRules, ...visualFacts]) {
+  for (const text of [label, composition, ...rendering, ...moodRules, ...visualFacts, ...reviewCues]) {
     assertNoOperationalText(text)
   }
 
@@ -90,29 +93,30 @@ function compileLocationRendererText(source, brief, art) {
     visualFacts.length
       ? `명시된 시각 사실: ${visualFacts.join('; ')}`
       : '세부 시각 사실이 따로 명시되지 않았으므로 장소 이름이 직접 가리키는 기본 유형과 일반적인 현대 한국 생활환경 범위만 최소한으로 표현한다',
+    reviewCues.length ? `보강 시각 묘사(표현 허용 범위이며 필수 요소 아님): ${reviewCues.join('; ')}` : '',
     `구도: ${composition}`,
     `분위기: ${moodRules.join('; ')}`,
     `화풍: ${STYLE_VERSION}; 회화적 반실사; ${rendering.join('; ')}`,
     '사람이 꼭 필요할 때만 아주 작고 비식별적인 배경 인물로 표현하며 전경 인물이나 초상 구도는 사용하지 않는다',
     '명시되지 않은 폐허, 대규모 파괴, 기념물, 깃발, 벽화, 선전문구, 표지판 문구, 극적인 일몰, 날씨, 계절, 식생, 건물 손상, 보안시설, 이동경로를 추가하지 않는다',
     '글자, 숫자, 라벨, 워터마크 또는 인터페이스 요소는 넣지 않는다',
-  ].join('. ')
+  ].filter(Boolean).join('. ')
 
   assertNoOperationalText(text)
   if (text.length < 40 || text.length > 6000) throw new Error('ILLUSTRATION_RENDERER_PROMPT_LENGTH_INVALID')
   return text
 }
 
-export function compileIllustrationRendererText(point) {
+export function compileIllustrationRendererText(point, reviewContextBundle = null) {
   const source = requireRecord(point)
   const brief = requireRecord(source.brief)
   const art = requireRecord(brief.art_direction)
 
   if (brief.point_type === 'LOCATION') {
-    return compileLocationRendererText(source, brief, art)
+    return compileLocationRendererText(source, brief, art, reviewContextBundle)
   }
 
-  const prompt = compileIllustrationImagePrompt(source)
+  const prompt = compileIllustrationImagePrompt(source, reviewContextBundle)
   const safeguards = requireTextList(brief.safeguards)
   const exclusions = [...requireTextList(art.avoid)]
   for (const safeguard of safeguards) {
@@ -159,7 +163,7 @@ export function validateIllustrationImagePrompt(prompt) {
   return contract
 }
 
-export function compileIllustrationImagePrompt(point) {
+export function compileIllustrationImagePrompt(point, reviewContextBundle = null) {
   const source = requireRecord(point)
   if (!POINT_ID.test(source.point_id ?? '') || !GENERATION_KEY.test(source.generation_key ?? '')
     || !SUBJECT_ID.test(source.subject_id ?? '')) throw new Error('INVALID_ILLUSTRATION_VISUAL_BRIEF')
@@ -184,8 +188,9 @@ export function compileIllustrationImagePrompt(point) {
   const subjectLabel = requireText(subject.label)
   const factLines = visualFactLines(canonFacts)
   if (factLines.length === 0) throw new Error('INVALID_ILLUSTRATION_VISUAL_BRIEF')
+  const reviewCues = reviewContextRenderCues(source, reviewContextBundle)
 
-  for (const text of [subjectLabel, composition, mood, theme, ...moodRules, ...rendering, ...avoid, ...safeguards]) {
+  for (const text of [subjectLabel, composition, mood, theme, ...moodRules, ...rendering, ...avoid, ...safeguards, ...reviewCues]) {
     assertNoOperationalText(text)
   }
 
@@ -195,11 +200,12 @@ export function compileIllustrationImagePrompt(point) {
   const positivePrompt = [
     subjectDescription,
     `공개 시각 사실: ${factLines.join('; ')}`,
+    reviewCues.length ? `보강 시각 묘사(표현 허용 범위이며 필수 요소 아님): ${reviewCues.join('; ')}` : '',
     `구도: ${composition}`,
     `분위기: ${mood}; ${moodRules.join('; ')}`,
     `화풍: ${STYLE_VERSION}; 회화적 반실사, painterly semi-realistic illustration; ${rendering.join('; ')}`,
     `시각 방향: ${theme}`,
-  ].join('. ')
+  ].filter(Boolean).join('. ')
 
   const negativeVisuals = [...DEFAULT_NEGATIVE_VISUALS, ...avoid]
   negativeVisuals.push('no text', 'no readable signs')
@@ -228,6 +234,7 @@ export function compileIllustrationImagePrompt(point) {
   const negativePrompt = [...new Set(negativeVisuals)].join('; ')
   const reviewChecklist = [
     'one subject only; keep every visible attribute within the supplied public visual facts',
+    'rich render cues are allowed depiction options, not required details and not new Canon',
     'use a simple non-identifying background and the AFTERFALL_ARCHIVE_V1 painterly semi-realistic direction',
     'reject any visible element listed in the negative visual constraints',
   ]

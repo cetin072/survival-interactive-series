@@ -8,9 +8,17 @@ import {
   ILLUSTRATION_IMAGE_PROMPT_VERSION,
   validateIllustrationImagePrompt,
 } from './illustration-image-prompt.mjs'
+import { buildIllustrationReviewContext } from './illustration-review-context.mjs'
 
 const catalogPath = fileURLToPath(new URL('../../content/visuals/C03-AFTERFALL/VISUALS.json', import.meta.url))
 const catalog = JSON.parse(await readFile(catalogPath, 'utf8'))
+const profilesPath = fileURLToPath(new URL('../../content/public-facts/C03-AFTERFALL/S03/RECORD_VISUAL_PROFILES_20260930.json', import.meta.url))
+const profiles = JSON.parse(await readFile(profilesPath, 'utf8'))
+const profileFor = (subjectId) => {
+  const profile = profiles.records.find((item) => item.node_id === subjectId)
+  assert.ok(profile, `Missing profile fixture: ${subjectId}`)
+  return profile
+}
 const pointFor = (subjectId) => {
   const point = catalog.points.find((item) => item.subject_id === subjectId)
   assert.ok(point, `Missing fixture point: ${subjectId}`)
@@ -124,4 +132,26 @@ test('location renderer uses explicit visual_facts when a future brief provides 
   const text = compileIllustrationRendererText(point)
   assert.ok(text.includes('포장도로'))
   assert.ok(text.includes('부분적인 노면 보수 흔적'))
+})
+
+
+test('shared review context enriches renderer and image prompts with allowed-not-required rich cues', () => {
+  const point = pointFor('char-jinwoo')
+  const bundle = buildIllustrationReviewContext(point, profileFor('char-jinwoo'))
+  const prompt = compileIllustrationImagePrompt(point, bundle)
+  const renderer = compileIllustrationRendererText(point, bundle)
+  for (const phrase of ['침착한 시선', '정돈된 인상', '표현 허용 범위이며 필수 요소 아님']) {
+    assert.ok(prompt.positive_prompt.includes(phrase), `Missing shared-context prompt cue: ${phrase}`)
+    assert.ok(renderer.includes(phrase), `Missing shared-context renderer cue: ${phrase}`)
+  }
+  assert.ok(prompt.review_checklist.some((item) => item.includes('allowed depiction options')))
+})
+
+test('operational contamination in rich render cues fails closed before renderer output', () => {
+  const point = pointFor('char-jinwoo')
+  const profile = structuredClone(profileFor('char-jinwoo'))
+  profile.render_cues[0] = 'GitHub dashboard'
+  const bundle = buildIllustrationReviewContext(point, profile)
+  assert.throws(() => compileIllustrationRendererText(point, bundle),
+    /ILLUSTRATION_PROMPT_OPERATIONAL_CONTEXT_REJECTED/)
 })
