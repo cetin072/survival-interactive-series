@@ -65,8 +65,15 @@ function record(v, isNode, nodes) {
   demand(Array.isArray(v.history) && v.history.length <= 10000, 'INVALID_GRAPH_HISTORY')
   let prior = null
   for (const h of v.history) {
-    keys(h, ['anchor', 'data_sha256', 'evidence']); anchor(h.anchor); evidence(h.evidence)
+    keys(h, ['anchor', 'data', 'data_sha256', 'evidence']); anchor(h.anchor); evidence(h.evidence)
     demand(hashOK(h.data_sha256) && compare(h.anchor, v.anchor) < 0, 'INVALID_HISTORY_ANCHOR')
+    // Older deployed history entries contain only hashes. New transitions retain
+    // the prior public data so the Wiki can show a readable snapshot.
+    if (h.data !== undefined) {
+      if (isNode) dataNode(h.data)
+      else dataRelation(h.data, nodes)
+      demand(graphHash(h.data) === h.data_sha256, 'INVALID_HISTORY_DATA')
+    }
     if (prior) demand(compare(prior, h.anchor) < 0, 'UNORDERED_HISTORY')
     prior = h.anchor
   }
@@ -197,7 +204,7 @@ export function reconcilePublicGraph({ batch, previous = null, facts, source, bo
       demand(compare(boundary, old.anchor) > 0, 'SAME_REVISION_FACT_CONFLICT')
       if (kind === 'nodes') demand(old.data.type === data.type, 'ENTITY_TYPE_CHANGED')
     }
-    store.set(id, { id, data: structuredClone(data), anchor: { ...boundary }, evidence: { ...source, pointer }, history: old ? [...old.history, { anchor: old.anchor, data_sha256: graphHash(old.data), evidence: old.evidence }] : [] })
+    store.set(id, { id, data: structuredClone(data), anchor: { ...boundary }, evidence: { ...source, pointer }, history: old ? [...old.history, { anchor: old.anchor, data: structuredClone(old.data), data_sha256: graphHash(old.data), evidence: old.evidence }] : [] })
     report[`${kind}_${old ? 'updated' : 'added'}`]++
   }
   for (const [index, data] of facts.nodes.entries()) { dataNode(data); demand(!seen.has(data.id), 'DUPLICATE_NODE'); seen.add(data.id); upsert(nodes, data.id, data, `/nodes/${index}`, 'nodes') }

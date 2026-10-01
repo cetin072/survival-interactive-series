@@ -39,7 +39,7 @@ export function ArchiveApp() {
   const rawChronicle = (() => { try { return getChronicle(chronicleId) } catch { return activeChronicle } })()
   const openRoom = (id: string, section: ChronicleSection = 'overview') => open({ view: 'chronicle', chronicleId: id, section })
   const roomSection = route.view === 'chronicle' ? route.section ?? 'overview' : 'overview'
-  const roomHasGraph = route.view === 'chronicle' && route.chronicleId === 'C03-AFTERFALL' && ['explorer','characters','locations','events','timeline','graph'].includes(roomSection)
+  const roomHasGraph = route.view === 'chronicle' && route.chronicleId === 'C03-AFTERFALL' && ['explorer','characters','locations','events','graph'].includes(roomSection)
 
   return <main className="archive-shell">
     <header className="archive-header">
