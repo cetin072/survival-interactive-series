@@ -180,6 +180,93 @@ test('source and policy pins fail closed on modified bytes', async () => {
   } finally { await rm(base, { recursive: true, force: true }) }
 })
 
+test('Reader provenance may be verified from the canonical AFTERFALL worldline branch when bytes are not on main', async () => {
+  const base = await mkdtemp(join(tmpdir(), 'semantic-reader-worldline-'))
+  const git = (args) => execFileSync('git', args, { cwd: base, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
+  try {
+    const policy = Buffer.from('{"version":2}')
+    const config = Buffer.from('{"publication_mode":"AUTO_LOW_RISK","auto_publish_enabled":true}')
+    const editorial = Buffer.from('editorial v1')
+    for (const [ref, bytes] of [
+      ['knowledge/automation/worker-policy.json', policy],
+      ['knowledge/automation/config.json', config],
+      ['docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V1.md', editorial],
+    ]) {
+      const file = join(base, ref)
+      await mkdir(join(file, '..'), { recursive: true })
+      await writeFile(file, bytes)
+    }
+
+    const provenanceRef = 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_001.md'
+    const provenanceBytes = Buffer.from('verified worldline provenance\n')
+    const provenanceHash = digest(provenanceBytes)
+    const chapter = {
+      id: 'ch-worldline',
+      chapterNumber: 1,
+      sourceKind: 'VERIFIED_GM_NARRATIVE',
+      body: 'Verified Reader body',
+      sourceRefs: [provenanceRef],
+      sourceHashes: [provenanceHash],
+    }
+    const bookPath = join(base, 'archive/content/stories/C03-AFTERFALL/BOOK.json')
+    await mkdir(join(bookPath, '..'), { recursive: true })
+    await writeFile(bookPath, JSON.stringify({ chapters: [chapter] }))
+
+    git(['init', '-b', 'main'])
+    git(['config', 'user.name', 'test'])
+    git(['config', 'user.email', 'test@example.invalid'])
+    git(['add', '.'])
+    git(['commit', '-m', 'main reader snapshot'])
+
+    git(['checkout', '-b', 'worldline-source'])
+    const provenancePath = join(base, provenanceRef)
+    await mkdir(join(provenancePath, '..'), { recursive: true })
+    await writeFile(provenancePath, provenanceBytes)
+    git(['add', provenanceRef])
+    git(['commit', '-m', 'worldline provenance'])
+    const sourceCommit = git(['rev-parse', 'HEAD'])
+    git(['update-ref', 'refs/remotes/origin/worldline/afterfall-rpg', sourceCommit])
+    git(['checkout', 'main'])
+
+    const policyHash = hashPolicyBytes(policy, config, editorial)
+    const chapterSha = chapterHash(chapter)
+    const readerJob = {
+      ...baseJob,
+      source_kind: 'PUBLIC_READER',
+      source_ref: 'archive/content/stories/C03-AFTERFALL/BOOK.json#ch-worldline',
+      source_sha256: chapterSha,
+      policy_sha256: policyHash,
+      policy_pin: { sha256: policyHash },
+      semantic_context: {
+        target: { brief_id: 'K-011', candidate_id: 'KC-worldline-reader' },
+        source: {
+          kind: 'PUBLIC_READER',
+          ref: 'archive/content/stories/C03-AFTERFALL/BOOK.json#ch-worldline',
+          sha256: chapterSha,
+          chapter_id: 'ch-worldline',
+          chapter_sha256: chapterSha,
+          reader_book_sha256: 'a'.repeat(64),
+          refs: [provenanceRef],
+          hashes: [provenanceHash],
+        },
+        policy: { publication_mode: 'AUTO_LOW_RISK', auto_publish_enabled: true },
+      },
+    }
+    await verifyPins(readerJob, base)
+
+    git(['checkout', 'worldline-source'])
+    await writeFile(provenancePath, 'modified provenance\n')
+    git(['add', provenanceRef])
+    git(['commit', '-m', 'change worldline provenance'])
+    const changedCommit = git(['rev-parse', 'HEAD'])
+    git(['update-ref', 'refs/remotes/origin/worldline/afterfall-rpg', changedCommit])
+    git(['checkout', 'main'])
+    await assert.rejects(verifyPins(readerJob, base), /SEMANTIC_SOURCE_SHA_CHANGED/)
+  } finally {
+    await rm(base, { recursive: true, force: true })
+  }
+})
+
 test('C-FINALIZER package application persists one validated BRIEF_READY disposition in an isolated repository', async () => {
   const root = await mkdtemp(join(tmpdir(), 'semantic-package-e2e-'))
   const repositoryRoot = resolve(import.meta.dirname, '../../..')
