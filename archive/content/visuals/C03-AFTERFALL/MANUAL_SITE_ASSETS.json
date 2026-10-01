@@ -1,0 +1,24 @@
+{
+  "version": "archive-manual-site-assets-v1",
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "visibility": "PUBLIC_ARCHIVE",
+  "assets": [
+    {
+      "point_id": "point-0f71c0b50d4da760b5890b9aae9a4a100e0cc1c4239deed7d0d0821f24c9f8bf",
+      "generation_key": "generation-5be38e37b9c4e1614344042f5d770e853265b3674e816f5389e21d84b8853e78",
+      "subject_id": "loc-west-road",
+      "source_kind": "USER_SUPPLIED_REFERENCE",
+      "canon_status": "ILLUSTRATIVE_NOT_NEW_CANON",
+      "original_source_sha256": "9a8a21a8f0de5ce0688560452656db590433b874d6e2b38c9854d478a3457e8b",
+      "public_path": "/visual-assets/de4f8d221b984ced2347d66edf92b4ebc87296c401db83710fcc8903860e19f6.png",
+      "sha256": "de4f8d221b984ced2347d66edf92b4ebc87296c401db83710fcc8903860e19f6",
+      "bytes": 144385,
+      "width": 512,
+      "height": 341,
+      "mime_type": "image/png",
+      "caption": "서쪽길 · 비 온 뒤 외곽 도로 풍경",
+      "registered_on": "2026-09-30"
+    }
+  ]
+}
