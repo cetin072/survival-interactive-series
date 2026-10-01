@@ -6,6 +6,8 @@ on:
       - 'archive/web/**'
       - 'archive/content/**'
       - 'archive/scripts/check-reader-browser.py'
+      - 'archive/scripts/reader_deploy_identity.py'
+      - 'archive/scripts/test_reader_deploy_identity.py'
       - '.github/workflows/archive-reader-browser.yml'
   push:
     branches: [main]
@@ -13,6 +15,8 @@ on:
       - 'archive/web/**'
       - 'archive/content/**'
       - 'archive/scripts/check-reader-browser.py'
+      - 'archive/scripts/reader_deploy_identity.py'
+      - 'archive/scripts/test_reader_deploy_identity.py'
       - '.github/workflows/archive-reader-browser.yml'
 
 permissions:
@@ -54,9 +58,18 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Audit built app on touch mobile and desktop
         run: python ../scripts/check-reader-browser.py
+      - name: Fetch recent PR history for source-equivalent preview verification
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        working-directory: .
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: git fetch --no-tags --depth=50 origin "refs/pull/$PR_NUMBER/head:refs/remotes/origin/pr-$PR_NUMBER"
+      - name: Test deployment identity matcher
+        working-directory: .
+        run: python -m unittest discover -s archive/scripts -p "test_reader_deploy_identity.py"
       - name: Verify tested assets and navigation on Deploy Preview
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        run: python ../scripts/check-reader-browser.py --url https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app --wait-assets
+        run: python ../scripts/check-reader-browser.py --url https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app --wait-assets --allow-ancestor-equivalent
       - name: Detect a batched Production release commit
         id: production_release
         if: github.event_name == 'push'
