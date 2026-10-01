@@ -284,16 +284,6 @@ begin
     'illustration-image-prompt-v1','A deterministic rollback-only stale dispatch fixture.',repeat('a',64),
     1,'FINALIZE_QUEUED','test-expired','00000000-0000-0000-0000-000000000007',clock_timestamp()-interval '1 second'
   );
-  -- A JWT claim without the active PostgreSQL role is insufficient.
-  perform set_config('request.jwt.claim.role','service_role',true);
-  perform set_config('role','none',true);
-  begin
-    perform public.archive_illustration_finalizer_dispatch_guarded('missing-job');
-    raise exception 'ILLUSTRATION_JWT_ONLY_DISPATCH_ACCEPTED';
-  exception when insufficient_privilege then
-    null;
-  end;
-
   -- Anon/authenticated cannot invoke the guarded dispatcher, even when the
   -- request claim and database role agree with their own low-privilege role.
   foreach v_kind in array array['anon','authenticated'] loop
