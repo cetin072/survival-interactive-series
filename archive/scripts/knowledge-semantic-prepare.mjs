@@ -38,10 +38,12 @@ function ghJson(args) {
 
 export function detectLegacyWorkerBlocker({ openPrs, branchRows, baseRef = 'origin/main', cwd = root }) {
   const prefix = 'knowledge/worker/'
-  const open = openPrs.filter((pr) => pr.state === 'OPEN' && (pr.headRefName ?? '').startsWith(prefix))
+  const semanticPrefix = 'knowledge/worker/semantic-'
+  const isLegacyWorkerRef = (name) => typeof name === 'string' && name.startsWith(prefix) && !name.startsWith(semanticPrefix)
+  const open = openPrs.filter((pr) => pr.state === 'OPEN' && isLegacyWorkerRef(pr.headRefName ?? ''))
   if (open.length) return `LEGACY_WORKER_PR_OPEN:${open[0].number}`
   for (const branch of branchRows) {
-    if (!branch.name.startsWith(prefix)) continue
+    if (!isLegacyWorkerRef(branch.name)) continue
     const ref = `refs/remotes/origin/${branch.name}`
     try {
       execFileSync('git', ['merge-base', '--is-ancestor', ref, baseRef], { cwd, stdio: 'ignore' })
