@@ -5,12 +5,14 @@ on:
     paths:
       - 'supabase/migrations/**'
       - 'supabase/tests/archive_exporter_readonly_verification.sql'
+      - 'supabase/tests/illustration_retry_leases_v1_verification.sql'
       - '.github/workflows/archive-exporter-migration.yml'
   push:
     branches: [main]
     paths:
       - 'supabase/migrations/**'
       - 'supabase/tests/archive_exporter_readonly_verification.sql'
+      - 'supabase/tests/illustration_retry_leases_v1_verification.sql'
       - '.github/workflows/archive-exporter-migration.yml'
 
 permissions:
@@ -71,3 +73,62 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260928050000_archive_exporter_readonly.sql
       - name: Verify exporter grants, RLS scope, optional links, and denied writes
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/archive_exporter_readonly_verification.sql
+
+  illustration-retry-lease-migration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+      - name: Create Supabase roles and transaction-local extension stubs
+        run: |
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE anon NOLOGIN;
+          CREATE ROLE authenticated NOLOGIN;
+          CREATE ROLE service_role NOLOGIN BYPASSRLS;
+          CREATE SCHEMA extensions;
+          CREATE EXTENSION pgcrypto WITH SCHEMA extensions;
+          CREATE SCHEMA vault;
+          CREATE TABLE vault.decrypted_secrets(name text, decrypted_secret text, created_at timestamptz);
+          CREATE SCHEMA net;
+          CREATE FUNCTION net.http_post(url text, body jsonb DEFAULT '{}'::jsonb,
+            params jsonb DEFAULT '{}'::jsonb, headers jsonb DEFAULT '{}'::jsonb,
+            timeout_milliseconds integer DEFAULT 5000)
+          RETURNS bigint LANGUAGE sql VOLATILE AS $$ SELECT -998::bigint $$;
+          CREATE SCHEMA cron;
+          CREATE TABLE cron.job(jobid bigint, jobname text);
+          CREATE FUNCTION cron.schedule(text, text, text) RETURNS bigint
+            LANGUAGE sql VOLATILE AS $$ SELECT 1::bigint $$;
+          CREATE FUNCTION cron.unschedule(bigint) RETURNS boolean
+            LANGUAGE sql VOLATILE AS $$ SELECT true $$;
+          SQL
+      - name: Apply the Automation B migrations under test
+        run: |
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260930012000_illustration_render_queue_dispatch_v1.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260930090000_illustration_review_staging_v2.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260930090001_illustration_retry_leases_v1.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260930090002_illustration_retry_lease_hardening_v1.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260930090003_illustration_retry_cron_dispatch_context_v1.sql
+      - name: Verify service role and postgres cron dispatch with rollback-only fixtures
+        run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_retry_leases_v1_verification.sql

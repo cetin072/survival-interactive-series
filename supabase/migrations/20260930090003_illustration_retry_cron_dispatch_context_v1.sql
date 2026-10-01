@@ -7,9 +7,13 @@ declare
   v_job survival_ops.illustration_render_jobs%rowtype;
   v_request bigint;
   v_role text:=current_setting('request.jwt.claim.role',true);
+  v_database_role text:=current_setting('role',true);
   v_db_context text:=current_setting('archive.illustration_dispatch_context',true);
 begin
-  if v_role is distinct from 'service_role'
+  -- HTTP callers must arrive under both the service_role JWT and PostgreSQL
+  -- role. The cron route uses a private transaction marker issued only by the
+  -- postgres-owned dispatcher helper.
+  if not (v_role='service_role' and v_database_role='service_role')
      and not (session_user='postgres' and v_db_context='pg_cron_prep_dispatch') then
     raise exception 'ILLUSTRATION_FINALIZER_DISPATCH_FORBIDDEN' using errcode='42501';
   end if;
