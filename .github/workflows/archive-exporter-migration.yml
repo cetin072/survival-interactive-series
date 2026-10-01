@@ -125,6 +125,7 @@ jobs:
           SQL
       - name: Apply the Automation B migrations under test
         run: |
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260929223500_illustration_private_binary_staging_v1.sql
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260930012000_illustration_render_queue_dispatch_v1.sql
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260930090000_illustration_review_staging_v2.sql
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260930090001_illustration_retry_leases_v1.sql
