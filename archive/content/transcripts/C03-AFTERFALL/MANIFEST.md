@@ -9,6 +9,7 @@ checkpoint, event, state, or summary material is presented as dialogue.
 | Season / range | Verification | Source | Notes |
 | --- | --- | --- | --- |
 | S01, directly visible span | `PARTIAL` | `worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_001.md` … `010.md` | 39 USER and 86 pushed GM messages. The pre-capture span and one later GM reply remain explicit gaps; PART 008 is a verified fragment. |
+| S02, opening shared-chat recovery | `VERIFIED` | user-provided ChatGPT shared conversation | 34 USER + 34 GM final messages recover the S02 opening through the exact boundary immediately before SESSION_001. |
 | S02, SESSION_001 | `PARTIAL` | `worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/` | 31 USER / 89 GM public blocks, from the industrial-fire response to the source cutoff. |
 | S02, SESSION_002 | `PARTIAL` | `worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/` | 13 USER / 16 GM public blocks, from the first-winter discussion to the source cutoff. |
 | S02, SESSION_003–004 | `PARTIAL_CAPTURE_INCOMPLETE_PAIRING` | `survival_rpg.transcript_messages` → durable S02 archive | One GM-only and one USER-only capture are retained as incomplete fragments; no counterpart is reconstructed. |
