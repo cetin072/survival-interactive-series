@@ -31,6 +31,10 @@ import c03S01Part7 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03
 import c03S01Part8 from '../../../content/transcripts/C03-AFTERFALL/S01/LATE_DOCX_RECOVERY/PART_C03_008_RECOVERED.md?raw'
 import c03S01Part9 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_009.md?raw'
 import c03S01Part10 from '../../../content/transcripts/C03-AFTERFALL/S01/PART_C03_010.md?raw'
+const c03S02OpeningRecoveryRaw = import.meta.glob(
+  '../../../content/transcripts/C03-AFTERFALL/S02/OPENING_SHARED_CHAT_RECOVERY/PART_OPENING_*.md',
+  { eager: true, query: '?raw', import: 'default' },
+) as Record<string, string>
 const c03S02Raw = import.meta.glob(
   '../../../content/transcripts/C03-AFTERFALL/S02/SESSION_*/PART_*.md',
   { eager: true, query: '?raw', import: 'default' },
@@ -115,6 +119,33 @@ const c03S02TranscriptParts: TranscriptPart[] = Object.entries(c03S02Raw)
       range: c03S02DisplayRange(session),
       status: incomplete ? 'verified_fragment' : 'verified_transcript',
       source: `worldlines/AFTERFALL/seasons/S02/raw_transcript/${sessionId}/${partFile}`,
+      sourceVerified: true,
+      content,
+    })
+  })
+
+const c03S02OpeningRanges = [
+  '2026-11-21 06:17 → 10:50',
+  '2026-11-21 11:24 → 14:36',
+  '2026-11-21 14:42 → 19:42',
+  '2026-11-22 06:42 → 09:52',
+]
+const c03S02OpeningRecoveryParts: TranscriptPart[] = Object.entries(c03S02OpeningRecoveryRaw)
+  .sort(([left], [right]) => left.localeCompare(right))
+  .map(([path, content], index) => {
+    const match = path.match(/OPENING_SHARED_CHAT_RECOVERY\/(PART_OPENING_(\d{3})\.md)$/)
+    if (!match) throw new Error('Unexpected C03 S02 opening recovery path: ' + path)
+    const [, partFile, partNumber] = match
+    return c03({
+      id: `c03-s02-opening-recovery-${partNumber}`,
+      seasonId: 'S02',
+      sessionId: 'SESSION_001',
+      number: 0,
+      tocLabel: `OPENING ${Number(partNumber)}`,
+      title: `복구된 시즌2 시작 · PART ${partNumber}`,
+      range: c03S02OpeningRanges[index] ?? '2026-11-21 → 2026-11-22',
+      status: 'verified_transcript',
+      source: `archive/content/transcripts/C03-AFTERFALL/S02/OPENING_SHARED_CHAT_RECOVERY/${partFile}`,
       sourceVerified: true,
       content,
     })
@@ -330,9 +361,10 @@ export const transcriptParts: TranscriptPart[] = [
   c03({ id: 'c03-s01-008', seasonId: 'S01', number: 8, title: '스포일러 지적과 답변', range: 'S01 종료 피드백 · USER 지적 → GM 답변', status: 'verified_transcript', source: 'archive/content/transcripts/C03-AFTERFALL/S01/LATE_DOCX_RECOVERY/PART_C03_008_RECOVERED.md', sourceVerified: true, content: c03S01Part8 }),
   c03({ id: 'c03-s01-009', seasonId: 'S01', number: 9, title: '시즌 종료 저장', range: '시즌 종료 저장 요청 → 공개 저장 진행 업데이트', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_009.md', sourceVerified: true, content: c03S01Part9 }),
   c03({ id: 'c03-s01-010', seasonId: 'S01', number: 10, title: '저장 완료 공개 보고', range: '시즌 종료 저장 완료 공개 보고', status: 'verified_transcript', source: 'worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_010.md', sourceVerified: true, content: c03S01Part10 }),
-  c03({ id: 'c03-s02-session-001-gap', seasonId: 'S02', sessionId: 'SESSION_001', number: 0, title: '세션 001 직접 확인 전 구간', range: '2026-11-22 industrial-fire response 이전', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/SOURCE_INDEX.md', sourceVerified: true }),
+  ...c03S02OpeningRecoveryParts,
+  ...c03S02TranscriptPartsWithRecovery.filter((part) => part.sessionId === 'SESSION_001'),
   c03({ id: 'c03-s02-session-002-gap', seasonId: 'S02', sessionId: 'SESSION_002', number: 0, title: '세션 002 직접 확인 전 구간', range: '2027-01-04 first-winter discussion 이전', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/SOURCE_INDEX.md', sourceVerified: true }),
-  ...c03S02TranscriptPartsWithRecovery,
+  ...c03S02TranscriptPartsWithRecovery.filter((part) => part.sessionId !== 'SESSION_001'),
   c03({ id: 'c03-s03-session-001-gap', seasonId: 'S03', sessionId: 'SESSION_001', number: 0, title: 'S03 원본 순서 0–41', range: '첫 게시 배치 이전 · 아직 Archive에 보존되지 않은 구간', status: 'missing_transcript', source: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_001/SOURCE_INDEX.md', sourceVerified: true }),
   ...c03S03TranscriptParts,
 ]
