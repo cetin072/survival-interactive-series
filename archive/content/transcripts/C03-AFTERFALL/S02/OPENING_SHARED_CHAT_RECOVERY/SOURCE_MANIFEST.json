@@ -1,0 +1,69 @@
+{
+  "version": "afterfall-s02-opening-shared-chat-recovery-v1",
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "season_id": "S02",
+  "protagonist": "서진우",
+  "archive_class": "COLD_RAW_RECOVERY",
+  "visibility": "PUBLIC_ARCHIVE",
+  "status": "VERIFIED_OPENING_RECOVERY",
+  "source": {
+    "kind": "CHATGPT_SHARED_CONVERSATION",
+    "url": "https://chatgpt.com/share/6abd9e2b-8644-83e9-801c-ee8cba198262?ogimg=plain",
+    "conversation_id": "6abd9e2b-8644-83e9-801c-ee8cba198262",
+    "title": "시즌2 장면 시작"
+  },
+  "extraction": {
+    "linear_nodes": 1473,
+    "public_messages": 68,
+    "user_messages": 34,
+    "gm_final_messages": 34,
+    "first_linear_index": 3,
+    "last_linear_index": 562,
+    "parts": [
+      {
+        "file": "PART_OPENING_001.md",
+        "firstLinearIndex": 3,
+        "lastLinearIndex": 197,
+        "userMessages": 10,
+        "gmMessages": 10,
+        "chars": 30100
+      },
+      {
+        "file": "PART_OPENING_002.md",
+        "firstLinearIndex": 198,
+        "lastLinearIndex": 343,
+        "userMessages": 10,
+        "gmMessages": 10,
+        "chars": 27454
+      },
+      {
+        "file": "PART_OPENING_003.md",
+        "firstLinearIndex": 344,
+        "lastLinearIndex": 474,
+        "userMessages": 9,
+        "gmMessages": 9,
+        "chars": 24885
+      },
+      {
+        "file": "PART_OPENING_004.md",
+        "firstLinearIndex": 475,
+        "lastLinearIndex": 562,
+        "userMessages": 5,
+        "gmMessages": 5,
+        "chars": 13268
+      }
+    ],
+    "source_public_messages": "SOURCE_PUBLIC_MESSAGES.json"
+  },
+  "overlap": {
+    "classification": "EXACT_CONTINUATION_INTO_SESSION_001",
+    "first_existing_linear_index": 563,
+    "existing_archive": "../SESSION_001/PART_001.md",
+    "action": "Stop recovery before overlap; do not duplicate existing SESSION_001."
+  },
+  "canon_policy": {
+    "promote_to_canon": false,
+    "reason": "Historical RAW recovery is evidence only; current Canon and game state remain unchanged."
+  }
+}

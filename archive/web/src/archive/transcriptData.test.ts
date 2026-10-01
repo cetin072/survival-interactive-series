@@ -25,11 +25,11 @@ describe('Chronicle-isolated public transcript catalog', () => {
     const c03 = transcriptPartsFor('C03-AFTERFALL')
     const preS03 = c03.filter((part) => part.seasonId !== 'S03')
     const s03Verified = c03.filter((part) => part.seasonId === 'S03' && part.status === 'verified_transcript')
-    expect(preS03).toHaveLength(40)
-    expect(preS03.filter((part) => part.status === 'verified_transcript')).toHaveLength(35)
+    expect(preS03).toHaveLength(43)
+    expect(preS03.filter((part) => part.status === 'verified_transcript')).toHaveLength(39)
     expect(s03Verified.length).toBeGreaterThanOrEqual(1)
-    expect(c03).toHaveLength(41 + s03Verified.length)
-    expect(c03.filter((part) => part.status === 'verified_transcript')).toHaveLength(35 + s03Verified.length)
+    expect(c03).toHaveLength(44 + s03Verified.length)
+    expect(c03.filter((part) => part.status === 'verified_transcript')).toHaveLength(39 + s03Verified.length)
     expect(c03.slice(0, 2)).toMatchObject([
       { id: 'c03-s01-opening-001', range: '2026-09-18 13:42 → 14:12', status: 'verified_transcript' },
       { id: 'c03-s01-missing-before', status: 'verified_transcript' },
@@ -46,7 +46,6 @@ describe('Chronicle-isolated public transcript catalog', () => {
       },
     ])
     expect(c03.filter((part) => part.status === 'missing_transcript').map((part) => part.id)).toEqual([
-      'c03-s02-session-001-gap',
       'c03-s02-session-002-gap',
       'c03-s03-session-001-gap',
     ])
@@ -66,6 +65,14 @@ describe('Chronicle-isolated public transcript catalog', () => {
       'SESSION_001', 'SESSION_002', 'SESSION_003', 'SESSION_004', 'SESSION_005',
       'SESSION_006', 'SESSION_007', 'SESSION_008', 'SESSION_009',
     ]))
+    expect(c03.filter((part) => part.id.startsWith('c03-s02-opening-recovery-'))).toHaveLength(4)
+    expect(c03.find((part) => part.id === 'c03-s02-opening-recovery-001')).toMatchObject({
+      sessionId: 'SESSION_001',
+      tocLabel: 'OPENING 1',
+      range: '2026-11-21 06:17 → 10:50',
+      status: 'verified_transcript',
+      source: 'archive/content/transcripts/C03-AFTERFALL/S02/OPENING_SHARED_CHAT_RECOVERY/PART_OPENING_001.md',
+    })
     expect(c03.find((part) => part.sessionId === 'SESSION_001' && part.number === 1)?.range).toBe('2026-11-22 industrial-fire response through archive-request cutoff')
     expect(c03.find((part) => part.sessionId === 'SESSION_003')?.range).toBe('2027-01-16 09:28 → 2027-01-16 09:28')
     expect(c03.find((part) => part.id === 'c03-s02-session-004-recovery-001')).toMatchObject({
