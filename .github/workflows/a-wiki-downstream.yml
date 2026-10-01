@@ -31,15 +31,29 @@ jobs:
       - name: Validate and build A-Wiki projection
         run: |
           node --test archive/scripts/lib/publication-graph.test.mjs archive/scripts/lib/wiki-semantic-jobs.test.mjs
-          node archive/scripts/run-wiki-automation.mjs --check
-          node archive/scripts/run-wiki-automation.mjs --apply
+          node archive/scripts/run-wiki-automation.mjs --check > a-wiki-check.json
+          node archive/scripts/run-wiki-automation.mjs --apply > a-wiki-apply.json
+          node --input-type=module <<'NODE'
+          import { appendFile, readFile } from 'node:fs/promises'
+          const results = await Promise.all(['a-wiki-check.json', 'a-wiki-apply.json'].map(async (path) => ({ path, ...JSON.parse(await readFile(path, 'utf8')) })))
+          const lines = ['## A-Wiki downstream result', '']
+          for (const result of results) {
+            const changed = result.graph_changed ?? (result.path === 'a-wiki-apply.json' && result.status === 'UPDATED')
+            lines.push(`- **${result.path}**: ${result.status}; source ${result.source_session ?? 'unknown'}; reason ${result.reason ?? 'none'}; graph changed ${changed}`)
+            if (result.status === 'HUMAN_REVIEW') console.log(`::warning::A-Wiki HUMAN_REVIEW for ${result.source_session ?? 'unknown'}: ${result.reason}`)
+          }
+          await appendFile(process.env.GITHUB_STEP_SUMMARY, `${lines.join('\n')}\n`)
+          NODE
 
       - name: Publish review artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: a-wiki-public-graph-${{ github.sha }}
           path: |
+            a-wiki-check.json
+            a-wiki-apply.json
             archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_*.json
             archive/content/graphs/C03-AFTERFALL/GRAPH.json
-          if-no-files-found: error
+          if-no-files-found: ignore
           retention-days: 30

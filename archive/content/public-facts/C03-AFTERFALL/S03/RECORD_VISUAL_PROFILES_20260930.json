@@ -5,7 +5,7 @@
   "visibility": "PUBLIC_ARCHIVE",
   "approved_on": "2026-09-30",
   "purpose": "공개 기록의 읽기 경험과 이미지 제작 프롬프트를 함께 보강한다. 확정 사실과 편집용 시각 큐를 구분한다.",
-  "record_count": 43,
+  "record_count": 40,
   "records": [
     {
       "node_id": "char-cheolsu",
@@ -727,51 +727,6 @@
       ],
       "canon_policy": "EDITORIAL_REFERENCE_NOT_NEW_CANON",
       "source_note": "현재 공개 기록을 바탕으로 한 시각 편집 보강"
-    },
-    {
-      "node_id": "char-jo-hansu",
-      "type": "character",
-      "label": "조한수",
-      "list_description": "조한수. 서쪽길 관리조에서 장부를 맡는 인물. 공개 기록은 외형을 특정하지 않음.",
-      "description": "조한수는 서쪽길 관리조에서 장부를 맡는다. 공개 기록은 성별, 연령, 체형, 얼굴, 복장을 특정하지 않는다. 시각 편집에서는 이 기록만으로 외형을 확정하지 않고 중립적인 표현을 유지하며, 장부 담당 역할은 문서에 집중하는 자세 정도로만 암시한다.",
-      "render_cues": [
-        "성별·연령·체형·얼굴·복장 미확정, 임의로 설정하지 않음",
-        "외형을 특정하지 않는 중립적인 표현",
-        "장부 담당 역할은 문서에 집중하는 자세 정도로만 암시",
-        "확인되지 않은 제복·소지품·표식은 추가하지 않음"
-      ],
-      "canon_policy": "EDITORIAL_RENDER_CUES_NO_NEW_CANON",
-      "source_note": "S03 SESSION_005 공개 기록의 역할 정보만 반영; 외형 정보 없음"
-    },
-    {
-      "node_id": "event-west-road-rain-response",
-      "type": "event",
-      "label": "서쪽길 긴급복구와 공동 장마계획",
-      "list_description": "서쪽길 침하 대응과 위험구간 표시·차량 우회·자재 등록·비용 계산을 포함한 공동 계획.",
-      "description": "서쪽길 침하 대응에서 임시 흙 보강만으로 반복을 막기 어렵다고 판단해 양측이 위험구간 표시, 큰 차량의 우회와 대기, 가용 자재 등록, 긴급공사 비용 계산을 포함한 장마철 공동계획을 세웠다. 시각 편집은 이 공개 요약을 설명하는 범위에 한정하고, 확인되지 않은 도로 구조나 장면을 덧붙이지 않는다.",
-      "render_cues": [
-        "위험구간 공동 표시와 큰 차량 우회·대기 계획을 설명하는 편집 표현",
-        "가용 자재 등록과 긴급공사 비용 계산을 함께 보여주는 기록 중심 구성",
-        "확인되지 않은 도로 구조·날씨·장비·인물은 추가하지 않음",
-        "사실 사진처럼 보이게 하기보다 공개 요약을 설명하는 삽화로 처리"
-      ],
-      "canon_policy": "EDITORIAL_RENDER_CUES_NO_NEW_CANON",
-      "source_note": "S03 SESSION_005 GM 공개 블록의 사건 요약만 반영"
-    },
-    {
-      "node_id": "event-west-road-trial-agreement",
-      "type": "event",
-      "label": "서쪽길 6주 시험협정",
-      "list_description": "실제 통행부담에 따른 길드 부담과 관리조 노동 비용을 정한 6주 시험협정.",
-      "description": "장마철 전 서쪽길에서 6주 시험협정을 맺었다. 길드 부담은 실제 통행부담을 기준으로 하고 관리조 노동을 비용에 포함하며, 도로 관리권과 통행 통제권은 길드로 넘기지 않았다. 시각 편집에서는 합의된 조건을 문서 중심으로 설명하고 확인되지 않은 서명자나 협정 장면을 만들어내지 않는다.",
-      "render_cues": [
-        "6주 시험협정과 실제 통행부담 기준을 설명하는 문서 중심 구성",
-        "관리조 노동의 비용 반영을 함께 나타냄",
-        "도로 관리권과 통행 통제권을 길드로 넘기지 않았다는 조건을 보존",
-        "확인되지 않은 서명자·문서 디자인·협정 장면은 추가하지 않음"
-      ],
-      "canon_policy": "EDITORIAL_RENDER_CUES_NO_NEW_CANON",
-      "source_note": "S03 SESSION_005 GM 공개 블록의 협정 요약만 반영"
     }
   ]
 }

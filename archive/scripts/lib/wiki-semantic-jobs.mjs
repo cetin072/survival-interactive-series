@@ -30,7 +30,11 @@ export async function discoverWikiSource(root) {
   }
   const approved = await approvedSeasonCatalog(manifest, 'S03', io)
   const session = manifest.sessions.at(-1)
-  demand(session?.session_id === 'SESSION_005', 'WIKI_V1_LATEST_SOURCE_UNSUPPORTED')
+  if (session?.session_id !== 'SESSION_005') {
+    const error = new Error('WIKI_V1_LATEST_SOURCE_UNSUPPORTED')
+    error.source_session = session?.session_id ?? 'UNKNOWN'
+    throw error
+  }
   const sourceManifestRef = `archive/content/transcripts/C03-AFTERFALL/S03/${session.source_manifest}`
   const sourceManifestBytes = await readFile(resolve(root, sourceManifestRef))
   const sourceManifest = JSON.parse(sourceManifestBytes.toString('utf8'))
@@ -78,12 +82,12 @@ function semanticFacts(source) {
       {
         id: 'event-west-road-trial-agreement', label: '서쪽길 6주 시험협정', type: 'event', subtitle: '2027년 6월 22일',
         summary: '장마철 전 6주 시험협정을 맺었다. 길드 부담은 실제 통행부담을 기준으로 정하고 관리조 노동을 비용에 포함했으며, 도로 관리권과 통행 통제권은 길드로 넘기지 않았다.',
-        tags: ['S03', '서쪽길', '시험협정'], source: `S03 SESSION_005 GM 공개 블록 ${gmLabels}`,
+        tags: ['S03', '서쪽길', '시험협정'], source: `S03 SESSION_005 GM 공개 블록 ${gmLabels}`, meta: { 기준시각: '2027-06-22 11:00' },
       },
       {
         id: 'event-west-road-rain-response', label: '서쪽길 긴급복구와 공동 장마계획', type: 'event', subtitle: '2027년 7월 5일',
         summary: '도로 침하 대응에서 임시 흙 보강만으로는 반복을 막기 어렵다고 판단했다. 양측은 위험구간 공동 표시, 큰 차량의 우회·대기, 가용 자재 등록, 긴급공사 비용의 사건별 계산을 포함한 장마철 공동계획을 세웠다.',
-        tags: ['S03', '서쪽길', '긴급복구', '장마계획'], source: `S03 SESSION_005 GM 공개 블록 ${gmLabels}`,
+        tags: ['S03', '서쪽길', '긴급복구', '장마계획'], source: `S03 SESSION_005 GM 공개 블록 ${gmLabels}`, meta: { 기준시각: '2027-07-05 09:00' },
       },
     ],
     relations: [

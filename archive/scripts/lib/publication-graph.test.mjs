@@ -30,6 +30,19 @@ test('repeat graph reconciliation is NOOP', () => { const f = fixture(); f.previ
 test('does not mutate caller-owned inputs', () => { const f = fixture(), old = structuredClone(f); reconcilePublicGraph(f); assert.deepEqual(f, old) })
 test('node ids and prior public prose are preserved', () => { const f = fixture(), r = reconcilePublicGraph(f); assert.deepEqual(r.graph.nodes.find((n) => n.id === 'char-test').data, f.facts.nodes[0]); assert.equal(r.graph.articles.find((n) => n.id === 'char-test').overview, f.facts.nodes[0].summary) })
 test('node update on newer save records a readable prior snapshot', () => { const f = fixture(); const before = reconcilePublicGraph(f).graph; f.previous = before; next(f); f.facts.nodes[0].summary = '새 공개 시험 설명'; const r = reconcilePublicGraph(f); const history = r.graph.nodes.find((n) => n.id === 'char-test').history; assert.equal(r.report.nodes_updated, 1); assert.equal(history.length, 1); assert.deepEqual(history[0].data, before.nodes.find((n) => n.id === 'char-test').data); assert.equal(history[0].data_sha256, graphHash(history[0].data)) })
+test('A to B to C retains public snapshots while A to A adds no history', () => {
+  const f = fixture(), a = reconcilePublicGraph(f).graph
+  f.previous = a; next(f); f.facts.nodes[0].summary = '상태 B'; f.facts.nodes[0].meta['기준시각'] = '2027-03-24 10:00'
+  const b = reconcilePublicGraph(f).graph
+  f.previous = b; next(f); f.facts.nodes[0].summary = '상태 C'; f.facts.nodes[0].meta['기준시각'] = '2027-03-25 10:00'
+  const c = reconcilePublicGraph(f).graph, record = c.nodes.find((item) => item.id === 'char-test')
+  assert.equal(record.data.summary, '상태 C')
+  assert.deepEqual(record.history.map((snapshot) => snapshot.data.summary), ['공개 시험 설명', '상태 B'])
+  f.previous = c
+  const unchanged = reconcilePublicGraph(f)
+  assert.equal(unchanged.report.status, 'NOOP')
+  assert.equal(unchanged.graph.nodes.find((item) => item.id === 'char-test').history.length, 2)
+})
 test('same-save conflicting node does not silently overwrite', () => { const f = fixture(); f.previous = reconcilePublicGraph(f).graph; f.facts.nodes[0].summary = 'CONFLICT'; assert.throws(() => reconcilePublicGraph(f), /SAME_REVISION/) })
 test('node type cannot change even on a later save', () => { const f = fixture(); f.previous = reconcilePublicGraph(f).graph; next(f); f.facts.nodes[0].type = 'location'; assert.throws(() => reconcilePublicGraph(f), /ENTITY_TYPE_CHANGED/) })
 test('omission of a node or edge never deletes existing state', () => { const f = fixture(); f.previous = reconcilePublicGraph(f).graph; next(f); f.facts.nodes = []; f.facts.relations = []; const r = reconcilePublicGraph(f); assert.equal(r.graph.nodes.length, 3); assert.equal(r.graph.relations.length, 1) })

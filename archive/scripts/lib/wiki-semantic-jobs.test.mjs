@@ -2,6 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { readFile } from 'node:fs/promises'
 import publicGraph from '../../content/graphs/C03-AFTERFALL/GRAPH.json' with { type: 'json' }
 import book from '../../content/stories/C03-AFTERFALL/BOOK.json' with { type: 'json' }
 import { byteHash, reconcilePublicGraph } from './publication-graph.mjs'
@@ -25,10 +26,29 @@ test('emits three GM-grounded nodes and explicit relations with stable source id
   assert.deepEqual(first, second)
   assert.equal(first.facts.nodes.length, 3)
   assert.equal(first.facts.relations.length, 3)
+  assert.equal(first.facts.nodes.find((node) => node.id === 'event-west-road-trial-agreement').meta['기준시각'], '2027-06-22 11:00')
+  assert.equal(first.facts.nodes.find((node) => node.id === 'event-west-road-rain-response').meta['기준시각'], '2027-07-05 09:00')
   assert.equal(first.facts.nodes[0].label, '조한수')
   assert.equal(first.facts.nodes.every((node) => node.source.includes('GM 공개 블록')), true)
   assert.match(first.path, /AWIKI_SESSION_005_[a-f0-9]{64}\.json$/)
   assert.equal(first.source.source_sha256, byteHash(first.bytes))
+})
+
+test('unsupported latest source yields visible HUMAN_REVIEW without changing Graph', async () => {
+  const { runCli } = await import('../run-wiki-automation.mjs')
+  const graphPath = resolve(root, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json')
+  const before = await readFile(graphPath)
+  const output = await runCli(['--apply'], { discover: async () => {
+    const error = new Error('WIKI_V1_LATEST_SOURCE_UNSUPPORTED')
+    error.source_session = 'SESSION_006'
+    throw error
+  } })
+  const result = JSON.parse(output)
+  assert.equal(result.status, 'HUMAN_REVIEW')
+  assert.equal(result.source_session, 'SESSION_006')
+  assert.equal(result.reason, 'WIKI_V1_LATEST_SOURCE_UNSUPPORTED')
+  assert.equal(result.graph_changed, false)
+  assert.deepEqual(await readFile(graphPath), before)
 })
 
 test('a previously applied source compiles to NOOP through the existing graph reconciler', async () => {
