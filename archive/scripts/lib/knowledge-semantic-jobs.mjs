@@ -63,6 +63,9 @@ export function extractPublicGmText(markdown, maxChars = 4500) {
 
 export function buildSemanticContext({ jobType, source, target, existingKnowledge, policy, excerpt }) {
   fail(['FRESH_BRIEF', 'BACKFILL_BRIEF'].includes(jobType), 'SEMANTIC_JOB_TYPE_INVALID')
+  if (source.kind === 'PUBLIC_READER') {
+    fail(/^[a-f0-9]{64}$/.test(source.reader_book_sha256 ?? ''), 'SEMANTIC_READER_BOOK_SHA_REQUIRED')
+  }
   const questions = existingKnowledge.candidates.map((item) => ({
     id: item.id, question: item.question, topic_id: item.topic_id, brief_id: item.brief_id ?? null,
   }))
@@ -75,7 +78,11 @@ export function buildSemanticContext({ jobType, source, target, existingKnowledg
       kind: source.kind,
       ref: source.ref,
       sha256: source.sha256,
-      ...(source.chapter_id ? { chapter_id: source.chapter_id, chapter_sha256: source.chapter_sha256 } : {}),
+      ...(source.chapter_id ? {
+        chapter_id: source.chapter_id,
+        chapter_sha256: source.chapter_sha256,
+        reader_book_sha256: source.reader_book_sha256,
+      } : {}),
       refs: source.refs ?? [],
       hashes: source.hashes ?? [],
       excerpt: excerpt.slice(0, 5000),
