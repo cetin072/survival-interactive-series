@@ -1,6 +1,6 @@
 # AFTERFALL B Reviewer runtime contract
 
-The scheduled ChatGPT Reviewer reservation currently predates the lease RPC contract. A rollout that enables lease enforcement must first update that reservation to use this contract. Do not send staging or review mutations without the current lease token.
+The existing scheduled AFTERFALL B Reviewer reservation predates and is incompatible with the lease RPC contract. Update that reservation to use this V2 contract before enabling lease enforcement. Do not send staging or review mutations without the current lease token.
 
 The machine-readable request fixture is [illustration-reviewer-runtime-contract.json](illustration-reviewer-runtime-contract.json). Its call shapes and terminal lease transitions are checked by `test_finalize_illustration_job.py`.
 

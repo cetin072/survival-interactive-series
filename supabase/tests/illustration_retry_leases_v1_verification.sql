@@ -1,7 +1,21 @@
 -- Run after 20260930090001_illustration_retry_leases_v1.sql in a transaction.
 -- Synthetic queue rows, RPC effects, and lease transitions are all rolled back.
 begin;
--- Transaction-local safe dispatch sink: the real network dispatcher is restored by ROLLBACK.
+-- Transaction-local network sink: even if this database contains a Vault token,
+-- the prep entrypoint cannot send an HTTP request during this verifier.
+create schema if not exists net;
+create or replace function net.http_post(
+  url text, body jsonb default '{}'::jsonb, params jsonb default '{}'::jsonb,
+  headers jsonb default '{}'::jsonb, timeout_milliseconds integer default 5000
+)
+returns bigint language sql volatile set search_path=pg_catalog as $$
+  select -998::bigint
+$$;
+create schema if not exists vault;
+create table if not exists vault.decrypted_secrets(
+  name text, decrypted_secret text, created_at timestamptz
+);
+-- Transaction-local safe finalizer dispatch sink: restored by ROLLBACK.
 create or replace function archive_ops.dispatch_afterfall_illustration_finalize(p_job_id text)
 returns bigint language sql volatile security definer set search_path=pg_catalog as $$
   select -999::bigint
@@ -15,6 +29,7 @@ declare
   failure_result jsonb;
   v_kind text;
   v_row survival_ops.illustration_render_jobs%rowtype;
+  prep_request bigint;
 begin
   if has_function_privilege('anon','public.archive_illustration_render_job_lease_acquire(text,text,integer)','EXECUTE')
      or has_function_privilege('authenticated','public.archive_illustration_render_jobs_sweep_stale()','EXECUTE')
@@ -269,6 +284,30 @@ begin
     'illustration-image-prompt-v1','A deterministic rollback-only stale dispatch fixture.',repeat('a',64),
     1,'FINALIZE_QUEUED','test-expired','00000000-0000-0000-0000-000000000007',clock_timestamp()-interval '1 second'
   );
+  -- A JWT claim without the active PostgreSQL role is insufficient.
+  perform set_config('request.jwt.claim.role','service_role',true);
+  perform set_config('role','none',true);
+  begin
+    perform public.archive_illustration_finalizer_dispatch_guarded('missing-job');
+    raise exception 'ILLUSTRATION_JWT_ONLY_DISPATCH_ACCEPTED';
+  exception when insufficient_privilege then
+    null;
+  end;
+
+  -- Anon/authenticated cannot invoke the guarded dispatcher, even when the
+  -- request claim and database role agree with their own low-privilege role.
+  foreach v_kind in array array['anon','authenticated'] loop
+    perform set_config('request.jwt.claim.role',v_kind,true);
+    perform set_config('role',v_kind,true);
+    begin
+      perform public.archive_illustration_finalizer_dispatch_guarded('missing-job');
+      raise exception 'ILLUSTRATION_LOW_PRIVILEGE_DISPATCH_ACCEPTED:%',v_kind;
+    exception when insufficient_privilege then
+      null;
+    end;
+    perform set_config('role','none',true);
+  end loop;
+
   perform set_config('request.jwt.claim.role','service_role',true);
   perform set_config('role','service_role',true);
   sweep_result:=public.archive_illustration_render_jobs_sweep_stale();
@@ -296,9 +335,9 @@ begin
     if sqlerrm='ILLUSTRATION_WRONG_STATUS_DISPATCH_ACCEPTED' then raise; end if;
   end;
 
-  -- Match the cron entrypoint's postgres-owned sweep path without running its
-  -- Vault lookup or GitHub HTTP dispatch. The finalizer dispatcher is stubbed
-  -- transaction-locally above and restored by the final ROLLBACK.
+  -- Invoke the actual postgres-owned pg_cron entrypoint. Its stale sweep must
+  -- run before Vault/GitHub dispatch; the net.http_post stub above keeps this
+  -- rollback-only verifier offline, and all test objects roll back below.
   update survival_ops.illustration_render_jobs set status='BLOCKED',lease_token=null,
     lease_until=null,lease_owner=null where job_id='test-illustration-stale-dispatch-0007';
   insert into survival_ops.illustration_render_jobs(
@@ -311,15 +350,26 @@ begin
     1,'FINALIZING','test-cron','00000000-0000-0000-0000-000000000009',clock_timestamp()-interval '1 second'
   );
   perform set_config('request.jwt.claim.role','',true);
+  perform set_config('role','none',true);
   if position('dispatch_afterfall_illustration_sweep' in pg_get_functiondef(
        'archive_ops.dispatch_afterfall_illustration_prep()'::regprocedure))=0 then
     raise exception 'ILLUSTRATION_PREP_CRON_SWEEP_PATH_MISSING';
   end if;
-  sweep_result:=archive_ops.dispatch_afterfall_illustration_sweep();
+  begin
+    prep_request:=archive_ops.dispatch_afterfall_illustration_prep();
+  exception when others then
+    if sqlerrm='ARCHIVE_GITHUB_DISPATCH_TOKEN_MISSING' then
+      -- This ephemeral database has no test Vault token. The stale sweep ran first.
+      prep_request:=null;
+    else
+      raise;
+    end if;
+  end;
   select * into v_row from survival_ops.illustration_render_jobs
     where job_id='test-illustration-cron-dispatch-0008';
-  if sweep_result->>'finalizer_dispatched'<>'1' or v_row.finalizer_dispatch_request_id<>-999
-     or v_row.status<>'FINALIZE_QUEUED' then
+  if v_row.finalizer_dispatch_request_id<>-999
+     or v_row.status<>'FINALIZE_QUEUED'
+     or (prep_request is not null and prep_request<>-998) then
     raise exception 'ILLUSTRATION_PGCRON_POSTGRES_DISPATCH_FAILED';
   end if;
 

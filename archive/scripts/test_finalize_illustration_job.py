@@ -62,6 +62,15 @@ class FinalizerIdentityTests(unittest.TestCase):
     def test_reviewer_runtime_contract_binds_each_mutation_and_decision_lifecycle(self):
         contract_path = ROOT / "archive/automation/illustration-reviewer-runtime-contract.json"
         contract = json.loads(contract_path.read_text(encoding="utf-8"))
+        self.assertEqual(contract["version"], "illustration-reviewer-runtime-contract-v2")
+        self.assertEqual(
+            contract["rollout_dependency"],
+            {
+                "reviewer_automation_update_required": "YES",
+                "existing_afterfall_b_reviewer_reservation_compatible": False,
+                "lease_enforced_rollout_allowed_before_reservation_update": False,
+            },
+        )
         self.assertEqual(
             contract["lease_acquire"]["rpc"],
             "archive_illustration_render_job_lease_acquire",

@@ -1,5 +1,10 @@
 {
-  "version": "illustration-reviewer-runtime-contract-v1",
+  "version": "illustration-reviewer-runtime-contract-v2",
+  "rollout_dependency": {
+    "reviewer_automation_update_required": "YES",
+    "existing_afterfall_b_reviewer_reservation_compatible": false,
+    "lease_enforced_rollout_allowed_before_reservation_update": false
+  },
   "lease_acquire": {
     "rpc": "archive_illustration_render_job_lease_acquire",
     "request": {
