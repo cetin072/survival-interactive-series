@@ -62,6 +62,24 @@ class FinalizerIdentityTests(unittest.TestCase):
     def test_reviewer_runtime_contract_binds_each_mutation_and_decision_lifecycle(self):
         contract_path = ROOT / "archive/automation/illustration-reviewer-runtime-contract.json"
         contract = json.loads(contract_path.read_text(encoding="utf-8"))
+        self.assertEqual(contract["version"], "illustration-reviewer-runtime-contract-v2")
+        self.assertFalse(contract["rollout_dependency"]["current_reservation_compatible"])
+        self.assertEqual(
+            contract["binding_snapshot"]["required_fields"],
+            [
+                "job_id", "attempt_no", "point_id", "generation_key", "subject_id",
+                "prompt_sha256", "review_context_version", "review_context_sha256",
+            ],
+        )
+        self.assertEqual(contract["binding_snapshot"]["authority"], "job.review_context")
+        self.assertEqual(
+            contract["review_context_authority"]["render_cues"],
+            "ALLOWED_NOT_REQUIRED_NOT_NEW_CANON",
+        )
+        self.assertEqual(
+            contract["review_context_authority"]["context_path"],
+            "job.review_context",
+        )
         self.assertEqual(
             contract["lease_acquire"]["rpc"],
             "archive_illustration_render_job_lease_acquire",
@@ -101,6 +119,22 @@ class FinalizerIdentityTests(unittest.TestCase):
         self.assertEqual(lifecycle["PASS"]["final_status"], "FINALIZE_QUEUED")
         self.assertIsNone(lifecycle["PASS"]["lease_owner"])
         self.assertIsNone(lifecycle["PASS"]["lease_token"])
+        review_complete = next(
+            item for item in contract["mutations"]
+            if item["rpc"] == "archive_illustration_review_complete"
+        )
+        self.assertEqual(
+            review_complete["request"]["p_review"]["review_context_sha256"],
+            "<exact_context_hash>",
+        )
+        self.assertEqual(
+            review_complete["context_hash_path"],
+            "p_review.review_context_sha256",
+        )
+        self.assertEqual(
+            contract["legacy_compatibility"]["null_context_hash"],
+            "PRE_V2_PATH_ALLOWED",
+        )
 
     def test_finalizer_heartbeat_renews_current_job_lease(self):
         MODULE.CURRENT_JOB = {"job_id": "illustration-test-0001"}
