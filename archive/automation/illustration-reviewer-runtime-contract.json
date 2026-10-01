@@ -119,7 +119,7 @@
   },
   "rollout_dependency": {
     "reviewer_update_required": true,
-    "current_reservation_compatible": false
+    "current_reservation_compatible": true
   },
   "binding_snapshot": {
     "required_fields": [
