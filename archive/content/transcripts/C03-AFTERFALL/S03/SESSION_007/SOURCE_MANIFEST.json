@@ -1,0 +1,94 @@
+{
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "protagonist": "서진우",
+  "season_id": "S03",
+  "session_id": "SESSION_007",
+  "publication_segment_id": "segment-e76ee1077ef947cee8c41121afa94a1d74b3fa7b1308603a9133bece64a7fc0e",
+  "source_type": "SUPABASE_ROLLING_RAW_SEGMENT",
+  "source_session_uuid": "8ef127f7-4729-4161-9784-49123171ad2a",
+  "source_session_status_at_capture": "OPEN",
+  "visibility": "PUBLIC_ARCHIVE",
+  "archive_class": "COLD_RAW",
+  "public_safe_only": true,
+  "status": "PARTIAL",
+  "capture_quality": "VERIFIED_CONTIGUOUS_TURN_PAIRS",
+  "atomic_pairing_complete": true,
+  "coverage_basis": "captured_message_range",
+  "captured_message_range": {
+    "start": "2027-09-22 16:10",
+    "end": "2027-10-30 13:20"
+  },
+  "source_message_order": {
+    "min": 96,
+    "max": 99,
+    "contiguous": true,
+    "archive_offset": 96
+  },
+  "closed_at": "2026-10-01T19:49:09.804Z",
+  "closure_meaning": "This publication segment is sealed; the source DB session may remain OPEN.",
+  "counts": {
+    "user": 2,
+    "gm": 2,
+    "total": 4,
+    "assistant_public_meta": 0
+  },
+  "message_order": {
+    "min": 0,
+    "max": 3,
+    "contiguous": true
+  },
+  "parts": [
+    "PART_001.md"
+  ],
+  "parts_sha256": {
+    "PART_001.md": "efa893c97eda7900061d6afde8809233199155851ee49773d4dcee30eb645210"
+  },
+  "content_sha256": [
+    {
+      "message_order": 0,
+      "source_message_order": 96,
+      "turn_no": 44,
+      "role": "USER",
+      "sha256": "be6758a5e4ff5ccbc27900079f0eb4ade2a3d0b01a608b136b2c5dfede6f23c4",
+      "save_version": 280,
+      "source_type": "LIVE"
+    },
+    {
+      "message_order": 1,
+      "source_message_order": 97,
+      "turn_no": 44,
+      "role": "GM",
+      "sha256": "d8e81e946c7e00127220d1034de2f8559bf88169d3e804a79025cf820d77caa6",
+      "save_version": 281,
+      "source_type": "LIVE",
+      "state_link": {
+        "outcome": "APPLIED",
+        "linked_save_version": 281
+      }
+    },
+    {
+      "message_order": 2,
+      "source_message_order": 98,
+      "turn_no": 45,
+      "role": "USER",
+      "sha256": "e903af1c330a25efc2c38e358dda96415c51940c047ba2a492a1fc6beed8aa21",
+      "save_version": 281,
+      "source_type": "LIVE"
+    },
+    {
+      "message_order": 3,
+      "source_message_order": 99,
+      "turn_no": 45,
+      "role": "GM",
+      "sha256": "6f7948494243657f1ab684b8c48686af3ad7b93e0c77af859e2316817e83db16",
+      "save_version": 282,
+      "source_type": "LIVE",
+      "state_link": {
+        "outcome": "APPLIED",
+        "linked_save_version": 282
+      }
+    }
+  ],
+  "source_policy": "Exact public_safe USER/GM content, contiguous complete pairs. State links are optional provenance."
+}
