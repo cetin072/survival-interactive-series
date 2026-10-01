@@ -1,0 +1,19 @@
+{
+  "id": "KC-c03-afterfall-prelude-02-ecfe45597b",
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-011",
+  "question": "정전이 시작되면 냉장·냉동 식품은 어떻게 안전하게 관리해야 할까",
+  "topic_id": "power-outage-food-safety",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_002.md"
+  ],
+  "source_hashes": [
+    "379a79b4498038394224f2894b5c175e26655478bf60a45c2b51ef659bf60903"
+  ],
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "disposition_note": "검증된 PUBLIC_READER 장면에서 대규모 정전 직전 냉장고 속 반찬을 먼저 먹고 이후 실제 정전을 겪는 상황을 보고, 현실에서는 '상하기 쉬운 것을 먼저 먹는다'는 감각보다 정전 시간·문 개방·기기 온도·공식 시간/온도 기준으로 식품 안전을 판단해야 한다는 질문을 추출했습니다. 기존 K-002는 비상용품 목록·점검, K-003은 가족 연락, K-008은 대피 결정으로 의미상 중복되지 않습니다. 현실 근거는 CDC, FDA, USDA FSIS의 정전 시 식품안전 안내를 교차검토했습니다. 홍수 오염 식품, 영아용 조제식, 의료식·특수식, 식중독 치료는 범위에서 제외합니다.",
+  "reader_chapter_id": "c03-afterfall-prelude-02",
+  "reader_book_sha256": "fbe55ce3f0c87abb3901ec2779fa2758f8d85edf5c1dad8bdd047717e32bb000",
+  "reader_chapter_sha256": "8166cdc91b4a53cba83d476a9aa75858888601d1f63b725c4e8542aa7eb4351f"
+}
