@@ -1,0 +1,12 @@
+{
+  "version": "foreground-local-approval-v1",
+  "role": "PROJECT_OWNER",
+  "decision": "ACCEPT_LOCAL_CANDIDATE",
+  "reviewer": "project-owner",
+  "reviewed_at": "2026-09-27T07:18:28.000Z",
+  "source_ref": "codex-thread:01a0de59-7992-7cc1-988c-3602970ac492#01a0e1b5-d828-7c60-aa49-465cf47663d3",
+  "observation_id": "observation-16cfc6f91f17e6ce550e028095c5887eff06dc50f3c95ace50a874c941649ac7",
+  "point_id": "point-e33f848046b1245234e579828dadc03939faf10d609c15bff315b8c421be1a72",
+  "generation_key": "generation-a59f0391ed3fa13bcbcde8ea2123446837e6cc84ef5ab24f93d07f815170f7e8",
+  "file_sha256": "f4882707c0272d1eb7123493bb46dc7193e0235ceba778d3582d0112a087a78d"
+}
