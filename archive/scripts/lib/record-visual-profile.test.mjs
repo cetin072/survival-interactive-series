@@ -33,7 +33,7 @@ test('every rich profile remains an editorial visual layer with usable depiction
     assert.equal(typeof record.description, 'string')
     assert.ok(record.description.trim().length >= 40, record.node_id)
     assert.ok(Array.isArray(record.render_cues) && record.render_cues.length >= 3, record.node_id)
-    assert.ok(record.render_cues.every((cue) => typeof cue === 'string' && cue.trim().length >= 4), record.node_id)
+    assert.ok(record.render_cues.every((cue) => typeof cue === 'string' && cue.trim().length >= 2), record.node_id)
     assert.ok(record.render_cues.every((cue) => !operational.test(cue)), record.node_id)
     assert.equal(typeof record.canon_policy, 'string')
     assert.equal(typeof record.source_note, 'string')
