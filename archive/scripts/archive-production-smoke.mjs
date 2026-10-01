@@ -58,14 +58,23 @@ export async function runProductionSmoke({ sourceSha, releaseSha, fetchImpl = fe
   const operatorHtml = await operatorResponse.text()
   const jsPath = operatorHtml.match(/<script[^>]+src="([^"]+\.js)"/)?.[1]
   if (!jsPath) throw new Error('OPERATOR_APP_BUNDLE_MISSING')
-  const jsResponse = await fetchImpl(new URL(jsPath, SITE), { cache: 'no-store', headers: { 'User-Agent': 'survival-diary-batched-release-smoke' } })
+  const jsHeaders = { 'User-Agent': 'survival-diary-batched-release-smoke' }
+  const jsResponse = await fetchImpl(new URL(jsPath, SITE), { cache: 'no-store', headers: jsHeaders })
   if (!jsResponse.ok) throw new Error(`OPERATOR_APP_BUNDLE_UNAVAILABLE:${jsResponse.status}`)
+  const clientBundles = [await jsResponse.text()]
+  const lazyChunks = [...new Set([...clientBundles[0].matchAll(/[\x60"'](?:\.\/|\/assets\/)?([A-Za-z0-9_.-]+-[A-Za-z0-9_-]{6,}\.js)[\x60"']/g)].map((match) => match[1]))]
+  if (lazyChunks.length > 32) throw new Error('OPERATOR_LAZY_BUNDLE_COUNT_INVALID')
+  for (const chunk of lazyChunks) {
+    const chunkResponse = await fetchImpl(new URL(`/assets/${chunk}`, SITE), { cache: 'no-store', headers: jsHeaders })
+    if (!chunkResponse.ok) throw new Error(`OPERATOR_LAZY_BUNDLE_UNAVAILABLE:${chunk}:${chunkResponse.status}`)
+    clientBundles.push(await chunkResponse.text())
+  }
   const smoke = validateOperatorSmoke({
     status: operatorResponse.status,
     csp: operatorResponse.headers.get('content-security-policy'),
     robots: operatorResponse.headers.get('x-robots-tag'),
     html: operatorHtml,
-    bundle: await jsResponse.text(),
+    bundle: clientBundles.join('\n'),
   })
   if (!smoke.ok) throw new Error(`OPERATOR_SMOKE_FAILED:${smoke.errors.join(',')}`)
   return { status: 'PRODUCTION_SMOKE_PASS', source_sha: sourceSha, release_sha: releaseSha, routes, operator: smoke }

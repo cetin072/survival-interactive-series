@@ -45,8 +45,9 @@ test('batched Production smoke checks the Hub, three Chronicle routes, Knowledge
     seen.push(url.pathname + url.search.replace(/[?&]archive-smoke=[^&]+/, ''))
     if (url.pathname === '/deploy-meta.json') return Response.json({ version: 1, provider: 'netlify', context: 'production', commit_ref: releaseSha })
     if (url.pathname === '/release/production.json') return Response.json({ version: 'production-release-v1', site: 'survival-diary-archive', source_main_sha: sourceSha, released_on_kst: '2026-09-30', interval_days: 2, release_attempt: 2, policy: 'BATCHED_PRODUCTION' })
-    if (url.pathname === '/operator/') return new Response('<script type="module" src="/assets/operator-1234.js"></script>', { status: 200, headers: { 'content-security-policy': "default-src 'self'; connect-src 'self' https://jgsxpdflgkqroecfjzxq.supabase.co", 'x-robots-tag': 'noindex, nofollow, noarchive' } })
-    if (url.pathname === '/assets/operator-1234.js') return new Response('const SUPABASE_URL="https://jgsxpdflgkqroecfjzxq.supabase.co"')
+    if (url.pathname === '/operator/') return new Response('<script type="module" src="/assets/index-12345678.js"></script>', { status: 200, headers: { 'content-security-policy': "default-src 'self'; connect-src 'self' https://jgsxpdflgkqroecfjzxq.supabase.co", 'x-robots-tag': 'noindex, nofollow, noarchive' } })
+    if (url.pathname === '/assets/index-12345678.js') return new Response('import(`./OperatorConsole-12345678.js`)')
+    if (url.pathname === '/assets/OperatorConsole-12345678.js') return new Response('const SUPABASE_URL="https://jgsxpdflgkqroecfjzxq.supabase.co"')
     return new Response('<!doctype html>', { status: 200 })
   }
 
