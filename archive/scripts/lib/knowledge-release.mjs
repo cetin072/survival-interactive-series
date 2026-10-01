@@ -12,6 +12,7 @@ export const AUTO_PUBLICATION_PATHS = Object.freeze([
   'knowledge/content/topics.json',
   'knowledge/content/stories.json',
   'knowledge/automation/state.json',
+  'knowledge/automation/runtime-state.json',
   'archive/web/public/knowledge/',
   'archive/web/public/sitemap.xml',
 ])

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://survival-diary-archive.netlify.app/contracts/knowledge-semantic-result-v1.json",
+  "title": "Knowledge Semantic Worker result v1",
+  "type": "object",
+  "required": ["version", "job_id", "decision"],
+  "properties": {
+    "version": { "const": "knowledge-semantic-result-v1" },
+    "job_id": { "type": "string", "format": "uuid" },
+    "decision": { "enum": ["BRIEF_READY", "HOLD", "HUMAN_REVIEW"] },
+    "candidate": { "type": "object" },
+    "evidence": { "type": "object" },
+    "brief": { "type": "object" },
+    "topic": { "type": "object" },
+    "code": { "type": "string", "minLength": 1, "maxLength": 100 },
+    "note": { "type": "string", "minLength": 1, "maxLength": 4000 }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "decision": { "const": "BRIEF_READY" } }, "required": ["decision"] },
+      "then": { "required": ["candidate", "evidence", "brief"], "not": { "anyOf": [{ "required": ["code"] }, { "required": ["note"] }] } }
+    },
+    {
+      "if": { "properties": { "decision": { "const": "HOLD" } }, "required": ["decision"] },
+      "then": { "required": ["code", "note"], "not": { "anyOf": [{ "required": ["candidate"] }, { "required": ["evidence"] }, { "required": ["brief"] }, { "required": ["topic"] }] } }
+    },
+    {
+      "if": { "properties": { "decision": { "const": "HUMAN_REVIEW" } }, "required": ["decision"] },
+      "then": { "required": ["candidate", "evidence", "brief", "code", "note"] }
+    }
+  ],
+  "additionalProperties": false
+}

@@ -82,6 +82,7 @@ jobs:
       - name: Run exact-head Knowledge validation
         run: |
           npm run knowledge:test
+          npm run knowledge:semantic:test
           npm run knowledge:check
 
       - name: Run exact-head release checker
@@ -106,6 +107,12 @@ jobs:
             if (!Array.isArray(result.reasons) || result.reasons.length !== 0) throw new Error('WORKER_GATE_REASONS_NOT_EMPTY')
             console.log('mode=auto')
             console.log('decision=AUTO_PUBLISH_ELIGIBLE')
+          } else if (result.decision === 'WOULD_AUTO_PUBLISH') {
+            console.log('mode=shadow')
+            console.log('decision=WOULD_AUTO_PUBLISH')
+          } else if (result.decision === 'PR_ONLY') {
+            console.log('mode=pr_only')
+            console.log('decision=PR_ONLY')
           } else if (result.decision === 'HUMAN_REVIEW_REQUIRED' || (result.decision === 'HOLD' && result.requires_human === true)) {
             console.log('mode=human_review')
             console.log(`decision=${result.decision}`)
@@ -164,6 +171,24 @@ jobs:
           if gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments?per_page=100" --paginate \
             --jq '.[].body' | grep -Fqx "$MARKER"; then
             echo "Gate marker already exists."
+          else
+            gh pr comment "$PR_NUMBER" --body "$MARKER"
+          fi
+
+      - name: Record non-merging gate decision on PR
+        if: steps.gate.outputs.mode == 'shadow' || steps.gate.outputs.mode == 'pr_only'
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          GATE_DECISION: ${{ steps.gate.outputs.decision }}
+        run: |
+          set -euo pipefail
+          MARKER="<!-- knowledge-worker-gate-v1:$HEAD_SHA:$GATE_DECISION:NO_MERGE -->"
+          if gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments?per_page=100" --paginate \
+            --jq '.[].body' | grep -Fqx "$MARKER"; then
+            echo "Non-merging gate marker already exists."
           else
             gh pr comment "$PR_NUMBER" --body "$MARKER"
           fi

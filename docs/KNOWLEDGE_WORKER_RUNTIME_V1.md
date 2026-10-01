@@ -205,3 +205,6 @@ Production은 batched Archive release system 책임이다.
 - disposition writer: `archive/scripts/knowledge-worker-disposition.mjs`
 - state validator: `archive/scripts/knowledge-worker-state-check.mjs`
 - state-only auto merge: `.github/workflows/knowledge-worker-state.yml`
+# C3 normal path and V1 fallback
+
+C3 owns normal source selection, durable job state, package finalization, and worker interruption recovery. This Runtime V1 document remains the compatibility and fallback contract; its existing publication gate, exact-head checks, HUMAN_REVIEW path, and Production batching are still authoritative release controls. The C3 worker itself does not perform branch, PR, CI, state, or publication orchestration. See [C3 architecture](KNOWLEDGE_AUTOMATION_C3_ARCHITECTURE_V1.md).

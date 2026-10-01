@@ -190,6 +190,7 @@ test('release gate covers PR_ONLY, shadow, AUTO, and the content-only boundary',
   assert.equal(codeDiff.decision, 'REJECTED')
   assert.deepEqual(codeDiff.content_only.rejected, ['archive/scripts/knowledge-release.mjs'])
   assert.equal(checkContentOnly(['archive/web/public/knowledge/knowledge.css']).allowed, false)
+  assert.equal(checkContentOnly(['knowledge/automation/runtime-state.json']).allowed, true)
 })
 
 test('publication mode config is authoritative and internally consistent', async () => {

@@ -38,10 +38,17 @@ type VisualRun = {
   target_subject_id?: string | null; accepted_count?: number | null
   registry_status?: string | null; cleanup_status?: string | null; main_sha?: string | null
 }
+type KnowledgeSemanticJob = {
+  job_id?: string; job_type?: string; status?: string; source_kind?: string; source_ref?: string
+  prepared_at?: string | null; submitted_at?: string | null; age_minutes?: number | null
+  stalled_code?: string | null; result_decision?: string | null; final_pr_number?: number | null
+  final_head_sha?: string | null; merge_sha?: string | null; blocker_code?: string | null; blocker_stage?: string | null
+}
 type SystemStatus = {
   archive: { daily_run_count: number; task_count: number; latest_daily_run: ArchiveRun | null; latest_task: ArchiveRun | null }
   visual: { run_count: number; latest_run: VisualRun | null }
   review: { pending_count: number; automation_error_count: number }
+  knowledge_semantic?: { active_count: number; latest_job: KnowledgeSemanticJob | null; prep: { last_status?: string; last_stage?: string; blocker_code?: string | null; checked_at?: string | null } | null }
 }
 type ReleaseMarker = {
   source_main_sha?: string; released_on_kst?: string; interval_days?: number
@@ -200,6 +207,9 @@ export default function OperatorConsole() {
   const archiveRunCount = (systemStatus?.archive.daily_run_count ?? 0) + (systemStatus?.archive.task_count ?? 0)
   const archiveLatest = systemStatus?.archive.latest_daily_run ?? systemStatus?.archive.latest_task ?? null
   const visualLatest = systemStatus?.visual.latest_run ?? null
+  const semanticLatest = systemStatus?.knowledge_semantic?.latest_job ?? null
+  const semanticBlocker = semanticLatest?.stalled_code ?? semanticLatest?.blocker_code ?? systemStatus?.knowledge_semantic?.prep?.blocker_code ?? null
+  const semanticBadgeClass = semanticBlocker ? 'warning' : semanticLatest?.status === 'PUBLISHED' ? 'ok' : ['HUMAN_REVIEW','BLOCKED','HOLD'].includes(semanticLatest?.status ?? '') ? 'warning' : 'neutral'
   const knowledgeLatestBrief = operatorStaticStatus.knowledge.latestBriefIds.at(-1) ?? '없음'
   const knowledgeNeedsReview = inbox.pending_count > 0
   const productionContext = productionStatus.deploy?.context ?? null
@@ -229,6 +239,21 @@ export default function OperatorConsole() {
             <div><dt>최근 대상</dt><dd>{subjectWithKorean(visualLatest?.target_subject_id)}</dd></div>
             <div><dt>최근 시각</dt><dd>{formatOperatorTime(visualLatest?.finished_at ?? visualLatest?.started_at)}</dd></div>
             <div><dt>상세</dt><dd>{visualLatest?.blocker_code ? <><code>{visualLatest.blocker_code}</code>{explainMachineCode(visualLatest.blocker_code) && <small className="operator-code-help">{explainMachineCode(visualLatest.blocker_code)}</small>}{visualLatest.blocker_stage && <><code>{visualLatest.blocker_stage}</code>{explainMachineCode(visualLatest.blocker_stage) && <small className="operator-code-help">{explainMachineCode(visualLatest.blocker_stage)}</small>}</>}</> : <>채택 결과 {visualLatest?.accepted_count ?? 0}건</>}</dd></div>
+          </dl>
+        </article>
+
+        <article className="operator-system-card">
+          <div className="operator-system-title"><h3>C · Semantic <small>Knowledge 작업</small></h3><span className={`operator-status-badge ${semanticBadgeClass}`}>{semanticBlocker ?? semanticLatest?.status ?? '실행이력 없음'}</span></div>
+          <dl>
+            <div><dt>활성 작업</dt><dd>{systemStatus?.knowledge_semantic?.active_count ?? 0}건</dd></div>
+            <div><dt>종류 / 판정</dt><dd>{semanticLatest?.job_type ?? '—'} · {semanticLatest?.result_decision ?? '—'}</dd></div>
+            <div><dt>Source</dt><dd>{semanticLatest?.source_kind ?? '—'} · {semanticLatest?.source_ref?.split('/').slice(-2).join('/') ?? '—'}</dd></div>
+            <div><dt>준비 / 제출</dt><dd>{formatOperatorTime(semanticLatest?.prepared_at)} / {formatOperatorTime(semanticLatest?.submitted_at)}</dd></div>
+            <div><dt>경과</dt><dd>{semanticLatest?.age_minutes == null ? '—' : `${semanticLatest.age_minutes}분`}</dd></div>
+            <div><dt>PR / 결과</dt><dd>{semanticLatest?.final_pr_number ? `#${semanticLatest.final_pr_number}` : '—'} · {semanticLatest?.status ?? '—'}</dd></div>
+            <div><dt>Merge SHA</dt><dd>{semanticLatest?.merge_sha?.slice(0, 12) ?? '—'}</dd></div>
+            <div><dt>차단 사유</dt><dd>{semanticBlocker ? <><code>{semanticBlocker}</code>{semanticLatest?.blocker_stage && <small className="operator-code-help">{semanticLatest.blocker_stage}</small>}</> : '없음'}</dd></div>
+            <div><dt>Prep 상태</dt><dd>{systemStatus?.knowledge_semantic?.prep?.last_status ?? '기록 없음'} · {systemStatus?.knowledge_semantic?.prep?.last_stage ?? '—'}</dd></div>
           </dl>
         </article>
 

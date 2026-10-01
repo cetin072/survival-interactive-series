@@ -346,3 +346,6 @@ Automation C 2.0의 성공은 “LONGFORM 글 수”가 아니다.
 최종 목표:
 
 > **BRIEF는 발견과 유입을 만들고, LONGFORM은 신뢰와 구독을 만든다.**
+# C3 integration note
+
+Future Longform automation may use the durable C3 semantic-job architecture with `job_type = LONGFORM`; this is an extension point only. C2's scope, requirements, and implementation plan remain unchanged.
