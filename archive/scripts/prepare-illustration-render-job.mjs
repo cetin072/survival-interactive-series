@@ -3,12 +3,14 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { compileIllustrationRendererText, ILLUSTRATION_IMAGE_PROMPT_VERSION } from './lib/illustration-image-prompt.mjs'
+import { buildIllustrationReviewContext } from './lib/illustration-review-context.mjs'
 import { readJson, selectIllustrationCandidates } from './lib/illustration-worker.mjs'
 
 const root = resolve(fileURLToPath(new URL('../..', import.meta.url)))
 const visualPath = resolve(root, 'archive/content/visuals/C03-AFTERFALL/VISUALS.json')
 const assetsPath = resolve(root, 'archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json')
 const manualAssetsPath = resolve(root, 'archive/content/visuals/C03-AFTERFALL/MANUAL_SITE_ASSETS.json')
+const visualProfilesPath = resolve(root, 'archive/content/public-facts/C03-AFTERFALL/S03/RECORD_VISUAL_PROFILES_20260930.json')
 const receiptsPath = resolve(root, 'archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_RECEIPTS.json')
 const providerPath = resolve(root, 'archive/automation/illustration-generation-provider.json')
 const sha256 = (value) => createHash('sha256').update(value).digest('hex')
@@ -42,11 +44,16 @@ async function rpc(name, body) {
 
 export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}) {
   demand(/^[a-f0-9]{40}$/.test(mainSha ?? ''), 'ILLUSTRATION_PREP_MAIN_SHA_INVALID')
-  const [catalog, siteAssets, manualAssets, receipts, providerConfig] = await Promise.all([
-    readJson(visualPath), readJson(assetsPath), readJson(manualAssetsPath), readJson(receiptsPath), readJson(providerPath),
+  const [catalog, siteAssets, manualAssets, visualProfiles, receipts, providerConfig] = await Promise.all([
+    readJson(visualPath), readJson(assetsPath), readJson(manualAssetsPath), readJson(visualProfilesPath),
+    readJson(receiptsPath), readJson(providerPath),
   ])
   demand(manualAssets?.version === 'archive-manual-site-assets-v1' && Array.isArray(manualAssets.assets),
     'ILLUSTRATION_PREP_MANUAL_ASSETS_INVALID')
+  demand(visualProfiles?.version === 'record-visual-profile-v1' && Array.isArray(visualProfiles.records),
+    'ILLUSTRATION_PREP_VISUAL_PROFILES_INVALID')
+  const profileBySubject = new Map(visualProfiles.records.map((profile) => [profile.node_id, profile]))
+  demand(profileBySubject.size === visualProfiles.records.length, 'ILLUSTRATION_PREP_VISUAL_PROFILE_DUPLICATE')
   const effectiveSiteAssets = { ...siteAssets, assets: [...manualAssets.assets, ...siteAssets.assets] }
 
   const activeProvider = providerConfig.active_provider
@@ -71,7 +78,10 @@ export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}
   for (const candidate of plan.candidates) {
     const point = catalog.points.find((item) => item.point_id === candidate.point_id)
     demand(point, 'ILLUSTRATION_PREP_POINT_NOT_FOUND')
-    const promptText = compileIllustrationRendererText(point)
+    const profile = profileBySubject.get(candidate.subject_id)
+    demand(profile, 'ILLUSTRATION_PREP_VISUAL_PROFILE_NOT_FOUND')
+    const reviewContextBundle = buildIllustrationReviewContext(point, profile)
+    const promptText = compileIllustrationRendererText(point, reviewContextBundle)
     const promptSha256 = sha256(promptText)
     const safeSubject = candidate.subject_id.replace(/[^a-z0-9-]/g, '-')
     const generationSuffix = candidate.generation_key.slice('generation-'.length, 'generation-'.length + 12)
@@ -88,6 +98,9 @@ export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}
         prompt_contract: ILLUSTRATION_IMAGE_PROMPT_VERSION,
         prompt_text: promptText,
         prompt_sha256: promptSha256,
+        review_context_version: reviewContextBundle.review_context_version,
+        review_context_sha256: reviewContextBundle.review_context_sha256,
+        review_context: reviewContextBundle.review_context,
       },
     })
     if (result?.status === 'PREPARED' || result?.status === 'WAITING_EXISTING_JOB'

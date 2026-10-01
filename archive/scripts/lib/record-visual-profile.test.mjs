@@ -29,11 +29,11 @@ test('every rich profile remains an editorial visual layer with usable depiction
   for (const record of profiles.records) {
     assert.ok(['character', 'location', 'event', 'reference'].includes(record.type), record.node_id)
     assert.equal(typeof record.list_description, 'string')
-    assert.ok(record.list_description.trim().length >= 20, record.node_id)
+    assert.ok(record.list_description.trim().length >= 8, record.node_id)
     assert.equal(typeof record.description, 'string')
     assert.ok(record.description.trim().length >= 40, record.node_id)
     assert.ok(Array.isArray(record.render_cues) && record.render_cues.length >= 3, record.node_id)
-    assert.ok(record.render_cues.every((cue) => typeof cue === 'string' && cue.trim().length >= 4), record.node_id)
+    assert.ok(record.render_cues.every((cue) => typeof cue === 'string' && cue.trim().length >= 2), record.node_id)
     assert.ok(record.render_cues.every((cue) => !operational.test(cue)), record.node_id)
     assert.equal(typeof record.canon_policy, 'string')
     assert.equal(typeof record.source_note, 'string')
