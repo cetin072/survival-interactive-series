@@ -22,11 +22,11 @@ describe('public graph world time', () => {
       event('higher-save', '2027-07-05 09:00', '2027-07-12 17:30', 275),
     ]
     expect(sortGraphEvents(records).map((record) => record.id)).toEqual([
-      'rain-plan', 'higher-save', 'tie-a', 'tie-b', 'trial-agreement', 'guild-warehouse', 'finale', 'network-decay',
+      'higher-save', 'rain-plan', 'tie-a', 'tie-b', 'trial-agreement', 'guild-warehouse', 'finale', 'network-decay',
       'winter-council', 'wide-area', 'shelter', 'fireline',
     ])
-    expect(sortGraphEvents(records).slice(0, 3).map(graphWorldTime)).toEqual([
-      '2027-07-05 09:00', '2027-06-22 11:00', '2027-04-10 00:00',
+    expect(sortGraphEvents(records).slice(0, 5).map(graphWorldTime)).toEqual([
+      '2027-07-05 09:00', '2027-07-05 09:00', '2027-07-05 09:00', '2027-07-05 09:00', '2027-06-22 11:00',
     ])
   })
 
