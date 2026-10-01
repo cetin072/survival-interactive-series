@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path'
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { applySemanticPackage, buildSemanticContext, chapterHash, hashPolicyBytes, makeWorkKey, nextBriefId, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
-import { finalizerAction, semanticBranchRef, reconcilePullRequest, verifyPins } from '../knowledge-semantic-finalize.mjs'
+import { finalizerAction, semanticBranchRef, reconcilePullRequest, runSemanticFinalizer, verifyPins } from '../knowledge-semantic-finalize.mjs'
 import { runPackage } from '../knowledge-semantic-finalize.mjs'
 import { detectLegacyWorkerBlocker, planSemanticPreparation } from '../knowledge-semantic-prepare.mjs'
 
@@ -208,7 +208,7 @@ test('C-FINALIZER package application persists one validated BRIEF_READY disposi
   } finally { await rm(root, { recursive: true, force: true }) }
 })
 
-test('C-FINALIZER builds, gates, commits, and pushes one exact-target package to a worker branch', async () => {
+test('C-FINALIZER drives an exact-target package through a Git worker branch to PR_OPEN', async () => {
   const root = await mkdtemp(join(tmpdir(), 'semantic-finalizer-package-git-'))
   const remote = await mkdtemp(join(tmpdir(), 'semantic-finalizer-origin-'))
   const repositoryRoot = resolve(import.meta.dirname, '../../..')
@@ -306,12 +306,36 @@ test('C-FINALIZER builds, gates, commits, and pushes one exact-target package to
       throw new Error(`Unexpected npm command in isolated test: ${args.join(' ')}`)
     }
     const headRef = semanticBranchRef(job.job_id)
-    const packaged = await runPackage(job, result, { currentMainSha: baseSha, headRef, currentRoot: root, runCommand })
-    assert.equal(packaged.release_decision, 'AUTO_PUBLISH_ELIGIBLE')
-    assert.equal(packaged.current_main_sha, baseSha)
-    assert.match(packaged.head_sha, /^[a-f0-9]{40}$/)
-    assert.equal(git(['rev-parse', `refs/heads/${headRef}`]), packaged.head_sha)
-    assert.equal(git(['--git-dir', remote, 'rev-parse', `refs/heads/${headRef}`]), packaged.head_sha)
+    const finalizingJob = { ...job, status: 'FINALIZING', result_decision: 'BRIEF_READY', semantic_result: result, finalizer_attempt_count: 0 }
+    const rpcCalls = []
+    const requestRpc = async (name, args) => {
+      rpcCalls.push({ name, args })
+      if (name === 'archive_knowledge_semantic_job_claim_finalizer') return finalizingJob
+      if (name === 'archive_knowledge_semantic_job_update') return { status: args.p_status }
+      throw new Error(`Unexpected RPC in isolated finalizer test: ${name}`)
+    }
+    let createdPr = null
+    const outcome = await runSemanticFinalizer({
+      requestRpc, mainSha: baseSha, currentRoot: root,
+      packageSemantic: (claimedJob, semanticResult, pins) => runPackage(claimedJob, semanticResult, { ...pins, currentRoot: root, runCommand }),
+      createDraft: async (_claimedJob, _semanticResult, ref, headSha) => {
+        assert.equal(ref, headRef)
+        assert.equal(git(['--git-dir', remote, 'rev-parse', `refs/heads/${ref}`]), headSha)
+        createdPr = { number: 501, url: 'https://example.invalid/pull/501', ref, headSha }
+        return { number: createdPr.number, url: createdPr.url }
+      },
+    })
+    assert.equal(outcome.status, 'PR_OPEN')
+    assert.equal(outcome.pr_number, 501)
+    assert.equal(outcome.head_sha, createdPr.headSha)
+    assert.equal(outcome.release_decision, 'AUTO_PUBLISH_ELIGIBLE')
+    assert.match(outcome.head_sha, /^[a-f0-9]{40}$/)
+    assert.equal(git(['rev-parse', `refs/heads/${headRef}`]), outcome.head_sha)
+    assert.equal(git(['--git-dir', remote, 'rev-parse', `refs/heads/${headRef}`]), outcome.head_sha)
+    const persisted = rpcCalls.find((call) => call.name === 'archive_knowledge_semantic_job_update')
+    assert.equal(persisted.args.p_status, 'PR_OPEN')
+    assert.equal(persisted.args.p_pr_number, 501)
+    assert.equal(persisted.args.p_head_sha, outcome.head_sha)
     const committedBrief = JSON.parse(git(['show', `${headRef}:knowledge/content/briefs/K-011.json`]))
     assert.equal(committedBrief.status, 'READY')
     assert.equal(committedBrief.id, 'K-011')
