@@ -490,3 +490,14 @@ test('Knowledge publication workflow allows the C3 runtime-state package file', 
   assert.match(workflow, /knowledge\/automation\/runtime-state\.json/)
 })
 
+test('exact-head publication persists the validated C3 head before merge', async () => {
+  const workflow = await readFile(resolve(import.meta.dirname, '../../../.github/workflows/knowledge-exact-head.yml'), 'utf8')
+  const persist = workflow.indexOf('- name: Persist exact C3 publication head')
+  const merge = workflow.indexOf('- name: Recheck exact PR head and merge')
+  assert.ok(persist > 0)
+  assert.ok(merge > persist)
+  assert.match(workflow, /archive_knowledge_semantic_job_update/)
+  assert.match(workflow, /p_expected_status: 'PR_OPEN'/)
+  assert.match(workflow, /p_head_sha: process\.env\.EXPECTED_SHA/)
+})
+
