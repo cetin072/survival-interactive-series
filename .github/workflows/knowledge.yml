@@ -9,6 +9,9 @@ on:
       - 'archive/web/public/knowledge/**'
       - 'archive/web/public/sitemap.xml'
       - 'archive/web/package.json'
+      - 'supabase/migrations/*knowledge_semantic*'
+      - '.github/workflows/knowledge-semantic-prep.yml'
+      - '.github/workflows/knowledge-semantic-finalizer.yml'
       - '.github/workflows/knowledge.yml'
       - '.github/workflows/knowledge-publish-prepare.yml'
       - '.github/workflows/knowledge-exact-head.yml'
@@ -16,6 +19,8 @@ on:
       - '.github/workflows/knowledge-worker-state.yml'
       - '.github/workflows/knowledge-worker-gate.yml'
       - 'docs/KNOWLEDGE_WORKER_*.md'
+      - 'docs/KNOWLEDGE_SEMANTIC_*.md'
+      - 'docs/KNOWLEDGE_AUTOMATION_C3_*.md'
   push:
     branches: [main]
     paths:
@@ -25,12 +30,17 @@ on:
       - 'archive/web/public/knowledge/**'
       - 'archive/web/public/sitemap.xml'
       - 'archive/web/package.json'
+      - 'supabase/migrations/*knowledge_semantic*'
+      - '.github/workflows/knowledge-semantic-prep.yml'
+      - '.github/workflows/knowledge-semantic-finalizer.yml'
       - '.github/workflows/knowledge.yml'
       - '.github/workflows/knowledge-publish-prepare.yml'
       - '.github/workflows/knowledge-exact-head.yml'
       - '.github/workflows/knowledge-review-consumer.yml'
       - '.github/workflows/knowledge-worker-state.yml'
       - 'docs/KNOWLEDGE_WORKER_*.md'
+      - 'docs/KNOWLEDGE_SEMANTIC_*.md'
+      - 'docs/KNOWLEDGE_AUTOMATION_C3_*.md'
 
 jobs:
   knowledge:
@@ -48,6 +58,8 @@ jobs:
       - run: npm ci
       - name: Knowledge scanner, contract, generator and gate tests
         run: npm run knowledge:test
+      - name: C3 semantic-job contracts and recovery tests
+        run: npm run knowledge:semantic:test
       - name: Automation C Review Queue contracts
         run: |
           node --test ../scripts/lib/knowledge-review-sync.test.mjs
@@ -65,6 +77,8 @@ jobs:
           node --check ../scripts/knowledge-worker-preflight.mjs
           node --check ../scripts/knowledge-worker-disposition.mjs
           node --check ../scripts/knowledge-worker-state-check.mjs
+          node --check ../scripts/knowledge-semantic-prepare.mjs
+          node --check ../scripts/knowledge-semantic-finalize.mjs
       - name: Verify checked-in static pages, sitemap and source inventory
         run: npm run knowledge:check
       - name: Archive Reader public-source regression

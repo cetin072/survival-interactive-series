@@ -7,6 +7,9 @@ on:
       - 'supabase/tests/archive_exporter_readonly_verification.sql'
       - 'supabase/tests/illustration_shared_review_context_v1_verification.sql'
       - '.github/workflows/archive-exporter-migration.yml'
+      - 'supabase/tests/knowledge_semantic_jobs_verification.sql'
+      - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
+      - 'supabase/tests/knowledge_semantic_review_e2e.sql'
   push:
     branches: [main]
     paths:
@@ -14,6 +17,9 @@ on:
       - 'supabase/tests/archive_exporter_readonly_verification.sql'
       - 'supabase/tests/illustration_shared_review_context_v1_verification.sql'
       - '.github/workflows/archive-exporter-migration.yml'
+      - 'supabase/tests/knowledge_semantic_jobs_verification.sql'
+      - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
+      - 'supabase/tests/knowledge_semantic_review_e2e.sql'
 
 permissions:
   contents: read
@@ -73,7 +79,54 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 --file supabase/migrations/20260928050000_archive_exporter_readonly.sql
       - name: Verify exporter grants, RLS scope, optional links, and denied writes
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/archive_exporter_readonly_verification.sql
-
+      - name: Prepare isolated database for Knowledge semantic jobs
+        run: |
+          createdb --owner=postgres knowledge_semantic_test
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE SCHEMA extensions;
+          CREATE EXTENSION pgcrypto WITH SCHEMA extensions;
+          CREATE SCHEMA auth;
+          CREATE SCHEMA survival_ops;
+          CREATE SCHEMA survival_rpg;
+          CREATE SCHEMA vault;
+          CREATE SCHEMA net;
+          CREATE SCHEMA cron;
+          CREATE TABLE public.roles (id uuid primary key, code text unique not null, active boolean not null);
+          CREATE TABLE public.platform_capabilities (code text primary key, capability_kind text not null, operations_manager_auto_grant boolean not null, description text not null, active boolean not null);
+          CREATE TABLE public.role_capability_grants (role_id uuid not null references public.roles(id), capability_code text not null references public.platform_capabilities(code), primary key(role_id, capability_code));
+          INSERT INTO public.roles(id,code,active) VALUES ('00000000-0000-4000-8000-000000000003','super_admin',true);
+          INSERT INTO public.roles(id,code,active) VALUES ('00000000-0000-4000-8000-000000000005','viewer',true);
+          CREATE TABLE public.profiles (id uuid primary key, display_name text not null, role_id uuid not null references public.roles(id), active boolean not null);
+          INSERT INTO public.profiles(id,display_name,role_id,active) VALUES
+            ('00000000-0000-4000-8000-000000000002','C3 CI Operator','00000000-0000-4000-8000-000000000003',true),
+            ('00000000-0000-4000-8000-000000000004','C3 CI Viewer','00000000-0000-4000-8000-000000000005',true);
+          CREATE FUNCTION auth.jwt() RETURNS jsonb LANGUAGE sql STABLE AS $fn$ SELECT coalesce(nullif(current_setting('request.jwt.claims',true),'')::jsonb,'{"role":"authenticated"}'::jsonb) $fn$;
+          CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $fn$ SELECT coalesce(nullif(auth.jwt()->>'sub','')::uuid,'00000000-0000-4000-8000-000000000002'::uuid) $fn$;
+          CREATE FUNCTION public.current_profile_is_active() RETURNS boolean LANGUAGE sql STABLE AS $fn$ SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id=auth.uid() AND active) $fn$;
+          CREATE FUNCTION public.private_actor_can(text) RETURNS boolean LANGUAGE sql STABLE AS $fn$ SELECT EXISTS (
+            SELECT 1 FROM public.profiles p
+            JOIN public.role_capability_grants g ON g.role_id=p.role_id
+            JOIN public.platform_capabilities c ON c.code=g.capability_code AND c.active
+            WHERE p.id=auth.uid() AND c.code=$1
+          ) $fn$;
+          CREATE TABLE vault.decrypted_secrets (name text, decrypted_secret text, created_at timestamptz);
+          CREATE TABLE cron.job (jobname text primary key, schedule text not null, active boolean not null);
+          CREATE FUNCTION cron.schedule(text,text,text) RETURNS bigint LANGUAGE plpgsql AS $fn$ BEGIN INSERT INTO cron.job(jobname,schedule,active) VALUES ($1,$2,true); RETURN 1; END $fn$;
+          CREATE FUNCTION net.http_post(url text, body jsonb, headers jsonb, timeout_milliseconds integer) RETURNS bigint LANGUAGE sql AS $fn$ SELECT 1::bigint $fn$;
+          CREATE TABLE survival_rpg.archive_publication_daily_runs (scheduled_date date,status text,attempt_count integer,last_error_code text,started_at timestamptz,finished_at timestamptz,created_at timestamptz);
+          CREATE TABLE survival_rpg.archive_publication_tasks (task_id uuid,task_kind text,chronicle_id text,season_id text,status text,attempt_count integer,last_error_code text,updated_at timestamptz,completed_at timestamptz,created_at timestamptz);
+          CREATE TABLE survival_ops.illustration_worker_runs (run_id uuid,started_at timestamptz,finished_at timestamptz,final_status text,blocker_code text,blocker_stage text,target_subject_id text,accepted_count integer,registry_status text,cleanup_status text,main_sha text,created_at timestamptz);
+          SQL
+      - name: Apply existing Operator review queue migrations
+        run: |
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20260929173506_archive_review_control_plane_v1.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20260929232408_archive_review_hardening_v1.sql
+      - name: Apply and exercise Knowledge semantic-job lifecycle
+        run: |
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261001064358_knowledge_semantic_jobs_v1.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_jobs_verification.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_jobs_crash_recovery.psql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_review_e2e.sql
 
   illustration-shared-review-context:
     runs-on: ubuntu-latest
@@ -137,3 +190,4 @@ jobs:
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261001180000_illustration_shared_review_context_v1.sql
       - name: Verify shared review context and legacy compatibility
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_shared_review_context_v1_verification.sql
+

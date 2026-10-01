@@ -1,0 +1,58 @@
+name: Finalize Knowledge semantic job
+
+on:
+  schedule:
+    # Fallback for the primary Supabase external dispatcher.
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+
+concurrency:
+  group: knowledge-semantic-finalizer
+  cancel-in-progress: false
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Require server-only credentials
+        env:
+          ARCHIVE_GITHUB_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$ARCHIVE_GITHUB_TOKEN" || { echo "ARCHIVE_GITHUB_TOKEN_REQUIRED"; exit 1; }
+          test -n "$ARCHIVE_SUPABASE_URL" || { echo "ARCHIVE_SUPABASE_URL_REQUIRED"; exit 1; }
+          test -n "$ARCHIVE_SUPABASE_SERVICE_ROLE_KEY" || { echo "ARCHIVE_SUPABASE_SERVICE_ROLE_KEY_REQUIRED"; exit 1; }
+
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: archive/web/package-lock.json
+
+      - name: Authenticate GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+        run: gh auth setup-git
+
+      - name: Validate submitted package and finalize one lifecycle action
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: node archive/scripts/knowledge-semantic-finalize.mjs

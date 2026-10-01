@@ -14,6 +14,7 @@ import re
 import threading
 import time
 import urllib.request
+from reader_deploy_identity import deployed_revision_matches
 from urllib.parse import parse_qs, urlencode, urlparse
 from playwright.sync_api import expect, sync_playwright
 
@@ -39,7 +40,9 @@ def asset_names(html: str) -> set[str]:
     return set(re.findall(r'(?:src|href)=[\"\']([^\"\']*/assets/[^\"\']+\.(?:js|css))[\"\']', html))
 
 
-def wait_for_deploy(url: str):
+def wait_for_deploy(url: str, *, allow_ancestor_equivalent: bool = False):
+    if allow_ancestor_equivalent and not (urlparse(url).hostname or "").startswith("deploy-preview-"):
+        raise ValueError("ANCESTOR_EQUIVALENCE_PREVIEW_ONLY")
     local_html = (DIST / 'index.html').read_text(encoding='utf-8')
     expected = asset_names(local_html)
     assert expected, 'No local production JS/CSS asset fingerprints'
@@ -52,11 +55,11 @@ def wait_for_deploy(url: str):
             deployed_html = get(url)
             actual = asset_names(deployed_html)
             deployed_ref = re.search(r'<meta name="archive-build-ref" content="([a-f0-9]{40})"', deployed_html)
-            if deployed_ref and deployed_ref.group(1) == expected_ref.group(1) and actual:
+            if deployed_ref and actual and deployed_revision_matches(deployed_ref.group(1), expected_ref.group(1), allow_ancestor_equivalent=allow_ancestor_equivalent, cwd=str(ROOT)):
                 for asset in actual:
                     with urllib.request.urlopen(url.rstrip('/') + asset, timeout=20) as response:
                         assert response.status == 200
-                report('deployed commit matches tested build and JS/CSS load', url=url, commit=expected_ref.group(1), assets=sorted(actual))
+                report('deployed revision is exact or source-equivalent and JS/CSS load', url=url, deployed_commit=deployed_ref.group(1), tested_commit=expected_ref.group(1), ancestor_equivalent=deployed_ref.group(1) != expected_ref.group(1), assets=sorted(actual))
                 return
             last = f'deployed commit ref differs: {deployed_ref.group(1) if deployed_ref else "missing"}; assets={sorted(actual)}'
         except Exception as error:
@@ -246,7 +249,8 @@ def probe_original(browser, url: str):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--url', help='Audit this deployed site instead of local dist')
-    parser.add_argument('--wait-assets', action='store_true', help='Wait for the URL to match local dist asset hashes')
+    parser.add_argument('--wait-assets', action='store_true', help='Wait for deployment identity and assets to match this build')
+    parser.add_argument('--allow-ancestor-equivalent', action='store_true', help='For Deploy Preview only, allow a verified ancestor deploy when all site inputs match exactly')
     parser.add_argument('--probe-original', help='Only reproduce the original bug at an immutable old deploy URL')
     args = parser.parse_args()
     server = None
@@ -259,7 +263,7 @@ def main():
         base = f'http://127.0.0.1:{server.server_port}'
     try:
         if args.wait_assets:
-            wait_for_deploy(base)
+            wait_for_deploy(base, allow_ancestor_equivalent=args.allow_ancestor_equivalent)
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch()
             if args.probe_original:
