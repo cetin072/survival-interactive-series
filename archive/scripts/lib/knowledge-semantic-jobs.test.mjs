@@ -1,11 +1,11 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
-import { buildSemanticContext, chapterHash, makeWorkKey, nextBriefId, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
+import { applySemanticPackage, buildSemanticContext, chapterHash, makeWorkKey, nextBriefId, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
 import { finalizerAction, semanticBranchRef, reconcilePullRequest, verifyPins } from '../knowledge-semantic-finalize.mjs'
 import { detectLegacyWorkerBlocker, planSemanticPreparation } from '../knowledge-semantic-prepare.mjs'
 
@@ -142,4 +142,67 @@ test('source and policy pins fail closed on modified bytes', async () => {
     await writeFile(join(base, sourceRef), 'modified')
     await assert.rejects(verifyPins(job, base), /SEMANTIC_SOURCE_SHA_CHANGED/)
   } finally { await rm(base, { recursive: true, force: true }) }
+})
+
+test('C-FINALIZER package application persists one validated BRIEF_READY disposition in an isolated repository', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'semantic-package-e2e-'))
+  const repositoryRoot = resolve(import.meta.dirname, '../../..')
+  try {
+    await Promise.all([
+      cp(join(repositoryRoot, 'knowledge'), join(root, 'knowledge'), { recursive: true }),
+      cp(join(repositoryRoot, 'archive/content'), join(root, 'archive/content'), { recursive: true }),
+      cp(join(repositoryRoot, 'archive/web/public'), join(root, 'archive/web/public'), { recursive: true }),
+    ])
+    const referenceBrief = JSON.parse(await readFile(join(root, 'knowledge/content/briefs/K-010.json'), 'utf8'))
+    const referenceCandidate = JSON.parse(await readFile(join(root, 'knowledge/content/candidates/KC-community-mutual-aid-agreement.json'), 'utf8'))
+    const referenceEvidence = JSON.parse(await readFile(join(root, 'knowledge/content/evidence/K-010.json'), 'utf8'))
+    const candidateId = 'KC-semantic-test-integration'
+    const question = '어떤 일반 자원 목록과 인수 기록을 미리 정해 두면 공동체 간 물품 인계를 확인하기 쉬울까'
+    const sourceRef = 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_999/SOURCE_MANIFEST.json'
+    const sourceSha = 'f'.repeat(64)
+    const syntheticJob = {
+      ...baseJob,
+      status: 'FINALIZING',
+      source_ref: sourceRef,
+      source_sha256: sourceSha,
+      semantic_context: {
+        target: { brief_id: 'K-011', candidate_id: candidateId },
+        source: { kind: 'PUBLIC_ARCHIVE', ref: sourceRef, sha256: sourceSha, refs: [], hashes: [] },
+      },
+    }
+    const candidate = {
+      ...referenceCandidate,
+      id: candidateId,
+      brief_id: 'K-011',
+      question,
+      source_manifest_ref: sourceRef,
+      source_manifest_sha256: sourceSha,
+    }
+    const brief = {
+      ...referenceBrief,
+      id: 'K-011',
+      slug: 'semantic-worker-package-fixture',
+      label: '공동 물품 인계 기록',
+      title: question,
+      summary: '공동체 사이의 일반 물품 인계를 사전에 정한 목록과 실제 인수 기록으로 확인하는 방법을 정리합니다.',
+      meta_description: '저위험 일반 재난대비에서 물품 인계 목록과 실제 인수 기록을 구분해 관리하는 방법을 설명합니다.',
+      lead: '공동으로 보관하거나 전달하는 일반 물품은 약속한 수량과 실제 인수량을 분리해 기록하면 확인이 쉬워집니다.',
+      status: 'READY',
+      updated_at: '2026-10-01',
+    }
+    const evidence = { ...referenceEvidence, brief_id: 'K-011', question }
+    const result = { version: 'knowledge-semantic-result-v1', job_id: syntheticJob.job_id, decision: 'BRIEF_READY', candidate, evidence, brief }
+
+    const applied = await applySemanticPackage({ root, job: syntheticJob, result, now: '2026-10-01T12:00:00.000Z' })
+    assert.equal(applied.brief_id, 'K-011')
+    assert.equal(applied.candidate_id, candidateId)
+    const { loadKnowledge, validateKnowledge } = await import('./knowledge-content.mjs')
+    const completed = await loadKnowledge(root)
+    await validateKnowledge(completed)
+    assert.equal(completed.briefs.find((item) => item.id === 'K-011').status, 'READY')
+    assert.equal(completed.evidence.get('K-011').question, question)
+    assert.ok(applied.changed_files.includes('knowledge/automation/state.json'))
+    const state = JSON.parse(await readFile(join(root, 'knowledge/automation/state.json'), 'utf8'))
+    assert.equal(state.sources.find((item) => item.source_manifest_ref === sourceRef)?.status, 'PROCESSED')
+  } finally { await rm(root, { recursive: true, force: true }) }
 })
