@@ -10,6 +10,8 @@ on:
       - 'supabase/tests/knowledge_semantic_jobs_verification.sql'
       - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
       - 'supabase/tests/knowledge_semantic_review_e2e.sql'
+      - 'supabase/tests/knowledge_semantic_published_reconcile.sql'
+      - 'supabase/migrations/20261001233000_knowledge_semantic_published_reconcile_v1.sql'
   push:
     branches: [main]
     paths:
@@ -20,6 +22,8 @@ on:
       - 'supabase/tests/knowledge_semantic_jobs_verification.sql'
       - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
       - 'supabase/tests/knowledge_semantic_review_e2e.sql'
+      - 'supabase/tests/knowledge_semantic_published_reconcile.sql'
+      - 'supabase/migrations/20261001233000_knowledge_semantic_published_reconcile_v1.sql'
 
 permissions:
   contents: read
@@ -127,6 +131,8 @@ jobs:
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_jobs_verification.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_jobs_crash_recovery.psql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_review_e2e.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261001233000_knowledge_semantic_published_reconcile_v1.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_published_reconcile.sql
 
   illustration-shared-review-context:
     runs-on: ubuntu-latest
