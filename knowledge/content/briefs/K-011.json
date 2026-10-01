@@ -1,0 +1,163 @@
+{
+  "id": "K-011",
+  "lead": "재고표에 '10kg 남음'이라고 적는 것만으로는 그 자원이 충분한지 알기 어렵습니다. 하루에 1kg을 쓰는 상황과 5kg을 쓰는 상황은 완전히 다르기 때문입니다. 재난물류에서는 실제 소비속도, 즉 burn rate를 보면서 앞으로 필요한 양을 다시 계산합니다. 소규모 조직도 이 원리를 단순하게 적용할 수 있습니다.",
+  "slug": "resource-burn-rate-planning",
+  "basis": "FEMA/USFA NIMS Managing Resources + FEMA disaster logistics burn-rate guidance + FEMA ICS Logistics/Supply Unit + 검증된 PUBLIC_READER 장면",
+  "label": "재고 지속기간 계산",
+  "scope": "소규모 조직·공동체가 일반 비상물자의 사용가능 재고, 실제 소비속도, 대략적인 남은 지속기간과 재보급 필요시점을 기록하는 저위험 자원관리 방식",
+  "title": "비상물자 재고를 볼 때 보유량만이 아니라 소비속도와 '며칠 버티는지'를 왜 같이 계산해야 할까",
+  "tools": [],
+  "footer": "이 글은 일반적인 재난대비 자원관리 정보입니다. 식품의 안전성·개인 영양 필요량, 연료·발전기·전기설비, 수질·급수설비처럼 별도 안전기준이 필요한 항목은 해당 공식 지침과 전문가 기준을 우선하세요.",
+  "status": "READY",
+  "sources": [
+    {
+      "id": "S1",
+      "url": "https://www.usfa.fema.gov/a-z/nims/managing-resources.html",
+      "note": "자원의 사전 inventory, 부족분 파악, 일정·운영 우선순위, 자원 종류·시간·인력·위치 보고와 향후 관리 원칙을 확인했습니다.",
+      "title": "U.S. Fire Administration · NIMS Can Help: Managing Resources",
+      "checked_at": "2026-10-01"
+    },
+    {
+      "id": "S2",
+      "url": "https://emilms.fema.gov/is_822/groups/310.html",
+      "note": "초기 계획 기반 공급에서 실제 burn rate와 실제 필요량 기반 자원요구로 전환하는 재난물류 원칙을 확인했습니다.",
+      "title": "FEMA EMI · Pushing vs. Pulling Resources",
+      "checked_at": "2026-10-01"
+    },
+    {
+      "id": "S3",
+      "url": "https://emilms.fema.gov/is_0200c/media/285.pdf",
+      "note": "Supply Unit의 주문·수령·보관·inventory·배분과 향후 자원 필요량 예측 역할을 확인했습니다.",
+      "title": "FEMA · National Incident Management System ICS: Logistics Section",
+      "checked_at": "2026-10-01"
+    },
+    {
+      "id": "S4",
+      "url": "https://survival-diary-archive.netlify.app/?view=story&chronicle=C03-AFTERFALL&chapter=c03-afterfall-prelude-05",
+      "note": "재고량과 소비속도를 함께 보며 자원 우선순위를 다시 계산하는 검증된 공개 Reader 장면을 narrative provenance로만 확인했습니다.",
+      "title": "생존일기 Reader · 곡물 거래와 자원 재계산",
+      "checked_at": "2026-10-01"
+    }
+  ],
+  "summary": "비상물자는 총량만 보면 많아 보여도 사용하는 사람이 늘거나 소비속도가 빨라지면 예상보다 빨리 바닥날 수 있습니다. 사용가능 재고, 최근 소비속도, 대략적인 남은 일수와 재보급 시점을 함께 기록하는 방법을 정리합니다.",
+  "guide_id": null,
+  "sections": [
+    {
+      "blocks": [
+        {
+          "text": "FEMA/USFA는 자원관리에서 현재 자원을 inventory하고 부족분을 파악하는 동시에 향후 필요량을 예측하도록 안내합니다. 같은 재고량이라도 사용하는 사람 수와 사용량이 달라지면 버틸 수 있는 기간이 달라지므로, '얼마나 남았는가'와 '얼마나 빨리 줄고 있는가'를 따로 기록해야 합니다.",
+          "type": "prose"
+        },
+        {
+          "rows": [
+            [
+              "사용가능 재고",
+              "실제로 공동으로 사용할 수 있다고 확인된 현재 수량"
+            ],
+            [
+              "최근 소비량",
+              "최근 일정 기간 실제로 사용한 수량"
+            ],
+            [
+              "소비속도",
+              "하루 등 같은 시간단위로 환산한 실제 사용량"
+            ],
+            [
+              "예상 남은 기간",
+              "현재 사용속도가 유지된다고 가정했을 때의 대략적인 지속기간"
+            ],
+            [
+              "재보급 조건",
+              "어느 수준에 도달하면 확보·구매·요청을 검토할지"
+            ]
+          ],
+          "type": "table",
+          "headers": [
+            "기록값",
+            "의미"
+          ]
+        }
+      ],
+      "heading": "재고량과 소비속도는 다른 숫자입니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "FEMA 재난물류 교육은 초기에는 계획이나 모델을 이용할 수 있지만, 현장 운영이 시작되면 실제 burn rate와 실제 필요량을 바탕으로 자원 요구량을 조정한다고 설명합니다. 평소 예상한 사용량보다 실제 사용량이 더 빠르거나 느리다면, 오래된 계획값을 계속 쓰지 말고 최근 기록으로 다시 계산하는 편이 낫습니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "실제 사용량이 생기면 계획값을 교체합니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "가장 단순한 방법은 사용가능 재고를 최근의 하루 사용량으로 나눠 대략적인 남은 일수를 보는 것입니다. 예를 들어 20단위가 남고 최근 하루에 4단위를 썼다면 현재 속도로는 약 5일이라는 식입니다. 이 값은 예측이지 보장이 아니며, 사람 수·날씨·업무량·재보급 상황이 바뀌면 즉시 다시 계산해야 합니다.",
+          "type": "prose"
+        },
+        {
+          "text": "이 계산 방식은 FEMA의 inventory·projected needs·actual burn rate 원칙을 이해하기 쉽게 적용한 편집 예시입니다. 특정 품목의 안전재고량이나 공식 의무 공식이 아닙니다.",
+          "type": "note"
+        }
+      ],
+      "heading": "'남은 일수'는 단순한 추정치로 씁니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "어떤 자원은 많이 남아 있어도 대체가 어렵고, 어떤 자원은 적게 남아 있어도 쉽게 보충할 수 있습니다. 따라서 남은 기간만 단독으로 보지 말고 재보급 가능성, 운영 우선순위, 대체 가능성을 함께 기록해야 합니다. FEMA의 자원관리 자료도 자원 일정과 운영 우선순위를 함께 보도록 안내합니다.",
+          "type": "prose"
+        },
+        {
+          "type": "unordered_list",
+          "items": [
+            "현재 사용가능 재고 확인",
+            "최근 실제 소비속도 확인",
+            "현재 속도의 예상 남은 기간 계산",
+            "재보급에 필요한 시간과 가능성 확인",
+            "상황이 변할 때 다시 계산"
+          ]
+        }
+      ],
+      "heading": "자원마다 같은 기준으로 줄 세울 필요는 없습니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "공동체가 실제로 보장할 수 있는 기간을 계산하려면 공동으로 사용할 수 있다고 확정된 재고와 개인이 별도로 보유한 물자를 구분하는 편이 명확합니다. 개인 물자를 자동으로 공용재고에 포함하면 장부상 지속기간이 실제보다 길게 보일 수 있습니다. 어떤 재고를 계산에 넣었는지 범위를 함께 기록하세요.",
+          "type": "prose"
+        }
+      ],
+      "heading": "공용재고와 개인비축을 섞지 않습니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "공개 Reader의 허구 서사에서는 공동으로 쓸 수 있는 식량·물·연료를 따로 계산하고, 단순 보유량보다 실제 사용속도를 고려해 무엇이 먼저 부족해지는지 판단합니다. 여기서 현실의 재난물류에서는 재고와 소비속도를 어떻게 함께 보는지 질문을 가져왔으며, 작품 속 구체적인 수량·열량·연료 사용량은 현실 기준으로 사용하지 않았습니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "《생존일기》에서 시작한 질문"
+    }
+  ],
+  "topic_id": "resource-burn-rate-planning",
+  "risk_level": "LOW",
+  "story_refs": [],
+  "updated_at": "2026-10-01",
+  "ai_assisted": true,
+  "content_type": "BRIEF",
+  "published_at": "2026-10-01",
+  "risk_domains": [
+    "GENERAL_PREPAREDNESS"
+  ],
+  "editorial_note": "검증된 PUBLIC_READER 장면에서 질문만 가져오고, 현실 내용은 FEMA/USFA의 NIMS 자원관리와 FEMA 재난물류·ICS 공식자료를 Evidence로 먼저 교차검토해 작성했습니다. 개인별 열량·의료·발전기·전기·수질 같은 고위험 실행지침은 제외했습니다.",
+  "meta_description": "FEMA·USFA 공식 재난물류 자료를 바탕으로 비상물자의 재고량, 실제 소비속도, 남은 지속기간과 재보급 필요시점을 함께 관리하는 방법을 설명합니다.",
+  "related_brief_ids": [
+    "K-004",
+    "K-005",
+    "K-010"
+  ],
+  "source_checked_at": "2026-10-01",
+  "publication_policy": "AUTO_LOW_RISK",
+  "semantic_qa_status": "PASS"
+}

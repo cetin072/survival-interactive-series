@@ -63,5 +63,15 @@
     "guide_id": null,
     "tools": [],
     "story_refs": []
+  },
+  {
+    "id": "resource-burn-rate-planning",
+    "title": "비상자원 소비속도 관리",
+    "brief_ids": [
+      "K-011"
+    ],
+    "guide_id": null,
+    "tools": [],
+    "story_refs": []
   }
 ]

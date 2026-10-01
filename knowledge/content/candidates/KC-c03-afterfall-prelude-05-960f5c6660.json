@@ -1,0 +1,19 @@
+{
+  "id": "KC-c03-afterfall-prelude-05-960f5c6660",
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-011",
+  "question": "비상물자 재고를 볼 때 보유량만이 아니라 소비속도와 '며칠 버티는지'를 왜 같이 계산해야 할까",
+  "topic_id": "resource-burn-rate-planning",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "archive/content/transcripts/C03-AFTERFALL/S01/SHARED_CHAT_RECOVERY/PART_PRELUDE_005.md"
+  ],
+  "source_hashes": [
+    "0a29d351dabf447e68bfd2f1b1808285ceed01cc7a9564de85856faa6924ffb2"
+  ],
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "disposition_note": "검증된 PUBLIC_READER 장면에서 공용 식량·연료·물의 보유량을 따로 보고, 실제 사용속도를 바탕으로 어떤 자원이 먼저 부족해지는지 다시 순서를 정하는 상황에서 질문을 추출했습니다. 기존 K-004는 여러 거점에 비상물자를 배치할 때 책임자·위치·수량·보충 기록, K-005는 용도가 다른 물품의 구역·장부 분리, K-010은 조직 간 자원공유 조건이 중심이므로 의미상 중복되지 않습니다. 현실 근거는 FEMA/USFA NIMS 자원관리와 FEMA 재난물류 교육의 inventory·projected needs·actual burn rate 원칙을 교차검토했습니다. 개인별 열량 처방, 의료·연료기기 운용, 수질·전기 안전기준은 범위에서 제외합니다.",
+  "reader_chapter_id": "c03-afterfall-prelude-05",
+  "reader_book_sha256": "fbe55ce3f0c87abb3901ec2779fa2758f8d85edf5c1dad8bdd047717e32bb000",
+  "reader_chapter_sha256": "9b20ec7dcf325ca8fb216e591222bed7d32018fc331d1d0af3199b02b41c6c68"
+}
