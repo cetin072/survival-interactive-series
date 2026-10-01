@@ -1,5 +1,7 @@
 # Knowledge Worker Protocol V1
 
+Status: **SUPERSEDED — historical V1 worker contract.** 아래의 shadow 설정은 당시 상태이며 현재 기본값이 아니다. 현재 실행 설정은 [`knowledge/automation/config.json`](../knowledge/automation/config.json), 정상 C3 경로는 [C3 architecture](KNOWLEDGE_AUTOMATION_C3_ARCHITECTURE_V1.md)와 [semantic protocol](KNOWLEDGE_SEMANTIC_WORKER_PROTOCOL_V1.md)을 따른다.
+
 상태: **두 차례 실제 FRESH 사이클 검증 완료 후 자동운전용 외부 Worker 계약**
 
 이 문서는 `GAME → Archive(A) → Knowledge(C)` 연결에서 외부 ChatGPT Knowledge Worker가 따라야 할 운영 프로토콜이다.

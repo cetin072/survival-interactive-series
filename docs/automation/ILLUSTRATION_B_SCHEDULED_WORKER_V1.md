@@ -1,5 +1,7 @@
 # AFTERFALL Illustration B 예약 작업 구조 (v1)
 
+Status: **HISTORICAL V1 scheduled-worker design.** 아래 Draft Release handoff와 활성화 상태는 당시 기준이다. 현재 실행 경로는 `archive-illustration-prep.yml` → `archive/scripts/prepare-illustration-render-job.mjs`, `archive-illustration-finalizer.yml` → `archive/scripts/finalize-illustration-job.py` 및 해당 코드의 안전 gate를 확인한다.
+
 ## 목적
 
 이 문서는 READY 상태의 AFTERFALL 시각 후보 한 건을 골라 Codex 기본 이미지 생성으로 원본을 만들고, 검증된 원본만 비공개 보관소로 넘겨 공개 발행 대기열에 넣는 B 작업자의 구조를 정의합니다.

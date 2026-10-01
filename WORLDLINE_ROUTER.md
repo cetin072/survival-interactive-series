@@ -1,6 +1,8 @@
 # WORLDLINE ROUTER — Repository-Level Boot Guard
 
-이 문서는 이 저장소에 여러 플레이 세계선/부팅 세대가 공존할 때 **잘못된 세계선 폴백을 막는 최상위 라우팅 가드**다.\n\nIP 전체 주인공 계보와 Chronicle identity는 `SURVIVAL_DIARY_IP_BIBLE.md`가 담당한다.
+이 문서는 이 저장소에 여러 플레이 세계선/부팅 세대가 공존할 때 **잘못된 세계선 폴백을 막는 최상위 라우팅 가드**다.
+
+IP 전체 주인공 계보와 Chronicle identity는 `SURVIVAL_DIARY_IP_BIBLE.md`가 담당한다. 현재 시각·시즌·Save 값은 이 라우터에 복제하지 않고 해당 세계선의 최신 boot/handoff와 런타임 상태에서 확인한다.
 
 ## 1. 최우선 라우팅 규칙
 
@@ -39,8 +41,8 @@
 - Branch: `worldline/stronghold-chronicle`
 - Directory: `worldlines/STRONGHOLD/`
 - Current protagonist: `박도현`
-- Current continuation entrypoint: `worldlines/STRONGHOLD/NEXT_ROOM_BOOT_2032_01.md`
-- Current time anchor: post-wildfire, around `2032-01`
+- Current continuation entrypoint: `worldlines/STRONGHOLD/START_ROOM.md`
+- Current state pointer: 같은 branch의 `worldlines/STRONGHOLD/CURRENT_STATE.json`; ACTIVE `LIVE_SCENE_STATE.md`가 있으면 현재 장면에 적용
 
 STRONGHOLD는 과거 4인 가족 세계선과 완전히 별개다.
 
@@ -66,7 +68,7 @@ STRONGHOLD의 정확한 로드 순서와 금지사항은 해당 branch의 최신
 
 독립 worldline 안에서도:
 
-`사용자 최신 교정 > 최신 NEXT_ROOM_BOOT/handoff overlay > CURRENT_STATE > 최신 ledger/archive/addendum > BOOT invariant > 오래된 canon/planning`
+`사용자 최신 교정 > 해당 세계선 START_ROOM/BOOT이 지정한 ACTIVE scene·최신 handoff overlay > CURRENT_STATE > 최신 ledger/archive/addendum > BOOT invariant > 오래된 canon/planning`
 
 순으로 현재성을 판단한다.
 
@@ -78,21 +80,20 @@ STRONGHOLD의 정확한 로드 순서와 금지사항은 해당 branch의 최신
 - branch
 - directory
 - protagonist/identity
-- latest boot entrypoint
-- current time anchor
+- authoritative boot entrypoint
+- current state pointer의 위치 (시각·시즌 값은 복제하지 않음)
 
 세부 Canon은 이 파일에 복제하지 않는다. 이 파일은 **라우팅 전용**이다.
 
 
 ### AFTERFALL
 - IP Chronicle: **03**
-- Protagonist: **서진우**, 32세, 응급실 간호사
+- Protagonist: **서진우**
 - Branch: `worldline/afterfall-rpg`
 - Directory: `worldlines/AFTERFALL/`
 - Primary entrypoint: `worldlines/AFTERFALL/START_ROOM.md`
-- Current continuation overlay: `worldlines/AFTERFALL/seasons/S02/CURRENT_CHECKPOINT.md`
+- Current continuation pointer: 같은 branch의 `worldlines/AFTERFALL/CURRENT_STATE.json`이 지정한 checkpoint
 - Current runtime state: Supabase `taejang-phase1-staging.survival_rpg.saves`, `worldline_id='AFTERFALL'`
-- Current time anchor: **2026-11-24 09:10 / S02 ACTIVE / WINTER_REBOOT_V2**
 
 AFTERFALL은 《생존일기》 IP의 세 번째 주인공 연대기다.
 박도현 STRONGHOLD 및 가족 기반 Legacy Chronicle과 현재상태를 공유하지 않는다.
@@ -100,4 +101,4 @@ AFTERFALL은 《생존일기》 IP의 세 번째 주인공 연대기다.
 현재 런타임 상태의 Source of Truth는 Supabase Save다.
 GitHub는 부팅·세계/캐릭터 바이블·시즌 체크포인트·아카이브·IP 보존을 담당한다.
 
-현재 S02 재개 시 START_HANDOFF가 아니라 CURRENT_CHECKPOINT를 사용한다.
+재개 시에는 해당 branch의 `CURRENT_STATE.json`이 가리키는 checkpoint를 확인하고, 오래된 START_HANDOFF로 현재 상태를 되감지 않는다.
