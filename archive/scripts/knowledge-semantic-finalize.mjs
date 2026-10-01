@@ -56,8 +56,8 @@ function rpc(name, args) {
   })
 }
 
-async function updateJob(jobId, expected, status, { blockerCode = null, blockerStage = null, prNumber = null, headRef = null, headSha = null, mergeSha = null } = {}) {
-  return rpc('archive_knowledge_semantic_job_update', {
+async function updateJob(requestRpc, jobId, expected, status, { blockerCode = null, blockerStage = null, prNumber = null, headRef = null, headSha = null, mergeSha = null } = {}) {
+  return requestRpc('archive_knowledge_semantic_job_update', {
     p_job_id: jobId, p_expected_status: expected, p_status: status,
     p_blocker_code: blockerCode, p_blocker_stage: blockerStage,
     p_pr_number: prNumber, p_head_ref: headRef, p_head_sha: headSha, p_merge_sha: mergeSha,
@@ -168,44 +168,44 @@ async function createOrReuseDraft(job, result, headRef, headSha) {
   return { number: pr.number, url: pr.url }
 }
 
-async function reconcileOpenJobs() {
-  const currentMainSha = run('git', ['rev-parse', 'origin/main'], root)
-  const jobs = await rpc('archive_knowledge_semantic_job_list_reconcile', {})
+async function reconcileOpenJobs({ requestRpc = rpc, shell = run, currentRoot = root, mainSha = null } = {}) {
+  const currentMainSha = mainSha ?? shell('git', ['rev-parse', 'origin/main'], currentRoot)
+  const jobs = await requestRpc('archive_knowledge_semantic_job_list_reconcile', {})
   const outcomes = []
   for (const job of jobs ?? []) {
     if (!Number.isInteger(job.final_pr_number)) {
       const outcome = { status: 'BLOCKED', code: 'PR_REFERENCE_MISSING' }
-      const update = await updateJob(job.job_id, job.status, outcome.status, { blockerCode: outcome.code, blockerStage: 'PR_RECONCILE' })
+      const update = await updateJob(requestRpc, job.job_id, job.status, outcome.status, { blockerCode: outcome.code, blockerStage: 'PR_RECONCILE' })
       outcomes.push({ job_id: job.job_id, ...outcome, update })
       continue
     }
-    const pr = JSON.parse(run('gh', ['api', `repos/${repository}/pulls/${job.final_pr_number}`], root))
+    const pr = JSON.parse(shell('gh', ['api', `repos/${repository}/pulls/${job.final_pr_number}`], currentRoot))
     const outcome = reconcilePullRequest(job, pr, currentMainSha)
     if (outcome.status === 'BLOCKED' && pr.state === 'open') {
-      run('gh', ['pr', 'close', String(job.final_pr_number), '--comment', `C3 finalizer closed this PR because ${outcome.code}. A new exact-head review is required.`], root)
+      shell('gh', ['pr', 'close', String(job.final_pr_number), '--comment', `C3 finalizer closed this PR because ${outcome.code}. A new exact-head review is required.`], currentRoot)
     }
-    if (outcome.status !== job.status) await updateJob(job.job_id, job.status, outcome.status, { blockerCode: outcome.code ?? null, blockerStage: outcome.code ? 'PR_RECONCILE' : null, mergeSha: outcome.mergeSha ?? null })
+    if (outcome.status !== job.status) await updateJob(requestRpc, job.job_id, job.status, outcome.status, { blockerCode: outcome.code ?? null, blockerStage: outcome.code ? 'PR_RECONCILE' : null, mergeSha: outcome.mergeSha ?? null })
     outcomes.push({ job_id: job.job_id, ...outcome })
   }
   return outcomes
 }
 
-export async function runSemanticFinalizer() {
-  const currentMainSha = run('git', ['rev-parse', 'origin/main'], root)
-  const job = await rpc('archive_knowledge_semantic_job_claim_finalizer', {})
-  if (job.status === 'NO_SUBMITTED_JOB') return { status: 'RECONCILED', jobs: await reconcileOpenJobs() }
+export async function runSemanticFinalizer({ requestRpc = rpc, shell = run, packageSemantic = runPackage, createDraft = createOrReuseDraft, enqueueReviewEntry = enqueueReview, verifyPinsFn = verifyPins, currentRoot = root, mainSha = null } = {}) {
+  const currentMainSha = mainSha ?? shell('git', ['rev-parse', 'origin/main'], currentRoot)
+  const job = await requestRpc('archive_knowledge_semantic_job_claim_finalizer', {})
+  if (job.status === 'NO_SUBMITTED_JOB') return { status: 'RECONCILED', jobs: await reconcileOpenJobs({ requestRpc, shell, currentRoot, mainSha: currentMainSha }) }
   try {
     const result = job.semantic_result
     const action = finalizerAction(job, result)
     if (action.action === 'HOLD') {
-      const updated = await updateJob(job.job_id, 'FINALIZING', 'HOLD', { blockerCode: result.code, blockerStage: 'SEMANTIC' })
+      const updated = await updateJob(requestRpc, job.job_id, 'FINALIZING', 'HOLD', { blockerCode: result.code, blockerStage: 'SEMANTIC' })
       return { status: 'HOLD', job_id: job.job_id, update: updated }
     }
-    const { context } = await verifyPins(job, root)
+    const { context } = await verifyPinsFn(job, currentRoot)
     if (context.target.brief_id !== result.brief.id) throw new Error('SEMANTIC_TARGET_BINDING_MISMATCH')
     const headRef = semanticBranchRef(job.job_id)
-    const packageResult = await runPackage(job, result, { currentMainSha, headRef })
-    const pr = await createOrReuseDraft(job, result, headRef, packageResult.head_sha)
+    const packageResult = await packageSemantic(job, result, { currentMainSha, headRef })
+    const pr = await createDraft(job, result, headRef, packageResult.head_sha)
 
     if (result.decision === 'HUMAN_REVIEW') {
       const payload = buildReviewQueuePayload({
@@ -215,16 +215,16 @@ export async function runSemanticFinalizer() {
         prNumber: pr.number,
         headRef,
       })
-      await enqueueReview(payload, { projectUrl: process.env.ARCHIVE_SUPABASE_URL, serviceRoleKey: process.env.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY })
+      await enqueueReviewEntry(payload, { projectUrl: process.env.ARCHIVE_SUPABASE_URL, serviceRoleKey: process.env.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY })
     }
     const nextStatus = result.decision === 'HUMAN_REVIEW' ? 'HUMAN_REVIEW' : 'PR_OPEN'
-    const updated = await updateJob(job.job_id, 'FINALIZING', nextStatus, { prNumber: pr.number, headRef, headSha: packageResult.head_sha })
+    const updated = await updateJob(requestRpc, job.job_id, 'FINALIZING', nextStatus, { prNumber: pr.number, headRef, headSha: packageResult.head_sha })
     return { status: nextStatus, job_id: job.job_id, pr_number: pr.number, head_sha: packageResult.head_sha, release_decision: packageResult.release_decision, update: updated }
   } catch (error) {
     const code = error.message.split(':')[0].slice(0, 120)
     const exhausted = Number(job.finalizer_attempt_count ?? 0) >= 3
     const status = error.retryable && !exhausted ? 'FINALIZING' : 'BLOCKED'
-    const updated = await updateJob(job.job_id, 'FINALIZING', status, { blockerCode: code, blockerStage: error.retryable ? 'FINALIZER_TRANSIENT' : 'FINALIZER' })
+    const updated = await updateJob(requestRpc, job.job_id, 'FINALIZING', status, { blockerCode: code, blockerStage: error.retryable ? 'FINALIZER_TRANSIENT' : 'FINALIZER' })
     return { status, job_id: job.job_id, blocker_code: code, update: updated }
   }
 }
