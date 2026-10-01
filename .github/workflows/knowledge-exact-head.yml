@@ -138,6 +138,70 @@ jobs:
           console.log(`auto_publish=${enabled ? 'true' : 'false'}`)
           NODE
 
+      - name: Resolve C3 durable job binding
+        id: c3
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > "$RUNNER_TEMP/c3-pr.json"
+          node --input-type=module <<'NODE' >> "$GITHUB_OUTPUT"
+          import { readFileSync } from 'node:fs'
+          const pr = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/c3-pr.json', 'utf8'))
+          if (pr.head?.sha !== process.env.EXPECTED_SHA) throw new Error('C3_PR_HEAD_CHANGED')
+          const match = String(pr.body ?? '').match(/<!-- knowledge-semantic-job-v1:([a-f0-9-]{36}) -->/i)
+          if (!match) {
+            console.log('bound=false')
+            process.exit(0)
+          }
+          console.log('bound=true')
+          console.log(`job_id=${match[1].toLowerCase()}`)
+          console.log(`head_ref=${pr.head.ref}`)
+          NODE
+
+      - name: Persist exact C3 publication head
+        if: steps.c3.outputs.bound == 'true'
+        working-directory: .
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          JOB_ID: ${{ steps.c3.outputs.job_id }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          HEAD_REF: ${{ steps.c3.outputs.head_ref }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          node --input-type=module <<'NODE'
+          const url = process.env.ARCHIVE_SUPABASE_URL
+          const key = process.env.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY
+          if (!url || !key) throw new Error('C3_SUPABASE_CREDENTIALS_REQUIRED')
+          const response = await fetch(`${url.replace(/\/$/, '')}/rest/v1/rpc/archive_knowledge_semantic_job_update`, {
+            method: 'POST',
+            headers: {
+              apikey: key,
+              authorization: `Bearer ${key}`,
+              'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+              p_job_id: process.env.JOB_ID,
+              p_expected_status: 'PR_OPEN',
+              p_status: 'PR_OPEN',
+              p_blocker_code: null,
+              p_blocker_stage: null,
+              p_pr_number: Number(process.env.PR_NUMBER),
+              p_head_ref: process.env.HEAD_REF,
+              p_head_sha: process.env.EXPECTED_SHA,
+              p_merge_sha: null,
+            }),
+          })
+          const text = await response.text()
+          if (!response.ok) throw new Error(`C3_LEDGER_UPDATE_HTTP_${response.status}:${text}`)
+          const result = JSON.parse(text)
+          if (result?.status !== 'PR_OPEN') throw new Error(`C3_LEDGER_UPDATE_${result?.status ?? 'INVALID'}`)
+          console.log(JSON.stringify({ status: result.status, job_id: result.job_id, head_sha: process.env.EXPECTED_SHA }))
+          NODE
+
       - name: Record SHADOW exact-head validation on PR
         if: steps.authority.outputs.auto_publish != 'true'
         working-directory: .
