@@ -79,9 +79,24 @@ export async function verifyPins(job, base) {
   const config = JSON.parse(configBytes.toString('utf8'))
   if (context.policy?.publication_mode !== config.publication_mode || context.policy?.auto_publish_enabled !== config.auto_publish_enabled) throw new Error('SEMANTIC_CONFIG_PIN_CHANGED')
 
+  const readPinnedSourceBytes = async (ref) => {
+    try {
+      return await readFile(join(base, ref))
+    } catch (cause) {
+      if (cause?.code !== 'ENOENT' || !ref.startsWith('worldlines/AFTERFALL/')) throw cause
+      try {
+        return execFileSync('git', ['show', `origin/worldline/afterfall-rpg:${ref}`], {
+          cwd: base,
+          stdio: ['ignore', 'pipe', 'pipe'],
+        })
+      } catch {
+        throw new Error('SEMANTIC_SOURCE_UNAVAILABLE')
+      }
+    }
+  }
   const verifyFile = async (ref, expectedHash) => {
     if (!safeRef(ref) || !/^[a-f0-9]{64}$/.test(expectedHash ?? '')) throw new Error('SEMANTIC_SOURCE_REFERENCE_INVALID')
-    if (sha(await readFile(join(base, ref))) !== expectedHash) throw new Error('SEMANTIC_SOURCE_SHA_CHANGED')
+    if (sha(await readPinnedSourceBytes(ref)) !== expectedHash) throw new Error('SEMANTIC_SOURCE_SHA_CHANGED')
   }
   if (job.source_kind === 'PUBLIC_ARCHIVE') {
     await verifyFile(job.source_ref, job.source_sha256)
