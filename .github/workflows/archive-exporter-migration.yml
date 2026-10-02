@@ -27,6 +27,7 @@ on:
       - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
       - 'supabase/tests/knowledge_semantic_review_e2e.sql'
       - 'supabase/tests/knowledge_semantic_published_reconcile.sql'
+      - 'supabase/tests/knowledge_operator_inbox_verification.sql'
       - 'supabase/migrations/20261001233000_knowledge_semantic_published_reconcile_v1.sql'
 
 permissions:
