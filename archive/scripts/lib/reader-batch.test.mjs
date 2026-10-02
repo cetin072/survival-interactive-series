@@ -80,7 +80,14 @@ test('stale expected book cannot overwrite an edited book', async () => disk(asy
 test('failure before swap preserves old content and cleans own temp/lock', async () => disk(async (file, dir) => { await assert.rejects(replaceBookAtomically(file, 'OLD_COMPLETE_BOOK', 'NEW', { beforeCommit: async () => { throw Error('TEST_IO_FAILURE') } })); assert.equal(await readFile(file, 'utf8'), 'OLD_COMPLETE_BOOK'); assert.deepEqual(await readdir(dir), ['BOOK.json']) }))
 test('concurrent modification during preparation is not overwritten', async () => disk(async (file) => { await assert.rejects(replaceBookAtomically(file, 'OLD_COMPLETE_BOOK', 'NEW', { beforeCommit: async () => writeFile(file, 'OTHER_WRITER') })); assert.equal(await readFile(file, 'utf8'), 'OTHER_WRITER') }))
 test('an existing lock is not stolen or removed', async () => disk(async (file) => { await writeFile(`${file}.publication-lock`, 'OTHER'); await assert.rejects(replaceBookAtomically(file, 'OLD_COMPLETE_BOOK', 'NEW')); assert.equal(await readFile(`${file}.publication-lock`, 'utf8'), 'OTHER') }))
-test('book symlink is rejected', async () => disk(async (file, dir) => { const link = join(dir, 'LINK.json'); await symlink(file, link); await assert.rejects(replaceBookAtomically(link, 'OLD_COMPLETE_BOOK', 'NEW')) }))
+test('book symlink is rejected', async (t) => disk(async (file, dir) => {
+  const link = join(dir, 'LINK.json')
+  try { await symlink(file, link) } catch (error) {
+    if (process.platform === 'win32' && error.code === 'EPERM') { t.skip('Windows does not permit symlink creation in this environment'); return }
+    throw error
+  }
+  await assert.rejects(replaceBookAtomically(link, 'OLD_COMPLETE_BOOK', 'NEW'))
+}))
 test('raw sentinel and another Chronicle stay untouched', async () => disk(async (file, dir) => { await writeFile(join(dir, 'RAW.md'), 'EXACT_RAW'); await writeFile(join(dir, 'C02.json'), 'OTHER_CHRONICLE'); await replaceBookAtomically(file, 'OLD_COMPLETE_BOOK', 'NEW'); assert.equal(await readFile(join(dir, 'RAW.md'), 'utf8'), 'EXACT_RAW'); assert.equal(await readFile(join(dir, 'C02.json'), 'utf8'), 'OTHER_CHRONICLE') }))
 
 test('past batch defers later unpublished input rather than publishing it', async () => { const { item } = await automatic(); assert.deepEqual(selectTextBatchCatalog([item], { chapters: [] }, { sources: [], source_game_time: '2027-03-23 17:50' }), []) })
