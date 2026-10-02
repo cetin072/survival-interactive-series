@@ -29,7 +29,7 @@ const bundleFor = (subjectId) => {
   return buildIllustrationReviewContext(point, profileFor(subjectId))
 }
 
-test('Taehoon provider prompt is positive-first and keeps only minimal universal exclusions', () => {
+test('Taehoon provider prompt is positive-first with no text/UI suppression', () => {
   const prompt = compileIllustrationImagePrompt(pointFor('char-taehoon'), bundleFor('char-taehoon'))
   assert.equal(prompt.contract_version, ILLUSTRATION_IMAGE_PROMPT_VERSION)
   assert.equal(prompt.subject_id, 'char-taehoon')
@@ -40,10 +40,7 @@ test('Taehoon provider prompt is positive-first and keeps only minimal universal
     'AFTERFALL_ARCHIVE_V1', '회화적 반실사', 'painterly illustration',
   ]) assert.ok(prompt.positive_prompt.includes(phrase), `Missing prompt fact: ${phrase}`)
 
-  assert.equal(
-    prompt.negative_prompt,
-    'no readable text or signs; no numbers or labels; no watermark; no UI or interface elements',
-  )
+  assert.equal(prompt.negative_prompt, '')
   assert.doesNotMatch(
     prompt.positive_prompt,
     /military|uniform|firearm|tactical|rank|군사|제복|무기|계급|zombie|cyberpunk|Mad Max|explosion|corpse|gore|damaged world|QUIET_DECAY|invented decay|vegetation/i,
@@ -64,15 +61,9 @@ test('Baekun prompt describes the intended state instead of naming unwanted deca
   assert.doesNotMatch(prompt.positive_prompt, /폐허|완전 붕괴|방어시설|no vegetation|no trees|no shrubs|no grass|no vines|no moss|no ivy|overgrowth/i)
 })
 
-test('provider negative prompt stays limited to text and interface hygiene', () => {
+test('provider negative prompt is empty so text and UI concepts are not activated during generation', () => {
   const prompt = compileIllustrationImagePrompt(pointFor('char-taehoon'), bundleFor('char-taehoon'))
-  for (const phrase of [
-    'no readable text or signs',
-    'no numbers or labels',
-    'no watermark',
-    'no UI or interface elements',
-  ]) assert.ok(prompt.negative_prompt.includes(phrase), `Missing minimal exclusion: ${phrase}`)
-  assert.doesNotMatch(prompt.negative_prompt, /military|firearm|scar|vegetation|decay|weather|security|layout|zombie|corpse|gore/i)
+  assert.equal(prompt.negative_prompt, '')
 })
 
 test('operational context in any visual input fails closed', () => {
@@ -122,8 +113,8 @@ test('character renderer is concrete, positive-first and visual-only', () => {
     '40대 초반', '낡은 남색 작업조끼', '거친 손',
     '실제 생활자처럼 편안하고 자연스러운 자세와 표정',
     '회화적 반실사',
-    '읽을 수 있는 글자, 숫자, 라벨, 간판 문구, 워터마크, UI/인터페이스 요소는 표현하지 않는다',
   ]) assert.ok(text.includes(phrase), `Missing renderer phrase: ${phrase}`)
+  assert.doesNotMatch(text, /글자|숫자|라벨|간판|워터마크|UI\/인터페이스|readable text|signage|watermark|interface elements/i)
   assert.doesNotMatch(text, /military|uniform|firearm|tactical|rank|군사|제복|무기|계급|zombie|cyberpunk|Mad Max|explosion|corpse|gore|damaged world|QUIET_DECAY|no invented/i)
   assert.doesNotMatch(text, /github|supabase|netlify|workflow|provider|storage|registry|handoff|scheduler|automation|report|dashboard|json|sha|\bci\b|\bpr\b|api|deploy|receipt/i)
   assert.ok(text.length < 6000)
@@ -181,6 +172,7 @@ test('shared review context enriches provider and renderer prompts without polic
     assert.ok(!renderer.includes(phrase), `Policy prose leaked into renderer: ${phrase}`)
   }
   assert.ok(prompt.review_checklist.some((item) => item.includes('optional depiction choices')))
+  assert.ok(prompt.review_checklist.some((item) => item.includes('not automatic rejection reasons')))
 })
 
 test('negative-form rich render cues fail closed before renderer output', () => {
