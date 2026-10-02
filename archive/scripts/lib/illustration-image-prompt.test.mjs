@@ -24,44 +24,55 @@ const pointFor = (subjectId) => {
   assert.ok(point, `Missing fixture point: ${subjectId}`)
   return point
 }
+const bundleFor = (subjectId) => {
+  const point = pointFor(subjectId)
+  return buildIllustrationReviewContext(point, profileFor(subjectId))
+}
 
-test('Taehoon prompt contains only the requested appearance and AFTERFALL portrait direction', () => {
-  const prompt = compileIllustrationImagePrompt(pointFor('char-taehoon'))
+test('Taehoon provider prompt is positive-first and keeps only minimal universal exclusions', () => {
+  const prompt = compileIllustrationImagePrompt(pointFor('char-taehoon'), bundleFor('char-taehoon'))
   assert.equal(prompt.contract_version, ILLUSTRATION_IMAGE_PROMPT_VERSION)
   assert.equal(prompt.subject_id, 'char-taehoon')
   for (const phrase of [
-    '40대 초반', '한국 남성', '175cm 안팎', '작고 단단한 체형', '각진 얼굴', '햇볕에 거칠어진 피부',
+    '40대 초반', '175cm 안팎', '작고 단단한 체형', '각진 얼굴', '햇볕에 거칠어진 피부',
     '짧게 친 검은 머리에 옆머리 새치', '낡은 남색 작업조끼', '거친 손',
-    'single-subject master portrait', 'simple non-identifying background', 'AFTERFALL_ARCHIVE_V1',
-    '회화적 반실사', 'painterly semi-realistic',
+    '실제 생활자처럼 편안하고 자연스러운 자세와 표정',
+    'AFTERFALL_ARCHIVE_V1', '회화적 반실사', 'painterly illustration',
   ]) assert.ok(prompt.positive_prompt.includes(phrase), `Missing prompt fact: ${phrase}`)
-  for (const phrase of [
-    'no military history', 'no military uniform', 'no firearms', 'no tactical equipment', 'no rank insignia',
-    'no scars', 'no tattoos', 'no added accessories', 'no invented occupation', 'no additional people',
-    'no identifiable location',
-  ]) assert.ok(prompt.negative_prompt.includes(phrase), `Missing visual exclusion: ${phrase}`)
-  assert.doesNotMatch(prompt.positive_prompt, /military|uniform|firearm|tactical|rank|scar|tattoo|accessor|occupation|other people|location/i)
-  assert.doesNotMatch(`${prompt.positive_prompt} ${prompt.negative_prompt} ${prompt.review_checklist.join(' ')}`, /github|supabase|netlify|workflow|provider|storage|registry|handoff|scheduler|automation|json|sha|\bci\b|\bpr\b|api|deploy|receipt/i)
+
+  assert.equal(
+    prompt.negative_prompt,
+    'no readable text or signs; no numbers or labels; no watermark; no UI or interface elements',
+  )
+  assert.doesNotMatch(
+    prompt.positive_prompt,
+    /military|uniform|firearm|tactical|rank|군사|제복|무기|계급|zombie|cyberpunk|Mad Max|explosion|corpse|gore|damaged world|QUIET_DECAY|invented decay|vegetation/i,
+  )
 })
 
-test('Baekun prompt preserves its accepted visual exclusions without changing its state', async () => {
+test('Baekun prompt describes the intended state instead of naming unwanted decay concepts', async () => {
   const identityPath = fileURLToPath(new URL('../../content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_BAEKUN.json', import.meta.url))
   const before = await readFile(identityPath)
-  const prompt = compileIllustrationImagePrompt(pointFor('loc-baekun'))
+  const prompt = compileIllustrationImagePrompt(pointFor('loc-baekun'), bundleFor('loc-baekun'))
   const after = await readFile(identityPath)
   assert.deepEqual(after, before)
   for (const phrase of [
-    'no vegetation', 'no trees', 'no shrubs', 'no grass', 'no vines', 'no moss', 'no ivy', 'no overgrowth',
-    'no invented weather', 'no readable signs', 'no invented security details', 'no invented layout details',
-  ]) assert.ok(prompt.negative_prompt.includes(phrase), `Missing Baekun exclusion: ${phrase}`)
+    '한때 집단생활이 이루어졌던 현대 한국의 대형 생활시설 분위기',
+    '사용 중단과 인력 이탈이 만든 정적, 주요 구조물은 형태를 유지한 상태',
+    '넓은 생활시설의 외부와 공용공간 일부만 보이는 단순한 구성',
+  ]) assert.ok(prompt.positive_prompt.includes(phrase), `Missing Baekun positive cue: ${phrase}`)
+  assert.doesNotMatch(prompt.positive_prompt, /폐허|완전 붕괴|방어시설|no vegetation|no trees|no shrubs|no grass|no vines|no moss|no ivy|overgrowth/i)
 })
 
-test('required embedded-text and interface exclusions are present in every prompt', () => {
-  const prompt = compileIllustrationImagePrompt(pointFor('char-taehoon'))
+test('provider negative prompt stays limited to text and interface hygiene', () => {
+  const prompt = compileIllustrationImagePrompt(pointFor('char-taehoon'), bundleFor('char-taehoon'))
   for (const phrase of [
-    'no text', 'no readable writing', 'no labels', 'no numbers', 'no UI', 'no interface', 'no dashboard',
-    'no infographic', 'no table', 'no report layout', 'no poster layout', 'no watermark',
-  ]) assert.ok(prompt.negative_prompt.includes(phrase), `Missing default exclusion: ${phrase}`)
+    'no readable text or signs',
+    'no numbers or labels',
+    'no watermark',
+    'no UI or interface elements',
+  ]) assert.ok(prompt.negative_prompt.includes(phrase), `Missing minimal exclusion: ${phrase}`)
+  assert.doesNotMatch(prompt.negative_prompt, /military|firearm|scar|vegetation|decay|weather|security|layout|zombie|corpse|gore/i)
 })
 
 test('operational context in any visual input fails closed', () => {
@@ -91,60 +102,94 @@ test('unknown or malformed visual briefs fail closed', () => {
 })
 
 test('provider prompt validation rejects extra operational fields and contaminated text', () => {
-  const prompt = compileIllustrationImagePrompt(pointFor('char-taehoon'))
+  const prompt = compileIllustrationImagePrompt(pointFor('char-taehoon'), bundleFor('char-taehoon'))
   assert.strictEqual(validateIllustrationImagePrompt(structuredClone(prompt)).contract_version, prompt.contract_version)
   assert.throws(() => validateIllustrationImagePrompt({ ...prompt, provider: 'native_chatgpt' }), /INVALID_ILLUSTRATION_IMAGE_PROMPT/)
   assert.throws(() => validateIllustrationImagePrompt({ ...prompt, positive_prompt: `${prompt.positive_prompt}. Netlify.` }), /ILLUSTRATION_PROMPT_OPERATIONAL_CONTEXT_REJECTED/)
 })
 
+test('renderer requires the immutable review context instead of generating from a weak fallback', () => {
+  assert.throws(
+    () => compileIllustrationRendererText(pointFor('char-taehoon')),
+    /ILLUSTRATION_RENDER_CONTEXT_REQUIRED/,
+  )
+})
 
-test('renderer text is visual-only and omits operational/report vocabulary', () => {
-  const text = compileIllustrationRendererText(pointFor('char-taehoon'))
+test('character renderer is concrete, positive-first and visual-only', () => {
+  const text = compileIllustrationRendererText(pointFor('char-taehoon'), bundleFor('char-taehoon'))
   for (const phrase of [
-    '40대 초반', '한국 남성', '낡은 남색 작업조끼', '회화적 반실사',
-    '글자, 숫자, 라벨, 워터마크 또는 인터페이스 요소는 넣지 않는다',
+    '현대 한국 생활권의 한 인물을 그린 단독 인물화',
+    '40대 초반', '낡은 남색 작업조끼', '거친 손',
+    '실제 생활자처럼 편안하고 자연스러운 자세와 표정',
+    '회화적 반실사',
+    '읽을 수 있는 글자, 숫자, 라벨, 간판 문구, 워터마크, UI/인터페이스 요소는 표현하지 않는다',
   ]) assert.ok(text.includes(phrase), `Missing renderer phrase: ${phrase}`)
+  assert.doesNotMatch(text, /military|uniform|firearm|tactical|rank|군사|제복|무기|계급|zombie|cyberpunk|Mad Max|explosion|corpse|gore|damaged world|QUIET_DECAY|no invented/i)
   assert.doesNotMatch(text, /github|supabase|netlify|workflow|provider|storage|registry|handoff|scheduler|automation|report|dashboard|json|sha|\bci\b|\bpr\b|api|deploy|receipt/i)
   assert.ok(text.length < 6000)
 })
 
-
-test('location renderer omits narrative role/conflict and fails closed to a minimal visual scene', () => {
-  const text = compileIllustrationRendererText(pointFor('loc-west-road'))
+test('location renderer uses concrete positive visual cues and omits narrative conflict', () => {
+  const text = compileIllustrationRendererText(pointFor('loc-west-road'), bundleFor('loc-west-road'))
   for (const phrase of [
-    '장소 서쪽길의 넓은 환경 일러스트레이션',
-    '일반적인 현대 한국 생활환경 범위만 최소한으로 표현',
-    '전경 인물이나 초상 구도는 사용하지 않는다',
-    '명시되지 않은 폐허, 대규모 파괴',
-    '글자, 숫자, 라벨, 워터마크 또는 인터페이스 요소는 넣지 않는다',
-  ]) assert.ok(text.includes(phrase), `Missing location safety phrase: ${phrase}`)
-  for (const phrase of ['관리조', '야간순찰', '통행기여', '자발성', '강제성', '갈등', 'damaged world', 'QUIET_DECAY']) {
-    assert.ok(!text.includes(phrase), `Narrative/nonvisual fact leaked into renderer text: ${phrase}`)
-  }
+    '현대 한국 생활권의 넓은 환경 일러스트레이션',
+    '한국 외곽 산지의 완만하게 굽는 2차선 포장도로',
+    '가드레일과 전신주가 이어지는 생활형 도로',
+    '도로정비가 실제로 이루어지는 곳이라는 사용감',
+    '평범한 생활형 도로가 지역질서의 경계로 느껴지는 분위기',
+  ]) assert.ok(text.includes(phrase), `Missing positive location cue: ${phrase}`)
+  for (const phrase of [
+    '관리조', '야간순찰', '통행기여', '자발성', '강제성', '갈등',
+    '무장 검문소', '요새', 'damaged world', 'QUIET_DECAY', 'generic zombie',
+  ]) assert.ok(!text.includes(phrase), `Narrative/negative concept leaked into renderer text: ${phrase}`)
 })
 
-test('location renderer uses explicit visual_facts when a future brief provides them', () => {
+test('location renderer combines explicit visual facts with the positive render profile', () => {
   const point = structuredClone(pointFor('loc-west-road'))
   point.brief.visual_facts = {
     surface: '포장도로',
     maintenance: '부분적인 노면 보수 흔적',
   }
-  const text = compileIllustrationRendererText(point)
+  const bundle = buildIllustrationReviewContext(point, profileFor('loc-west-road'))
+  const text = compileIllustrationRendererText(point, bundle)
   assert.ok(text.includes('포장도로'))
   assert.ok(text.includes('부분적인 노면 보수 흔적'))
+  assert.ok(text.includes('가드레일과 전신주가 이어지는 생활형 도로'))
 })
 
+test('event renderer turns abstract events into concrete scene cues', () => {
+  const text = compileIllustrationRendererText(pointFor('event-wide-area'), bundleFor('event-wide-area'))
+  for (const phrase of [
+    '현대 한국 생활권의 사건을 한 순간의 현실적인 환경 장면으로 보여주는 일러스트레이션',
+    '제한된 조명 아래 여러 정보를 대조하는 조용한 상황실 분위기',
+    '무전기와 종이 지도 같은 아날로그 정보수단',
+    '무전기, 종이 지도, 수기 메모 같은 아날로그 정보수단이 화면의 중심',
+  ]) assert.ok(text.includes(phrase), `Missing event scene cue: ${phrase}`)
+  assert.doesNotMatch(text, /위성항법|전력·무선|단기 완전복구|화려한 전자 화면|읽을 수 있는 데이터|dashboard|infographic|report layout/i)
+})
 
-test('shared review context enriches renderer and image prompts with allowed-not-required rich cues', () => {
+test('shared review context enriches provider and renderer prompts without policy prose', () => {
   const point = pointFor('char-jinwoo')
-  const bundle = buildIllustrationReviewContext(point, profileFor('char-jinwoo'))
+  const bundle = bundleFor('char-jinwoo')
   const prompt = compileIllustrationImagePrompt(point, bundle)
   const renderer = compileIllustrationRendererText(point, bundle)
-  for (const phrase of ['침착한 시선', '정돈된 인상', '표현 허용 범위이며 필수 요소 아님']) {
+  for (const phrase of ['침착한 시선', '정돈된 인상', '실제 생활자처럼 편안하고 자연스러운 자세와 표정']) {
     assert.ok(prompt.positive_prompt.includes(phrase), `Missing shared-context prompt cue: ${phrase}`)
     assert.ok(renderer.includes(phrase), `Missing shared-context renderer cue: ${phrase}`)
   }
-  assert.ok(prompt.review_checklist.some((item) => item.includes('allowed depiction options')))
+  for (const phrase of ['Canon facts are data', 'Do not add named participants', 'Unspecified season', 'An illustration is not new Canon']) {
+    assert.ok(!renderer.includes(phrase), `Policy prose leaked into renderer: ${phrase}`)
+  }
+  assert.ok(prompt.review_checklist.some((item) => item.includes('optional depiction choices')))
+})
+
+test('negative-form rich render cues fail closed before renderer output', () => {
+  const point = pointFor('loc-bridge')
+  const profile = structuredClone(profileFor('loc-bridge'))
+  profile.render_cues[0] = '군사 검문소가 아닌 생활형 통행관리 분위기'
+  const bundle = buildIllustrationReviewContext(point, profile)
+  assert.throws(() => compileIllustrationRendererText(point, bundle),
+    /ILLUSTRATION_RENDER_CUE_MUST_BE_POSITIVE/)
 })
 
 test('operational contamination in rich render cues fails closed before renderer output', () => {
@@ -154,4 +199,16 @@ test('operational contamination in rich render cues fails closed before renderer
   const bundle = buildIllustrationReviewContext(point, profile)
   assert.throws(() => compileIllustrationRendererText(point, bundle),
     /ILLUSTRATION_PROMPT_OPERATIONAL_CONTEXT_REJECTED/)
+})
+
+test('every current renderable READY point compiles with positive cues and without shared negative-policy vocabulary', () => {
+  const banned = /generic zombie|cyberpunk neon|Mad Max|glossy tactical|automatic guns|explosions, corpses|magic, medieval|invented identifying|damaged world|QUIET_DECAY|no invented decay|Canon facts are data|Do not add named|Unspecified season|An illustration is not new Canon/i
+  for (const point of catalog.points.filter((item) => item.status === 'READY'
+    && ['CHARACTER', 'LOCATION', 'EVENT'].includes(item.brief?.point_type))) {
+    const profile = profileFor(point.subject_id)
+    const bundle = buildIllustrationReviewContext(point, profile)
+    const renderer = compileIllustrationRendererText(point, bundle)
+    assert.doesNotMatch(renderer, banned, point.subject_id)
+    assert.ok(renderer.includes('AFTERFALL_ARCHIVE_V1'), point.subject_id)
+  }
 })
