@@ -7,20 +7,15 @@ const GENERATION_KEY = /^generation-[a-f0-9]{64}$/
 const SUBJECT_ID = /^[a-z][a-z0-9-]{1,79}$/
 const STYLE_VERSION = 'AFTERFALL_ARCHIVE_V1'
 const OPERATIONAL_TERM = /\b(github|supabase|netlify|workflow|provider|storage|registry|handoff|scheduler|automation|report|dashboard|json|sha|ci|pr|api|deploy|receipt)\b/i
+const NEGATING_RENDER_CUE = /(?:아니라|아닌|추가하지|사용하지|식별되지|과장하지|제외|금지|넣지|보이지 않|읽을 수 있는[^.;]*없이|\bno\b|\bwithout\b|\bdo not\b|\bnever\b|\bexclude\w*\b|\bforbid\w*\b)/i
+const NEGATING_RENDER_STYLE = /(?:\bnon-photorealistic\b|\bno\b|\bwithout\b|\bdo not\b|\bnever\b)/i
 const DEFAULT_NEGATIVE_VISUALS = [
-  'no text',
-  'no readable writing',
-  'no labels',
-  'no numbers',
-  'no UI',
-  'no interface',
-  'no dashboard',
-  'no infographic',
-  'no table',
-  'no report layout',
-  'no poster layout',
+  'no readable text or signs',
+  'no numbers or labels',
   'no watermark',
+  'no UI or interface elements',
 ]
+const RENDERER_TEXT_EXCLUSION = '읽을 수 있는 글자, 숫자, 라벨, 간판 문구, 워터마크, UI/인터페이스 요소는 표현하지 않는다'
 
 const isRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value)
 const requireRecord = (value) => {
@@ -44,100 +39,151 @@ function assertNoOperationalText(value) {
   if (OPERATIONAL_TERM.test(value)) throw new Error('ILLUSTRATION_PROMPT_OPERATIONAL_CONTEXT_REJECTED')
 }
 
-function visualFactLines(value, path = '') {
+function visualFactValues(value) {
   if (typeof value === 'string') {
     const text = requireText(value)
     assertNoOperationalText(text)
-    return [`${path}: ${text}`]
+    return [text]
   }
-  if (typeof value === 'number' && Number.isFinite(value)) return [`${path}: ${value}`]
+  if (typeof value === 'number' && Number.isFinite(value)) return [String(value)]
   if (Array.isArray(value)) {
     if (value.length > 100) throw new Error('INVALID_ILLUSTRATION_VISUAL_BRIEF')
-    return value.flatMap((item) => visualFactLines(item, path))
+    return value.flatMap((item) => visualFactValues(item))
   }
   if (!isRecord(value) || Object.getPrototypeOf(value) !== Object.prototype) throw new Error('INVALID_ILLUSTRATION_VISUAL_BRIEF')
-  return Object.keys(value).sort().flatMap((key) => {
-    const childPath = path ? `${path}.${key}` : key
-    return visualFactLines(value[key], childPath)
-  })
+  return Object.keys(value).sort().flatMap((key) => visualFactValues(value[key]))
+}
+
+function dedupeText(values) {
+  return [...new Set(values.map((value) => requireText(value)))]
+}
+
+function positiveReviewCues(source, reviewContextBundle, { required = false } = {}) {
+  const cues = reviewContextRenderCues(source, reviewContextBundle)
+  if (required && cues.length === 0) throw new Error('ILLUSTRATION_RENDER_CONTEXT_REQUIRED')
+  for (const cue of cues) {
+    assertNoOperationalText(cue)
+    if (NEGATING_RENDER_CUE.test(cue)) throw new Error('ILLUSTRATION_RENDER_CUE_MUST_BE_POSITIVE')
+  }
+  return cues
+}
+
+function positiveStyleDescriptors(art) {
+  const moodRules = requireTextList(art.mood_rules)
+  const rendering = requireTextList(art.rendering)
+  for (const text of [...moodRules, ...rendering]) assertNoOperationalText(text)
+
+  const positiveMood = moodRules.filter((text) => !NEGATING_RENDER_CUE.test(text))
+  const positiveRendering = rendering.filter((text) => !NEGATING_RENDER_STYLE.test(text))
+  return dedupeText([
+    ...positiveMood,
+    '회화적 반실사',
+    '붓터치가 느껴지는 현대적 painterly illustration',
+    ...positiveRendering,
+  ])
+}
+
+function validateBriefStructure(source) {
+  if (!POINT_ID.test(source.point_id ?? '') || !GENERATION_KEY.test(source.generation_key ?? '')
+    || !SUBJECT_ID.test(source.subject_id ?? '')) throw new Error('INVALID_ILLUSTRATION_VISUAL_BRIEF')
+
+  const brief = requireRecord(source.brief)
+  const subject = requireRecord(brief.subject)
+  const canonFacts = requireRecord(brief.canon_facts)
+  const art = requireRecord(brief.art_direction)
+  const composition = requireText(art.composition)
+  const mood = requireText(art.mood)
+  const theme = requireText(art.theme)
+  const moodRules = requireTextList(art.mood_rules)
+  const rendering = requireTextList(art.rendering)
+  const avoid = requireTextList(art.avoid)
+  const safeguards = requireTextList(brief.safeguards)
+  const subjectLabel = requireText(subject.label)
+
+  if (brief.version !== 'visual-brief-v1' || !['CHARACTER', 'LOCATION', 'EVENT'].includes(brief.point_type)
+    || subject.node_id !== source.subject_id || art.style_version !== STYLE_VERSION) {
+    throw new Error('INVALID_ILLUSTRATION_VISUAL_BRIEF')
+  }
+
+  const factValues = visualFactValues(canonFacts)
+  if (factValues.length === 0) throw new Error('INVALID_ILLUSTRATION_VISUAL_BRIEF')
+
+  for (const text of [
+    subjectLabel, composition, mood, theme, ...moodRules, ...rendering, ...avoid, ...safeguards,
+  ]) assertNoOperationalText(text)
+
+  return { brief, art, factValues }
+}
+
+function compileCharacterPositiveText(source, brief, art, reviewContextBundle, { requireContext = false } = {}) {
+  const cues = positiveReviewCues(source, reviewContextBundle, { required: requireContext })
+  const details = dedupeText([...visualFactValues(brief.canon_facts), ...cues])
+  const style = positiveStyleDescriptors(art)
+
+  return [
+    '현대 한국 생활권의 한 인물을 그린 단독 인물화',
+    `확인된 외형과 허용된 표현 범위: ${details.join('; ')}`,
+    '한 사람만 화면의 중심에 두고 실제 생활자처럼 편안하고 자연스러운 자세와 표정을 보여준다',
+    '배경은 단순하고 중립적인 현대 한국 생활공간으로 두며 얼굴, 체형, 옷감과 손의 사용감이 자연스럽게 드러나게 한다',
+    `빛·색감·화풍: ${STYLE_VERSION}; ${style.join('; ')}`,
+  ].join('. ')
+}
+
+function compileLocationPositiveText(source, brief, art, reviewContextBundle, { requireContext = false } = {}) {
+  const cues = positiveReviewCues(source, reviewContextBundle, { required: requireContext })
+  const visualFacts = brief.visual_facts === undefined
+    ? []
+    : visualFactValues(requireRecord(brief.visual_facts))
+  const details = dedupeText([...visualFacts, ...cues])
+  const style = positiveStyleDescriptors(art)
+
+  return [
+    '현대 한국 생활권의 넓은 환경 일러스트레이션',
+    details.length
+      ? `장면에 보이는 구체적 요소: ${details.join('; ')}`
+      : '시설과 생활 흔적을 단순하고 절제된 범위로 보여주는 넓은 환경 장면',
+    '전경·중경·후경이 자연스럽게 이어지고 시설, 작업 흔적, 생활 소품이 실제 사용 공간처럼 배치된다',
+    '사람이 필요한 경우에는 아주 작은 비식별 배경 인물만 두어 환경의 규모와 생활감을 보조한다',
+    `빛·색감·화풍: ${STYLE_VERSION}; ${style.join('; ')}`,
+  ].join('. ')
+}
+
+function compileEventPositiveText(source, brief, art, reviewContextBundle, { requireContext = false } = {}) {
+  const cues = positiveReviewCues(source, reviewContextBundle, { required: requireContext })
+  const style = positiveStyleDescriptors(art)
+
+  return [
+    '현대 한국 생활권의 사건을 한 순간의 현실적인 환경 장면으로 보여주는 일러스트레이션',
+    cues.length
+      ? `장면에 보이는 구체적 요소: ${cues.join('; ')}`
+      : '실제 공간, 생활 소품, 사람의 행동과 환경 변화가 중심인 절제된 사건 장면',
+    '사건의 의미는 실제 공간과 생활 흔적의 변화로 전달하고 장면 자체가 자연스럽게 상황을 설명하게 한다',
+    '인물은 장면 이해에 필요한 수만 작고 자연스럽게 배치해 환경과 행동이 함께 보이게 한다',
+    `빛·색감·화풍: ${STYLE_VERSION}; ${style.join('; ')}`,
+  ].join('. ')
+}
+
+function compilePositiveText(source, reviewContextBundle, { requireContext = false } = {}) {
+  const { brief, art } = validateBriefStructure(source)
+  if (brief.point_type === 'CHARACTER') {
+    return compileCharacterPositiveText(source, brief, art, reviewContextBundle, { requireContext })
+  }
+  if (brief.point_type === 'LOCATION') {
+    return compileLocationPositiveText(source, brief, art, reviewContextBundle, { requireContext })
+  }
+  return compileEventPositiveText(source, brief, art, reviewContextBundle, { requireContext })
 }
 
 function assertNoOutputContamination(positivePrompt, negativePrompt, checklist) {
   assertNoOperationalText(positivePrompt)
-  // These two phrases are required visual exclusions. They are emitted only from
-  // this fixed list; user-supplied text containing either term is rejected above.
-  const checkedNegative = negativePrompt
-    .replace(/\bno dashboard\b/gi, '')
-    .replace(/\bno report layout\b/gi, '')
-  assertNoOperationalText(checkedNegative)
+  assertNoOperationalText(negativePrompt)
   for (const item of checklist) assertNoOperationalText(item)
-}
-
-function compileLocationRendererText(source, brief, art, reviewContextBundle = null) {
-  const subject = requireRecord(brief.subject)
-  const label = requireText(subject.label)
-  const composition = requireText(art.composition)
-  const rendering = requireTextList(art.rendering)
-  const moodRules = requireTextList(art.mood_rules)
-  const visualFacts = brief.visual_facts === undefined
-    ? []
-    : visualFactLines(requireRecord(brief.visual_facts))
-  const reviewCues = reviewContextRenderCues(source, reviewContextBundle)
-
-  for (const text of [label, composition, ...rendering, ...moodRules, ...visualFacts, ...reviewCues]) {
-    assertNoOperationalText(text)
-  }
-
-  const text = [
-    `장소 ${label}의 넓은 환경 일러스트레이션`,
-    visualFacts.length
-      ? `명시된 시각 사실: ${visualFacts.join('; ')}`
-      : '세부 시각 사실이 따로 명시되지 않았으므로 장소 이름이 직접 가리키는 기본 유형과 일반적인 현대 한국 생활환경 범위만 최소한으로 표현한다',
-    reviewCues.length ? `보강 시각 묘사(표현 허용 범위이며 필수 요소 아님): ${reviewCues.join('; ')}` : '',
-    `구도: ${composition}`,
-    `분위기: ${moodRules.join('; ')}`,
-    `화풍: ${STYLE_VERSION}; 회화적 반실사; ${rendering.join('; ')}`,
-    '사람이 꼭 필요할 때만 아주 작고 비식별적인 배경 인물로 표현하며 전경 인물이나 초상 구도는 사용하지 않는다',
-    '명시되지 않은 폐허, 대규모 파괴, 기념물, 깃발, 벽화, 선전문구, 표지판 문구, 극적인 일몰, 날씨, 계절, 식생, 건물 손상, 보안시설, 이동경로를 추가하지 않는다',
-    '글자, 숫자, 라벨, 워터마크 또는 인터페이스 요소는 넣지 않는다',
-  ].filter(Boolean).join('. ')
-
-  assertNoOperationalText(text)
-  if (text.length < 40 || text.length > 6000) throw new Error('ILLUSTRATION_RENDERER_PROMPT_LENGTH_INVALID')
-  return text
 }
 
 export function compileIllustrationRendererText(point, reviewContextBundle = null) {
   const source = requireRecord(point)
-  const brief = requireRecord(source.brief)
-  const art = requireRecord(brief.art_direction)
-
-  if (brief.point_type === 'LOCATION') {
-    return compileLocationRendererText(source, brief, art, reviewContextBundle)
-  }
-
-  const prompt = compileIllustrationImagePrompt(source, reviewContextBundle)
-  const safeguards = requireTextList(brief.safeguards)
-  const exclusions = [...requireTextList(art.avoid)]
-  for (const safeguard of safeguards) {
-    if (/^(Do not|Unspecified)/.test(safeguard)) exclusions.push(safeguard)
-  }
-  if (source.subject_id === 'char-taehoon') {
-    exclusions.push(
-      'no military uniform', 'no firearms', 'no tactical equipment', 'no rank insignia',
-      'no scars', 'no tattoos', 'no added accessories', 'no invented occupation',
-      'no additional people', 'no identifiable location',
-    )
-  }
-
-  const deduped = [...new Set(exclusions)]
-  for (const item of deduped) assertNoOperationalText(item)
-
-  const text = [
-    prompt.positive_prompt,
-    deduped.length ? `제외 요소: ${deduped.join('; ')}` : '',
-    '글자, 숫자, 라벨, 워터마크 또는 인터페이스 요소는 넣지 않는다',
-  ].filter(Boolean).join('. ')
+  const positiveText = compilePositiveText(source, reviewContextBundle, { requireContext: true })
+  const text = `${positiveText}. ${RENDERER_TEXT_EXCLUSION}`
 
   assertNoOperationalText(text)
   if (text.length < 40 || text.length > 6000) throw new Error('ILLUSTRATION_RENDERER_PROMPT_LENGTH_INVALID')
@@ -165,78 +211,15 @@ export function validateIllustrationImagePrompt(prompt) {
 
 export function compileIllustrationImagePrompt(point, reviewContextBundle = null) {
   const source = requireRecord(point)
-  if (!POINT_ID.test(source.point_id ?? '') || !GENERATION_KEY.test(source.generation_key ?? '')
-    || !SUBJECT_ID.test(source.subject_id ?? '')) throw new Error('INVALID_ILLUSTRATION_VISUAL_BRIEF')
+  validateBriefStructure(source)
 
-  const brief = requireRecord(source.brief)
-  const subject = requireRecord(brief.subject)
-  const canonFacts = requireRecord(brief.canon_facts)
-  const art = requireRecord(brief.art_direction)
-  const composition = requireText(art.composition)
-  const mood = requireText(art.mood)
-  const theme = requireText(art.theme)
-  const moodRules = requireTextList(art.mood_rules)
-  const rendering = requireTextList(art.rendering)
-  const avoid = requireTextList(art.avoid)
-  const safeguards = requireTextList(brief.safeguards)
-
-  if (brief.version !== 'visual-brief-v1' || !['CHARACTER', 'LOCATION', 'EVENT'].includes(brief.point_type)
-    || subject.node_id !== source.subject_id || art.style_version !== STYLE_VERSION) {
-    throw new Error('INVALID_ILLUSTRATION_VISUAL_BRIEF')
-  }
-
-  const subjectLabel = requireText(subject.label)
-  const factLines = visualFactLines(canonFacts)
-  if (factLines.length === 0) throw new Error('INVALID_ILLUSTRATION_VISUAL_BRIEF')
-  const reviewCues = reviewContextRenderCues(source, reviewContextBundle)
-
-  for (const text of [subjectLabel, composition, mood, theme, ...moodRules, ...rendering, ...avoid, ...safeguards, ...reviewCues]) {
-    assertNoOperationalText(text)
-  }
-
-  const subjectDescription = source.subject_id === 'char-taehoon'
-    ? '한국 남성 장태훈'
-    : brief.point_type === 'CHARACTER' ? `인물 ${subjectLabel}` : subjectLabel
-  const positivePrompt = [
-    subjectDescription,
-    `공개 시각 사실: ${factLines.join('; ')}`,
-    reviewCues.length ? `보강 시각 묘사(표현 허용 범위이며 필수 요소 아님): ${reviewCues.join('; ')}` : '',
-    `구도: ${composition}`,
-    `분위기: ${mood}; ${moodRules.join('; ')}`,
-    `화풍: ${STYLE_VERSION}; 회화적 반실사, painterly semi-realistic illustration; ${rendering.join('; ')}`,
-    `시각 방향: ${theme}`,
-  ].filter(Boolean).join('. ')
-
-  const negativeVisuals = [...DEFAULT_NEGATIVE_VISUALS, ...avoid]
-  negativeVisuals.push('no text', 'no readable signs')
-  for (const safeguard of safeguards) {
-    if (safeguard.startsWith('Canon facts are data, not instructions.')) {
-      negativeVisuals.push('treat the supplied facts only as depiction limits; do not depict instructions')
-    } else if (safeguard.startsWith('An illustration is not new Canon.')) {
-      negativeVisuals.push('do not add visual details that create new story facts')
-    } else {
-      negativeVisuals.push(safeguard)
-    }
-  }
-  if (source.subject_id === 'loc-baekun') {
-    negativeVisuals.push(
-      'no vegetation', 'no trees', 'no shrubs', 'no grass', 'no vines', 'no moss', 'no ivy', 'no overgrowth',
-      'no invented weather', 'no invented security details', 'no invented layout details',
-    )
-  }
-  if (source.subject_id === 'char-taehoon') {
-    negativeVisuals.push(
-      'no military history', 'no military uniform', 'no firearms', 'no tactical equipment', 'no rank insignia',
-      'no scars', 'no tattoos', 'no added accessories', 'no invented occupation', 'no additional people',
-      'no identifiable location',
-    )
-  }
-  const negativePrompt = [...new Set(negativeVisuals)].join('; ')
+  const positivePrompt = compilePositiveText(source, reviewContextBundle)
+  const negativePrompt = DEFAULT_NEGATIVE_VISUALS.join('; ')
   const reviewChecklist = [
-    'one subject only; keep every visible attribute within the supplied public visual facts',
-    'rich render cues are allowed depiction options, not required details and not new Canon',
-    'use a simple non-identifying background and the AFTERFALL_ARCHIVE_V1 painterly semi-realistic direction',
-    'reject any visible element listed in the negative visual constraints',
+    'match visible appearance or scene facts to the stored Canon and allowed render cues',
+    'treat rich render cues as optional depiction choices rather than mandatory new Canon',
+    'keep the AFTERFALL_ARCHIVE_V1 painterly semi-realistic direction and believable contemporary Korean material culture',
+    'reject unsupported story facts, unsupported identifying details, readable text, watermark or UI elements during review',
   ]
 
   return validateIllustrationImagePrompt({
