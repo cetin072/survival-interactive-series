@@ -12,7 +12,9 @@ on:
       - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
       - 'supabase/tests/knowledge_semantic_review_e2e.sql'
       - 'supabase/tests/knowledge_semantic_published_reconcile.sql'
+      - 'supabase/tests/knowledge_operator_inbox_verification.sql'
       - 'supabase/migrations/20261001233000_knowledge_semantic_published_reconcile_v1.sql'
+      - 'supabase/migrations/20261003090000_knowledge_operator_inbox_v1.sql'
   push:
     branches: [main]
     paths:
@@ -158,7 +160,9 @@ jobs:
       - name: Apply and exercise Knowledge semantic-job lifecycle
         run: |
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261001064358_knowledge_semantic_jobs_v1.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261003090000_knowledge_operator_inbox_v1.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_jobs_verification.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_operator_inbox_verification.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_jobs_crash_recovery.psql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_review_e2e.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261001233000_knowledge_semantic_published_reconcile_v1.sql
