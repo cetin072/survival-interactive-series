@@ -567,6 +567,33 @@
     },
     {
       "facts": {
+        "역할": "관리조 장부 담당"
+      },
+      "id": "char-jo-hansu",
+      "label": "조한수",
+      "overview": "서쪽길 관리조에서 장부를 맡는다. 2027년 7월 긴급보강 예상표와 비용 항목을 설명하고 실제 투입분과 예비분을 구분하는 논의에 참여했다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "긴급보강 장부와 비용 설명",
+          "other_id": "event-west-road-rain-response",
+          "relation_id": "rel-5c7187de6195e6fe6eb5859ff372302c24bb697677474e55ab55cda305f3d8de"
+        }
+      ],
+      "story_link_ids": [
+        "mention-770aed676f48de5c67e6f525c3bf5295a9bcd2654390fe3bbfcd5ece1982e902"
+      ],
+      "subtitle": "서쪽길 관리조 장부 담당",
+      "tags": [
+        "S03",
+        "인물",
+        "서쪽길 관리조"
+      ],
+      "type": "character"
+    },
+    {
+      "facts": {
         "거점": "산림교육원",
         "상태": "ACTIVE"
       },
@@ -1332,6 +1359,64 @@
       "type": "event"
     },
     {
+      "facts": {
+        "기준시각": "2027-07-05 09:00"
+      },
+      "id": "event-west-road-rain-response",
+      "label": "서쪽길 긴급복구와 공동 장마계획",
+      "overview": "도로 침하 대응에서 임시 흙 보강만으로는 반복을 막기 어렵다고 판단했다. 양측은 위험구간 공동 표시, 큰 차량의 우회·대기, 가용 자재 등록, 긴급공사 비용의 사건별 계산을 포함한 장마철 공동계획을 세웠다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "서쪽길 침하 구간",
+          "other_id": "loc-west-road",
+          "relation_id": "rel-37051bd84a6ea9f347ab6ab42dbd3562a5e9d2e1fb5bf1f94afb5d897a6b09a3"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "긴급보강 장부와 비용 설명",
+          "other_id": "char-jo-hansu",
+          "relation_id": "rel-5c7187de6195e6fe6eb5859ff372302c24bb697677474e55ab55cda305f3d8de"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 7월 5일",
+      "tags": [
+        "S03",
+        "서쪽길",
+        "긴급복구",
+        "장마계획"
+      ],
+      "type": "event"
+    },
+    {
+      "facts": {
+        "기준시각": "2027-06-22 11:00"
+      },
+      "id": "event-west-road-trial-agreement",
+      "label": "서쪽길 6주 시험협정",
+      "overview": "장마철 전 6주 시험협정을 맺었다. 길드 부담은 실제 통행부담을 기준으로 정하고 관리조 노동을 비용에 포함했으며, 도로 관리권과 통행 통제권은 길드로 넘기지 않았다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "서쪽길 관리구간",
+          "other_id": "loc-west-road",
+          "relation_id": "rel-fee5572fb1b6b1f70f77e953181680143834f7118b7661a12bc24c0ad8fd7151"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 6월 22일",
+      "tags": [
+        "S03",
+        "서쪽길",
+        "시험협정"
+      ],
+      "type": "event"
+    },
+    {
       "facts": {},
       "id": "event-wide-area",
       "label": "광역 이상 교차확인",
@@ -1875,6 +1960,20 @@
           "label": "관리조 접점",
           "other_id": "char-seongho",
           "relation_id": "rel-297df0d034fcf1cb2d66c8323fda77b0dadd1cb23b5bc8ce2b1eedea80a8090e"
+        },
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "서쪽길 침하 구간",
+          "other_id": "event-west-road-rain-response",
+          "relation_id": "rel-37051bd84a6ea9f347ab6ab42dbd3562a5e9d2e1fb5bf1f94afb5d897a6b09a3"
+        },
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "서쪽길 관리구간",
+          "other_id": "event-west-road-trial-agreement",
+          "relation_id": "rel-fee5572fb1b6b1f70f77e953181680143834f7118b7661a12bc24c0ad8fd7151"
         }
       ],
       "story_link_ids": [
@@ -2018,7 +2117,7 @@
     }
   ],
   "chronicle_id": "C03-AFTERFALL",
-  "content_sha256": "ed021e99a75f0953ef59479566c80446bc9b513b20d5015d250256422c844437",
+  "content_sha256": "d7e5c7c210f534605b0321a8100ca49d0c8349c37481369764ab0db1fc8539be",
   "nodes": [
     {
       "anchor": {
@@ -2292,6 +2391,35 @@
       },
       "history": [],
       "id": "char-jisu"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-07-12 17:30",
+        "save_version": 274
+      },
+      "data": {
+        "id": "char-jo-hansu",
+        "label": "조한수",
+        "meta": {
+          "역할": "관리조 장부 담당"
+        },
+        "source": "S03 SESSION_005 GM 공개 블록 001, 003, 005",
+        "subtitle": "서쪽길 관리조 장부 담당",
+        "summary": "서쪽길 관리조에서 장부를 맡는다. 2027년 7월 긴급보강 예상표와 비용 항목을 설명하고 실제 투입분과 예비분을 구분하는 논의에 참여했다.",
+        "tags": [
+          "S03",
+          "인물",
+          "서쪽길 관리조"
+        ],
+        "type": "character"
+      },
+      "evidence": {
+        "pointer": "/nodes/0",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_005_1d7513ee6981ace5be8ef3d8164c6816d10f3d291037c6f1d4d4f169e52c5550.json",
+        "source_sha256": "30b24b2bb63bb92bfe2a6b78ca03ae1c2ff754c0036652a65bbdbfd074cc4913"
+      },
+      "history": [],
+      "id": "char-jo-hansu"
     },
     {
       "anchor": {
@@ -2701,6 +2829,65 @@
       },
       "history": [],
       "id": "event-shelter"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-07-12 17:30",
+        "save_version": 274
+      },
+      "data": {
+        "id": "event-west-road-rain-response",
+        "label": "서쪽길 긴급복구와 공동 장마계획",
+        "meta": {
+          "기준시각": "2027-07-05 09:00"
+        },
+        "source": "S03 SESSION_005 GM 공개 블록 001, 003, 005",
+        "subtitle": "2027년 7월 5일",
+        "summary": "도로 침하 대응에서 임시 흙 보강만으로는 반복을 막기 어렵다고 판단했다. 양측은 위험구간 공동 표시, 큰 차량의 우회·대기, 가용 자재 등록, 긴급공사 비용의 사건별 계산을 포함한 장마철 공동계획을 세웠다.",
+        "tags": [
+          "S03",
+          "서쪽길",
+          "긴급복구",
+          "장마계획"
+        ],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/2",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_005_1d7513ee6981ace5be8ef3d8164c6816d10f3d291037c6f1d4d4f169e52c5550.json",
+        "source_sha256": "30b24b2bb63bb92bfe2a6b78ca03ae1c2ff754c0036652a65bbdbfd074cc4913"
+      },
+      "history": [],
+      "id": "event-west-road-rain-response"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-07-12 17:30",
+        "save_version": 274
+      },
+      "data": {
+        "id": "event-west-road-trial-agreement",
+        "label": "서쪽길 6주 시험협정",
+        "meta": {
+          "기준시각": "2027-06-22 11:00"
+        },
+        "source": "S03 SESSION_005 GM 공개 블록 001, 003, 005",
+        "subtitle": "2027년 6월 22일",
+        "summary": "장마철 전 6주 시험협정을 맺었다. 길드 부담은 실제 통행부담을 기준으로 정하고 관리조 노동을 비용에 포함했으며, 도로 관리권과 통행 통제권은 길드로 넘기지 않았다.",
+        "tags": [
+          "S03",
+          "서쪽길",
+          "시험협정"
+        ],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/1",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_005_1d7513ee6981ace5be8ef3d8164c6816d10f3d291037c6f1d4d4f169e52c5550.json",
+        "source_sha256": "30b24b2bb63bb92bfe2a6b78ca03ae1c2ff754c0036652a65bbdbfd074cc4913"
+      },
+      "history": [],
+      "id": "event-west-road-trial-agreement"
     },
     {
       "anchor": {
@@ -3383,6 +3570,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-07-12 17:30",
+        "save_version": 274
+      },
+      "data": {
+        "from": "event-west-road-rain-response",
+        "kind": "occurred_at",
+        "label": "서쪽길 침하 구간",
+        "to": "loc-west-road"
+      },
+      "evidence": {
+        "pointer": "/relations/2",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_005_1d7513ee6981ace5be8ef3d8164c6816d10f3d291037c6f1d4d4f169e52c5550.json",
+        "source_sha256": "30b24b2bb63bb92bfe2a6b78ca03ae1c2ff754c0036652a65bbdbfd074cc4913"
+      },
+      "history": [],
+      "id": "rel-37051bd84a6ea9f347ab6ab42dbd3562a5e9d2e1fb5bf1f94afb5d897a6b09a3"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -3475,6 +3681,25 @@
       },
       "history": [],
       "id": "rel-56f8c169cc6059c0724a14a1e8111ce615c230e70dad89cf9b229f293b76d9cc"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-07-12 17:30",
+        "save_version": 274
+      },
+      "data": {
+        "from": "char-jo-hansu",
+        "kind": "participated_in",
+        "label": "긴급보강 장부와 비용 설명",
+        "to": "event-west-road-rain-response"
+      },
+      "evidence": {
+        "pointer": "/relations/1",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_005_1d7513ee6981ace5be8ef3d8164c6816d10f3d291037c6f1d4d4f169e52c5550.json",
+        "source_sha256": "30b24b2bb63bb92bfe2a6b78ca03ae1c2ff754c0036652a65bbdbfd074cc4913"
+      },
+      "history": [],
+      "id": "rel-5c7187de6195e6fe6eb5859ff372302c24bb697677474e55ab55cda305f3d8de"
     },
     {
       "anchor": {
@@ -4387,6 +4612,25 @@
       },
       "history": [],
       "id": "rel-fe656cefceb75f1851d1c41da9a41d7946557721df61567e56d23e834c123438"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-07-12 17:30",
+        "save_version": 274
+      },
+      "data": {
+        "from": "event-west-road-trial-agreement",
+        "kind": "occurred_at",
+        "label": "서쪽길 관리구간",
+        "to": "loc-west-road"
+      },
+      "evidence": {
+        "pointer": "/relations/0",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_005_1d7513ee6981ace5be8ef3d8164c6816d10f3d291037c6f1d4d4f169e52c5550.json",
+        "source_sha256": "30b24b2bb63bb92bfe2a6b78ca03ae1c2ff754c0036652a65bbdbfd074cc4913"
+      },
+      "history": [],
+      "id": "rel-fee5572fb1b6b1f70f77e953181680143834f7118b7661a12bc24c0ad8fd7151"
     },
     {
       "anchor": {
@@ -8582,6 +8826,27 @@
       "reasons": [
         {
           "kind": "EDITORIAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "body_sha256": "7e6d795ab02ce8381b9103da6943dcbb9aeb90c125ef168f756a134439453a6b",
+      "chapter_id": "c03-afterfall-auto-668e820685498b88560bd4b41869c32da0b69b5712af55b27b787c648bd40e5e",
+      "chapter_title": "2027년 6월 19일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "36f199f9cc14a4678d48ef694dd326c310be655965e91b8875154aa338615f83"
+      },
+      "id": "mention-770aed676f48de5c67e6f525c3bf5295a9bcd2654390fe3bbfcd5ece1982e902",
+      "node_id": "char-jo-hansu",
+      "reasons": [
+        {
+          "alias": "조한수",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            3182,
+            4565
+          ]
         }
       ]
     },
