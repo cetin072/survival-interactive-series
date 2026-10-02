@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { chronicleRegistry } from './chronicleRegistry'
+import { OperatorVisualMetadata } from './OperatorVisualMetadata'
 import { supabaseClient } from './supabaseClient'
 import { operatorPasswordRedirectUrl, validatePasswordChange } from './operatorPassword'
 import {
@@ -289,6 +290,7 @@ export default function OperatorConsole() {
       {!!selected.decision_history.length && <div className="operator-history"><h4>결정 기록</h4>{selected.decision_history.map((entry, index) => <p key={index}>{entry.decision} · {entry.actor ?? '운영자'} · {new Date(entry.created_at).toLocaleString()} {entry.note && `· ${entry.note}`}</p>)}</div>}
       {selected.status === 'PENDING' && <div className="operator-decision"><label>검토 메모<textarea maxLength={1000} value={note} onChange={(event) => setNote(event.target.value)} /></label><div><button disabled={busy} onClick={() => void decide('APPROVED')}>승인</button><button className="operator-secondary" disabled={busy} onClick={() => void decide('HOLD')}>보류</button><button className="operator-danger" disabled={busy} onClick={() => void decide('REJECTED')}>거절</button></div></div>}
     </>}</section></div>
+    <OperatorVisualMetadata />
     <section className="operator-panel operator-chronicles"><h2>Chronicles</h2><div>{chronicleRegistry.map((item) => <span key={item.id}>C{String(item.number).padStart(2,'0')} · {item.title}</span>)}</div></section>
     <p className="operator-muted">검토 결정은 Supabase에 기록되고, 승인된 C 항목만 기존 GitHub CI와 Batched Production 흐름으로 이어집니다. Security/Cost는 실제 데이터원이 연결될 때까지 미연결로 표시합니다.</p>
   </section>
