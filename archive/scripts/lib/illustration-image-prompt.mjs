@@ -9,7 +9,6 @@ const STYLE_VERSION = 'AFTERFALL_ARCHIVE_V1'
 const OPERATIONAL_TERM = /\b(github|supabase|netlify|workflow|provider|storage|registry|handoff|scheduler|automation|report|dashboard|json|sha|ci|pr|api|deploy|receipt)\b/i
 const NEGATING_RENDER_CUE = /(?:아니라|아닌|추가하지|사용하지|식별되지|과장하지|제외|금지|넣지|보이지 않|읽을 수 있는[^.;]*없이|\bno\b|\bwithout\b|\bdo not\b|\bnever\b|\bexclude\w*\b|\bforbid\w*\b)/i
 const NEGATING_RENDER_STYLE = /(?:\bnon-photorealistic\b|\bno\b|\bwithout\b|\bdo not\b|\bnever\b)/i
-const DEFAULT_NEGATIVE_VISUALS = []
 
 const isRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value)
 const requireRecord = (value) => {
@@ -211,7 +210,7 @@ export function compileIllustrationImagePrompt(point, reviewContextBundle = null
   validateBriefStructure(source)
 
   const positivePrompt = compilePositiveText(source, reviewContextBundle)
-  const negativePrompt = DEFAULT_NEGATIVE_VISUALS.join('; ')
+  const negativePrompt = ''
   const reviewChecklist = [
     'match visible appearance or scene facts to the stored Canon and allowed render cues',
     'treat rich render cues as optional depiction choices rather than mandatory new Canon',
