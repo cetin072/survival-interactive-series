@@ -18,6 +18,9 @@ const graph = JSON.parse(await readFile(resolve(root, 'archive/content/graphs/C0
 assert.ok(Number.isSafeInteger(graph.anchor?.save_version) && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(graph.anchor?.game_time))
 const factsRefS03 = 'archive/content/public-facts/C03-AFTERFALL/S03/FACTS.json'
 const facts = JSON.parse(await readFile(resolve(root, factsRefS03)))
+const aWikiFactsRef = 'archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_005_1d7513ee6981ace5be8ef3d8164c6816d10f3d291037c6f1d4d4f169e52c5550.json'
+const aWikiFacts = JSON.parse(execFileSync('git', ['show', `${head}:${aWikiFactsRef}`], { cwd: root }))
+const aWikiEventCount = aWikiFacts.nodes.filter((node) => node.type === 'event').length
 const source = manifest.sessions.find((session) => session.captured_message_range?.end === facts.anchor?.game_time)
 assert.ok(source?.session_id && source?.source_manifest)
 const newerVisual = graph.anchor.save_version > facts.anchor.save_version
@@ -125,7 +128,8 @@ try {
   assert.ok(publishedVisual.equals(await readFile(outputPath)))
   const args = ['--snapshot', snapshotFile, '--facts', factsRef, '--appearances', appearancesRef, '--map', mapRef, '--apply']
   const later = run(args)
-  assert.equal(later.point_count, 38)
+  // The later public graph includes A-Wiki events, plus this synthetic event and map.
+  assert.equal(later.point_count, initial.report.point_count + aWikiEventCount + 2)
   assert.equal(later.by_type.MAP, 1)
   const goodBytes = await readFile(outputPath), catalog = JSON.parse(goodBytes)
   assert.equal(catalog.points.find((p) => p.subject_id === 'event-test-visual').brief.art_direction.mood, 'RED_HORIZON')

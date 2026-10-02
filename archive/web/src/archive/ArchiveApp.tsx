@@ -39,7 +39,7 @@ export function ArchiveApp() {
   const rawChronicle = (() => { try { return getChronicle(chronicleId) } catch { return activeChronicle } })()
   const openRoom = (id: string, section: ChronicleSection = 'overview') => open({ view: 'chronicle', chronicleId: id, section })
   const roomSection = route.view === 'chronicle' ? route.section ?? 'overview' : 'overview'
-  const roomHasGraph = route.view === 'chronicle' && route.chronicleId === 'C03-AFTERFALL' && ['explorer','characters','locations','events','timeline','graph'].includes(roomSection)
+  const roomHasGraph = route.view === 'chronicle' && route.chronicleId === 'C03-AFTERFALL' && ['explorer','characters','locations','events','graph'].includes(roomSection)
 
   return <main className="archive-shell">
     <header className="archive-header">
@@ -59,7 +59,7 @@ export function ArchiveApp() {
     {route.view === 'raw' && <RawTranscriptReader key={rawChronicle.id} chronicleId={rawChronicle.id} initialPartId={route.partId} onPartChange={(partId) => open({ ...route, partId })} onOpenNode={(nodeId) => open({ view: 'archive', chronicleId: activeChronicle.id, nodeId })} onOpenExplorer={() => open({ view: 'archive', chronicleId: activeChronicle.id })} />}
     {route.view === 'tools' && <section className="archive-panel future-archive"><p className="archive-eyebrow">TOOLS</p><h1>생존 도구</h1><p>체크리스트와 자료 도구를 연결할 자리입니다.</p><div className="future-cards"><article>PDF 자료 <span>아직 기록 없음</span></article><article>XLSX 관리표 <span>준비 중</span></article><article>체크리스트 <span>준비 중</span></article></div></section>}
     {route.view === 'media' && <section className="archive-panel future-archive"><p className="archive-eyebrow">MEDIA</p><h1>미디어 Archive</h1><p>공개 허용된 시각 자료와 향후 미디어 진입점을 모읍니다.</p><div className="future-cards"><article>삽화 <span>Chronicle 안의 공개 Visual 자료</span></article><article>영상 <span>아직 기록 없음</span></article><article>웹툰 · 교육 <span>아직 기록 없음</span></article></div></section>}
-    {route.view === 'operator' && <Suspense fallback={<section className="operator-page" aria-live="polite">운영자 화면을 불러오는 중…</section>}><OperatorConsole /></Suspense>}
-    {route.view !== 'operator' && <footer className="archive-footer"><p>읽기 정책 · 공개된 이야기와 세계 기록은 실제 확인된 자료를 바탕으로 편집됩니다.</p><button onClick={() => open({ view: 'raw', chronicleId: activeChronicle.id })}>기록 원문 보관소</button></footer>}
+    {(route.view === 'operator' || route.view === 'operator-visuals') && <Suspense fallback={<section className="operator-page" aria-live="polite">운영자 화면을 불러오는 중…</section>}><OperatorConsole view={route.view === 'operator-visuals' ? 'visuals' : 'dashboard'} /></Suspense>}
+    {route.view !== 'operator' && route.view !== 'operator-visuals' && <footer className="archive-footer"><p>읽기 정책 · 공개된 이야기와 세계 기록은 실제 확인된 자료를 바탕으로 편집됩니다.</p><button onClick={() => open({ view: 'raw', chronicleId: activeChronicle.id })}>기록 원문 보관소</button></footer>}
   </main>
 }

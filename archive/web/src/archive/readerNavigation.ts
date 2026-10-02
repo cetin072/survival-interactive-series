@@ -4,7 +4,7 @@ import { chronicleRegistry } from './chronicleRegistry'
 import type { ChronicleSection } from './ChronicleRoom'
 
 export type ArchiveRoute =
-  | { view: 'home' | 'story' | 'tools' | 'media' | 'operator'; chronicleId: ChronicleId }
+  | { view: 'home' | 'story' | 'tools' | 'media' | 'operator' | 'operator-visuals'; chronicleId: ChronicleId }
   | { view: 'chronicle'; chronicleId: ChronicleId; section?: ChronicleSection }
   | { view: 'archive'; chronicleId: ChronicleId; nodeId?: string }
   | { view: 'book'; chronicleId: ChronicleId; chapterId?: string }
@@ -51,7 +51,8 @@ export function parseArchiveRoute(search: string, storage?: ReaderStorage, pathn
   const params = new URLSearchParams(search)
   const requested = params.get('chronicle')
   const chronicleId = chronicleRegistry.find((chronicle) => chronicle.id === requested)?.id ?? activeChronicle.id
-  if (pathname === '/operator' || pathname.startsWith('/operator/')) return { view: 'operator', chronicleId }
+  if (pathname === '/operator/visuals' || pathname.startsWith('/operator/visuals/')) return { view: 'operator-visuals', chronicleId }
+  if (pathname === '/operator' || pathname === '/operator/' || pathname.startsWith('/operator/')) return { view: 'operator', chronicleId }
   const view = params.get('view')
   if (view === 'reader' || view === 'raw') return resolveReaderRoute({ view: 'raw', chronicleId, partId: params.get('part') ?? undefined }, storage)
   if (view === 'past') return { view: 'story', chronicleId }
@@ -70,8 +71,8 @@ export function parseArchiveRoute(search: string, storage?: ReaderStorage, pathn
 export function archiveRouteUrl(route: ArchiveRoute, href: string): URL {
   const url = new URL(href)
   url.search = ''; url.hash = ''
-  if (route.view === 'operator') {
-    url.pathname = '/operator/'
+  if (route.view === 'operator' || route.view === 'operator-visuals') {
+    url.pathname = route.view === 'operator-visuals' ? '/operator/visuals/' : '/operator/'
   } else if (route.view === 'archive') {
     url.pathname = '/'
     if (route.nodeId) {

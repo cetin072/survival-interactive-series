@@ -50,6 +50,13 @@ async function disk(fn) { const root = await mkdtemp(join(tmpdir(), 'poc-test-')
 test('reads exact known local file without copying or upload', async () => disk(async (root) => { const file = join(root, 'sample.png'); await writeFile(file, png()); assert.deepEqual(await readPocImage(root, file), png()); assert.deepEqual(await readFile(file), png()) }))
 test('URL is never fetched', async () => disk(async (root) => assert.rejects(readPocImage(root, 'https://example.invalid/image.png'))))
 test('outside working root refused', async () => disk(async (root) => assert.rejects(readPocImage(root, '/tmp/not-allowed.png'))))
-test('symlink refused rather than following it', async () => disk(async (root) => { const file = join(root, 'source.png'); await writeFile(file, png()); const link = join(root, 'alias.png'); await symlink(file, link); await assert.rejects(readPocImage(root, link)) }))
+test('symlink refused rather than following it', async (t) => disk(async (root) => {
+  const file = join(root, 'source.png'); await writeFile(file, png()); const link = join(root, 'alias.png')
+  try { await symlink(file, link) } catch (error) {
+    if (process.platform === 'win32' && error.code === 'EPERM') { t.skip('Windows does not permit symlink creation in this environment'); return }
+    throw error
+  }
+  await assert.rejects(readPocImage(root, link))
+}))
 test('missing file is not fabricated', async () => disk(async (root) => assert.rejects(readPocImage(root, join(root, 'missing.png')))))
 test('source module has no external requests or paid execution flags', async () => { const text = await readFile(new URL('./image-poc-exchange.mjs', import.meta.url), 'utf8'); assert.doesNotMatch(text, /fetch\s*\(|https?:\/\/|process\.env|provider\.generate|writeFile\s*\(/) })

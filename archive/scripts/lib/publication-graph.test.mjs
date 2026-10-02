@@ -29,7 +29,20 @@ test('same inputs produce byte-identical graph and report', () => assert.deepEqu
 test('repeat graph reconciliation is NOOP', () => { const f = fixture(); f.previous = reconcilePublicGraph(f).graph; const again = reconcilePublicGraph(f); assert.equal(again.report.status, 'NOOP'); assert.equal(again.report.unchanged_records, 4) })
 test('does not mutate caller-owned inputs', () => { const f = fixture(), old = structuredClone(f); reconcilePublicGraph(f); assert.deepEqual(f, old) })
 test('node ids and prior public prose are preserved', () => { const f = fixture(), r = reconcilePublicGraph(f); assert.deepEqual(r.graph.nodes.find((n) => n.id === 'char-test').data, f.facts.nodes[0]); assert.equal(r.graph.articles.find((n) => n.id === 'char-test').overview, f.facts.nodes[0].summary) })
-test('node update on newer save records history', () => { const f = fixture(); f.previous = reconcilePublicGraph(f).graph; next(f); f.facts.nodes[0].summary = '새 공개 시험 설명'; const r = reconcilePublicGraph(f); assert.equal(r.report.nodes_updated, 1); assert.equal(r.graph.nodes.find((n) => n.id === 'char-test').history.length, 1) })
+test('node update on newer save records a readable prior snapshot', () => { const f = fixture(); const before = reconcilePublicGraph(f).graph; f.previous = before; next(f); f.facts.nodes[0].summary = '새 공개 시험 설명'; const r = reconcilePublicGraph(f); const history = r.graph.nodes.find((n) => n.id === 'char-test').history; assert.equal(r.report.nodes_updated, 1); assert.equal(history.length, 1); assert.deepEqual(history[0].data, before.nodes.find((n) => n.id === 'char-test').data); assert.equal(history[0].data_sha256, graphHash(history[0].data)) })
+test('A to B to C retains public snapshots while A to A adds no history', () => {
+  const f = fixture(), a = reconcilePublicGraph(f).graph
+  f.previous = a; next(f); f.facts.nodes[0].summary = '상태 B'; f.facts.nodes[0].meta['기준시각'] = '2027-03-24 10:00'
+  const b = reconcilePublicGraph(f).graph
+  f.previous = b; next(f); f.facts.nodes[0].summary = '상태 C'; f.facts.nodes[0].meta['기준시각'] = '2027-03-25 10:00'
+  const c = reconcilePublicGraph(f).graph, record = c.nodes.find((item) => item.id === 'char-test')
+  assert.equal(record.data.summary, '상태 C')
+  assert.deepEqual(record.history.map((snapshot) => snapshot.data.summary), ['공개 시험 설명', '상태 B'])
+  f.previous = c
+  const unchanged = reconcilePublicGraph(f)
+  assert.equal(unchanged.report.status, 'NOOP')
+  assert.equal(unchanged.graph.nodes.find((item) => item.id === 'char-test').history.length, 2)
+})
 test('same-save conflicting node does not silently overwrite', () => { const f = fixture(); f.previous = reconcilePublicGraph(f).graph; f.facts.nodes[0].summary = 'CONFLICT'; assert.throws(() => reconcilePublicGraph(f), /SAME_REVISION/) })
 test('node type cannot change even on a later save', () => { const f = fixture(); f.previous = reconcilePublicGraph(f).graph; next(f); f.facts.nodes[0].type = 'location'; assert.throws(() => reconcilePublicGraph(f), /ENTITY_TYPE_CHANGED/) })
 test('omission of a node or edge never deletes existing state', () => { const f = fixture(); f.previous = reconcilePublicGraph(f).graph; next(f); f.facts.nodes = []; f.facts.relations = []; const r = reconcilePublicGraph(f); assert.equal(r.graph.nodes.length, 3); assert.equal(r.graph.relations.length, 1) })
@@ -91,6 +104,18 @@ test('changed baseline metadata requires review', () => assert.throws(() => lega
 test('no image generation, database or site-publication effect', () => { const r = reconcilePublicGraph(fixture()).report; assert.equal(r.database_writes, 0); assert.equal(r.external_calls, 0); assert.equal(r.site_publications, 0) })
 
 async function disk(fn) { const dir = await mkdtemp(join(tmpdir(), 'graph-test-')); try { await fn(join(dir, 'GRAPH.json'), dir) } finally { await rm(dir, { recursive: true, force: true }) } }
+async function createTestSymlink(t, target, linkPath) {
+  try {
+    await symlink(target, linkPath)
+    return true
+  } catch (error) {
+    if (process.platform === 'win32' && error.code === 'EPERM') {
+      t.skip('Windows does not permit symlink creation in this environment')
+      return false
+    }
+    throw error
+  }
+}
 test('first graph is created atomically', async () => disk(async (file) => { const r = await writeGraphAtomically(file, null, 'GRAPH'); assert.equal(r.files_written, 1); assert.equal(await readFile(file, 'utf8'), 'GRAPH') }))
 test('unchanged local graph produces no write', async () => disk(async (file) => { await writeFile(file, 'GRAPH'); assert.equal((await writeGraphAtomically(file, 'GRAPH', 'GRAPH')).status, 'NOOP') }))
 test('existing graph is replaced only with a complete output', async () => disk(async (file) => { await writeFile(file, 'OLD'); await writeGraphAtomically(file, 'OLD', 'NEW'); assert.equal(await readFile(file, 'utf8'), 'NEW') }))
@@ -99,8 +124,8 @@ test('existing lock is not stolen', async () => disk(async (file) => { await wri
 test('failure before replace preserves good graph and removes own temporary', async () => disk(async (file, dir) => { await writeFile(file, 'OLD'); await assert.rejects(writeGraphAtomically(file, 'OLD', 'NEW', { beforeCommit: async () => { throw Error('TEST_IO') } })); assert.equal(await readFile(file, 'utf8'), 'OLD'); assert.deepEqual(await readdir(dir), ['GRAPH.json']) }))
 test('concurrent create is never overwritten', async () => disk(async (file) => { await assert.rejects(writeGraphAtomically(file, null, 'NEW', { beforeCommit: async () => writeFile(file, 'OTHER') })); assert.equal(await readFile(file, 'utf8'), 'OTHER') }))
 test('concurrent existing edit is retained', async () => disk(async (file) => { await writeFile(file, 'OLD'); await assert.rejects(writeGraphAtomically(file, 'OLD', 'NEW', { beforeCommit: async () => writeFile(file, 'OTHER') })); assert.equal(await readFile(file, 'utf8'), 'OTHER') }))
-test('symlinked graph file is rejected', async () => disk(async (file, dir) => { const target = join(dir, 'TARGET'); await writeFile(target, 'ORIGINAL'); await symlink(target, file); await assert.rejects(writeGraphAtomically(file, null, 'NEW')); assert.equal(await readFile(target, 'utf8'), 'ORIGINAL') }))
-test('symlinked output parent is rejected', async () => disk(async (file, dir) => { const linkPath = join(dir, 'link'); await symlink(dir, linkPath); await assert.rejects(writeGraphAtomically(join(linkPath, 'OTHER.json'), null, 'NEW')) }))
+test('symlinked graph file is rejected', async (t) => disk(async (file, dir) => { const target = join(dir, 'TARGET'); await writeFile(target, 'ORIGINAL'); if (!await createTestSymlink(t, target, file)) return; await assert.rejects(writeGraphAtomically(file, null, 'NEW')); assert.equal(await readFile(target, 'utf8'), 'ORIGINAL') }))
+test('symlinked output parent is rejected', async (t) => disk(async (file, dir) => { const linkPath = join(dir, 'link'); if (!await createTestSymlink(t, dir, linkPath)) return; await assert.rejects(writeGraphAtomically(join(linkPath, 'OTHER.json'), null, 'NEW')) }))
 test('RAW and another Chronicle are untouched', async () => disk(async (file, dir) => { await writeFile(join(dir, 'RAW.md'), 'RAW'); await writeFile(join(dir, 'C02.json'), 'C02'); await writeGraphAtomically(file, null, 'GRAPH'); assert.equal(await readFile(join(dir, 'RAW.md'), 'utf8'), 'RAW'); assert.equal(await readFile(join(dir, 'C02.json'), 'utf8'), 'C02') }))
 test('node-only output without links is valid', () => { const f = fixture(); f.book.chapters = []; f.facts.relations = []; const r = reconcilePublicGraph(f); assert.equal(r.graph.story_links.length, 0); assert.equal(r.graph.articles.length, 3) })
 test('canonical serialization is independent of object insertion order', () => assert.equal(graphBytes({ z: 1, a: 2 }), graphBytes({ a: 2, z: 1 })))

@@ -12,16 +12,24 @@ const graph = JSON.parse(await readFile(
   resolve(root, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'), 'utf8',
 ))
 
-test('rich visual profiles cover the complete 40-record public archive', () => {
+test('registered rich visual profiles reference valid public Graph nodes', () => {
   assert.equal(profiles.version, 'record-visual-profile-v1')
-  assert.equal(profiles.record_count, 40)
-  assert.equal(profiles.records.length, 40)
-  assert.equal(graph.articles.length, 40)
+  assert.equal(profiles.record_count, profiles.records.length)
 
-  const graphIds = new Set(graph.articles.map((article) => article.id))
+  const graphNodes = new Map(graph.nodes.map((record) => [record.id, record.data]))
   const profileIds = new Set(profiles.records.map((record) => record.node_id))
-  assert.equal(profileIds.size, 40)
-  assert.deepEqual([...profileIds].sort(), [...graphIds].sort())
+  assert.equal(profileIds.size, profiles.records.length)
+  for (const profile of profiles.records) {
+    assert.ok(graphNodes.has(profile.node_id), `${profile.node_id} is not a public Graph node`)
+    assert.equal(profile.type, graphNodes.get(profile.node_id).type, profile.node_id)
+  }
+})
+
+test('A-Wiki nodes stay outside Automation B manual visual enrichment', () => {
+  const profileIds = new Set(profiles.records.map((record) => record.node_id))
+  for (const id of ['char-jo-hansu', 'event-west-road-trial-agreement', 'event-west-road-rain-response']) {
+    assert.equal(profileIds.has(id), false)
+  }
 })
 
 test('every rich profile remains an editorial visual layer with usable depiction cues', () => {

@@ -1,0 +1,82 @@
+{
+  "version": "public-graph-facts-v1",
+  "chronicle_id": "C03-AFTERFALL",
+  "worldline_id": "AFTERFALL",
+  "visibility": "PUBLIC_ARCHIVE",
+  "season_id": "S03",
+  "anchor": {
+    "save_version": 274,
+    "game_time": "2027-07-12 17:30"
+  },
+  "nodes": [
+    {
+      "id": "char-jo-hansu",
+      "label": "조한수",
+      "type": "character",
+      "subtitle": "서쪽길 관리조 장부 담당",
+      "summary": "서쪽길 관리조에서 장부를 맡는다. 2027년 7월 긴급보강 예상표와 비용 항목을 설명하고 실제 투입분과 예비분을 구분하는 논의에 참여했다.",
+      "tags": [
+        "S03",
+        "인물",
+        "서쪽길 관리조"
+      ],
+      "source": "S03 SESSION_005 GM 공개 블록 001, 003, 005",
+      "meta": {
+        "역할": "관리조 장부 담당"
+      }
+    },
+    {
+      "id": "event-west-road-trial-agreement",
+      "label": "서쪽길 6주 시험협정",
+      "type": "event",
+      "subtitle": "2027년 6월 22일",
+      "summary": "장마철 전 6주 시험협정을 맺었다. 길드 부담은 실제 통행부담을 기준으로 정하고 관리조 노동을 비용에 포함했으며, 도로 관리권과 통행 통제권은 길드로 넘기지 않았다.",
+      "tags": [
+        "S03",
+        "서쪽길",
+        "시험협정"
+      ],
+      "source": "S03 SESSION_005 GM 공개 블록 001, 003, 005",
+      "meta": {
+        "기준시각": "2027-06-22 11:00"
+      }
+    },
+    {
+      "id": "event-west-road-rain-response",
+      "label": "서쪽길 긴급복구와 공동 장마계획",
+      "type": "event",
+      "subtitle": "2027년 7월 5일",
+      "summary": "도로 침하 대응에서 임시 흙 보강만으로는 반복을 막기 어렵다고 판단했다. 양측은 위험구간 공동 표시, 큰 차량의 우회·대기, 가용 자재 등록, 긴급공사 비용의 사건별 계산을 포함한 장마철 공동계획을 세웠다.",
+      "tags": [
+        "S03",
+        "서쪽길",
+        "긴급복구",
+        "장마계획"
+      ],
+      "source": "S03 SESSION_005 GM 공개 블록 001, 003, 005",
+      "meta": {
+        "기준시각": "2027-07-05 09:00"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "from": "event-west-road-trial-agreement",
+      "to": "loc-west-road",
+      "kind": "occurred_at",
+      "label": "서쪽길 관리구간"
+    },
+    {
+      "from": "char-jo-hansu",
+      "to": "event-west-road-rain-response",
+      "kind": "participated_in",
+      "label": "긴급보강 장부와 비용 설명"
+    },
+    {
+      "from": "event-west-road-rain-response",
+      "to": "loc-west-road",
+      "kind": "occurred_at",
+      "label": "서쪽길 침하 구간"
+    }
+  ]
+}
