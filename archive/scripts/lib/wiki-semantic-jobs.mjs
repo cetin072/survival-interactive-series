@@ -1,17 +1,12 @@
-import { createHash } from 'node:crypto'
 import { readdir, readFile, lstat } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { approvedSeasonCatalog } from './approved-reader-sources.mjs'
 import { splitRoleBlocks } from './reader-transform.mjs'
 import { byteHash, graphHash } from './publication-graph.mjs'
 
-export const WIKI_RESULT_VERSION = 'a-wiki-semantic-result-v1'
 const namespace = { chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', visibility: 'PUBLIC_ARCHIVE' }
 const demand = (condition, code) => { if (!condition) throw new Error(code) }
-const sha = (bytes) => createHash('sha256').update(bytes).digest('hex')
 const jsonBytes = (value) => Buffer.from(JSON.stringify(value, null, 2) + '\n')
-
-function blockText(block) { return block.body }
 
 /**
  * V1 deliberately supports the latest verified S03 source only. The A-Core
@@ -54,13 +49,13 @@ export async function discoverWikiSource(root) {
   return {
     manifestRef,
     sourceManifestRef,
-    sourceManifestSha256: sha(sourceManifestBytes),
-    sourceDigest: sha(sourceManifestBytes),
+    sourceManifestSha256: byteHash(sourceManifestBytes),
+    sourceDigest: byteHash(sourceManifestBytes),
     sourceSession: session,
     anchor,
     rawRef: part.archivePath,
-    rawSha256: sha(rawBytes),
-    gmBlocks: gmBlocks.map((block) => ({ messageLabel: block.header.messageLabel, body: blockText(block) })),
+    rawSha256: byteHash(rawBytes),
+    gmBlocks: gmBlocks.map((block) => ({ messageLabel: block.header.messageLabel, body: block.body })),
   }
 }
 
