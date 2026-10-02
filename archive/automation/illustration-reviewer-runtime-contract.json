@@ -143,5 +143,23 @@
   },
   "legacy_compatibility": {
     "null_context_hash": "PRE_V2_PATH_ALLOWED"
+  },
+  "visual_quality_policy": {
+    "incidental_text_and_interface": {
+      "automatic_reject": false,
+      "pass_when": [
+        "small_or_contextual",
+        "legible_or_visually_coherent",
+        "not_composition_dominant",
+        "does_not_create_unsupported_canon_or_identity"
+      ],
+      "reject_when": [
+        "garbled_or_malformed_text",
+        "nonsensical_repeated_glyphs",
+        "dominant_fake_ui_or_text_layout",
+        "specific_text_or_label_creates_unsupported_story_fact_or_identity",
+        "intrusive_watermark_or_generation_artifact"
+      ]
+    }
   }
 }
