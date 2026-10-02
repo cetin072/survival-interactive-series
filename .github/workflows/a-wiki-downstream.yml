@@ -1,6 +1,12 @@
 name: A-Wiki downstream public archive
 
 on:
+  pull_request:
+    paths:
+      - 'archive/scripts/lib/wiki-semantic-jobs*'
+      - 'archive/scripts/run-wiki-automation.mjs'
+      - 'archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_*.json'
+      - '.github/workflows/a-wiki-downstream.yml'
   push:
     branches: [main]
     paths:
@@ -11,7 +17,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: a-wiki-downstream
+  group: a-wiki-downstream-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -21,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.event.pull_request.head.sha || 'main' }}
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
