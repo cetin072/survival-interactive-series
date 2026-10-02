@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { graphWorldTime, sortGraphEvents, sortGraphHistory } from './graphWorldTime'
+import { graphChangeTime, graphWorldTime, sortGraphEvents, sortGraphHistory } from './graphWorldTime'
 
 const event = (id: string, subtitle: string, game_time: string, save_version: number, meta?: Record<string, string>) => ({
   id, data: { subtitle, ...(meta ? { meta } : {}) }, anchor: { game_time, save_version },
@@ -41,5 +41,14 @@ describe('public graph world time', () => {
       { ...event('item', '상태 A', '2027-07-12 17:30', 1, { 기준시각: '2027-06-01 09:00' }), data_sha256: 'a'.repeat(64) },
     ]
     expect(sortGraphHistory(history).map((snapshot) => snapshot.data.subtitle)).toEqual(['상태 B', '상태 A'])
+  })
+
+  it('uses the snapshot anchor when change time is unknown, even with a dated subtitle', () => {
+    const history = [
+      event('item', '2027-06-22 11:00', '2027-07-12 17:30', 274),
+      event('item', '2027-07-05 09:00', '2027-07-10 10:00', 273),
+    ]
+    expect(sortGraphHistory(history).map(graphChangeTime)).toEqual(['2027-07-12 17:30', '2027-07-10 10:00'])
+    expect(graphChangeTime(event('item', '2027-06-22 11:00', '2027-07-12 17:30', 274, { 기준시각: 'invalid' }))).toBe('2027-07-12 17:30')
   })
 })

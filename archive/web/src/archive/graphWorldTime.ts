@@ -24,11 +24,17 @@ function subtitleTime(subtitle: string | undefined): string | undefined {
   return validTime(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} ${time.padStart(5, '0')}`)
 }
 
-export function graphWorldTime(record: GraphTimeRecord): string {
+function explicitWorldTime(record: GraphTimeRecord): string | undefined {
   const explicit = record.data?.meta?.['기준시각']
   return validTime(typeof explicit === 'string' ? explicit : '')
-    ?? subtitleTime(record.data?.subtitle)
-    ?? record.anchor.game_time
+}
+
+export function graphWorldTime(record: GraphTimeRecord): string {
+  return explicitWorldTime(record) ?? subtitleTime(record.data?.subtitle) ?? record.anchor.game_time
+}
+
+export function graphChangeTime(record: GraphTimeRecord): string {
+  return explicitWorldTime(record) ?? record.anchor.game_time
 }
 
 export function sortGraphEvents<T extends GraphTimeRecord>(records: T[]): T[] {
@@ -41,7 +47,7 @@ export function sortGraphEvents<T extends GraphTimeRecord>(records: T[]): T[] {
 
 export function sortGraphHistory<T extends GraphTimeRecord & { data_sha256?: string }>(history: T[]): T[] {
   return [...history].sort((a, b) =>
-    graphWorldTime(b).localeCompare(graphWorldTime(a))
+    graphChangeTime(b).localeCompare(graphChangeTime(a))
     || b.anchor.save_version - a.anchor.save_version
     || (a.id ?? a.data_sha256 ?? '').localeCompare(b.id ?? b.data_sha256 ?? ''),
   )
