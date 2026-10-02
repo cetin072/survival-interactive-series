@@ -65,7 +65,7 @@ describe('one-source Reader navigation', () => {
     expect(parseArchiveRoute('?view=media').view).toBe('media')
     expect(parseArchiveRoute('', undefined, '/operator/')).toMatchObject({ view: 'operator' })
     expect(parseArchiveRoute('', undefined, '/operator/visuals/')).toMatchObject({ view: 'operator-visuals' })
-    expect(archiveRouteUrl({ view: 'operator-visuals', chronicleId: 'C03-AFTERFALL' }, 'https://archive.example/operator/')).pathname).toBe('/operator/visuals/')
+    expect(archiveRouteUrl({ view: 'operator-visuals', chronicleId: 'C03-AFTERFALL' }, 'https://archive.example/operator/').pathname).toBe('/operator/visuals/')
     expect(parseArchiveRoute('?view=chronicle&chronicle=C01-HAN-JUNHO').view).toBe('chronicle')
     expect(parseArchiveRoute('?view=chronicle&chronicle=C03-AFTERFALL&section=not-a-section')).toMatchObject({ view: 'chronicle', section: 'overview' })
   })
