@@ -9,13 +9,7 @@ const STYLE_VERSION = 'AFTERFALL_ARCHIVE_V1'
 const OPERATIONAL_TERM = /\b(github|supabase|netlify|workflow|provider|storage|registry|handoff|scheduler|automation|report|dashboard|json|sha|ci|pr|api|deploy|receipt)\b/i
 const NEGATING_RENDER_CUE = /(?:아니라|아닌|추가하지|사용하지|식별되지|과장하지|제외|금지|넣지|보이지 않|읽을 수 있는[^.;]*없이|\bno\b|\bwithout\b|\bdo not\b|\bnever\b|\bexclude\w*\b|\bforbid\w*\b)/i
 const NEGATING_RENDER_STYLE = /(?:\bnon-photorealistic\b|\bno\b|\bwithout\b|\bdo not\b|\bnever\b)/i
-const DEFAULT_NEGATIVE_VISUALS = [
-  'no readable text or signs',
-  'no numbers or labels',
-  'no watermark',
-  'no UI or interface elements',
-]
-const RENDERER_TEXT_EXCLUSION = '읽을 수 있는 글자, 숫자, 라벨, 간판 문구, 워터마크, UI/인터페이스 요소는 표현하지 않는다'
+const DEFAULT_NEGATIVE_VISUALS = []
 
 const isRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value)
 const requireRecord = (value) => {
@@ -183,7 +177,7 @@ function assertNoOutputContamination(positivePrompt, negativePrompt, checklist) 
 export function compileIllustrationRendererText(point, reviewContextBundle = null) {
   const source = requireRecord(point)
   const positiveText = compilePositiveText(source, reviewContextBundle, { requireContext: true })
-  const text = `${positiveText}. ${RENDERER_TEXT_EXCLUSION}`
+  const text = positiveText
 
   assertNoOperationalText(text)
   if (text.length < 40 || text.length > 6000) throw new Error('ILLUSTRATION_RENDERER_PROMPT_LENGTH_INVALID')
@@ -203,7 +197,10 @@ export function validateIllustrationImagePrompt(prompt) {
     throw new Error('INVALID_ILLUSTRATION_IMAGE_PROMPT')
   }
   const positivePrompt = requireText(contract.positive_prompt, { maxLength: 12000 })
-  const negativePrompt = requireText(contract.negative_prompt, { maxLength: 12000 })
+  if (typeof contract.negative_prompt !== 'string' || contract.negative_prompt.length > 12000) {
+    throw new Error('INVALID_ILLUSTRATION_IMAGE_PROMPT')
+  }
+  const negativePrompt = contract.negative_prompt
   const checklist = requireTextList(contract.review_checklist)
   assertNoOutputContamination(positivePrompt, negativePrompt, checklist)
   return contract
@@ -219,7 +216,7 @@ export function compileIllustrationImagePrompt(point, reviewContextBundle = null
     'match visible appearance or scene facts to the stored Canon and allowed render cues',
     'treat rich render cues as optional depiction choices rather than mandatory new Canon',
     'keep the AFTERFALL_ARCHIVE_V1 painterly semi-realistic direction and believable contemporary Korean material culture',
-    'reject unsupported story facts, unsupported identifying details, readable text, watermark or UI elements during review',
+    'incidental text, numbers, labels, signage, watermark-like marks or UI are not automatic rejection reasons when coherent and non-dominant; reject only malformed or intrusive artifacts or unsupported story claims',
   ]
 
   return validateIllustrationImagePrompt({
