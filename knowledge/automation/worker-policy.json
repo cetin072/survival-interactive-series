@@ -39,7 +39,9 @@
       "OTHER_SEVERE_HARM"
     ],
     "prefer_distinct_nonduplicate_question": true,
-    "never_downgrade_risk_to_make_auto_eligible": true
+    "never_downgrade_risk_to_make_auto_eligible": true,
+    "retain_high_risk_as_human_review": true,
+    "hold_only_when_no_worthwhile_package": true
   },
   "research_policy": {
     "story_source_is_narrative_provenance_only": true,
@@ -60,7 +62,8 @@
   "source_policy": {
     "require_verified_public_archive": true,
     "pin_source_manifest_sha256": true,
-    "leave_other_pending_sources_unprocessed": true
+    "leave_other_pending_sources_unprocessed": true,
+    "operator_inbox_is_default_staging": true
   },
   "notification_policy": {
     "notify_on": [
