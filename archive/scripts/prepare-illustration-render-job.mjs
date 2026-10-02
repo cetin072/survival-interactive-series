@@ -19,6 +19,13 @@ const kstDate = () => new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit',
 }).format(new Date()).replaceAll('-', '')
 
+const renderRunSuffix = () => {
+  const raw = process.env.GITHUB_RUN_ID ?? String(Date.now())
+  const normalized = raw.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(-20)
+  if (!normalized) throw new Error('ILLUSTRATION_PREP_RUN_SUFFIX_INVALID')
+  return normalized
+}
+
 function demand(ok, code) {
   if (!ok) throw new Error(code)
 }
@@ -111,7 +118,7 @@ export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}
     const promptSha256 = sha256(promptText)
     const safeSubject = candidate.subject_id.replace(/[^a-z0-9-]/g, '-')
     const generationSuffix = candidate.generation_key.slice('generation-'.length, 'generation-'.length + 12)
-    const jobId = `illustration-${safeSubject}-${generationSuffix}-${kstDate()}`
+    const jobId = `illustration-${safeSubject}-${generationSuffix}-${kstDate()}-${renderRunSuffix()}`
     const result = await rpc('archive_illustration_render_job_enqueue', {
       p_job: {
         job_id: jobId,
@@ -130,7 +137,10 @@ export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}
       },
     })
     if (result?.status === 'PREPARED' || result?.status === 'WAITING_EXISTING_JOB'
-      || result?.status === 'DAILY_JOB_CAP_REACHED' || result?.status === 'FINALIZE_QUEUED'
+      || result?.status === 'DAILY_JOB_CAP_REACHED'
+      || result?.status === 'DAILY_SUCCESS_TARGET_REACHED'
+      || result?.status === 'DAILY_ATTEMPT_CAP_REACHED'
+      || result?.status === 'FINALIZE_QUEUED'
       || result?.status === 'INGESTING' || result?.status === 'READY_FOR_REVIEW') {
       return { ...result, active_provider: activeProvider }
     }
