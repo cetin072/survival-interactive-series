@@ -18,6 +18,7 @@ type KnowledgeBrief = {
   id: string
   status: string
   slug: string
+  published_at?: string
   label?: string
   title: string
   summary: string
@@ -52,7 +53,7 @@ const wikiEntries: PublicSearchEntry[] = wikiNodeIndex.map((item) => {
   }
 })
 
-const knowledgeEntries: PublicSearchEntry[] = Object.values(knowledgeBriefs)
+export const publishedKnowledgeEntries: (PublicSearchEntry & { publishedAt?: string })[] = Object.values(knowledgeBriefs)
   .filter((brief) => brief.status === 'PUBLISHED')
   .map((brief) => ({
     id: 'knowledge:' + brief.id,
@@ -63,8 +64,9 @@ const knowledgeEntries: PublicSearchEntry[] = Object.values(knowledgeBriefs)
     summary: brief.summary ?? brief.lead ?? '',
     href: '/knowledge/' + encodeURIComponent(brief.slug) + '/',
     terms: [brief.id, brief.title, brief.label ?? '', brief.summary ?? '', brief.lead ?? '', brief.scope ?? ''],
+    publishedAt: brief.published_at,
   }))
-  .sort((a, b) => a.title.localeCompare(b.title, 'ko'))
+  .sort((a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? '') || a.title.localeCompare(b.title, 'ko'))
 
 const resourceEntries: PublicSearchEntry[] = siteVisualsFor('C03-AFTERFALL').map((asset) => {
   const node = requireWikiNode(asset.subject_id)
@@ -84,7 +86,7 @@ const resourceEntries: PublicSearchEntry[] = siteVisualsFor('C03-AFTERFALL').map
 
 export const publicSearchIndex: PublicSearchEntry[] = [
   ...wikiEntries,
-  ...knowledgeEntries,
+  ...publishedKnowledgeEntries,
   ...resourceEntries,
 ]
 
