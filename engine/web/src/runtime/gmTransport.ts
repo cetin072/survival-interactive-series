@@ -64,10 +64,10 @@ export function validateGMTransportRequest(value: unknown): ValidationResult<GMP
 export function validateGMTransportResponse(value: unknown): ValidationResult<GMProviderResult> {
   if (!isObject(value)) return { valid: false, message: 'Malformed GM transport response.' }
   if (value.status === 'unavailable' && typeof value.message === 'string') {
-    return { valid: true, value: { status: 'unavailable', message: value.message } }
+    return { valid: true, value: { status: 'unavailable', message: value.message, meta: isObject(value.meta) ? value.meta : undefined } }
   }
   if (value.status === 'proposal' && Object.prototype.hasOwnProperty.call(value, 'proposal')) {
-    return { valid: true, value: { status: 'proposal', proposal: value.proposal } }
+    return { valid: true, value: { status: 'proposal', proposal: value.proposal, meta: isObject(value.meta) ? value.meta : undefined } }
   }
   return { valid: false, message: 'Malformed GM transport response.' }
 }
