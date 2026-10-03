@@ -73,5 +73,15 @@
     "guide_id": null,
     "tools": [],
     "story_refs": []
+  },
+  {
+    "id": "emergency-information-access-control",
+    "title": "재난 정보 공유와 접근관리",
+    "brief_ids": [
+      "K-012"
+    ],
+    "guide_id": null,
+    "tools": [],
+    "story_refs": []
   }
 ]
