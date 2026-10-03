@@ -10,6 +10,8 @@ declare
   v_updated jsonb;
   v_inbox jsonb;
   v_detail jsonb;
+  v_review jsonb;
+  v_decision jsonb;
   v_job_id uuid;
   v_source_ref text := 'synthetic://knowledge-inbox/high-risk';
   v_result jsonb;
@@ -86,11 +88,51 @@ begin
     raise exception 'HUMAN_REVIEW package was not retained in Knowledge Inbox: %', v_inbox;
   end if;
 
+  perform set_config('request.jwt.claims','{"role":"service_role"}',true);
+  v_review := public.archive_worker_enqueue_review_item(
+    'C_KNOWLEDGE:K-999:' || repeat('c',40),
+    'C_KNOWLEDGE','KNOWLEDGE',null,'P1',
+    '고위험 질문','Synthetic high-risk review item.','HIGH',
+    'https://github.com/cetin072/survival-interactive-series/blob/' || repeat('c',40) || '/knowledge/content/briefs/K-999.json',
+    jsonb_build_object(
+      'brief_id','K-999',
+      'head_sha',repeat('c',40),
+      'decision','HUMAN_REVIEW',
+      'reason_codes',jsonb_build_array('HIGH_RISK_MEDICAL'),
+      'pr_number',999,
+      'head_ref','knowledge/worker/semantic-' || v_job_id::text
+    )
+  );
+  if v_review->>'status' <> 'PENDING' then
+    raise exception 'review queue item was not created: %', v_review;
+  end if;
+
+  perform set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-0000-4000-8000-000000000002"}',true);
+  v_inbox := public.archive_operator_knowledge_inbox();
+  if v_inbox->'items'->0->>'review_item_id' <> v_review->>'id'
+     or v_inbox->'items'->0->>'review_status' <> 'PENDING' then
+    raise exception 'Knowledge Inbox did not link existing human review: %', v_inbox;
+  end if;
+
   v_detail := public.archive_operator_knowledge_job_detail(v_job_id);
   if v_detail->'result'->>'decision' <> 'HUMAN_REVIEW'
      or v_detail->'result'->'candidate'->>'id' <> 'KC-inbox-high-risk'
-     or v_detail->'result'->'brief'->>'id' <> 'K-999' then
-    raise exception 'Knowledge Inbox detail did not preserve the full package: %', v_detail;
+     or v_detail->'result'->'brief'->>'id' <> 'K-999'
+     or v_detail->>'review_item_id' <> v_review->>'id'
+     or v_detail->>'review_status' <> 'PENDING' then
+    raise exception 'Knowledge Inbox detail did not preserve/link the full package: %', v_detail;
+  end if;
+
+  v_decision := public.archive_operator_decide_review_item(
+    (v_review->>'id')::uuid,'APPROVED','Approved from Knowledge Inbox test.'
+  );
+  if v_decision->>'status' <> 'APPROVED' then
+    raise exception 'Knowledge Inbox approval reuse failed: %', v_decision;
+  end if;
+  v_detail := public.archive_operator_knowledge_job_detail(v_job_id);
+  if v_detail->>'review_status' <> 'APPROVED'
+     or v_detail->>'review_decision_note' <> 'Approved from Knowledge Inbox test.' then
+    raise exception 'Knowledge Inbox did not reflect review decision: %', v_detail;
   end if;
 
   v_updated := public.archive_knowledge_semantic_job_update(
