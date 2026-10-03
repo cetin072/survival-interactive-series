@@ -5,36 +5,39 @@ import { splitRoleBlocks } from './reader-transform.mjs'
 import { byteHash, graphHash } from './publication-graph.mjs'
 
 const namespace = { chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', visibility: 'PUBLIC_ARCHIVE' }
+const seasonRoot = 'archive/content/transcripts/C03-AFTERFALL/S03'
+const factsRoot = 'archive/content/public-facts/C03-AFTERFALL/S03'
 const demand = (condition, code) => { if (!condition) throw new Error(code) }
 const jsonBytes = (value) => Buffer.from(JSON.stringify(value, null, 2) + '\n')
 
-/**
- * V1 deliberately supports the latest verified S03 source only. The A-Core
- * catalog performs the public visibility, pairing, path and hash checks; the
- * semantic input below is assembled from GM blocks only.
- */
-export async function discoverWikiSource(root) {
-  const manifestRef = 'archive/content/transcripts/C03-AFTERFALL/S03/MANIFEST.json'
-  const manifestBytes = await readFile(resolve(root, manifestRef))
-  const manifest = JSON.parse(manifestBytes.toString('utf8'))
-  demand(manifest.chronicle_id === namespace.chronicle_id && manifest.worldline_id === namespace.worldline_id, 'WIKI_SOURCE_NAMESPACE_INVALID')
-  demand(manifest.season_id === 'S03' && manifest.archive_class === 'COLD_RAW' && manifest.visibility === namespace.visibility, 'WIKI_SOURCE_NOT_PUBLIC_ARCHIVE')
-  const io = {
-    read: (ref) => readFile(resolve(root, ref)),
-    listParts: async (prefix) => (await readdir(resolve(root, prefix))).filter((name) => /^PART_\d{3}\.md$/.test(name)),
-  }
-  const approved = await approvedSeasonCatalog(manifest, 'S03', io)
-  const session = manifest.sessions.at(-1)
-  if (session?.session_id !== 'SESSION_005') {
-    const error = new Error('WIKI_V1_LATEST_SOURCE_UNSUPPORTED')
-    error.source_session = session?.session_id ?? 'UNKNOWN'
+export function expectedWikiFactPath(source) {
+  return `${factsRoot}/AWIKI_${source.sourceSession.session_id}_${source.sourceDigest}.json`
+}
+
+async function existingWikiFactNames(root) {
+  try {
+    return new Set((await readdir(resolve(root, factsRoot)))
+      .filter((name) => /^AWIKI_SESSION_\d{3}_[a-f0-9]{64}\.json$/.test(name)))
+  } catch (error) {
+    if (error.code === 'ENOENT') return new Set()
     throw error
   }
-  const sourceManifestRef = `archive/content/transcripts/C03-AFTERFALL/S03/${session.source_manifest}`
+}
+
+async function materializeWikiSource(root, approved, session) {
+  demand(/^SESSION_\d{3}$/.test(session?.session_id ?? ''), 'WIKI_SOURCE_SESSION_ID_INVALID')
+  const sourceManifestRef = `${seasonRoot}/${session.source_manifest}`
   const sourceManifestBytes = await readFile(resolve(root, sourceManifestRef))
   const sourceManifest = JSON.parse(sourceManifestBytes.toString('utf8'))
+  demand(sourceManifest.session_id === session.session_id
+    && sourceManifest.chronicle_id === namespace.chronicle_id
+    && sourceManifest.worldline_id === namespace.worldline_id
+    && sourceManifest.season_id === 'S03'
+    && sourceManifest.visibility === namespace.visibility,
+  'WIKI_SOURCE_MANIFEST_SCOPE_INVALID')
+
   const part = approved.find((entry) => entry.autoPublication.sessionId === session.session_id)
-  demand(part, 'WIKI_LATEST_SOURCE_NOT_APPROVED')
+  demand(part, 'WIKI_SOURCE_NOT_APPROVED')
   const rawPath = resolve(root, part.archivePath)
   demand((await lstat(rawPath)).isFile(), 'WIKI_SOURCE_PART_NOT_REGULAR_FILE')
   const rawBytes = await readFile(rawPath)
@@ -42,12 +45,19 @@ export async function discoverWikiSource(root) {
   const gmBlocks = blocks.filter((block) => block.header.role === 'GM')
   demand(gmBlocks.length === session.gm_public_blocks && gmBlocks.length === session.user_messages, 'WIKI_GM_PAIR_COUNT_MISMATCH')
   demand(gmBlocks.every((block) => block.header.messageLabel !== undefined), 'WIKI_GM_BLOCK_ORDER_MISSING')
+
   const lastPublicMessage = sourceManifest.content_sha256.at(-1)
   demand(lastPublicMessage?.role === 'GM' && lastPublicMessage.state_link?.outcome === 'APPLIED', 'WIKI_PUBLIC_ANCHOR_NOT_APPLIED')
-  const anchor = { save_version: lastPublicMessage.state_link.linked_save_version, game_time: sourceManifest.captured_message_range.end }
-  demand(anchor.save_version === 274 && anchor.game_time === '2027-07-12 17:30', 'WIKI_V1_ANCHOR_REVIEW_REQUIRED')
+  const anchor = {
+    save_version: lastPublicMessage.state_link.linked_save_version,
+    game_time: sourceManifest.captured_message_range.end,
+  }
+  demand(Number.isSafeInteger(anchor.save_version) && anchor.save_version > 0
+    && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(anchor.game_time),
+  'WIKI_SOURCE_ANCHOR_INVALID')
+
   return {
-    manifestRef,
+    manifestRef: `${seasonRoot}/MANIFEST.json`,
     sourceManifestRef,
     sourceManifestSha256: byteHash(sourceManifestBytes),
     sourceDigest: byteHash(sourceManifestBytes),
@@ -59,7 +69,59 @@ export async function discoverWikiSource(root) {
   }
 }
 
+/**
+ * A-Core owns source visibility/pairing/hash validation. A-Wiki walks the
+ * verified S03 sessions in manifest order and selects the first source whose
+ * exact immutable AWIKI fact file does not yet exist.
+ */
+export async function discoverWikiSources(root) {
+  const manifestRef = `${seasonRoot}/MANIFEST.json`
+  const manifestBytes = await readFile(resolve(root, manifestRef))
+  const manifest = JSON.parse(manifestBytes.toString('utf8'))
+  demand(manifest.chronicle_id === namespace.chronicle_id && manifest.worldline_id === namespace.worldline_id, 'WIKI_SOURCE_NAMESPACE_INVALID')
+  demand(manifest.season_id === 'S03' && manifest.archive_class === 'COLD_RAW' && manifest.visibility === namespace.visibility, 'WIKI_SOURCE_NOT_PUBLIC_ARCHIVE')
+  demand(Array.isArray(manifest.sessions) && manifest.sessions.length > 0, 'WIKI_SOURCE_MANIFEST_EMPTY')
+
+  const existingNames = await existingWikiFactNames(root)
+  const trackedSessionIds = new Set([...existingNames]
+    .map((name) => name.match(/^AWIKI_(SESSION_\d{3})_[a-f0-9]{64}\.json$/)?.[1])
+    .filter(Boolean))
+  const firstTrackedIndex = manifest.sessions.findIndex((session) => trackedSessionIds.has(session.session_id))
+  const trackedSessions = firstTrackedIndex >= 0 ? manifest.sessions.slice(firstTrackedIndex) : manifest.sessions
+
+  const io = {
+    read: (ref) => readFile(resolve(root, ref)),
+    listParts: async (prefix) => (await readdir(resolve(root, prefix))).filter((name) => /^PART_\d{3}\.md$/.test(name)),
+  }
+  const approved = await approvedSeasonCatalog(manifest, 'S03', io)
+  const sources = []
+  for (const session of trackedSessions) sources.push(await materializeWikiSource(root, approved, session))
+  return sources
+}
+
+export async function discoverWikiSource(root) {
+  const [sources, existingNames] = await Promise.all([
+    discoverWikiSources(root),
+    existingWikiFactNames(root),
+  ])
+  const source = sources.find((candidate) =>
+    !existingNames.has(expectedWikiFactPath(candidate).split('/').at(-1)))
+
+  if (!source) {
+    const error = new Error('WIKI_NO_PENDING_SOURCE')
+    error.source_session = sources.at(-1)?.sourceSession.session_id ?? null
+    throw error
+  }
+  return source
+}
+
 function semanticFacts(source) {
+  if (source.sourceSession.session_id !== 'SESSION_005') {
+    const error = new Error('WIKI_SEMANTIC_EXTRACTOR_REQUIRED')
+    error.source_session = source.sourceSession.session_id
+    throw error
+  }
+
   const gmText = source.gmBlocks.map((block) => block.body).join('\n\n').replace(/\*+/g, '')
   demand(/장부를 맡는\s+조한수라는 남자/.test(gmText), 'WIKI_NAMED_ENTITY_EVIDENCE_MISSING')
   demand(/장마철 전\s+6주 시험협정/.test(gmText), 'WIKI_AGREEMENT_EVIDENCE_MISSING')
@@ -117,6 +179,6 @@ export function validateWikiFacts(facts, source, graph) {
 export function prepareWikiFacts(source, graph) {
   const facts = semanticFacts(source)
   validateWikiFacts(facts, source, graph)
-  const path = `archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_005_${source.sourceDigest}.json`
+  const path = expectedWikiFactPath(source)
   return { facts, path, bytes: jsonBytes(facts), source: { source_ref: path, source_sha256: byteHash(jsonBytes(facts)) } }
 }

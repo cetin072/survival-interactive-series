@@ -2,27 +2,56 @@ import { test, before, after } from 'node:test'
 import assert from 'node:assert/strict'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { readFile, mkdtemp, cp, mkdir, writeFile, rm } from 'node:fs/promises'
+import { readFile, readdir, mkdtemp, cp, mkdir, writeFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import publicGraph from '../../content/graphs/C03-AFTERFALL/GRAPH.json' with { type: 'json' }
 import book from '../../content/stories/C03-AFTERFALL/BOOK.json' with { type: 'json' }
 import { byteHash, reconcilePublicGraph } from './publication-graph.mjs'
-import { discoverWikiSource, prepareWikiFacts, validateWikiFacts } from './wiki-semantic-jobs.mjs'
+import {
+  discoverWikiSource,
+  discoverWikiSources,
+  expectedWikiFactPath,
+  prepareWikiFacts,
+  validateWikiFacts,
+} from './wiki-semantic-jobs.mjs'
 
 const root = resolve(fileURLToPath(new URL('../../..', import.meta.url)))
+const transcriptRoot = 'archive/content/transcripts/C03-AFTERFALL/S03'
+const factsRoot = 'archive/content/public-facts/C03-AFTERFALL/S03'
 let fixtureRoot
+let backlogRoot
+
+async function copyManifestWithSessions(targetRoot, sessionIds) {
+  const manifest = JSON.parse(await readFile(resolve(root, transcriptRoot, 'MANIFEST.json')))
+  manifest.sessions = manifest.sessions.filter((session) => sessionIds.includes(session.session_id))
+  await writeFile(resolve(targetRoot, transcriptRoot, 'MANIFEST.json'), JSON.stringify(manifest))
+}
+
 before(async () => {
   fixtureRoot = await mkdtemp(resolve(tmpdir(), 'wiki-session-005-'))
-  const ref = 'archive/content/transcripts/C03-AFTERFALL/S03'
-  await mkdir(resolve(fixtureRoot, ref), { recursive: true })
-  await cp(resolve(root, ref, 'SESSION_005'), resolve(fixtureRoot, ref, 'SESSION_005'), { recursive: true })
-  const manifest = JSON.parse(await readFile(resolve(root, ref, 'MANIFEST.json')))
-  manifest.sessions = manifest.sessions.filter((session) => session.session_id === 'SESSION_005')
-  await writeFile(resolve(fixtureRoot, ref, 'MANIFEST.json'), JSON.stringify(manifest))
-})
-after(async () => { await rm(fixtureRoot, { recursive: true, force: true }) })
+  await mkdir(resolve(fixtureRoot, transcriptRoot), { recursive: true })
+  await cp(resolve(root, transcriptRoot, 'SESSION_005'), resolve(fixtureRoot, transcriptRoot, 'SESSION_005'), { recursive: true })
+  await copyManifestWithSessions(fixtureRoot, ['SESSION_005'])
 
-test('discovers only verified PUBLIC_ARCHIVE GM blocks from the latest S03 session', async () => {
+  backlogRoot = await mkdtemp(resolve(tmpdir(), 'wiki-backlog-'))
+  await mkdir(resolve(backlogRoot, transcriptRoot), { recursive: true })
+  await mkdir(resolve(backlogRoot, factsRoot), { recursive: true })
+  const backlogSessions = ['SESSION_001', 'SESSION_002', 'SESSION_003', 'SESSION_004', 'SESSION_005', 'SESSION_006']
+  for (const sessionId of backlogSessions) {
+    await cp(resolve(root, transcriptRoot, sessionId), resolve(backlogRoot, transcriptRoot, sessionId), { recursive: true })
+  }
+  await copyManifestWithSessions(backlogRoot, backlogSessions)
+  const applied005 = (await readdir(resolve(root, factsRoot))).find((name) => /^AWIKI_SESSION_005_[a-f0-9]{64}\.json$/.test(name))
+  assert.ok(applied005)
+  await cp(resolve(root, factsRoot, applied005), resolve(backlogRoot, factsRoot, applied005))
+})
+
+after(async () => {
+  await rm(fixtureRoot, { recursive: true, force: true })
+  await rm(backlogRoot, { recursive: true, force: true })
+})
+
+test('discovers only verified PUBLIC_ARCHIVE GM blocks from a selected S03 source', async () => {
   const source = await discoverWikiSource(fixtureRoot)
   assert.equal(source.sourceSession.session_id, 'SESSION_005')
   assert.equal(source.anchor.save_version, 274)
@@ -31,7 +60,19 @@ test('discovers only verified PUBLIC_ARCHIVE GM blocks from the latest S03 sessi
   assert.equal(source.gmBlocks.some((block) => block.body.includes('너 이거 얼마 쓰는지')), false)
 })
 
-test('emits three GM-grounded nodes and explicit relations with stable source identity', async () => {
+test('walks manifest order and selects SESSION_006 after exact SESSION_005 facts exist', async () => {
+  const sources = await discoverWikiSources(backlogRoot)
+  assert.deepEqual(sources.map((source) => source.sourceSession.session_id), ['SESSION_005', 'SESSION_006'])
+
+  const source = await discoverWikiSource(backlogRoot)
+  assert.equal(source.sourceSession.session_id, 'SESSION_006')
+  assert.equal(source.anchor.save_version, 280)
+  assert.equal(source.anchor.game_time, '2027-09-22 16:10')
+  assert.deepEqual(source.gmBlocks.map((block) => block.messageLabel), ['001', '003', '005', '007', '009', '011', '013'])
+  assert.match(expectedWikiFactPath(source), /AWIKI_SESSION_006_[a-f0-9]{64}\.json$/)
+})
+
+test('emits the legacy SESSION_005 GM-grounded facts with stable source identity', async () => {
   const source = await discoverWikiSource(fixtureRoot)
   const first = prepareWikiFacts(source, publicGraph)
   const second = prepareWikiFacts(source, publicGraph)
@@ -46,28 +87,23 @@ test('emits three GM-grounded nodes and explicit relations with stable source id
   assert.equal(first.source.source_sha256, byteHash(first.bytes))
 })
 
-test('unsupported latest source yields visible HUMAN_REVIEW without changing Graph', async () => {
+test('next generic source is visible as semantic work instead of being rejected by session number', async () => {
   const { runCli } = await import('../run-wiki-automation.mjs')
   const graphPath = resolve(root, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json')
   const before = await readFile(graphPath)
-  const output = await runCli(['--apply'], { discover: async () => {
-    const error = new Error('WIKI_V1_LATEST_SOURCE_UNSUPPORTED')
-    error.source_session = 'SESSION_006'
-    throw error
-  } })
+  const output = await runCli(['--apply'], { discover: () => discoverWikiSource(backlogRoot) })
   const result = JSON.parse(output)
   assert.equal(result.status, 'HUMAN_REVIEW')
   assert.equal(result.source_session, 'SESSION_006')
-  assert.equal(result.reason, 'WIKI_V1_LATEST_SOURCE_UNSUPPORTED')
+  assert.equal(result.reason, 'WIKI_SEMANTIC_EXTRACTOR_REQUIRED')
   assert.equal(result.graph_changed, false)
   assert.deepEqual(await readFile(graphPath), before)
 })
 
-test('latest real archive stays HUMAN_REVIEW and applied SESSION_005 stays NOOP', async () => {
+test('applied SESSION_005 remains a deterministic NOOP', async () => {
   const { runCli } = await import('../run-wiki-automation.mjs')
   const graphPath = resolve(root, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json')
   const before = await readFile(graphPath)
-  assert.equal(JSON.parse(await runCli(['--check'])).status, 'HUMAN_REVIEW')
   for (const mode of ['--apply', '--apply', '--check']) {
     const result = JSON.parse(await runCli([mode], { discover: () => discoverWikiSource(fixtureRoot) }))
     assert.equal(result.status, 'NOOP')
