@@ -67,9 +67,9 @@ Add a small provider-independent reviewer result bound to the exact proposal:
 
 Allowed decisions: `APPROVE`, `HUMAN_REVIEW`, `REJECT`.
 
-The reviewer receives the proposal, its literal GM evidence and the identity inventory required to judge the claims. It must check semantic entailment, identity, chronology, unsupported intent, and relation meaning. Exact quotation presence alone is not approval.
+The reviewer receives the **complete prepared job** (all verified GM blocks, source/Graph binding and identity inventory) together with the fixed proposal. It must check semantic entailment, identity, chronology, unsupported intent, relation meaning, and whether any material durable fact was omitted before accepting COMPLETE coverage. Exact quotation presence alone is not approval.
 
-The review is a separate second pass. It does not edit the extractor result. Any uncertainty returns HUMAN_REVIEW.
+The review is a fresh separate second pass with a new context. It does not edit the extractor result. Any uncertainty or material omission returns HUMAN_REVIEW.
 
 ## Safe historical reconciliation
 
