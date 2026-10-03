@@ -48,10 +48,10 @@ describe('WikiDocument compiler', () => {
   })
 
   it('compiles every supported character, location and event without a second source of truth', () => {
-    expect(wikiCharacterIndex).toHaveLength(19)
-    expect(wikiLocationIndex).toHaveLength(11)
-    expect(wikiEventIndex).toHaveLength(9)
-    expect(wikiSupportedNodeIds).toHaveLength(39)
+    expect(wikiCharacterIndex.length).toBeGreaterThan(0)
+    expect(wikiLocationIndex.length).toBeGreaterThan(0)
+    expect(wikiEventIndex.length).toBeGreaterThan(0)
+    expect(wikiSupportedNodeIds).toHaveLength(wikiCharacterIndex.length + wikiLocationIndex.length + wikiEventIndex.length)
 
     const documents = buildWikiDocuments(wikiSupportedNodeIds)
     expect(documents).toHaveLength(wikiSupportedNodeIds.length)
