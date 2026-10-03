@@ -41,8 +41,9 @@ export function OperatorIllustrationVault({
 
   const refresh = useCallback(async () => {
     if (!supabaseClient) return
+    const client = supabaseClient
     setBusy(true); setError('')
-    const { data, error: rpcError } = await supabaseClient.rpc('archive_operator_illustration_vault', { p_limit: 100 })
+    const { data, error: rpcError } = await client.rpc('archive_operator_illustration_vault', { p_limit: 100 })
     if (rpcError) {
       setError('보관함을 불러오지 못했습니다.')
       setBusy(false)
@@ -53,7 +54,7 @@ export function OperatorIllustrationVault({
 
     const stored = next.filter((item) => item.vault_status === 'STORED' && item.object_path)
     const signed = await Promise.all(stored.map(async (item) => {
-      const { data: signedData, error: signedError } = await supabaseClient.storage
+      const { data: signedData, error: signedError } = await client.storage
         .from(bucket)
         .createSignedUrl(item.object_path, 300)
       return [item.job_id, signedError ? '' : signedData?.signedUrl ?? ''] as const
