@@ -61,12 +61,13 @@ async function completePackage(root) {
   const proposal = compileWikiFactProposal(job, result)
   const reviewJob = buildWikiFactReviewJob(job, proposal)
   assert.equal(reviewJob.prepared_job.source.gm_blocks.length, 7)
-  const review = validateWikiFactReview(reviewJob, {
+  const review = {
     version: WIKI_REVIEW_VERSION,
     proposal_sha256: proposal.proposal_sha256,
     decision: 'APPROVE',
     note: 'TEST_ONLY independent approval after examining the complete prepared source.',
-  })
+  }
+  validateWikiFactReview(reviewJob, review)
   return { source, job, proposal, review }
 }
 
@@ -82,12 +83,13 @@ async function noFactsPackage(root) {
     nodes: [], relations: [], citations: [], deferred: [],
     note: 'TEST_ONLY complete no-facts disposition.',
   })
-  const review = validateWikiFactReview(buildWikiFactReviewJob(job, proposal), {
+  const review = {
     version: WIKI_REVIEW_VERSION,
     proposal_sha256: proposal.proposal_sha256,
     decision: 'APPROVE',
     note: 'TEST_ONLY no-facts approval.',
-  })
+  }
+  validateWikiFactReview(buildWikiFactReviewJob(job, proposal), review)
   return { source, job, proposal, review }
 }
 
