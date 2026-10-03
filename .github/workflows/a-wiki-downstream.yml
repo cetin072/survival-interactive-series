@@ -13,6 +13,7 @@ on:
       - 'docs/automation/A_WIKI_FACT_FINALIZER_PLAN_V1.md'
       - 'archive/scripts/run-wiki-automation.mjs'
       - 'archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_*.json'
+      - 'archive/content/public-facts/C03-AFTERFALL/S03/receipts/AWIKI_SESSION_*.json'
       - '.github/workflows/a-wiki-downstream.yml'
   push:
     branches: [main]
@@ -69,6 +70,7 @@ jobs:
             a-wiki-apply.json
             a-wiki-fact-job.json
             archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_*.json
+            archive/content/public-facts/C03-AFTERFALL/S03/receipts/AWIKI_SESSION_*.json
             archive/content/graphs/C03-AFTERFALL/GRAPH.json
           if-no-files-found: ignore
           retention-days: 30
