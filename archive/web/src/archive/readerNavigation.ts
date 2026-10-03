@@ -5,6 +5,7 @@ import type { ChronicleSection } from './ChronicleRoom'
 
 export type ArchiveRoute =
   | { view: 'home' | 'story' | 'tools' | 'media' | 'operator' | 'operator-visuals' | 'operator-knowledge' | 'operator-vault'; chronicleId: ChronicleId }
+  | { view: 'knowledge-preview'; chronicleId: ChronicleId; briefId?: string }
   | { view: 'wiki-preview'; chronicleId: ChronicleId; nodeId?: string; page?: 'home' | 'chronicle' }
   | { view: 'chronicle'; chronicleId: ChronicleId; section?: ChronicleSection }
   | { view: 'archive'; chronicleId: ChronicleId; nodeId?: string }
@@ -73,6 +74,7 @@ export function parseArchiveRoute(search: string, storage?: ReaderStorage, pathn
     nodeId: params.get('node') ?? undefined,
     page: params.get('page') === 'chronicle' ? 'chronicle' : 'home',
   }
+  if (view === 'knowledge-preview') return { view: 'knowledge-preview', chronicleId, briefId: params.get('brief') ?? undefined }
   if (view === 'archive') return { view: 'archive', chronicleId: activeChronicle.id, nodeId: params.get('node') ?? undefined }
   return { view: 'home', chronicleId: activeChronicle.id }
 }
@@ -91,6 +93,7 @@ export function archiveRouteUrl(route: ArchiveRoute, href: string): URL {
     url.pathname = '/'
     if (route.view !== 'home') url.searchParams.set('view', route.view === 'book' ? 'story' : route.view)
     if (route.view === 'wiki-preview' && route.nodeId) url.searchParams.set('node', route.nodeId)
+    if (route.view === 'knowledge-preview' && route.briefId) url.searchParams.set('brief', route.briefId)
     if (route.view === 'wiki-preview' && !route.nodeId && route.page === 'chronicle') url.searchParams.set('page', 'chronicle')
     if (route.view === 'chronicle' || route.view === 'book' || route.view === 'raw' || (route.view === 'wiki-preview' && route.page === 'chronicle')) url.searchParams.set('chronicle', route.chronicleId)
     if (route.view === 'chronicle' && route.section && route.section !== 'overview') url.searchParams.set('section', route.section)
