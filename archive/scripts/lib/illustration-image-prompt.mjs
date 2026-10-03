@@ -7,6 +7,7 @@ const GENERATION_KEY = /^generation-[a-f0-9]{64}$/
 const SUBJECT_ID = /^[a-z][a-z0-9-]{1,79}$/
 const STYLE_VERSION = 'AFTERFALL_ARCHIVE_V1'
 const OPERATIONAL_TERM = /\b(github|supabase|netlify|workflow|provider|storage|registry|handoff|scheduler|automation|report|dashboard|json|sha|ci|pr|api|deploy|receipt)\b/i
+const GENERATION_META_TERM = /(?:AFTERFALL|생존일기|시즌(?:\s*\d+)?|\bchronicle\b(?:\s*\d+)?|\bseason\b(?:\s*\d+)?|\bpost[-\s]?apocalyptic\b|\bapocalypse\b)/i
 const NEGATING_RENDER_CUE = /(?:아니라|아닌|추가하지|사용하지|식별되지|과장하지|제외|금지|넣지|보이지 않|읽을 수 있는[^.;]*없이|\bno\b|\bwithout\b|\bdo not\b|\bnever\b|\bexclude\w*\b|\bforbid\w*\b)/i
 const NEGATING_RENDER_STYLE = /(?:\bnon-photorealistic\b|\bno\b|\bwithout\b|\bdo not\b|\bnever\b)/i
 
@@ -30,6 +31,10 @@ function requireTextList(value) {
 
 function assertNoOperationalText(value) {
   if (OPERATIONAL_TERM.test(value)) throw new Error('ILLUSTRATION_PROMPT_OPERATIONAL_CONTEXT_REJECTED')
+}
+
+function assertNoGenerationMetaText(value) {
+  if (GENERATION_META_TERM.test(value)) throw new Error('ILLUSTRATION_PROMPT_WORLD_META_REJECTED')
 }
 
 function visualFactValues(value) {
@@ -118,7 +123,7 @@ function compileCharacterPositiveText(source, brief, art, reviewContextBundle, {
     `확인된 외형과 허용된 표현 범위: ${details.join('; ')}`,
     '한 사람만 화면의 중심에 두고 실제 생활자처럼 편안하고 자연스러운 자세와 표정을 보여준다',
     '배경은 단순하고 중립적인 현대 한국 생활공간으로 두며 얼굴, 체형, 옷감과 손의 사용감이 자연스럽게 드러나게 한다',
-    `빛·색감·화풍: ${STYLE_VERSION}; ${style.join('; ')}`,
+    `빛·색감·화풍: ${style.join('; ')}`,
   ].join('. ')
 }
 
@@ -137,7 +142,7 @@ function compileLocationPositiveText(source, brief, art, reviewContextBundle, { 
       : '시설과 생활 흔적을 단순하고 절제된 범위로 보여주는 넓은 환경 장면',
     '전경·중경·후경이 자연스럽게 이어지고 시설, 작업 흔적, 생활 소품이 실제 사용 공간처럼 배치된다',
     '사람이 필요한 경우에는 아주 작은 비식별 배경 인물만 두어 환경의 규모와 생활감을 보조한다',
-    `빛·색감·화풍: ${STYLE_VERSION}; ${style.join('; ')}`,
+    `빛·색감·화풍: ${style.join('; ')}`,
   ].join('. ')
 }
 
@@ -152,7 +157,7 @@ function compileEventPositiveText(source, brief, art, reviewContextBundle, { req
       : '실제 공간, 생활 소품, 사람의 행동과 환경 변화가 중심인 절제된 사건 장면',
     '사건의 의미는 실제 공간과 생활 흔적의 변화로 전달하고 장면 자체가 자연스럽게 상황을 설명하게 한다',
     '인물은 장면 이해에 필요한 수만 작고 자연스럽게 배치해 환경과 행동이 함께 보이게 한다',
-    `빛·색감·화풍: ${STYLE_VERSION}; ${style.join('; ')}`,
+    `빛·색감·화풍: ${style.join('; ')}`,
   ].join('. ')
 }
 
@@ -170,7 +175,12 @@ function compilePositiveText(source, reviewContextBundle, { requireContext = fal
 function assertNoOutputContamination(positivePrompt, negativePrompt, checklist) {
   assertNoOperationalText(positivePrompt)
   assertNoOperationalText(negativePrompt)
-  for (const item of checklist) assertNoOperationalText(item)
+  assertNoGenerationMetaText(positivePrompt)
+  assertNoGenerationMetaText(negativePrompt)
+  for (const item of checklist) {
+    assertNoOperationalText(item)
+    assertNoGenerationMetaText(item)
+  }
 }
 
 export function compileIllustrationRendererText(point, reviewContextBundle = null) {
@@ -179,6 +189,7 @@ export function compileIllustrationRendererText(point, reviewContextBundle = nul
   const text = positiveText
 
   assertNoOperationalText(text)
+  assertNoGenerationMetaText(text)
   if (text.length < 40 || text.length > 6000) throw new Error('ILLUSTRATION_RENDERER_PROMPT_LENGTH_INVALID')
   return text
 }
@@ -214,7 +225,7 @@ export function compileIllustrationImagePrompt(point, reviewContextBundle = null
   const reviewChecklist = [
     'match visible appearance or scene facts to the stored Canon and allowed render cues',
     'treat rich render cues as optional depiction choices rather than mandatory new Canon',
-    'keep the AFTERFALL_ARCHIVE_V1 painterly semi-realistic direction and believable contemporary Korean material culture',
+    'keep a painterly semi-realistic direction with believable contemporary Korean material culture',
     'incidental text, numbers, labels, signage, watermark-like marks or UI are not automatic rejection reasons when coherent and non-dominant; reject only malformed or intrusive artifacts or unsupported story claims',
   ]
 

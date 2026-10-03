@@ -8,7 +8,7 @@
 1. 저장소의 archive/content/visuals/C03-AFTERFALL/VISUALS.json과 현재 B identity 파일을 확인한다. main의 최신 상태를 기준으로 하며, 사용자 변경을 덮어쓰지 않는다.
 2. 이미 identity, 비공개 보관 성공, registry READY 또는 공개 자산이 있는 point/generation은 다시 처리하지 않는다. READY 후보가 없으면 변경 없이 종료한다.
 3. 후보의 public visual brief를 `archive/scripts/lib/illustration-image-prompt.mjs`의 compiler로 처리하고 `illustration-image-prompt-v1` 결과를 확인한다. malformed brief 또는 운영 문맥 오염이면 fail closed 한다.
-4. 이미지 생성 도구에는 `positive_prompt`와 `negative_prompt`만 전달한다. Scheduler, provider, workflow, storage, registry, report 등 운영 지시와 handoff/출판 문맥을 이미지 입력에 섞지 않는다. review checklist는 생성 이미지 품질 gate에서만 사용한다.
+4. 이미지 생성 도구에는 **순수한 `positive_prompt` 본문 하나만** 전달한다. `negative_prompt`는 생성 입력으로 전달하지 않는다. 프로젝트명·세계관명·시즌명·`AFTERFALL`·아포칼립스 같은 메타 라벨, Scheduler/provider/workflow/storage/registry/report 같은 운영 문맥, review checklist, handoff/출판 문맥을 이미지 입력에 섞지 않는다. 필요한 화풍은 `회화적 반실사`, 자연광, 색감, 붓터치처럼 실제로 그릴 수 있는 긍정 시각 묘사로만 표현한다.
 5. Codex 기본 이미지 생성 도구만 사용한다. 유료 API나 새 공급자를 사용하지 않는다. 한 후보당 최대 3회 생성한다. 금지 요소가 보이면 그 이미지는 거절한다. 최대 횟수 내 적합 이미지가 없으면 상태를 HOLD로 기록하고 다음 후보로 넘어가지 않는다.
 6. 원본 PNG 한 장만 수용한다. SHA-256, bytes, 가로·세로, 결과 ID, 전체 시도 수, 검토 요약과 거절 사유를 identity에 남긴다. 받아들이기 어려운 주관적 품질 문제는 임의로 통과시키지 말고 사람 검토 대상으로 둔다.
 7. identity 변경은 feature branch에서 PR로 제안한다. main에 identity가 합쳐진 뒤에만 그 exact merge commit을 source commit으로 사용한다.
