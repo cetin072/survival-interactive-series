@@ -62,7 +62,7 @@ test('discovers only verified PUBLIC_ARCHIVE GM blocks from a selected S03 sourc
 
 test('walks manifest order and selects SESSION_006 after exact SESSION_005 facts exist', async () => {
   const sources = await discoverWikiSources(backlogRoot)
-  assert.deepEqual(sources.map((source) => source.sourceSession.session_id), ['SESSION_001', 'SESSION_002', 'SESSION_003', 'SESSION_004', 'SESSION_005', 'SESSION_006'])
+  assert.deepEqual(sources.map((source) => source.sourceSession.session_id), ['SESSION_005', 'SESSION_006'])
 
   const source = await discoverWikiSource(backlogRoot)
   assert.equal(source.sourceSession.session_id, 'SESSION_006')
