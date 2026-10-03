@@ -4,7 +4,7 @@ import { chronicleRegistry } from './chronicleRegistry'
 import type { ChronicleSection } from './ChronicleRoom'
 
 export type ArchiveRoute =
-  | { view: 'home' | 'story' | 'tools' | 'media' | 'operator' | 'operator-visuals' | 'operator-knowledge' | 'operator-vault'; chronicleId: ChronicleId }
+  | { view: 'home' | 'story' | 'tools' | 'media' | 'wiki-preview' | 'operator' | 'operator-visuals' | 'operator-knowledge' | 'operator-vault'; chronicleId: ChronicleId }
   | { view: 'chronicle'; chronicleId: ChronicleId; section?: ChronicleSection }
   | { view: 'archive'; chronicleId: ChronicleId; nodeId?: string }
   | { view: 'book'; chronicleId: ChronicleId; chapterId?: string }
@@ -66,6 +66,7 @@ export function parseArchiveRoute(search: string, storage?: ReaderStorage, pathn
   }
   if (view === 'tools') return { view: 'tools', chronicleId }
   if (view === 'media') return { view: 'media', chronicleId }
+  if (view === 'wiki-preview') return { view: 'wiki-preview', chronicleId }
   if (view === 'archive') return { view: 'archive', chronicleId: activeChronicle.id, nodeId: params.get('node') ?? undefined }
   return { view: 'home', chronicleId: activeChronicle.id }
 }
