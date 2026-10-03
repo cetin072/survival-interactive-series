@@ -7,6 +7,7 @@ function GuideBlock({ block, guide }: { block: KnowledgeGuideBlock; guide: Knowl
   if (block.type === 'prose') return <p>{block.text}</p>
   if (block.type === 'note') return <aside className="knowledge-guide-note"><strong>주의</strong><p>{block.text}</p></aside>
   if (block.type === 'ordered_list') return <ol className="knowledge-guide-steps">{block.items.map((item) => <li key={item}>{item}</li>)}</ol>
+  if (block.type === 'unordered_list') return <ul className="knowledge-guide-list">{block.items.map((item) => <li key={item}>{item}</li>)}</ul>
   if (block.type === 'table') return <div className="knowledge-guide-table-wrap"><table><thead><tr>{block.headers.map((header) => <th key={header}>{header}</th>)}</tr></thead><tbody>{block.rows.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{cell}</td>)}</tr>)}</tbody></table></div>
   if (block.type === 'download/tool') {
     const tool = guide.tools.find((item) => item.path === block.tool_path)
@@ -26,7 +27,7 @@ export function KnowledgeGuidePage({ guide }: { guide: KnowledgeGuide }) {
     <div className="knowledge-guide-frame">
       <nav className="wiki-breadcrumb" aria-label="현재 위치">
         <a href="/?view=wiki-preview">생존일기</a><span>›</span>
-        <a href="/knowledge/">생존 지식</a><span>›</span>
+        <a href="/?view=knowledge-preview">생존 지식</a><span>›</span>
         <strong>{guide.label}</strong>
       </nav>
 
