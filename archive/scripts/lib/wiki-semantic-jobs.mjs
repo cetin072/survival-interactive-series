@@ -82,13 +82,20 @@ export async function discoverWikiSources(root) {
   demand(manifest.season_id === 'S03' && manifest.archive_class === 'COLD_RAW' && manifest.visibility === namespace.visibility, 'WIKI_SOURCE_NOT_PUBLIC_ARCHIVE')
   demand(Array.isArray(manifest.sessions) && manifest.sessions.length > 0, 'WIKI_SOURCE_MANIFEST_EMPTY')
 
+  const existingNames = await existingWikiFactNames(root)
+  const trackedSessionIds = new Set([...existingNames]
+    .map((name) => name.match(/^AWIKI_(SESSION_\d{3})_[a-f0-9]{64}\.json$/)?.[1])
+    .filter(Boolean))
+  const firstTrackedIndex = manifest.sessions.findIndex((session) => trackedSessionIds.has(session.session_id))
+  const trackedSessions = firstTrackedIndex >= 0 ? manifest.sessions.slice(firstTrackedIndex) : manifest.sessions
+
   const io = {
     read: (ref) => readFile(resolve(root, ref)),
     listParts: async (prefix) => (await readdir(resolve(root, prefix))).filter((name) => /^PART_\d{3}\.md$/.test(name)),
   }
   const approved = await approvedSeasonCatalog(manifest, 'S03', io)
   const sources = []
-  for (const session of manifest.sessions) sources.push(await materializeWikiSource(root, approved, session))
+  for (const session of trackedSessions) sources.push(await materializeWikiSource(root, approved, session))
   return sources
 }
 
@@ -97,11 +104,7 @@ export async function discoverWikiSource(root) {
     discoverWikiSources(root),
     existingWikiFactNames(root),
   ])
-
-  const firstTrackedIndex = sources.findIndex((candidate) =>
-    existingNames.has(expectedWikiFactPath(candidate).split('/').at(-1)))
-  const trackedSources = firstTrackedIndex >= 0 ? sources.slice(firstTrackedIndex) : sources
-  const source = trackedSources.find((candidate) =>
+  const source = sources.find((candidate) =>
     !existingNames.has(expectedWikiFactPath(candidate).split('/').at(-1)))
 
   if (!source) {
