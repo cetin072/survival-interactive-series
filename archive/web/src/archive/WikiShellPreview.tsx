@@ -1,12 +1,49 @@
+import publicGraph from '../../../content/graphs/C03-AFTERFALL/GRAPH.json'
+import type { ArchiveNode } from './archiveData'
+import { archiveArticleByNodeId } from './archiveArticleData'
+import { confirmedAppearanceFor } from './characterAppearance'
+import { chapterForNode } from './storyData'
+import { siteVisualFor } from './siteVisual'
 import './wikiShell.css'
+
+const subjectId = 'char-jinwoo'
+const record = publicGraph.nodes.find((item) => item.id === subjectId)
+if (!record) throw new Error('Wiki vertical slice source missing: ' + subjectId)
+
+const node = record.data as ArchiveNode
+const appearance = confirmedAppearanceFor(node)
+const article = archiveArticleByNodeId[subjectId]
+const visual = siteVisualFor(subjectId)
+const chapter = chapterForNode(subjectId)
+const nodeById = new Map(publicGraph.nodes.map((item) => [item.id, item.data as ArchiveNode]))
+const relations = publicGraph.relations
+  .filter((item) => item.data.from === subjectId || item.data.to === subjectId)
+  .map((item) => {
+    const otherId = item.data.from === subjectId ? item.data.to : item.data.from
+    return { label: item.data.label, node: nodeById.get(otherId), otherId }
+  })
+  .filter((item): item is { label: string; node: ArchiveNode; otherId: string } => Boolean(item.node))
+
+const statusLabel: Record<string, string> = {
+  ACTIVE: '활동 중',
+  INACTIVE: '비활성',
+}
+const affiliationLabel: Record<string, string> = {
+  CORE_FOUR: '핵심 4인',
+}
 
 const toc = [
   ['wiki-overview', '1. 개요'],
-  ['wiki-history', '2. 주요 행적'],
-  ['wiki-relations', '3. 관계'],
-  ['wiki-visuals', '4. 삽화'],
-  ['wiki-sources', '5. 기록 근거'],
+  ['wiki-appearance', '2. 외형'],
+  ['wiki-role', '3. 생존기에서의 역할'],
+  ['wiki-history', '4. 주요 행적'],
+  ['wiki-relations', '5. 관계'],
+  ['wiki-visuals', '6. 삽화'],
+  ['wiki-sources', '7. 관련 이야기 · 기록 근거'],
 ] as const
+
+const roleSection = article?.sections.find((section) => section.id === 'jinwoo-role')
+const historySections = article?.sections.filter((section) => section.id !== 'jinwoo-role') ?? []
 
 export function WikiShellPreview() {
   return <main className="wiki-shell" id="wiki-top">
@@ -17,7 +54,7 @@ export function WikiShellPreview() {
       </a>
       <form className="wiki-search" onSubmit={(event) => event.preventDefault()} role="search">
         <input aria-label="문서 검색" placeholder="인물, 장소, 사건, 생존 지식 검색" />
-        <button type="submit">검색</button>
+        <button type="submit" aria-label="검색은 다음 단계에서 연결">검색</button>
       </form>
       <nav aria-label="공용 메뉴">
         <a href="/">이야기</a>
@@ -28,26 +65,32 @@ export function WikiShellPreview() {
 
     <div className="wiki-frame">
       <nav className="wiki-breadcrumb" aria-label="현재 위치">
-        <a href="/">생존일기</a><span>›</span><a href="/?view=chronicle&chronicle=C03-AFTERFALL">AFTERFALL</a><span>›</span><strong>문서 미리보기</strong>
+        <a href="/">생존일기</a><span>›</span>
+        <a href="/?view=chronicle&chronicle=C03-AFTERFALL">AFTERFALL</a><span>›</span>
+        <span>인물</span><span>›</span><strong>{node.label}</strong>
       </nav>
 
       <article className="wiki-document">
         <header className="wiki-document-header">
-          <p className="wiki-document-kicker">구조 미리보기 · 실제 데이터 연결 전</p>
-          <h1>Wiki 문서 골격</h1>
-          <p>세계관 문서를 읽고 문서 사이를 이동하는 방식의 기본 화면입니다.</p>
+          <p className="wiki-document-kicker">C03 AFTERFALL · 인물</p>
+          <h1>{node.label}</h1>
+          <p>{node.subtitle}</p>
         </header>
 
-        <aside className="wiki-infobox" aria-label="문서 정보표">
-          <div className="wiki-infobox-cover">
-            <span>대표 이미지 자리</span>
+        <aside className="wiki-infobox" aria-label={node.label + ' 정보표'}>
+          <div className={'wiki-infobox-cover' + (visual ? ' has-image' : '')}>
+            {visual
+              ? <img src={visual.public_path} width={visual.width} height={visual.height} alt={node.label + ' 대표 삽화'} />
+              : <span>대표 삽화 없음</span>}
           </div>
-          <h2>문서 정보</h2>
+          <h2>{node.label}</h2>
           <dl>
-            <div><dt>문서 유형</dt><dd>인물 · 장소 · 사건 공통</dd></div>
-            <div><dt>소속 생존기</dt><dd>C03 AFTERFALL</dd></div>
-            <div><dt>공개 상태</dt><dd>구조 미리보기</dd></div>
-            <div><dt>데이터 출처</dt><dd>다음 단계에서 기존 Graph / Reader / Visual 연결</dd></div>
+            <div><dt>유형</dt><dd>인물</dd></div>
+            <div><dt>생존기</dt><dd>C03 AFTERFALL</dd></div>
+            <div><dt>역할</dt><dd>{node.subtitle}</dd></div>
+            <div><dt>상태</dt><dd>{statusLabel[node.meta?.상태 ?? ''] ?? node.meta?.상태 ?? '공개 기록'}</dd></div>
+            <div><dt>소속</dt><dd>{affiliationLabel[node.meta?.소속 ?? ''] ?? node.meta?.소속 ?? '기록 없음'}</dd></div>
+            <div><dt>기록 기준</dt><dd>{record.anchor.game_time}</dd></div>
           </dl>
         </aside>
 
@@ -59,47 +102,81 @@ export function WikiShellPreview() {
         <div className="wiki-article-body">
           <section id="wiki-overview">
             <h2><span>1.</span> 개요</h2>
-            <p>문서의 핵심 설명이 들어가는 자리입니다. 긴 세계관 정보는 카드 여러 개가 아니라 하나의 문서 흐름 안에서 읽습니다.</p>
-            <p>인물, 장소, 사건 이름은 내부 링크가 되어 다른 문서로 이어집니다. 다음 단계에서 실제 데이터를 연결합니다.</p>
+            <p className="wiki-lead">{node.summary}</p>
+            {article?.lead.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+          </section>
+
+          <section id="wiki-appearance">
+            <h2><span>2.</span> 외형</h2>
+            {appearance?.publicDescription
+              ? <p>{appearance.publicDescription}</p>
+              : <p className="wiki-muted">현재 공개 가능한 외형 기록이 없습니다.</p>}
+          </section>
+
+          <section id="wiki-role">
+            <h2><span>3.</span> 생존기에서의 역할</h2>
+            {roleSection
+              ? <>
+                  {roleSection.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+                  {!!roleSection.bullets?.length && <ul className="wiki-bullet-list">{roleSection.bullets.map((item) => <li key={item}>{item}</li>)}</ul>}
+                </>
+              : <p>{node.summary}</p>}
           </section>
 
           <section id="wiki-history">
-            <h2><span>2.</span> 주요 행적</h2>
-            <p>시간의 흐름에 따라 중요한 변화와 사건을 정리합니다. 기존 Graph의 변경 이력과 Reader 연결을 재사용할 자리입니다.</p>
-            <h3>2.1. 최근 기록</h3>
-            <p>세부 항목은 문서가 길어질 때만 사용합니다. 목차에는 자동으로 계층이 보이도록 확장할 수 있습니다.</p>
+            <h2><span>4.</span> 주요 행적</h2>
+            {historySections.map((section, sectionIndex) => <div className="wiki-subsection" key={section.id}>
+              <h3>4.{sectionIndex + 1}. {section.title}</h3>
+              {section.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+            </div>)}
+            {!!article?.timeline.length && <div className="wiki-timeline">
+              {article.timeline.map((item) => <article key={item.date + item.title}>
+                <time>{item.date}</time>
+                <div><strong>{item.title}</strong><p>{item.text}</p></div>
+              </article>)}
+            </div>}
           </section>
 
           <section id="wiki-relations">
-            <h2><span>3.</span> 관계</h2>
-            <p>관련 인물, 장소, 사건을 텍스트 내부 링크와 간단한 목록으로 연결합니다. Graph 자체는 뒤에서 관계 데이터를 공급합니다.</p>
-            <div className="wiki-related-links">
-              <a href="#wiki-relations">관련 인물 예시</a>
-              <a href="#wiki-relations">관련 장소 예시</a>
-              <a href="#wiki-relations">관련 사건 예시</a>
+            <h2><span>5.</span> 관계</h2>
+            <div className="wiki-relation-list">
+              {relations.map(({ label, node: related }) => <a key={related.id + label} href={'/?view=archive&node=' + encodeURIComponent(related.id)}>
+                <strong>{related.label}</strong>
+                <span>{label}</span>
+                <small>{related.subtitle}</small>
+              </a>)}
             </div>
           </section>
 
           <section id="wiki-visuals">
-            <h2><span>4.</span> 삽화</h2>
-            <p>Automation B의 공개 삽화가 있는 경우 문서 중간이나 정보표에 자연스럽게 배치합니다. 이미지가 없다고 빈 카드로 공간을 낭비하지 않습니다.</p>
+            <h2><span>6.</span> 삽화</h2>
+            {visual
+              ? <figure className="wiki-main-visual"><img src={visual.public_path} width={visual.width} height={visual.height} alt={node.label + ' 공개 삽화'} /><figcaption>{visual.caption ?? node.label + ' · 공개 삽화'}</figcaption></figure>
+              : <p className="wiki-muted">현재 공개된 삽화가 없습니다.</p>}
           </section>
 
           <section id="wiki-sources">
-            <h2><span>5.</span> 기록 근거</h2>
-            <p>Reader와 공개 원문은 메인 메뉴가 아니라 문서의 근거와 관련 이야기로 연결합니다.</p>
+            <h2><span>7.</span> 관련 이야기 · 기록 근거</h2>
             <div className="wiki-source-box">
               <strong>관련 이야기</strong>
-              <span>Reader 연결 자리</span>
+              <span>{chapter
+                ? <a href={'/?view=story&chronicle=C03-AFTERFALL&chapter=' + encodeURIComponent(chapter.id)}>{chapter.title}</a>
+                : '직접 연결된 공개 장 없음'}</span>
+              <strong>현재 상태</strong>
+              <span>공개 Graph · {record.anchor.game_time} · save {record.anchor.save_version}</span>
               <strong>원문 기록</strong>
-              <span>RAW 근거 연결 자리</span>
+              <span>{article?.transcriptPartIds.length
+                ? article.transcriptPartIds.map((partId, index) => <span className="wiki-inline-source" key={partId}><a href={'/?view=raw&chronicle=C03-AFTERFALL&part=' + encodeURIComponent(partId)}>{partId}</a>{index < article.transcriptPartIds.length - 1 ? ' · ' : ''}</span>)
+                : '연결된 공개 원문 없음'}</span>
             </div>
           </section>
         </div>
 
         <footer className="wiki-document-footer" id="wiki-bottom">
           <strong>관련 문서</strong>
-          <nav><a href="#wiki-top">생존기</a><a href="#wiki-top">인물</a><a href="#wiki-top">장소</a><a href="#wiki-top">사건</a></nav>
+          <nav>
+            {relations.slice(0, 8).map(({ node: related }) => <a key={related.id} href={'/?view=archive&node=' + encodeURIComponent(related.id)}>{related.label}</a>)}
+          </nav>
         </footer>
       </article>
     </div>
