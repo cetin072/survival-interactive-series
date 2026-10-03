@@ -36,10 +36,11 @@ before(async () => {
   backlogRoot = await mkdtemp(resolve(tmpdir(), 'wiki-backlog-'))
   await mkdir(resolve(backlogRoot, transcriptRoot), { recursive: true })
   await mkdir(resolve(backlogRoot, factsRoot), { recursive: true })
-  for (const sessionId of ['SESSION_005', 'SESSION_006']) {
+  const backlogSessions = ['SESSION_001', 'SESSION_002', 'SESSION_003', 'SESSION_004', 'SESSION_005', 'SESSION_006']
+  for (const sessionId of backlogSessions) {
     await cp(resolve(root, transcriptRoot, sessionId), resolve(backlogRoot, transcriptRoot, sessionId), { recursive: true })
   }
-  await copyManifestWithSessions(backlogRoot, ['SESSION_005', 'SESSION_006'])
+  await copyManifestWithSessions(backlogRoot, backlogSessions)
   const applied005 = (await readdir(resolve(root, factsRoot))).find((name) => /^AWIKI_SESSION_005_[a-f0-9]{64}\.json$/.test(name))
   assert.ok(applied005)
   await cp(resolve(root, factsRoot, applied005), resolve(backlogRoot, factsRoot, applied005))
@@ -61,7 +62,7 @@ test('discovers only verified PUBLIC_ARCHIVE GM blocks from a selected S03 sourc
 
 test('walks manifest order and selects SESSION_006 after exact SESSION_005 facts exist', async () => {
   const sources = await discoverWikiSources(backlogRoot)
-  assert.deepEqual(sources.map((source) => source.sourceSession.session_id), ['SESSION_005', 'SESSION_006'])
+  assert.deepEqual(sources.map((source) => source.sourceSession.session_id), ['SESSION_001', 'SESSION_002', 'SESSION_003', 'SESSION_004', 'SESSION_005', 'SESSION_006'])
 
   const source = await discoverWikiSource(backlogRoot)
   assert.equal(source.sourceSession.session_id, 'SESSION_006')
