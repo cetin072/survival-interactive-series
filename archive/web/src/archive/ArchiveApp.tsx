@@ -4,6 +4,7 @@ import { ChronicleRoom, chronicleFilterFor, type ChronicleSection } from './Chro
 import { RawTranscriptReader } from './RawTranscriptReader'
 import { StoryBookReader } from './StoryBookReader'
 import { StoryLibrary } from './StoryLibrary'
+import { WikiShellPreview } from './WikiShellPreview'
 import { activeChronicle, getChronicle } from './transcriptData'
 import type { ReaderChapter } from './storyData'
 import { archiveRouteUrl, browserReaderStorage, parseArchiveRoute, resolveReaderRoute, type ArchiveRoute } from './readerNavigation'
@@ -40,6 +41,8 @@ export function ArchiveApp() {
   const openRoom = (id: string, section: ChronicleSection = 'overview') => open({ view: 'chronicle', chronicleId: id, section })
   const roomSection = route.view === 'chronicle' ? route.section ?? 'overview' : 'overview'
   const roomHasGraph = route.view === 'chronicle' && route.chronicleId === 'C03-AFTERFALL' && ['explorer','characters','locations','events','graph'].includes(roomSection)
+
+  if (route.view === 'wiki-preview') return <WikiShellPreview />
 
   return <main className="archive-shell">
     <header className="archive-header">
