@@ -7,8 +7,12 @@ import { siteVisualFor } from './siteVisual'
 import './wikiShell.css'
 
 const subjectId = 'char-jinwoo'
-const record = publicGraph.nodes.find((item) => item.id === subjectId)
-if (!record) throw new Error('Wiki vertical slice source missing: ' + subjectId)
+function requireGraphRecord(id: string) {
+  const found = publicGraph.nodes.find((item) => item.id === id)
+  if (!found) throw new Error('Wiki vertical slice source missing: ' + id)
+  return found
+}
+const record = requireGraphRecord(subjectId)
 
 const node = record.data as ArchiveNode
 const appearance = confirmedAppearanceFor(node)
