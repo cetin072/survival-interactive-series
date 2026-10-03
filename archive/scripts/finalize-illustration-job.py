@@ -488,20 +488,23 @@ def finalize(job_id):
     if not asset:
         fail("FINALIZER_SITE_ASSET_NOT_PUBLISHED")
 
-    cleanup = rpc("archive_illustration_review_staging_cleanup", {
-        "p_job_id": job_id,
-        "p_lease_token": LEASE_TOKEN,
-        "p_staging_id": job["review_staging_id"],
-        "p_source_sha256": job["output_sha256"],
-    })
-    if not isinstance(cleanup, dict) or cleanup.get("deleted") != 1:
-        fail("FINALIZER_REVIEW_STAGING_CLEANUP_FAILED")
-
     rpc("archive_illustration_render_job_finish", {
         "p_job_id": job_id,
         "p_status": "SUCCEEDED",
         "p_summary": {"lease_token": LEASE_TOKEN},
     })
+
+    # The 30-day vault and permanent finalizer may race on the same immutable
+    # review staging. Cleanup is safe only after the vault copy is STORED.
+    # If the vault is still pending this returns deleted=0; the vault worker
+    # performs the same cleanup after it stores the object.
+    cleanup = rpc("archive_illustration_vault_cleanup_review_staging", {
+        "p_job_id": job_id,
+        "p_source_sha256": job["output_sha256"],
+    })
+    if not isinstance(cleanup, dict):
+        fail("FINALIZER_REVIEW_STAGING_CLEANUP_CHECK_FAILED")
+
     return {
         "status": "AUTOMATION_B_FINALIZED",
         "job_id": job_id,
