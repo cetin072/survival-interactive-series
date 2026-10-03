@@ -195,7 +195,7 @@
     "human_review_behavior": "Keep only the temporary vault copy unless later approved through a separate operator flow."
   },
   "staging_transport": {
-    "source_path": "/AFTERFALL-B/render-output/current.png",
+    "source_path": "/IMAGE-RENDER/output/current.png",
     "source_acquisition": "FILES_LIBRARY_RAW_MATERIALIZE",
     "preview_or_image_asset_pointer_is_not_binary_transport": true,
     "encoding": "base64",
