@@ -1,4 +1,6 @@
+import { WikiChroniclePreview } from './WikiChroniclePreview'
 import { WikiDocumentPage } from './WikiDocumentPage'
+import { WikiHomePreview } from './WikiHomePreview'
 import {
   buildWikiDocument,
   isWikiSupportedNodeId,
@@ -7,45 +9,51 @@ import {
   wikiLocationIndex,
 } from './wikiDocument'
 
-const defaultNodeId = 'char-jinwoo'
-
-function selectedWikiNodeId(requested?: string) {
-  return requested && isWikiSupportedNodeId(requested) ? requested : defaultNodeId
-}
-
 function wikiHref(nodeId: string) {
   return '/?view=wiki-preview&node=' + encodeURIComponent(nodeId)
 }
 
-export function WikiShellPreview({ nodeId }: { nodeId?: string }) {
-  const selectedNodeId = selectedWikiNodeId(nodeId)
-  const document = buildWikiDocument(selectedNodeId)
+export function WikiShellPreview({
+  nodeId,
+  page = 'home',
+  chronicleId = 'C03-AFTERFALL',
+}: {
+  nodeId?: string
+  page?: 'home' | 'chronicle'
+  chronicleId?: string
+}) {
+  if (nodeId && isWikiSupportedNodeId(nodeId)) {
+    const document = buildWikiDocument(nodeId)
 
-  const previewTools = <form className="wiki-preview-tools" action="/" method="get">
-    <input type="hidden" name="view" value="wiki-preview" />
-    <label>
-      <span>Wiki 문서 미리보기</span>
-      <select name="node" defaultValue={selectedNodeId}>
-        <optgroup label="인물">
-          {wikiCharacterIndex.map((item) => <option key={item.id} value={item.id}>{item.title} · {item.subtitle}</option>)}
-        </optgroup>
-        <optgroup label="장소">
-          {wikiLocationIndex.map((item) => <option key={item.id} value={item.id}>{item.title} · {item.subtitle}</option>)}
-        </optgroup>
-        <optgroup label="사건">
-          {wikiEventIndex.map((item) => <option key={item.id} value={item.id}>{item.title} · {item.subtitle}</option>)}
-        </optgroup>
-      </select>
-    </label>
-    <button type="submit">열기</button>
-    <small>인물·장소·사건은 Wiki 문서로 연결합니다. 자료(reference)는 기존 Archive에서 유지합니다.</small>
-  </form>
+    const previewTools = <form className="wiki-preview-tools" action="/" method="get">
+      <input type="hidden" name="view" value="wiki-preview" />
+      <label>
+        <span>Wiki 문서 미리보기</span>
+        <select name="node" defaultValue={nodeId}>
+          <optgroup label="인물">
+            {wikiCharacterIndex.map((item) => <option key={item.id} value={item.id}>{item.title} · {item.subtitle}</option>)}
+          </optgroup>
+          <optgroup label="장소">
+            {wikiLocationIndex.map((item) => <option key={item.id} value={item.id}>{item.title} · {item.subtitle}</option>)}
+          </optgroup>
+          <optgroup label="사건">
+            {wikiEventIndex.map((item) => <option key={item.id} value={item.id}>{item.title} · {item.subtitle}</option>)}
+          </optgroup>
+        </select>
+      </label>
+      <button type="submit">열기</button>
+      <small>인물·장소·사건은 Wiki 문서로 연결합니다. 자료(reference)는 기존 Archive에서 유지합니다.</small>
+    </form>
 
-  return <WikiDocumentPage
-    document={document}
-    previewTools={previewTools}
-    relationHref={(relation) => isWikiSupportedNodeId(relation.nodeId)
-      ? wikiHref(relation.nodeId)
-      : '/?view=archive&node=' + encodeURIComponent(relation.nodeId)}
-  />
+    return <WikiDocumentPage
+      document={document}
+      previewTools={previewTools}
+      relationHref={(relation) => isWikiSupportedNodeId(relation.nodeId)
+        ? wikiHref(relation.nodeId)
+        : '/?view=archive&node=' + encodeURIComponent(relation.nodeId)}
+    />
+  }
+
+  if (page === 'chronicle') return <WikiChroniclePreview chronicleId={chronicleId} />
+  return <WikiHomePreview />
 }
