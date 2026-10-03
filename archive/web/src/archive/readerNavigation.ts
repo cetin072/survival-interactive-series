@@ -5,6 +5,7 @@ import type { ChronicleSection } from './ChronicleRoom'
 
 export type ArchiveRoute =
   | { view: 'home' | 'story' | 'tools' | 'media' | 'operator' | 'operator-visuals' | 'operator-knowledge' | 'operator-vault'; chronicleId: ChronicleId }
+  | { view: 'operator-knowledge-detail'; chronicleId: ChronicleId; jobId: string }
   | { view: 'knowledge-preview'; chronicleId: ChronicleId; briefId?: string }
   | { view: 'wiki-preview'; chronicleId: ChronicleId; nodeId?: string; page?: 'home' | 'chronicle' }
   | { view: 'chronicle'; chronicleId: ChronicleId; section?: ChronicleSection }
@@ -54,7 +55,9 @@ export function parseArchiveRoute(search: string, storage?: ReaderStorage, pathn
   const requested = params.get('chronicle')
   const chronicleId = chronicleRegistry.find((chronicle) => chronicle.id === requested)?.id ?? activeChronicle.id
   if (pathname === '/operator/visuals' || pathname.startsWith('/operator/visuals/')) return { view: 'operator-visuals', chronicleId }
-  if (pathname === '/operator/knowledge' || pathname.startsWith('/operator/knowledge/')) return { view: 'operator-knowledge', chronicleId }
+  const knowledgeDetail = /^\/operator\/knowledge\/([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\/?$/i.exec(pathname)
+  if (knowledgeDetail) return { view: 'operator-knowledge-detail', chronicleId, jobId: knowledgeDetail[1].toLowerCase() }
+  if (pathname === '/operator/knowledge' || pathname === '/operator/knowledge/' || pathname.startsWith('/operator/knowledge/')) return { view: 'operator-knowledge', chronicleId }
   if (pathname === '/operator/vault' || pathname.startsWith('/operator/vault/')) return { view: 'operator-vault', chronicleId }
   if (pathname === '/operator' || pathname === '/operator/' || pathname.startsWith('/operator/')) return { view: 'operator', chronicleId }
   const view = params.get('view')
@@ -82,8 +85,8 @@ export function parseArchiveRoute(search: string, storage?: ReaderStorage, pathn
 export function archiveRouteUrl(route: ArchiveRoute, href: string): URL {
   const url = new URL(href)
   url.search = ''; url.hash = ''
-  if (route.view === 'operator' || route.view === 'operator-visuals' || route.view === 'operator-knowledge' || route.view === 'operator-vault') {
-    url.pathname = route.view === 'operator-visuals' ? '/operator/visuals/' : route.view === 'operator-knowledge' ? '/operator/knowledge/' : route.view === 'operator-vault' ? '/operator/vault/' : '/operator/'
+  if (route.view === 'operator' || route.view === 'operator-visuals' || route.view === 'operator-knowledge' || route.view === 'operator-knowledge-detail' || route.view === 'operator-vault') {
+    url.pathname = route.view === 'operator-visuals' ? '/operator/visuals/' : route.view === 'operator-knowledge' ? '/operator/knowledge/' : route.view === 'operator-knowledge-detail' ? `/operator/knowledge/${route.jobId}/` : route.view === 'operator-vault' ? '/operator/vault/' : '/operator/'
   } else if (route.view === 'archive') {
     url.pathname = '/'
     if (route.nodeId) {

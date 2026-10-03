@@ -3,6 +3,7 @@ import type { User } from '@supabase/supabase-js'
 import { chronicleRegistry } from './chronicleRegistry'
 import { OperatorVisualMetadata } from './OperatorVisualMetadata'
 import { OperatorKnowledgeInbox } from './OperatorKnowledgeInbox'
+import { OperatorKnowledgeDetail } from './OperatorKnowledgeDetail'
 import { OperatorIllustrationVault } from './OperatorIllustrationVault'
 import { supabaseClient } from './supabaseClient'
 import { operatorPasswordRedirectUrl, validatePasswordChange } from './operatorPassword'
@@ -88,7 +89,7 @@ const readJson = async <T,>(path: string): Promise<T | null> => {
   }
 }
 
-export default function OperatorConsole({ view = 'dashboard' }: { view?: 'dashboard' | 'visuals' | 'knowledge' | 'vault' }) {
+export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: { view?: 'dashboard' | 'visuals' | 'knowledge' | 'knowledge-detail' | 'vault'; knowledgeJobId?: string }) {
   const [user, setUser] = useState<User | null>(null)
   const [ready, setReady] = useState(false)
   const [email, setEmail] = useState('')
@@ -244,6 +245,7 @@ export default function OperatorConsole({ view = 'dashboard' }: { view?: 'dashbo
   </section>
 
   if (view === 'knowledge') return <OperatorKnowledgeInbox email={user.email} busy={busy} onSignOut={() => void signOut()} />
+  if (view === 'knowledge-detail' && knowledgeJobId) return <OperatorKnowledgeDetail jobId={knowledgeJobId} email={user.email} busy={busy} onSignOut={() => void signOut()} />
   if (view === 'vault') return <OperatorIllustrationVault email={user.email} busy={busy} onSignOut={() => void signOut()} />
 
   if (view === 'visuals') return <section className="operator-page">

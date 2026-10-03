@@ -57,7 +57,7 @@ jobs:
           node --input-type=module <<'NODE' >> "$GITHUB_OUTPUT"
           import { readFileSync } from 'node:fs'
           const result = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/review.json', 'utf8'))
-          const fields = ['status','reason','item_id','decided_at','brief_id','approved_head_sha','prepared_head_sha','pr_number','head_ref','current_main','merge_sha']
+          const fields = ['status','reason','item_id','decided_at','brief_id','approved_head_sha','prepared_head_sha','pr_number','head_ref','current_main','merge_sha','operator_job_id','operator_draft_revision','operator_draft_sha256']
           for (const field of fields) {
             if (result[field] !== undefined && result[field] !== null) console.log(`${field}=${result[field]}`)
           }
@@ -150,6 +150,23 @@ jobs:
         if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
         working-directory: archive/web
         run: npm ci
+
+      - name: Apply exact approved Operator draft
+        if: steps.inspect.outputs.status == 'READY' && steps.inspect.outputs.operator_draft_revision != ''
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          JOB_ID: ${{ steps.inspect.outputs.operator_job_id }}
+          DRAFT_REVISION: ${{ steps.inspect.outputs.operator_draft_revision }}
+          DRAFT_SHA256: ${{ steps.inspect.outputs.operator_draft_sha256 }}
+          BRIEF_ID: ${{ steps.inspect.outputs.brief_id }}
+        run: |
+          set -euo pipefail
+          node archive/scripts/knowledge-operator-draft-apply.mjs \
+            --job-id "$JOB_ID" \
+            --revision "$DRAFT_REVISION" \
+            --draft-sha256 "$DRAFT_SHA256" \
+            --brief-id "$BRIEF_ID"
 
       - name: Revalidate approved source package
         if: steps.inspect.outputs.status == 'READY'

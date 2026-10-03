@@ -67,9 +67,13 @@ describe('one-source Reader navigation', () => {
     expect(parseArchiveRoute('', undefined, '/operator/')).toMatchObject({ view: 'operator' })
     expect(parseArchiveRoute('', undefined, '/operator/visuals/')).toMatchObject({ view: 'operator-visuals' })
     expect(parseArchiveRoute('', undefined, '/operator/knowledge/')).toMatchObject({ view: 'operator-knowledge' })
+    const knowledgeJobId = '11111111-1111-4111-8111-111111111111'
+    expect(parseArchiveRoute('', undefined, `/operator/knowledge/${knowledgeJobId}/`)).toMatchObject({ view: 'operator-knowledge-detail', jobId: knowledgeJobId })
+    expect(parseArchiveRoute('', undefined, '/operator/knowledge/not-a-job/')).toMatchObject({ view: 'operator-knowledge' })
     expect(parseArchiveRoute('', undefined, '/operator/vault/')).toMatchObject({ view: 'operator-vault' })
     expect(archiveRouteUrl({ view: 'operator-visuals', chronicleId: 'C03-AFTERFALL' }, 'https://archive.example/operator/').pathname).toBe('/operator/visuals/')
     expect(archiveRouteUrl({ view: 'operator-knowledge', chronicleId: 'C03-AFTERFALL' }, 'https://archive.example/operator/').pathname).toBe('/operator/knowledge/')
+    expect(archiveRouteUrl({ view: 'operator-knowledge-detail', chronicleId: 'C03-AFTERFALL', jobId: knowledgeJobId }, 'https://archive.example/operator/knowledge/').pathname).toBe(`/operator/knowledge/${knowledgeJobId}/`)
     expect(archiveRouteUrl({ view: 'operator-vault', chronicleId: 'C03-AFTERFALL' }, 'https://archive.example/operator/').pathname).toBe('/operator/vault/')
     expect(archiveRouteUrl({ view: 'wiki-preview', chronicleId: 'C03-AFTERFALL', nodeId: 'char-seojin' }, 'https://archive.example/').search).toContain('node=char-seojin')
     expect(archiveRouteUrl({ view: 'wiki-preview', chronicleId: 'C03-AFTERFALL', page: 'home' }, 'https://archive.example/?legacy=1').search).toBe('')

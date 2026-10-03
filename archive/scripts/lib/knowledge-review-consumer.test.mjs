@@ -151,3 +151,68 @@ test('consumption receipt uses server-only credential and exact approval timesta
 test('list requires server configuration', async () => {
   await assert.rejects(listApprovedReview({ projectUrl: '', serviceRoleKey: '' }), /ARCHIVE_SUPABASE_URL_REQUIRED/)
 })
+
+
+test('operator draft approval metadata is exact and partial bindings fail closed', () => {
+  const operator = {
+    ...item,
+    payload: {
+      ...item.payload,
+      operator_job_id: '22222222-2222-4222-8222-222222222222',
+      operator_draft_revision: 3,
+      operator_draft_sha256: 'd'.repeat(64),
+    },
+  }
+  const identity = validateReviewIdentity(operator)
+  assert.equal(identity.ok, true)
+  assert.equal(identity.operatorJobId, operator.payload.operator_job_id)
+  assert.equal(identity.operatorDraftRevision, 3)
+  assert.equal(identity.operatorDraftSha256, 'd'.repeat(64))
+
+  const partial = {
+    ...item,
+    payload: { ...item.payload, operator_job_id: operator.payload.operator_job_id },
+  }
+  assert.equal(validateReviewIdentity(partial).reason, 'REVIEW_OPERATOR_DRAFT_REVISION_INVALID')
+
+  const badSha = {
+    ...item,
+    payload: {
+      ...operator.payload,
+      operator_draft_sha256: 'not-a-sha',
+    },
+  }
+  assert.equal(validateReviewIdentity(badSha).reason, 'REVIEW_OPERATOR_DRAFT_SHA_INVALID')
+})
+
+test('READY approval carries exact operator draft identity to the workflow boundary', async () => {
+  const operator = {
+    ...item,
+    payload: {
+      ...item.payload,
+      operator_job_id: '22222222-2222-4222-8222-222222222222',
+      operator_draft_revision: 2,
+      operator_draft_sha256: 'e'.repeat(64),
+    },
+  }
+  const result = await inspectApprovedReview({
+    projectUrl: 'https://project.supabase.co',
+    serviceRoleKey: 'server-key',
+    githubToken: 'github-token',
+    fetchImpl: async (url) => {
+      if (url.includes('archive_worker_list_approved_reviews')) return response([operator])
+      if (url.endsWith('/pulls/321')) return response({
+        state: 'open',
+        base: { ref: 'main' },
+        head: { sha: 'a'.repeat(40), ref: 'knowledge/worker/fresh-example', repo: { full_name: 'cetin072/survival-interactive-series' } },
+      })
+      if (url.endsWith('/git/ref/heads/main')) return response({ object: { sha: 'b'.repeat(40) } })
+      if (url.includes('/compare/')) return response({ status: 'ahead' })
+      throw new Error('unexpected URL: ' + url)
+    },
+  })
+  assert.equal(result.status, 'READY')
+  assert.equal(result.operator_job_id, operator.payload.operator_job_id)
+  assert.equal(result.operator_draft_revision, 2)
+  assert.equal(result.operator_draft_sha256, 'e'.repeat(64))
+})
