@@ -9,6 +9,7 @@ on:
       - 'archive/scripts/lib/publication-graph.mjs'
       - 'archive/scripts/run-wiki-automation.mjs'
       - 'archive/scripts/run-wiki-fact-*'
+      - 'archive/scripts/a-wiki-native-status*'
       - 'docs/automation/A_WIKI_NATIVE_HANDOFF_V1.md'
   push:
     branches:
@@ -23,6 +24,7 @@ on:
       - 'archive/scripts/lib/publication-graph.mjs'
       - 'archive/scripts/run-wiki-automation.mjs'
       - 'archive/scripts/run-wiki-fact-*'
+      - 'archive/scripts/a-wiki-native-status*'
       - 'docs/automation/A_WIKI_FACT_WORKER_V1.md'
       - 'docs/automation/A_WIKI_NATIVE_HANDOFF_V1.md'
   workflow_dispatch:
@@ -60,7 +62,8 @@ jobs:
             archive/scripts/lib/publication-graph.test.mjs \
             archive/scripts/lib/wiki-semantic-jobs.test.mjs \
             archive/scripts/lib/wiki-fact-extractor.test.mjs \
-            archive/scripts/lib/wiki-fact-finalizer.test.mjs
+            archive/scripts/lib/wiki-fact-finalizer.test.mjs \
+            archive/scripts/a-wiki-native-status.test.mjs
           node archive/scripts/run-wiki-automation.mjs --prepare > "$RUNNER_TEMP/a-wiki-native-job.json"
           node --input-type=module <<'NODE'
           import { readFileSync } from 'node:fs'
@@ -118,22 +121,7 @@ jobs:
           node archive/scripts/run-wiki-automation.mjs --prepare > "$OP_DIR/job.json"
 
           BASE_SHA="$(git rev-parse origin/main)"
-          BASE_SHA="$BASE_SHA" node --input-type=module <<'NODE'
-          import { readFileSync, writeFileSync } from 'node:fs'
-          const dir = process.env.OP_DIR
-          const job = JSON.parse(readFileSync(`${dir}/job.json`, 'utf8'))
-          const semantic = job.version === 'wiki-fact-job-v1'
-          const status = {
-            version: 'a-wiki-native-status-v1',
-            phase: semantic ? 'EXTRACTOR_READY' : 'NO_JOB',
-            base_main_sha: process.env.BASE_SHA,
-            session_id: semantic ? job.source.session_id : null,
-            job_id: semantic ? job.job_id : null,
-            source_sha256: semantic ? job.source.manifest_sha256 : null,
-            graph_sha256: semantic ? job.graph_sha256 : null,
-          }
-          writeFileSync(`${dir}/status.json`, JSON.stringify(status, null, 2) + '\n')
-          NODE
+          BASE_SHA="$BASE_SHA" node archive/scripts/a-wiki-native-status.mjs             from-job "$OP_DIR/job.json" "$OP_DIR/status.json"
 
           git add "$OP_DIR"
           git commit -m "a-wiki: prepare native semantic handoff"
@@ -176,25 +164,10 @@ jobs:
 
             proposal_status="$(node --input-type=module -e "import p from './$OP_DIR/proposal.json' with {type:'json'}; console.log(p.status)")"
             if [ "$proposal_status" = "HUMAN_REVIEW" ]; then
-              node --input-type=module <<'NODE'
-              import { readFileSync, writeFileSync } from 'node:fs'
-              const path = process.env.OP_DIR + '/status.json'
-              const status = JSON.parse(readFileSync(path, 'utf8'))
-              status.phase = 'HUMAN_REVIEW'
-              status.reason = 'EXTRACTOR_HUMAN_REVIEW'
-              writeFileSync(path, JSON.stringify(status, null, 2) + '\n')
-              NODE
+              REASON="EXTRACTOR_HUMAN_REVIEW"                 node archive/scripts/a-wiki-native-status.mjs                 set-phase "$OP_DIR/status.json" HUMAN_REVIEW
             else
               node archive/scripts/run-wiki-automation.mjs                 --proposal "$OP_DIR/proposal.json" --prepare-review > "$OP_DIR/review-job.json"
-              node --input-type=module <<'NODE'
-              import { readFileSync, writeFileSync } from 'node:fs'
-              const path = process.env.OP_DIR + '/status.json'
-              const status = JSON.parse(readFileSync(path, 'utf8'))
-              const proposal = JSON.parse(readFileSync(process.env.OP_DIR + '/proposal.json', 'utf8'))
-              status.phase = 'REVIEW_READY'
-              status.proposal_sha256 = proposal.proposal_sha256
-              writeFileSync(path, JSON.stringify(status, null, 2) + '\n')
-              NODE
+              PROPOSAL_PATH="$OP_DIR/proposal.json"                 node archive/scripts/a-wiki-native-status.mjs                 set-phase "$OP_DIR/status.json" REVIEW_READY
             fi
 
             git add "$OP_DIR/proposal.json" "$OP_DIR/status.json"
@@ -214,14 +187,9 @@ jobs:
 
           decision="$(node --input-type=module -e "import r from './$OP_DIR/reviewed.json' with {type:'json'}; console.log(r.decision)")"
           if [ "$decision" != "APPROVE" ]; then
-            DECISION="$decision" node --input-type=module <<'NODE'
-            import { readFileSync, writeFileSync } from 'node:fs'
-            const path = process.env.OP_DIR + '/status.json'
-            const status = JSON.parse(readFileSync(path, 'utf8'))
-            status.phase = process.env.DECISION === 'REJECT' ? 'REJECT' : 'HUMAN_REVIEW'
-            status.reason = 'REVIEWER_' + process.env.DECISION
-            writeFileSync(path, JSON.stringify(status, null, 2) + '\n')
-            NODE
+            next_phase="HUMAN_REVIEW"
+            [ "$decision" = "REJECT" ] && next_phase="REJECT"
+            REASON="REVIEWER_$decision"               node archive/scripts/a-wiki-native-status.mjs               set-phase "$OP_DIR/status.json" "$next_phase"
             git add "$OP_DIR/reviewed.json" "$OP_DIR/status.json"
             git commit -m "a-wiki: record native review disposition"
             git push origin "HEAD:refs/heads/$OP_BRANCH"
@@ -256,20 +224,7 @@ jobs:
               node archive/scripts/run-wiki-fact-finalizer.mjs                 --job "$JOB" --proposal "$PROPOSAL" --review "$REVIEW" --check                 > "$RUNNER_TEMP/finalizer-check.json"
               node archive/scripts/run-wiki-fact-finalizer.mjs                 --job "$JOB" --proposal "$PROPOSAL" --review "$REVIEW" --apply                 > "$RUNNER_TEMP/finalizer-apply.json"
 
-              node --input-type=module <<'NODE'
-              import { execFileSync } from 'node:child_process'
-              import { readFileSync } from 'node:fs'
-              const result = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/finalizer-apply.json', 'utf8'))
-              const changed = execFileSync('git', ['diff', '--name-only'], { encoding: 'utf8' }).trim().split('\n').filter(Boolean)
-              const allowed = new Set([
-                'archive/content/graphs/C03-AFTERFALL/GRAPH.json',
-                result.fact_ref,
-                result.receipt_ref,
-              ].filter(Boolean))
-              if (!changed.length || changed.some((path) => !allowed.has(path))) {
-                throw new Error('A_WIKI_PUBLICATION_SCOPE_INVALID:' + changed.join(','))
-              }
-              NODE
+              node archive/scripts/a-wiki-native-status.mjs                 publication-scope "$RUNNER_TEMP/finalizer-apply.json"
 
               git add archive/content/graphs/C03-AFTERFALL/GRAPH.json                 archive/content/public-facts/C03-AFTERFALL/S03
               git commit -m "a-wiki: publish $SESSION semantic facts"
@@ -292,22 +247,7 @@ jobs:
                 mkdir -p "$OP_DIR"
                 node archive/scripts/run-wiki-automation.mjs --prepare > "$OP_DIR/job.json"
                 BASE_SHA="$(git rev-parse origin/main)"
-                BASE_SHA="$BASE_SHA" node --input-type=module <<'NODE'
-                import { readFileSync, writeFileSync } from 'node:fs'
-                const dir = process.env.OP_DIR
-                const job = JSON.parse(readFileSync(dir + '/job.json', 'utf8'))
-                const semantic = job.version === 'wiki-fact-job-v1'
-                writeFileSync(dir + '/status.json', JSON.stringify({
-                  version: 'a-wiki-native-status-v1',
-                  phase: semantic ? 'EXTRACTOR_READY' : 'NO_JOB',
-                  base_main_sha: process.env.BASE_SHA,
-                  session_id: semantic ? job.source.session_id : null,
-                  job_id: semantic ? job.job_id : null,
-                  source_sha256: semantic ? job.source.manifest_sha256 : null,
-                  graph_sha256: semantic ? job.graph_sha256 : null,
-                  reason: 'REPREPARED_AFTER_GRAPH_MOVE',
-                }, null, 2) + '\n')
-                NODE
+                BASE_SHA="$BASE_SHA" REASON="REPREPARED_AFTER_GRAPH_MOVE"                   node archive/scripts/a-wiki-native-status.mjs                   from-job "$OP_DIR/job.json" "$OP_DIR/status.json"
                 git add "$OP_DIR"
                 git commit -m "a-wiki: reprepare after Graph moved"
                 git push --force origin "HEAD:refs/heads/$OP_BRANCH"
@@ -356,22 +296,7 @@ jobs:
             mkdir -p "$OP_DIR"
             node archive/scripts/run-wiki-automation.mjs --prepare > "$OP_DIR/job.json"
             BASE_SHA="$(git rev-parse origin/main)"
-            BASE_SHA="$BASE_SHA" MERGE_SHA="$MERGE_SHA" node --input-type=module <<'NODE'
-            import { readFileSync, writeFileSync } from 'node:fs'
-            const dir = process.env.OP_DIR
-            const job = JSON.parse(readFileSync(dir + '/job.json', 'utf8'))
-            const semantic = job.version === 'wiki-fact-job-v1'
-            writeFileSync(dir + '/status.json', JSON.stringify({
-              version: 'a-wiki-native-status-v1',
-              phase: semantic ? 'EXTRACTOR_READY' : 'NO_JOB',
-              base_main_sha: process.env.BASE_SHA,
-              session_id: semantic ? job.source.session_id : null,
-              job_id: semantic ? job.job_id : null,
-              source_sha256: semantic ? job.source.manifest_sha256 : null,
-              graph_sha256: semantic ? job.graph_sha256 : null,
-              previous_merge_sha: process.env.MERGE_SHA,
-            }, null, 2) + '\n')
-            NODE
+            BASE_SHA="$BASE_SHA" PREVIOUS_MERGE_SHA="$MERGE_SHA"               node archive/scripts/a-wiki-native-status.mjs               from-job "$OP_DIR/job.json" "$OP_DIR/status.json"
             git add "$OP_DIR"
             git commit -m "a-wiki: prepare next native semantic handoff"
             git push --force origin "HEAD:refs/heads/$OP_BRANCH"
