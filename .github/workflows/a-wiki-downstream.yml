@@ -5,9 +5,12 @@ on:
     paths:
       - 'archive/scripts/lib/wiki-semantic-jobs*'
       - 'archive/scripts/lib/wiki-fact-extractor*'
+      - 'archive/scripts/lib/wiki-fact-finalizer*'
       - 'archive/scripts/lib/fixtures/wiki-fact-results-v1.json'
       - 'archive/scripts/run-wiki-fact-extractor.mjs'
+      - 'archive/scripts/run-wiki-fact-finalizer.mjs'
       - 'docs/automation/A_WIKI_FACT_WORKER_V1.md'
+      - 'docs/automation/A_WIKI_FACT_FINALIZER_PLAN_V1.md'
       - 'archive/scripts/run-wiki-automation.mjs'
       - 'archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_*.json'
       - '.github/workflows/a-wiki-downstream.yml'
@@ -40,7 +43,7 @@ jobs:
 
       - name: Validate and build A-Wiki projection
         run: |
-          node --test archive/scripts/lib/publication-graph.test.mjs archive/scripts/lib/wiki-semantic-jobs.test.mjs archive/scripts/lib/wiki-fact-extractor.test.mjs
+          node --test archive/scripts/lib/publication-graph.test.mjs archive/scripts/lib/wiki-semantic-jobs.test.mjs archive/scripts/lib/wiki-fact-extractor.test.mjs archive/scripts/lib/wiki-fact-finalizer.test.mjs
           node archive/scripts/run-wiki-automation.mjs --prepare > a-wiki-fact-job.json
           node archive/scripts/run-wiki-automation.mjs --check > a-wiki-check.json
           node archive/scripts/run-wiki-automation.mjs --apply > a-wiki-apply.json
