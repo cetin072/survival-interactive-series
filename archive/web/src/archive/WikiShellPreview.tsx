@@ -1,33 +1,51 @@
 import { WikiDocumentPage } from './WikiDocumentPage'
-import { buildWikiDocument, wikiCharacterIndex, wikiCharacterNodeIds } from './wikiDocument'
+import {
+  buildWikiDocument,
+  isWikiSupportedNodeId,
+  wikiCharacterIndex,
+  wikiEventIndex,
+  wikiLocationIndex,
+} from './wikiDocument'
 
 const defaultNodeId = 'char-jinwoo'
 
-function selectedCharacterNodeId(requested?: string) {
-  return requested && wikiCharacterNodeIds.includes(requested) ? requested : defaultNodeId
+function selectedWikiNodeId(requested?: string) {
+  return requested && isWikiSupportedNodeId(requested) ? requested : defaultNodeId
+}
+
+function wikiHref(nodeId: string) {
+  return '/?view=wiki-preview&node=' + encodeURIComponent(nodeId)
 }
 
 export function WikiShellPreview({ nodeId }: { nodeId?: string }) {
-  const selectedNodeId = selectedCharacterNodeId(nodeId)
+  const selectedNodeId = selectedWikiNodeId(nodeId)
   const document = buildWikiDocument(selectedNodeId)
 
   const previewTools = <form className="wiki-preview-tools" action="/" method="get">
     <input type="hidden" name="view" value="wiki-preview" />
     <label>
-      <span>인물 문서 미리보기</span>
+      <span>Wiki 문서 미리보기</span>
       <select name="node" defaultValue={selectedNodeId}>
-        {wikiCharacterIndex.map((item) => <option key={item.id} value={item.id}>{item.title} · {item.subtitle}</option>)}
+        <optgroup label="인물">
+          {wikiCharacterIndex.map((item) => <option key={item.id} value={item.id}>{item.title} · {item.subtitle}</option>)}
+        </optgroup>
+        <optgroup label="장소">
+          {wikiLocationIndex.map((item) => <option key={item.id} value={item.id}>{item.title} · {item.subtitle}</option>)}
+        </optgroup>
+        <optgroup label="사건">
+          {wikiEventIndex.map((item) => <option key={item.id} value={item.id}>{item.title} · {item.subtitle}</option>)}
+        </optgroup>
       </select>
     </label>
     <button type="submit">열기</button>
-    <small>현재 4단계는 인물만 Wiki 문서로 연결합니다. 장소·사건은 다음 단계에서 전환합니다.</small>
+    <small>인물·장소·사건은 Wiki 문서로 연결합니다. 자료(reference)는 기존 Archive에서 유지합니다.</small>
   </form>
 
   return <WikiDocumentPage
     document={document}
     previewTools={previewTools}
-    relationHref={(relation) => relation.type === 'character'
-      ? '/?view=wiki-preview&node=' + encodeURIComponent(relation.nodeId)
+    relationHref={(relation) => isWikiSupportedNodeId(relation.nodeId)
+      ? wikiHref(relation.nodeId)
       : '/?view=archive&node=' + encodeURIComponent(relation.nodeId)}
   />
 }
