@@ -153,3 +153,124 @@
   .wiki-article-body h2 { font-size: 25px; }
   .wiki-source-box { grid-template-columns: 84px minmax(0,1fr); }
 }
+
+.wiki-infobox-cover.has-image {
+  height: auto;
+  min-height: 0;
+  background: #eceeef;
+}
+.wiki-infobox-cover.has-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+.wiki-lead {
+  color: #24262b !important;
+  font-weight: 650;
+}
+.wiki-muted {
+  color: #7c7f85 !important;
+}
+.wiki-bullet-list {
+  margin: 0 0 22px;
+  padding-left: 23px;
+  color: #36383e;
+  font-size: 15px;
+  line-height: 1.8;
+}
+.wiki-bullet-list li + li {
+  margin-top: 4px;
+}
+.wiki-subsection + .wiki-subsection {
+  margin-top: 28px;
+}
+.wiki-timeline {
+  display: grid;
+  margin: 24px 0 10px;
+  border-top: 1px solid #d9dbde;
+}
+.wiki-timeline article {
+  display: grid;
+  grid-template-columns: 110px minmax(0,1fr);
+  gap: 16px;
+  padding: 13px 0;
+  border-bottom: 1px solid #e3e5e7;
+}
+.wiki-timeline time {
+  color: #74777d;
+  font-size: 13px;
+  font-weight: 700;
+}
+.wiki-timeline strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #2f3136;
+  font-size: 14px;
+}
+.wiki-timeline p {
+  margin: 0;
+  color: #55585e;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.wiki-relation-list {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.wiki-relation-list a {
+  display: grid;
+  gap: 3px;
+  padding: 11px 12px;
+  border: 1px solid #d9dbde;
+  border-radius: 5px;
+  background: #fafafb;
+  text-decoration: none;
+}
+.wiki-relation-list a:hover {
+  border-color: #b7bbc0;
+  background: #f4f5f6;
+  text-decoration: none;
+}
+.wiki-relation-list strong {
+  color: #2379b7;
+  font-size: 14px;
+}
+.wiki-relation-list span {
+  color: #4e5157;
+  font-size: 12px;
+  font-weight: 700;
+}
+.wiki-relation-list small {
+  color: #7b7e84;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.wiki-main-visual {
+  max-width: 560px;
+  margin: 12px 0 24px;
+  border: 1px solid #d9dbde;
+  background: #fff;
+}
+.wiki-main-visual img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.wiki-main-visual figcaption {
+  padding: 9px 11px;
+  border-top: 1px solid #e0e2e5;
+  color: #73767c;
+  font-size: 12px;
+}
+.wiki-inline-source {
+  display: inline;
+}
+
+@media (max-width: 620px) {
+  .wiki-relation-list { grid-template-columns: 1fr; }
+  .wiki-timeline article { grid-template-columns: 84px minmax(0,1fr); gap: 10px; }
+}
