@@ -1,5 +1,15 @@
 {
   "version": "illustration-reviewer-runtime-contract-v2",
+  "renderer_handoff": {
+    "rpc": "archive_illustration_render_job_provider_complete",
+    "request": {
+      "p_job_id": "<job_id>",
+      "p_prompt_sha256": "<exact_prompt_sha256>"
+    },
+    "normal_transition": "PREPARED -> INGESTING",
+    "called_only_after": "The exact bound PNG exists in the neutral Library output path and readback confirms a non-empty PNG.",
+    "idempotent_statuses": ["INGESTING", "READY_FOR_REVIEW"]
+  },
   "lease_acquire": {
     "rpc": "archive_illustration_render_job_lease_acquire",
     "request": {
@@ -39,7 +49,11 @@
           "provider_asset_id": "<provider_asset_id>"
         }
       },
-      "required_job_status": "PREPARED",
+      "required_job_status": [
+        "PREPARED",
+        "INGESTING"
+      ],
+      "success_job_status": "INGESTING",
       "token_path": "p_meta.lease_token"
     },
     {
@@ -70,6 +84,7 @@
         "INGESTING",
         "READY_FOR_REVIEW"
       ],
+      "success_job_status": "READY_FOR_REVIEW",
       "token_path": "p_lease_token"
     },
     {
@@ -90,7 +105,7 @@
           "provider_asset_id": "<provider_asset_id>"
         }
       },
-      "required_job_status": "PREPARED",
+      "required_job_status": "READY_FOR_REVIEW",
       "token_path": "p_review.lease_token",
       "context_hash_path": "p_review.review_context_sha256",
       "required_fields": [
@@ -176,6 +191,7 @@
     "order": [
       "acquire_lease",
       "bind_exact_job_and_review_context",
+      "require_renderer_handoff_status_INGESTING",
       "materialize_and_hash_current_png",
       "resume_exact_staging_or_begin_only_after_binary_preflight",
       "upload_only_missing_chunks_and_finalize_exact_png",
