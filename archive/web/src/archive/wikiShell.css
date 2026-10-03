@@ -1055,3 +1055,126 @@
   .knowledge-guide-tool { grid-template-columns: 1fr; }
   .knowledge-guide-tool b { grid-column: 1; grid-row: auto; margin-top: 5px; }
 }
+
+
+.knowledge-guide-list {
+  display: grid;
+  gap: 7px;
+  margin: 12px 0 20px;
+  padding-left: 22px;
+}
+.knowledge-guide-list li {
+  color: #34373c;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.knowledge-library-header {
+  padding: 28px 30px 24px;
+  border: 1px solid #d9dbde;
+  background: #fff;
+}
+.knowledge-library-header h1 {
+  margin: 4px 0 10px;
+  color: #202126;
+  font-size: clamp(34px,5vw,48px);
+  letter-spacing: -.05em;
+}
+.knowledge-library-header > p:last-child {
+  max-width: 760px;
+  margin: 0;
+  color: #5d6066;
+  font-size: 15px;
+  line-height: 1.75;
+}
+.knowledge-library-notice {
+  margin: 12px 0 0;
+  padding: 11px 13px;
+  border: 1px solid #e1cfaa;
+  background: #fff8e9;
+  color: #6f5729;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.knowledge-library-list {
+  margin-top: 14px;
+  padding: 18px 20px;
+  border: 1px solid #d9dbde;
+  background: #fff;
+}
+.knowledge-library-list > div:last-child {
+  display: grid;
+}
+.knowledge-library-list article {
+  padding: 15px 2px;
+  border-top: 1px solid #e4e6e8;
+}
+.knowledge-library-list article:first-child {
+  border-top: 0;
+}
+.knowledge-library-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.knowledge-library-meta span {
+  color: #5f6f61;
+  font-size: 10px;
+  font-weight: 800;
+}
+.knowledge-library-meta small {
+  color: #898c91;
+  font-size: 10px;
+}
+.knowledge-library-list h3 {
+  margin: 0 0 7px;
+  font-size: 18px;
+  line-height: 1.45;
+}
+.knowledge-library-list h3 a {
+  color: #2379b7;
+}
+.knowledge-library-list article > p {
+  margin: 0;
+  color: #55585e;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.knowledge-library-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 9px;
+}
+.knowledge-library-footer span {
+  color: #7a7d83;
+  font-size: 10px;
+}
+.knowledge-library-footer a {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+@media (max-width: 700px) {
+  .knowledge-library-header {
+    padding: 21px 14px 18px;
+    border-right: 0;
+    border-left: 0;
+  }
+  .knowledge-library-list {
+    padding: 15px 14px;
+    border-right: 0;
+    border-left: 0;
+  }
+  .knowledge-library-notice {
+    margin-right: 14px;
+    margin-left: 14px;
+  }
+  .knowledge-library-meta {
+    align-items: start;
+    flex-direction: column;
+    gap: 3px;
+  }
+}
