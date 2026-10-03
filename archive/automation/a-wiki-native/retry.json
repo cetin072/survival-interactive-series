@@ -1,0 +1,7 @@
+{
+  "version": "a-wiki-native-retry-v1",
+  "phase": "EXTRACTOR_READY",
+  "job_id": "wiki-job-d813785694227b24920b9d7e05ed72ecde59dd4ab5454bf1678612b47936aeee",
+  "reason": "RETRY_AFTER_WORKFLOW_HEREDOC_FIX",
+  "main_fix_sha": "8454ad556ed10e1cdaaf16b892c994a08a205456"
+}
