@@ -2,6 +2,7 @@ export type KnowledgeGuideBlock =
   | { type: 'prose'; text: string }
   | { type: 'note'; text: string }
   | { type: 'ordered_list'; items: string[] }
+  | { type: 'unordered_list'; items: string[] }
   | { type: 'table'; headers: string[]; rows: string[][] }
   | { type: 'download/tool'; tool_path: string }
 
@@ -70,8 +71,29 @@ const briefFiles = import.meta.glob('../../../../knowledge/content/briefs/*.json
   import: 'default',
 }) as Record<string, KnowledgeBriefFile>
 
+export const supportedKnowledgeBlockTypes = new Set([
+  'prose',
+  'note',
+  'ordered_list',
+  'unordered_list',
+  'table',
+  'download/tool',
+])
+
+function assertSupportedBlocks(brief: KnowledgeBriefFile) {
+  for (const section of brief.sections ?? []) {
+    for (const block of section.blocks ?? []) {
+      if (!supportedKnowledgeBlockTypes.has(block.type)) {
+        throw new Error(`Unsupported published Knowledge block type: ${brief.id} / ${block.type}`)
+      }
+    }
+  }
+  return brief
+}
+
 export const publishedKnowledgeGuides = Object.values(briefFiles)
   .filter((brief) => brief.status === 'PUBLISHED')
+  .map(assertSupportedBlocks)
   .map((brief): KnowledgeGuide => ({
     id: brief.id,
     slug: brief.slug,
