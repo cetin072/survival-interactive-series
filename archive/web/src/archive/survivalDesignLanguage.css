@@ -4,7 +4,8 @@
  * "modern field archive" identity without copying another site's skin.
  */
 
-.wiki-shell {
+.wiki-shell,
+.survival-public-shell {
   --sd-canvas: #eeece5;
   --sd-paper: #fffdf8;
   --sd-paper-soft: #f7f3ea;
@@ -431,4 +432,306 @@
 .wiki-shell ::selection {
   background: #dfe7d9;
   color: var(--sd-ink);
+}
+
+
+/* Public Archive surfaces: extend the same design language without changing layout or data. */
+.survival-public-shell {
+  min-height: 100vh;
+}
+
+.survival-public-shell .archive-header {
+  border-bottom-color: var(--sd-line-strong);
+  background: color-mix(in srgb, var(--sd-paper) 96%, transparent);
+  box-shadow: 0 2px 10px rgba(53, 54, 46, .05);
+}
+.survival-public-shell .archive-kicker,
+.survival-public-shell .archive-eyebrow,
+.survival-public-shell .reader-status {
+  color: var(--sd-rust);
+}
+.survival-public-shell .archive-brand h1 {
+  color: var(--sd-olive-dark);
+}
+.survival-public-shell .archive-brand h1 span,
+.survival-public-shell .archive-primary-nav button,
+.survival-public-shell .archive-primary-nav a {
+  color: var(--sd-ink-soft);
+}
+.survival-public-shell .archive-primary-nav button:hover,
+.survival-public-shell .archive-primary-nav button.active,
+.survival-public-shell .archive-primary-nav a:hover {
+  background: var(--sd-olive-soft);
+  color: var(--sd-olive-dark);
+}
+.survival-public-shell .archive-primary-nav button.primary,
+.survival-public-shell .reader-home,
+.survival-public-shell .past-chronicle-card .primary,
+.survival-public-shell .chronicle-feature .primary,
+.survival-public-shell .chronicle-empty .primary,
+.survival-public-shell .graph-expand-button,
+.survival-public-shell .graph-read-button,
+.survival-public-shell .detail-reader-button {
+  border-color: var(--sd-olive-dark) !important;
+  background: var(--sd-olive-dark) !important;
+  color: #fffdf8 !important;
+}
+
+.survival-public-shell .archive-panel,
+.survival-public-shell .archive-toolbar,
+.survival-public-shell .book-card,
+.survival-public-shell .shared-archive-links a,
+.survival-public-shell .chronicle-summary,
+.survival-public-shell .chronicle-sections,
+.survival-public-shell .chronicle-empty,
+.survival-public-shell .future-cards article,
+.survival-public-shell .archive-detail {
+  border-color: var(--sd-line);
+  background: var(--sd-paper);
+}
+.survival-public-shell .book-card {
+  border-top-color: var(--sd-olive-dark);
+  box-shadow: var(--sd-shadow-soft);
+}
+.survival-public-shell .featured-chronicle {
+  background: var(--sd-olive-dark);
+}
+.survival-public-shell .featured-chronicle .archive-eyebrow,
+.survival-public-shell .featured-chronicle > div > p:not(.archive-eyebrow) {
+  color: #d7ded3;
+}
+.survival-public-shell .featured-chronicle .hub-actions button.primary {
+  border-color: var(--sd-paper-deep);
+  background: var(--sd-paper-deep);
+  color: var(--sd-olive-dark);
+}
+.survival-public-shell .library-intro > p:last-child,
+.survival-public-shell .hub-section-heading > span,
+.survival-public-shell .chronicle-room-heading > p:last-child,
+.survival-public-shell .chronicle-summary > p:not(.archive-eyebrow),
+.survival-public-shell .chronicle-empty > p,
+.survival-public-shell .future-archive > p:not(.archive-eyebrow),
+.survival-public-shell .book-card > p:not(.archive-eyebrow):not(.book-subtitle),
+.survival-public-shell .book-card dl,
+.survival-public-shell .shared-archive-links a span,
+.survival-public-shell .visual-grid figcaption {
+  color: var(--sd-muted);
+}
+.survival-public-shell .shared-archive-links a strong,
+.survival-public-shell .archive-footer button,
+.survival-public-shell .text-button {
+  color: var(--sd-link);
+}
+.survival-public-shell .chronicle-tabs {
+  border-bottom-color: var(--sd-line);
+}
+.survival-public-shell .chronicle-tabs button {
+  color: var(--sd-ink-soft);
+}
+.survival-public-shell .chronicle-tabs button:hover,
+.survival-public-shell .chronicle-tabs button.active {
+  border-color: var(--sd-line);
+  background: var(--sd-paper);
+  color: var(--sd-olive-dark);
+}
+
+.survival-public-shell .book-toc,
+.survival-public-shell .reader-toc {
+  border-color: var(--sd-line);
+}
+.survival-public-shell .book-toc h3,
+.survival-public-shell .book-toc section button span,
+.survival-public-shell .reader-part-list span,
+.survival-public-shell .reader-part-list small {
+  color: var(--sd-muted);
+}
+.survival-public-shell .book-toc section button,
+.survival-public-shell .reader-part-list button {
+  color: var(--sd-ink-soft);
+}
+.survival-public-shell .book-toc section button:hover,
+.survival-public-shell .reader-part-list button:hover,
+.survival-public-shell .reader-part-list button.selected {
+  background: var(--sd-olive-soft);
+  color: var(--sd-olive-dark);
+}
+.survival-public-shell .book-toc section button.selected,
+.survival-public-shell .reader-season-tabs button.active {
+  border-color: var(--sd-olive-dark);
+  background: var(--sd-olive-dark);
+  color: #fffdf8;
+}
+.survival-public-shell .book-prose header,
+.survival-public-shell .reader-header,
+.survival-public-shell .book-related,
+.survival-public-shell .book-pager,
+.survival-public-shell .reader-related,
+.survival-public-shell .reader-pager {
+  border-color: var(--sd-line);
+}
+.survival-public-shell .book-prose header h1,
+.survival-public-shell .reader-header h1,
+.survival-public-shell .reader-body h1,
+.survival-public-shell .reader-body h2,
+.survival-public-shell .reader-body h3,
+.survival-public-shell .reader-body p,
+.survival-public-shell .transcript-message-body {
+  color: var(--sd-ink);
+}
+.survival-public-shell .book-prose header > p:not(.archive-eyebrow),
+.survival-public-shell .reader-header p:not(.archive-eyebrow) {
+  color: var(--sd-muted);
+}
+.survival-public-shell .reader-progress {
+  color: var(--sd-muted);
+}
+.survival-public-shell .reader-progress span {
+  background: var(--sd-paper-deep);
+}
+.survival-public-shell .reader-progress i {
+  background: var(--sd-olive);
+}
+.survival-public-shell .reader-body blockquote,
+.survival-public-shell .transcript-message-body blockquote {
+  border-left-color: var(--sd-rust);
+  color: var(--sd-ink-soft);
+}
+.survival-public-shell .scene-divider {
+  border-top-color: var(--sd-line-strong);
+}
+.survival-public-shell .reader-integrity-note,
+.survival-public-shell .canon-summary,
+.survival-public-shell .missing-transcript {
+  border-color: var(--sd-line);
+  background: var(--sd-paper-soft);
+}
+.survival-public-shell .missing-transcript {
+  border-color: #e0cda5;
+  background: #fff8e8;
+}
+.survival-public-shell .transcript-player {
+  border-left-color: var(--sd-olive);
+  background: var(--sd-olive-soft);
+}
+.survival-public-shell .transcript-system_public,
+.survival-public-shell .transcript-list,
+.survival-public-shell .transcript-fragment {
+  border-color: var(--sd-line);
+  background: var(--sd-paper-soft);
+}
+.survival-public-shell .transcript-role {
+  color: var(--sd-rust);
+}
+.survival-public-shell .book-related button,
+.survival-public-shell .book-pager button,
+.survival-public-shell .reader-related button,
+.survival-public-shell .reader-pager button,
+.survival-public-shell .reader-explorer-link {
+  border-color: var(--sd-line);
+  background: var(--sd-paper);
+  color: var(--sd-ink-soft);
+}
+.survival-public-shell .book-related button:hover,
+.survival-public-shell .reader-related button:hover,
+.survival-public-shell .book-pager button:hover,
+.survival-public-shell .reader-pager button:hover {
+  background: var(--sd-olive-soft);
+  color: var(--sd-olive-dark);
+}
+
+.survival-public-shell .graph-toolbar,
+.survival-public-shell .graph-selection-banner {
+  border-color: var(--sd-line);
+  background: var(--sd-paper-soft);
+}
+.survival-public-shell .graph-toolbar button,
+.survival-public-shell .graph-selection-banner button,
+.survival-public-shell .graph-heading-meta button,
+.survival-public-shell .detail-focus-button,
+.survival-public-shell .connection-list button {
+  border-color: var(--sd-line);
+  background: var(--sd-paper);
+  color: var(--sd-ink-soft);
+}
+.survival-public-shell .graph-toolbar button.active {
+  border-color: var(--sd-olive);
+  background: var(--sd-olive-soft);
+  color: var(--sd-olive-dark);
+}
+.survival-public-shell .graph-canvas {
+  background: linear-gradient(var(--sd-paper), var(--sd-paper-soft));
+}
+.survival-public-shell .graph-edge {
+  stroke: var(--sd-line-strong);
+}
+.survival-public-shell .graph-edge.root-edge {
+  stroke: var(--sd-olive);
+}
+.survival-public-shell .graph-edge.selected-edge {
+  stroke: var(--sd-olive-dark);
+}
+.survival-public-shell .graph-edge-label {
+  fill: var(--sd-ink-soft);
+  stroke: var(--sd-paper);
+}
+.survival-public-shell .graph-node circle {
+  fill: var(--sd-paper-soft);
+  stroke: var(--sd-line-strong);
+}
+.survival-public-shell .graph-node text {
+  fill: var(--sd-ink-soft);
+}
+.survival-public-shell .graph-node-root circle,
+.survival-public-shell .graph-node-selected circle {
+  fill: var(--sd-olive-dark);
+  stroke: var(--sd-olive-dark);
+}
+.survival-public-shell .type-dot-character { background: var(--sd-link); }
+.survival-public-shell .type-dot-location { background: var(--sd-rust); }
+.survival-public-shell .type-dot-event { background: var(--sd-danger); }
+.survival-public-shell .type-dot-reference { background: var(--sd-olive); }
+.survival-public-shell .result-list > button:hover,
+.survival-public-shell .result-list > button.selected,
+.survival-public-shell .timeline-list button:hover {
+  border-color: var(--sd-line);
+  background: var(--sd-olive-soft);
+}
+.survival-public-shell .tag-row span {
+  background: var(--sd-paper-soft);
+  color: var(--sd-muted);
+}
+
+.survival-public-shell .archive-search input,
+.survival-public-shell .archive-filters button,
+.survival-public-shell .reader-season-tabs button {
+  border-color: var(--sd-line);
+  background: var(--sd-paper);
+  color: var(--sd-ink-soft);
+}
+.survival-public-shell .archive-search input:focus {
+  border-color: var(--sd-olive);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sd-olive) 18%, transparent);
+}
+.survival-public-shell .archive-filters button.active {
+  border-color: var(--sd-olive-dark);
+  background: var(--sd-olive-dark);
+  color: #fffdf8;
+}
+.survival-public-shell .future-cards article {
+  box-shadow: 0 5px 16px rgba(55, 52, 44, .05);
+}
+.survival-public-shell .archive-footer {
+  border-top-color: var(--sd-line);
+  color: var(--sd-muted);
+}
+
+.survival-public-shell button,
+.survival-public-shell select,
+.survival-public-shell input,
+.survival-public-shell a {
+  transition: color .12s ease, background-color .12s ease, border-color .12s ease, transform .08s ease;
+}
+.survival-public-shell button:active,
+.survival-public-shell a:active {
+  transform: translateY(1px);
 }
