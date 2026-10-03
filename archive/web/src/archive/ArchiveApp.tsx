@@ -12,7 +12,7 @@ import './archive.css'
 const OperatorConsole = lazy(() => import('./OperatorConsole'))
 
 export { buildPositions, buildVisibleGraph }
-export const primaryNavigationLabels = ['이야기', '생존 지식', 'Tools', 'Media'] as const
+export const primaryNavigationLabels = ['이야기', '생존 지식', '자료실'] as const
 const readRoute = () => parseArchiveRoute(window.location.search, browserReaderStorage(), window.location.pathname)
 
 function writeRoute(route: ArchiveRoute, replace = false) {
@@ -47,8 +47,7 @@ export function ArchiveApp() {
       <nav className="archive-primary-nav" aria-label="주요 탐색">
         <button className={route.view === 'home' || route.view === 'story' || route.view === 'chronicle' || route.view === 'book' ? 'active' : ''} onClick={() => open({ view: 'home', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[0]}</button>
         <a href="/knowledge/">{primaryNavigationLabels[1]}</a>
-        <button className={route.view === 'tools' ? 'active' : ''} onClick={() => open({ view: 'tools', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[2]}</button>
-        <button className={route.view === 'media' ? 'active' : ''} onClick={() => open({ view: 'media', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[3]}</button>
+        <button className={route.view === 'tools' || route.view === 'media' ? 'active' : ''} onClick={() => open({ view: 'tools', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[2]}</button>
       </nav>
     </header>
     {(route.view === 'home' || route.view === 'story') && <StoryLibrary onOpenChronicle={(id) => openRoom(id)} onOpenBook={(id) => openBook(id)} onOpenExplorer={(id) => openRoom(id, 'explorer')} />}
@@ -57,9 +56,8 @@ export function ArchiveApp() {
     {route.view === 'archive' && <ExplorerView key={route.nodeId ?? 'default'} initialNodeId={route.nodeId} onOpenStory={(chapterId) => openBook('C03-AFTERFALL', chapterId)} />}
     {route.view === 'book' && <StoryBookReader key={route.chronicleId} chronicleId={route.chronicleId} initialChapterId={route.chapterId} onChapterChange={(chapterId) => open({ ...route, chapterId })} onOpenNode={(nodeId) => open({ view: 'archive', chronicleId: activeChronicle.id, nodeId })} onBack={() => open({ view: 'chronicle', chronicleId: route.chronicleId, section: 'overview' })} />}
     {route.view === 'raw' && <RawTranscriptReader key={rawChronicle.id} chronicleId={rawChronicle.id} initialPartId={route.partId} onPartChange={(partId) => open({ ...route, partId })} onOpenNode={(nodeId) => open({ view: 'archive', chronicleId: activeChronicle.id, nodeId })} onOpenExplorer={() => open({ view: 'archive', chronicleId: activeChronicle.id })} />}
-    {route.view === 'tools' && <section className="archive-panel future-archive"><p className="archive-eyebrow">TOOLS</p><h1>생존 도구</h1><p>체크리스트와 자료 도구를 연결할 자리입니다.</p><div className="future-cards"><article>PDF 자료 <span>아직 기록 없음</span></article><article>XLSX 관리표 <span>준비 중</span></article><article>체크리스트 <span>준비 중</span></article></div></section>}
-    {route.view === 'media' && <section className="archive-panel future-archive"><p className="archive-eyebrow">MEDIA</p><h1>미디어 Archive</h1><p>공개 허용된 시각 자료와 향후 미디어 진입점을 모읍니다.</p><div className="future-cards"><article>삽화 <span>Chronicle 안의 공개 Visual 자료</span></article><article>영상 <span>아직 기록 없음</span></article><article>웹툰 · 교육 <span>아직 기록 없음</span></article></div></section>}
+    {(route.view === 'tools' || route.view === 'media') && <section className="archive-panel future-archive"><p className="archive-eyebrow">SURVIVAL DIARY · LIBRARY</p><h1>자료실</h1><p>이야기에서 만들어진 삽화와 지도, 현실에서 쓸 수 있는 체크리스트와 파일을 한곳에 모읍니다.</p><div className="future-cards"><article>삽화 <span>각 생존기의 공개 삽화를 모아볼 자리</span></article><article>지도 <span>세계관 지도가 준비되면 연결</span></article><article>체크리스트 <span>현실 생존 준비용 자료</span></article><article>PDF · XLSX <span>다운로드 가능한 자료와 관리표</span></article><article>영상 <span>향후 영상·교육 콘텐츠</span></article></div></section>}
     {(route.view === 'operator' || route.view === 'operator-visuals' || route.view === 'operator-knowledge' || route.view === 'operator-vault') && <Suspense fallback={<section className="operator-page" aria-live="polite">운영자 화면을 불러오는 중…</section>}><OperatorConsole view={route.view === 'operator-visuals' ? 'visuals' : route.view === 'operator-knowledge' ? 'knowledge' : route.view === 'operator-vault' ? 'vault' : 'dashboard'} /></Suspense>}
-    {route.view !== 'operator' && route.view !== 'operator-visuals' && route.view !== 'operator-knowledge' && route.view !== 'operator-vault' && <footer className="archive-footer"><p>읽기 정책 · 공개된 이야기와 세계 기록은 실제 확인된 자료를 바탕으로 편집됩니다.</p><button onClick={() => open({ view: 'raw', chronicleId: activeChronicle.id })}>기록 원문 보관소</button></footer>}
+    {route.view !== 'operator' && route.view !== 'operator-visuals' && route.view !== 'operator-knowledge' && route.view !== 'operator-vault' && <footer className="archive-footer"><p>공개된 이야기와 세계 기록은 실제 확인된 자료를 바탕으로 편집됩니다.</p><button onClick={() => open({ view: 'raw', chronicleId: activeChronicle.id })}>원문 기록</button></footer>}
   </main>
 }
