@@ -26,7 +26,12 @@ export function OperatorVisualMetadata() {
         return <details key={profile.node_id}>
           <summary>
             <span><strong>{profile.label}</strong><small>{typeLabel[profile.type] ?? profile.type} · {profile.node_id}</small></span>
-            <span>{asset ? '삽화 있음' : '삽화 없음'}</span>
+            <span
+              className={`operator-visual-state ${asset ? 'is-present' : 'is-empty'}`}
+              role="img"
+              aria-label={asset ? '삽화 있음' : '삽화 없음'}
+              title={asset ? '삽화 있음' : '삽화 없음'}
+            >{asset ? '✓' : '—'}</span>
           </summary>
           <div className="operator-visual-body">
             <p>{profile.description}</p>
