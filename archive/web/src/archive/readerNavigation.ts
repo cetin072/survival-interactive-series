@@ -76,7 +76,7 @@ export function parseArchiveRoute(search: string, storage?: ReaderStorage, pathn
   }
   if (view === 'knowledge-preview') return { view: 'knowledge-preview', chronicleId, briefId: params.get('brief') ?? undefined }
   if (view === 'archive') return { view: 'archive', chronicleId: activeChronicle.id, nodeId: params.get('node') ?? undefined }
-  return { view: 'home', chronicleId: activeChronicle.id }
+  return { view: 'wiki-preview', chronicleId: activeChronicle.id, page: 'home' }
 }
 
 export function archiveRouteUrl(route: ArchiveRoute, href: string): URL {
@@ -91,7 +91,8 @@ export function archiveRouteUrl(route: ArchiveRoute, href: string): URL {
     }
   } else {
     url.pathname = '/'
-    if (route.view !== 'home') url.searchParams.set('view', route.view === 'book' ? 'story' : route.view)
+    const isWikiHome = route.view === 'wiki-preview' && !route.nodeId && route.page !== 'chronicle'
+    if (route.view !== 'home' && !isWikiHome) url.searchParams.set('view', route.view === 'book' ? 'story' : route.view)
     if (route.view === 'wiki-preview' && route.nodeId) url.searchParams.set('node', route.nodeId)
     if (route.view === 'knowledge-preview' && route.briefId) url.searchParams.set('brief', route.briefId)
     if (route.view === 'wiki-preview' && !route.nodeId && route.page === 'chronicle') url.searchParams.set('page', 'chronicle')
