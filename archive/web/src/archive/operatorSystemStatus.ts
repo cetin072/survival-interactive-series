@@ -58,8 +58,8 @@ export function shortSha(value?: string | null) {
 
 export function visualStatusTone(status?: string | null) {
   const normalized = (status ?? '').toUpperCase()
-  if (['SUCCESS', 'PASS', 'COMPLETED', 'PUBLISHED'].includes(normalized)) return 'ok'
-  if (['BLOCKED', 'FAILED', 'ERROR', 'REJECTED'].includes(normalized)) return 'warning'
+  if (['SUCCESS', 'SUCCEEDED', 'PASS', 'COMPLETED', 'PUBLISHED'].includes(normalized)) return 'ok'
+  if (['BLOCKED', 'FAILED', 'ERROR', 'REJECTED', 'REVIEW_REJECTED', 'HUMAN_REVIEW'].includes(normalized)) return 'warning'
   return 'neutral'
 }
 
@@ -72,9 +72,21 @@ const statusKorean: Record<string, string> = {
   AUTO: '자동 운영',
   BLOCKED: '작업 중단',
   SUCCESS: '성공',
+  SUCCEEDED: '성공',
   PASS: '통과',
   COMPLETED: '완료',
   PUBLISHED: '게시 완료',
+  PREPARED: '생성 준비',
+  INGESTING: '파일 처리 중',
+  READY_FOR_REVIEW: '검수 대기',
+  REVIEW_PASS_STAGED: '검수 통과 파일 준비',
+  FINALIZE_QUEUED: '후처리 대기',
+  FINALIZING: '후처리 중',
+  REVIEW_REJECTED: '품질 검수 재시도',
+  HUMAN_REVIEW: '사람 검토 필요',
+  HOLD: '보류',
+  SUBMITTED: '제출 완료',
+  PR_OPEN: 'PR 검증 중',
   FAILED: '실패',
   ERROR: '오류',
   REJECTED: '거절됨',
