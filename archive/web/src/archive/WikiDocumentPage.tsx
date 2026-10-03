@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import type { WikiDocument } from './wikiDocument'
 import { WikiTopbar } from './WikiTopbar'
 import './wikiShell.css'
+import './survivalDesignLanguage.css'
 
 type PlannedSection = {
   id: string

@@ -1,6 +1,7 @@
 import { knowledgeRiskLabel, publishedKnowledgeGuides } from './knowledgeGuide'
 import { WikiTopbar } from './WikiTopbar'
 import './wikiShell.css'
+import './survivalDesignLanguage.css'
 
 const guideHref = (id: string) => '/?view=knowledge-preview&brief=' + encodeURIComponent(id)
 

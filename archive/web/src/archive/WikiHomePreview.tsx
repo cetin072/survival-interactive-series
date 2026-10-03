@@ -3,6 +3,7 @@ import { buildWikiDocuments, wikiCharacterIndex, wikiEventIndex, wikiLocationInd
 import { publishedKnowledgeEntries } from './wikiSearch'
 import { WikiTopbar } from './WikiTopbar'
 import './wikiShell.css'
+import './survivalDesignLanguage.css'
 
 const recentWorldDocuments = buildWikiDocuments(wikiSupportedNodeIds)
   .sort((a, b) => b.anchor.gameTime.localeCompare(a.anchor.gameTime) || b.anchor.saveVersion - a.anchor.saveVersion)
