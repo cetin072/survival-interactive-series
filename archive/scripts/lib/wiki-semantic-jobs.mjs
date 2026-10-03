@@ -97,7 +97,13 @@ export async function discoverWikiSource(root) {
     discoverWikiSources(root),
     existingWikiFactNames(root),
   ])
-  const source = sources.find((candidate) => !existingNames.has(expectedWikiFactPath(candidate).split('/').at(-1)))
+
+  const firstTrackedIndex = sources.findIndex((candidate) =>
+    existingNames.has(expectedWikiFactPath(candidate).split('/').at(-1)))
+  const trackedSources = firstTrackedIndex >= 0 ? sources.slice(firstTrackedIndex) : sources
+  const source = trackedSources.find((candidate) =>
+    !existingNames.has(expectedWikiFactPath(candidate).split('/').at(-1)))
+
   if (!source) {
     const error = new Error('WIKI_NO_PENDING_SOURCE')
     error.source_session = sources.at(-1)?.sourceSession.session_id ?? null
