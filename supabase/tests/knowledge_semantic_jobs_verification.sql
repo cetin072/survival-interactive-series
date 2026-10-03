@@ -14,6 +14,8 @@ declare
   v_duplicate jsonb;
   v_conflict jsonb;
   v_wrong_source jsonb;
+  v_invalid jsonb;
+  v_rejected jsonb;
   v_second_prepare jsonb;
   v_claimed jsonb;
   v_updated jsonb;
@@ -45,7 +47,7 @@ begin
       'FRESH_BRIEF','PUBLIC_ARCHIVE',v_source_ref,repeat('a',64),
       'synthetic-c3-ci-' || lower(v_decision),'c3-test-v1',repeat('b',64),
       '{"synthetic":true}'::jsonb,repeat('1',40),
-      '{"source":{"kind":"PUBLIC_ARCHIVE"},"target":{"brief_id":"K-999"}}'::jsonb,
+      '{"source":{"kind":"PUBLIC_ARCHIVE"},"target":{"brief_id":"K-999","candidate_id":"KC-synthetic"}}'::jsonb,
       'PREPARED',null
     );
     if v_prepared->>'status' <> 'PREPARED' or v_prepared->>'created' <> 'true' then
@@ -82,9 +84,36 @@ begin
       v_result := v_result || jsonb_build_object('code','NO_DISTINCT_SAFE_QUESTION','note','synthetic HOLD lifecycle');
     else
       v_result := v_result || jsonb_build_object(
-        'candidate',jsonb_build_object('synthetic',true),
-        'evidence',jsonb_build_object('synthetic',true),
-        'brief',jsonb_build_object('synthetic',true)
+        'candidate',jsonb_build_object(
+          'id','KC-synthetic',
+          'brief_id','K-999',
+          'topic_id','T-SYNTHETIC',
+          'status','BRIEF_PROPOSED',
+          'question','Synthetic semantic question',
+          'source_kind','PUBLIC_ARCHIVE',
+          'source_manifest_ref',v_source_ref,
+          'source_manifest_sha256',repeat('a',64)
+        ),
+        'evidence',jsonb_build_object(
+          'brief_id','K-999',
+          'question','Synthetic semantic question',
+          'claims',jsonb_build_array(jsonb_build_object(
+            'claim','Synthetic claim',
+            'source_ids',jsonb_build_array('S1'),
+            'context','Synthetic context',
+            'limitation','Synthetic limitation'
+          ))
+        ),
+        'brief',jsonb_build_object(
+          'id','K-999',
+          'topic_id','T-SYNTHETIC',
+          'title','Synthetic semantic question',
+          'content_type','BRIEF',
+          'status','READY',
+          'risk_level',case when v_decision='HUMAN_REVIEW' then 'HIGH' else 'LOW' end,
+          'publication_policy',case when v_decision='HUMAN_REVIEW' then 'HUMAN_APPROVED' else 'AUTO_LOW_RISK' end,
+          'semantic_qa_status',case when v_decision='HUMAN_REVIEW' then 'REVIEW' else 'PASS' end
+        )
       );
       if v_decision = 'HUMAN_REVIEW' then
         v_result := v_result || jsonb_build_object('code','SYNTHETIC_REVIEW','note','synthetic review lifecycle');
@@ -96,6 +125,21 @@ begin
     );
     if v_wrong_source->>'status' <> 'REJECTED' or v_wrong_source->>'reason' <> 'SOURCE_BINDING_MISMATCH' then
       raise exception 'wrong source binding was not rejected: %',v_wrong_source;
+    end if;
+
+    if v_decision <> 'HOLD' then
+      v_invalid := v_result #- '{brief,content_type}';
+      v_rejected := public.archive_knowledge_semantic_job_submit(
+        v_job_id,v_source_ref,repeat('a',64),v_invalid
+      );
+      if v_rejected->>'status' <> 'REJECTED'
+         or v_rejected->>'reason' <> 'PACKAGE_CORE_CONTRACT_INVALID' then
+        raise exception 'malformed package was not rejected before SUBMITTED: %',v_rejected;
+      end if;
+      v_current := public.archive_knowledge_semantic_job_current();
+      if v_current->>'status' <> 'PREPARED' or v_current->'job'->>'job_id' <> v_job_id::text then
+        raise exception 'rejected malformed package mutated durable PREPARED job: %',v_current;
+      end if;
     end if;
 
     v_submitted := public.archive_knowledge_semantic_job_submit(v_job_id,v_source_ref,repeat('a',64),v_result);
@@ -182,7 +226,7 @@ begin
       'FRESH_BRIEF','PUBLIC_ARCHIVE',v_source_ref,repeat('a',64),
       'synthetic-c3-ci-' || lower(v_decision),'c3-test-v1',repeat('b',64),
       '{"synthetic":true}'::jsonb,repeat('1',40),
-      '{"source":{"kind":"PUBLIC_ARCHIVE"},"target":{"brief_id":"K-999"}}'::jsonb,
+      '{"source":{"kind":"PUBLIC_ARCHIVE"},"target":{"brief_id":"K-999","candidate_id":"KC-synthetic"}}'::jsonb,
       'PREPARED',null
     );
     if v_prepared->>'status' <> 'EXISTING_JOB' or v_prepared->>'job_id' <> v_job_id::text then
