@@ -20,6 +20,10 @@ export function OperatorVisualMetadata() {
       <strong>{profiles.length}건</strong>
     </header>
     <p className="operator-muted">공개 Wiki에서는 숨기고, 이미지 제작과 운영 검수에만 사용하는 설명·렌더 큐·정책·출처를 모아 봅니다.</p>
+    <div className="operator-visual-legend" aria-label="삽화 상태 안내">
+      <span className="operator-visual-legend-item"><span className="operator-visual-signal is-present" aria-hidden="true" />삽화 있음</span>
+      <span className="operator-visual-legend-item"><span className="operator-visual-signal is-empty" aria-hidden="true" />삽화 없음</span>
+    </div>
     <div className="operator-visual-list">
       {profiles.map((profile) => {
         const asset = siteVisualFor(profile.node_id)
@@ -31,7 +35,7 @@ export function OperatorVisualMetadata() {
               role="img"
               aria-label={asset ? '삽화 있음' : '삽화 없음'}
               title={asset ? '삽화 있음' : '삽화 없음'}
-            >{asset ? '✓' : '—'}</span>
+            ><span className="operator-visual-signal" aria-hidden="true" /></span>
           </summary>
           <div className="operator-visual-body">
             <p>{profile.description}</p>
