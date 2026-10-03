@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { WikiDocument } from './wikiDocument'
-import { WikiSearchBox } from './WikiSearchBox'
+import { WikiTopbar } from './WikiTopbar'
 import './wikiShell.css'
 
 type PlannedSection = {
@@ -39,24 +39,13 @@ export function WikiDocumentPage({
   const hrefForRelation = relationHref ?? ((relation: WikiDocument['relations'][number]) => '/?view=archive&node=' + encodeURIComponent(relation.nodeId))
 
   return <main className="wiki-shell" id="wiki-top">
-    <header className="wiki-topbar">
-      <a className="wiki-brand" href="/" aria-label="생존일기 홈">
-        <strong>생존일기</strong>
-        <span>WIKI PREVIEW</span>
-      </a>
-      <WikiSearchBox />
-      <nav aria-label="공용 메뉴">
-        <a href="/">이야기</a>
-        <a href="/knowledge/">생존 지식</a>
-        <a href="/?view=tools">자료실</a>
-      </nav>
-    </header>
+    <WikiTopbar />
 
     <div className="wiki-frame">
       {previewTools}
       <nav className="wiki-breadcrumb" aria-label="현재 위치">
-        <a href="/">생존일기</a><span>›</span>
-        <a href="/?view=chronicle&chronicle=C03-AFTERFALL">AFTERFALL</a><span>›</span>
+        <a href="/?view=wiki-preview">생존일기</a><span>›</span>
+        <a href="/?view=wiki-preview&page=chronicle&chronicle=C03-AFTERFALL">AFTERFALL</a><span>›</span>
         <span>{document.typeLabel}</span><span>›</span><strong>{document.title}</strong>
       </nav>
 
