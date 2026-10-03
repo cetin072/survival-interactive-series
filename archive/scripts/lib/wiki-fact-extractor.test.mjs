@@ -5,7 +5,7 @@ import { resolve, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { byteHash, graphHash, reconcilePublicGraph } from './publication-graph.mjs'
 import { discoverWikiSources, discoverWikiSource } from './wiki-semantic-jobs.mjs'
-import { buildWikiFactJob, compileWikiFactProposal, extractWikiFacts, WIKI_RESULT_VERSION } from './wiki-fact-extractor.mjs'
+import { buildWikiFactJob, buildWikiFactReviewJob, compileWikiFactProposal, extractWikiFacts, reviewWikiFactProposal, validateWikiFactReview, WIKI_RESULT_VERSION, WIKI_REVIEW_VERSION } from './wiki-fact-extractor.mjs'
 import { runWikiFactCli } from '../run-wiki-fact-extractor.mjs'
 
 const root = resolve(import.meta.dirname, '../../..')
@@ -145,4 +145,70 @@ test('real CLI prepares current source and validates result without an apply pat
     assert.equal(proposal.facts.nodes.length, 7); assert.equal(proposal.graph_changed, false)
     await assert.rejects(runWikiFactCli(['--result', path, '--apply']), /WIKI_FACT_CLI_ARGUMENTS_INVALID/)
   } finally { await rm(dir, { recursive: true, force: true }) }
+})
+
+
+test('review job contains the complete prepared GM source and fixed proposal', () => {
+  const f = fixture()
+  f.source.gmBlocks.push({ messageLabel: '003', body: '두 번째 공개 블록이다.' })
+  const job = buildWikiFactJob(f.source, f.graph)
+  f.result.job_id = job.job_id
+  f.result.coverage = { status: 'PARTIAL', reviewed_blocks: ['001'] }
+  const proposal = compileWikiFactProposal(job, f.result)
+  const reviewJob = buildWikiFactReviewJob(job, proposal)
+  assert.equal(reviewJob.prepared_job.source.gm_blocks.length, 2)
+  assert.equal(reviewJob.prepared_job.source.gm_blocks[1].text, '두 번째 공개 블록이다.')
+  assert.equal(reviewJob.proposal.proposal_sha256, proposal.proposal_sha256)
+})
+
+test('reviewer cannot APPROVE a partial extraction', () => {
+  const f = fixture()
+  f.source.gmBlocks.push({ messageLabel: '003', body: '두 번째 공개 블록이다.' })
+  const job = buildWikiFactJob(f.source, f.graph)
+  f.result.job_id = job.job_id
+  f.result.coverage = { status: 'PARTIAL', reviewed_blocks: ['001'] }
+  const proposal = compileWikiFactProposal(job, f.result)
+  const reviewJob = buildWikiFactReviewJob(job, proposal)
+  assert.throws(() => validateWikiFactReview(reviewJob, {
+    version: WIKI_REVIEW_VERSION,
+    proposal_sha256: proposal.proposal_sha256,
+    decision: 'APPROVE',
+    note: 'TEST',
+  }), /WIKI_REVIEW_PARTIAL_APPROVAL_FORBIDDEN/)
+})
+
+test('independent reviewer is a separate provider seam and binds exact proposal hash', async () => {
+  const f = fixture()
+  const proposal = compileWikiFactProposal(f.job, f.result)
+  const reviewJob = buildWikiFactReviewJob(f.job, proposal)
+  let calls = 0
+  const review = await reviewWikiFactProposal(reviewJob, async (input) => {
+    calls++
+    assert.equal(input.prepared_job.job_id, f.job.job_id)
+    assert.equal(input.proposal.proposal_sha256, proposal.proposal_sha256)
+    return {
+      version: WIKI_REVIEW_VERSION,
+      proposal_sha256: proposal.proposal_sha256,
+      decision: 'APPROVE',
+      note: 'Independent test review.',
+    }
+  })
+  assert.equal(calls, 1)
+  assert.equal(review.decision, 'APPROVE')
+  assert.match(review.review_sha256, /^[a-f0-9]{64}$/)
+  await assert.rejects(reviewWikiFactProposal(reviewJob), /WIKI_REVIEW_MODEL_ADAPTER_REQUIRED/)
+})
+
+test('review result cannot be replayed onto another proposal', () => {
+  const a = fixture('SESSION_008', '첫시험인물')
+  const b = fixture('SESSION_009', '둘째시험인물')
+  const proposalA = compileWikiFactProposal(a.job, a.result)
+  const proposalB = compileWikiFactProposal(b.job, b.result)
+  const reviewJobB = buildWikiFactReviewJob(b.job, proposalB)
+  assert.throws(() => validateWikiFactReview(reviewJobB, {
+    version: WIKI_REVIEW_VERSION,
+    proposal_sha256: proposalA.proposal_sha256,
+    decision: 'APPROVE',
+    note: 'wrong proposal',
+  }), /WIKI_REVIEW_PROPOSAL_MISMATCH/)
 })
