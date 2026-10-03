@@ -1,0 +1,1198 @@
+{
+  "_notice": "Native-assistant-authored public-source samples for replay tests only. Not approved facts or a complete session sweep. Tests bind job_id to a freshly verified job; runtime never uses these as an extractor.",
+  "SESSION_006": {
+    "decision": "FACTS_READY",
+    "coverage": {
+      "status": "PARTIAL",
+      "reviewed_blocks": [
+        "001",
+        "003"
+      ]
+    },
+    "nodes": [
+      {
+        "key": "new:im-gwansu",
+        "existing_id": null,
+        "type": "character",
+        "label": "임관수",
+        "changes": {
+          "subtitle": "남쪽 차량야드 현장 관리자",
+          "summary": "남쪽 차량야드를 오래 관리해 왔다. 토지 권리는 혼자 결정할 수 없으며, 누나 임지연이 가족 쪽 공동권리자로 확인됐다."
+        },
+        "evidence": {
+          "type": [
+            "yard",
+            "rights"
+          ],
+          "label": [
+            "yard",
+            "rights"
+          ],
+          "subtitle": [
+            "yard",
+            "rights"
+          ],
+          "summary": [
+            "yard",
+            "rights"
+          ]
+        }
+      },
+      {
+        "key": "new:im-jiyeon",
+        "existing_id": null,
+        "type": "character",
+        "label": "임지연",
+        "changes": {
+          "subtitle": "남쪽 차량야드 공동권리자",
+          "summary": "임관수의 누나이며 차량야드의 가족 쪽 공동권리자로 확인됐다. 길드 차량 통행을 보장하는 합의의 당사자로 기록됐다."
+        },
+        "evidence": {
+          "type": [
+            "rights",
+            "parties"
+          ],
+          "label": [
+            "rights",
+            "parties"
+          ],
+          "subtitle": [
+            "rights",
+            "parties"
+          ],
+          "summary": [
+            "rights",
+            "parties"
+          ]
+        }
+      },
+      {
+        "key": "new:south-yard",
+        "existing_id": null,
+        "type": "location",
+        "label": "남쪽 차량야드",
+        "changes": {
+          "subtitle": "차량 통행·회차 사용권 합의 장소",
+          "summary": "길드는 야드 전체를 가져오지 않고 12개월 차량 통행·회차 사용권만 확보했다."
+        },
+        "evidence": {
+          "type": [
+            "yard",
+            "agreement"
+          ],
+          "label": [
+            "yard",
+            "agreement"
+          ],
+          "subtitle": [
+            "yard",
+            "agreement"
+          ],
+          "summary": [
+            "yard",
+            "agreement"
+          ]
+        }
+      },
+      {
+        "key": "new:yard-agreement",
+        "existing_id": null,
+        "type": "event",
+        "label": "남쪽 차량야드 통행·회차 사용권 합의",
+        "changes": {
+          "subtitle": "2027년 7월 차량야드 협상",
+          "summary": "길드는 차량야드 전체가 아닌 12개월 통행·회차 사용권을 확보했다. 관수·지연은 계약 구간의 통행 보장과 큰 구조변경 전 협의를 맡았다."
+        },
+        "evidence": {
+          "type": [
+            "yard",
+            "agreement",
+            "parties"
+          ],
+          "label": [
+            "yard",
+            "agreement",
+            "parties"
+          ],
+          "subtitle": [
+            "yard",
+            "agreement",
+            "parties"
+          ],
+          "summary": [
+            "yard",
+            "agreement",
+            "parties"
+          ]
+        }
+      },
+      {
+        "key": "new:han-jaeuk",
+        "existing_id": null,
+        "type": "character",
+        "label": "한재욱",
+        "changes": {
+          "subtitle": "이동상인",
+          "summary": "길드 밖에서 말린 곡물을 직접 판매한 이동상인이다. 거래 뒤 곡물 상태에 관한 분쟁이 발생했으나 고의 사기 여부는 확정되지 않았다."
+        },
+        "evidence": {
+          "type": [
+            "trader",
+            "grain",
+            "uncertain"
+          ],
+          "label": [
+            "trader",
+            "grain",
+            "uncertain"
+          ],
+          "subtitle": [
+            "trader",
+            "grain",
+            "uncertain"
+          ],
+          "summary": [
+            "trader",
+            "grain",
+            "uncertain"
+          ]
+        }
+      },
+      {
+        "key": "new:grain-dispute",
+        "existing_id": null,
+        "type": "event",
+        "label": "한재욱 곡물 직접거래 분쟁",
+        "changes": {
+          "subtitle": "길드 밖 직접거래의 책임범위 확인",
+          "summary": "한재욱의 곡물 직접거래 뒤 습기 먹은 곡물이 발견돼 구매자가 길드를 찾았다. 은채가 중개·에스크로·검수 기록이 없음을 확인했고 진우는 대신 보상하지 않았다."
+        },
+        "evidence": {
+          "type": [
+            "trader",
+            "grain",
+            "records"
+          ],
+          "label": [
+            "trader",
+            "grain",
+            "records"
+          ],
+          "subtitle": [
+            "trader",
+            "grain",
+            "records"
+          ],
+          "summary": [
+            "trader",
+            "grain",
+            "records"
+          ]
+        }
+      },
+      {
+        "key": "char-eunchae",
+        "existing_id": "char-eunchae",
+        "type": "character",
+        "label": "최은채",
+        "changes": {
+          "meta": {
+            "시장분쟁 기록확인": "곡물 직접거래 분쟁에서 길드 중개·에스크로·검수 기록의 유무를 확인했다."
+          }
+        },
+        "evidence": {
+          "type": [
+            "records"
+          ],
+          "label": [
+            "records"
+          ],
+          "meta.시장분쟁 기록확인": [
+            "records"
+          ]
+        }
+      }
+    ],
+    "relations": [
+      {
+        "from": "new:im-gwansu",
+        "to": "new:south-yard",
+        "kind": "works_at",
+        "label": "현장 관리",
+        "evidence": [
+          "rights",
+          "yard"
+        ]
+      },
+      {
+        "from": "new:im-jiyeon",
+        "to": "new:yard-agreement",
+        "kind": "participated_in",
+        "label": "통행 보장 합의 당사자",
+        "evidence": [
+          "rights",
+          "parties"
+        ]
+      },
+      {
+        "from": "new:yard-agreement",
+        "to": "new:south-yard",
+        "kind": "occurred_at",
+        "label": "차량야드 사용권 협상",
+        "evidence": [
+          "yard",
+          "agreement"
+        ]
+      },
+      {
+        "from": "new:han-jaeuk",
+        "to": "new:grain-dispute",
+        "kind": "participated_in",
+        "label": "직접거래 판매자",
+        "evidence": [
+          "trader",
+          "grain"
+        ]
+      },
+      {
+        "from": "char-eunchae",
+        "to": "new:grain-dispute",
+        "kind": "participated_in",
+        "label": "거래 기록 확인",
+        "evidence": [
+          "records"
+        ]
+      }
+    ],
+    "citations": [
+      {
+        "id": "yard",
+        "block_id": "001",
+        "quote": "# 2027년 7월 13일\n### 남쪽 차량야드 — 권리 확인"
+      },
+      {
+        "id": "rights",
+        "block_id": "001",
+        "quote": "임관수가 실제로 어디까지 결정할 수 있느냐였다.\n\n결과는 조금 복잡했다.\n\n관수가 이 야드를 오래 관리해온 건 맞았다.\n\n하지만 남아 있는 기록과 주변 증언을 맞춰보니,\n토지 권리는 관수 혼자에게만 있지 않았다.\n\n가족 쪽 공동권리자가 한 명 더 있었다.\n\n**임지연.**\n\n관수의 누나였다.\n\n관수는 현장을 관리했고,\n지연은 겨울 전까지 다른 지역에서 살았다."
+      },
+      {
+        "id": "agreement",
+        "block_id": "001",
+        "quote": "길드는 차량야드 전체를 가져오지 않았다.\n\n대신 **12개월 차량 통행·회차 사용권**만 확보했다."
+      },
+      {
+        "id": "parties",
+        "block_id": "001",
+        "quote": "관수·지연이 지키는 것:\n- 계약 구간을 다른 임차인에게 막히게 넘기지 않음\n- 길드 차량 통행 보장\n- 큰 구조변경 전 사전협의"
+      },
+      {
+        "id": "trader",
+        "block_id": "003",
+        "quote": "**한재욱**이라는 이동상인이 말린 곡물 자루 몇 개를 팔았다.\n\n거래 자체는 길드 밖에서 직접 이루어졌다."
+      },
+      {
+        "id": "grain",
+        "block_id": "003",
+        "quote": "이틀 뒤 자루 하나 안쪽에서 습기 먹은 곡물이 나왔다.\n\n구매자는 길드로 찾아왔다."
+      },
+      {
+        "id": "records",
+        "block_id": "003",
+        "quote": "은채는 기록부터 확인했다.\n\n없었다.\n\n에스크로도,\n중개도,\n검수도 없었다.\n\n진우는 보상하지 않았다."
+      },
+      {
+        "id": "uncertain",
+        "block_id": "003",
+        "quote": "고의로 사기를 친 건지,\n말을 유리하게 흘린 건지는 명확하지 않았다."
+      }
+    ],
+    "deferred": [
+      {
+        "reason": "한재욱의 고의 사기·악역 성향은 미확정이므로 확정 사실로 승격하지 않는다.",
+        "evidence": [
+          "uncertain"
+        ]
+      }
+    ],
+    "note": "원문 GM 001·003의 범용 추출 실전 표본. 나머지 GM 블록은 아직 이 표본의 처리범위가 아니며 세션 완료로 표시하지 않는다."
+  },
+  "SESSION_007": {
+    "decision": "FACTS_READY",
+    "coverage": {
+      "status": "PARTIAL",
+      "reviewed_blocks": [
+        "003"
+      ]
+    },
+    "nodes": [
+      {
+        "key": "new:jeong-byeongho",
+        "existing_id": null,
+        "type": "character",
+        "label": "정병호",
+        "changes": {
+          "subtitle": "옛 축사 재배지 거점 대표",
+          "summary": "언덕 아래 옛 축사 재배지의 거점 대표로 길드의 급수설비 표준화 협의에 등장했다."
+        },
+        "evidence": {
+          "type": [
+            "site",
+            "representative",
+            "standard"
+          ],
+          "label": [
+            "site",
+            "representative",
+            "standard"
+          ],
+          "subtitle": [
+            "site",
+            "representative",
+            "standard"
+          ],
+          "summary": [
+            "site",
+            "representative",
+            "standard"
+          ]
+        }
+      },
+      {
+        "key": "new:old-barn",
+        "existing_id": null,
+        "type": "location",
+        "label": "언덕 아래 옛 축사 재배지",
+        "changes": {
+          "subtitle": "현장조사 대상 세 번째 생산거점",
+          "summary": "길드가 조사한 세 생산거점 중 하나다. 다른 두 곳과 함께 같은 A형 계열에 들어왔다."
+        },
+        "evidence": {
+          "type": [
+            "site",
+            "standard"
+          ],
+          "label": [
+            "site",
+            "standard"
+          ],
+          "subtitle": [
+            "site",
+            "standard"
+          ],
+          "summary": [
+            "site",
+            "standard"
+          ]
+        }
+      },
+      {
+        "key": "new:water-network",
+        "existing_id": null,
+        "type": "event",
+        "label": "세 생산거점 표준 급수망 첫 계약",
+        "changes": {
+          "subtitle": "2027년 10월 23일",
+          "summary": "세 생산거점이 길드의 첫 묶음 고객이 됐다. 첫 계약의 공급 상한은 운영용 3대와 공동예비 2대, 총 5대다."
+        },
+        "evidence": {
+          "type": [
+            "contract",
+            "capacity"
+          ],
+          "label": [
+            "contract",
+            "capacity"
+          ],
+          "subtitle": [
+            "contract",
+            "capacity"
+          ],
+          "summary": [
+            "contract",
+            "capacity"
+          ]
+        }
+      },
+      {
+        "key": "char-taehoon",
+        "existing_id": "char-taehoon",
+        "type": "character",
+        "label": "장태훈",
+        "changes": {
+          "meta": {
+            "표준 급수망 현장조사": "진우·민규와 함께 세 생산거점을 현장조사했다."
+          }
+        },
+        "evidence": {
+          "type": [
+            "survey"
+          ],
+          "label": [
+            "survey"
+          ],
+          "meta.표준 급수망 현장조사": [
+            "survey"
+          ]
+        }
+      }
+    ],
+    "relations": [
+      {
+        "from": "new:jeong-byeongho",
+        "to": "new:old-barn",
+        "kind": "related_to",
+        "label": "거점 대표",
+        "evidence": [
+          "site",
+          "representative"
+        ]
+      },
+      {
+        "from": "new:water-network",
+        "to": "new:old-barn",
+        "kind": "related_to",
+        "label": "같은 A형 계열의 계약 대상 생산거점",
+        "evidence": [
+          "standard",
+          "contract",
+          "site"
+        ]
+      },
+      {
+        "from": "char-taehoon",
+        "to": "new:water-network",
+        "kind": "related_to",
+        "label": "계약 전 현장조사",
+        "evidence": [
+          "survey",
+          "contract"
+        ]
+      }
+    ],
+    "citations": [
+      {
+        "id": "survey",
+        "block_id": "003",
+        "quote": "진우는 계약서부터 쓰지 않았다.\n\n태훈과 민규를 데리고\n세 생산거점을 하나씩 돌았다."
+      },
+      {
+        "id": "site",
+        "block_id": "003",
+        "quote": "# 3번 거점 — 언덕 아래 옛 축사 재배지"
+      },
+      {
+        "id": "representative",
+        "block_id": "003",
+        "quote": "거점 대표 **정병호**가 물었다."
+      },
+      {
+        "id": "standard",
+        "block_id": "003",
+        "quote": "이렇게 세 곳 모두\n**같은 A형 계열** 안에 들어오게 됐다."
+      },
+      {
+        "id": "contract",
+        "block_id": "003",
+        "quote": "# 2027년 10월 23일\n### 첫 ‘표준 급수망’ 계약\n\n세 생산거점은\n길드의 첫 묶음 고객이 됐다."
+      },
+      {
+        "id": "capacity",
+        "block_id": "003",
+        "quote": "**운영용 3대 + 공동예비 2대.**\n\n총 **5대**가 상한이었다."
+      }
+    ],
+    "deferred": [],
+    "note": "다른 세션·다른 인물·다른 사건으로 같은 엔진을 검증하는 표본. GM 001은 이 표본에 포함하지 않았다."
+  },
+  "SESSION_006_COMPLETE": {
+    "decision": "FACTS_READY",
+    "coverage": {
+      "status": "COMPLETE",
+      "reviewed_blocks": [
+        "001",
+        "003",
+        "005",
+        "007",
+        "009",
+        "011",
+        "013"
+      ]
+    },
+    "nodes": [
+      {
+        "key": "new:im-gwansu",
+        "existing_id": null,
+        "type": "character",
+        "label": "임관수",
+        "changes": {
+          "subtitle": "남쪽 차량야드 현장 관리자",
+          "summary": "남쪽 차량야드를 오래 관리해 왔으며, 임지연과 함께 차량 통행·회차 사용권 합의의 권리 당사자로 확인됐다."
+        },
+        "evidence": {
+          "type": [
+            "gwansu",
+            "yard"
+          ],
+          "label": [
+            "gwansu"
+          ],
+          "subtitle": [
+            "gwansu",
+            "yard"
+          ],
+          "summary": [
+            "gwansu",
+            "jiyeon",
+            "agreement"
+          ]
+        }
+      },
+      {
+        "key": "new:im-jiyeon",
+        "existing_id": null,
+        "type": "character",
+        "label": "임지연",
+        "changes": {
+          "subtitle": "남쪽 차량야드 공동권리자",
+          "summary": "임관수의 누나이자 가족 쪽 공동권리자로 확인됐고, 길드 차량 통행을 보장하는 합의에 참여했다."
+        },
+        "evidence": {
+          "type": [
+            "jiyeon"
+          ],
+          "label": [
+            "jiyeon"
+          ],
+          "subtitle": [
+            "jiyeon"
+          ],
+          "summary": [
+            "jiyeon",
+            "parties"
+          ]
+        }
+      },
+      {
+        "key": "new:choi-gwangseok",
+        "existing_id": null,
+        "type": "character",
+        "label": "최광석",
+        "changes": {
+          "subtitle": "시장 상인",
+          "summary": "남쪽 차량야드 협상에 먼저 가격을 맞춰보던 상인이며, 이후 야드의 남는 일부를 확보해 숙박 손님 차량과 손수레 주차에 사용했다."
+        },
+        "evidence": {
+          "type": [
+            "gwangseok"
+          ],
+          "label": [
+            "gwangseok"
+          ],
+          "subtitle": [
+            "gwangseok"
+          ],
+          "summary": [
+            "gwangseok",
+            "gwangseok-result"
+          ]
+        }
+      },
+      {
+        "key": "new:south-yard",
+        "existing_id": null,
+        "type": "location",
+        "label": "남쪽 차량야드",
+        "changes": {
+          "subtitle": "차량 통행·회차 사용권을 확보한 야드",
+          "summary": "길드는 야드 전체가 아니라 12개월 차량 통행·회차 사용권만 확보했고 나머지는 시장에 남겼다."
+        },
+        "evidence": {
+          "type": [
+            "yard"
+          ],
+          "label": [
+            "yard"
+          ],
+          "subtitle": [
+            "agreement"
+          ],
+          "summary": [
+            "agreement",
+            "gwangseok-result"
+          ]
+        }
+      },
+      {
+        "key": "new:yard-agreement",
+        "existing_id": null,
+        "type": "event",
+        "label": "남쪽 차량야드 통행·회차 사용권 합의",
+        "changes": {
+          "subtitle": "2027년 7월 차량야드 협상",
+          "summary": "길드는 차량야드 전체를 임차하지 않고 12개월 통행·회차 사용권만 확보했다. 관수·지연은 계약 구간의 통행 보장과 큰 구조변경 전 협의를 맡았다."
+        },
+        "evidence": {
+          "type": [
+            "agreement"
+          ],
+          "label": [
+            "agreement"
+          ],
+          "subtitle": [
+            "yard",
+            "agreement"
+          ],
+          "summary": [
+            "agreement",
+            "parties"
+          ]
+        }
+      },
+      {
+        "key": "new:han-jaeuk",
+        "existing_id": null,
+        "type": "character",
+        "label": "한재욱",
+        "changes": {
+          "subtitle": "이동상인",
+          "summary": "길드 밖에서 말린 곡물을 직접 판매한 이동상인이다. 거래 뒤 곡물 상태 분쟁이 발생했지만 고의 사기 여부는 확정되지 않았다."
+        },
+        "evidence": {
+          "type": [
+            "han"
+          ],
+          "label": [
+            "han"
+          ],
+          "subtitle": [
+            "han"
+          ],
+          "summary": [
+            "han",
+            "grain",
+            "uncertain"
+          ]
+        }
+      },
+      {
+        "key": "new:grain-dispute",
+        "existing_id": null,
+        "type": "event",
+        "label": "한재욱 곡물 직접거래 분쟁",
+        "changes": {
+          "subtitle": "길드 밖 직접거래 책임범위 확인",
+          "summary": "한재욱의 직접거래 뒤 습기 먹은 곡물이 발견돼 구매자가 길드를 찾았다. 길드 중개·에스크로·검수 기록이 없어 진우는 대신 보상하지 않았다."
+        },
+        "evidence": {
+          "type": [
+            "han",
+            "grain"
+          ],
+          "label": [
+            "han",
+            "grain"
+          ],
+          "subtitle": [
+            "records"
+          ],
+          "summary": [
+            "han",
+            "grain",
+            "records"
+          ]
+        }
+      },
+      {
+        "key": "new:oh-serin",
+        "existing_id": null,
+        "type": "character",
+        "label": "오세린",
+        "changes": {
+          "subtitle": "길드 관리·접수 실무 인물",
+          "summary": "길드 관리동에서 등록상인·에스크로·보증거래의 차이를 질문하고 시장 서비스의 책임범위를 정리하는 논의에 참여했다."
+        },
+        "evidence": {
+          "type": [
+            "oserin"
+          ],
+          "label": [
+            "oserin"
+          ],
+          "subtitle": [
+            "oserin"
+          ],
+          "summary": [
+            "oserin",
+            "service"
+          ]
+        }
+      },
+      {
+        "key": "new:direct-buy-reframe",
+        "existing_id": null,
+        "type": "event",
+        "label": "길드 직매입·검수·재판매 사업 재정의",
+        "changes": {
+          "subtitle": "2027년 8월 5일",
+          "summary": "등록상인 제도는 보류하고 에스크로는 유지했다. 남의 거래를 보증하는 대신 길드가 직접 매입·검수·수리한 뒤 재판매하는 표준품 사업으로 방향을 바꿨다."
+        },
+        "evidence": {
+          "type": [
+            "direct"
+          ],
+          "label": [
+            "direct"
+          ],
+          "subtitle": [
+            "direct"
+          ],
+          "summary": [
+            "service",
+            "direct",
+            "standard-rule"
+          ]
+        }
+      },
+      {
+        "key": "new:lee-wonhyeok",
+        "existing_id": null,
+        "type": "character",
+        "label": "이원혁",
+        "changes": {
+          "subtitle": "외부 상인",
+          "summary": "표준품 후보 관찰기간에 인버터를 가져왔고, 이후 길드의 펌프 매입을 예상해 소형 펌프를 선매입했다가 길드가 매입가 상한을 올리지 않아 재고위험을 직접 부담했다."
+        },
+        "evidence": {
+          "type": [
+            "lee"
+          ],
+          "label": [
+            "lee"
+          ],
+          "subtitle": [
+            "lee"
+          ],
+          "summary": [
+            "lee",
+            "lee-seven",
+            "market-price"
+          ]
+        }
+      },
+      {
+        "key": "new:standard-goods-observation",
+        "existing_id": null,
+        "type": "event",
+        "label": "길드 표준품 후보 관찰기간",
+        "changes": {
+          "subtitle": "2027년 8월 6일~8월 28일",
+          "summary": "전력·급수배관·운송작업 장비의 거래가격, 고장, 수리 가능성, 부품과 수요를 비교했고 급수·배관이 반복수요와 표준화 가능성, 자체 사용가치에서 첫 사업 후보로 좁혀졌다."
+        },
+        "evidence": {
+          "type": [
+            "observation"
+          ],
+          "label": [
+            "observation"
+          ],
+          "subtitle": [
+            "observation"
+          ],
+          "summary": [
+            "observation",
+            "pump-repeat",
+            "selection"
+          ]
+        }
+      },
+      {
+        "key": "new:standard-pump-one",
+        "existing_id": null,
+        "type": "event",
+        "label": "길드 표준펌프 1호",
+        "changes": {
+          "subtitle": "2027년 9월 22일",
+          "summary": "길드는 매입가 상한을 따라 올리지 않고 지정 규격의 고장품·미검수품 중 수리 가능한 것만 골라 가치를 붙이는 방식으로 첫 판매용 표준펌프 두 대를 완성했다."
+        },
+        "evidence": {
+          "type": [
+            "pump-one"
+          ],
+          "label": [
+            "pump-one"
+          ],
+          "subtitle": [
+            "pump-one"
+          ],
+          "summary": [
+            "upper-limit",
+            "market-price",
+            "pump-one",
+            "repair"
+          ]
+        }
+      },
+      {
+        "key": "char-eunchae",
+        "existing_id": "char-eunchae",
+        "type": "character",
+        "label": "최은채",
+        "changes": {
+          "meta": {
+            "표준품 후보 관찰": "표준품 후보의 실제 거래가격·고장·수리·부품·구매문의·판매기간을 기록하는 관찰표를 운영했다."
+          }
+        },
+        "evidence": {
+          "type": [
+            "eunchae-table"
+          ],
+          "label": [
+            "eunchae-table"
+          ],
+          "meta.표준품 후보 관찰": [
+            "eunchae-table"
+          ]
+        }
+      },
+      {
+        "key": "char-mingyu",
+        "existing_id": "char-mingyu",
+        "type": "character",
+        "label": "정민규",
+        "changes": {
+          "meta": {
+            "표준펌프 검수·수리": "표준펌프 후보를 분해·수리하고 지정 규격의 수리 가능성을 판별했다."
+          }
+        },
+        "evidence": {
+          "type": [
+            "repair"
+          ],
+          "label": [
+            "repair"
+          ],
+          "meta.표준펌프 검수·수리": [
+            "repair",
+            "three-pumps"
+          ]
+        }
+      },
+      {
+        "key": "char-taehoon",
+        "existing_id": "char-taehoon",
+        "type": "character",
+        "label": "장태훈",
+        "changes": {
+          "meta": {
+            "표준펌프 시험": "수리된 표준펌프의 작동시험과 급수장비 표준화 판단에 참여했다."
+          }
+        },
+        "evidence": {
+          "type": [
+            "repair"
+          ],
+          "label": [
+            "repair"
+          ],
+          "meta.표준펌프 시험": [
+            "pump-repeat",
+            "repair"
+          ]
+        }
+      }
+    ],
+    "relations": [
+      {
+        "from": "new:im-gwansu",
+        "to": "new:south-yard",
+        "kind": "works_at",
+        "label": "현장 관리",
+        "evidence": [
+          "gwansu",
+          "yard"
+        ]
+      },
+      {
+        "from": "new:im-jiyeon",
+        "to": "new:yard-agreement",
+        "kind": "participated_in",
+        "label": "통행 보장 합의 당사자",
+        "evidence": [
+          "jiyeon",
+          "parties"
+        ]
+      },
+      {
+        "from": "new:choi-gwangseok",
+        "to": "new:south-yard",
+        "kind": "related_to",
+        "label": "남는 야드 일부 사용",
+        "evidence": [
+          "gwangseok-result"
+        ]
+      },
+      {
+        "from": "new:yard-agreement",
+        "to": "new:south-yard",
+        "kind": "occurred_at",
+        "label": "차량야드 사용권 협상",
+        "evidence": [
+          "yard",
+          "agreement"
+        ]
+      },
+      {
+        "from": "new:han-jaeuk",
+        "to": "new:grain-dispute",
+        "kind": "participated_in",
+        "label": "직접거래 판매자",
+        "evidence": [
+          "han",
+          "grain"
+        ]
+      },
+      {
+        "from": "char-eunchae",
+        "to": "new:grain-dispute",
+        "kind": "participated_in",
+        "label": "거래 기록 확인",
+        "evidence": [
+          "records"
+        ]
+      },
+      {
+        "from": "new:oh-serin",
+        "to": "new:direct-buy-reframe",
+        "kind": "participated_in",
+        "label": "시장 서비스 구조 논의",
+        "evidence": [
+          "oserin",
+          "service"
+        ]
+      },
+      {
+        "from": "new:direct-buy-reframe",
+        "to": "loc-sports-complex",
+        "kind": "occurred_at",
+        "label": "길드 관리동",
+        "evidence": [
+          "direct"
+        ]
+      },
+      {
+        "from": "char-mingyu",
+        "to": "new:standard-goods-observation",
+        "kind": "participated_in",
+        "label": "수리 가능성 검토",
+        "evidence": [
+          "three-pumps"
+        ]
+      },
+      {
+        "from": "char-taehoon",
+        "to": "new:standard-goods-observation",
+        "kind": "participated_in",
+        "label": "급수장비 표준화 검토",
+        "evidence": [
+          "pump-repeat"
+        ]
+      },
+      {
+        "from": "new:lee-wonhyeok",
+        "to": "new:standard-goods-observation",
+        "kind": "participated_in",
+        "label": "전력장비 매물 제공",
+        "evidence": [
+          "lee"
+        ]
+      },
+      {
+        "from": "new:standard-goods-observation",
+        "to": "loc-sports-complex",
+        "kind": "occurred_at",
+        "label": "길드 시장 관찰",
+        "evidence": [
+          "observation"
+        ]
+      },
+      {
+        "from": "new:lee-wonhyeok",
+        "to": "new:standard-pump-one",
+        "kind": "participated_in",
+        "label": "펌프 선매입·재판매 시도",
+        "evidence": [
+          "lee-seven",
+          "market-price"
+        ]
+      },
+      {
+        "from": "char-mingyu",
+        "to": "new:standard-pump-one",
+        "kind": "participated_in",
+        "label": "분해·수리",
+        "evidence": [
+          "repair"
+        ]
+      },
+      {
+        "from": "char-taehoon",
+        "to": "new:standard-pump-one",
+        "kind": "participated_in",
+        "label": "작동 시험",
+        "evidence": [
+          "repair"
+        ]
+      },
+      {
+        "from": "new:standard-pump-one",
+        "to": "loc-sports-complex",
+        "kind": "occurred_at",
+        "label": "길드 작업대·매입대",
+        "evidence": [
+          "pump-one"
+        ]
+      }
+    ],
+    "citations": [
+      {
+        "id": "yard",
+        "block_id": "001",
+        "quote": "# 2027년 7월 13일\n### 남쪽 차량야드 — 권리 확인"
+      },
+      {
+        "id": "gwansu",
+        "block_id": "001",
+        "quote": "임관수가 실제로 어디까지 결정할 수 있느냐였다."
+      },
+      {
+        "id": "jiyeon",
+        "block_id": "001",
+        "quote": "가족 쪽 공동권리자가 한 명 더 있었다.\n\n**임지연.**\n\n관수의 누나였다."
+      },
+      {
+        "id": "gwangseok",
+        "block_id": "001",
+        "quote": "최광석에게도 이미 확정된 계약은 없었다.\n\n말을 넣고 가격을 맞춰보는 단계였다."
+      },
+      {
+        "id": "gwangseok-result",
+        "block_id": "001",
+        "quote": "며칠 뒤 광석은 실제로 야드 남는 부분 일부를 잡았다.\n\n숙박 손님 차량과 손수레를 세우기 시작했다."
+      },
+      {
+        "id": "agreement",
+        "block_id": "001",
+        "quote": "길드는 차량야드 전체를 가져오지 않았다.\n\n대신 **12개월 차량 통행·회차 사용권**만 확보했다."
+      },
+      {
+        "id": "parties",
+        "block_id": "001",
+        "quote": "관수·지연이 지키는 것:\n- 계약 구간을 다른 임차인에게 막히게 넘기지 않음\n- 길드 차량 통행 보장\n- 큰 구조변경 전 사전협의"
+      },
+      {
+        "id": "han",
+        "block_id": "003",
+        "quote": "**한재욱**이라는 이동상인이 말린 곡물 자루 몇 개를 팔았다.\n\n거래 자체는 길드 밖에서 직접 이루어졌다."
+      },
+      {
+        "id": "grain",
+        "block_id": "003",
+        "quote": "이틀 뒤 자루 하나 안쪽에서 습기 먹은 곡물이 나왔다.\n\n구매자는 길드로 찾아왔다."
+      },
+      {
+        "id": "records",
+        "block_id": "003",
+        "quote": "은채는 기록부터 확인했다.\n\n없었다.\n\n에스크로도,\n중개도,\n검수도 없었다.\n\n진우는 보상하지 않았다."
+      },
+      {
+        "id": "uncertain",
+        "block_id": "003",
+        "quote": "고의로 사기를 친 건지,\n말을 유리하게 흘린 건지는 명확하지 않았다."
+      },
+      {
+        "id": "oserin",
+        "block_id": "005",
+        "quote": "오세린이 먼저 물었다.\n\n“잠깐만요. 저도 헷갈리는데요.”"
+      },
+      {
+        "id": "service",
+        "block_id": "005",
+        "quote": "등록상인은 거래를 보증하는 게 아니라 **사람과 이력을 확인하는 제도**에 가까워."
+      },
+      {
+        "id": "direct",
+        "block_id": "007",
+        "quote": "**등록상인 — 보류.**\n\n**에스크로 — 유지.**\n\n**보증거래 — 폐기하고 길드 직매입·검수·재판매로 재정의.**"
+      },
+      {
+        "id": "standard-rule",
+        "block_id": "007",
+        "quote": "특정 규격을 길드가 계속 사들이고  \n검수·정비해서  \n같은 기준으로 다시 내놓는 ‘길드 표준품’"
+      },
+      {
+        "id": "observation",
+        "block_id": "009",
+        "quote": "# 2027년 8월 6일 ~ 8월 28일\n### 폐쇄 체육시설 — 길드 시장 관찰기간"
+      },
+      {
+        "id": "lee",
+        "block_id": "009",
+        "quote": "8월 11일,\n외부 상인 **이원혁**이 인버터 두 대를 들고 왔다."
+      },
+      {
+        "id": "pump-repeat",
+        "block_id": "009",
+        "quote": "특히 소형 급수펌프 몇 종류는\n예전 상가·농가·시설에서 많이 쓰던 규격이 반복됐다."
+      },
+      {
+        "id": "three-pumps",
+        "block_id": "009",
+        "quote": "8월 중순,\n동쪽 생활권에서 작은 펌프 세 대가 동시에 수리 문의로 들어왔다.\n\n세 대 가운데 두 대는\n같은 규격 부품으로 살릴 수 있었다."
+      },
+      {
+        "id": "selection",
+        "block_id": "009",
+        "quote": "진우는 처음 생각보다 더 좁혀볼 수 있었다.\n\n**길드 표준품 1호를 ‘급수제품 전체’로 잡을 필요도 없다.**"
+      },
+      {
+        "id": "eunchae-table",
+        "block_id": "009",
+        "quote": "대신 은채가 종이 한 장을 새로 만들었다.\n\n> **표준품 후보 관찰표**"
+      },
+      {
+        "id": "upper-limit",
+        "block_id": "011",
+        "quote": "그러면 길드는 **매입가 상한을 먼저 정하고 그 이상이면 그냥 안 산다.**"
+      },
+      {
+        "id": "lee-seven",
+        "block_id": "013",
+        "quote": "원혁 뒤 수레에는 소형 펌프가 **일곱 대** 실려 있었다."
+      },
+      {
+        "id": "market-price",
+        "block_id": "013",
+        "quote": "길드는 **처음 제시했던 가격 그대로** 두 대만 샀다."
+      },
+      {
+        "id": "repair",
+        "block_id": "013",
+        "quote": "민규가 분해했고,\n태훈이 시험했고,\n소모부품을 바꿨다."
+      },
+      {
+        "id": "pump-one",
+        "block_id": "013",
+        "quote": "# 2027년 9월 22일 16:10\n### 길드 표준펌프 1호"
+      }
+    ],
+    "deferred": [
+      {
+        "reason": "한재욱의 고의 사기 여부는 원문에서 명확하지 않으므로 성향·범죄 사실로 승격하지 않는다.",
+        "evidence": [
+          "uncertain"
+        ]
+      }
+    ],
+    "note": "SESSION_006 GM 001·003·005·007·009·011·013 전체를 검토한 실전 COMPLETE 리플레이 샘플. 미래 선택지는 사실로 승격하지 않는다."
+  }
+}

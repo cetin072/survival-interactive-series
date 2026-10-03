@@ -7,6 +7,7 @@ import { byteHash, graphHash } from './publication-graph.mjs'
 const namespace = { chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', visibility: 'PUBLIC_ARCHIVE' }
 const seasonRoot = 'archive/content/transcripts/C03-AFTERFALL/S03'
 const factsRoot = 'archive/content/public-facts/C03-AFTERFALL/S03'
+const receiptsRoot = `${factsRoot}/receipts`
 const demand = (condition, code) => { if (!condition) throw new Error(code) }
 const jsonBytes = (value) => Buffer.from(JSON.stringify(value, null, 2) + '\n')
 
@@ -14,9 +15,23 @@ export function expectedWikiFactPath(source) {
   return `${factsRoot}/AWIKI_${source.sourceSession.session_id}_${source.sourceDigest}.json`
 }
 
+export function expectedWikiReceiptPath(source) {
+  return `${receiptsRoot}/AWIKI_${source.sourceSession.session_id}_${source.sourceDigest}.json`
+}
+
 async function existingWikiFactNames(root) {
   try {
     return new Set((await readdir(resolve(root, factsRoot)))
+      .filter((name) => /^AWIKI_SESSION_\d{3}_[a-f0-9]{64}\.json$/.test(name)))
+  } catch (error) {
+    if (error.code === 'ENOENT') return new Set()
+    throw error
+  }
+}
+
+async function existingWikiReceiptNames(root) {
+  try {
+    return new Set((await readdir(resolve(root, receiptsRoot)))
       .filter((name) => /^AWIKI_SESSION_\d{3}_[a-f0-9]{64}\.json$/.test(name)))
   } catch (error) {
     if (error.code === 'ENOENT') return new Set()
@@ -100,12 +115,17 @@ export async function discoverWikiSources(root) {
 }
 
 export async function discoverWikiSource(root) {
-  const [sources, existingNames] = await Promise.all([
+  const [sources, existingNames, receiptNames] = await Promise.all([
     discoverWikiSources(root),
     existingWikiFactNames(root),
+    existingWikiReceiptNames(root),
   ])
-  const source = sources.find((candidate) =>
-    !existingNames.has(expectedWikiFactPath(candidate).split('/').at(-1)))
+  const source = sources.find((candidate) => {
+    const factName = expectedWikiFactPath(candidate).split('/').at(-1)
+    const receiptName = expectedWikiReceiptPath(candidate).split('/').at(-1)
+    const legacyApplied = candidate.sourceSession.session_id === 'SESSION_005' && existingNames.has(factName)
+    return !legacyApplied && !receiptNames.has(receiptName)
+  })
 
   if (!source) {
     const error = new Error('WIKI_NO_PENDING_SOURCE')

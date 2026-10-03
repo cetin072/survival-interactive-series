@@ -222,6 +222,99 @@ export function reconcilePublicGraph({ batch, previous = null, facts, source, bo
   return { graph, report: { ...report, status: previous?.content_sha256 === graph.content_sha256 ? 'NOOP' : 'GRAPH_COMPILED', node_count: sortedNodes.length, relation_count: sortedRelations.length, story_links: graph.story_links.length, ambiguous_aliases: derived.ambiguous_aliases, inferred_relationships: 0 } }
 }
 
+/**
+ * Reconcile a reviewed historical semantic source without moving the global
+ * Reader boundary backward. Existing records may advance only when their own
+ * anchor is older than the source. Newer/same-revision conflicts fail closed.
+ */
+export function reconcilePublicGraphBackfill({ previous, facts, source, book, bookSource }) {
+  validatePrevious(previous)
+  keys(facts, ['version', 'chronicle_id', 'worldline_id', 'season_id', 'visibility', 'anchor', 'nodes', 'relations'])
+  namespace(facts); anchor(facts.anchor)
+  demand(facts.version === 'public-graph-facts-v1' && facts.season_id === 'S03', 'GRAPH_FACT_SCOPE_MISMATCH')
+  keys(source, ['source_ref', 'source_sha256'])
+  demand(source.source_ref.startsWith('archive/content/public-facts/C03-AFTERFALL/S03/'), 'GRAPH_SOURCE_SEASON_MISMATCH')
+  evidence({ ...source, pointer: '/nodes/0' })
+  demand(Array.isArray(facts.nodes) && facts.nodes.length <= 5000
+    && Array.isArray(facts.relations) && facts.relations.length <= 20000, 'INVALID_GRAPH_INVENTORY')
+
+  const boundary = facts.anchor
+  const nodes = new Map(previous.nodes.map((record) => [record.id, structuredClone(record)]))
+  const relations = new Map(previous.relations.map((record) => [record.id, structuredClone(record)]))
+  const report = {
+    nodes_added: 0, nodes_updated: 0, relations_added: 0, relations_updated: 0,
+    unchanged_records: 0, database_writes: 0, external_calls: 0, site_publications: 0,
+  }
+  const seen = new Set(), edgeSeen = new Set()
+  const upsert = (store, id, data, pointer, kind) => {
+    const old = store.get(id)
+    if (old && graphHash(old.data) === graphHash(data)) {
+      report.unchanged_records++
+      return
+    }
+    if (old) {
+      const order = compare(boundary, old.anchor)
+      demand(order >= 0, 'BACKFILL_RECORD_NEWER_THAN_SOURCE')
+      demand(order > 0, 'SAME_REVISION_FACT_CONFLICT')
+      if (kind === 'nodes') demand(old.data.type === data.type, 'ENTITY_TYPE_CHANGED')
+    }
+    store.set(id, {
+      id,
+      data: structuredClone(data),
+      anchor: { ...boundary },
+      evidence: { ...source, pointer },
+      history: old ? [...old.history, {
+        anchor: old.anchor,
+        data: structuredClone(old.data),
+        data_sha256: graphHash(old.data),
+        evidence: old.evidence,
+      }] : [],
+    })
+    report[`${kind}_${old ? 'updated' : 'added'}`]++
+  }
+
+  for (const [index, data] of facts.nodes.entries()) {
+    dataNode(data)
+    demand(!seen.has(data.id), 'DUPLICATE_NODE')
+    seen.add(data.id)
+    upsert(nodes, data.id, data, `/nodes/${index}`, 'nodes')
+  }
+  for (const [index, data] of facts.relations.entries()) {
+    dataRelation(data, nodes)
+    const id = relationId(data)
+    demand(!edgeSeen.has(id), 'DUPLICATE_RELATION')
+    edgeSeen.add(id)
+    upsert(relations, id, data, `/relations/${index}`, 'relations')
+  }
+
+  const sortedNodes = [...nodes.values()].sort((a, b) => a.id.localeCompare(b.id))
+  const sortedRelations = [...relations.values()].sort((a, b) => a.id.localeCompare(b.id))
+  const nodeMap = new Map(sortedNodes.map((record) => [record.id, record]))
+  for (const record of sortedRelations) dataRelation(record.data, nodeMap)
+
+  const globalAnchor = compare(boundary, previous.anchor) > 0 ? boundary : previous.anchor
+  const derived = views(sortedNodes, sortedRelations, book, bookSource, globalAnchor)
+  const body = {
+    version: 'archive-graph-v1', ...ns, anchor: { ...globalAnchor },
+    nodes: sortedNodes, relations: sortedRelations,
+    story_links: derived.story_links, articles: derived.articles,
+  }
+  const graph = { ...body, content_sha256: graphHash(body) }
+  return {
+    graph,
+    report: {
+      ...report,
+      status: previous.content_sha256 === graph.content_sha256 ? 'NOOP' : 'GRAPH_BACKFILL_COMPILED',
+      node_count: sortedNodes.length,
+      relation_count: sortedRelations.length,
+      story_links: graph.story_links.length,
+      ambiguous_aliases: derived.ambiguous_aliases,
+      inferred_relationships: 0,
+      global_anchor_preserved: compare(boundary, previous.anchor) < 0,
+    },
+  }
+}
+
 /** The one legacy adapter is limited to the graph already deployed from main, not live DB data. */
 export function legacyPublicFacts({ archiveMeta, archiveNodes, archiveEdges }) {
   demand(archiveMeta?.worldline === 'AFTERFALL' && archiveMeta.season === 'S02 COMPLETE' && archiveMeta.saveVersion === '253' && archiveMeta.gameTime === '2027-03-23 17:50', 'LEGACY_BASELINE_CHANGED_REVIEW_REQUIRED')
