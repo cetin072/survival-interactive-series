@@ -136,12 +136,14 @@ def archive(job_id):
     })
     demand(isinstance(stored, dict) and stored.get("status") == "STORED", "VAULT_MARK_STORED_FAILED")
 
-    staging_cleanup = None
-    if job.get("review_decision") in ("REJECT", "HUMAN_REVIEW"):
-        staging_cleanup = rpc("archive_illustration_vault_cleanup_review_staging", {
-            "p_job_id": job_id,
-            "p_source_sha256": job["source_sha256"],
-        })
+    # Safe for every decision. REJECT/HUMAN_REVIEW clean immediately after the
+    # vault store. PASS cleans only when the permanent Finalizer has reached
+    # SUCCEEDED; otherwise it intentionally returns deleted=0 and Finalizer
+    # repeats the same cleanup after permanent publication.
+    staging_cleanup = rpc("archive_illustration_vault_cleanup_review_staging", {
+        "p_job_id": job_id,
+        "p_source_sha256": job["source_sha256"],
+    })
 
     return {
         "status": "ILLUSTRATION_VAULT_STORED",
