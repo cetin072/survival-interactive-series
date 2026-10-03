@@ -58,8 +58,8 @@ describe('one-source Reader navigation', () => {
     expect(parsed.chronicleId).toBe('C03-AFTERFALL')
     expect(bookRoute(parsed).chapterId).toBe(chaptersForChronicle('C03-AFTERFALL')[0].id)
   })
-  it('routes the root to the Chronicle hub and keeps shared and operator routes distinct', () => {
-    expect(parseArchiveRoute('').view).toBe('home')
+  it('routes the root to the Wiki home and keeps shared and operator routes distinct', () => {
+    expect(parseArchiveRoute('')).toMatchObject({ view: 'wiki-preview', page: 'home' })
     expect(parseArchiveRoute('?view=story').view).toBe('story')
     expect(parseArchiveRoute('?view=tools').view).toBe('tools')
     expect(parseArchiveRoute('?view=media').view).toBe('media')
@@ -72,6 +72,7 @@ describe('one-source Reader navigation', () => {
     expect(archiveRouteUrl({ view: 'operator-knowledge', chronicleId: 'C03-AFTERFALL' }, 'https://archive.example/operator/').pathname).toBe('/operator/knowledge/')
     expect(archiveRouteUrl({ view: 'operator-vault', chronicleId: 'C03-AFTERFALL' }, 'https://archive.example/operator/').pathname).toBe('/operator/vault/')
     expect(archiveRouteUrl({ view: 'wiki-preview', chronicleId: 'C03-AFTERFALL', nodeId: 'char-seojin' }, 'https://archive.example/').search).toContain('node=char-seojin')
+    expect(archiveRouteUrl({ view: 'wiki-preview', chronicleId: 'C03-AFTERFALL', page: 'home' }, 'https://archive.example/?legacy=1').search).toBe('')
     expect(parseArchiveRoute('?view=chronicle&chronicle=C01-HAN-JUNHO').view).toBe('chronicle')
     expect(parseArchiveRoute('?view=chronicle&chronicle=C03-AFTERFALL&section=not-a-section')).toMatchObject({ view: 'chronicle', section: 'overview' })
   })
