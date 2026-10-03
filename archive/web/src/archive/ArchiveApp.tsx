@@ -42,7 +42,7 @@ export function ArchiveApp() {
   const roomSection = route.view === 'chronicle' ? route.section ?? 'overview' : 'overview'
   const roomHasGraph = route.view === 'chronicle' && route.chronicleId === 'C03-AFTERFALL' && ['explorer','characters','locations','events','graph'].includes(roomSection)
 
-  if (route.view === 'wiki-preview') return <WikiShellPreview nodeId={route.nodeId} />
+  if (route.view === 'wiki-preview') return <WikiShellPreview nodeId={route.nodeId} page={route.page} chronicleId={route.chronicleId} />
 
   return <main className="archive-shell">
     <header className="archive-header">
