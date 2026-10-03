@@ -9,6 +9,22 @@ const fail = (condition, message) => { if (!condition) throw new Error(`KNOWLEDG
 const nonempty = (value) => typeof value === 'string' && value.trim().length > 0
 const date = (value) => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value))
 const localPath = (value) => typeof value === 'string' && /^\/knowledge\/[a-z0-9/-]+\.(xlsx|pdf|csv)$/.test(value) && !value.includes('..')
+const httpsUrl = (value) => typeof value === 'string' && /^https:\/\//i.test(value)
+export function youtubeVideoId(value) {
+  if (!httpsUrl(value)) return null
+  try {
+    const url = new URL(value)
+    const host = url.hostname.toLowerCase().replace(/^www\./, '')
+    if (host === 'youtu.be') return /^[A-Za-z0-9_-]{6,20}$/.test(url.pathname.slice(1)) ? url.pathname.slice(1) : null
+    if (host === 'youtube.com' || host === 'm.youtube.com') {
+      const direct = url.searchParams.get('v')
+      if (direct && /^[A-Za-z0-9_-]{6,20}$/.test(direct)) return direct
+      const parts = url.pathname.split('/').filter(Boolean)
+      if (['shorts','embed','live'].includes(parts[0]) && /^[A-Za-z0-9_-]{6,20}$/.test(parts[1] ?? '')) return parts[1]
+    }
+  } catch {}
+  return null
+}
 const lowRiskDomains = new Set(['GENERAL_PREPAREDNESS', 'FOOD_STORAGE', 'COMMUNICATION', 'EVACUATION'])
 const highRiskDomains = new Set(['MEDICAL', 'MEDICATION', 'FIRST_AID_PROCEDURE', 'WATER_PURIFICATION', 'GENERATOR', 'COMBUSTION_CO', 'ELECTRICAL', 'RESCUE', 'SHELTER_STRUCTURAL', 'OTHER_SEVERE_HARM'])
 const allowedRiskDomains = new Set([...lowRiskDomains, ...highRiskDomains])
@@ -99,11 +115,13 @@ export async function validateKnowledge(data) {
     for (const section of brief.sections) {
       fail(nonempty(section.heading) && Array.isArray(section.blocks) && section.blocks.length > 0, `${brief.id} section`)
       for (const block of section.blocks) {
-        fail(['prose', 'table', 'ordered_list', 'unordered_list', 'note', 'download/tool'].includes(block.type), `${brief.id} block type`)
+        fail(['prose', 'table', 'ordered_list', 'unordered_list', 'note', 'download/tool', 'image', 'youtube'].includes(block.type), `${brief.id} block type`)
         if (['prose', 'note'].includes(block.type)) fail(nonempty(block.text), `${brief.id} block text`)
         if (block.type === 'table') fail(Array.isArray(block.headers) && block.headers.length > 0 && Array.isArray(block.rows) && block.rows.every((row) => row.length === block.headers.length), `${brief.id} table`)
         if (block.type.endsWith('list')) fail(Array.isArray(block.items) && block.items.length > 0, `${brief.id} list`)
         if (block.type === 'download/tool') fail(brief.tools.some((tool) => tool.path === block.tool_path), `${brief.id} tool block`)
+        if (block.type === 'image') fail(httpsUrl(block.src) && nonempty(block.alt) && (block.caption == null || typeof block.caption === 'string'), `${brief.id} image block`)
+        if (block.type === 'youtube') fail(Boolean(youtubeVideoId(block.url)) && nonempty(block.title), `${brief.id} youtube block`)
       }
     }
     for (const tool of brief.tools) {

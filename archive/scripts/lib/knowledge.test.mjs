@@ -6,7 +6,7 @@ import { mkdtemp, mkdir, readFile, writeFile, rm, copyFile } from 'node:fs/promi
 import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { publicKnowledgeInventory, scanKnowledge, bootstrapKnowledge, recordKnowledgeDisposition } from './knowledge-scan.mjs'
-import { loadKnowledge, validateKnowledge, publicationEligibility, root } from './knowledge-content.mjs'
+import { loadKnowledge, validateKnowledge, publicationEligibility, root, youtubeVideoId } from './knowledge-content.mjs'
 import { checkContentOnly, checkRelease, verifyProductionPublication } from './knowledge-release.mjs'
 import { planWorkerRun, validateProviderConfig, validateWorkerPolicy } from './knowledge-worker-config.mjs'
 import { assertReleaseReady, expectedReleaseDecision, promoteBriefRecord } from './knowledge-publish.mjs'
@@ -844,4 +844,30 @@ test('GitHub Actions owns automatic publication handoff', async () => {
   assert.equal(policy.runtime.automatic_publication_handoff, true)
   assert.equal(policy.runtime.scheduled_ai_publication_handoff, false)
   assert.equal(validateWorkerPolicy(policy), true)
+})
+
+
+test('Knowledge media blocks accept HTTPS images and canonical YouTube URLs', async () => {
+  assert.equal(youtubeVideoId('https://youtu.be/dQw4w9WgXcQ'), 'dQw4w9WgXcQ')
+  assert.equal(youtubeVideoId('https://www.youtube.com/watch?v=dQw4w9WgXcQ'), 'dQw4w9WgXcQ')
+  assert.equal(youtubeVideoId('https://youtube.com/shorts/dQw4w9WgXcQ'), 'dQw4w9WgXcQ')
+  assert.equal(youtubeVideoId('https://example.com/watch?v=dQw4w9WgXcQ'), null)
+
+  const data = await loadKnowledge(root)
+  const brief = data.briefs.find((item) => item.id === 'K-012')
+  assert.ok(brief)
+  brief.sections = [
+    ...brief.sections,
+    {
+      heading: '미디어 블록 테스트',
+      blocks: [
+        { type: 'image', src: 'https://example.gov/example.webp', alt: '테스트 이미지', caption: '테스트 캡션' },
+        { type: 'youtube', url: 'https://youtu.be/dQw4w9WgXcQ', title: '테스트 영상' },
+      ],
+    },
+  ]
+  assert.equal(await validateKnowledge(data), true)
+
+  brief.sections.at(-1).blocks[1].url = 'https://example.com/video'
+  await assert.rejects(validateKnowledge(data), /K-012 youtube block/)
 })

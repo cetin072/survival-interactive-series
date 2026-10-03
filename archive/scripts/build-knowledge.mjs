@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { loadKnowledge, validateKnowledge, root } from './lib/knowledge-content.mjs'
+import { loadKnowledge, validateKnowledge, root, youtubeVideoId } from './lib/knowledge-content.mjs'
 
 const check = process.argv.includes('--check')
 const data = await loadKnowledge()
@@ -42,6 +42,14 @@ const renderBlock = (block, brief) => {
   if (block.type === 'ordered_list' || block.type === 'unordered_list') {
     const tag = block.type === 'ordered_list' ? 'ol' : 'ul'
     return `<${tag}>${block.items.map((item) => `<li>${esc(item)}</li>`).join('')}</${tag}>`
+  }
+  if (block.type === 'image') {
+    const caption = block.caption?.trim() ? `<figcaption>${esc(block.caption)}</figcaption>` : ''
+    return `<figure class="article-media"><img src="${esc(block.src)}" alt="${esc(block.alt)}" loading="lazy" decoding="async" />${caption}</figure>`
+  }
+  if (block.type === 'youtube') {
+    const id = youtubeVideoId(block.url)
+    return `<figure class="article-media article-video"><div class="article-video-frame"><iframe src="https://www.youtube-nocookie.com/embed/${esc(id)}" title="${esc(block.title)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div></figure>`
   }
   const tool = brief.tools.find((item) => item.path === block.tool_path)
   return `<a class="download-button" href="${esc(tool.path)}" download>${esc(tool.label)}</a>`

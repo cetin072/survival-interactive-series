@@ -5,6 +5,7 @@ const shaPattern = /^[a-f0-9]{40}$/
 const briefPattern = /^K-\d+$/
 const headRefPattern = /^knowledge\/worker\/[A-Za-z0-9._/-]+$/
 const itemPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+const sha256Pattern = /^[a-f0-9]{64}$/
 
 function required(value, code) {
   if (!value) throw new Error(code)
@@ -97,13 +98,27 @@ export function validateReviewIdentity(item) {
   const headSha = payload.head_sha
   const prNumber = payload.pr_number
   const headRef = payload.head_ref
+  const operatorJobId = payload.operator_job_id ?? null
+  const operatorDraftRevision = payload.operator_draft_revision ?? null
+  const operatorDraftSha256 = payload.operator_draft_sha256 ?? null
+  const hasOperatorDraft = operatorJobId != null || operatorDraftRevision != null || operatorDraftSha256 != null
   if (!briefPattern.test(briefId ?? '')) return { ok: false, reason: 'REVIEW_BRIEF_INVALID' }
   if (!shaPattern.test(headSha ?? '')) return { ok: false, reason: 'REVIEW_HEAD_SHA_INVALID' }
   if (!Number.isInteger(prNumber) || prNumber <= 0) return { ok: false, reason: 'REVIEW_PR_NUMBER_MISSING' }
   if (!headRefPattern.test(headRef ?? '')) return { ok: false, reason: 'REVIEW_HEAD_REF_MISSING' }
   const expectedSource = `https://github.com/${repo}/blob/${headSha}/knowledge/content/briefs/${briefId}.json`
   if (item.source_ref !== expectedSource) return { ok: false, reason: 'REVIEW_SOURCE_REF_MISMATCH' }
-  return { ok: true, briefId, headSha, prNumber, headRef }
+  if (hasOperatorDraft) {
+    if (!itemPattern.test(operatorJobId ?? '')) return { ok: false, reason: 'REVIEW_OPERATOR_JOB_INVALID' }
+    if (!Number.isInteger(operatorDraftRevision) || operatorDraftRevision < 1) return { ok: false, reason: 'REVIEW_OPERATOR_DRAFT_REVISION_INVALID' }
+    if (!sha256Pattern.test(operatorDraftSha256 ?? '')) return { ok: false, reason: 'REVIEW_OPERATOR_DRAFT_SHA_INVALID' }
+  }
+  return {
+    ok: true, briefId, headSha, prNumber, headRef,
+    operatorJobId: hasOperatorDraft ? operatorJobId : null,
+    operatorDraftRevision: hasOperatorDraft ? operatorDraftRevision : null,
+    operatorDraftSha256: hasOperatorDraft ? operatorDraftSha256 : null,
+  }
 }
 
 export async function inspectApprovedReview({ projectUrl, serviceRoleKey, githubToken, fetchImpl = fetch }) {
@@ -172,6 +187,9 @@ export async function inspectApprovedReview({ projectUrl, serviceRoleKey, github
       pr_number: identity.prNumber,
       head_ref: identity.headRef,
       current_main: currentMain,
+      operator_job_id: identity.operatorJobId,
+      operator_draft_revision: identity.operatorDraftRevision,
+      operator_draft_sha256: identity.operatorDraftSha256,
     }
   }
 
@@ -203,6 +221,9 @@ export async function inspectApprovedReview({ projectUrl, serviceRoleKey, github
     pr_number: identity.prNumber,
     head_ref: identity.headRef,
     current_main: currentMain,
+    operator_job_id: identity.operatorJobId,
+    operator_draft_revision: identity.operatorDraftRevision,
+    operator_draft_sha256: identity.operatorDraftSha256,
   }
 }
 
