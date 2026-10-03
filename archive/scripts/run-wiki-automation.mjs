@@ -81,7 +81,10 @@ export async function runCli(args, { discover = discoverWikiSource } = {}) {
   demand(args.length === 1, 'INVALID_WIKI_CLI_ARGUMENTS')
   try { return JSON.stringify(await runWikiAutomation(args[0], { discover }), null, 2) + '\n' }
   catch (error) {
-    if (error.message === 'WIKI_NO_PENDING_SOURCE') {\n      return JSON.stringify({ status: 'NOOP', source_session: error.source_session ?? null, reason: error.message, graph_changed: false, raw_changed: false, book_changed: false }) + '\\n'\n    }\n    if (/WIKI_(?:SEMANTIC_EXTRACTOR_REQUIRED|NAMED_ENTITY_EVIDENCE_MISSING|AGREEMENT_EVIDENCE_MISSING|RAIN_PLAN_EVIDENCE_MISSING|ENTITY_COLLISION_OR_NO_GM_EVIDENCE|NODE_LABEL_COLLISION|NODE_IDENTITY_COLLISION|NEW_CHARACTER_EVIDENCE_INVALID|RELATION_KIND_REVIEW_REQUIRED)/.test(error.message)) {
+    if (error.message === 'WIKI_NO_PENDING_SOURCE') {
+      return JSON.stringify({ status: 'NOOP', source_session: error.source_session ?? null, reason: error.message, graph_changed: false, raw_changed: false, book_changed: false }) + '\n'
+    }
+    if (/WIKI_(?:SEMANTIC_EXTRACTOR_REQUIRED|NAMED_ENTITY_EVIDENCE_MISSING|AGREEMENT_EVIDENCE_MISSING|RAIN_PLAN_EVIDENCE_MISSING|ENTITY_COLLISION_OR_NO_GM_EVIDENCE|NODE_LABEL_COLLISION|NODE_IDENTITY_COLLISION|NEW_CHARACTER_EVIDENCE_INVALID|RELATION_KIND_REVIEW_REQUIRED)/.test(error.message)) {
       return JSON.stringify({ status: 'HUMAN_REVIEW', source_session: error.source_session ?? null, reason: error.message, graph_changed: false, raw_changed: false, book_changed: false }) + '\n'
     }
     throw error
