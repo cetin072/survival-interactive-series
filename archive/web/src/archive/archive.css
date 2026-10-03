@@ -133,16 +133,19 @@ button { cursor: pointer; }
 @keyframes operator-refresh-spin { to { transform: rotate(360deg); } }
 .operator-inbox { display: grid; gap: 7px; margin: 14px 0 0; padding: 0; list-style: none; }.operator-inbox button { width: 100%; padding: 12px; border: 1px solid #e4e4e7; border-radius: 8px; background: #fff; color: #2c2c32; text-align: left; }.operator-inbox button.selected, .operator-inbox button:hover { border-color: #aaaab2; background: #f8f8f9; }.operator-inbox button > span { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }.operator-inbox button > span b { padding: 3px 6px; border-radius: 4px; background: #f0f0f2; color: #5a5a62; font-size: 11px; }.operator-inbox strong, .operator-inbox small { display: block; }.operator-inbox small { margin-top: 4px; color: #74747c; }.operator-inbox p, .operator-detail > p { margin: 8px 0 0; color: #66666e; font-size: 14px; line-height: 1.55; }.operator-empty, .operator-muted { color: #77777f; font-size: 14px; line-height: 1.6; }.operator-detail h3 { font-size: 21px; }.operator-detail dl { display: grid; gap: 0; }.operator-detail dl div { display: grid; grid-template-columns: 100px minmax(0,1fr); gap: 8px; padding: 9px 0; border-top: 1px solid #eeeef0; }.operator-detail dt { color: #77777f; }.operator-detail dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }.operator-detail details { margin-top: 16px; }.operator-detail pre { max-height: 280px; overflow: auto; padding: 12px; border-radius: 7px; background: #f5f5f6; white-space: pre-wrap; overflow-wrap: anywhere; }.operator-decision { margin-top: 18px; padding-top: 16px; border-top: 1px solid #e8e8eb; }.operator-decision textarea { min-height: 90px; resize: vertical; }.operator-decision > div { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }.operator-history { margin-top: 15px; }.operator-history h4 { margin: 0; }.operator-history p { color: #66666e; font-size: 13px; }.operator-visual-metadata { margin-top: 14px; }
 .operator-visual-metadata > header > strong { color: #66666e; font-size: 13px; }
+.operator-visual-legend { display: flex; flex-wrap: wrap; gap: 10px 14px; margin-top: 8px; color: #6f6f77; font-size: 11px; }
+.operator-visual-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.operator-visual-signal { display: inline-block; width: 10px; height: 10px; border-radius: 999px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.operator-visual-signal.is-present, .operator-visual-state.is-present .operator-visual-signal { background: #3f8f57; }
+.operator-visual-signal.is-empty, .operator-visual-state.is-empty .operator-visual-signal { background: #b85a5a; }
 .operator-visual-list { display: grid; gap: 7px; margin-top: 14px; }
 .operator-visual-list > details { border: 1px solid #e5e5e8; border-radius: 8px; background: #fafafa; }
 .operator-visual-list > details > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; cursor: pointer; list-style: none; }
 .operator-visual-list > details > summary::-webkit-details-marker { display: none; }
-.operator-visual-list summary span:first-child { display: grid; gap: 3px; min-width: 0; }
+.operator-visual-list summary > span:first-child { display: grid; gap: 3px; min-width: 0; }
 .operator-visual-list summary strong { color: #2d2d33; font-size: 15px; }
 .operator-visual-list summary small, .operator-visual-list summary > span:last-child { color: #77777f; font-size: 11px; }
-.operator-visual-list summary > span.operator-visual-state { width: 20px; flex: 0 0 20px; text-align: center; font-size: 15px; font-weight: 700; line-height: 1; }
-.operator-visual-list summary > span.operator-visual-state.is-present { color: #4f6f5b; }
-.operator-visual-list summary > span.operator-visual-state.is-empty { color: #b2b2b8; }
+.operator-visual-list summary > span.operator-visual-state { display: flex; width: 20px; flex: 0 0 20px; align-items: center; justify-content: center; }
 .operator-visual-body { padding: 0 14px 14px; border-top: 1px solid #e7e7ea; }
 .operator-visual-body > p { color: #4e4e56; line-height: 1.65; }
 .operator-visual-body dl { display: grid; gap: 0; }
