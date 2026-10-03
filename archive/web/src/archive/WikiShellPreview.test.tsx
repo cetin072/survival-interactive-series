@@ -21,6 +21,8 @@ describe('Wiki 서진우 vertical slice', () => {
     expect(markup).toContain('장태훈')
     expect(markup).toContain('/visual-assets/')
     expect(markup).toContain('관련 이야기 · 기록 근거')
+    expect(markup).toContain('href="#wiki-overview">개요</a>')
+    expect(markup).not.toContain('>1. 개요</a>')
     expect(markup).toContain('c03-s01-001')
 
     expect(markup).not.toContain('실제 데이터 연결 전')
