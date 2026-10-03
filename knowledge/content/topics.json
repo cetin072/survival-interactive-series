@@ -83,5 +83,15 @@
     "guide_id": null,
     "tools": [],
     "story_refs": []
+  },
+  {
+    "id": "emergency-personnel-credentialing",
+    "title": "재난 외부 인력 자격·체크인",
+    "brief_ids": [
+      "K-013"
+    ],
+    "guide_id": null,
+    "tools": [],
+    "story_refs": []
   }
 ]
