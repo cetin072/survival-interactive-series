@@ -51,12 +51,7 @@ async function completePackage(root) {
   const result = {
     version: WIKI_RESULT_VERSION,
     job_id: job.job_id,
-    ...samples.SESSION_006,
-    coverage: {
-      status: 'COMPLETE',
-      reviewed_blocks: job.source.gm_blocks.map((block) => block.block_id),
-    },
-    note: 'TEST_ONLY complete-coverage finalizer replay; semantic approval is supplied by the independent review fixture.',
+    ...samples.SESSION_006_COMPLETE,
   }
   const proposal = compileWikiFactProposal(job, result)
   const reviewJob = buildWikiFactReviewJob(job, proposal)
