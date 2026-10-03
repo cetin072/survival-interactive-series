@@ -85,12 +85,18 @@
           "output_width": 1,
           "output_height": 1,
           "rejection_codes": [],
-          "review_context_sha256": "<exact_context_hash>"
+          "review_context_sha256": "<exact_context_hash>",
+          "review_staging_id": "<staging_id>",
+          "provider_asset_id": "<provider_asset_id>"
         }
       },
       "required_job_status": "PREPARED",
       "token_path": "p_review.lease_token",
-      "context_hash_path": "p_review.review_context_sha256"
+      "context_hash_path": "p_review.review_context_sha256",
+      "required_fields": [
+        "review_staging_id",
+        "provider_asset_id"
+      ]
     }
   ],
   "decision_lifecycle": {
@@ -100,21 +106,24 @@
       "lease_token": null,
       "lease_until": "decision_time + 7 days",
       "worker_may_acquire_during_sla": false,
-      "attempt_no_effect": "Unchanged"
+      "attempt_no_effect": "Unchanged",
+      "vault": "REQUIRED_30_DAY_PRIVATE_ARCHIVE"
     },
     "REJECT": {
       "final_status": "REVIEW_REJECTED",
       "lease_owner": null,
       "lease_token": null,
       "lease_until": null,
-      "attempt_no_effect": "The current attempt_no is unchanged; only a later queued semantic retry receives the next attempt number."
+      "attempt_no_effect": "The current attempt_no is unchanged; only a later queued semantic retry receives the next attempt number.",
+      "vault": "REQUIRED_30_DAY_PRIVATE_ARCHIVE"
     },
     "PASS": {
       "final_status": "FINALIZE_QUEUED",
       "lease_owner": null,
       "lease_token": null,
       "lease_until": null,
-      "next_owner": "Program Finalizer must acquire a fresh lease before mutation."
+      "next_owner": "Program Finalizer must acquire a fresh lease before mutation.",
+      "vault": "REQUIRED_30_DAY_PRIVATE_ARCHIVE_AND_EXISTING_PERMANENT_PROMOTION"
     }
   },
   "rollout_dependency": {
@@ -161,5 +170,27 @@
         "intrusive_watermark_or_generation_artifact"
       ]
     }
+  },
+  "review_staging_policy": {
+    "required_for_every_decision": true,
+    "order": [
+      "acquire_lease",
+      "bind_exact_job_and_review_context",
+      "read_current_png",
+      "stage_and_finalize_exact_png",
+      "perform_visual_review",
+      "submit_PASS_REJECT_or_HUMAN_REVIEW"
+    ],
+    "reason": "Every generated render must enter the 30-day private illustration vault, including rejected and human-review outputs."
+  },
+  "vault": {
+    "storage_bucket": "survival-illustration-vault",
+    "visibility": "PRIVATE_OPERATOR_ONLY",
+    "retention_days": 30,
+    "cleanup_owner": "Program Prep",
+    "ai_schedule_added": false,
+    "pass_behavior": "Keep a temporary vault copy while the accepted original also proceeds through the existing permanent Storage/Registry/SITE_ASSETS pipeline.",
+    "reject_behavior": "Keep only the temporary vault copy; remove transport staging after the vault upload succeeds.",
+    "human_review_behavior": "Keep only the temporary vault copy unless later approved through a separate operator flow."
   }
 }
