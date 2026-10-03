@@ -1,0 +1,9 @@
+{
+  "version": "a-wiki-native-status-v1",
+  "phase": "EXTRACTOR_READY",
+  "base_main_sha": "25929b19da814741ec0ad03fb7cba123159ff5c7",
+  "session_id": "SESSION_006",
+  "job_id": "wiki-job-d813785694227b24920b9d7e05ed72ecde59dd4ab5454bf1678612b47936aeee",
+  "source_sha256": "14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3",
+  "graph_sha256": "d7e5c7c210f534605b0321a8100ca49d0c8349c37481369764ab0db1fc8539be"
+}
