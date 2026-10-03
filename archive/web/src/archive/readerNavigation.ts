@@ -5,7 +5,7 @@ import type { ChronicleSection } from './ChronicleRoom'
 
 export type ArchiveRoute =
   | { view: 'home' | 'story' | 'tools' | 'media' | 'operator' | 'operator-visuals' | 'operator-knowledge' | 'operator-vault'; chronicleId: ChronicleId }
-  | { view: 'wiki-preview'; chronicleId: ChronicleId; nodeId?: string }
+  | { view: 'wiki-preview'; chronicleId: ChronicleId; nodeId?: string; page?: 'home' | 'chronicle' }
   | { view: 'chronicle'; chronicleId: ChronicleId; section?: ChronicleSection }
   | { view: 'archive'; chronicleId: ChronicleId; nodeId?: string }
   | { view: 'book'; chronicleId: ChronicleId; chapterId?: string }
@@ -67,7 +67,12 @@ export function parseArchiveRoute(search: string, storage?: ReaderStorage, pathn
   }
   if (view === 'tools') return { view: 'tools', chronicleId }
   if (view === 'media') return { view: 'media', chronicleId }
-  if (view === 'wiki-preview') return { view: 'wiki-preview', chronicleId, nodeId: params.get('node') ?? undefined }
+  if (view === 'wiki-preview') return {
+    view: 'wiki-preview',
+    chronicleId,
+    nodeId: params.get('node') ?? undefined,
+    page: params.get('page') === 'chronicle' ? 'chronicle' : 'home',
+  }
   if (view === 'archive') return { view: 'archive', chronicleId: activeChronicle.id, nodeId: params.get('node') ?? undefined }
   return { view: 'home', chronicleId: activeChronicle.id }
 }
@@ -86,7 +91,8 @@ export function archiveRouteUrl(route: ArchiveRoute, href: string): URL {
     url.pathname = '/'
     if (route.view !== 'home') url.searchParams.set('view', route.view === 'book' ? 'story' : route.view)
     if (route.view === 'wiki-preview' && route.nodeId) url.searchParams.set('node', route.nodeId)
-    if (route.view === 'chronicle' || route.view === 'book' || route.view === 'raw') url.searchParams.set('chronicle', route.chronicleId)
+    if (route.view === 'wiki-preview' && !route.nodeId && route.page === 'chronicle') url.searchParams.set('page', 'chronicle')
+    if (route.view === 'chronicle' || route.view === 'book' || route.view === 'raw' || (route.view === 'wiki-preview' && route.page === 'chronicle')) url.searchParams.set('chronicle', route.chronicleId)
     if (route.view === 'chronicle' && route.section && route.section !== 'overview') url.searchParams.set('section', route.section)
     if (route.view === 'book' && route.chapterId) url.searchParams.set('chapter', route.chapterId)
     if (route.view === 'raw' && route.partId) url.searchParams.set('part', route.partId)
