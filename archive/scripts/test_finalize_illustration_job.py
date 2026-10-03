@@ -131,6 +131,25 @@ class FinalizerIdentityTests(unittest.TestCase):
             review_complete["context_hash_path"],
             "p_review.review_context_sha256",
         )
+        self.assertTrue(contract["review_staging_policy"]["required_for_every_decision"])
+        self.assertEqual(
+            review_complete["required_fields"],
+            ["review_staging_id", "provider_asset_id"],
+        )
+        self.assertEqual(
+            review_complete["request"]["p_review"]["review_staging_id"],
+            "<staging_id>",
+        )
+        self.assertEqual(
+            review_complete["request"]["p_review"]["provider_asset_id"],
+            "<provider_asset_id>",
+        )
+        self.assertEqual(contract["vault"]["retention_days"], 30)
+        self.assertFalse(contract["vault"]["ai_schedule_added"])
+        self.assertEqual(
+            lifecycle["REJECT"]["vault"],
+            "REQUIRED_30_DAY_PRIVATE_ARCHIVE",
+        )
         self.assertEqual(
             contract["legacy_compatibility"]["null_context_hash"],
             "PRE_V2_PATH_ALLOWED",
