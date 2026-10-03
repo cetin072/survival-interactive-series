@@ -10,7 +10,7 @@ declare
   retried jsonb;
   wrong jsonb;
   current_row survival_ops.knowledge_semantic_jobs%rowtype;
-  job_id uuid;
+  v_job_id uuid;
   source_ref text := 'synthetic://c3-finalizer-retry';
   source_sha text := repeat('a',64);
   result jsonb;
@@ -41,11 +41,11 @@ begin
   if prepared->>'status' <> 'PREPARED' then
     raise exception 'prepare failed: %',prepared;
   end if;
-  job_id := (prepared->>'job_id')::uuid;
+  v_job_id := (prepared->>'job_id')::uuid;
 
   result := jsonb_build_object(
     'version','knowledge-semantic-result-v1',
-    'job_id',job_id::text,
+    'job_id',v_job_id::text,
     'decision','BRIEF_READY',
     'candidate',jsonb_build_object(
       'id','KC-finalizer-retry',
@@ -79,33 +79,33 @@ begin
     )
   );
 
-  submitted := public.archive_knowledge_semantic_job_submit(job_id,source_ref,source_sha,result);
+  submitted := public.archive_knowledge_semantic_job_submit(v_job_id,source_ref,source_sha,result);
   if submitted->>'status' <> 'ACCEPTED' then
     raise exception 'submit failed: %',submitted;
   end if;
   result_sha := submitted->>'result_sha256';
 
   claimed := public.archive_knowledge_semantic_job_claim_finalizer();
-  if claimed->>'status' <> 'FINALIZING' or claimed->>'job_id' <> job_id::text then
+  if claimed->>'status' <> 'FINALIZING' or claimed->>'job_id' <> v_job_id::text then
     raise exception 'claim failed: %',claimed;
   end if;
 
   blocked := public.archive_knowledge_semantic_job_update(
-    job_id,'FINALIZING','BLOCKED','KNOWLEDGE_CONTRACT','FINALIZER'
+    v_job_id,'FINALIZING','BLOCKED','KNOWLEDGE_CONTRACT','FINALIZER'
   );
   if blocked->>'status' <> 'BLOCKED' then
     raise exception 'block transition failed: %',blocked;
   end if;
 
   wrong := survival_ops.retry_knowledge_semantic_blocked_finalizer(
-    job_id,repeat('f',64),'KNOWLEDGE_CONTRACT'
+    v_job_id,repeat('f',64),'KNOWLEDGE_CONTRACT'
   );
   if wrong->>'status' <> 'REJECTED' or wrong->>'reason' <> 'RETRY_BINDING_MISMATCH' then
     raise exception 'wrong result SHA was not rejected: %',wrong;
   end if;
 
   retried := survival_ops.retry_knowledge_semantic_blocked_finalizer(
-    job_id,result_sha,'KNOWLEDGE_CONTRACT'
+    v_job_id,result_sha,'KNOWLEDGE_CONTRACT'
   );
   if retried->>'status' <> 'SUBMITTED'
      or retried->>'semantic_result_sha256' <> result_sha then
@@ -114,7 +114,7 @@ begin
 
   select * into current_row
   from survival_ops.knowledge_semantic_jobs
-  where survival_ops.knowledge_semantic_jobs.job_id = job_id;
+  where survival_ops.knowledge_semantic_jobs.job_id = v_job_id;
 
   if current_row.status <> 'SUBMITTED'
      or current_row.semantic_result is distinct from result
@@ -128,7 +128,7 @@ begin
   end if;
 
   claimed := public.archive_knowledge_semantic_job_claim_finalizer();
-  if claimed->>'status' <> 'FINALIZING' or claimed->>'job_id' <> job_id::text then
+  if claimed->>'status' <> 'FINALIZING' or claimed->>'job_id' <> v_job_id::text then
     raise exception 'retried job was not claimable: %',claimed;
   end if;
 end
