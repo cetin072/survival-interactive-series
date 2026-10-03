@@ -29,7 +29,7 @@ begin
     'BACKFILL_BRIEF','PUBLIC_READER','synthetic://published-reconcile',repeat('1',64),
     'synthetic-published-reconcile','c3-test-v1',repeat('2',64),
     '{"synthetic":true}'::jsonb,repeat('3',40),
-    '{"source":{"kind":"PUBLIC_READER"},"target":{"brief_id":"K-999"}}'::jsonb,
+    '{"source":{"kind":"PUBLIC_READER"},"target":{"brief_id":"K-999","candidate_id":"KC-published-reconcile"}}'::jsonb,
     'PREPARED',null
   );
   if prepared->>'status' <> 'PREPARED' then
@@ -43,9 +43,35 @@ begin
       'version','knowledge-semantic-result-v1',
       'decision','BRIEF_READY',
       'job_id',v_job_id::text,
-      'candidate',jsonb_build_object('synthetic',true),
-      'evidence',jsonb_build_object('synthetic',true),
-      'brief',jsonb_build_object('synthetic',true)
+      'candidate',jsonb_build_object(
+        'id','KC-published-reconcile',
+        'brief_id','K-999',
+        'topic_id','T-SYNTHETIC',
+        'status','BRIEF_PROPOSED',
+        'question','Synthetic published reconcile question',
+        'source_kind','PUBLIC_READER',
+        'reader_book_ref','archive/content/stories/C03-AFTERFALL/BOOK.json'
+      ),
+      'evidence',jsonb_build_object(
+        'brief_id','K-999',
+        'question','Synthetic published reconcile question',
+        'claims',jsonb_build_array(jsonb_build_object(
+          'claim','Synthetic claim',
+          'source_ids',jsonb_build_array('S1'),
+          'context','Synthetic context',
+          'limitation','Synthetic limitation'
+        ))
+      ),
+      'brief',jsonb_build_object(
+        'id','K-999',
+        'topic_id','T-SYNTHETIC',
+        'title','Synthetic published reconcile question',
+        'content_type','BRIEF',
+        'status','READY',
+        'risk_level','LOW',
+        'publication_policy','AUTO_LOW_RISK',
+        'semantic_qa_status','PASS'
+      )
     )
   );
   if submitted->>'status' <> 'ACCEPTED' then
