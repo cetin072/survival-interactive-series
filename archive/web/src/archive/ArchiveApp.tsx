@@ -5,6 +5,7 @@ import { RawTranscriptReader } from './RawTranscriptReader'
 import { StoryBookReader } from './StoryBookReader'
 import { StoryLibrary } from './StoryLibrary'
 import { WikiShellPreview } from './WikiShellPreview'
+import { KnowledgeGuidePreview } from './KnowledgeGuidePreview'
 import { activeChronicle, getChronicle } from './transcriptData'
 import type { ReaderChapter } from './storyData'
 import { archiveRouteUrl, browserReaderStorage, parseArchiveRoute, resolveReaderRoute, type ArchiveRoute } from './readerNavigation'
@@ -28,7 +29,7 @@ export function ArchiveApp() {
     window.addEventListener('popstate', restore)
     return () => window.removeEventListener('popstate', restore)
   }, [])
-  useEffect(() => { writeRoute(route, true) }, [route.view, 'chronicleId' in route ? route.chronicleId : '', 'section' in route ? route.section : '', 'chapterId' in route ? route.chapterId : '', 'partId' in route ? route.partId : '', 'nodeId' in route ? route.nodeId : '', 'page' in route ? route.page : ''])
+  useEffect(() => { writeRoute(route, true) }, [route.view, 'chronicleId' in route ? route.chronicleId : '', 'section' in route ? route.section : '', 'chapterId' in route ? route.chapterId : '', 'partId' in route ? route.partId : '', 'nodeId' in route ? route.nodeId : '', 'page' in route ? route.page : '', 'briefId' in route ? route.briefId : ''])
   const open = (next: ArchiveRoute) => {
     const resolved = resolveReaderRoute(next, browserReaderStorage())
     setRoute(resolved)
@@ -43,6 +44,7 @@ export function ArchiveApp() {
   const roomHasGraph = route.view === 'chronicle' && route.chronicleId === 'C03-AFTERFALL' && ['explorer','characters','locations','events','graph'].includes(roomSection)
 
   if (route.view === 'wiki-preview') return <WikiShellPreview nodeId={route.nodeId} page={route.page} chronicleId={route.chronicleId} />
+  if (route.view === 'knowledge-preview') return <KnowledgeGuidePreview briefId={route.briefId} />
 
   return <main className="archive-shell">
     <header className="archive-header">
