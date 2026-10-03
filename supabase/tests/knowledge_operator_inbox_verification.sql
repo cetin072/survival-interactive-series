@@ -59,9 +59,36 @@ begin
     'decision','HUMAN_REVIEW',
     'code','HIGH_RISK_MEDICAL',
     'note','Strong question retained for human review.',
-    'candidate',jsonb_build_object('id','KC-inbox-high-risk','brief_id','K-999','question','고위험 질문'),
-    'evidence',jsonb_build_object('brief_id','K-999','question','고위험 질문'),
-    'brief',jsonb_build_object('id','K-999','title','고위험 질문','risk_level','HIGH')
+    'candidate',jsonb_build_object(
+      'id','KC-inbox-high-risk',
+      'brief_id','K-999',
+      'topic_id','T-INBOX',
+      'status','BRIEF_PROPOSED',
+      'question','고위험 질문',
+      'source_kind','PUBLIC_ARCHIVE',
+      'source_manifest_ref',v_source_ref,
+      'source_manifest_sha256',repeat('a',64)
+    ),
+    'evidence',jsonb_build_object(
+      'brief_id','K-999',
+      'question','고위험 질문',
+      'claims',jsonb_build_array(jsonb_build_object(
+        'claim','Synthetic high-risk claim',
+        'source_ids',jsonb_build_array('S1'),
+        'context','Synthetic context',
+        'limitation','Synthetic limitation'
+      ))
+    ),
+    'brief',jsonb_build_object(
+      'id','K-999',
+      'topic_id','T-INBOX',
+      'title','고위험 질문',
+      'content_type','BRIEF',
+      'status','READY',
+      'risk_level','HIGH',
+      'publication_policy','HUMAN_APPROVED',
+      'semantic_qa_status','REVIEW'
+    )
   );
   v_submit := public.archive_knowledge_semantic_job_submit(v_job_id,v_source_ref,repeat('a',64),v_result);
   if v_submit->>'status' <> 'ACCEPTED' then
