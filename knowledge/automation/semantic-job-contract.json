@@ -8,9 +8,20 @@
     "version": { "const": "knowledge-semantic-result-v1" },
     "job_id": { "type": "string", "format": "uuid" },
     "decision": { "enum": ["BRIEF_READY", "HOLD", "HUMAN_REVIEW"] },
-    "candidate": { "type": "object" },
+    "candidate": {
+      "type": "object",
+      "required": ["status"],
+      "properties": { "status": { "const": "BRIEF_PROPOSED" } }
+    },
     "evidence": { "type": "object" },
-    "brief": { "type": "object" },
+    "brief": {
+      "type": "object",
+      "required": ["content_type", "status"],
+      "properties": {
+        "content_type": { "const": "BRIEF" },
+        "status": { "const": "READY" }
+      }
+    },
     "topic": { "type": "object" },
     "code": { "type": "string", "minLength": 1, "maxLength": 100 },
     "note": { "type": "string", "minLength": 1, "maxLength": 4000 }
