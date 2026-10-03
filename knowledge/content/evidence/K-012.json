@@ -1,0 +1,46 @@
+{
+  "claims": [
+    {
+      "claim": "FEMA는 사고정보를 적절한 대상에게 적절한 시점에 전달하고 공통상황도와 정보공유 절차를 유지하도록 권고한다.",
+      "context": "FEMA NIMS 민간부문 정보관리 원칙이다.",
+      "limitation": "소규모 공동체의 세부 공개등급을 정한 규정은 아니다.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "claim": "CISA의 OPSEC 안내는 노출 시 위험을 만들 수 있는 민감정보를 식별하고 보호하면서도 필요한 정보공유와 투명성을 유지할 수 있다고 설명한다.",
+      "context": "CISA의 공식 OPSEC 안내에서 일반 원칙만 적용했다.",
+      "limitation": "선거 운영 대상 자료이므로 법적 의무가 아니라 일반 정보보호 원칙으로만 사용한다.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "claim": "NIST는 개인식별정보를 부적절한 접근·사용·공개로부터 보호하고 상황에 맞는 보호수준을 정하도록 안내한다.",
+      "context": "NIST SP 800-122의 PII 보호 원칙이다.",
+      "limitation": "미국 연방기관 중심 자료이며 현지 개인정보법을 대신하지 않는다.",
+      "source_ids": [
+        "S3"
+      ]
+    },
+    {
+      "claim": "허구 Reader에서는 여러 거점 위치와 인원·자원 메모가 한 지도에 함께 표시된다.",
+      "context": "C03-AFTERFALL의 허구 서사에서 나온 narrative provenance다.",
+      "limitation": "허구 서사이며 현실 정보보안 기준의 근거가 아니다.",
+      "source_ids": [
+        "S4"
+      ]
+    }
+  ],
+  "brief_id": "K-012",
+  "question": "재난 대응 지도에 거점·인원·자원정보를 기록할 때 공개용과 내부용 정보를 어떻게 나눠 관리해야 할까",
+  "unknowns": [],
+  "conflicts": [],
+  "risk_notes": [
+    "저위험 GENERAL_PREPAREDNESS·COMMUNICATION 범위다.",
+    "실제 공개의무와 개인정보 규정은 관할 법률을 우선한다."
+  ],
+  "copyright_status": "CLEAR",
+  "story_source_status": "VERIFIED_PUBLIC_READER_BACKFILL"
+}

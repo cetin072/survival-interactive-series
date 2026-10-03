@@ -1,0 +1,106 @@
+{
+  "id": "K-012",
+  "lead": "상황지도는 판단을 돕지만 위치·인원·연락처·자원정보를 모두 한 장에 넣어 널리 공유하면 불필요한 노출이 생길 수 있습니다. 목적과 대상에 따라 공개범위를 나누는 것이 핵심입니다.",
+  "slug": "emergency-map-information-access",
+  "basis": "FEMA NIMS + CISA OPSEC + NIST SP 800-122 + 검증된 PUBLIC_READER",
+  "label": "재난 지도 정보공개 범위",
+  "scope": "소규모 조직·공동체의 재난 상황지도에서 공개정보와 내부정보를 구분하고 공유범위를 정하는 저위험 정보관리 원칙",
+  "title": "재난 대응 지도에 거점·인원·자원정보를 기록할 때 공개용과 내부용 정보를 어떻게 나눠 관리해야 할까",
+  "tools": [],
+  "footer": "일반 정보관리 원칙입니다. 실제 개인정보·시설보안·정보공개 의무는 관할 법률과 조직 규정을 우선하세요.",
+  "status": "PUBLISHED",
+  "sources": [
+    {
+      "id": "S1",
+      "url": "https://www.fema.gov/sites/default/files/documents/fema_nims-private-sector-fact-sheet_05-2021.pdf",
+      "note": "적절한 대상에게 사고정보를 전달하고 공통상황도와 공유절차를 유지하는 원칙을 확인했습니다.",
+      "title": "FEMA · NIMS Fact Sheet for Private Sector Organizations",
+      "checked_at": "2026-10-03"
+    },
+    {
+      "id": "S2",
+      "url": "https://www.cisa.gov/sites/default/files/2024-07/Guide_to_Operational_Security_for_Election_Officials_07.01.24_508C.pdf",
+      "note": "민감정보 식별과 노출위험 감소, 필요한 정보공유를 함께 고려하는 OPSEC 원칙을 확인했습니다.",
+      "title": "CISA · Guide to Operational Security",
+      "checked_at": "2026-10-03"
+    },
+    {
+      "id": "S3",
+      "url": "https://csrc.nist.gov/pubs/sp/800/122/final",
+      "note": "개인식별정보를 부적절한 접근·사용·공개로부터 보호하는 원칙을 확인했습니다.",
+      "title": "NIST SP 800-122 · Protecting PII",
+      "checked_at": "2026-10-03"
+    },
+    {
+      "id": "S4",
+      "url": "https://survival-diary-archive.netlify.app/?view=story&chronicle=C03-AFTERFALL&chapter=c03-afterfall-chapter-05",
+      "note": "허구 지도 장면을 narrative provenance로만 확인했습니다.",
+      "title": "생존일기 Reader · 거점 정보 지도",
+      "checked_at": "2026-10-03"
+    }
+  ],
+  "summary": "재난 지도에서 모두가 알아야 할 정보와 내부 운영정보를 나누고, 민감정보는 필요한 사람에게만 공유하는 기본 원칙을 정리합니다.",
+  "guide_id": null,
+  "sections": [
+    {
+      "blocks": [
+        {
+          "text": "FEMA는 사고정보를 적절한 대상에게 전달하고 공통상황도를 유지하도록 안내합니다. 누구나 알아야 할 위치·상태와 내부 판단용 세부정보를 같은 상세도로 배포할 필요는 없습니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "공개용과 내부용을 먼저 나눕니다"
+    },
+    {
+      "blocks": [
+        {
+          "type": "unordered_list",
+          "items": [
+            "공개용: 공식 대피소·이용시간·일반 통제정보",
+            "내부용: 세부 재고량·내부 연락망·담당자 정보",
+            "개인정보: 이름·전화번호 등은 꼭 필요한 경우만 기록",
+            "민감정보: 노출 시 운영위험이 커지면 공유대상을 제한"
+          ]
+        }
+      ],
+      "heading": "노출 위험이 큰 정보는 범위를 좁힙니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "CISA와 NIST 원칙을 적용하면 내부정보도 필요한 역할에 필요한 만큼만 공유하고, 담당 변경이나 상황 변화가 생기면 접근범위와 기록을 함께 갱신하는 방식이 단순합니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "공유대상과 갱신책임을 함께 정합니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "허구 Reader에서 여러 거점의 위치와 인원·자원 메모가 한 지도에 함께 표시됩니다. 여기서 정보의 상세도를 누구에게까지 보여줄지라는 현실 질문만 가져왔습니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "《생존일기》에서 시작한 질문"
+    }
+  ],
+  "topic_id": "emergency-information-access-control",
+  "risk_level": "LOW",
+  "story_refs": [],
+  "updated_at": "2026-10-03",
+  "ai_assisted": true,
+  "content_type": "BRIEF",
+  "published_at": "2026-10-03",
+  "risk_domains": [
+    "GENERAL_PREPAREDNESS",
+    "COMMUNICATION"
+  ],
+  "editorial_note": "Reader에서 질문만 가져오고 현실 설명은 FEMA·CISA·NIST 공식자료를 Evidence-first로 확인했습니다.",
+  "meta_description": "FEMA·CISA·NIST 공식자료를 바탕으로 재난 대응 지도의 공개용·내부용 정보를 구분하는 방법을 설명합니다.",
+  "related_brief_ids": [
+    "K-007"
+  ],
+  "source_checked_at": "2026-10-03",
+  "publication_policy": "AUTO_LOW_RISK",
+  "semantic_qa_status": "PASS"
+}
