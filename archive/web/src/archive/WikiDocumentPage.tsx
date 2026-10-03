@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { WikiDocument } from './wikiDocument'
+import { WikiSearchBox } from './WikiSearchBox'
 import './wikiShell.css'
 
 type PlannedSection = {
@@ -43,10 +44,7 @@ export function WikiDocumentPage({
         <strong>생존일기</strong>
         <span>WIKI PREVIEW</span>
       </a>
-      <form className="wiki-search" onSubmit={(event) => event.preventDefault()} role="search">
-        <input aria-label="문서 검색" placeholder="인물, 장소, 사건, 생존 지식 검색" />
-        <button type="submit" aria-label="검색은 다음 단계에서 연결">검색</button>
-      </form>
+      <WikiSearchBox />
       <nav aria-label="공용 메뉴">
         <a href="/">이야기</a>
         <a href="/knowledge/">생존 지식</a>
