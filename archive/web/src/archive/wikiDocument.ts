@@ -55,6 +55,14 @@ const nodeById = new Map(
   publicGraph.nodes.map((record) => [record.id, record.data as ArchiveNode]),
 )
 
+export const wikiCharacterIndex = publicGraph.nodes
+  .map((record) => record.data as ArchiveNode)
+  .filter((node) => node.type === 'character')
+  .map((node) => ({ id: node.id, title: node.label, subtitle: node.subtitle }))
+  .sort((a, b) => a.title.localeCompare(b.title, 'ko'))
+
+export const wikiCharacterNodeIds = wikiCharacterIndex.map((item) => item.id)
+
 export function requireWikiNode(nodeId: string): ArchiveNode {
   const node = nodeById.get(nodeId)
   if (!node) throw new Error('Wiki source node missing: ' + nodeId)

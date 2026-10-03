@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { WikiDocument } from './wikiDocument'
 import './wikiShell.css'
 
@@ -21,11 +22,20 @@ export function wikiSectionPlan(document: WikiDocument): PlannedSection[] {
   return plan
 }
 
-export function WikiDocumentPage({ document }: { document: WikiDocument }) {
+export function WikiDocumentPage({
+  document,
+  previewTools,
+  relationHref,
+}: {
+  document: WikiDocument
+  previewTools?: ReactNode
+  relationHref?: (relation: WikiDocument['relations'][number]) => string
+}) {
   const plan = wikiSectionPlan(document)
   const numberFor = (kind: PlannedSection['kind']) => plan.findIndex((section) => section.kind === kind) + 1
   const roleSection = document.sections.find((section) => /(?:^|-)role$/.test(section.id))
   const historySections = document.sections.filter((section) => section !== roleSection)
+  const hrefForRelation = relationHref ?? ((relation: WikiDocument['relations'][number]) => '/?view=archive&node=' + encodeURIComponent(relation.nodeId))
 
   return <main className="wiki-shell" id="wiki-top">
     <header className="wiki-topbar">
@@ -45,6 +55,7 @@ export function WikiDocumentPage({ document }: { document: WikiDocument }) {
     </header>
 
     <div className="wiki-frame">
+      {previewTools}
       <nav className="wiki-breadcrumb" aria-label="현재 위치">
         <a href="/">생존일기</a><span>›</span>
         <a href="/?view=chronicle&chronicle=C03-AFTERFALL">AFTERFALL</a><span>›</span>
@@ -112,7 +123,7 @@ export function WikiDocumentPage({ document }: { document: WikiDocument }) {
           {!!document.relations.length && <section id="wiki-relations">
             <h2><span>{numberFor('relations')}.</span> 관계</h2>
             <div className="wiki-relation-list">
-              {document.relations.map((relation) => <a key={relation.nodeId + relation.label} href={'/?view=archive&node=' + encodeURIComponent(relation.nodeId)}>
+              {document.relations.map((relation) => <a key={relation.nodeId + relation.label} href={hrefForRelation(relation)}>
                 <strong>{relation.title}</strong>
                 <span>{relation.label}</span>
                 <small>{relation.type === 'character' ? '인물' : relation.type === 'location' ? '장소' : relation.type === 'event' ? '사건' : '자료'} · {relation.subtitle}</small>
@@ -147,7 +158,7 @@ export function WikiDocumentPage({ document }: { document: WikiDocument }) {
 
         <footer className="wiki-document-footer" id="wiki-bottom">
           <strong>관련 문서</strong>
-          <nav>{document.relations.slice(0, 8).map((relation) => <a key={relation.nodeId} href={'/?view=archive&node=' + encodeURIComponent(relation.nodeId)}>{relation.title}</a>)}</nav>
+          <nav>{document.relations.slice(0, 8).map((relation) => <a key={relation.nodeId} href={hrefForRelation(relation)}>{relation.title}</a>)}</nav>
         </footer>
       </article>
     </div>
