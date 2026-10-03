@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  formatOperatorRefreshTime,
   formatOperatorTime,
   operatorStaticStatus,
   productionStatusTone,
@@ -20,6 +21,8 @@ describe('Operator system status helpers', () => {
 
   it('formats status values safely', () => {
     expect(formatOperatorTime(null)).toBe('기록 없음')
+    expect(formatOperatorRefreshTime(null)).toBe('아직 없음')
+    expect(formatOperatorRefreshTime('2026-10-03T05:03:12.000Z')).toContain('14:03:12')
     expect(shortSha('1234567890abcdef')).toBe('12345678')
     expect(visualStatusTone('BLOCKED')).toBe('warning')
     expect(visualStatusTone('SUCCESS')).toBe('ok')

@@ -8,6 +8,7 @@ import { supabaseClient } from './supabaseClient'
 import { operatorPasswordRedirectUrl, validatePasswordChange } from './operatorPassword'
 import {
   explainMachineCode,
+  formatOperatorRefreshTime,
   formatOperatorTime,
   operatorStaticStatus,
   productionStatusTone,
@@ -103,24 +104,31 @@ export default function OperatorConsole({ view = 'dashboard' }: { view?: 'dashbo
   const [selected, setSelected] = useState<ReviewDetail | null>(null)
   const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<string | null>(null)
   const [error, setError] = useState('')
   const initialDashboardLoaded = useRef(false)
 
   const refresh = useCallback(async () => {
     if (!supabaseClient) return
-    setBusy(true); setError(''); setStatusError('')
-    const [inboxResult, systemResult, release, deploy] = await Promise.all([
-      supabaseClient.rpc('archive_operator_review_inbox'),
-      supabaseClient.rpc('archive_operator_system_status'),
-      readJson<ReleaseMarker>('/release/production.json'),
-      readJson<DeployMeta>('/deploy-meta.json'),
-    ])
-    if (inboxResult.error) setError(rpcError(inboxResult.error))
-    else setInbox((inboxResult.data ?? emptyInbox) as Inbox)
-    if (systemResult.error) setStatusError('자동화 실행 상태를 불러오지 못했습니다.')
-    else setSystemStatus(systemResult.data as SystemStatus)
-    setProductionStatus({ release, deploy })
-    setBusy(false)
+    setBusy(true); setRefreshing(true); setError(''); setStatusError('')
+    try {
+      const [inboxResult, systemResult, release, deploy] = await Promise.all([
+        supabaseClient.rpc('archive_operator_review_inbox'),
+        supabaseClient.rpc('archive_operator_system_status'),
+        readJson<ReleaseMarker>('/release/production.json'),
+        readJson<DeployMeta>('/deploy-meta.json'),
+      ])
+      if (inboxResult.error) setError(rpcError(inboxResult.error))
+      else setInbox((inboxResult.data ?? emptyInbox) as Inbox)
+      if (systemResult.error) setStatusError('자동화 실행 상태를 불러오지 못했습니다.')
+      else setSystemStatus(systemResult.data as SystemStatus)
+      setProductionStatus({ release, deploy })
+      setLastRefreshedAt(new Date().toISOString())
+    } finally {
+      setRefreshing(false)
+      setBusy(false)
+    }
   }, [])
 
   const loadDetail = useCallback(async (id: string) => {
@@ -263,7 +271,7 @@ export default function OperatorConsole({ view = 'dashboard' }: { view?: 'dashbo
     <div className="operator-counts"><article><span>사람 검토 · Human Review</span><strong>{inbox.pending_count}</strong></article><article><span>자동화 오류 · Automation Error</span><strong>{inbox.automation_error_count}</strong></article><article><span>보안 알림 · Security</span><strong className="operator-unwired">미연결</strong></article><article><span>비용 알림 · Cost</span><strong className="operator-unwired">미연결</strong></article></div>
 
     <section className="operator-system">
-      <header><div><p className="archive-eyebrow">SYSTEM STATUS</p><h2>자동화 상태</h2></div><button className="operator-secondary" disabled={busy} onClick={() => void refresh()}>상태 새로고침</button></header>
+      <header><div><p className="archive-eyebrow">SYSTEM STATUS</p><h2>자동화 상태</h2><p className="operator-refresh-time" aria-live="polite">마지막 갱신 {formatOperatorRefreshTime(lastRefreshedAt)}</p></div><button className={`operator-secondary operator-refresh-button ${refreshing ? 'refreshing' : ''}`} disabled={busy} aria-busy={refreshing} onClick={() => void refresh()}><span aria-hidden="true">↻</span>{refreshing ? '새로고침 중…' : '상태 새로고침'}</button></header>
       <div className="operator-system-grid">
         <article className="operator-system-card">
           <div className="operator-system-title"><h3>A · Archive <small>아카이브</small></h3><span className={`operator-status-badge ${archiveHealthy ? 'ok' : archiveCron ? 'warning' : 'neutral'}`}>{archiveHealthy ? '작동 중' : archiveCron?.active === false ? '중지' : archiveCron ? statusWithKorean(archiveCron.last_status) : '기록 없음'}</span></div>
@@ -327,7 +335,7 @@ export default function OperatorConsole({ view = 'dashboard' }: { view?: 'dashbo
       <p className="operator-muted">A는 실제 Supabase Cron과 GitHub 외부 호출 기록, B는 현재 이미지 Render/Review/Finalizer job 상태를 보여줍니다. C는 생존 지식 자동화의 최근 처리 상태를 보여줍니다. 상태는 로그인 시 한 번 불러오며 이후에는 상태 새로고침 버튼을 눌렀을 때 갱신됩니다.</p>
     </section>
 
-    <div className="operator-grid"><section className="operator-panel"><header><h2>대기 항목</h2><button className="operator-secondary" disabled={busy} onClick={() => void refresh()}>새로고침</button></header>
+    <div className="operator-grid"><section className="operator-panel"><header><h2>대기 항목</h2><button className={`operator-secondary operator-refresh-button ${refreshing ? 'refreshing' : ''}`} disabled={busy} aria-busy={refreshing} onClick={() => void refresh()}><span aria-hidden="true">↻</span>{refreshing ? '새로고침 중…' : '새로고침'}</button></header>
       {busy && <p className="operator-muted" aria-live="polite">처리 중…</p>}{!inbox.items.length && <p className="operator-empty">현재 대기 중인 검토 항목이 없습니다.</p>}
       <ul className="operator-inbox">{inbox.items.map((item) => <li key={item.id}><button className={selected?.id === item.id ? 'selected' : ''} onClick={() => void loadDetail(item.id)}><span><b>{item.priority}</b><b>{item.item_type}</b><b>{item.risk_level}</b></span><strong>{item.title}</strong><small>{item.source_worker} · {item.status} · {item.chronicle_id ?? '공용'}</small><p>{item.summary}</p></button></li>)}</ul>
     </section><section className="operator-panel operator-detail"><h2>항목 상세</h2>{!selected ? <p className="operator-empty">검토 항목을 선택하세요.</p> : <>

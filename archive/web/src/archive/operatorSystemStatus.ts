@@ -39,6 +39,17 @@ export const operatorStaticStatus = {
   },
 } as const
 
+export function formatOperatorRefreshTime(value?: string | null) {
+  if (!value || Number.isNaN(Date.parse(value))) return '아직 없음'
+  return new Intl.DateTimeFormat('ko-KR', {
+    timeZone: 'Asia/Seoul',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).format(new Date(value))
+}
+
 export function formatOperatorTime(value?: string | null) {
   if (!value || Number.isNaN(Date.parse(value))) return '기록 없음'
   return new Intl.DateTimeFormat('ko-KR', {
