@@ -37,13 +37,13 @@ const affiliationLabel: Record<string, string> = {
 }
 
 const toc = [
-  ['wiki-overview', '1. 개요'],
-  ['wiki-appearance', '2. 외형'],
-  ['wiki-role', '3. 생존기에서의 역할'],
-  ['wiki-history', '4. 주요 행적'],
-  ['wiki-relations', '5. 관계'],
-  ['wiki-visuals', '6. 삽화'],
-  ['wiki-sources', '7. 관련 이야기 · 기록 근거'],
+  ['wiki-overview', '개요'],
+  ['wiki-appearance', '외형'],
+  ['wiki-role', '생존기에서의 역할'],
+  ['wiki-history', '주요 행적'],
+  ['wiki-relations', '관계'],
+  ['wiki-visuals', '삽화'],
+  ['wiki-sources', '관련 이야기 · 기록 근거'],
 ] as const
 
 const roleSection = article?.sections.find((section) => section.id === 'jinwoo-role')
