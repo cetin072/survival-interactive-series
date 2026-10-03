@@ -6,6 +6,8 @@ import { byteHash, graphHash } from './publication-graph.mjs'
 
 export const WIKI_JOB_VERSION = 'wiki-fact-job-v1'
 export const WIKI_RESULT_VERSION = 'wiki-fact-result-v1'
+export const WIKI_REVIEW_JOB_VERSION = 'wiki-fact-review-job-v1'
+export const WIKI_REVIEW_VERSION = 'wiki-fact-review-v1'
 const NS = { chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', visibility: 'PUBLIC_ARCHIVE' }
 const TYPES = { character: 'char', location: 'loc', event: 'event' }
 const KINDS = ['related_to', 'participated_in', 'occurred_at', 'lives_at', 'works_at']
@@ -213,10 +215,63 @@ export function compileWikiFactProposal(job, result) {
   return { ...body, proposal_sha256: graphHash(body) }
 }
 
-/** Provider-independent seam. No fallback that pretends a fixed fixture is AI. */
+export function buildWikiFactReviewJob(job, proposal) {
+  verifyJob(job)
+  object(proposal, ['version', 'job_id', 'source', 'expected_graph_sha256', 'result_sha256', 'status', 'review_required', 'application_status', 'coverage', 'facts', 'evidence', 'deferred', 'note', 'raw_changed', 'book_changed', 'graph_changed', 'source_marked_processed', 'proposal_sha256'])
+  const { proposal_sha256, ...proposalBody } = proposal
+  insist(proposal.version === 'wiki-fact-proposal-v1' && proposal.job_id === job.job_id, 'WIKI_REVIEW_PROPOSAL_INVALID')
+  insist(proposal_sha256 === graphHash(proposalBody), 'WIKI_REVIEW_PROPOSAL_HASH_INVALID')
+  insist(proposal.expected_graph_sha256 === job.graph_sha256, 'WIKI_REVIEW_GRAPH_BINDING_INVALID')
+  const body = {
+    version: WIKI_REVIEW_JOB_VERSION,
+    instructions_ref: 'docs/automation/A_WIKI_FACT_WORKER_V1.md',
+    prepared_job: structuredClone(job),
+    proposal: structuredClone(proposal),
+  }
+  return { ...body, review_job_id: `wiki-review-job-${graphHash(body)}` }
+}
+
+function verifyReviewJob(reviewJob) {
+  insist(plain(reviewJob), 'WIKI_REVIEW_JOB_INVALID')
+  const { review_job_id, ...body } = reviewJob
+  insist(reviewJob.version === WIKI_REVIEW_JOB_VERSION
+    && review_job_id === `wiki-review-job-${graphHash(body)}`, 'WIKI_REVIEW_JOB_BINDING_INVALID')
+  verifyJob(reviewJob.prepared_job)
+  const { proposal_sha256, ...proposalBody } = reviewJob.proposal
+  insist(proposal_sha256 === graphHash(proposalBody)
+    && reviewJob.proposal.job_id === reviewJob.prepared_job.job_id, 'WIKI_REVIEW_PROPOSAL_HASH_INVALID')
+}
+
+export function validateWikiFactReview(reviewJob, result) {
+  verifyReviewJob(reviewJob)
+  object(result, ['version', 'proposal_sha256', 'decision', 'note'])
+  insist(result.version === WIKI_REVIEW_VERSION, 'WIKI_REVIEW_VERSION_INVALID')
+  insist(result.proposal_sha256 === reviewJob.proposal.proposal_sha256, 'WIKI_REVIEW_PROPOSAL_MISMATCH')
+  insist(['APPROVE', 'HUMAN_REVIEW', 'REJECT'].includes(result.decision), 'WIKI_REVIEW_DECISION_INVALID')
+  text(result.note)
+  if (result.decision === 'APPROVE') {
+    insist(reviewJob.proposal.coverage.status === 'COMPLETE', 'WIKI_REVIEW_PARTIAL_APPROVAL_FORBIDDEN')
+    insist(['FACTS_PROPOSED', 'NO_FACTS'].includes(reviewJob.proposal.status), 'WIKI_REVIEW_NONFINAL_PROPOSAL')
+    const allBlocks = reviewJob.prepared_job.source.gm_blocks.map((block) => block.block_id)
+    const reviewed = reviewJob.proposal.coverage.reviewed_blocks
+    insist(Array.isArray(reviewed) && reviewed.length === allBlocks.length
+      && reviewed.every((id, index) => id === allBlocks[index]), 'WIKI_REVIEW_COMPLETE_COVERAGE_REQUIRED')
+  }
+  return { ...structuredClone(result), review_sha256: graphHash(result) }
+}
+
+/** Provider-independent first semantic pass. */
 export async function extractWikiFacts(job, generate) {
   verifyJob(job)
   insist(typeof generate === 'function', 'WIKI_MODEL_ADAPTER_REQUIRED')
   const result = await generate(structuredClone(job))
   return compileWikiFactProposal(job, result)
+}
+
+/** Independent second pass. The reviewer receives the complete prepared job and fixed proposal. */
+export async function reviewWikiFactProposal(reviewJob, generate) {
+  verifyReviewJob(reviewJob)
+  insist(typeof generate === 'function', 'WIKI_REVIEW_MODEL_ADAPTER_REQUIRED')
+  const result = await generate(structuredClone(reviewJob))
+  return validateWikiFactReview(reviewJob, result)
 }
