@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { buildWikiDocument, buildWikiDocuments, wikiCharacterIndex, wikiCharacterNodeIds } from './wikiDocument'
+import {
+  buildWikiDocument,
+  buildWikiDocuments,
+  wikiCharacterIndex,
+  wikiCharacterNodeIds,
+  wikiEventIndex,
+  wikiLocationIndex,
+  wikiSupportedNodeIds,
+} from './wikiDocument'
 import { wikiSectionPlan } from './WikiDocumentPage'
 
 describe('WikiDocument compiler', () => {
@@ -35,6 +43,19 @@ describe('WikiDocument compiler', () => {
     const documents = buildWikiDocuments(wikiCharacterNodeIds)
     expect(documents).toHaveLength(wikiCharacterNodeIds.length)
     expect(documents.every((document) => document.type === 'character')).toBe(true)
+    expect(documents.every((document) => document.title.length > 0 && document.summary.length > 0)).toBe(true)
+    expect(documents.every((document) => document.metaRows.some((row) => row.label === '생존기'))).toBe(true)
+  })
+
+  it('compiles every supported character, location and event without a second source of truth', () => {
+    expect(wikiCharacterIndex).toHaveLength(19)
+    expect(wikiLocationIndex).toHaveLength(11)
+    expect(wikiEventIndex).toHaveLength(9)
+    expect(wikiSupportedNodeIds).toHaveLength(39)
+
+    const documents = buildWikiDocuments(wikiSupportedNodeIds)
+    expect(documents).toHaveLength(wikiSupportedNodeIds.length)
+    expect(documents.every((document) => ['character', 'location', 'event'].includes(document.type))).toBe(true)
     expect(documents.every((document) => document.title.length > 0 && document.summary.length > 0)).toBe(true)
     expect(documents.every((document) => document.metaRows.some((row) => row.label === '생존기'))).toBe(true)
   })
