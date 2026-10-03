@@ -36,7 +36,7 @@ before(async () => {
   backlogRoot = await mkdtemp(resolve(tmpdir(), 'wiki-backlog-'))
   await mkdir(resolve(backlogRoot, transcriptRoot), { recursive: true })
   await mkdir(resolve(backlogRoot, factsRoot), { recursive: true })
-  const backlogSessions = ['SESSION_001', 'SESSION_002', 'SESSION_003', 'SESSION_004', 'SESSION_005', 'SESSION_006']
+  const backlogSessions = ['SESSION_001', 'SESSION_002', 'SESSION_003', 'SESSION_004', 'SESSION_005', 'SESSION_006', 'SESSION_007']
   for (const sessionId of backlogSessions) {
     await cp(resolve(root, transcriptRoot, sessionId), resolve(backlogRoot, transcriptRoot, sessionId), { recursive: true })
   }
@@ -70,6 +70,22 @@ test('walks manifest order and selects SESSION_006 after exact SESSION_005 facts
   assert.equal(source.anchor.game_time, '2027-09-22 16:10')
   assert.deepEqual(source.gmBlocks.map((block) => block.messageLabel), ['001', '003', '005', '007', '009', '011', '013'])
   assert.match(expectedWikiFactPath(source), /AWIKI_SESSION_006_[a-f0-9]{64}\.json$/)
+})
+
+
+test('fact file alone does not advance; receipt advances exactly one source', async () => {
+  const source006 = await discoverWikiSource(backlogRoot)
+  assert.equal(source006.sourceSession.session_id, 'SESSION_006')
+
+  const factRef = expectedWikiFactPath(source006)
+  await writeFile(resolve(backlogRoot, factRef), '{}\n')
+  assert.equal((await discoverWikiSource(backlogRoot)).sourceSession.session_id, 'SESSION_006')
+
+  const { expectedWikiReceiptPath } = await import('./wiki-semantic-jobs.mjs')
+  const receiptRef = expectedWikiReceiptPath(source006)
+  await mkdir(resolve(backlogRoot, receiptRef, '..'), { recursive: true })
+  await writeFile(resolve(backlogRoot, receiptRef), '{}\n')
+  assert.equal((await discoverWikiSource(backlogRoot)).sourceSession.session_id, 'SESSION_007')
 })
 
 test('emits the legacy SESSION_005 GM-grounded facts with stable source identity', async () => {
