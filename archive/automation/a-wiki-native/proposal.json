@@ -1,0 +1,1385 @@
+{
+  "version": "wiki-fact-proposal-v1",
+  "job_id": "wiki-job-d813785694227b24920b9d7e05ed72ecde59dd4ab5454bf1678612b47936aeee",
+  "source": {
+    "session_id": "SESSION_006",
+    "manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_006/SOURCE_MANIFEST.json",
+    "manifest_sha256": "14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3",
+    "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_006/PART_001.md",
+    "raw_sha256": "5e9482a9a273fe104c329701ca3d56592fa2f2beb5f04858946a9ae0e71ec4ed"
+  },
+  "expected_graph_sha256": "d7e5c7c210f534605b0321a8100ca49d0c8349c37481369764ab0db1fc8539be",
+  "result_sha256": "cd7a563d8bdc172415989a35af12f0307ef2b5b0bd719bd4f44bc81727b30c0e",
+  "status": "FACTS_PROPOSED",
+  "review_required": true,
+  "application_status": "BACKFILL_REVIEW_REQUIRED",
+  "coverage": {
+    "status": "COMPLETE",
+    "reviewed_blocks": [
+      "001",
+      "003",
+      "005",
+      "007",
+      "009",
+      "011",
+      "013"
+    ]
+  },
+  "facts": {
+    "version": "public-graph-facts-v1",
+    "chronicle_id": "C03-AFTERFALL",
+    "worldline_id": "AFTERFALL",
+    "visibility": "PUBLIC_ARCHIVE",
+    "season_id": "S03",
+    "anchor": {
+      "save_version": 280,
+      "game_time": "2027-09-22 16:10"
+    },
+    "nodes": [
+      {
+        "id": "char-wiki-322a5a52d57198d4a6f25429",
+        "type": "character",
+        "label": "임관수",
+        "tags": [],
+        "subtitle": "남쪽 차량야드 현장 관리자",
+        "summary": "남쪽 차량야드를 오래 관리해 왔으며, 임지연과 함께 차량 통행·회차 사용권 합의의 권리 당사자로 확인됐다.",
+        "source": "S03 SESSION_006 GM 공개 블록 001"
+      },
+      {
+        "id": "char-wiki-97e31f6fd22a6841eb7def52",
+        "type": "character",
+        "label": "임지연",
+        "tags": [],
+        "subtitle": "남쪽 차량야드 공동권리자",
+        "summary": "임관수의 누나이자 가족 쪽 공동권리자로 확인됐고, 길드 차량 통행을 보장하는 합의에 참여했다.",
+        "source": "S03 SESSION_006 GM 공개 블록 001"
+      },
+      {
+        "id": "char-wiki-cc15e0b3875ce0e734646be4",
+        "type": "character",
+        "label": "최광석",
+        "tags": [],
+        "subtitle": "시장 상인",
+        "summary": "남쪽 차량야드 협상에 먼저 가격을 맞춰보던 상인이며, 이후 야드의 남는 일부를 확보해 숙박 손님 차량과 손수레 주차에 사용했다.",
+        "source": "S03 SESSION_006 GM 공개 블록 001"
+      },
+      {
+        "id": "loc-wiki-b1be03144484391b40b8ecc4",
+        "type": "location",
+        "label": "남쪽 차량야드",
+        "tags": [],
+        "subtitle": "차량 통행·회차 사용권을 확보한 야드",
+        "summary": "길드는 야드 전체가 아니라 12개월 차량 통행·회차 사용권만 확보했고 나머지는 시장에 남겼다.",
+        "source": "S03 SESSION_006 GM 공개 블록 001"
+      },
+      {
+        "id": "event-wiki-bf4768814dd7f1559d9f7496",
+        "type": "event",
+        "label": "남쪽 차량야드 통행·회차 사용권 합의",
+        "tags": [],
+        "subtitle": "2027년 7월 차량야드 협상",
+        "summary": "길드는 차량야드 전체를 임차하지 않고 12개월 통행·회차 사용권만 확보했다. 관수·지연은 계약 구간의 통행 보장과 큰 구조변경 전 협의를 맡았다.",
+        "source": "S03 SESSION_006 GM 공개 블록 001"
+      },
+      {
+        "id": "char-wiki-14b41bbae77f8558c571d384",
+        "type": "character",
+        "label": "한재욱",
+        "tags": [],
+        "subtitle": "이동상인",
+        "summary": "길드 밖에서 말린 곡물을 직접 판매한 이동상인이다. 거래 뒤 곡물 상태 분쟁이 발생했지만 고의 사기 여부는 확정되지 않았다.",
+        "source": "S03 SESSION_006 GM 공개 블록 003"
+      },
+      {
+        "id": "event-wiki-37bff157632c4ca2e1e99420",
+        "type": "event",
+        "label": "한재욱 곡물 직접거래 분쟁",
+        "tags": [],
+        "subtitle": "길드 밖 직접거래 책임범위 확인",
+        "summary": "한재욱의 직접거래 뒤 습기 먹은 곡물이 발견돼 구매자가 길드를 찾았다. 길드 중개·에스크로·검수 기록이 없어 진우는 대신 보상하지 않았다.",
+        "source": "S03 SESSION_006 GM 공개 블록 003"
+      },
+      {
+        "id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+        "type": "character",
+        "label": "오세린",
+        "tags": [],
+        "subtitle": "길드 관리·접수 실무 인물",
+        "summary": "길드 관리동에서 등록상인·에스크로·보증거래의 차이를 질문하고 시장 서비스의 책임범위를 정리하는 논의에 참여했다.",
+        "source": "S03 SESSION_006 GM 공개 블록 005"
+      },
+      {
+        "id": "event-wiki-111fe570a078504a9c47714f",
+        "type": "event",
+        "label": "길드 직매입·검수·재판매 사업 재정의",
+        "tags": [],
+        "subtitle": "2027년 8월 5일",
+        "summary": "등록상인 제도는 보류하고 에스크로는 유지했다. 남의 거래를 보증하는 대신 길드가 직접 매입·검수·수리한 뒤 재판매하는 표준품 사업으로 방향을 바꿨다.",
+        "source": "S03 SESSION_006 GM 공개 블록 005, 007"
+      },
+      {
+        "id": "char-wiki-8499006fbd51eb7a8c88ab1f",
+        "type": "character",
+        "label": "이원혁",
+        "tags": [],
+        "subtitle": "외부 상인",
+        "summary": "표준품 후보 관찰기간에 인버터를 가져왔고, 이후 길드의 펌프 매입을 예상해 소형 펌프를 선매입했다가 길드가 매입가 상한을 올리지 않아 재고위험을 직접 부담했다.",
+        "source": "S03 SESSION_006 GM 공개 블록 009, 013"
+      },
+      {
+        "id": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+        "type": "event",
+        "label": "길드 표준품 후보 관찰기간",
+        "tags": [],
+        "subtitle": "2027년 8월 6일~8월 28일",
+        "summary": "전력·급수배관·운송작업 장비의 거래가격, 고장, 수리 가능성, 부품과 수요를 비교했고 급수·배관이 반복수요와 표준화 가능성, 자체 사용가치에서 첫 사업 후보로 좁혀졌다.",
+        "source": "S03 SESSION_006 GM 공개 블록 009"
+      },
+      {
+        "id": "event-wiki-a93db7854c7049a3b7c936b2",
+        "type": "event",
+        "label": "길드 표준펌프 1호",
+        "tags": [],
+        "subtitle": "2027년 9월 22일",
+        "summary": "길드는 매입가 상한을 따라 올리지 않고 지정 규격의 고장품·미검수품 중 수리 가능한 것만 골라 가치를 붙이는 방식으로 첫 판매용 표준펌프 두 대를 완성했다.",
+        "source": "S03 SESSION_006 GM 공개 블록 011, 013"
+      },
+      {
+        "id": "char-eunchae",
+        "label": "최은채",
+        "meta": {
+          "겨울역할": "물류·기록 지원",
+          "상태": "ACTIVE",
+          "표준품 후보 관찰": "표준품 후보의 실제 거래가격·고장·수리·부품·구매문의·판매기간을 기록하는 관찰표를 운영했다."
+        },
+        "source": "S03 SESSION_006 GM 공개 블록 009",
+        "subtitle": "병원 행정직 출신 · 물류·기록",
+        "summary": "핵심 4인의 물류·기록·접근권·관계 경계 담당. 위치 비밀 유지와 재고·규칙의 구분을 중요하게 다룬다.",
+        "tags": [
+          "CORE",
+          "핵심 4인",
+          "물류",
+          "기록"
+        ],
+        "type": "character"
+      },
+      {
+        "id": "char-mingyu",
+        "label": "정민규",
+        "meta": {
+          "거점출입": "없음",
+          "상태": "ACTIVE",
+          "표준펌프 검수·수리": "표준펌프 후보를 분해·수리하고 지정 규격의 수리 가능성을 판별했다."
+        },
+        "source": "S03 SESSION_006 GM 공개 블록 009, 013",
+        "subtitle": "외부 전기·시설 기술자",
+        "summary": "백운생활관 이탈 후 검증을 거쳐 외부 시설·전기 협력자로 승인됐다. 거점 출입권은 없고 작업 전 대가·회수품·위험범위를 합의한다.",
+        "tags": [
+          "MAJOR",
+          "전기",
+          "시설",
+          "외부협력"
+        ],
+        "type": "character"
+      },
+      {
+        "id": "char-taehoon",
+        "label": "장태훈",
+        "meta": {
+          "겨울역할": "설비·난방·급수 지원",
+          "상태": "ACTIVE",
+          "표준펌프 시험": "수리된 표준펌프의 작동시험과 급수장비 표준화 판단에 참여했다."
+        },
+        "source": "S03 SESSION_006 GM 공개 블록 009, 013",
+        "subtitle": "시설운영 기술자",
+        "summary": "핵심 4인의 발전기·급수·난방·설비·부품·수리 담당. 실증단지 관정 계통에도 실제 기술지원을 제공했다.",
+        "tags": [
+          "CORE",
+          "핵심 4인",
+          "시설",
+          "난방",
+          "급수"
+        ],
+        "type": "character"
+      }
+    ],
+    "relations": [
+      {
+        "from": "char-wiki-322a5a52d57198d4a6f25429",
+        "to": "loc-wiki-b1be03144484391b40b8ecc4",
+        "kind": "works_at",
+        "label": "현장 관리"
+      },
+      {
+        "from": "char-wiki-97e31f6fd22a6841eb7def52",
+        "to": "event-wiki-bf4768814dd7f1559d9f7496",
+        "kind": "participated_in",
+        "label": "통행 보장 합의 당사자"
+      },
+      {
+        "from": "char-wiki-cc15e0b3875ce0e734646be4",
+        "to": "loc-wiki-b1be03144484391b40b8ecc4",
+        "kind": "related_to",
+        "label": "남는 야드 일부 사용"
+      },
+      {
+        "from": "event-wiki-bf4768814dd7f1559d9f7496",
+        "to": "loc-wiki-b1be03144484391b40b8ecc4",
+        "kind": "occurred_at",
+        "label": "차량야드 사용권 협상"
+      },
+      {
+        "from": "char-wiki-14b41bbae77f8558c571d384",
+        "to": "event-wiki-37bff157632c4ca2e1e99420",
+        "kind": "participated_in",
+        "label": "직접거래 판매자"
+      },
+      {
+        "from": "char-eunchae",
+        "to": "event-wiki-37bff157632c4ca2e1e99420",
+        "kind": "participated_in",
+        "label": "거래 기록 확인"
+      },
+      {
+        "from": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+        "to": "event-wiki-111fe570a078504a9c47714f",
+        "kind": "participated_in",
+        "label": "시장 서비스 구조 논의"
+      },
+      {
+        "from": "event-wiki-111fe570a078504a9c47714f",
+        "to": "loc-sports-complex",
+        "kind": "occurred_at",
+        "label": "길드 관리동"
+      },
+      {
+        "from": "char-mingyu",
+        "to": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+        "kind": "participated_in",
+        "label": "수리 가능성 검토"
+      },
+      {
+        "from": "char-taehoon",
+        "to": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+        "kind": "participated_in",
+        "label": "급수장비 표준화 검토"
+      },
+      {
+        "from": "char-wiki-8499006fbd51eb7a8c88ab1f",
+        "to": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+        "kind": "participated_in",
+        "label": "전력장비 매물 제공"
+      },
+      {
+        "from": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+        "to": "loc-sports-complex",
+        "kind": "occurred_at",
+        "label": "길드 시장 관찰"
+      },
+      {
+        "from": "char-wiki-8499006fbd51eb7a8c88ab1f",
+        "to": "event-wiki-a93db7854c7049a3b7c936b2",
+        "kind": "participated_in",
+        "label": "펌프 선매입·재판매 시도"
+      },
+      {
+        "from": "char-mingyu",
+        "to": "event-wiki-a93db7854c7049a3b7c936b2",
+        "kind": "participated_in",
+        "label": "분해·수리"
+      },
+      {
+        "from": "char-taehoon",
+        "to": "event-wiki-a93db7854c7049a3b7c936b2",
+        "kind": "participated_in",
+        "label": "작동 시험"
+      },
+      {
+        "from": "event-wiki-a93db7854c7049a3b7c936b2",
+        "to": "loc-sports-complex",
+        "kind": "occurred_at",
+        "label": "길드 작업대·매입대"
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "pointer": "/nodes/0",
+      "operation": "CREATE",
+      "fields": {
+        "type": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 474,
+            "end": 500,
+            "quote": "임관수가 실제로 어디까지 결정할 수 있느냐였다."
+          },
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 414,
+            "end": 448,
+            "quote": "# 2027년 7월 13일\n### 남쪽 차량야드 — 권리 확인"
+          }
+        ],
+        "label": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 474,
+            "end": 500,
+            "quote": "임관수가 실제로 어디까지 결정할 수 있느냐였다."
+          }
+        ],
+        "subtitle": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 474,
+            "end": 500,
+            "quote": "임관수가 실제로 어디까지 결정할 수 있느냐였다."
+          },
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 414,
+            "end": 448,
+            "quote": "# 2027년 7월 13일\n### 남쪽 차량야드 — 권리 확인"
+          }
+        ],
+        "summary": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 474,
+            "end": 500,
+            "quote": "임관수가 실제로 어디까지 결정할 수 있느냐였다."
+          },
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 594,
+            "end": 637,
+            "quote": "가족 쪽 공동권리자가 한 명 더 있었다.\n\n**임지연.**\n\n관수의 누나였다."
+          },
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 2361,
+            "end": 2416,
+            "quote": "길드는 차량야드 전체를 가져오지 않았다.\n\n대신 **12개월 차량 통행·회차 사용권**만 확보했다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/nodes/1",
+      "operation": "CREATE",
+      "fields": {
+        "type": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 594,
+            "end": 637,
+            "quote": "가족 쪽 공동권리자가 한 명 더 있었다.\n\n**임지연.**\n\n관수의 누나였다."
+          }
+        ],
+        "label": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 594,
+            "end": 637,
+            "quote": "가족 쪽 공동권리자가 한 명 더 있었다.\n\n**임지연.**\n\n관수의 누나였다."
+          }
+        ],
+        "subtitle": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 594,
+            "end": 637,
+            "quote": "가족 쪽 공동권리자가 한 명 더 있었다.\n\n**임지연.**\n\n관수의 누나였다."
+          }
+        ],
+        "summary": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 594,
+            "end": 637,
+            "quote": "가족 쪽 공동권리자가 한 명 더 있었다.\n\n**임지연.**\n\n관수의 누나였다."
+          },
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 2497,
+            "end": 2569,
+            "quote": "관수·지연이 지키는 것:\n- 계약 구간을 다른 임차인에게 막히게 넘기지 않음\n- 길드 차량 통행 보장\n- 큰 구조변경 전 사전협의"
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/nodes/2",
+      "operation": "CREATE",
+      "fields": {
+        "type": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 733,
+            "end": 777,
+            "quote": "최광석에게도 이미 확정된 계약은 없었다.\n\n말을 넣고 가격을 맞춰보는 단계였다."
+          }
+        ],
+        "label": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 733,
+            "end": 777,
+            "quote": "최광석에게도 이미 확정된 계약은 없었다.\n\n말을 넣고 가격을 맞춰보는 단계였다."
+          }
+        ],
+        "subtitle": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 733,
+            "end": 777,
+            "quote": "최광석에게도 이미 확정된 계약은 없었다.\n\n말을 넣고 가격을 맞춰보는 단계였다."
+          }
+        ],
+        "summary": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 733,
+            "end": 777,
+            "quote": "최광석에게도 이미 확정된 계약은 없었다.\n\n말을 넣고 가격을 맞춰보는 단계였다."
+          },
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 2683,
+            "end": 2739,
+            "quote": "며칠 뒤 광석은 실제로 야드 남는 부분 일부를 잡았다.\n\n숙박 손님 차량과 손수레를 세우기 시작했다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/nodes/3",
+      "operation": "CREATE",
+      "fields": {
+        "type": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 414,
+            "end": 448,
+            "quote": "# 2027년 7월 13일\n### 남쪽 차량야드 — 권리 확인"
+          }
+        ],
+        "label": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 414,
+            "end": 448,
+            "quote": "# 2027년 7월 13일\n### 남쪽 차량야드 — 권리 확인"
+          }
+        ],
+        "subtitle": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 2361,
+            "end": 2416,
+            "quote": "길드는 차량야드 전체를 가져오지 않았다.\n\n대신 **12개월 차량 통행·회차 사용권**만 확보했다."
+          }
+        ],
+        "summary": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 2361,
+            "end": 2416,
+            "quote": "길드는 차량야드 전체를 가져오지 않았다.\n\n대신 **12개월 차량 통행·회차 사용권**만 확보했다."
+          },
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 2683,
+            "end": 2739,
+            "quote": "며칠 뒤 광석은 실제로 야드 남는 부분 일부를 잡았다.\n\n숙박 손님 차량과 손수레를 세우기 시작했다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/nodes/4",
+      "operation": "CREATE",
+      "fields": {
+        "type": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 2361,
+            "end": 2416,
+            "quote": "길드는 차량야드 전체를 가져오지 않았다.\n\n대신 **12개월 차량 통행·회차 사용권**만 확보했다."
+          }
+        ],
+        "label": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 2361,
+            "end": 2416,
+            "quote": "길드는 차량야드 전체를 가져오지 않았다.\n\n대신 **12개월 차량 통행·회차 사용권**만 확보했다."
+          }
+        ],
+        "subtitle": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 414,
+            "end": 448,
+            "quote": "# 2027년 7월 13일\n### 남쪽 차량야드 — 권리 확인"
+          },
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 2361,
+            "end": 2416,
+            "quote": "길드는 차량야드 전체를 가져오지 않았다.\n\n대신 **12개월 차량 통행·회차 사용권**만 확보했다."
+          }
+        ],
+        "summary": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 2361,
+            "end": 2416,
+            "quote": "길드는 차량야드 전체를 가져오지 않았다.\n\n대신 **12개월 차량 통행·회차 사용권**만 확보했다."
+          },
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 2497,
+            "end": 2569,
+            "quote": "관수·지연이 지키는 것:\n- 계약 구간을 다른 임차인에게 막히게 넘기지 않음\n- 길드 차량 통행 보장\n- 큰 구조변경 전 사전협의"
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/nodes/5",
+      "operation": "CREATE",
+      "fields": {
+        "type": [
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 356,
+            "end": 416,
+            "quote": "**한재욱**이라는 이동상인이 말린 곡물 자루 몇 개를 팔았다.\n\n거래 자체는 길드 밖에서 직접 이루어졌다."
+          }
+        ],
+        "label": [
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 356,
+            "end": 416,
+            "quote": "**한재욱**이라는 이동상인이 말린 곡물 자루 몇 개를 팔았다.\n\n거래 자체는 길드 밖에서 직접 이루어졌다."
+          }
+        ],
+        "subtitle": [
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 356,
+            "end": 416,
+            "quote": "**한재욱**이라는 이동상인이 말린 곡물 자루 몇 개를 팔았다.\n\n거래 자체는 길드 밖에서 직접 이루어졌다."
+          }
+        ],
+        "summary": [
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 356,
+            "end": 416,
+            "quote": "**한재욱**이라는 이동상인이 말린 곡물 자루 몇 개를 팔았다.\n\n거래 자체는 길드 밖에서 직접 이루어졌다."
+          },
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 546,
+            "end": 592,
+            "quote": "이틀 뒤 자루 하나 안쪽에서 습기 먹은 곡물이 나왔다.\n\n구매자는 길드로 찾아왔다."
+          },
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 951,
+            "end": 989,
+            "quote": "고의로 사기를 친 건지,\n말을 유리하게 흘린 건지는 명확하지 않았다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/nodes/6",
+      "operation": "CREATE",
+      "fields": {
+        "type": [
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 356,
+            "end": 416,
+            "quote": "**한재욱**이라는 이동상인이 말린 곡물 자루 몇 개를 팔았다.\n\n거래 자체는 길드 밖에서 직접 이루어졌다."
+          },
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 546,
+            "end": 592,
+            "quote": "이틀 뒤 자루 하나 안쪽에서 습기 먹은 곡물이 나왔다.\n\n구매자는 길드로 찾아왔다."
+          }
+        ],
+        "label": [
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 356,
+            "end": 416,
+            "quote": "**한재욱**이라는 이동상인이 말린 곡물 자루 몇 개를 팔았다.\n\n거래 자체는 길드 밖에서 직접 이루어졌다."
+          },
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 546,
+            "end": 592,
+            "quote": "이틀 뒤 자루 하나 안쪽에서 습기 먹은 곡물이 나왔다.\n\n구매자는 길드로 찾아왔다."
+          }
+        ],
+        "subtitle": [
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 624,
+            "end": 681,
+            "quote": "은채는 기록부터 확인했다.\n\n없었다.\n\n에스크로도,\n중개도,\n검수도 없었다.\n\n진우는 보상하지 않았다."
+          }
+        ],
+        "summary": [
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 356,
+            "end": 416,
+            "quote": "**한재욱**이라는 이동상인이 말린 곡물 자루 몇 개를 팔았다.\n\n거래 자체는 길드 밖에서 직접 이루어졌다."
+          },
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 546,
+            "end": 592,
+            "quote": "이틀 뒤 자루 하나 안쪽에서 습기 먹은 곡물이 나왔다.\n\n구매자는 길드로 찾아왔다."
+          },
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 624,
+            "end": 681,
+            "quote": "은채는 기록부터 확인했다.\n\n없었다.\n\n에스크로도,\n중개도,\n검수도 없었다.\n\n진우는 보상하지 않았다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/nodes/7",
+      "operation": "CREATE",
+      "fields": {
+        "type": [
+          {
+            "block_id": "005",
+            "block_sha256": "4e80346b930011132a30a23089bab146e3ebb96bd15d76ecf2eea5d5eb794cae",
+            "start": 36,
+            "end": 68,
+            "quote": "오세린이 먼저 물었다.\n\n“잠깐만요. 저도 헷갈리는데요.”"
+          }
+        ],
+        "label": [
+          {
+            "block_id": "005",
+            "block_sha256": "4e80346b930011132a30a23089bab146e3ebb96bd15d76ecf2eea5d5eb794cae",
+            "start": 36,
+            "end": 68,
+            "quote": "오세린이 먼저 물었다.\n\n“잠깐만요. 저도 헷갈리는데요.”"
+          }
+        ],
+        "subtitle": [
+          {
+            "block_id": "005",
+            "block_sha256": "4e80346b930011132a30a23089bab146e3ebb96bd15d76ecf2eea5d5eb794cae",
+            "start": 36,
+            "end": 68,
+            "quote": "오세린이 먼저 물었다.\n\n“잠깐만요. 저도 헷갈리는데요.”"
+          }
+        ],
+        "summary": [
+          {
+            "block_id": "005",
+            "block_sha256": "4e80346b930011132a30a23089bab146e3ebb96bd15d76ecf2eea5d5eb794cae",
+            "start": 36,
+            "end": 68,
+            "quote": "오세린이 먼저 물었다.\n\n“잠깐만요. 저도 헷갈리는데요.”"
+          },
+          {
+            "block_id": "005",
+            "block_sha256": "4e80346b930011132a30a23089bab146e3ebb96bd15d76ecf2eea5d5eb794cae",
+            "start": 1108,
+            "end": 1154,
+            "quote": "등록상인은 거래를 보증하는 게 아니라 **사람과 이력을 확인하는 제도**에 가까워."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/nodes/8",
+      "operation": "CREATE",
+      "fields": {
+        "type": [
+          {
+            "block_id": "007",
+            "block_sha256": "6965247c228b7b79e690e7599bea27a7afa461edf19f62aee507ea1f0646d312",
+            "start": 2947,
+            "end": 3014,
+            "quote": "**등록상인 — 보류.**\n\n**에스크로 — 유지.**\n\n**보증거래 — 폐기하고 길드 직매입·검수·재판매로 재정의.**"
+          }
+        ],
+        "label": [
+          {
+            "block_id": "007",
+            "block_sha256": "6965247c228b7b79e690e7599bea27a7afa461edf19f62aee507ea1f0646d312",
+            "start": 2947,
+            "end": 3014,
+            "quote": "**등록상인 — 보류.**\n\n**에스크로 — 유지.**\n\n**보증거래 — 폐기하고 길드 직매입·검수·재판매로 재정의.**"
+          }
+        ],
+        "subtitle": [
+          {
+            "block_id": "007",
+            "block_sha256": "6965247c228b7b79e690e7599bea27a7afa461edf19f62aee507ea1f0646d312",
+            "start": 2947,
+            "end": 3014,
+            "quote": "**등록상인 — 보류.**\n\n**에스크로 — 유지.**\n\n**보증거래 — 폐기하고 길드 직매입·검수·재판매로 재정의.**"
+          }
+        ],
+        "summary": [
+          {
+            "block_id": "005",
+            "block_sha256": "4e80346b930011132a30a23089bab146e3ebb96bd15d76ecf2eea5d5eb794cae",
+            "start": 1108,
+            "end": 1154,
+            "quote": "등록상인은 거래를 보증하는 게 아니라 **사람과 이력을 확인하는 제도**에 가까워."
+          },
+          {
+            "block_id": "007",
+            "block_sha256": "6965247c228b7b79e690e7599bea27a7afa461edf19f62aee507ea1f0646d312",
+            "start": 2947,
+            "end": 3014,
+            "quote": "**등록상인 — 보류.**\n\n**에스크로 — 유지.**\n\n**보증거래 — 폐기하고 길드 직매입·검수·재판매로 재정의.**"
+          },
+          {
+            "block_id": "007",
+            "block_sha256": "6965247c228b7b79e690e7599bea27a7afa461edf19f62aee507ea1f0646d312",
+            "start": 1402,
+            "end": 1456,
+            "quote": "특정 규격을 길드가 계속 사들이고  \n검수·정비해서  \n같은 기준으로 다시 내놓는 ‘길드 표준품’"
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/nodes/9",
+      "operation": "CREATE",
+      "fields": {
+        "type": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 391,
+            "end": 429,
+            "quote": "8월 11일,\n외부 상인 **이원혁**이 인버터 두 대를 들고 왔다."
+          }
+        ],
+        "label": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 391,
+            "end": 429,
+            "quote": "8월 11일,\n외부 상인 **이원혁**이 인버터 두 대를 들고 왔다."
+          }
+        ],
+        "subtitle": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 391,
+            "end": 429,
+            "quote": "8월 11일,\n외부 상인 **이원혁**이 인버터 두 대를 들고 왔다."
+          }
+        ],
+        "summary": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 391,
+            "end": 429,
+            "quote": "8월 11일,\n외부 상인 **이원혁**이 인버터 두 대를 들고 왔다."
+          },
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 405,
+            "end": 438,
+            "quote": "원혁 뒤 수레에는 소형 펌프가 **일곱 대** 실려 있었다."
+          },
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 2129,
+            "end": 2160,
+            "quote": "길드는 **처음 제시했던 가격 그대로** 두 대만 샀다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/nodes/10",
+      "operation": "CREATE",
+      "fields": {
+        "type": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 0,
+            "end": 47,
+            "quote": "# 2027년 8월 6일 ~ 8월 28일\n### 폐쇄 체육시설 — 길드 시장 관찰기간"
+          }
+        ],
+        "label": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 0,
+            "end": 47,
+            "quote": "# 2027년 8월 6일 ~ 8월 28일\n### 폐쇄 체육시설 — 길드 시장 관찰기간"
+          }
+        ],
+        "subtitle": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 0,
+            "end": 47,
+            "quote": "# 2027년 8월 6일 ~ 8월 28일\n### 폐쇄 체육시설 — 길드 시장 관찰기간"
+          }
+        ],
+        "summary": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 0,
+            "end": 47,
+            "quote": "# 2027년 8월 6일 ~ 8월 28일\n### 폐쇄 체육시설 — 길드 시장 관찰기간"
+          },
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 1052,
+            "end": 1098,
+            "quote": "특히 소형 급수펌프 몇 종류는\n예전 상가·농가·시설에서 많이 쓰던 규격이 반복됐다."
+          },
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 3329,
+            "end": 3391,
+            "quote": "진우는 처음 생각보다 더 좁혀볼 수 있었다.\n\n**길드 표준품 1호를 ‘급수제품 전체’로 잡을 필요도 없다.**"
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/nodes/11",
+      "operation": "CREATE",
+      "fields": {
+        "type": [
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 3270,
+            "end": 3305,
+            "quote": "# 2027년 9월 22일 16:10\n### 길드 표준펌프 1호"
+          }
+        ],
+        "label": [
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 3270,
+            "end": 3305,
+            "quote": "# 2027년 9월 22일 16:10\n### 길드 표준펌프 1호"
+          }
+        ],
+        "subtitle": [
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 3270,
+            "end": 3305,
+            "quote": "# 2027년 9월 22일 16:10\n### 길드 표준펌프 1호"
+          }
+        ],
+        "summary": [
+          {
+            "block_id": "011",
+            "block_sha256": "0a0e70dcaa91e35235dd594a0501c5b138adf73fdf4d59cab784780c8d70cf20",
+            "start": 101,
+            "end": 143,
+            "quote": "그러면 길드는 **매입가 상한을 먼저 정하고 그 이상이면 그냥 안 산다.**"
+          },
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 2129,
+            "end": 2160,
+            "quote": "길드는 **처음 제시했던 가격 그대로** 두 대만 샀다."
+          },
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 3270,
+            "end": 3305,
+            "quote": "# 2027년 9월 22일 16:10\n### 길드 표준펌프 1호"
+          },
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 2917,
+            "end": 2947,
+            "quote": "민규가 분해했고,\n태훈이 시험했고,\n소모부품을 바꿨다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/nodes/12",
+      "operation": "UPDATE",
+      "fields": {
+        "type": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 68,
+            "end": 109,
+            "quote": "대신 은채가 종이 한 장을 새로 만들었다.\n\n> **표준품 후보 관찰표**"
+          }
+        ],
+        "label": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 68,
+            "end": 109,
+            "quote": "대신 은채가 종이 한 장을 새로 만들었다.\n\n> **표준품 후보 관찰표**"
+          }
+        ],
+        "meta.표준품 후보 관찰": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 68,
+            "end": 109,
+            "quote": "대신 은채가 종이 한 장을 새로 만들었다.\n\n> **표준품 후보 관찰표**"
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/nodes/13",
+      "operation": "UPDATE",
+      "fields": {
+        "type": [
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 2917,
+            "end": 2947,
+            "quote": "민규가 분해했고,\n태훈이 시험했고,\n소모부품을 바꿨다."
+          }
+        ],
+        "label": [
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 2917,
+            "end": 2947,
+            "quote": "민규가 분해했고,\n태훈이 시험했고,\n소모부품을 바꿨다."
+          }
+        ],
+        "meta.표준펌프 검수·수리": [
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 2917,
+            "end": 2947,
+            "quote": "민규가 분해했고,\n태훈이 시험했고,\n소모부품을 바꿨다."
+          },
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 1246,
+            "end": 1324,
+            "quote": "8월 중순,\n동쪽 생활권에서 작은 펌프 세 대가 동시에 수리 문의로 들어왔다.\n\n세 대 가운데 두 대는\n같은 규격 부품으로 살릴 수 있었다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/nodes/14",
+      "operation": "UPDATE",
+      "fields": {
+        "type": [
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 2917,
+            "end": 2947,
+            "quote": "민규가 분해했고,\n태훈이 시험했고,\n소모부품을 바꿨다."
+          }
+        ],
+        "label": [
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 2917,
+            "end": 2947,
+            "quote": "민규가 분해했고,\n태훈이 시험했고,\n소모부품을 바꿨다."
+          }
+        ],
+        "meta.표준펌프 시험": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 1052,
+            "end": 1098,
+            "quote": "특히 소형 급수펌프 몇 종류는\n예전 상가·농가·시설에서 많이 쓰던 규격이 반복됐다."
+          },
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 2917,
+            "end": 2947,
+            "quote": "민규가 분해했고,\n태훈이 시험했고,\n소모부품을 바꿨다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/0",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 474,
+            "end": 500,
+            "quote": "임관수가 실제로 어디까지 결정할 수 있느냐였다."
+          },
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 414,
+            "end": 448,
+            "quote": "# 2027년 7월 13일\n### 남쪽 차량야드 — 권리 확인"
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/1",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 594,
+            "end": 637,
+            "quote": "가족 쪽 공동권리자가 한 명 더 있었다.\n\n**임지연.**\n\n관수의 누나였다."
+          },
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 2497,
+            "end": 2569,
+            "quote": "관수·지연이 지키는 것:\n- 계약 구간을 다른 임차인에게 막히게 넘기지 않음\n- 길드 차량 통행 보장\n- 큰 구조변경 전 사전협의"
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/2",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 2683,
+            "end": 2739,
+            "quote": "며칠 뒤 광석은 실제로 야드 남는 부분 일부를 잡았다.\n\n숙박 손님 차량과 손수레를 세우기 시작했다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/3",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 414,
+            "end": 448,
+            "quote": "# 2027년 7월 13일\n### 남쪽 차량야드 — 권리 확인"
+          },
+          {
+            "block_id": "001",
+            "block_sha256": "7ec036379d7037a468e25dca78f47f3e16e79c46f2d50009001824c9ed9a5b6f",
+            "start": 2361,
+            "end": 2416,
+            "quote": "길드는 차량야드 전체를 가져오지 않았다.\n\n대신 **12개월 차량 통행·회차 사용권**만 확보했다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/4",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 356,
+            "end": 416,
+            "quote": "**한재욱**이라는 이동상인이 말린 곡물 자루 몇 개를 팔았다.\n\n거래 자체는 길드 밖에서 직접 이루어졌다."
+          },
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 546,
+            "end": 592,
+            "quote": "이틀 뒤 자루 하나 안쪽에서 습기 먹은 곡물이 나왔다.\n\n구매자는 길드로 찾아왔다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/5",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "003",
+            "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+            "start": 624,
+            "end": 681,
+            "quote": "은채는 기록부터 확인했다.\n\n없었다.\n\n에스크로도,\n중개도,\n검수도 없었다.\n\n진우는 보상하지 않았다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/6",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "005",
+            "block_sha256": "4e80346b930011132a30a23089bab146e3ebb96bd15d76ecf2eea5d5eb794cae",
+            "start": 36,
+            "end": 68,
+            "quote": "오세린이 먼저 물었다.\n\n“잠깐만요. 저도 헷갈리는데요.”"
+          },
+          {
+            "block_id": "005",
+            "block_sha256": "4e80346b930011132a30a23089bab146e3ebb96bd15d76ecf2eea5d5eb794cae",
+            "start": 1108,
+            "end": 1154,
+            "quote": "등록상인은 거래를 보증하는 게 아니라 **사람과 이력을 확인하는 제도**에 가까워."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/7",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "007",
+            "block_sha256": "6965247c228b7b79e690e7599bea27a7afa461edf19f62aee507ea1f0646d312",
+            "start": 2947,
+            "end": 3014,
+            "quote": "**등록상인 — 보류.**\n\n**에스크로 — 유지.**\n\n**보증거래 — 폐기하고 길드 직매입·검수·재판매로 재정의.**"
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/8",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 1246,
+            "end": 1324,
+            "quote": "8월 중순,\n동쪽 생활권에서 작은 펌프 세 대가 동시에 수리 문의로 들어왔다.\n\n세 대 가운데 두 대는\n같은 규격 부품으로 살릴 수 있었다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/9",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 1052,
+            "end": 1098,
+            "quote": "특히 소형 급수펌프 몇 종류는\n예전 상가·농가·시설에서 많이 쓰던 규격이 반복됐다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/10",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 391,
+            "end": 429,
+            "quote": "8월 11일,\n외부 상인 **이원혁**이 인버터 두 대를 들고 왔다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/11",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "009",
+            "block_sha256": "502dd159aebbb553e1ebb3b7e7399ab94a9ce92df739327b96598b4f62e0520f",
+            "start": 0,
+            "end": 47,
+            "quote": "# 2027년 8월 6일 ~ 8월 28일\n### 폐쇄 체육시설 — 길드 시장 관찰기간"
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/12",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 405,
+            "end": 438,
+            "quote": "원혁 뒤 수레에는 소형 펌프가 **일곱 대** 실려 있었다."
+          },
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 2129,
+            "end": 2160,
+            "quote": "길드는 **처음 제시했던 가격 그대로** 두 대만 샀다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/13",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 2917,
+            "end": 2947,
+            "quote": "민규가 분해했고,\n태훈이 시험했고,\n소모부품을 바꿨다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/14",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 2917,
+            "end": 2947,
+            "quote": "민규가 분해했고,\n태훈이 시험했고,\n소모부품을 바꿨다."
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/relations/15",
+      "fields": {
+        "relation": [
+          {
+            "block_id": "013",
+            "block_sha256": "7bf40a4ef358b4063b4e30ada790fcc9b3db45bc15b583d47cc8a3d8a0105c41",
+            "start": 3270,
+            "end": 3305,
+            "quote": "# 2027년 9월 22일 16:10\n### 길드 표준펌프 1호"
+          }
+        ]
+      }
+    }
+  ],
+  "deferred": [
+    {
+      "reason": "한재욱의 고의 사기 여부는 원문에서 명확하지 않으므로 성향·범죄 사실로 승격하지 않는다.",
+      "evidence": [
+        {
+          "block_id": "003",
+          "block_sha256": "0b126f28b0a1509be3a1bf44d7946c859b7f26c86b359c7b130406ae3f08d95b",
+          "start": 951,
+          "end": 989,
+          "quote": "고의로 사기를 친 건지,\n말을 유리하게 흘린 건지는 명확하지 않았다."
+        }
+      ]
+    }
+  ],
+  "note": "SESSION_006 GM 001·003·005·007·009·011·013 전체를 검토한 실전 COMPLETE 리플레이 샘플. 미래 선택지는 사실로 승격하지 않는다.",
+  "raw_changed": false,
+  "book_changed": false,
+  "graph_changed": false,
+  "source_marked_processed": false,
+  "proposal_sha256": "3bba6d221d1e9b2da8528c1ddbe4b644a66152b58da54aec9e3e4fabd94da10f"
+}
