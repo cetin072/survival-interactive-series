@@ -1,6 +1,15 @@
 name: A-Wiki native semantic handoff
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/a-wiki-native-handoff.yml'
+      - 'archive/scripts/lib/wiki-fact-*'
+      - 'archive/scripts/lib/wiki-semantic-jobs*'
+      - 'archive/scripts/lib/publication-graph.mjs'
+      - 'archive/scripts/run-wiki-automation.mjs'
+      - 'archive/scripts/run-wiki-fact-*'
+      - 'docs/automation/A_WIKI_NATIVE_HANDOFF_V1.md'
   push:
     branches:
       - main
@@ -33,6 +42,34 @@ env:
   GRAPH_REF: archive/content/graphs/C03-AFTERFALL/GRAPH.json
 
 jobs:
+  verify-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify A-Wiki native handoff contracts
+        run: |
+          node --test \
+            archive/scripts/lib/publication-graph.test.mjs \
+            archive/scripts/lib/wiki-semantic-jobs.test.mjs \
+            archive/scripts/lib/wiki-fact-extractor.test.mjs \
+            archive/scripts/lib/wiki-fact-finalizer.test.mjs
+          node archive/scripts/run-wiki-automation.mjs --prepare > "$RUNNER_TEMP/a-wiki-native-job.json"
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs'
+          const job = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/a-wiki-native-job.json', 'utf8'))
+          if (job.version !== 'wiki-fact-job-v1' && job.status !== 'NOOP') {
+            throw new Error('A_WIKI_NATIVE_PREPARE_CONTRACT_INVALID')
+          }
+          NODE
+
   prepare:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -81,7 +118,7 @@ jobs:
           node archive/scripts/run-wiki-automation.mjs --prepare > "$OP_DIR/job.json"
 
           BASE_SHA="$(git rev-parse origin/main)"
-          node --input-type=module <<'NODE'
+          BASE_SHA="$BASE_SHA" node --input-type=module <<'NODE'
           import { readFileSync, writeFileSync } from 'node:fs'
           const dir = process.env.OP_DIR
           const job = JSON.parse(readFileSync(`${dir}/job.json`, 'utf8'))
@@ -243,8 +280,11 @@ jobs:
           }
 
           for attempt in 1 2 3; do
-            if ! build_publication; then
-              code="$?"
+            set +e
+            build_publication
+            code="$?"
+            set -e
+            if [ "$code" -ne 0 ]; then
               if [ "$code" -eq 42 ]; then
                 git fetch origin main:refs/remotes/origin/main
                 git switch -C "$OP_BRANCH" origin/main
