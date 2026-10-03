@@ -62,7 +62,7 @@ test('discovers only verified PUBLIC_ARCHIVE GM blocks from a selected S03 sourc
 
 test('walks manifest order and selects SESSION_006 after exact SESSION_005 facts exist', async () => {
   const sources = await discoverWikiSources(backlogRoot)
-  assert.deepEqual(sources.map((source) => source.sourceSession.session_id), ['SESSION_005', 'SESSION_006'])
+  assert.deepEqual(sources.map((source) => source.sourceSession.session_id), ['SESSION_005', 'SESSION_006', 'SESSION_007'])
 
   const source = await discoverWikiSource(backlogRoot)
   assert.equal(source.sourceSession.session_id, 'SESSION_006')
@@ -86,6 +86,8 @@ test('fact file alone does not advance; receipt advances exactly one source', as
   await mkdir(resolve(backlogRoot, receiptRef, '..'), { recursive: true })
   await writeFile(resolve(backlogRoot, receiptRef), '{}\n')
   assert.equal((await discoverWikiSource(backlogRoot)).sourceSession.session_id, 'SESSION_007')
+  await rm(resolve(backlogRoot, factRef), { force: true })
+  await rm(resolve(backlogRoot, receiptRef), { force: true })
 })
 
 test('emits the legacy SESSION_005 GM-grounded facts with stable source identity', async () => {
