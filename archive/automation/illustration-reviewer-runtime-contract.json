@@ -176,8 +176,9 @@
     "order": [
       "acquire_lease",
       "bind_exact_job_and_review_context",
-      "read_current_png",
-      "stage_and_finalize_exact_png",
+      "materialize_and_hash_current_png",
+      "resume_exact_staging_or_begin_only_after_binary_preflight",
+      "upload_only_missing_chunks_and_finalize_exact_png",
       "perform_visual_review",
       "submit_PASS_REJECT_or_HUMAN_REVIEW"
     ],
@@ -192,5 +193,22 @@
     "pass_behavior": "Keep a temporary vault copy while the accepted original also proceeds through the existing permanent Storage/Registry/SITE_ASSETS pipeline.",
     "reject_behavior": "Keep only the temporary vault copy; remove transport staging after the vault upload succeeds.",
     "human_review_behavior": "Keep only the temporary vault copy unless later approved through a separate operator flow."
+  },
+  "staging_transport": {
+    "source_path": "/AFTERFALL-B/render-output/current.png",
+    "source_acquisition": "FILES_LIBRARY_RAW_MATERIALIZE",
+    "preview_or_image_asset_pointer_is_not_binary_transport": true,
+    "encoding": "base64",
+    "preferred_chunk_b64_chars": 220000,
+    "hard_max_chunk_b64_chars": 240000,
+    "precondition": "Materialize the exact Library PNG to local raw bytes and compute SHA-256, byte count, width, height and chunk_count before calling staging_begin.",
+    "provider_asset_id": "Use the exact Library backing file id as chatgpt-library:<file_id> when no more specific native generation asset id is available.",
+    "resume_rpc": "archive_illustration_review_staging_resume",
+    "abort_rpc": "archive_illustration_review_staging_abort",
+    "resume_behavior": "If an existing UPLOADING staging row matches the exact job/point/generation/subject/SHA/bytes/dimensions/provider_asset_id, reuse its staging_id even if its naming predates the current convention and upload only missing chunk indexes.",
+    "ready_behavior": "If the exact staging is already READY, do not upload again; continue to visual review.",
+    "conflict_behavior": "Never overwrite a mismatched staging row. Abort is allowed only for the same leased job, exact staging_id, exact source_sha256 and UPLOADING status; then begin a fresh exact staging.",
+    "partial_failure_behavior": "Preserve exact matching chunks for a later resume. Never create a second staging row for the same job.",
+    "chunk_execution": "Generate and submit one base64 chunk at a time from the materialized local file; do not place the full-file base64 into repository files, prompts, logs or user-visible output."
   }
 }
