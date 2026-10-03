@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { chronicleRegistry } from './chronicleRegistry'
 import { OperatorVisualMetadata } from './OperatorVisualMetadata'
+import { OperatorKnowledgeInbox } from './OperatorKnowledgeInbox'
 import { supabaseClient } from './supabaseClient'
 import { operatorPasswordRedirectUrl, validatePasswordChange } from './operatorPassword'
 import {
@@ -69,7 +70,7 @@ const readJson = async <T,>(path: string): Promise<T | null> => {
   }
 }
 
-export default function OperatorConsole({ view = 'dashboard' }: { view?: 'dashboard' | 'visuals' }) {
+export default function OperatorConsole({ view = 'dashboard' }: { view?: 'dashboard' | 'visuals' | 'knowledge' }) {
   const [user, setUser] = useState<User | null>(null)
   const [ready, setReady] = useState(false)
   const [email, setEmail] = useState('')
@@ -205,8 +206,10 @@ export default function OperatorConsole({ view = 'dashboard' }: { view?: 'dashbo
     <button type="button" className="operator-reset-link" disabled={busy} onClick={() => void requestPasswordReset()}>비밀번호를 모르겠어요 · 재설정 메일 받기</button>
   </section>
 
+  if (view === 'knowledge') return <OperatorKnowledgeInbox email={user.email} busy={busy} onSignOut={() => void signOut()} />
+
   if (view === 'visuals') return <section className="operator-page">
-    <header className="operator-heading"><div><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>시각 제작 메타</h1><p>{user.email} · 이미지 제작과 운영 검수에만 사용하는 내부 메타입니다.</p></div><div className="operator-heading-actions"><a className="operator-secondary" href="/operator/">대시보드로 돌아가기</a><button className="operator-secondary" disabled={busy} onClick={() => void signOut()}>로그아웃</button></div></header>
+    <header className="operator-heading"><div><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>시각 제작 메타</h1><p>{user.email} · 이미지 제작과 운영 검수에만 사용하는 내부 메타입니다.</p></div><div className="operator-heading-actions"><a className="operator-secondary" href="/operator/">대시보드로 돌아가기</a><a className="operator-secondary" href="/operator/knowledge/">Knowledge Inbox</a><button className="operator-secondary" disabled={busy} onClick={() => void signOut()}>로그아웃</button></div></header>
   </section>
 
   const archiveRunCount = (systemStatus?.archive.daily_run_count ?? 0) + (systemStatus?.archive.task_count ?? 0)
@@ -219,7 +222,7 @@ export default function OperatorConsole({ view = 'dashboard' }: { view?: 'dashbo
   const knowledgeNeedsReview = inbox.pending_count > 0
   const productionContext = productionStatus.deploy?.context ?? null
 
-  return <section className="operator-page"><header className="operator-heading"><div><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>Operator Dashboard</h1><p>{user.email} · 실제 자동화 상태와 검토 대기 항목을 한곳에서 확인합니다.</p></div><div className="operator-heading-actions"><a className="operator-secondary" href="/operator/visuals/">시각 제작 메타</a><button className="operator-secondary" disabled={busy} onClick={() => void signOut()}>로그아웃</button></div></header>
+  return <section className="operator-page"><header className="operator-heading"><div><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>Operator Dashboard</h1><p>{user.email} · 실제 자동화 상태와 검토 대기 항목을 한곳에서 확인합니다.</p></div><div className="operator-heading-actions"><a className="operator-secondary" href="/operator/knowledge/">Knowledge Inbox</a><a className="operator-secondary" href="/operator/visuals/">시각 제작 메타</a><button className="operator-secondary" disabled={busy} onClick={() => void signOut()}>로그아웃</button></div></header>
     {error && <p className="operator-error" role="alert">{error}</p>}
     {statusError && <p className="operator-error" role="alert">{statusError}</p>}
     <div className="operator-counts"><article><span>사람 검토 · Human Review</span><strong>{inbox.pending_count}</strong></article><article><span>자동화 오류 · Automation Error</span><strong>{inbox.automation_error_count}</strong></article><article><span>보안 알림 · Security</span><strong className="operator-unwired">미연결</strong></article><article><span>비용 알림 · Cost</span><strong className="operator-unwired">미연결</strong></article></div>
