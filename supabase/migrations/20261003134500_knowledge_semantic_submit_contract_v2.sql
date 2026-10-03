@@ -88,7 +88,7 @@ begin
     if candidate->>'status' is distinct from 'BRIEF_PROPOSED'
        or brief->>'content_type' is distinct from 'BRIEF'
        or brief->>'status' is distinct from 'READY'
-       or pg_catalog.nullif(pg_catalog.btrim(candidate->>'question'),'') is null
+       or nullif(pg_catalog.btrim(candidate->>'question'),'') is null
        or candidate->>'question' is distinct from evidence->>'question'
        or candidate->>'question' is distinct from brief->>'title' then
       return pg_catalog.jsonb_build_object(
