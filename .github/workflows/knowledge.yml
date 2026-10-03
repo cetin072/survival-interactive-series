@@ -10,6 +10,7 @@ on:
       - 'archive/web/public/sitemap.xml'
       - 'archive/web/package.json'
       - 'supabase/migrations/*knowledge_semantic*'
+      - 'supabase/migrations/*knowledge_operator*'
       - '.github/workflows/knowledge-semantic-prep.yml'
       - '.github/workflows/knowledge-semantic-finalizer.yml'
       - '.github/workflows/knowledge.yml'
@@ -31,6 +32,7 @@ on:
       - 'archive/web/public/sitemap.xml'
       - 'archive/web/package.json'
       - 'supabase/migrations/*knowledge_semantic*'
+      - 'supabase/migrations/*knowledge_operator*'
       - '.github/workflows/knowledge-semantic-prep.yml'
       - '.github/workflows/knowledge-semantic-finalizer.yml'
       - '.github/workflows/knowledge.yml'
@@ -65,6 +67,7 @@ jobs:
           node --test ../scripts/lib/knowledge-review-sync.test.mjs
           node --test ../scripts/lib/knowledge-review-consumer.test.mjs
           node --test ../scripts/lib/knowledge-human-approved.test.mjs
+          node --test ../scripts/lib/knowledge-operator-draft-apply.test.mjs
       - name: Syntax-check Knowledge publication executors
         run: |
           node --check ../scripts/knowledge-publish-prepare.mjs
@@ -73,6 +76,7 @@ jobs:
           node --check ../scripts/knowledge-review-consumer.mjs
           node --check ../scripts/knowledge-human-approved-prepare.mjs
           node --check ../scripts/knowledge-human-approved-release-check.mjs
+          node --check ../scripts/knowledge-operator-draft-apply.mjs
           node --check ../scripts/write-deploy-meta.mjs
           node --check ../scripts/knowledge-worker-preflight.mjs
           node --check ../scripts/knowledge-worker-disposition.mjs

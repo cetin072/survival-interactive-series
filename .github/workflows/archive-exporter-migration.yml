@@ -14,6 +14,8 @@ on:
       - 'supabase/tests/knowledge_semantic_published_reconcile.sql'
       - 'supabase/tests/knowledge_semantic_finalizer_retry.sql'
       - 'supabase/tests/knowledge_operator_inbox_verification.sql'
+      - 'supabase/tests/knowledge_operator_drafts_verification.sql'
+      - 'supabase/tests/knowledge_media_bucket_verification.sql'
       - 'supabase/migrations/20261001233000_knowledge_semantic_published_reconcile_v1.sql'
       - 'supabase/migrations/20261003090000_knowledge_operator_inbox_v1.sql'
   push:
@@ -30,6 +32,8 @@ on:
       - 'supabase/tests/knowledge_semantic_published_reconcile.sql'
       - 'supabase/tests/knowledge_semantic_finalizer_retry.sql'
       - 'supabase/tests/knowledge_operator_inbox_verification.sql'
+      - 'supabase/tests/knowledge_operator_drafts_verification.sql'
+      - 'supabase/tests/knowledge_media_bucket_verification.sql'
       - 'supabase/migrations/20261001233000_knowledge_semantic_published_reconcile_v1.sql'
 
 permissions:
@@ -127,6 +131,22 @@ jobs:
           CREATE SCHEMA auth;
           CREATE SCHEMA survival_ops;
           CREATE SCHEMA survival_rpg;
+          CREATE SCHEMA storage;
+          CREATE TABLE storage.buckets (
+            id text primary key,
+            name text not null,
+            public boolean not null default false,
+            file_size_limit bigint,
+            allowed_mime_types text[]
+          );
+          CREATE TABLE storage.objects (
+            id uuid primary key default gen_random_uuid(),
+            bucket_id text not null,
+            name text not null
+          );
+          ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+          GRANT USAGE ON SCHEMA storage TO authenticated;
+          GRANT SELECT,INSERT,UPDATE,DELETE ON storage.objects TO authenticated;
           CREATE SCHEMA vault;
           CREATE SCHEMA net;
           CREATE SCHEMA cron;
@@ -166,8 +186,12 @@ jobs:
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261003134500_knowledge_semantic_submit_contract_v2.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261003090000_knowledge_operator_inbox_v1.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261003093000_knowledge_operator_inbox_review_link_v1.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261004001000_knowledge_operator_drafts_v1.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261004002000_knowledge_media_bucket_v1.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_jobs_verification.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_operator_inbox_verification.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_operator_drafts_verification.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_media_bucket_verification.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_jobs_crash_recovery.psql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_review_e2e.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261001233000_knowledge_semantic_published_reconcile_v1.sql

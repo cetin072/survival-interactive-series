@@ -58,3 +58,10 @@ a { color: inherit; }
 .download-button { display: inline-flex; align-items: center; margin-top: 4px; padding: 12px 15px; border-radius: 8px; background: #202023; color: #fff; font-size: 15px; font-weight: 750; text-decoration: none; }
 .download-button:hover { background: #000; }
 .download-note { margin-top: 12px !important; color: #6d6d75 !important; font-family: inherit !important; font-size: 14px !important; line-height: 1.65 !important; }
+
+
+.article-media { margin: 24px 0; }
+.article-media img { display: block; width: 100%; height: auto; border-radius: 12px; }
+.article-media figcaption { margin-top: 8px; color: #666; font-size: 14px; line-height: 1.5; }
+.article-video-frame { position: relative; overflow: hidden; width: 100%; padding-top: 56.25%; border-radius: 12px; background: #111; }
+.article-video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
