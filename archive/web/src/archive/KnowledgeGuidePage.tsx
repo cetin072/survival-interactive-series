@@ -2,6 +2,7 @@ import type { KnowledgeGuide, KnowledgeGuideBlock } from './knowledgeGuide'
 import { knowledgeRiskLabel } from './knowledgeGuide'
 import { WikiTopbar } from './WikiTopbar'
 import './wikiShell.css'
+import './survivalDesignLanguage.css'
 
 function GuideBlock({ block, guide }: { block: KnowledgeGuideBlock; guide: KnowledgeGuide }) {
   if (block.type === 'prose') return <p>{block.text}</p>
