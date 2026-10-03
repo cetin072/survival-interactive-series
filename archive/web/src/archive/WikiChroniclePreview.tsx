@@ -3,6 +3,7 @@ import { chaptersForChronicle } from './storyData'
 import { buildWikiDocuments, wikiCharacterIndex, wikiEventIndex, wikiLocationIndex, wikiSupportedNodeIds } from './wikiDocument'
 import { WikiTopbar } from './WikiTopbar'
 import './wikiShell.css'
+import './survivalDesignLanguage.css'
 
 const wikiHref = (nodeId: string) => '/?view=wiki-preview&node=' + encodeURIComponent(nodeId)
 const storyHref = (chronicleId: string) => '/?view=story&chronicle=' + encodeURIComponent(chronicleId)
