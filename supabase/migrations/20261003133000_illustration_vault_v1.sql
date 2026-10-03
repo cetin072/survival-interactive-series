@@ -95,7 +95,7 @@ begin
       set status='BLOCKED',last_error_code=coalesce(last_error_code,'VAULT_DISPATCH_ATTEMPTS_EXHAUSTED'),
           updated_at=clock_timestamp()
     where job_id=p_job_id;
-    raise exception 'ILLUSTRATION_VAULT_DISPATCH_ATTEMPTS_EXHAUSTED';
+    return coalesce(v_item.dispatch_request_id,0);
   end if;
 
   select decrypted_secret into github_token
@@ -253,9 +253,12 @@ as $$
 begin
   update survival_ops.illustration_vault_items
   set last_error_code=left(coalesce(p_error_code,'VAULT_UNKNOWN_ERROR'),200),
-      status=case when dispatch_attempt_count>=5 then 'BLOCKED' else status end,
+      status=case
+        when status in ('QUEUED','DISPATCHED') and dispatch_attempt_count>=5 then 'BLOCKED'
+        else status
+      end,
       updated_at=clock_timestamp()
-  where job_id=p_job_id and status not in ('STORED','DELETED');
+  where job_id=p_job_id and status<>'DELETED';
 
   return jsonb_build_object('job_id',p_job_id,'recorded',found);
 end
@@ -283,7 +286,10 @@ begin
   where v.job_id=p_job_id
     and v.status='STORED'
     and v.source_sha256=p_source_sha256
-    and j.review_decision in ('REJECT','HUMAN_REVIEW');
+    and (
+      j.review_decision in ('REJECT','HUMAN_REVIEW')
+      or (j.review_decision='PASS' and j.status='SUCCEEDED')
+    );
 
   if v_staging_id is null then
     return jsonb_build_object('job_id',p_job_id,'deleted',0);
