@@ -59,6 +59,16 @@
 - Preview 전용으로 명시된 PR을 임의로 Ready/merge/Production 배포하지 않습니다.
 - 사용자 승인 전에는 중요한 아키텍처 변경, 유료 API 비용 확대, Canon 영향 변경, main 병합, Production 배포를 하지 않습니다.
 
+## Learning Loop v0 파일럿
+
+- 이 파일럿의 로컬 SOP는 [`docs/automation/skills/learning-loop-v0/SKILL.md`](docs/automation/skills/learning-loop-v0/SKILL.md)입니다.
+- 사용자가 별도로 `Lesson 등록`을 요청하기를 기다리지 않습니다. **실질적인 개발 작업을 마칠 때** 다음 신호가 실제로 있었는지만 짧게 판정합니다: 사용자에 의한 개발 방식/판단 교정, 반복 실패, 사용자가 발견한 기계적 사전 검출 가능 버그, 재사용 가능한 더 단순·안전한 성공 절차, 기존 Rule/Skill/Gate 미준수.
+- 신호가 없으면 아무 기록도 남기지 않습니다. 모든 작업을 회고하거나 별도 Lesson 문서를 만들지 않습니다.
+- 신호가 있으면 현재 작업의 **기존 Issue 또는 Draft PR에만** `Learning Loop v0` 형식의 짧은 후보를 남깁니다. 별도 Issue·중앙 규칙·Skill을 자동 생성하지 않습니다.
+- Canon / Worldline / RAW Transcript / GM 규칙 / Automation A·B·C 고유 계약 / 이미지·Archive·Knowledge의 프로젝트 전용 결정은 기본적으로 **생존일기 로컬**로 유지합니다.
+- 둘 이상의 프로젝트에서 같은 개발 운영 문제가 반복되거나 보안·권한·데이터 무결성처럼 보편적 위험일 때만 중앙 공통 후보로 표시합니다.
+- 이 파일럿은 Hook, background observer, 별도 DB, 새 예약을 사용하지 않으며 기존 Exact-head·승인·데이터 보존·Canon/RAW 안전 경계를 약화하지 않습니다.
+
 ## 검증
 
 - 기존 테스트와 상태 검증을 삭제하거나 약화하지 않습니다.
