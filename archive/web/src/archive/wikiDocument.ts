@@ -55,13 +55,23 @@ const nodeById = new Map(
   publicGraph.nodes.map((record) => [record.id, record.data as ArchiveNode]),
 )
 
-export const wikiCharacterIndex = publicGraph.nodes
+export const wikiSupportedTypes: ArchiveNodeType[] = ['character', 'location', 'event']
+
+const wikiIndexFor = (type: ArchiveNodeType) => publicGraph.nodes
   .map((record) => record.data as ArchiveNode)
-  .filter((node) => node.type === 'character')
-  .map((node) => ({ id: node.id, title: node.label, subtitle: node.subtitle }))
+  .filter((node) => node.type === type)
+  .map((node) => ({ id: node.id, title: node.label, subtitle: node.subtitle, type: node.type }))
   .sort((a, b) => a.title.localeCompare(b.title, 'ko'))
 
-export const wikiCharacterNodeIds = wikiCharacterIndex.map((item) => item.id)
+export const wikiCharacterIndex = wikiIndexFor('character')
+export const wikiLocationIndex = wikiIndexFor('location')
+export const wikiEventIndex = wikiIndexFor('event')
+export const wikiNodeIndex = [...wikiCharacterIndex, ...wikiLocationIndex, ...wikiEventIndex]
+export const wikiSupportedNodeIds = wikiNodeIndex.map((item) => item.id)
+
+export function isWikiSupportedNodeId(nodeId: string): boolean {
+  return wikiSupportedNodeIds.includes(nodeId)
+}
 
 export function requireWikiNode(nodeId: string): ArchiveNode {
   const node = nodeById.get(nodeId)
