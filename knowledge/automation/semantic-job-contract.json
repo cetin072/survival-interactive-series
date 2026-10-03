@@ -26,110 +26,31 @@
     "candidate": {
       "type": "object",
       "required": [
-        "id",
-        "brief_id",
-        "topic_id",
-        "status",
-        "question",
-        "source_kind"
+        "status"
       ],
       "properties": {
-        "id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "brief_id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "topic_id": {
-          "type": "string",
-          "minLength": 1
-        },
         "status": {
           "const": "BRIEF_PROPOSED"
-        },
-        "question": {
-          "type": "string",
-          "minLength": 1
-        },
-        "source_kind": {
-          "enum": [
-            "PUBLIC_ARCHIVE",
-            "PUBLIC_READER"
-          ]
         }
-      },
-      "additionalProperties": true
+      }
     },
     "evidence": {
-      "type": "object",
-      "required": [
-        "brief_id",
-        "question",
-        "claims"
-      ],
-      "properties": {
-        "brief_id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "question": {
-          "type": "string",
-          "minLength": 1
-        },
-        "claims": {
-          "type": "array",
-          "minItems": 1
-        }
-      },
-      "additionalProperties": true
+      "type": "object"
     },
     "brief": {
       "type": "object",
       "required": [
-        "id",
-        "topic_id",
-        "title",
         "content_type",
-        "status",
-        "risk_level",
-        "publication_policy",
-        "semantic_qa_status"
+        "status"
       ],
       "properties": {
-        "id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "topic_id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "title": {
-          "type": "string",
-          "minLength": 1
-        },
         "content_type": {
           "const": "BRIEF"
         },
         "status": {
           "const": "READY"
-        },
-        "risk_level": {
-          "type": "string",
-          "minLength": 1
-        },
-        "publication_policy": {
-          "type": "string",
-          "minLength": 1
-        },
-        "semantic_qa_status": {
-          "type": "string",
-          "minLength": 1
         }
-      },
-      "additionalProperties": true
+      }
     },
     "topic": {
       "type": "object"
