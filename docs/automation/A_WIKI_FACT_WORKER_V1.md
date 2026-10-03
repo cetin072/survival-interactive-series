@@ -14,12 +14,42 @@ The original SESSION_005 replay and ordinary `--check`/`--apply` remain intact. 
 
 ```sh
 node archive/scripts/run-wiki-automation.mjs --prepare > /tmp/a-wiki-job.json
-# A native worker reads the complete job, follows the instructions below,
-# and writes ONLY its result JSON to /tmp/a-wiki-result.json.
-node archive/scripts/run-wiki-automation.mjs --result /tmp/a-wiki-result.json --check > /tmp/a-wiki-proposal.json
+
+# First native call: Extractor reads the complete prepared job.
+# It writes ONLY wiki-fact-result-v1 JSON.
+node archive/scripts/run-wiki-automation.mjs \
+  --result /tmp/a-wiki-result.json --check \
+  > /tmp/a-wiki-proposal.json
+
+# Build the second-pass review job. It contains the complete prepared GM source
+# plus the fixed proposal; this is not the Extractor's original context.
+node archive/scripts/run-wiki-automation.mjs \
+  --proposal /tmp/a-wiki-proposal.json --prepare-review \
+  > /tmp/a-wiki-review-job.json
+
+# Second native call: Reviewer reads the complete review job and writes ONLY
+# wiki-fact-review-v1 JSON: APPROVE / HUMAN_REVIEW / REJECT.
+node archive/scripts/run-wiki-automation.mjs \
+  --proposal /tmp/a-wiki-proposal.json \
+  --review /tmp/a-wiki-review.json --check \
+  > /tmp/a-wiki-reviewed.json
+
+# Finalizer revalidates the source, current Graph, exact proposal and review.
+# Run --check first; only an APPROVE + COMPLETE package can use --apply.
+node archive/scripts/run-wiki-fact-finalizer.mjs \
+  --job /tmp/a-wiki-job.json \
+  --proposal /tmp/a-wiki-proposal.json \
+  --review /tmp/a-wiki-review.json \
+  --check
+
+node archive/scripts/run-wiki-fact-finalizer.mjs \
+  --job /tmp/a-wiki-job.json \
+  --proposal /tmp/a-wiki-proposal.json \
+  --review /tmp/a-wiki-review.json \
+  --apply
 ```
 
-Never edit the job, bind a result to another job, add a paid API, auto-merge, or call the legacy apply path with a new unreviewed result. A nonzero exit is rejection, not success. NOOP from prepare means no pending source, not a new empty model job.
+Never edit the job/proposal between passes, bind a result or review to another hash, add a paid API, auto-merge, or call the legacy SESSION_005 apply path with a new unreviewed result. A nonzero exit is rejection, not success. NOOP from prepare means no pending source, not a new empty model job. The completion receipt is written only after durable Graph success.
 
 ## Native worker instructions
 
@@ -52,6 +82,30 @@ Each citation is `{id, block_id, quote}`. The quote must be a sufficiently disti
 `changes` allows `subtitle`, `summary`, `tags`, and string-valued `meta`. New nodes need subtitle and summary. Updates preserve unrelated fields, merge metadata and union tags; deletion is not supported. `evidence` maps `type`, `label`, every changed scalar/tag field, and each `meta.FIELD` to arrays of citation IDs. Every claim in a summary needs adequate support, not merely one mention of the character.
 
 Each relation is `{from, to, kind, label, evidence}`. Endpoints are existing IDs or new candidate keys. Use only `job.relation_kinds`; cite explicit relation evidence. Each deferred item is `{reason, evidence}` with citation IDs.
+
+## Independent Reviewer instructions
+
+The Reviewer is a fresh second native-model call. It receives the complete prepared job (all GM blocks and existing public identities) plus the immutable proposal. It must not edit the proposal.
+
+Check both directions:
+
+1. **Precision:** every proposed fact, update and relation is actually entailed by the cited GM record.
+2. **Completeness:** after reading every GM block, no material durable character/location/event/relation is silently omitted while coverage is declared COMPLETE.
+
+Also check identity, chronology, unsupported intention, future-choice leakage and over-strong relationship labels. If any material point is ambiguous or incomplete, return HUMAN_REVIEW rather than fixing the Extractor output in place.
+
+Review result:
+
+```json
+{
+  "version": "wiki-fact-review-v1",
+  "proposal_sha256": "<exact proposal hash>",
+  "decision": "APPROVE",
+  "note": "..."
+}
+```
+
+Only COMPLETE proposals may be APPROVE. PARTIAL proposals remain useful for replay tests but never advance the source queue.
 
 ## Validation and limits
 
