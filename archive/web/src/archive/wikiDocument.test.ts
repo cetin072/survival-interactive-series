@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildWikiDocument, buildWikiDocuments } from './wikiDocument'
+import { buildWikiDocument, buildWikiDocuments, wikiCharacterIndex, wikiCharacterNodeIds } from './wikiDocument'
 import { wikiSectionPlan } from './WikiDocumentPage'
 
 describe('WikiDocument compiler', () => {
@@ -27,6 +27,16 @@ describe('WikiDocument compiler', () => {
     expect(documents[2].title).toBe('서쪽 대형화재 방어선')
     expect(documents.every((document) => document.anchor.gameTime.length > 0)).toBe(true)
     expect(documents.every((document) => document.metaRows.length >= 3)).toBe(true)
+  })
+
+  it('compiles every current Graph character through the same WikiDocument contract', () => {
+    expect(wikiCharacterNodeIds).toHaveLength(19)
+    expect(wikiCharacterIndex.some((item) => item.id === 'char-seojin' && item.title === '윤서진')).toBe(true)
+    const documents = buildWikiDocuments(wikiCharacterNodeIds)
+    expect(documents).toHaveLength(wikiCharacterNodeIds.length)
+    expect(documents.every((document) => document.type === 'character')).toBe(true)
+    expect(documents.every((document) => document.title.length > 0 && document.summary.length > 0)).toBe(true)
+    expect(documents.every((document) => document.metaRows.some((row) => row.label === '생존기'))).toBe(true)
   })
 
   it('omits empty optional sections instead of fabricating content', () => {
