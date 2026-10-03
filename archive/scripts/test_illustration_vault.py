@@ -75,12 +75,14 @@ class IllustrationVaultTests(unittest.TestCase):
                 return job
             if name == "archive_illustration_vault_mark_stored":
                 return {"status": "STORED", "expires_at": "2026-11-02T00:00:00Z"}
+            if name == "archive_illustration_vault_cleanup_review_staging":
+                return {"deleted": 0}
             raise AssertionError(name)
 
         with patch.object(vault, "rpc", side_effect=fake_rpc),              patch.object(vault, "read_staged_bytes", return_value=raw),              patch.object(vault, "provider", return_value=FakeProvider()):
             vault.archive("job-12345678")
 
-        self.assertNotIn("archive_illustration_vault_cleanup_review_staging", calls)
+        self.assertIn("archive_illustration_vault_cleanup_review_staging", calls)
 
     def test_cleanup_deletes_storage_before_marking_metadata_deleted(self):
         calls = []
