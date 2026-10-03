@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
-import { applySemanticPackage, buildSemanticContext, chapterHash, hashPolicyBytes, makeWorkKey, nextBriefId, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
+import { applySemanticPackage, buildSemanticContext, chapterHash, hashPolicyBytes, knowledgeOperationalDate, makeWorkKey, nextBriefId, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
 import { finalizerAction, semanticBranchRef, reconcilePullRequest, runSemanticFinalizer, verifyPins } from '../knowledge-semantic-finalize.mjs'
 import { runPackage } from '../knowledge-semantic-finalize.mjs'
 import { detectLegacyWorkerBlocker, planSemanticPreparation } from '../knowledge-semantic-prepare.mjs'
@@ -28,6 +28,12 @@ const packageResult = (decision = 'BRIEF_READY') => ({
   candidate: { id: 'KC-session-001-abcdef1234', brief_id: 'K-011', topic_id: 'T-PREP', status: 'BRIEF_PROPOSED', source_kind: 'PUBLIC_ARCHIVE', source_manifest_ref: sourceRef, source_manifest_sha256: sourceSha },
   evidence: { brief_id: 'K-011', claims: [{ claim: 'Fixture claim', source_ids: ['S1'], context: 'Public fact', limitation: 'Limited scope' }] },
   brief: { id: 'K-011', topic_id: 'T-PREP', content_type: 'BRIEF', status: 'READY', risk_level: decision === 'HUMAN_REVIEW' ? 'HIGH' : 'LOW', publication_policy: decision === 'HUMAN_REVIEW' ? 'HUMAN_APPROVED' : 'AUTO_LOW_RISK', semantic_qa_status: decision === 'HUMAN_REVIEW' ? 'REVIEW' : 'PASS' },
+})
+
+test('Knowledge operational date follows Asia/Seoul across the UTC midnight boundary', () => {
+  assert.equal(knowledgeOperationalDate('2026-10-03T14:59:59.000Z'), '2026-10-03')
+  assert.equal(knowledgeOperationalDate('2026-10-03T15:00:00.000Z'), '2026-10-04')
+  assert.equal(knowledgeOperationalDate('2026-10-03T16:28:03.320Z'), '2026-10-04')
 })
 
 test('C-PREP is a no-op with no source and active work prevents concurrent preparation', () => {
@@ -314,17 +320,20 @@ test('C-FINALIZER package application persists one validated BRIEF_READY disposi
       meta_description: '저위험 일반 재난대비에서 물품 인계 목록과 실제 인수 기록을 구분해 관리하는 방법을 설명합니다.',
       lead: '공동으로 보관하거나 전달하는 일반 물품은 약속한 수량과 실제 인수량을 분리해 기록하면 확인이 쉬워집니다.',
       status: 'READY',
-      updated_at: '2026-10-01',
+      source_checked_at: '2026-10-04',
+      published_at: '2026-10-04',
+      updated_at: '2026-10-04',
     }
     const evidence = { ...referenceEvidence, brief_id: briefId, question }
     const result = { version: 'knowledge-semantic-result-v1', job_id: syntheticJob.job_id, decision: 'BRIEF_READY', candidate, evidence, brief }
 
-    const applied = await applySemanticPackage({ root, job: syntheticJob, result, now: '2026-10-01T12:00:00.000Z' })
+    const applied = await applySemanticPackage({ root, job: syntheticJob, result, now: '2026-10-03T16:28:03.320Z' })
     assert.equal(applied.brief_id, briefId)
     assert.equal(applied.candidate_id, candidateId)
     const completed = await loadKnowledge(root)
     await validateKnowledge(completed)
     assert.equal(completed.briefs.find((item) => item.id === briefId).status, 'READY')
+    assert.equal(completed.briefs.find((item) => item.id === briefId).updated_at, '2026-10-04')
     assert.equal(completed.evidence.get(briefId).question, question)
     assert.ok(applied.changed_files.includes('knowledge/automation/state.json'))
     const state = JSON.parse(await readFile(join(root, 'knowledge/automation/state.json'), 'utf8'))

@@ -1,0 +1,19 @@
+{
+  "id": "KC-c03-afterfall-chapter-06-d60fc34930",
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-013",
+  "question": "재난 대응에 외부 인력이나 기술자를 투입할 때 신원·자격·투입 승인·체크인 기록을 어떻게 확인해야 할까",
+  "topic_id": "emergency-personnel-credentialing",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_004.md"
+  ],
+  "source_hashes": [
+    "8b47ab7b7efeff90cc791866b3b2bfcc0b185348d7dd3c15a29cb4a217104c5d"
+  ],
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "disposition_note": "Reader의 외부 기술자 협업 장면에서 질문을 추출했다. K-009는 내부 역할·승인 분담, K-010은 조직 간 자원·비용 합의가 중심이고, 이번 글은 외부 인력의 신원·자격·투입 승인·현장 체크인 기록에 초점을 둔다.",
+  "reader_chapter_id": "c03-afterfall-chapter-06",
+  "reader_book_sha256": "36f199f9cc14a4678d48ef694dd326c310be655965e91b8875154aa338615f83",
+  "reader_chapter_sha256": "4d4eb5f257648e62a906f1f4c94e15178c481d3728708b9467db43980315d502"
+}
