@@ -10,6 +10,7 @@ import { activeChronicle, getChronicle } from './transcriptData'
 import type { ReaderChapter } from './storyData'
 import { archiveRouteUrl, browserReaderStorage, parseArchiveRoute, resolveReaderRoute, type ArchiveRoute } from './readerNavigation'
 import './archive.css'
+import './survivalDesignLanguage.css'
 
 const OperatorConsole = lazy(() => import('./OperatorConsole'))
 
@@ -46,7 +47,7 @@ export function ArchiveApp() {
   if (route.view === 'wiki-preview') return <WikiShellPreview nodeId={route.nodeId} page={route.page} chronicleId={route.chronicleId} />
   if (route.view === 'knowledge-preview') return <KnowledgeGuidePreview briefId={route.briefId} />
 
-  return <main className="archive-shell">
+  return <main className="archive-shell survival-public-shell">
     <header className="archive-header">
       <button className="archive-brand" onClick={() => open({ view: 'wiki-preview', chronicleId: activeChronicle.id, page: 'home' })}><p className="archive-kicker">SURVIVAL DIARY</p><h1>생존일기 <span>ARCHIVE</span></h1></button>
       <nav className="archive-primary-nav" aria-label="주요 탐색">
