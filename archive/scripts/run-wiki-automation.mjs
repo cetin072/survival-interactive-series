@@ -78,8 +78,8 @@ export async function runWikiAutomation(mode, { discover = discoverWikiSource } 
 }
 
 export async function runCli(args, { discover = discoverWikiSource } = {}) {
-  if (args[0] === '--prepare' || args[0] === '--result') return runWikiFactCli(args, { root, discover })
-  if (args.length === 1 && args[0] === '--help') return 'Usage: node archive/scripts/run-wiki-automation.mjs (--check|--apply)\nNative semantic path: --prepare | --result <result.json> --check (proposal only; no apply).\nReads the first unprocessed verified S03 PUBLIC_ARCHIVE session in manifest order; extracts GM blocks only.\n--check writes nothing; --apply writes one deterministic AWiki fact and reconciles GRAPH.json.\n'
+  if (['--prepare', '--result', '--proposal'].includes(args[0])) return runWikiFactCli(args, { root, discover })
+  if (args.length === 1 && args[0] === '--help') return 'Usage: node archive/scripts/run-wiki-automation.mjs (--check|--apply)\nNative semantic path: --prepare | --result <result.json> --check | --proposal <proposal.json> --prepare-review | --proposal <proposal.json> --review <review.json> --check.\nReads the first unprocessed verified S03 PUBLIC_ARCHIVE session in manifest order; extracts GM blocks only.\n--check writes nothing; --apply writes one deterministic AWiki fact and reconciles GRAPH.json.\n'
   demand(args.length === 1, 'INVALID_WIKI_CLI_ARGUMENTS')
   try { return JSON.stringify(await runWikiAutomation(args[0], { discover }), null, 2) + '\n' }
   catch (error) {
