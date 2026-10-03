@@ -9,7 +9,7 @@ export function WikiTopbar() {
     <WikiSearchBox />
     <nav aria-label="공용 메뉴">
       <a href="/?view=wiki-preview">이야기</a>
-      <a href="/knowledge/">생존 지식</a>
+      <a href="/?view=knowledge-preview">생존 지식</a>
       <a href="/?view=tools">자료실</a>
     </nav>
   </header>
