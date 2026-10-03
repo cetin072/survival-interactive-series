@@ -27,7 +27,7 @@ export function KnowledgeGuidePage({ guide }: { guide: KnowledgeGuide }) {
     <div className="knowledge-guide-frame">
       <nav className="wiki-breadcrumb" aria-label="현재 위치">
         <a href="/?view=wiki-preview">생존일기</a><span>›</span>
-        <a href="/knowledge/">생존 지식</a><span>›</span>
+        <a href="/?view=knowledge-preview">생존 지식</a><span>›</span>
         <strong>{guide.label}</strong>
       </nav>
 
