@@ -28,17 +28,21 @@ type ReviewDetail = ReviewItem & {
   decision_note: string | null; decision_history: Decision[]
 }
 type Inbox = { pending_count: number; automation_error_count: number; items: ReviewItem[] }
-type ArchiveRun = {
-  scheduled_date?: string | null; status?: string | null; attempt_count?: number | null
-  last_error_code?: string | null; started_at?: string | null; finished_at?: string | null
-  task_id?: string | null; task_kind?: string | null; chronicle_id?: string | null
-  season_id?: string | null; updated_at?: string | null; completed_at?: string | null
+type CronStatus = {
+  jobname?: string | null; schedule?: string | null; active?: boolean | null
+  last_status?: string | null; last_start_at?: string | null; last_end_at?: string | null
+  last_message?: string | null
 }
-type VisualRun = {
-  run_id?: string | null; started_at?: string | null; finished_at?: string | null
-  final_status?: string | null; blocker_code?: string | null; blocker_stage?: string | null
-  target_subject_id?: string | null; accepted_count?: number | null
-  registry_status?: string | null; cleanup_status?: string | null; main_sha?: string | null
+type ArchiveDispatch = {
+  id?: number | null; requested_at?: string | null; workflow_file?: string | null
+  git_ref?: string | null; request_id?: number | null; origin?: string | null
+}
+type VisualJob = {
+  job_id?: string | null; date_kst?: string | null; status?: string | null; attempt_no?: number | null
+  subject_id?: string | null; title?: string | null; review_decision?: string | null
+  review_summary?: string | null; blocker_code?: string | null; blocker_stage?: string | null
+  last_error_code?: string | null; last_error_stage?: string | null
+  created_at?: string | null; updated_at?: string | null; reviewed_at?: string | null; finalized_at?: string | null
 }
 type KnowledgeSemanticJob = {
   job_id?: string; job_type?: string; status?: string; source_kind?: string; source_ref?: string
@@ -47,8 +51,20 @@ type KnowledgeSemanticJob = {
   final_head_sha?: string | null; merge_sha?: string | null; blocker_code?: string | null; blocker_stage?: string | null
 }
 type SystemStatus = {
-  archive: { daily_run_count: number; task_count: number; latest_daily_run: ArchiveRun | null; latest_task: ArchiveRun | null }
-  visual: { run_count: number; latest_run: VisualRun | null }
+  archive: {
+    dispatch_count: number
+    latest_dispatch: ArchiveDispatch | null
+    cron: CronStatus | null
+  }
+  visual: {
+    job_count: number
+    today_job_count: number
+    today_success_count: number
+    active_count: number
+    latest_job: VisualJob | null
+    prep_cron: CronStatus | null
+    retry_cron: CronStatus | null
+  }
   review: { pending_count: number; automation_error_count: number }
   knowledge_semantic?: { active_count: number; latest_job: KnowledgeSemanticJob | null; prep: { last_status?: string; last_stage?: string; blocker_code?: string | null; checked_at?: string | null } | null }
 }
@@ -212,9 +228,14 @@ export default function OperatorConsole({ view = 'dashboard' }: { view?: 'dashbo
     <header className="operator-heading"><div><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>시각 제작 메타</h1><p>{user.email} · 이미지 제작과 운영 검수에만 사용하는 내부 메타입니다.</p></div><div className="operator-heading-actions"><a className="operator-secondary" href="/operator/">대시보드로 돌아가기</a><a className="operator-secondary" href="/operator/knowledge/">Knowledge Inbox</a><button className="operator-secondary" disabled={busy} onClick={() => void signOut()}>로그아웃</button></div></header>
   </section>
 
-  const archiveRunCount = (systemStatus?.archive.daily_run_count ?? 0) + (systemStatus?.archive.task_count ?? 0)
-  const archiveLatest = systemStatus?.archive.latest_daily_run ?? systemStatus?.archive.latest_task ?? null
-  const visualLatest = systemStatus?.visual.latest_run ?? null
+  const archiveCron = systemStatus?.archive.cron ?? null
+  const archiveDispatch = systemStatus?.archive.latest_dispatch ?? null
+  const archiveHealthy = archiveCron?.active === true && archiveCron.last_status === 'succeeded'
+  const visualLatest = systemStatus?.visual.latest_job ?? null
+  const visualPrepHealthy = systemStatus?.visual.prep_cron?.active === true
+    && systemStatus?.visual.prep_cron?.last_status === 'succeeded'
+    && systemStatus?.visual.retry_cron?.active === true
+    && systemStatus?.visual.retry_cron?.last_status === 'succeeded'
   const semanticLatest = systemStatus?.knowledge_semantic?.latest_job ?? null
   const semanticBlocker = semanticLatest?.stalled_code ?? semanticLatest?.blocker_code ?? systemStatus?.knowledge_semantic?.prep?.blocker_code ?? null
   const semanticBadgeClass = semanticBlocker ? 'warning' : semanticLatest?.status === 'PUBLISHED' ? 'ok' : ['HUMAN_REVIEW','BLOCKED','HOLD'].includes(semanticLatest?.status ?? '') ? 'warning' : 'neutral'
@@ -231,22 +252,26 @@ export default function OperatorConsole({ view = 'dashboard' }: { view?: 'dashbo
       <header><div><p className="archive-eyebrow">SYSTEM STATUS</p><h2>자동화 상태</h2></div><button className="operator-secondary" disabled={busy} onClick={() => void refresh()}>상태 새로고침</button></header>
       <div className="operator-system-grid">
         <article className="operator-system-card">
-          <div className="operator-system-title"><h3>A · Archive <small>아카이브</small></h3><span className="operator-status-badge neutral">{archiveRunCount ? statusWithKorean(archiveLatest?.status ?? '기록 있음') : '실행이력 미수집'}</span></div>
+          <div className="operator-system-title"><h3>A · Archive <small>아카이브</small></h3><span className={`operator-status-badge ${archiveHealthy ? 'ok' : archiveCron ? 'warning' : 'neutral'}`}>{archiveHealthy ? '작동 중' : archiveCron?.active === false ? '중지' : archiveCron ? statusWithKorean(archiveCron.last_status) : '기록 없음'}</span></div>
           <dl>
             <div><dt>모드</dt><dd>{statusWithKorean(operatorStaticStatus.archive.mode)}</dd></div>
-            <div><dt>DB 실행기록</dt><dd>{archiveRunCount}건</dd></div>
-            <div><dt>최근 결과</dt><dd>{statusWithKorean(archiveLatest?.status)}</dd></div>
-            <div><dt>최근 시각</dt><dd>{formatOperatorTime(archiveLatest?.finished_at ?? archiveLatest?.completed_at ?? archiveLatest?.updated_at)}</dd></div>
+            <div><dt>자동 실행</dt><dd>{archiveCron?.active ? '켜짐' : archiveCron ? '꺼짐' : '기록 없음'} · {statusWithKorean(archiveCron?.last_status)}</dd></div>
+            <div><dt>최근 Cron</dt><dd>{formatOperatorTime(archiveCron?.last_end_at ?? archiveCron?.last_start_at)}</dd></div>
+            <div><dt>최근 GitHub 호출</dt><dd>{formatOperatorTime(archiveDispatch?.requested_at)}{archiveDispatch?.request_id ? ` · #${archiveDispatch.request_id}` : ''}</dd></div>
+            <div><dt>누적 외부 호출</dt><dd>{systemStatus?.archive.dispatch_count ?? 0}건</dd></div>
           </dl>
         </article>
 
         <article className="operator-system-card">
-          <div className="operator-system-title"><h3>B · Visual <small>이미지</small></h3><span className={`operator-status-badge ${visualStatusTone(visualLatest?.final_status)}`}>{visualLatest?.final_status ? statusWithKorean(visualLatest.final_status) : '실행이력 없음'}</span></div>
+          <div className="operator-system-title"><h3>B · Visual <small>이미지</small></h3><span className={`operator-status-badge ${visualStatusTone(visualLatest?.status)}`}>{visualLatest?.status ? statusWithKorean(visualLatest.status) : '실행이력 없음'}</span></div>
           <dl>
-            <div><dt>실행기록</dt><dd>{systemStatus?.visual.run_count ?? 0}건</dd></div>
-            <div><dt>최근 대상</dt><dd>{subjectWithKorean(visualLatest?.target_subject_id)}</dd></div>
-            <div><dt>최근 시각</dt><dd>{formatOperatorTime(visualLatest?.finished_at ?? visualLatest?.started_at)}</dd></div>
-            <div><dt>상세</dt><dd>{visualLatest?.blocker_code ? <><code>{visualLatest.blocker_code}</code>{explainMachineCode(visualLatest.blocker_code) && <small className="operator-code-help">{explainMachineCode(visualLatest.blocker_code)}</small>}{visualLatest.blocker_stage && <><code>{visualLatest.blocker_stage}</code>{explainMachineCode(visualLatest.blocker_stage) && <small className="operator-code-help">{explainMachineCode(visualLatest.blocker_stage)}</small>}</>}</> : <>채택 결과 {visualLatest?.accepted_count ?? 0}건</>}</dd></div>
+            <div><dt>Prep 자동실행</dt><dd>{visualPrepHealthy ? '정상' : '확인 필요'}</dd></div>
+            <div><dt>오늘 시도 / 성공</dt><dd>{systemStatus?.visual.today_job_count ?? 0}건 / {systemStatus?.visual.today_success_count ?? 0}건</dd></div>
+            <div><dt>활성 작업</dt><dd>{systemStatus?.visual.active_count ?? 0}건</dd></div>
+            <div><dt>최근 대상</dt><dd>{visualLatest?.title ? `${visualLatest.title} · ${visualLatest.subject_id ?? ''}` : subjectWithKorean(visualLatest?.subject_id)}</dd></div>
+            <div><dt>최근 상태 시각</dt><dd>{formatOperatorTime(visualLatest?.finalized_at ?? visualLatest?.reviewed_at ?? visualLatest?.updated_at ?? visualLatest?.created_at)}</dd></div>
+            <div><dt>검수 판정</dt><dd>{visualLatest?.review_decision ? statusWithKorean(visualLatest.review_decision) : '—'}</dd></div>
+            <div><dt>상세</dt><dd>{visualLatest?.blocker_code || visualLatest?.last_error_code ? <><code>{visualLatest.blocker_code ?? visualLatest.last_error_code}</code>{explainMachineCode(visualLatest.blocker_code ?? visualLatest.last_error_code) && <small className="operator-code-help">{explainMachineCode(visualLatest.blocker_code ?? visualLatest.last_error_code)}</small>}{(visualLatest.blocker_stage ?? visualLatest.last_error_stage) && <small className="operator-code-help">{visualLatest.blocker_stage ?? visualLatest.last_error_stage}</small>}</> : <>attempt {visualLatest?.attempt_no ?? '—'} · 누적 {systemStatus?.visual.job_count ?? 0}건</>}</dd></div>
           </dl>
         </article>
 
@@ -285,7 +310,7 @@ export default function OperatorConsole({ view = 'dashboard' }: { view?: 'dashbo
           </dl>
         </article>
       </div>
-      <p className="operator-muted">A는 자동 운영 설정과 실행기록 수집 여부를 보여줍니다. B는 이미지 자동화의 실제 최근 결과, C는 생존 지식 자동화의 최근 처리 상태를 보여줍니다. Production은 현재 실사이트에 올라간 코드 버전을 표시합니다.</p>
+      <p className="operator-muted">A는 실제 Supabase Cron과 GitHub 외부 호출 기록, B는 현재 이미지 Render/Review/Finalizer job 상태를 보여줍니다. C는 생존 지식 자동화의 최근 처리 상태를 보여줍니다. 상태는 로그인 시 한 번 불러오며 이후에는 상태 새로고침 버튼을 눌렀을 때 갱신됩니다.</p>
     </section>
 
     <div className="operator-grid"><section className="operator-panel"><header><h2>대기 항목</h2><button className="operator-secondary" disabled={busy} onClick={() => void refresh()}>새로고침</button></header>
