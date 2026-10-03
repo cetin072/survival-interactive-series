@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { chronicleRegistry } from './chronicleRegistry'
 import { OperatorVisualMetadata } from './OperatorVisualMetadata'
@@ -103,6 +103,7 @@ export default function OperatorConsole({ view = 'dashboard' }: { view?: 'dashbo
   const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const initialDashboardLoaded = useRef(false)
 
   const refresh = useCallback(async () => {
     if (!supabaseClient) return
@@ -144,13 +145,24 @@ export default function OperatorConsole({ view = 'dashboard' }: { view?: 'dashbo
     const { data: listener } = supabaseClient.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') setRecoveryMode(true)
       setUser(session?.user ?? null)
-      if (session?.user && view === 'dashboard') queueMicrotask(() => void refresh())
-      else { setInbox(emptyInbox); setSelected(null) }
+      if (!session?.user) {
+        initialDashboardLoaded.current = false
+        setInbox(emptyInbox); setSelected(null)
+      }
     })
     return () => { alive = false; listener.subscription.unsubscribe() }
   }, [refresh, view])
 
-  useEffect(() => { if (user && view === 'dashboard') void refresh() }, [user, refresh, view])
+  useEffect(() => {
+    if (!user) {
+      initialDashboardLoaded.current = false
+      return
+    }
+    if (view === 'dashboard' && !initialDashboardLoaded.current) {
+      initialDashboardLoaded.current = true
+      void refresh()
+    }
+  }, [user?.id, refresh, view])
 
   async function signIn(event: FormEvent) {
     event.preventDefault()
