@@ -14,6 +14,20 @@ const canonicalChapterSha = (chapter) => sha(Buffer.from(JSON.stringify(chapter)
 const fail = (condition, code) => { if (!condition) throw new Error(code) }
 const plainObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 
+export function knowledgeOperationalDate(value, timeZone = 'Asia/Seoul') {
+  const instant = new Date(value)
+  fail(!Number.isNaN(instant.valueOf()), 'SEMANTIC_OPERATIONAL_DATE_INVALID')
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(instant)
+  const values = Object.fromEntries(parts.filter((part) => part.type !== 'literal').map((part) => [part.type, part.value]))
+  fail(/^\d{4}$/.test(values.year ?? '') && /^\d{2}$/.test(values.month ?? '') && /^\d{2}$/.test(values.day ?? ''), 'SEMANTIC_OPERATIONAL_DATE_INVALID')
+  return `${values.year}-${values.month}-${values.day}`
+}
+
 export function nextBriefId(briefs) {
   const max = briefs.reduce((current, brief) => Math.max(current, Number(/^K-(\d+)$/.exec(brief.id)?.[1] ?? 0)), 0)
   return `K-${String(max + 1).padStart(3, '0')}`
@@ -183,7 +197,7 @@ export async function applySemanticPackage({ root, job, result, now = new Date()
     topics.push(targetTopic)
   }
   if (!targetTopic.brief_ids.includes(brief.id)) targetTopic.brief_ids.push(brief.id)
-  const nowDate = now.slice(0, 10)
+  const nowDate = knowledgeOperationalDate(now)
   const stagedBrief = { ...brief, source_checked_at: brief.source_checked_at ?? nowDate, updated_at: nowDate }
   const stagedCandidate = { ...candidate }
   const stagedEvidence = { ...evidence }
