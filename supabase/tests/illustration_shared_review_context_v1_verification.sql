@@ -86,6 +86,10 @@ begin
   end if;
   v_token:=(v_lease->>'lease_token')::uuid;
 
+  update survival_ops.illustration_render_jobs
+  set status='READY_FOR_REVIEW'
+  where job_id='illustration-char-context-test-aaaaaaaaaaaa-20261001';
+
   begin
     perform public.archive_illustration_review_complete(jsonb_build_object(
       'job_id','illustration-char-context-test-aaaaaaaaaaaa-20261001',
@@ -145,6 +149,10 @@ begin
     600
   );
   v_legacy_token:=(v_lease->>'lease_token')::uuid;
+
+  update survival_ops.illustration_render_jobs
+  set status='READY_FOR_REVIEW'
+  where job_id='illustration-char-legacy-test-bbbbbbbbbbbb-20260930';
 
   v_result:=public.archive_illustration_review_complete(jsonb_build_object(
     'job_id','illustration-char-legacy-test-bbbbbbbbbbbb-20260930',
