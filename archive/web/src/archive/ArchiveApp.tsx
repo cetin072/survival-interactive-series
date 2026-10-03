@@ -48,16 +48,16 @@ export function ArchiveApp() {
 
   return <main className="archive-shell">
     <header className="archive-header">
-      <button className="archive-brand" onClick={() => open({ view: 'home', chronicleId: activeChronicle.id })}><p className="archive-kicker">SURVIVAL DIARY</p><h1>생존일기 <span>ARCHIVE</span></h1></button>
+      <button className="archive-brand" onClick={() => open({ view: 'wiki-preview', chronicleId: activeChronicle.id, page: 'home' })}><p className="archive-kicker">SURVIVAL DIARY</p><h1>생존일기 <span>ARCHIVE</span></h1></button>
       <nav className="archive-primary-nav" aria-label="주요 탐색">
-        <button className={route.view === 'home' || route.view === 'story' || route.view === 'chronicle' || route.view === 'book' ? 'active' : ''} onClick={() => open({ view: 'home', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[0]}</button>
+        <button className={route.view === 'home' || route.view === 'story' || route.view === 'chronicle' || route.view === 'book' ? 'active' : ''} onClick={() => open({ view: 'story', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[0]}</button>
         <a href="/knowledge/">{primaryNavigationLabels[1]}</a>
         <button className={route.view === 'tools' ? 'active' : ''} onClick={() => open({ view: 'tools', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[2]}</button>
         <button className={route.view === 'media' ? 'active' : ''} onClick={() => open({ view: 'media', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[3]}</button>
       </nav>
     </header>
     {(route.view === 'home' || route.view === 'story') && <StoryLibrary onOpenChronicle={(id) => openRoom(id)} onOpenBook={(id) => openBook(id)} onOpenExplorer={(id) => openRoom(id, 'explorer')} />}
-    {route.view === 'chronicle' && <ChronicleRoom key={route.chronicleId} chronicleId={route.chronicleId} section={roomSection} onSection={(section) => open({ ...route, section })} onRead={() => openBook(route.chronicleId)} onExplore={() => openRoom(route.chronicleId, 'graph')} onRaw={() => open({ view: 'raw', chronicleId: route.chronicleId })} onOpenHub={() => open({ view: 'home', chronicleId: activeChronicle.id })} />}
+    {route.view === 'chronicle' && <ChronicleRoom key={route.chronicleId} chronicleId={route.chronicleId} section={roomSection} onSection={(section) => open({ ...route, section })} onRead={() => openBook(route.chronicleId)} onExplore={() => openRoom(route.chronicleId, 'graph')} onRaw={() => open({ view: 'raw', chronicleId: route.chronicleId })} onOpenHub={() => open({ view: 'story', chronicleId: activeChronicle.id })} />}
     {roomHasGraph && <ExplorerView key={route.chronicleId + ':' + roomSection} initialFilter={chronicleFilterFor(roomSection)} onOpenStory={(chapterId) => openBook(route.chronicleId, chapterId)} />}
     {route.view === 'archive' && <ExplorerView key={route.nodeId ?? 'default'} initialNodeId={route.nodeId} onOpenStory={(chapterId) => openBook('C03-AFTERFALL', chapterId)} />}
     {route.view === 'book' && <StoryBookReader key={route.chronicleId} chronicleId={route.chronicleId} initialChapterId={route.chapterId} onChapterChange={(chapterId) => open({ ...route, chapterId })} onOpenNode={(nodeId) => open({ view: 'archive', chronicleId: activeChronicle.id, nodeId })} onBack={() => open({ view: 'chronicle', chronicleId: route.chronicleId, section: 'overview' })} />}
