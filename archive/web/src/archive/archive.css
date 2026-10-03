@@ -140,6 +140,9 @@ button { cursor: pointer; }
 .operator-visual-list summary span:first-child { display: grid; gap: 3px; min-width: 0; }
 .operator-visual-list summary strong { color: #2d2d33; font-size: 15px; }
 .operator-visual-list summary small, .operator-visual-list summary > span:last-child { color: #77777f; font-size: 11px; }
+.operator-visual-list summary > span.operator-visual-state { width: 20px; flex: 0 0 20px; text-align: center; font-size: 15px; font-weight: 700; line-height: 1; }
+.operator-visual-list summary > span.operator-visual-state.is-present { color: #4f6f5b; }
+.operator-visual-list summary > span.operator-visual-state.is-empty { color: #b2b2b8; }
 .operator-visual-body { padding: 0 14px 14px; border-top: 1px solid #e7e7ea; }
 .operator-visual-body > p { color: #4e4e56; line-height: 1.65; }
 .operator-visual-body dl { display: grid; gap: 0; }
