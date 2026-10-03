@@ -66,6 +66,11 @@ const wikiIndexFor = (type: ArchiveNodeType) => publicGraph.nodes
 export const wikiCharacterIndex = wikiIndexFor('character')
 export const wikiLocationIndex = wikiIndexFor('location')
 export const wikiEventIndex = wikiIndexFor('event')
+
+export const wikiCharacterNodeIds = wikiCharacterIndex.map((item) => item.id)
+export const wikiLocationNodeIds = wikiLocationIndex.map((item) => item.id)
+export const wikiEventNodeIds = wikiEventIndex.map((item) => item.id)
+
 export const wikiNodeIndex = [...wikiCharacterIndex, ...wikiLocationIndex, ...wikiEventIndex]
 export const wikiSupportedNodeIds = wikiNodeIndex.map((item) => item.id)
 
