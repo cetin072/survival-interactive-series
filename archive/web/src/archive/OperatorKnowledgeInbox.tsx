@@ -20,6 +20,9 @@ type KnowledgeItem = {
   note?: string | null
   final_pr_number?: number | null
   merge_sha?: string | null
+  review_item_id?: string | null
+  review_status?: string | null
+  review_decision_note?: string | null
 }
 
 type KnowledgeInbox = {
@@ -70,6 +73,7 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
   const [filter, setFilter] = useState<Filter>('ALL')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [reviewNote, setReviewNote] = useState('')
 
   const refresh = useCallback(async () => {
     if (!supabaseClient) return
@@ -85,9 +89,29 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
     setBusy(true); setError('')
     const { data, error: rpcError } = await supabaseClient.rpc('archive_operator_knowledge_job_detail', { p_job_id: jobId })
     if (rpcError) setError('글감 상세를 불러오지 못했습니다.')
-    else setSelected(data as KnowledgeDetail)
+    else {
+      const detail = data as KnowledgeDetail
+      setSelected(detail)
+      setReviewNote(detail.review_decision_note ?? '')
+    }
     setBusy(false)
   }, [])
+
+  const decideReview = useCallback(async (decision: 'APPROVED' | 'HOLD' | 'REJECTED') => {
+    if (!supabaseClient || !selected?.review_item_id) return
+    setBusy(true); setError('')
+    const { error: decisionError } = await supabaseClient.rpc('archive_operator_decide_review_item', {
+      p_item_id: selected.review_item_id,
+      p_decision: decision,
+      p_note: reviewNote.trim() || null,
+    })
+    if (decisionError) setError('검토 결정을 저장하지 못했습니다.')
+    else {
+      await refresh()
+      await loadDetail(selected.job_id)
+    }
+    setBusy(false)
+  }, [loadDetail, refresh, reviewNote, selected])
 
   useEffect(() => { void refresh() }, [refresh])
 
@@ -166,7 +190,18 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
             <div><dt>제출</dt><dd>{formatOperatorTime(selected.submitted_at)}</dd></div>
             <div><dt>PR</dt><dd>{selected.final_pr_number ? `#${selected.final_pr_number}` : '—'}</dd></div>
             <div><dt>차단 코드</dt><dd>{selected.code ?? selected.blocker_code ?? '없음'}</dd></div>
+            <div><dt>사람 검토</dt><dd>{selected.review_status ?? (selected.status === 'HUMAN_REVIEW' ? '검토 항목 준비 중' : '해당 없음')}</dd></div>
           </dl>
+          {selected.review_status === 'PENDING' && <div className="operator-decision">
+            <label>검토 메모<textarea maxLength={1000} value={reviewNote} onChange={(event) => setReviewNote(event.target.value)} /></label>
+            <div>
+              <button disabled={busy} onClick={() => void decideReview('APPROVED')}>공개 승격 승인</button>
+              <button className="operator-secondary" disabled={busy} onClick={() => void decideReview('HOLD')}>보류</button>
+              <button className="operator-danger" disabled={busy} onClick={() => void decideReview('REJECTED')}>거절</button>
+            </div>
+            <p className="operator-muted">승인은 즉시 공개하지 않습니다. 기존 C3 승인 소비자가 다시 검증한 뒤 exact-head 병합하고, Production은 기존 배치 게이트를 따릅니다.</p>
+          </div>}
+          {selected.review_status && selected.review_status !== 'PENDING' && <p className="operator-muted">검토 결과: {selected.review_status}{selected.review_decision_note ? ` · ${selected.review_decision_note}` : ''}</p>}
           <details><summary>Prepared context</summary><pre>{JSON.stringify(selected.context, null, 2)}</pre></details>
           <details><summary>Semantic result · Candidate / Evidence / BRIEF</summary><pre>{JSON.stringify(selected.result, null, 2)}</pre></details>
         </>}
