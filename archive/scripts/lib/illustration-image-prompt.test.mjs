@@ -37,7 +37,7 @@ test('Taehoon provider prompt is positive-first with no text/UI suppression', ()
     '40대 초반', '175cm 안팎', '작고 단단한 체형', '각진 얼굴', '햇볕에 거칠어진 피부',
     '짧게 친 검은 머리에 옆머리 새치', '낡은 남색 작업조끼', '거친 손',
     '실제 생활자처럼 편안하고 자연스러운 자세와 표정',
-    'AFTERFALL_ARCHIVE_V1', '회화적 반실사', 'painterly illustration',
+    '회화적 반실사', 'painterly illustration',
   ]) assert.ok(prompt.positive_prompt.includes(phrase), `Missing prompt fact: ${phrase}`)
 
   assert.equal(prompt.negative_prompt, '')
@@ -59,6 +59,15 @@ test('Baekun prompt describes the intended state instead of naming unwanted deca
     '넓은 생활시설의 외부와 공용공간 일부만 보이는 단순한 구성',
   ]) assert.ok(prompt.positive_prompt.includes(phrase), `Missing Baekun positive cue: ${phrase}`)
   assert.doesNotMatch(prompt.positive_prompt, /폐허|완전 붕괴|방어시설|no vegetation|no trees|no shrubs|no grass|no vines|no moss|no ivy|overgrowth/i)
+})
+
+test('renderer output never exposes project, worldline, season or apocalypse meta labels', () => {
+  const banned = /AFTERFALL|생존일기|시즌|\bseason\b|\bchronicle\b|post[-\s]?apocalyptic|apocalypse/i
+  for (const point of catalog.points.filter((item) => item.status === 'READY'
+    && ['CHARACTER', 'LOCATION', 'EVENT'].includes(item.brief?.point_type))) {
+    const renderer = compileIllustrationRendererText(point, bundleFor(point.subject_id))
+    assert.doesNotMatch(renderer, banned, point.subject_id)
+  }
 })
 
 test('provider negative prompt is empty so text and UI concepts are not activated during generation', () => {
@@ -201,6 +210,6 @@ test('every current renderable READY point compiles with positive cues and witho
     const bundle = buildIllustrationReviewContext(point, profile)
     const renderer = compileIllustrationRendererText(point, bundle)
     assert.doesNotMatch(renderer, banned, point.subject_id)
-    assert.ok(renderer.includes('AFTERFALL_ARCHIVE_V1'), point.subject_id)
+    assert.doesNotMatch(renderer, /AFTERFALL|생존일기|시즌|\bseason\b|\bchronicle\b|post[-\s]?apocalyptic|apocalypse/i, point.subject_id)
   }
 })
