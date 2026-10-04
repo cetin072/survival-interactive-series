@@ -1,0 +1,33 @@
+{
+  "worldline": "AFTERFALL",
+  "season": 4,
+  "status": "READY_FOR_NEW_ROOM_BOOT",
+  "previous_season": 3,
+  "previous_end_date": "2027-11-22",
+  "previous_end_scene": "S03_END",
+  "previous_end_save_version": 285,
+  "runtime_source_of_truth": {
+    "provider": "Supabase",
+    "schema": "survival_rpg",
+    "table": "saves",
+    "worldline_id": "AFTERFALL"
+  },
+  "required_load": [
+    "worldlines/AFTERFALL/BOOT.md",
+    "worldlines/AFTERFALL/PERSISTENT_CANON.md",
+    "worldlines/AFTERFALL/seasons/S03/END_CHECKPOINT_2027-11-22.md",
+    "worldlines/AFTERFALL/seasons/S04/START_HANDOFF.md",
+    "worldlines/AFTERFALL/CURRENT_STATE.json",
+    "Supabase AFTERFALL save 285"
+  ],
+  "do_not_boot_from": [
+    "raw_transcript",
+    "STRONGHOLD",
+    "older historical checkpoints not selected by CURRENT_STATE"
+  ],
+  "opening_hook": "NORTH_FUEL_YARD_PRE_WINTER_REGIONAL_FUEL_TRANSPORT_MEETING",
+  "opening_hook_status": "UNANSWERED",
+  "presentation": "MUD_TEXT_V1",
+  "future_plot_spoilers": false,
+  "new_transcript_session_required": true
+}
