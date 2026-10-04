@@ -164,14 +164,15 @@ async function buildPublication(row) {
       })
       insist(['FINALIZED', 'RECOVERED_AND_FINALIZED', 'NOOP_ALREADY_FINALIZED'].includes(result.status), 'A_WIKI_FINALIZER_NOT_APPLIED')
 
-      const changed = run('git', ['status', '--porcelain', '--untracked-files=all'], temp).split(/\r?\n/).filter(Boolean)
-      insist(changed.length > 0, 'A_WIKI_PUBLICATION_EMPTY')
+      const trackedChanged = run('git', ['diff', '--name-only'], temp).split(/\r?\n/).filter(Boolean)
+      const untrackedChanged = run('git', ['ls-files', '--others', '--exclude-standard'], temp).split(/\r?\n/).filter(Boolean)
+      const changedPaths = [...new Set([...trackedChanged, ...untrackedChanged])]
+      insist(changedPaths.length > 0, 'A_WIKI_PUBLICATION_EMPTY')
       const allowedPrefixes = [
         'archive/content/graphs/C03-AFTERFALL/GRAPH.json',
         'archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_',
         'archive/content/public-facts/C03-AFTERFALL/S03/receipts/AWIKI_',
       ]
-      const changedPaths = changed.map((line) => line.slice(3))
       const invalidPaths = changedPaths.filter((path) =>
         !allowedPrefixes.some((allowed) => path === allowed || path.startsWith(allowed)))
       insist(invalidPaths.length === 0,
