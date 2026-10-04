@@ -104,6 +104,33 @@ test('orders priorities 0, 10, 20, 25, 30 ascending with deterministic ties', ()
   assert.deepEqual(ties.candidates.map((item) => item.point_id), [point('a').point_id, point('b').point_id])
 })
 
+test('automatic selection defers locations and events while character candidates exist', () => {
+  const location = point('a', 0, { subject_id: 'loc-forest' })
+  const event = point('b', 10, { subject_id: 'event-market' })
+  const character = point('c', 30, { subject_id: 'char-hayoung' })
+  const plan = select({ points: [location, event, character], batchLimit: 3 })
+  assert.deepEqual(plan.candidates.map((item) => item.subject_id), ['char-hayoung'])
+  assert.equal(plan.counts.deferred_non_character_priority, 2)
+})
+
+test('automatic character selection prefers fresh subjects over retries', () => {
+  const retryCharacter = point('a', 0, { subject_id: 'char-retry' })
+  const freshCharacter = point('b', 30, { subject_id: 'char-fresh' })
+  const plan = select({
+    points: [retryCharacter, freshCharacter],
+    attempts: [receipt(retryCharacter, 'FAILED', '2026-09-27T12:00:00.000Z', 1)],
+    batchLimit: 1,
+  })
+  assert.deepEqual(plan.candidates.map((item) => item.subject_id), ['char-fresh'])
+})
+
+test('explicit subjectIds remain authoritative despite automatic character-first policy', () => {
+  const location = point('a', 0, { subject_id: 'loc-target' })
+  const character = point('b', 30, { subject_id: 'char-other' })
+  const plan = select({ points: [location, character], subjectIds: ['loc-target'], batchLimit: 1 })
+  assert.deepEqual(plan.candidates.map((item) => item.subject_id), ['loc-target'])
+})
+
 test('missing priority fails closed instead of falling back to priority zero', () => {
   const missing = point('a')
   delete missing.priority
