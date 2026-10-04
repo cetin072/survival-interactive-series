@@ -109,7 +109,7 @@ $$;
 
 revoke all on function survival_ops.revalidate_ex001_human_review(uuid,uuid,integer,text,integer,text,text,text)
   from public,anon,authenticated,service_role;
-grant execute on function survival_ops.revalidate_ex001_human_review(uuid,uuid,integer,text,integer,text,text)
+grant execute on function survival_ops.revalidate_ex001_human_review(uuid,uuid,integer,text,integer,text,text,text)
   to postgres;
 
 commit;
