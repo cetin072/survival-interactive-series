@@ -75,7 +75,7 @@ export function WikiHomePreview() {
           </section>
 
           <section className="wiki-home-section" aria-labelledby="wiki-knowledge-title">
-            <div className="wiki-section-heading"><h2 id="wiki-knowledge-title">최근 생존 지식</h2><a href="/knowledge/">전체 보기</a></div>
+            <div className="wiki-section-heading"><h2 id="wiki-knowledge-title">최근 생존 지식</h2><a href="/?view=knowledge-preview">전체 보기</a></div>
             <div className="wiki-knowledge-list">
               {publishedKnowledgeEntries.slice(0, 5).map((entry) => <a key={entry.id} href={entry.href}>
                 <strong>{entry.title}</strong>
