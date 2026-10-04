@@ -145,6 +145,16 @@ async function buildPublication(row) {
     try {
       run('git', ['worktree', 'add', '-b', branch, temp, 'origin/main'], root)
       worktree = true
+      // Unit/contract tests must run against the unmutated repository state.
+      // After apply, the Finalizer itself verifies exact persisted Graph bytes
+      // and Receipt-last semantics, while the scope gate below verifies the diff.
+      run('node', ['--test',
+        'archive/scripts/lib/publication-graph.test.mjs',
+        'archive/scripts/lib/wiki-semantic-jobs.test.mjs',
+        'archive/scripts/lib/wiki-fact-extractor.test.mjs',
+        'archive/scripts/lib/wiki-fact-finalizer.test.mjs',
+      ], temp)
+
       const result = await finalizeWikiFactProposal({
         root: temp,
         job: row.prepared_job,
@@ -153,12 +163,6 @@ async function buildPublication(row) {
         apply: true,
       })
       insist(['FINALIZED', 'RECOVERED_AND_FINALIZED', 'NOOP_ALREADY_FINALIZED'].includes(result.status), 'A_WIKI_FINALIZER_NOT_APPLIED')
-      run('node', ['--test',
-        'archive/scripts/lib/publication-graph.test.mjs',
-        'archive/scripts/lib/wiki-semantic-jobs.test.mjs',
-        'archive/scripts/lib/wiki-fact-extractor.test.mjs',
-        'archive/scripts/lib/wiki-fact-finalizer.test.mjs',
-      ], temp)
 
       const changed = run('git', ['status', '--porcelain'], temp).split(/\r?\n/).filter(Boolean)
       insist(changed.length > 0, 'A_WIKI_PUBLICATION_EMPTY')
