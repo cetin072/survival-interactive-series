@@ -1,0 +1,47 @@
+name: Apply Automation B review handoff
+
+on:
+  push:
+    branches:
+      - automation-b-review-handoff
+    paths:
+      - 'archive/automation/runtime/illustration-review-handoff.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: afterfall-illustration-review-handoff
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: github.repository == 'cetin072/survival-interactive-series'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout current main program
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Materialize exact review handoff from triggering commit
+        env:
+          HANDOFF_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin automation-b-review-handoff
+          git show "${HANDOFF_SHA}:archive/automation/runtime/illustration-review-handoff.json" \
+            > "${RUNNER_TEMP}/illustration-review-handoff.json"
+          test -s "${RUNNER_TEMP}/illustration-review-handoff.json"
+      - name: Apply review decision through program boundary
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: node archive/scripts/apply-illustration-review-handoff.mjs "${RUNNER_TEMP}/illustration-review-handoff.json"
