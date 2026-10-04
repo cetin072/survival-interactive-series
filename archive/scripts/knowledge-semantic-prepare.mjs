@@ -81,7 +81,7 @@ async function recordPrep(status, stage, fields = {}) {
   })
 }
 
-async function legacyWorkerBlocker() {
+export async function legacyWorkerBlocker() {
   const openPrs = ghJson(['pr', 'list', '--state', 'open', '--json', 'number,state,headRefName'])
   const names = execFileSync('git', ['ls-remote', '--heads', 'origin', 'knowledge/worker/*'], { cwd: root, encoding: 'utf8' })
     .split(/\r?\n/).filter(Boolean).map((line) => ({ sha: line.split(/\s+/)[0], name: line.split(/refs\/heads\//)[1] }))
@@ -93,7 +93,7 @@ async function legacyWorkerBlocker() {
   return detectLegacyWorkerBlocker({ openPrs, branchRows: names })
 }
 
-function policyPin(policyBytes, configBytes, editorialBytes, policy, config) {
+export function policyPin(policyBytes, configBytes, editorialBytes, policy, config) {
   const digest = hashPolicyBytes(policyBytes, configBytes, editorialBytes)
   return {
     version: 'knowledge-c3-policy-v1',
@@ -149,7 +149,7 @@ async function freshChoice(source) {
   }
 }
 
-async function createJob({ choice, policy, policyPin, mainSha, data, initialStatus = 'PREPARED', blockerCode = null }) {
+export async function createJob({ choice, policy, policyPin, mainSha, data, initialStatus = 'PREPARED', blockerCode = null }) {
   const briefId = nextBriefId(data.briefs)
   const candidateId = choice.existingCandidate?.id ?? reservedCandidateId(choice.workKey)
   const target = { brief_id: briefId, candidate_id: candidateId }

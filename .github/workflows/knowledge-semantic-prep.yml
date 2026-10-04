@@ -11,6 +11,10 @@ on:
         description: Scheduler origin
         required: false
         default: manual
+      experience_seed_ref:
+        description: Explicit EX-001 Seed path for the one-off pilot; leave blank for normal C-PREP
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -56,8 +60,25 @@ jobs:
           npm run knowledge:check
 
       - name: Prepare one durable semantic job
+        if: inputs.experience_seed_ref == ''
         env:
           GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
           ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
           ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
         run: node archive/scripts/knowledge-semantic-prepare.mjs
+
+      - name: Prepare EX-001 experience job
+        if: inputs.experience_seed_ref != ''
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          EXPERIENCE_SEED_REF: ${{ inputs.experience_seed_ref }}
+        run: node archive/scripts/knowledge-semantic-prepare-experience.mjs "$EXPERIENCE_SEED_REF"
+
+      - name: Submit EX-001 for existing C3 finalizer
+        if: inputs.experience_seed_ref != ''
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: node archive/scripts/knowledge-semantic-submit-experience.mjs

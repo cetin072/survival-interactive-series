@@ -5,6 +5,7 @@ import {
   emptyKnowledgeInbox,
   knowledgeBucketFor,
   knowledgeBucketLabel,
+  knowledgeSourceLabel,
   type KnowledgeFilter,
   type KnowledgeInbox,
 } from './knowledgeOperatorModel'
@@ -83,7 +84,7 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
               {item.risk_level && <b>{item.risk_level}</b>}
             </span>
             <strong>{item.title ?? item.brief_id ?? item.candidate_id ?? item.source_ref?.split('/').at(-1) ?? item.job_id}</strong>
-            <small>{item.job_type ?? '—'} · {item.source_kind ?? '—'} · {formatOperatorTime(item.prepared_at)}</small>
+            <small>{item.job_type ?? '—'} · {knowledgeSourceLabel(item.source_kind)} · {formatOperatorTime(item.prepared_at)}</small>
             {item.note && <p>{item.note}</p>}
             <em>상세 열기 →</em>
           </a>

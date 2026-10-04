@@ -61,6 +61,9 @@ export const knowledgeBucketFor = (item: KnowledgeItem): Exclude<KnowledgeFilter
   return 'WORKING'
 }
 
+export const knowledgeSourceLabel = (kind?: string | null): string =>
+  kind === 'USER_REPORTED_EXPERIENCE' ? '개인 경험' : kind ?? '—'
+
 export const knowledgeBucketLabel: Record<Exclude<KnowledgeFilter, 'ALL'>, string> = {
   WORKING: '작업 중',
   REVIEW: '사람 검토',

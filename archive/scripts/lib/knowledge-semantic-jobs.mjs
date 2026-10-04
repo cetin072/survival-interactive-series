@@ -34,8 +34,9 @@ export function nextBriefId(briefs) {
 }
 
 export function makeWorkKey({ sourceKind, sourceRef, sourceSha256 }) {
-  fail(['PUBLIC_ARCHIVE', 'PUBLIC_READER'].includes(sourceKind), 'SEMANTIC_SOURCE_KIND_INVALID')
+  fail(['PUBLIC_ARCHIVE', 'PUBLIC_READER', 'USER_REPORTED_EXPERIENCE'].includes(sourceKind), 'SEMANTIC_SOURCE_KIND_INVALID')
   fail(typeof sourceRef === 'string' && sourceRef.length > 0, 'SEMANTIC_SOURCE_REF_REQUIRED')
+  if (sourceKind === 'USER_REPORTED_EXPERIENCE') fail(sourceRef === 'knowledge/content/experience-seeds/EX-001-apartment-power-outage.json', 'SEMANTIC_EXPERIENCE_REF_INVALID')
   fail(/^[a-f0-9]{64}$/.test(sourceSha256 ?? ''), 'SEMANTIC_SOURCE_SHA_INVALID')
   return `${sourceKind}:${sourceRef}:${sourceSha256}`
 }
@@ -160,6 +161,11 @@ export function validateSemanticResult(job, result) {
   fail(candidate.source_kind === job.source_kind && candidate.source_kind === source.kind, 'SEMANTIC_SOURCE_KIND_BINDING_MISMATCH')
   if (source.kind === 'PUBLIC_ARCHIVE') {
     fail(candidate.source_manifest_ref === job.source_ref && candidate.source_manifest_sha256 === job.source_sha256, 'SEMANTIC_ARCHIVE_SOURCE_BINDING_MISMATCH')
+  } else if (source.kind === 'USER_REPORTED_EXPERIENCE') {
+    fail(job.source_ref === 'knowledge/content/experience-seeds/EX-001-apartment-power-outage.json', 'SEMANTIC_EXPERIENCE_REF_INVALID')
+    fail(candidate.source_ref === job.source_ref && candidate.source_sha256 === job.source_sha256,
+      'SEMANTIC_EXPERIENCE_SOURCE_BINDING_MISMATCH')
+    fail(result.decision === 'HUMAN_REVIEW', 'SEMANTIC_EXPERIENCE_REVIEW_REQUIRED')
   } else {
     fail(candidate.reader_book_ref === READER_BOOK_REF
       && candidate.reader_book_sha256 === source.reader_book_sha256
@@ -182,6 +188,8 @@ export async function applySemanticPackage({ root, job, result, now = new Date()
   if (priorCandidate) {
     fail(priorCandidate.status === 'DISCOVERED' && !priorCandidate.brief_id
       && priorCandidate.source_kind === candidate.source_kind
+      && priorCandidate.source_ref === candidate.source_ref
+      && priorCandidate.source_sha256 === candidate.source_sha256
       && priorCandidate.reader_chapter_id === candidate.reader_chapter_id
       && priorCandidate.source_manifest_ref === candidate.source_manifest_ref
       && priorCandidate.source_manifest_sha256 === candidate.source_manifest_sha256,
@@ -220,7 +228,7 @@ export async function applySemanticPackage({ root, job, result, now = new Date()
       ...(result.decision === 'HUMAN_REVIEW' ? { dispositionCode: result.code, dispositionNote: result.note } : {}),
     })
     await writeFile(statePath, `${JSON.stringify(state, null, 2)}\n`)
-  } else {
+  } else if (job.source_kind === 'PUBLIC_READER') {
     const runtimePath = join(root, 'knowledge/automation/runtime-state.json')
     const runtime = JSON.parse(await readFile(runtimePath, 'utf8'))
     validateRuntimeState(runtime)
@@ -237,7 +245,7 @@ export async function applySemanticPackage({ root, job, result, now = new Date()
   return { brief_id: brief.id, candidate_id: candidate.id, changed_files: [
     `knowledge/content/topics.json`, `knowledge/content/candidates/${candidate.id}.json`,
     `knowledge/content/evidence/${brief.id}.json`, `knowledge/content/briefs/${brief.id}.json`,
-    job.source_kind === 'PUBLIC_ARCHIVE' ? 'knowledge/automation/state.json' : 'knowledge/automation/runtime-state.json',
+    ...(job.source_kind === 'PUBLIC_ARCHIVE' ? ['knowledge/automation/state.json'] : job.source_kind === 'PUBLIC_READER' ? ['knowledge/automation/runtime-state.json'] : []),
   ] }
 }
 
