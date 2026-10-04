@@ -132,17 +132,32 @@ test('real SESSION_006 and SESSION_007 samples compile with unchanged protected 
   const after = await Promise.all(protectedRefs.map(async (ref) => byteHash(await readFile(resolve(root, ref)))))
   assert.deepEqual(after, before)
 })
-test('real CLI prepares current source and validates result without an apply path', async () => {
+test('real CLI prepares the current pending source and validates a state-agnostic result', async () => {
   const source = await discoverWikiSource(root)
-  assert.equal(source.sourceSession.session_id, 'SESSION_006')
   const job = JSON.parse(await runWikiFactCli(['--prepare']))
-  const samples = JSON.parse(await readFile(new URL('./fixtures/wiki-fact-results-v1.json', import.meta.url)))
+  assert.equal(job.source.session_id, source.sourceSession.session_id)
   const dir = await mkdtemp(join(tmpdir(), 'wiki-native-'))
   try {
     const path = join(dir, 'result.json')
-    await writeFile(path, JSON.stringify({ version: WIKI_RESULT_VERSION, job_id: job.job_id, ...samples.SESSION_006 }))
+    const result = {
+      version: WIKI_RESULT_VERSION,
+      job_id: job.job_id,
+      decision: 'NO_FACTS',
+      coverage: {
+        status: 'COMPLETE',
+        reviewed_blocks: job.source.gm_blocks.map((block) => block.block_id),
+      },
+      nodes: [],
+      relations: [],
+      citations: [],
+      deferred: [],
+      note: 'STATE_AGNOSTIC_CLI_TEST_ONLY',
+    }
+    await writeFile(path, JSON.stringify(result))
     const proposal = JSON.parse(await runWikiFactCli(['--result', path, '--check']))
-    assert.equal(proposal.facts.nodes.length, 7); assert.equal(proposal.graph_changed, false)
+    assert.equal(proposal.status, 'NO_FACTS')
+    assert.equal(proposal.coverage.status, 'COMPLETE')
+    assert.equal(proposal.graph_changed, false)
     await assert.rejects(runWikiFactCli(['--result', path, '--apply']), /WIKI_FACT_CLI_ARGUMENTS_INVALID/)
   } finally { await rm(dir, { recursive: true, force: true }) }
 })
