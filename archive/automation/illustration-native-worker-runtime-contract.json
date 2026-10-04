@@ -1,5 +1,5 @@
 {
-  "version": "illustration-native-worker-runtime-contract-v1",
+  "version": "illustration-native-worker-runtime-contract-v1.1",
   "purpose": "One scheduled ChatGPT worker. Program selects work; AI generates or reviews based only on durable job state. Transfer occurs only after PASS.",
   "roles": {
     "PREPARED": {
@@ -15,12 +15,16 @@
         "PASS": "REVIEW_PASS_STAGED",
         "REJECT": "REVIEW_REJECTED",
         "HUMAN_REVIEW": "HUMAN_REVIEW"
-      }
+      },
+      "one_role_per_run": true,
+      "stop_after_status_transition": true
     },
     "REVIEW_PASS_STAGED": {
       "role": "PASS_SITE_ASSET_TRANSFER",
       "re_review": false,
-      "next_status": "FINALIZE_QUEUED"
+      "next_status": "FINALIZE_QUEUED",
+      "one_role_per_run": true,
+      "stop_after_status_transition": true
     }
   },
   "source": {
@@ -57,7 +61,8 @@
     "finalizer": "Existing GitHub Program Finalizer"
   },
   "selection_policy": {
-    "automatic": "fresh CHARACTER before retried CHARACTER; defer LOCATION/EVENT while eligible CHARACTER candidates exist",
-    "manual_subject_override": true
+    "automatic": "eligible CHARACTER only; never-attempted CHARACTER before retried CHARACTER; LOCATION/EVENT deferred while eligible CHARACTER exists",
+    "manual_subject_override": true,
+    "durable_attempt_history_rpc": "archive_illustration_render_attempt_history"
   }
 }

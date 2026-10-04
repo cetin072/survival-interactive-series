@@ -70,8 +70,8 @@ const receipt = (p, status, occurred_at = '2026-09-28T01:00:00.000Z', attempt_no
   ...overrides,
 })
 const emptyReceipts = () => ({ version: 'illustration-receipts-v2', attempts: [] })
-const select = ({ points, assets = [], attempts = [], batchLimit = 3, now = new Date('2026-09-28T05:00:00.000Z'), subjectIds = null }) => selectIllustrationCandidates({
-  catalog: { points }, siteAssets: { assets }, receipts: { ...emptyReceipts(), attempts }, now, batchLimit, subjectIds,
+const select = ({ points, assets = [], attempts = [], observedAttempts = [], batchLimit = 3, now = new Date('2026-09-28T05:00:00.000Z'), subjectIds = null }) => selectIllustrationCandidates({
+  catalog: { points }, siteAssets: { assets }, receipts: { ...emptyReceipts(), attempts }, observedAttempts, now, batchLimit, subjectIds,
 })
 
 test('selects only unpublished READY points with valid identities', () => {
@@ -131,6 +131,43 @@ test('automatic character selection prefers fresh subjects over retries', () => 
     batchLimit: 1,
   })
   assert.deepEqual(plan.candidates.map((item) => item.subject_id), ['char-fresh'])
+})
+
+
+test('durable DB rejection makes that character a retry so a fresh character is selected first', () => {
+  const rejectedCharacter = withSubject(point('a', 0), 'char-rejected')
+  const freshCharacter = withSubject(point('b', 30), 'char-fresh-db')
+  const plan = select({
+    points: [rejectedCharacter, freshCharacter],
+    observedAttempts: [{
+      point_id: rejectedCharacter.point_id,
+      generation_key: rejectedCharacter.generation_key,
+      subject_id: rejectedCharacter.subject_id,
+      attempt_no: 1,
+      status: 'REVIEW_REJECTED',
+      review_decision: 'REJECT',
+    }],
+    batchLimit: 1,
+  })
+  assert.deepEqual(plan.candidates.map((item) => item.subject_id), ['char-fresh-db'])
+})
+
+test('durable DB success excludes an already completed visual even when receipts lag behind', () => {
+  const completed = withSubject(point('a', 0), 'char-completed')
+  const candidate = withSubject(point('b', 30), 'char-next')
+  const plan = select({
+    points: [completed, candidate],
+    observedAttempts: [{
+      point_id: completed.point_id,
+      generation_key: completed.generation_key,
+      subject_id: completed.subject_id,
+      attempt_no: 1,
+      status: 'SUCCEEDED',
+      review_decision: 'PASS',
+    }],
+  })
+  assert.deepEqual(plan.candidates.map((item) => item.subject_id), ['char-next'])
+  assert.equal(plan.counts.skipped_previous_success, 1)
 })
 
 test('explicit subjectIds remain authoritative despite automatic character-first policy', () => {
