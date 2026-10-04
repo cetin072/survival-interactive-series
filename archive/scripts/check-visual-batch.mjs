@@ -1,7 +1,7 @@
 /** Real public inputs and a local-only synthetic S99 transaction. Never calls an image model. */
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises'
+import { mkdtemp, mkdir, writeFile, readFile, readdir, rm } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { prepareVisualPublication, APPROVED_S02_APPEARANCE_REF } from './run-visual-publication.mjs'
@@ -18,9 +18,16 @@ const graph = JSON.parse(await readFile(resolve(root, 'archive/content/graphs/C0
 assert.ok(Number.isSafeInteger(graph.anchor?.save_version) && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(graph.anchor?.game_time))
 const factsRefS03 = 'archive/content/public-facts/C03-AFTERFALL/S03/FACTS.json'
 const facts = JSON.parse(await readFile(resolve(root, factsRefS03)))
-const aWikiFactsRef = 'archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_005_1d7513ee6981ace5be8ef3d8164c6816d10f3d291037c6f1d4d4f169e52c5550.json'
-const aWikiFacts = JSON.parse(execFileSync('git', ['show', `${head}:${aWikiFactsRef}`], { cwd: root }))
-const aWikiEventCount = aWikiFacts.nodes.filter((node) => node.type === 'event').length
+const aWikiFactsRoot = resolve(root, 'archive/content/public-facts/C03-AFTERFALL/S03')
+const baselineEventIds = new Set(facts.nodes.filter((node) => node.type === 'event').map((node) => node.id))
+const aWikiEventIds = new Set()
+for (const name of (await readdir(aWikiFactsRoot)).filter((name) => /^AWIKI_SESSION_\d{3}_[a-f0-9]{64}\.json$/.test(name))) {
+  const batch = JSON.parse(await readFile(resolve(aWikiFactsRoot, name), 'utf8'))
+  for (const node of batch.nodes ?? []) {
+    if (node.type === 'event' && !baselineEventIds.has(node.id)) aWikiEventIds.add(node.id)
+  }
+}
+const aWikiEventCount = aWikiEventIds.size
 const source = manifest.sessions.find((session) => session.captured_message_range?.end === facts.anchor?.game_time)
 assert.ok(source?.session_id && source?.source_manifest)
 const newerVisual = graph.anchor.save_version > facts.anchor.save_version
