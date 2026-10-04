@@ -6,6 +6,7 @@ import { OperatorKnowledgeDetail } from './OperatorKnowledgeDetail'
 import { OperatorIllustrationVault } from './OperatorIllustrationVault'
 import { supabaseClient } from './supabaseClient'
 import { operatorPasswordRedirectUrl, validatePasswordChange } from './operatorPassword'
+import './operator.css'
 import {
   OperatorDashboard,
   emptyInbox,
