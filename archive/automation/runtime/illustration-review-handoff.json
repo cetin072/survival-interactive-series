@@ -1,19 +1,21 @@
 {
   "version": "illustration-review-handoff-v1",
-  "job_id": "illustration-char-doyoon-377d18532ae4-20261004-37205326583",
-  "main_sha": "91f52a2a653045b0b7ca5deee9e75e1309636942",
-  "point_id": "point-142aa7bc9462b8273a4d27aabb4d01b298fea771661b4fcedb257e888b87d19b",
-  "generation_key": "generation-377d18532ae4da7a862984d6cc88340b86fa67e84a894960c17943e4aff5c0c2",
-  "subject_id": "char-doyoon",
-  "prompt_sha256": "60cf641871c0afd590efb4375a8a155cff22e823cc9b1ca59157ef48e3650019",
-  "review_context_sha256": "03a8f7f910eb11934812c99b3ff6e664a30b0746f32809703c6ccbc7978ac7de",
+  "job_id": "illustration-loc-clinic-ab0a6e24c3e1-20261004-37208572429",
+  "main_sha": "a8166153d37186ed0b0e323481a7b7e8a082a30d",
+  "point_id": "point-c0e0668052879a806b3453892c610d913ca9cf7ea2ab9a60eb904f86d7933185",
+  "generation_key": "generation-ab0a6e24c3e1b35ff2b66440f5853ebe317a52a08c6ac1cc111ad0152a8b8d2f",
+  "subject_id": "loc-clinic",
+  "prompt_sha256": "52b573af98332754d222628e8e49d011adf1ff825035be5c98549a4ea8ef74f2",
+  "review_context_sha256": "d9bf0a9b13c5ab7245368731b70f54081d51450b4c1f2443c82d44cb1746004d",
   "source_library_path": "/IMAGE-RENDER/output/current.png",
-  "source_library_file_id": "file_0000000066fc823093670e1a224f3ed4",
+  "source_library_file_id": "file_0000000017ac8210b8b974a73fcf7d14",
   "decision": "REJECT",
   "review_provider": "native_chatgpt_vision",
-  "review_summary": "Generated portrait does not match the bound Kim Do-yoon character appearance: apparent age, short sports haircut, broad sturdy build, and neutral contemporary Korean setting are materially mismatched.",
+  "review_summary": "Bright pristine photorealistic clinic with extensive embedded signage conflicts with the bound painterly quiet-decay brief and invents identifying clinic details.",
   "rejection_codes": [
-    "CHARACTER_APPEARANCE_MISMATCH"
+    "EMBEDDED_TYPOGRAPHY",
+    "STYLE_MISMATCH",
+    "INVENTED_IDENTIFYING_FEATURES"
   ],
-  "created_at": "2026-10-04T14:12:53.373Z"
+  "created_at": "2026-10-04T14:20:28.000Z"
 }
