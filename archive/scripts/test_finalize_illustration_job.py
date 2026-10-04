@@ -28,6 +28,7 @@ class FinalizerIdentityTests(unittest.TestCase):
             "provider_asset_id": "file_00000000example",
             "prompt_sha256": "e" * 64,
             "review_provider": "native_chatgpt_vision",
+            "review_decision": "PASS",
             "review_summary": "matches visual brief",
         }
 
@@ -58,6 +59,22 @@ class FinalizerIdentityTests(unittest.TestCase):
         job["provider_asset_id"] = None
         with self.assertRaisesRegex(ValueError, "FINALIZER_IDENTITY_JOB_INCOMPLETE"):
             MODULE.identity_payload(job)
+
+    def test_finalizer_rejects_non_pass_review_decision_before_side_effects(self):
+        job = self.fixture()
+        job.update({
+            "status": "FINALIZE_QUEUED",
+            "review_decision": "REJECT",
+            "review_staging_id": "illustration-review-staging-0001",
+        })
+        with mock.patch.object(MODULE, "checkout_main"), \
+             mock.patch.object(MODULE, "rpc", return_value=job) as rpc:
+            with self.assertRaisesRegex(ValueError, "FINALIZER_REVIEW_DECISION_NOT_PASS"):
+                MODULE.finalize(job["job_id"])
+        rpc.assert_called_once_with(
+            "archive_illustration_render_job_readback",
+            {"p_job_id": job["job_id"]},
+        )
 
     def test_reviewer_runtime_contract_binds_each_mutation_and_decision_lifecycle(self):
         contract_path = ROOT / "archive/automation/illustration-reviewer-runtime-contract.json"

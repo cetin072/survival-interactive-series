@@ -408,6 +408,8 @@ def finalize(job_id):
         return {"status": "NOOP_ALREADY_SUCCEEDED", "job_id": job_id}
     if job.get("status") not in ("FINALIZE_QUEUED", "FINALIZING"):
         fail("FINALIZER_JOB_NOT_QUEUED")
+    if job.get("review_decision") != "PASS":
+        fail("FINALIZER_REVIEW_DECISION_NOT_PASS")
     for key in ("review_staging_id", "output_sha256", "provider_asset_id"):
         if not job.get(key):
             fail("FINALIZER_JOB_BINDING_INCOMPLETE")
