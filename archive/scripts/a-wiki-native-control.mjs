@@ -172,8 +172,10 @@ async function buildPublication(row) {
         'archive/content/public-facts/C03-AFTERFALL/S03/receipts/AWIKI_',
       ]
       const changedPaths = changed.map((line) => line.slice(3))
-      insist(changedPaths.every((path) => allowedPrefixes.some((allowed) => path === allowed || path.startsWith(allowed))),
-        'A_WIKI_PUBLICATION_SCOPE_INVALID')
+      const invalidPaths = changedPaths.filter((path) =>
+        !allowedPrefixes.some((allowed) => path === allowed || path.startsWith(allowed)))
+      insist(invalidPaths.length === 0,
+        `A_WIKI_PUBLICATION_SCOPE_INVALID|${invalidPaths[0]?.slice(0, 80) ?? 'UNKNOWN'}`)
       run('git', ['add', 'archive/content/graphs/C03-AFTERFALL/GRAPH.json',
         'archive/content/public-facts/C03-AFTERFALL/S03'], temp)
       run('git', ['config', 'user.name', 'a-wiki-native-finalizer'], temp)
