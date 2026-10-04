@@ -97,11 +97,32 @@
       "overview": "핵심 4인의 물류·기록·접근권·관계 경계 담당. 위치 비밀 유지와 재고·규칙의 구분을 중요하게 다룬다.",
       "relations": [
         {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "표준품 후보 관찰표 작성·기록",
+          "other_id": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+          "relation_id": "rel-24355c6112acde8deb454abeb3bf1a45b7c58edf8391522eddc5b9bb92cbaf6c"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "권리 확인과 협상 준비에 참여",
+          "other_id": "event-wiki-bf4768814dd7f1559d9f7496",
+          "relation_id": "rel-379921507d951549980d75a5036d96ce51a37ba682e79a003f7dc807ab14e1eb"
+        },
+        {
           "direction": "incoming",
           "kind": "published_relation",
           "label": "핵심 동료",
           "other_id": "char-jinwoo",
           "relation_id": "rel-b21904bde57949a1f2d27cb43fe43efabc3a143b1cccdcfaf017d4f35afe802a"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "수리내역 기록과 내부 매입상한 관리",
+          "other_id": "event-wiki-a93db7854c7049a3b7c936b2",
+          "relation_id": "rel-cb45632abd508d72c4fbcbf855c6db4e205cd02c47b372091b88965680ee9440"
         },
         {
           "direction": "incoming",
@@ -385,6 +406,13 @@
       "relations": [
         {
           "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "보증거래 폐기·직매입 재판매 방향 결정",
+          "other_id": "event-wiki-111fe570a078504a9c47714f",
+          "relation_id": "rel-05d1eb1eace7023308e2f773415c17ed4a5c593eef0d1e1a97cd8ab272f7132f"
+        },
+        {
+          "direction": "outgoing",
           "kind": "published_relation",
           "label": "의료 협력",
           "other_id": "char-hyerin",
@@ -396,6 +424,13 @@
           "label": "창고 사용 조건 합의",
           "other_id": "event-guild-warehouse-option",
           "relation_id": "rel-268d0314e2b8d8cb4e98eff44573b47f6aca60fc7ef3aa4204aefa89a7131274"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "사용권 협상·합의에 참여",
+          "other_id": "event-wiki-bf4768814dd7f1559d9f7496",
+          "relation_id": "rel-2f8ad14936dd46d8f08325022edd1c80295ca07e8b1b797966c86635b340b871"
         },
         {
           "direction": "incoming",
@@ -410,6 +445,13 @@
           "label": "핵심 동료",
           "other_id": "char-taehoon",
           "relation_id": "rel-661cb1a147e956644e3479208e2b8cba00256abac0fb114a83b37f4752ce5cb9"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "매입상한을 넘는 거래 거부",
+          "other_id": "event-wiki-a93db7854c7049a3b7c936b2",
+          "relation_id": "rel-7250782c7b60e910cfef3e1f8fd72fdba2620b6328f36ba08a46a5a026090850"
         },
         {
           "direction": "outgoing",
@@ -466,6 +508,13 @@
           "label": "핵심 동료",
           "other_id": "char-seojin",
           "relation_id": "rel-b808579e2bd7719dc687412bc80373f7063244c09d0bd20d33c1c5d990ebcec5"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "길드 배상 거부 및 책임경계 집행",
+          "other_id": "event-wiki-37bff157632c4ca2e1e99420",
+          "relation_id": "rel-c01a49b5bea44ec8503f095d95594fdd8427e9031c17e3afc8d9838de86d260c"
         },
         {
           "direction": "outgoing",
@@ -672,6 +721,13 @@
           "label": "전기·시설",
           "other_id": "event-shelter",
           "relation_id": "rel-b101246c94ba7317552545a26ff1456ba5a00d6662a5d1bfd340b024a1b23fb6"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "분해·수리 작업",
+          "other_id": "event-wiki-a93db7854c7049a3b7c936b2",
+          "relation_id": "rel-d9600315a2f6f453fd4b44beee790607435e0f3ff0b514555570ac8f689c0870"
         }
       ],
       "story_link_ids": [
@@ -1022,6 +1078,13 @@
           "label": "참여",
           "other_id": "event-fireline",
           "relation_id": "rel-c451c5546915b078ebc2d8ddb4d676a08558b9408798ff445684e2895e5c2ca2"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "작동 시험",
+          "other_id": "event-wiki-a93db7854c7049a3b7c936b2",
+          "relation_id": "rel-fe9897192360e1885492989f3a784a96a5c9db25bed303bbf982d6c930e43bc4"
         }
       ],
       "story_link_ids": [
@@ -1050,6 +1113,209 @@
         "시설",
         "난방",
         "급수"
+      ],
+      "type": "character"
+    },
+    {
+      "facts": {},
+      "id": "char-wiki-14b41bbae77f8558c571d384",
+      "label": "한재욱",
+      "overview": "말린 곡물을 판 이동상인으로 길드 밖 직접거래 분쟁의 당사자였다. 길드는 그에게 길드 이름을 거래 신용처럼 끌어다 쓰지 말라고 선을 그었다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "직접거래 판매자",
+          "other_id": "event-wiki-37bff157632c4ca2e1e99420",
+          "relation_id": "rel-d7ac0c01ce2a598fdc4a63635a003259b2327237cd2babcf4a4162fe2ac42c2e"
+        }
+      ],
+      "story_link_ids": [
+        "mention-5142a748a4c3ef3a98390aac6ee19293a2ca158f034f8a6798461b7e611a9f5e"
+      ],
+      "subtitle": "이동상인",
+      "tags": [
+        "S03",
+        "인물",
+        "상인"
+      ],
+      "type": "character"
+    },
+    {
+      "facts": {},
+      "id": "char-wiki-322a5a52d57198d4a6f25429",
+      "label": "임관수",
+      "overview": "남쪽 차량야드를 오래 관리해온 현장 관리자다. 누나 임지연과 권리구조가 연결되어 있어 혼자 장기계약을 확정하는 구조는 아니었다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "차량야드 권리자 측 합의 당사자",
+          "other_id": "event-wiki-bf4768814dd7f1559d9f7496",
+          "relation_id": "rel-5f80a15d7073ac713bf260b37db7197ddfaf077e5596c8a9d55f53018f8dd14e"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "related_to",
+          "label": "남매",
+          "other_id": "char-wiki-97e31f6fd22a6841eb7def52",
+          "relation_id": "rel-927639b0b5b5741ece673ff9a6e88183be3034d22c555443630eb95683174b91"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "works_at",
+          "label": "현장 관리",
+          "other_id": "loc-wiki-b1be03144484391b40b8ecc4",
+          "relation_id": "rel-d54a4521487899d2b7611e6f71a7833d2ce75af0a06834bff7f844e1d06e5214"
+        }
+      ],
+      "story_link_ids": [
+        "mention-011cd9732fe0783a3565e315ece5bc12471cefbf87d4d42524d9b3ca48181ed9",
+        "mention-5ae082c7495537b34ff3afcf52e73e7982737ae3558e34c1fd2544289acdf038"
+      ],
+      "subtitle": "남쪽 차량야드 현장 관리자",
+      "tags": [
+        "S03",
+        "인물",
+        "남쪽 차량야드"
+      ],
+      "type": "character"
+    },
+    {
+      "facts": {},
+      "id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+      "label": "오세린",
+      "overview": "길드 접수와 관리동 논의에 참여하며 거래 책임범위를 안내하고 등록상인·에스크로·보증거래의 차이를 정리하는 실무 접점이다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "제도 차이를 질문하고 정리 논의에 참여",
+          "other_id": "event-wiki-6fa152109f3897e4ad04b372",
+          "relation_id": "rel-371f50d7000d779aabe499e795a56a7fef4605e3817e8c27dbf0c0b139f53486"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "접수대에서 책임범위 안내",
+          "other_id": "event-wiki-d9895688b2873d713ac106cd",
+          "relation_id": "rel-e3198123614c280f420e8437ab8e9f9126b5bf57fac98136dc09177ceb455863"
+        }
+      ],
+      "story_link_ids": [
+        "mention-b026005591f0dba5d281c7e41d8f75d2b8ec4f29f7ea291b41b44c331283e6a8",
+        "mention-beb4e8509801741b345602e5fe17464f1c323d0a49283d96261f2cf7574300a4"
+      ],
+      "subtitle": "길드 접수·관리 실무자",
+      "tags": [
+        "S03",
+        "인물",
+        "길드"
+      ],
+      "type": "character"
+    },
+    {
+      "facts": {},
+      "id": "char-wiki-8499006fbd51eb7a8c88ab1f",
+      "label": "이원혁",
+      "overview": "인버터와 소형 펌프를 취급한 외부 상인이다. 길드의 표준펌프 사업을 예상해 펌프를 선매입했지만 길드가 매입상한을 따라 올리지 않아, 지정 규격과 수리조건을 통과한 일부만 기존 제시가로 매각했다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "펌프 선매입 후 일부를 길드에 매각",
+          "other_id": "event-wiki-a93db7854c7049a3b7c936b2",
+          "relation_id": "rel-71856021974e34eab5e2335f863bdbfcaed336e276b45aaba0fa24126834a0e6"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "전력장비 관찰 사례를 제공한 외부 상인",
+          "other_id": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+          "relation_id": "rel-ae11d88c34713a93191f5667701b4ecc60b0a7be03ed285611ac9e3e44268837"
+        }
+      ],
+      "story_link_ids": [
+        "mention-d38d97a97896ecb69c2057836a2a95ce330365c5766e21034809dc661bbbefc1"
+      ],
+      "subtitle": "외부 장비 상인",
+      "tags": [
+        "S03",
+        "인물",
+        "상인",
+        "장비"
+      ],
+      "type": "character"
+    },
+    {
+      "facts": {},
+      "id": "char-wiki-97e31f6fd22a6841eb7def52",
+      "label": "임지연",
+      "overview": "임관수의 누나이자 남쪽 차량야드의 공동권리자다. 길드의 12개월 차량 통행·회차 사용권 합의 당사자로 참여했다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "차량야드 공동권리자 측 합의 당사자",
+          "other_id": "event-wiki-bf4768814dd7f1559d9f7496",
+          "relation_id": "rel-10d5e63ebd10729b7a0e23bb0f473cc3d269793d3cceaf80294f90824bf4fc97"
+        },
+        {
+          "direction": "incoming",
+          "kind": "related_to",
+          "label": "남매",
+          "other_id": "char-wiki-322a5a52d57198d4a6f25429",
+          "relation_id": "rel-927639b0b5b5741ece673ff9a6e88183be3034d22c555443630eb95683174b91"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "related_to",
+          "label": "공동권리자",
+          "other_id": "loc-wiki-b1be03144484391b40b8ecc4",
+          "relation_id": "rel-9b68e9bb1adcc22ff4f485e96d0b8b80ed55321f9fe16fc89989a42bd69cfe68"
+        }
+      ],
+      "story_link_ids": [
+        "mention-cba356c94db8a78dac512a39f5ec67cbe4626354dbbffe674e58580d0fdfcef6"
+      ],
+      "subtitle": "남쪽 차량야드 공동권리자",
+      "tags": [
+        "S03",
+        "인물",
+        "남쪽 차량야드"
+      ],
+      "type": "character"
+    },
+    {
+      "facts": {},
+      "id": "char-wiki-cc15e0b3875ce0e734646be4",
+      "label": "최광석",
+      "overview": "길드 주변에서 계속 장사해온 상인이다. 남쪽 차량야드의 남는 일부를 잡아 숙박 손님 차량과 손수레 공간으로 사용했고, 자신의 거래이력을 외부 손님이 확인할 수 있는 표시를 원했다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "등록상인 필요를 제기한 기존 상인",
+          "other_id": "event-wiki-6fa152109f3897e4ad04b372",
+          "relation_id": "rel-a23f755f04040c753fa814de697f6e3d8742a57ca08644d63a6633135bcfda8d"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "related_to",
+          "label": "남는 야드 일부를 숙박 손님 차량·손수레 공간으로 사용",
+          "other_id": "loc-wiki-b1be03144484391b40b8ecc4",
+          "relation_id": "rel-e051a8019e3b74a357fb0dcb5cccc40f0a8f7518c61bac630b32083c0f6813c4"
+        }
+      ],
+      "story_link_ids": [
+        "mention-0fda28f174db9871118dd72079040c4c2733ae6ee4822a37144c56dbf2af839c",
+        "mention-ef8ec36d09f32178abc73401dad09f6e6e1797d5d272edcd1f574a8b7a924819"
+      ],
+      "subtitle": "길드 주변 시장의 기존 상인",
+      "tags": [
+        "S03",
+        "인물",
+        "상인"
       ],
       "type": "character"
     },
@@ -1472,6 +1738,277 @@
         "전력",
         "통신",
         "광역이상"
+      ],
+      "type": "event"
+    },
+    {
+      "facts": {},
+      "id": "event-wiki-111fe570a078504a9c47714f",
+      "label": "길드 직매입·검수·재판매 사업 재정의",
+      "overview": "등록상인은 보류하고 에스크로는 유지하며, 보증거래는 폐기해 길드가 물건을 직접 매입·검수·수리·재판매하는 모델로 재정의했다. 길드는 검사·수리·지속수요 기준을 충족하는 물건만 사고 기준 밖이면 매입하지 않는 원칙을 세웠다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "보증거래 폐기·직매입 재판매 방향 결정",
+          "other_id": "char-jinwoo",
+          "relation_id": "rel-05d1eb1eace7023308e2f773415c17ed4a5c593eef0d1e1a97cd8ab272f7132f"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "폐쇄 체육시설 관리동에서 사업구조 재정의",
+          "other_id": "loc-sports-complex",
+          "relation_id": "rel-d7073f1a5e301740c448f42b9fbe46721779c039c1d63d10a406968a9ef016d5"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 8월 5일",
+      "tags": [
+        "S03",
+        "길드",
+        "직매입",
+        "표준품"
+      ],
+      "type": "event"
+    },
+    {
+      "facts": {},
+      "id": "event-wiki-37bff157632c4ca2e1e99420",
+      "label": "한재욱 곡물 직접거래 분쟁",
+      "overview": "길드 밖 직접거래한 곡물에서 문제가 생겼지만 에스크로·중개·검수가 없어 길드는 배상하지 않았다. 길드는 한재욱에게 길드 이름을 거래 신용처럼 끌어다 쓰지 말라고 선을 그었다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "길드 배상 거부 및 책임경계 집행",
+          "other_id": "char-jinwoo",
+          "relation_id": "rel-c01a49b5bea44ec8503f095d95594fdd8427e9031c17e3afc8d9838de86d260c"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "직접거래 판매자",
+          "other_id": "char-wiki-14b41bbae77f8558c571d384",
+          "relation_id": "rel-d7ac0c01ce2a598fdc4a63635a003259b2327237cd2babcf4a4162fe2ac42c2e"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 7월 24일",
+      "tags": [
+        "S03",
+        "분쟁",
+        "자유거래"
+      ],
+      "type": "event"
+    },
+    {
+      "facts": {},
+      "id": "event-wiki-6fa152109f3897e4ad04b372",
+      "label": "길드 거래 서비스 구분 검토",
+      "overview": "관리동 논의에서 등록상인은 사람과 이력 확인, 에스크로는 정해진 거래 과정 관리, 보증거래는 특정 거래 결과조건까지 책임범위를 넓히는 구조로 구분했다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "제도 차이를 질문하고 정리 논의에 참여",
+          "other_id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+          "relation_id": "rel-371f50d7000d779aabe499e795a56a7fef4605e3817e8c27dbf0c0b139f53486"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "등록상인 필요를 제기한 기존 상인",
+          "other_id": "char-wiki-cc15e0b3875ce0e734646be4",
+          "relation_id": "rel-a23f755f04040c753fa814de697f6e3d8742a57ca08644d63a6633135bcfda8d"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 8월 4일",
+      "tags": [
+        "S03",
+        "길드",
+        "거래서비스"
+      ],
+      "type": "event"
+    },
+    {
+      "facts": {},
+      "id": "event-wiki-a93db7854c7049a3b7c936b2",
+      "label": "길드 표준펌프 1호",
+      "overview": "길드 표준펌프 1호 사업이 시작됐다. 공개 매입가 대신 내부 상한을 두고 지정 규격과 수리조건을 통과한 물건만 기존 기준가로 매입했으며 첫 판매용 두 대를 완성했다. 표준품 가치는 기술력·부품재고·검수기록·수리능력·사후 신뢰를 더하는 데서 만들어졌다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "폐쇄 체육시설 길드 매입대에서 운영",
+          "other_id": "loc-sports-complex",
+          "relation_id": "rel-6b5ad09b43d062858e5ec4f4d54ad4dfb464825eaaa33770ccb606d408989a28"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "펌프 선매입 후 일부를 길드에 매각",
+          "other_id": "char-wiki-8499006fbd51eb7a8c88ab1f",
+          "relation_id": "rel-71856021974e34eab5e2335f863bdbfcaed336e276b45aaba0fa24126834a0e6"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "매입상한을 넘는 거래 거부",
+          "other_id": "char-jinwoo",
+          "relation_id": "rel-7250782c7b60e910cfef3e1f8fd72fdba2620b6328f36ba08a46a5a026090850"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "수리내역 기록과 내부 매입상한 관리",
+          "other_id": "char-eunchae",
+          "relation_id": "rel-cb45632abd508d72c4fbcbf855c6db4e205cd02c47b372091b88965680ee9440"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "분해·수리 작업",
+          "other_id": "char-mingyu",
+          "relation_id": "rel-d9600315a2f6f453fd4b44beee790607435e0f3ff0b514555570ac8f689c0870"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "작동 시험",
+          "other_id": "char-taehoon",
+          "relation_id": "rel-fe9897192360e1885492989f3a784a96a5c9db25bed303bbf982d6c930e43bc4"
+        }
+      ],
+      "story_link_ids": [
+        "mention-562b88b62c8f8ac875e172dab68849005c7ace75628ee7a88063f219049a3080"
+      ],
+      "subtitle": "2027년 9월 19–22일",
+      "tags": [
+        "S03",
+        "길드",
+        "표준품",
+        "급수"
+      ],
+      "type": "event"
+    },
+    {
+      "facts": {},
+      "id": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+      "label": "길드 표준품 후보 관찰기간",
+      "overview": "길드는 직매입 사업을 바로 열지 않고 실제 거래가격·고장·수리·부품·구매문의·판매기간을 기록했다. 급수·배관은 반복수요, 표준화 가능성, 미판매 재고의 자체 사용가치가 높았고, 길드의 구매의사 자체가 시장가격에 영향을 주는 점도 확인됐다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "표준품 후보 관찰표 작성·기록",
+          "other_id": "char-eunchae",
+          "relation_id": "rel-24355c6112acde8deb454abeb3bf1a45b7c58edf8391522eddc5b9bb92cbaf6c"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "전력장비 관찰 사례를 제공한 외부 상인",
+          "other_id": "char-wiki-8499006fbd51eb7a8c88ab1f",
+          "relation_id": "rel-ae11d88c34713a93191f5667701b4ecc60b0a7be03ed285611ac9e3e44268837"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "폐쇄 체육시설 길드 시장 관찰기간",
+          "other_id": "loc-sports-complex",
+          "relation_id": "rel-b26d518a8e698e6858e428de83fb1777d1b02e6145cbdde794e4c1eec08e0ef1"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 8월 6–28일",
+      "tags": [
+        "S03",
+        "길드",
+        "시장관찰",
+        "표준품"
+      ],
+      "type": "event"
+    },
+    {
+      "facts": {},
+      "id": "event-wiki-bf4768814dd7f1559d9f7496",
+      "label": "남쪽 차량야드 통행·회차 사용권 합의",
+      "overview": "길드는 차량야드 전체를 임대하지 않고 12개월 차량 통행·회차 사용권만 확보했다. 길드는 통로 배수·노면·방해물·소규모 파손 관리와 정기 대가를 맡고, 관수·지연은 계약 구간의 차량 통행을 보장했으며 나머지 야드는 시장에 남았다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "차량야드 공동권리자 측 합의 당사자",
+          "other_id": "char-wiki-97e31f6fd22a6841eb7def52",
+          "relation_id": "rel-10d5e63ebd10729b7a0e23bb0f473cc3d269793d3cceaf80294f90824bf4fc97"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "사용권 협상·합의에 참여",
+          "other_id": "char-jinwoo",
+          "relation_id": "rel-2f8ad14936dd46d8f08325022edd1c80295ca07e8b1b797966c86635b340b871"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "권리 확인과 협상 준비에 참여",
+          "other_id": "char-eunchae",
+          "relation_id": "rel-379921507d951549980d75a5036d96ce51a37ba682e79a003f7dc807ab14e1eb"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "차량야드 권리자 측 합의 당사자",
+          "other_id": "char-wiki-322a5a52d57198d4a6f25429",
+          "relation_id": "rel-5f80a15d7073ac713bf260b37db7197ddfaf077e5596c8a9d55f53018f8dd14e"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "남쪽 차량야드 사용권 합의",
+          "other_id": "loc-wiki-b1be03144484391b40b8ecc4",
+          "relation_id": "rel-af5492e1d459418cc6d9f92e1119d981bac4a0e36883bd0255e729a63b05fc6f"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 7월 13–20일",
+      "tags": [
+        "S03",
+        "계약",
+        "차량야드"
+      ],
+      "type": "event"
+    },
+    {
+      "facts": {},
+      "id": "event-wiki-d9895688b2873d713ac106cd",
+      "label": "길드 거래 책임범위 공개",
+      "overview": "길드는 중개한 거래, 에스크로를 받은 거래, 직접 운영한 서비스는 기록된 약속 범위에서 책임지고, 시장 바깥이나 주변 점포의 당사자 직접거래는 보증하지 않는다고 공개했다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "폐쇄 체육시설 시장 입구에서 책임범위 공개",
+          "other_id": "loc-sports-complex",
+          "relation_id": "rel-99850ee670e9c5180585b8de5a6ee27693c1d824ed426094c4fca3234e21f438"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "접수대에서 책임범위 안내",
+          "other_id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+          "relation_id": "rel-e3198123614c280f420e8437ab8e9f9126b5bf57fac98136dc09177ceb455863"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 7월 21일",
+      "tags": [
+        "S03",
+        "길드",
+        "거래규칙"
       ],
       "type": "event"
     },
@@ -1919,10 +2456,38 @@
         },
         {
           "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "폐쇄 체육시설 길드 매입대에서 운영",
+          "other_id": "event-wiki-a93db7854c7049a3b7c936b2",
+          "relation_id": "rel-6b5ad09b43d062858e5ec4f4d54ad4dfb464825eaaa33770ccb606d408989a28"
+        },
+        {
+          "direction": "incoming",
           "kind": "published_relation",
           "label": "생활망 압박",
           "other_id": "event-s02-finale",
           "relation_id": "rel-8d06ac889fd04119c11ef01fdbed3840afe7cf7fcafd53e02fc83d4d6e3689a0"
+        },
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "폐쇄 체육시설 시장 입구에서 책임범위 공개",
+          "other_id": "event-wiki-d9895688b2873d713ac106cd",
+          "relation_id": "rel-99850ee670e9c5180585b8de5a6ee27693c1d824ed426094c4fca3234e21f438"
+        },
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "폐쇄 체육시설 길드 시장 관찰기간",
+          "other_id": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+          "relation_id": "rel-b26d518a8e698e6858e428de83fb1777d1b02e6145cbdde794e4c1eec08e0ef1"
+        },
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "폐쇄 체육시설 관리동에서 사업구조 재정의",
+          "other_id": "event-wiki-111fe570a078504a9c47714f",
+          "relation_id": "rel-d7073f1a5e301740c448f42b9fbe46721779c039c1d63d10a406968a9ef016d5"
         }
       ],
       "story_link_ids": [
@@ -1999,6 +2564,53 @@
         "도로",
         "관리조",
         "지역질서"
+      ],
+      "type": "location"
+    },
+    {
+      "facts": {},
+      "id": "loc-wiki-b1be03144484391b40b8ecc4",
+      "label": "남쪽 차량야드",
+      "overview": "임관수가 현장을 관리하고 임지연이 공동권리를 가진 차량야드다. 길드는 야드 전체를 가져오지 않고 12개월 차량 통행·회차 사용권만 확보했으며 나머지는 시장에 남겼다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "related_to",
+          "label": "공동권리자",
+          "other_id": "char-wiki-97e31f6fd22a6841eb7def52",
+          "relation_id": "rel-9b68e9bb1adcc22ff4f485e96d0b8b80ed55321f9fe16fc89989a42bd69cfe68"
+        },
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "남쪽 차량야드 사용권 합의",
+          "other_id": "event-wiki-bf4768814dd7f1559d9f7496",
+          "relation_id": "rel-af5492e1d459418cc6d9f92e1119d981bac4a0e36883bd0255e729a63b05fc6f"
+        },
+        {
+          "direction": "incoming",
+          "kind": "works_at",
+          "label": "현장 관리",
+          "other_id": "char-wiki-322a5a52d57198d4a6f25429",
+          "relation_id": "rel-d54a4521487899d2b7611e6f71a7833d2ce75af0a06834bff7f844e1d06e5214"
+        },
+        {
+          "direction": "incoming",
+          "kind": "related_to",
+          "label": "남는 야드 일부를 숙박 손님 차량·손수레 공간으로 사용",
+          "other_id": "char-wiki-cc15e0b3875ce0e734646be4",
+          "relation_id": "rel-e051a8019e3b74a357fb0dcb5cccc40f0a8f7518c61bac630b32083c0f6813c4"
+        }
+      ],
+      "story_link_ids": [
+        "mention-2f82964ebd7ba69d4b8fc1cd9c02847ebc5ef9285791fb623c7d1df648de4ebe",
+        "mention-892c90e77e884e7e37291c27b2609db3d58cf7b6589c0e49a23f8b1b1aba0678"
+      ],
+      "subtitle": "길드 남쪽 차량 통행·회차 동선",
+      "tags": [
+        "S03",
+        "장소",
+        "차량야드"
       ],
       "type": "location"
     },
@@ -2117,7 +2729,7 @@
     }
   ],
   "chronicle_id": "C03-AFTERFALL",
-  "content_sha256": "d7e5c7c210f534605b0321a8100ca49d0c8349c37481369764ab0db1fc8539be",
+  "content_sha256": "e4aba69685cbfa6fa34e1c3c9387a775200d236a55a979a7ef68342883da3e0a",
   "nodes": [
     {
       "anchor": {
@@ -2668,6 +3280,163 @@
     },
     {
       "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "id": "char-wiki-14b41bbae77f8558c571d384",
+        "label": "한재욱",
+        "source": "S03 SESSION_006 GM 공개 블록 003",
+        "subtitle": "이동상인",
+        "summary": "말린 곡물을 판 이동상인으로 길드 밖 직접거래 분쟁의 당사자였다. 길드는 그에게 길드 이름을 거래 신용처럼 끌어다 쓰지 말라고 선을 그었다.",
+        "tags": [
+          "S03",
+          "인물",
+          "상인"
+        ],
+        "type": "character"
+      },
+      "evidence": {
+        "pointer": "/nodes/4",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "char-wiki-14b41bbae77f8558c571d384"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "id": "char-wiki-322a5a52d57198d4a6f25429",
+        "label": "임관수",
+        "source": "S03 SESSION_006 GM 공개 블록 001",
+        "subtitle": "남쪽 차량야드 현장 관리자",
+        "summary": "남쪽 차량야드를 오래 관리해온 현장 관리자다. 누나 임지연과 권리구조가 연결되어 있어 혼자 장기계약을 확정하는 구조는 아니었다.",
+        "tags": [
+          "S03",
+          "인물",
+          "남쪽 차량야드"
+        ],
+        "type": "character"
+      },
+      "evidence": {
+        "pointer": "/nodes/0",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "char-wiki-322a5a52d57198d4a6f25429"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+        "label": "오세린",
+        "source": "S03 SESSION_006 GM 공개 블록 003, 005",
+        "subtitle": "길드 접수·관리 실무자",
+        "summary": "길드 접수와 관리동 논의에 참여하며 거래 책임범위를 안내하고 등록상인·에스크로·보증거래의 차이를 정리하는 실무 접점이다.",
+        "tags": [
+          "S03",
+          "인물",
+          "길드"
+        ],
+        "type": "character"
+      },
+      "evidence": {
+        "pointer": "/nodes/3",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "char-wiki-6f18bfaa7aba3f5b5456f96f"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "id": "char-wiki-8499006fbd51eb7a8c88ab1f",
+        "label": "이원혁",
+        "source": "S03 SESSION_006 GM 공개 블록 009, 013",
+        "subtitle": "외부 장비 상인",
+        "summary": "인버터와 소형 펌프를 취급한 외부 상인이다. 길드의 표준펌프 사업을 예상해 펌프를 선매입했지만 길드가 매입상한을 따라 올리지 않아, 지정 규격과 수리조건을 통과한 일부만 기존 제시가로 매각했다.",
+        "tags": [
+          "S03",
+          "인물",
+          "상인",
+          "장비"
+        ],
+        "type": "character"
+      },
+      "evidence": {
+        "pointer": "/nodes/5",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "char-wiki-8499006fbd51eb7a8c88ab1f"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "id": "char-wiki-97e31f6fd22a6841eb7def52",
+        "label": "임지연",
+        "source": "S03 SESSION_006 GM 공개 블록 001",
+        "subtitle": "남쪽 차량야드 공동권리자",
+        "summary": "임관수의 누나이자 남쪽 차량야드의 공동권리자다. 길드의 12개월 차량 통행·회차 사용권 합의 당사자로 참여했다.",
+        "tags": [
+          "S03",
+          "인물",
+          "남쪽 차량야드"
+        ],
+        "type": "character"
+      },
+      "evidence": {
+        "pointer": "/nodes/1",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "char-wiki-97e31f6fd22a6841eb7def52"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "id": "char-wiki-cc15e0b3875ce0e734646be4",
+        "label": "최광석",
+        "source": "S03 SESSION_006 GM 공개 블록 001, 003",
+        "subtitle": "길드 주변 시장의 기존 상인",
+        "summary": "길드 주변에서 계속 장사해온 상인이다. 남쪽 차량야드의 남는 일부를 잡아 숙박 손님 차량과 손수레 공간으로 사용했고, 자신의 거래이력을 외부 손님이 확인할 수 있는 표시를 원했다.",
+        "tags": [
+          "S03",
+          "인물",
+          "상인"
+        ],
+        "type": "character"
+      },
+      "evidence": {
+        "pointer": "/nodes/2",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "char-wiki-cc15e0b3875ce0e734646be4"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -2915,6 +3684,191 @@
       },
       "history": [],
       "id": "event-wide-area"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "id": "event-wiki-111fe570a078504a9c47714f",
+        "label": "길드 직매입·검수·재판매 사업 재정의",
+        "source": "S03 SESSION_006 GM 공개 블록 007, 011",
+        "subtitle": "2027년 8월 5일",
+        "summary": "등록상인은 보류하고 에스크로는 유지하며, 보증거래는 폐기해 길드가 물건을 직접 매입·검수·수리·재판매하는 모델로 재정의했다. 길드는 검사·수리·지속수요 기준을 충족하는 물건만 사고 기준 밖이면 매입하지 않는 원칙을 세웠다.",
+        "tags": [
+          "S03",
+          "길드",
+          "직매입",
+          "표준품"
+        ],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/11",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "event-wiki-111fe570a078504a9c47714f"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "id": "event-wiki-37bff157632c4ca2e1e99420",
+        "label": "한재욱 곡물 직접거래 분쟁",
+        "source": "S03 SESSION_006 GM 공개 블록 003",
+        "subtitle": "2027년 7월 24일",
+        "summary": "길드 밖 직접거래한 곡물에서 문제가 생겼지만 에스크로·중개·검수가 없어 길드는 배상하지 않았다. 길드는 한재욱에게 길드 이름을 거래 신용처럼 끌어다 쓰지 말라고 선을 그었다.",
+        "tags": [
+          "S03",
+          "분쟁",
+          "자유거래"
+        ],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/9",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "event-wiki-37bff157632c4ca2e1e99420"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "id": "event-wiki-6fa152109f3897e4ad04b372",
+        "label": "길드 거래 서비스 구분 검토",
+        "source": "S03 SESSION_006 GM 공개 블록 005",
+        "subtitle": "2027년 8월 4일",
+        "summary": "관리동 논의에서 등록상인은 사람과 이력 확인, 에스크로는 정해진 거래 과정 관리, 보증거래는 특정 거래 결과조건까지 책임범위를 넓히는 구조로 구분했다.",
+        "tags": [
+          "S03",
+          "길드",
+          "거래서비스"
+        ],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/10",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "event-wiki-6fa152109f3897e4ad04b372"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "id": "event-wiki-a93db7854c7049a3b7c936b2",
+        "label": "길드 표준펌프 1호",
+        "source": "S03 SESSION_006 GM 공개 블록 013",
+        "subtitle": "2027년 9월 19–22일",
+        "summary": "길드 표준펌프 1호 사업이 시작됐다. 공개 매입가 대신 내부 상한을 두고 지정 규격과 수리조건을 통과한 물건만 기존 기준가로 매입했으며 첫 판매용 두 대를 완성했다. 표준품 가치는 기술력·부품재고·검수기록·수리능력·사후 신뢰를 더하는 데서 만들어졌다.",
+        "tags": [
+          "S03",
+          "길드",
+          "표준품",
+          "급수"
+        ],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/13",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "event-wiki-a93db7854c7049a3b7c936b2"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "id": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+        "label": "길드 표준품 후보 관찰기간",
+        "source": "S03 SESSION_006 GM 공개 블록 009",
+        "subtitle": "2027년 8월 6–28일",
+        "summary": "길드는 직매입 사업을 바로 열지 않고 실제 거래가격·고장·수리·부품·구매문의·판매기간을 기록했다. 급수·배관은 반복수요, 표준화 가능성, 미판매 재고의 자체 사용가치가 높았고, 길드의 구매의사 자체가 시장가격에 영향을 주는 점도 확인됐다.",
+        "tags": [
+          "S03",
+          "길드",
+          "시장관찰",
+          "표준품"
+        ],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/12",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "event-wiki-ad8b8dbcdc75bcabfcae2cf7"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "id": "event-wiki-bf4768814dd7f1559d9f7496",
+        "label": "남쪽 차량야드 통행·회차 사용권 합의",
+        "source": "S03 SESSION_006 GM 공개 블록 001",
+        "subtitle": "2027년 7월 13–20일",
+        "summary": "길드는 차량야드 전체를 임대하지 않고 12개월 차량 통행·회차 사용권만 확보했다. 길드는 통로 배수·노면·방해물·소규모 파손 관리와 정기 대가를 맡고, 관수·지연은 계약 구간의 차량 통행을 보장했으며 나머지 야드는 시장에 남았다.",
+        "tags": [
+          "S03",
+          "계약",
+          "차량야드"
+        ],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/7",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "event-wiki-bf4768814dd7f1559d9f7496"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "id": "event-wiki-d9895688b2873d713ac106cd",
+        "label": "길드 거래 책임범위 공개",
+        "source": "S03 SESSION_006 GM 공개 블록 003",
+        "subtitle": "2027년 7월 21일",
+        "summary": "길드는 중개한 거래, 에스크로를 받은 거래, 직접 운영한 서비스는 기록된 약속 범위에서 책임지고, 시장 바깥이나 주변 점포의 당사자 직접거래는 보증하지 않는다고 공개했다.",
+        "tags": [
+          "S03",
+          "길드",
+          "거래규칙"
+        ],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/8",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "event-wiki-d9895688b2873d713ac106cd"
     },
     {
       "anchor": {
@@ -3236,6 +4190,32 @@
     },
     {
       "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "id": "loc-wiki-b1be03144484391b40b8ecc4",
+        "label": "남쪽 차량야드",
+        "source": "S03 SESSION_006 GM 공개 블록 001",
+        "subtitle": "길드 남쪽 차량 통행·회차 동선",
+        "summary": "임관수가 현장을 관리하고 임지연이 공동권리를 가진 차량야드다. 길드는 야드 전체를 가져오지 않고 12개월 차량 통행·회차 사용권만 확보했으며 나머지는 시장에 남겼다.",
+        "tags": [
+          "S03",
+          "장소",
+          "차량야드"
+        ],
+        "type": "location"
+      },
+      "evidence": {
+        "pointer": "/nodes/6",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "loc-wiki-b1be03144484391b40b8ecc4"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -3380,6 +4360,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-jinwoo",
+        "kind": "participated_in",
+        "label": "보증거래 폐기·직매입 재판매 방향 결정",
+        "to": "event-wiki-111fe570a078504a9c47714f"
+      },
+      "evidence": {
+        "pointer": "/relations/15",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-05d1eb1eace7023308e2f773415c17ed4a5c593eef0d1e1a97cd8ab272f7132f"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -3396,6 +4395,25 @@
       },
       "history": [],
       "id": "rel-0e77240921c8e1916dd267add5ceb3249638ca06208bad6f69a310ef532bded4"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-wiki-97e31f6fd22a6841eb7def52",
+        "kind": "participated_in",
+        "label": "차량야드 공동권리자 측 합의 당사자",
+        "to": "event-wiki-bf4768814dd7f1559d9f7496"
+      },
+      "evidence": {
+        "pointer": "/relations/3",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-10d5e63ebd10729b7a0e23bb0f473cc3d269793d3cceaf80294f90824bf4fc97"
     },
     {
       "anchor": {
@@ -3513,6 +4531,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-eunchae",
+        "kind": "participated_in",
+        "label": "표준품 후보 관찰표 작성·기록",
+        "to": "event-wiki-ad8b8dbcdc75bcabfcae2cf7"
+      },
+      "evidence": {
+        "pointer": "/relations/17",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-24355c6112acde8deb454abeb3bf1a45b7c58edf8391522eddc5b9bb92cbaf6c"
+    },
+    {
+      "anchor": {
         "game_time": "2027-04-11 17:20",
         "save_version": 258
       },
@@ -3551,6 +4588,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-jinwoo",
+        "kind": "participated_in",
+        "label": "사용권 협상·합의에 참여",
+        "to": "event-wiki-bf4768814dd7f1559d9f7496"
+      },
+      "evidence": {
+        "pointer": "/relations/0",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-2f8ad14936dd46d8f08325022edd1c80295ca07e8b1b797966c86635b340b871"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -3586,6 +4642,44 @@
       },
       "history": [],
       "id": "rel-37051bd84a6ea9f347ab6ab42dbd3562a5e9d2e1fb5bf1f94afb5d897a6b09a3"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+        "kind": "participated_in",
+        "label": "제도 차이를 질문하고 정리 논의에 참여",
+        "to": "event-wiki-6fa152109f3897e4ad04b372"
+      },
+      "evidence": {
+        "pointer": "/relations/13",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-371f50d7000d779aabe499e795a56a7fef4605e3817e8c27dbf0c0b139f53486"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-eunchae",
+        "kind": "participated_in",
+        "label": "권리 확인과 협상 준비에 참여",
+        "to": "event-wiki-bf4768814dd7f1559d9f7496"
+      },
+      "evidence": {
+        "pointer": "/relations/1",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-379921507d951549980d75a5036d96ce51a37ba682e79a003f7dc807ab14e1eb"
     },
     {
       "anchor": {
@@ -3722,6 +4816,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-wiki-322a5a52d57198d4a6f25429",
+        "kind": "participated_in",
+        "label": "차량야드 권리자 측 합의 당사자",
+        "to": "event-wiki-bf4768814dd7f1559d9f7496"
+      },
+      "evidence": {
+        "pointer": "/relations/2",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-5f80a15d7073ac713bf260b37db7197ddfaf077e5596c8a9d55f53018f8dd14e"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -3814,6 +4927,63 @@
       },
       "history": [],
       "id": "rel-661cb1a147e956644e3479208e2b8cba00256abac0fb114a83b37f4752ce5cb9"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "event-wiki-a93db7854c7049a3b7c936b2",
+        "kind": "occurred_at",
+        "label": "폐쇄 체육시설 길드 매입대에서 운영",
+        "to": "loc-sports-complex"
+      },
+      "evidence": {
+        "pointer": "/relations/25",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-6b5ad09b43d062858e5ec4f4d54ad4dfb464825eaaa33770ccb606d408989a28"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-wiki-8499006fbd51eb7a8c88ab1f",
+        "kind": "participated_in",
+        "label": "펌프 선매입 후 일부를 길드에 매각",
+        "to": "event-wiki-a93db7854c7049a3b7c936b2"
+      },
+      "evidence": {
+        "pointer": "/relations/20",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-71856021974e34eab5e2335f863bdbfcaed336e276b45aaba0fa24126834a0e6"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-jinwoo",
+        "kind": "participated_in",
+        "label": "매입상한을 넘는 거래 거부",
+        "to": "event-wiki-a93db7854c7049a3b7c936b2"
+      },
+      "evidence": {
+        "pointer": "/relations/24",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-7250782c7b60e910cfef3e1f8fd72fdba2620b6328f36ba08a46a5a026090850"
     },
     {
       "anchor": {
@@ -4064,6 +5234,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-wiki-322a5a52d57198d4a6f25429",
+        "kind": "related_to",
+        "label": "남매",
+        "to": "char-wiki-97e31f6fd22a6841eb7def52"
+      },
+      "evidence": {
+        "pointer": "/relations/7",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-927639b0b5b5741ece673ff9a6e88183be3034d22c555443630eb95683174b91"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -4121,6 +5310,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "event-wiki-d9895688b2873d713ac106cd",
+        "kind": "occurred_at",
+        "label": "폐쇄 체육시설 시장 입구에서 책임범위 공개",
+        "to": "loc-sports-complex"
+      },
+      "evidence": {
+        "pointer": "/relations/9",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-99850ee670e9c5180585b8de5a6ee27693c1d824ed426094c4fca3234e21f438"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -4137,6 +5345,44 @@
       },
       "history": [],
       "id": "rel-99c12405d831cfbf91aeacc7cb30f2f52979472dfef637b65e5a0060f72a6125"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-wiki-97e31f6fd22a6841eb7def52",
+        "kind": "related_to",
+        "label": "공동권리자",
+        "to": "loc-wiki-b1be03144484391b40b8ecc4"
+      },
+      "evidence": {
+        "pointer": "/relations/6",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-9b68e9bb1adcc22ff4f485e96d0b8b80ed55321f9fe16fc89989a42bd69cfe68"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-wiki-cc15e0b3875ce0e734646be4",
+        "kind": "participated_in",
+        "label": "등록상인 필요를 제기한 기존 상인",
+        "to": "event-wiki-6fa152109f3897e4ad04b372"
+      },
+      "evidence": {
+        "pointer": "/relations/14",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-a23f755f04040c753fa814de697f6e3d8742a57ca08644d63a6633135bcfda8d"
     },
     {
       "anchor": {
@@ -4178,6 +5424,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-wiki-8499006fbd51eb7a8c88ab1f",
+        "kind": "participated_in",
+        "label": "전력장비 관찰 사례를 제공한 외부 상인",
+        "to": "event-wiki-ad8b8dbcdc75bcabfcae2cf7"
+      },
+      "evidence": {
+        "pointer": "/relations/18",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-ae11d88c34713a93191f5667701b4ecc60b0a7be03ed285611ac9e3e44268837"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -4194,6 +5459,25 @@
       },
       "history": [],
       "id": "rel-af3a86632f5ed3d9cac5d2e848b0a971e9481b9db93911ce1fac25515a7c8813"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "event-wiki-bf4768814dd7f1559d9f7496",
+        "kind": "occurred_at",
+        "label": "남쪽 차량야드 사용권 합의",
+        "to": "loc-wiki-b1be03144484391b40b8ecc4"
+      },
+      "evidence": {
+        "pointer": "/relations/4",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-af5492e1d459418cc6d9f92e1119d981bac4a0e36883bd0255e729a63b05fc6f"
     },
     {
       "anchor": {
@@ -4254,6 +5538,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+        "kind": "occurred_at",
+        "label": "폐쇄 체육시설 길드 시장 관찰기간",
+        "to": "loc-sports-complex"
+      },
+      "evidence": {
+        "pointer": "/relations/19",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-b26d518a8e698e6858e428de83fb1777d1b02e6145cbdde794e4c1eec08e0ef1"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -4270,6 +5573,25 @@
       },
       "history": [],
       "id": "rel-b808579e2bd7719dc687412bc80373f7063244c09d0bd20d33c1c5d990ebcec5"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-jinwoo",
+        "kind": "participated_in",
+        "label": "길드 배상 거부 및 책임경계 집행",
+        "to": "event-wiki-37bff157632c4ca2e1e99420"
+      },
+      "evidence": {
+        "pointer": "/relations/11",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-c01a49b5bea44ec8503f095d95594fdd8427e9031c17e3afc8d9838de86d260c"
     },
     {
       "anchor": {
@@ -4330,6 +5652,44 @@
     },
     {
       "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-eunchae",
+        "kind": "participated_in",
+        "label": "수리내역 기록과 내부 매입상한 관리",
+        "to": "event-wiki-a93db7854c7049a3b7c936b2"
+      },
+      "evidence": {
+        "pointer": "/relations/23",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-cb45632abd508d72c4fbcbf855c6db4e205cd02c47b372091b88965680ee9440"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-wiki-322a5a52d57198d4a6f25429",
+        "kind": "works_at",
+        "label": "현장 관리",
+        "to": "loc-wiki-b1be03144484391b40b8ecc4"
+      },
+      "evidence": {
+        "pointer": "/relations/5",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-d54a4521487899d2b7611e6f71a7833d2ce75af0a06834bff7f844e1d06e5214"
+    },
+    {
+      "anchor": {
         "game_time": "2027-04-11 17:20",
         "save_version": 258
       },
@@ -4346,6 +5706,63 @@
       },
       "history": [],
       "id": "rel-d656d1af53e80ca99ea66cad4d8d07ba559c96e80165b16e32c2035249d3a6a6"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "event-wiki-111fe570a078504a9c47714f",
+        "kind": "occurred_at",
+        "label": "폐쇄 체육시설 관리동에서 사업구조 재정의",
+        "to": "loc-sports-complex"
+      },
+      "evidence": {
+        "pointer": "/relations/16",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-d7073f1a5e301740c448f42b9fbe46721779c039c1d63d10a406968a9ef016d5"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-wiki-14b41bbae77f8558c571d384",
+        "kind": "participated_in",
+        "label": "직접거래 판매자",
+        "to": "event-wiki-37bff157632c4ca2e1e99420"
+      },
+      "evidence": {
+        "pointer": "/relations/12",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-d7ac0c01ce2a598fdc4a63635a003259b2327237cd2babcf4a4162fe2ac42c2e"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-mingyu",
+        "kind": "participated_in",
+        "label": "분해·수리 작업",
+        "to": "event-wiki-a93db7854c7049a3b7c936b2"
+      },
+      "evidence": {
+        "pointer": "/relations/21",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-d9600315a2f6f453fd4b44beee790607435e0f3ff0b514555570ac8f689c0870"
     },
     {
       "anchor": {
@@ -4387,6 +5804,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-wiki-cc15e0b3875ce0e734646be4",
+        "kind": "related_to",
+        "label": "남는 야드 일부를 숙박 손님 차량·손수레 공간으로 사용",
+        "to": "loc-wiki-b1be03144484391b40b8ecc4"
+      },
+      "evidence": {
+        "pointer": "/relations/8",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-e051a8019e3b74a357fb0dcb5cccc40f0a8f7518c61bac630b32083c0f6813c4"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -4403,6 +5839,25 @@
       },
       "history": [],
       "id": "rel-e27bdf76c984bc703a2683837a7f6fa508e909abb971182e1a95c9efbe19ffa1"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+        "kind": "participated_in",
+        "label": "접수대에서 책임범위 안내",
+        "to": "event-wiki-d9895688b2873d713ac106cd"
+      },
+      "evidence": {
+        "pointer": "/relations/10",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-e3198123614c280f420e8437ab8e9f9126b5bf57fac98136dc09177ceb455863"
     },
     {
       "anchor": {
@@ -4615,6 +6070,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-09-22 16:10",
+        "save_version": 280
+      },
+      "data": {
+        "from": "char-taehoon",
+        "kind": "participated_in",
+        "label": "작동 시험",
+        "to": "event-wiki-a93db7854c7049a3b7c936b2"
+      },
+      "evidence": {
+        "pointer": "/relations/22",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_006_14675b02060276c1588d732c6c100e9c259486ecbe86241dc90fa64abfd5c1a3.json",
+        "source_sha256": "2b1d8760592ce2b1c3a4b2b44580eb23f8e18c2fd24069621205ad5004e0b611"
+      },
+      "history": [],
+      "id": "rel-fe9897192360e1885492989f3a784a96a5c9db25bed303bbf982d6c930e43bc4"
+    },
+    {
+      "anchor": {
         "game_time": "2027-07-12 17:30",
         "save_version": 274
       },
@@ -4712,6 +6186,26 @@
             7487,
             14752,
             16157
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "9beb279b9f4f20a015257c2354fd6549853ef887242f2d8d3cddd3f947361087",
+      "chapter_id": "c03-afterfall-auto-a10359ad99e31369dccfe2526d95309968cd930ba35847b9b0f6c5fe0e6436c3",
+      "chapter_title": "2027년 7월 13일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "36f199f9cc14a4678d48ef694dd326c310be655965e91b8875154aa338615f83"
+      },
+      "id": "mention-011cd9732fe0783a3565e315ece5bc12471cefbf87d4d42524d9b3ca48181ed9",
+      "node_id": "char-wiki-322a5a52d57198d4a6f25429",
+      "reasons": [
+        {
+          "alias": "임관수",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            60
           ]
         }
       ]
@@ -5158,6 +6652,29 @@
           "offsets": [
             1985,
             16746
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "9beb279b9f4f20a015257c2354fd6549853ef887242f2d8d3cddd3f947361087",
+      "chapter_id": "c03-afterfall-auto-a10359ad99e31369dccfe2526d95309968cd930ba35847b9b0f6c5fe0e6436c3",
+      "chapter_title": "2027년 7월 13일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "36f199f9cc14a4678d48ef694dd326c310be655965e91b8875154aa338615f83"
+      },
+      "id": "mention-0fda28f174db9871118dd72079040c4c2733ae6ee4822a37144c56dbf2af839c",
+      "node_id": "char-wiki-cc15e0b3875ce0e734646be4",
+      "reasons": [
+        {
+          "alias": "최광석",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            2179,
+            5016,
+            6251,
+            16790
           ]
         }
       ]
@@ -6369,6 +7886,26 @@
             2933,
             4973,
             7836
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "9beb279b9f4f20a015257c2354fd6549853ef887242f2d8d3cddd3f947361087",
+      "chapter_id": "c03-afterfall-auto-a10359ad99e31369dccfe2526d95309968cd930ba35847b9b0f6c5fe0e6436c3",
+      "chapter_title": "2027년 7월 13일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "36f199f9cc14a4678d48ef694dd326c310be655965e91b8875154aa338615f83"
+      },
+      "id": "mention-2f82964ebd7ba69d4b8fc1cd9c02847ebc5ef9285791fb623c7d1df648de4ebe",
+      "node_id": "loc-wiki-b1be03144484391b40b8ecc4",
+      "reasons": [
+        {
+          "alias": "남쪽 차량야드",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            19
           ]
         }
       ]
@@ -7696,6 +9233,27 @@
       ]
     },
     {
+      "body_sha256": "9beb279b9f4f20a015257c2354fd6549853ef887242f2d8d3cddd3f947361087",
+      "chapter_id": "c03-afterfall-auto-a10359ad99e31369dccfe2526d95309968cd930ba35847b9b0f6c5fe0e6436c3",
+      "chapter_title": "2027년 7월 13일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "36f199f9cc14a4678d48ef694dd326c310be655965e91b8875154aa338615f83"
+      },
+      "id": "mention-5142a748a4c3ef3a98390aac6ee19293a2ca158f034f8a6798461b7e611a9f5e",
+      "node_id": "char-wiki-14b41bbae77f8558c571d384",
+      "reasons": [
+        {
+          "alias": "한재욱",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            3657,
+            4113
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "77155b3ad643e7ed17eaee5114f05f7e34eb8d68f39fd32a1fcddf1a39db373c",
       "chapter_id": "c03-afterfall-chapter-11",
       "chapter_title": "야간 감시",
@@ -7895,6 +9453,27 @@
       ]
     },
     {
+      "body_sha256": "9beb279b9f4f20a015257c2354fd6549853ef887242f2d8d3cddd3f947361087",
+      "chapter_id": "c03-afterfall-auto-a10359ad99e31369dccfe2526d95309968cd930ba35847b9b0f6c5fe0e6436c3",
+      "chapter_title": "2027년 7월 13일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "36f199f9cc14a4678d48ef694dd326c310be655965e91b8875154aa338615f83"
+      },
+      "id": "mention-562b88b62c8f8ac875e172dab68849005c7ace75628ee7a88063f219049a3080",
+      "node_id": "event-wiki-a93db7854c7049a3b7c936b2",
+      "reasons": [
+        {
+          "alias": "길드 표준펌프 1호",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            19170,
+            22428
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "16e3f9a31315014e476866454da0bf0cb6e04804c549ecd7032aca3cbec68ea0",
       "chapter_id": "c03-afterfall-chapter-24",
       "chapter_title": "동천교 바깥의 차량들",
@@ -7912,6 +9491,26 @@
             2537,
             8406,
             15195
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "7e6d795ab02ce8381b9103da6943dcbb9aeb90c125ef168f756a134439453a6b",
+      "chapter_id": "c03-afterfall-auto-668e820685498b88560bd4b41869c32da0b69b5712af55b27b787c648bd40e5e",
+      "chapter_title": "2027년 6월 19일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "36f199f9cc14a4678d48ef694dd326c310be655965e91b8875154aa338615f83"
+      },
+      "id": "mention-5ae082c7495537b34ff3afcf52e73e7982737ae3558e34c1fd2544289acdf038",
+      "node_id": "char-wiki-322a5a52d57198d4a6f25429",
+      "reasons": [
+        {
+          "alias": "임관수",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            7955
           ]
         }
       ]
@@ -9568,6 +11167,26 @@
       ]
     },
     {
+      "body_sha256": "7e6d795ab02ce8381b9103da6943dcbb9aeb90c125ef168f756a134439453a6b",
+      "chapter_id": "c03-afterfall-auto-668e820685498b88560bd4b41869c32da0b69b5712af55b27b787c648bd40e5e",
+      "chapter_title": "2027년 6월 19일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "36f199f9cc14a4678d48ef694dd326c310be655965e91b8875154aa338615f83"
+      },
+      "id": "mention-892c90e77e884e7e37291c27b2609db3d58cf7b6589c0e49a23f8b1b1aba0678",
+      "node_id": "loc-wiki-b1be03144484391b40b8ecc4",
+      "reasons": [
+        {
+          "alias": "남쪽 차량야드",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            7853
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "4906deb09b422920bbe7fff911836a6cfcfb9dac7ba3e09adb0a93f39aa53906",
       "chapter_id": "c03-afterfall-chapter-16",
       "chapter_title": "외곽 주민복지관",
@@ -10594,6 +12213,36 @@
       ]
     },
     {
+      "body_sha256": "b9c7c9db6a785834a5afa51302905661443a61ea0970f8ccd618d039a513f82d",
+      "chapter_id": "c03-afterfall-auto-a4fae733c4c5f58987a52d6ce1061f9f82e055bbfb41a851fc24d4cea450cc7c",
+      "chapter_title": "2027년 5월 4일 09:00",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "36f199f9cc14a4678d48ef694dd326c310be655965e91b8875154aa338615f83"
+      },
+      "id": "mention-b026005591f0dba5d281c7e41d8f75d2b8ec4f29f7ea291b41b44c331283e6a8",
+      "node_id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+      "reasons": [
+        {
+          "alias": "오세린",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            3232,
+            3447,
+            3939,
+            4803,
+            5518,
+            5663,
+            7351,
+            8479,
+            8597,
+            8647,
+            8748
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "81419d7f86ed4ce66ac5b3d1244b479aa27931fb186e73900264f8b2eb503a51",
       "chapter_id": "c03-afterfall-chapter-05",
       "chapter_title": "산림교육원",
@@ -10979,6 +12628,26 @@
             10164,
             10226,
             10246
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "9beb279b9f4f20a015257c2354fd6549853ef887242f2d8d3cddd3f947361087",
+      "chapter_id": "c03-afterfall-auto-a10359ad99e31369dccfe2526d95309968cd930ba35847b9b0f6c5fe0e6436c3",
+      "chapter_title": "2027년 7월 13일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "36f199f9cc14a4678d48ef694dd326c310be655965e91b8875154aa338615f83"
+      },
+      "id": "mention-beb4e8509801741b345602e5fe17464f1c323d0a49283d96261f2cf7574300a4",
+      "node_id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+      "reasons": [
+        {
+          "alias": "오세린",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            6132
           ]
         }
       ]
@@ -11447,6 +13116,27 @@
       ]
     },
     {
+      "body_sha256": "9beb279b9f4f20a015257c2354fd6549853ef887242f2d8d3cddd3f947361087",
+      "chapter_id": "c03-afterfall-auto-a10359ad99e31369dccfe2526d95309968cd930ba35847b9b0f6c5fe0e6436c3",
+      "chapter_title": "2027년 7월 13일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "36f199f9cc14a4678d48ef694dd326c310be655965e91b8875154aa338615f83"
+      },
+      "id": "mention-cba356c94db8a78dac512a39f5ec67cbe4626354dbbffe674e58580d0fdfcef6",
+      "node_id": "char-wiki-97e31f6fd22a6841eb7def52",
+      "reasons": [
+        {
+          "alias": "임지연",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            206,
+            1059
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "c1671d7762f9ca8245da91ffeb60ac5e84edbc4f6013ac5ba95ae0d81719ce8d",
       "chapter_id": "c03-afterfall-chapter-08",
       "chapter_title": "겨울 전 갈무리",
@@ -11620,6 +13310,28 @@
             5388,
             5854,
             7303
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "9beb279b9f4f20a015257c2354fd6549853ef887242f2d8d3cddd3f947361087",
+      "chapter_id": "c03-afterfall-auto-a10359ad99e31369dccfe2526d95309968cd930ba35847b9b0f6c5fe0e6436c3",
+      "chapter_title": "2027년 7월 13일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "36f199f9cc14a4678d48ef694dd326c310be655965e91b8875154aa338615f83"
+      },
+      "id": "mention-d38d97a97896ecb69c2057836a2a95ce330365c5766e21034809dc661bbbefc1",
+      "node_id": "char-wiki-8499006fbd51eb7a8c88ab1f",
+      "reasons": [
+        {
+          "alias": "이원혁",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            15477,
+            17641,
+            19471
           ]
         }
       ]
@@ -12245,6 +13957,27 @@
             3347,
             4705,
             7994
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "7e6d795ab02ce8381b9103da6943dcbb9aeb90c125ef168f756a134439453a6b",
+      "chapter_id": "c03-afterfall-auto-668e820685498b88560bd4b41869c32da0b69b5712af55b27b787c648bd40e5e",
+      "chapter_title": "2027년 6월 19일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "36f199f9cc14a4678d48ef694dd326c310be655965e91b8875154aa338615f83"
+      },
+      "id": "mention-ef8ec36d09f32178abc73401dad09f6e6e1797d5d272edcd1f574a8b7a924819",
+      "node_id": "char-wiki-cc15e0b3875ce0e734646be4",
+      "reasons": [
+        {
+          "alias": "최광석",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            7480,
+            8044
           ]
         }
       ]

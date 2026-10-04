@@ -1,0 +1,357 @@
+{
+  "anchor": {
+    "game_time": "2027-09-22 16:10",
+    "save_version": 280
+  },
+  "chronicle_id": "C03-AFTERFALL",
+  "nodes": [
+    {
+      "id": "char-wiki-322a5a52d57198d4a6f25429",
+      "label": "임관수",
+      "source": "S03 SESSION_006 GM 공개 블록 001",
+      "subtitle": "남쪽 차량야드 현장 관리자",
+      "summary": "남쪽 차량야드를 오래 관리해온 현장 관리자다. 누나 임지연과 권리구조가 연결되어 있어 혼자 장기계약을 확정하는 구조는 아니었다.",
+      "tags": [
+        "S03",
+        "인물",
+        "남쪽 차량야드"
+      ],
+      "type": "character"
+    },
+    {
+      "id": "char-wiki-97e31f6fd22a6841eb7def52",
+      "label": "임지연",
+      "source": "S03 SESSION_006 GM 공개 블록 001",
+      "subtitle": "남쪽 차량야드 공동권리자",
+      "summary": "임관수의 누나이자 남쪽 차량야드의 공동권리자다. 길드의 12개월 차량 통행·회차 사용권 합의 당사자로 참여했다.",
+      "tags": [
+        "S03",
+        "인물",
+        "남쪽 차량야드"
+      ],
+      "type": "character"
+    },
+    {
+      "id": "char-wiki-cc15e0b3875ce0e734646be4",
+      "label": "최광석",
+      "source": "S03 SESSION_006 GM 공개 블록 001, 003",
+      "subtitle": "길드 주변 시장의 기존 상인",
+      "summary": "길드 주변에서 계속 장사해온 상인이다. 남쪽 차량야드의 남는 일부를 잡아 숙박 손님 차량과 손수레 공간으로 사용했고, 자신의 거래이력을 외부 손님이 확인할 수 있는 표시를 원했다.",
+      "tags": [
+        "S03",
+        "인물",
+        "상인"
+      ],
+      "type": "character"
+    },
+    {
+      "id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+      "label": "오세린",
+      "source": "S03 SESSION_006 GM 공개 블록 003, 005",
+      "subtitle": "길드 접수·관리 실무자",
+      "summary": "길드 접수와 관리동 논의에 참여하며 거래 책임범위를 안내하고 등록상인·에스크로·보증거래의 차이를 정리하는 실무 접점이다.",
+      "tags": [
+        "S03",
+        "인물",
+        "길드"
+      ],
+      "type": "character"
+    },
+    {
+      "id": "char-wiki-14b41bbae77f8558c571d384",
+      "label": "한재욱",
+      "source": "S03 SESSION_006 GM 공개 블록 003",
+      "subtitle": "이동상인",
+      "summary": "말린 곡물을 판 이동상인으로 길드 밖 직접거래 분쟁의 당사자였다. 길드는 그에게 길드 이름을 거래 신용처럼 끌어다 쓰지 말라고 선을 그었다.",
+      "tags": [
+        "S03",
+        "인물",
+        "상인"
+      ],
+      "type": "character"
+    },
+    {
+      "id": "char-wiki-8499006fbd51eb7a8c88ab1f",
+      "label": "이원혁",
+      "source": "S03 SESSION_006 GM 공개 블록 009, 013",
+      "subtitle": "외부 장비 상인",
+      "summary": "인버터와 소형 펌프를 취급한 외부 상인이다. 길드의 표준펌프 사업을 예상해 펌프를 선매입했지만 길드가 매입상한을 따라 올리지 않아, 지정 규격과 수리조건을 통과한 일부만 기존 제시가로 매각했다.",
+      "tags": [
+        "S03",
+        "인물",
+        "상인",
+        "장비"
+      ],
+      "type": "character"
+    },
+    {
+      "id": "loc-wiki-b1be03144484391b40b8ecc4",
+      "label": "남쪽 차량야드",
+      "source": "S03 SESSION_006 GM 공개 블록 001",
+      "subtitle": "길드 남쪽 차량 통행·회차 동선",
+      "summary": "임관수가 현장을 관리하고 임지연이 공동권리를 가진 차량야드다. 길드는 야드 전체를 가져오지 않고 12개월 차량 통행·회차 사용권만 확보했으며 나머지는 시장에 남겼다.",
+      "tags": [
+        "S03",
+        "장소",
+        "차량야드"
+      ],
+      "type": "location"
+    },
+    {
+      "id": "event-wiki-bf4768814dd7f1559d9f7496",
+      "label": "남쪽 차량야드 통행·회차 사용권 합의",
+      "source": "S03 SESSION_006 GM 공개 블록 001",
+      "subtitle": "2027년 7월 13–20일",
+      "summary": "길드는 차량야드 전체를 임대하지 않고 12개월 차량 통행·회차 사용권만 확보했다. 길드는 통로 배수·노면·방해물·소규모 파손 관리와 정기 대가를 맡고, 관수·지연은 계약 구간의 차량 통행을 보장했으며 나머지 야드는 시장에 남았다.",
+      "tags": [
+        "S03",
+        "계약",
+        "차량야드"
+      ],
+      "type": "event"
+    },
+    {
+      "id": "event-wiki-d9895688b2873d713ac106cd",
+      "label": "길드 거래 책임범위 공개",
+      "source": "S03 SESSION_006 GM 공개 블록 003",
+      "subtitle": "2027년 7월 21일",
+      "summary": "길드는 중개한 거래, 에스크로를 받은 거래, 직접 운영한 서비스는 기록된 약속 범위에서 책임지고, 시장 바깥이나 주변 점포의 당사자 직접거래는 보증하지 않는다고 공개했다.",
+      "tags": [
+        "S03",
+        "길드",
+        "거래규칙"
+      ],
+      "type": "event"
+    },
+    {
+      "id": "event-wiki-37bff157632c4ca2e1e99420",
+      "label": "한재욱 곡물 직접거래 분쟁",
+      "source": "S03 SESSION_006 GM 공개 블록 003",
+      "subtitle": "2027년 7월 24일",
+      "summary": "길드 밖 직접거래한 곡물에서 문제가 생겼지만 에스크로·중개·검수가 없어 길드는 배상하지 않았다. 길드는 한재욱에게 길드 이름을 거래 신용처럼 끌어다 쓰지 말라고 선을 그었다.",
+      "tags": [
+        "S03",
+        "분쟁",
+        "자유거래"
+      ],
+      "type": "event"
+    },
+    {
+      "id": "event-wiki-6fa152109f3897e4ad04b372",
+      "label": "길드 거래 서비스 구분 검토",
+      "source": "S03 SESSION_006 GM 공개 블록 005",
+      "subtitle": "2027년 8월 4일",
+      "summary": "관리동 논의에서 등록상인은 사람과 이력 확인, 에스크로는 정해진 거래 과정 관리, 보증거래는 특정 거래 결과조건까지 책임범위를 넓히는 구조로 구분했다.",
+      "tags": [
+        "S03",
+        "길드",
+        "거래서비스"
+      ],
+      "type": "event"
+    },
+    {
+      "id": "event-wiki-111fe570a078504a9c47714f",
+      "label": "길드 직매입·검수·재판매 사업 재정의",
+      "source": "S03 SESSION_006 GM 공개 블록 007, 011",
+      "subtitle": "2027년 8월 5일",
+      "summary": "등록상인은 보류하고 에스크로는 유지하며, 보증거래는 폐기해 길드가 물건을 직접 매입·검수·수리·재판매하는 모델로 재정의했다. 길드는 검사·수리·지속수요 기준을 충족하는 물건만 사고 기준 밖이면 매입하지 않는 원칙을 세웠다.",
+      "tags": [
+        "S03",
+        "길드",
+        "직매입",
+        "표준품"
+      ],
+      "type": "event"
+    },
+    {
+      "id": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+      "label": "길드 표준품 후보 관찰기간",
+      "source": "S03 SESSION_006 GM 공개 블록 009",
+      "subtitle": "2027년 8월 6–28일",
+      "summary": "길드는 직매입 사업을 바로 열지 않고 실제 거래가격·고장·수리·부품·구매문의·판매기간을 기록했다. 급수·배관은 반복수요, 표준화 가능성, 미판매 재고의 자체 사용가치가 높았고, 길드의 구매의사 자체가 시장가격에 영향을 주는 점도 확인됐다.",
+      "tags": [
+        "S03",
+        "길드",
+        "시장관찰",
+        "표준품"
+      ],
+      "type": "event"
+    },
+    {
+      "id": "event-wiki-a93db7854c7049a3b7c936b2",
+      "label": "길드 표준펌프 1호",
+      "source": "S03 SESSION_006 GM 공개 블록 013",
+      "subtitle": "2027년 9월 19–22일",
+      "summary": "길드 표준펌프 1호 사업이 시작됐다. 공개 매입가 대신 내부 상한을 두고 지정 규격과 수리조건을 통과한 물건만 기존 기준가로 매입했으며 첫 판매용 두 대를 완성했다. 표준품 가치는 기술력·부품재고·검수기록·수리능력·사후 신뢰를 더하는 데서 만들어졌다.",
+      "tags": [
+        "S03",
+        "길드",
+        "표준품",
+        "급수"
+      ],
+      "type": "event"
+    }
+  ],
+  "relations": [
+    {
+      "from": "char-jinwoo",
+      "kind": "participated_in",
+      "label": "사용권 협상·합의에 참여",
+      "to": "event-wiki-bf4768814dd7f1559d9f7496"
+    },
+    {
+      "from": "char-eunchae",
+      "kind": "participated_in",
+      "label": "권리 확인과 협상 준비에 참여",
+      "to": "event-wiki-bf4768814dd7f1559d9f7496"
+    },
+    {
+      "from": "char-wiki-322a5a52d57198d4a6f25429",
+      "kind": "participated_in",
+      "label": "차량야드 권리자 측 합의 당사자",
+      "to": "event-wiki-bf4768814dd7f1559d9f7496"
+    },
+    {
+      "from": "char-wiki-97e31f6fd22a6841eb7def52",
+      "kind": "participated_in",
+      "label": "차량야드 공동권리자 측 합의 당사자",
+      "to": "event-wiki-bf4768814dd7f1559d9f7496"
+    },
+    {
+      "from": "event-wiki-bf4768814dd7f1559d9f7496",
+      "kind": "occurred_at",
+      "label": "남쪽 차량야드 사용권 합의",
+      "to": "loc-wiki-b1be03144484391b40b8ecc4"
+    },
+    {
+      "from": "char-wiki-322a5a52d57198d4a6f25429",
+      "kind": "works_at",
+      "label": "현장 관리",
+      "to": "loc-wiki-b1be03144484391b40b8ecc4"
+    },
+    {
+      "from": "char-wiki-97e31f6fd22a6841eb7def52",
+      "kind": "related_to",
+      "label": "공동권리자",
+      "to": "loc-wiki-b1be03144484391b40b8ecc4"
+    },
+    {
+      "from": "char-wiki-322a5a52d57198d4a6f25429",
+      "kind": "related_to",
+      "label": "남매",
+      "to": "char-wiki-97e31f6fd22a6841eb7def52"
+    },
+    {
+      "from": "char-wiki-cc15e0b3875ce0e734646be4",
+      "kind": "related_to",
+      "label": "남는 야드 일부를 숙박 손님 차량·손수레 공간으로 사용",
+      "to": "loc-wiki-b1be03144484391b40b8ecc4"
+    },
+    {
+      "from": "event-wiki-d9895688b2873d713ac106cd",
+      "kind": "occurred_at",
+      "label": "폐쇄 체육시설 시장 입구에서 책임범위 공개",
+      "to": "loc-sports-complex"
+    },
+    {
+      "from": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+      "kind": "participated_in",
+      "label": "접수대에서 책임범위 안내",
+      "to": "event-wiki-d9895688b2873d713ac106cd"
+    },
+    {
+      "from": "char-jinwoo",
+      "kind": "participated_in",
+      "label": "길드 배상 거부 및 책임경계 집행",
+      "to": "event-wiki-37bff157632c4ca2e1e99420"
+    },
+    {
+      "from": "char-wiki-14b41bbae77f8558c571d384",
+      "kind": "participated_in",
+      "label": "직접거래 판매자",
+      "to": "event-wiki-37bff157632c4ca2e1e99420"
+    },
+    {
+      "from": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+      "kind": "participated_in",
+      "label": "제도 차이를 질문하고 정리 논의에 참여",
+      "to": "event-wiki-6fa152109f3897e4ad04b372"
+    },
+    {
+      "from": "char-wiki-cc15e0b3875ce0e734646be4",
+      "kind": "participated_in",
+      "label": "등록상인 필요를 제기한 기존 상인",
+      "to": "event-wiki-6fa152109f3897e4ad04b372"
+    },
+    {
+      "from": "char-jinwoo",
+      "kind": "participated_in",
+      "label": "보증거래 폐기·직매입 재판매 방향 결정",
+      "to": "event-wiki-111fe570a078504a9c47714f"
+    },
+    {
+      "from": "event-wiki-111fe570a078504a9c47714f",
+      "kind": "occurred_at",
+      "label": "폐쇄 체육시설 관리동에서 사업구조 재정의",
+      "to": "loc-sports-complex"
+    },
+    {
+      "from": "char-eunchae",
+      "kind": "participated_in",
+      "label": "표준품 후보 관찰표 작성·기록",
+      "to": "event-wiki-ad8b8dbcdc75bcabfcae2cf7"
+    },
+    {
+      "from": "char-wiki-8499006fbd51eb7a8c88ab1f",
+      "kind": "participated_in",
+      "label": "전력장비 관찰 사례를 제공한 외부 상인",
+      "to": "event-wiki-ad8b8dbcdc75bcabfcae2cf7"
+    },
+    {
+      "from": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+      "kind": "occurred_at",
+      "label": "폐쇄 체육시설 길드 시장 관찰기간",
+      "to": "loc-sports-complex"
+    },
+    {
+      "from": "char-wiki-8499006fbd51eb7a8c88ab1f",
+      "kind": "participated_in",
+      "label": "펌프 선매입 후 일부를 길드에 매각",
+      "to": "event-wiki-a93db7854c7049a3b7c936b2"
+    },
+    {
+      "from": "char-mingyu",
+      "kind": "participated_in",
+      "label": "분해·수리 작업",
+      "to": "event-wiki-a93db7854c7049a3b7c936b2"
+    },
+    {
+      "from": "char-taehoon",
+      "kind": "participated_in",
+      "label": "작동 시험",
+      "to": "event-wiki-a93db7854c7049a3b7c936b2"
+    },
+    {
+      "from": "char-eunchae",
+      "kind": "participated_in",
+      "label": "수리내역 기록과 내부 매입상한 관리",
+      "to": "event-wiki-a93db7854c7049a3b7c936b2"
+    },
+    {
+      "from": "char-jinwoo",
+      "kind": "participated_in",
+      "label": "매입상한을 넘는 거래 거부",
+      "to": "event-wiki-a93db7854c7049a3b7c936b2"
+    },
+    {
+      "from": "event-wiki-a93db7854c7049a3b7c936b2",
+      "kind": "occurred_at",
+      "label": "폐쇄 체육시설 길드 매입대에서 운영",
+      "to": "loc-sports-complex"
+    }
+  ],
+  "season_id": "S03",
+  "version": "public-graph-facts-v1",
+  "visibility": "PUBLIC_ARCHIVE",
+  "worldline_id": "AFTERFALL"
+}
