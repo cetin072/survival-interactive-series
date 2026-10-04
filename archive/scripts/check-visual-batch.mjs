@@ -1,7 +1,7 @@
 /** Real public inputs and a local-only synthetic S99 transaction. Never calls an image model. */
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { mkdtemp, mkdir, writeFile, readFile, readdir, rm } from 'node:fs/promises'
+import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { prepareVisualPublication, APPROVED_S02_APPEARANCE_REF } from './run-visual-publication.mjs'
@@ -18,16 +18,6 @@ const graph = JSON.parse(await readFile(resolve(root, 'archive/content/graphs/C0
 assert.ok(Number.isSafeInteger(graph.anchor?.save_version) && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(graph.anchor?.game_time))
 const factsRefS03 = 'archive/content/public-facts/C03-AFTERFALL/S03/FACTS.json'
 const facts = JSON.parse(await readFile(resolve(root, factsRefS03)))
-const aWikiFactsRoot = resolve(root, 'archive/content/public-facts/C03-AFTERFALL/S03')
-const baselineEventIds = new Set(facts.nodes.filter((node) => node.type === 'event').map((node) => node.id))
-const aWikiEventIds = new Set()
-for (const name of (await readdir(aWikiFactsRoot)).filter((name) => /^AWIKI_SESSION_\d{3}_[a-f0-9]{64}\.json$/.test(name))) {
-  const batch = JSON.parse(await readFile(resolve(aWikiFactsRoot, name), 'utf8'))
-  for (const node of batch.nodes ?? []) {
-    if (node.type === 'event' && !baselineEventIds.has(node.id)) aWikiEventIds.add(node.id)
-  }
-}
-const aWikiEventCount = aWikiEventIds.size
 const source = manifest.sessions.find((session) => session.captured_message_range?.end === facts.anchor?.game_time)
 assert.ok(source?.session_id && source?.source_manifest)
 const newerVisual = graph.anchor.save_version > facts.anchor.save_version
@@ -41,6 +31,9 @@ for (const record of approvedInput.records) {
 }
 const initial = await prepareVisualPublication(snapshot, { factsRef: factsRefS03 }), repeat = await prepareVisualPublication(snapshot, { factsRef: factsRefS03 })
 assert.ok(initial.candidateBytes.equals(repeat.candidateBytes))
+const initialSubjectIds = new Set(initial.catalog.points.map((point) => point.subject_id).filter(Boolean))
+const graphGrowthVisualCount = graph.nodes.filter((record) =>
+  ['event', 'location'].includes(record.data.type) && !initialSubjectIds.has(record.id)).length
 assert.equal(initial.report.point_count, 36)
 assert.equal(initial.report.by_type.CHARACTER, 18)
 assert.equal(initial.report.by_type.LOCATION, 11)
@@ -135,8 +128,8 @@ try {
   assert.ok(publishedVisual.equals(await readFile(outputPath)))
   const args = ['--snapshot', snapshotFile, '--facts', factsRef, '--appearances', appearancesRef, '--map', mapRef, '--apply']
   const later = run(args)
-  // The later public graph includes A-Wiki events, plus this synthetic event and map.
-  assert.equal(later.point_count, initial.report.point_count + aWikiEventCount + 2)
+  // The later public graph includes reviewed Graph-growth event/location points, plus this synthetic event and map.
+  assert.equal(later.point_count, initial.report.point_count + graphGrowthVisualCount + 2)
   assert.equal(later.by_type.MAP, 1)
   const goodBytes = await readFile(outputPath), catalog = JSON.parse(goodBytes)
   assert.equal(catalog.points.find((p) => p.subject_id === 'event-test-visual').brief.art_direction.mood, 'RED_HORIZON')
