@@ -143,11 +143,12 @@ async function withRoot(fn) {
   try { await fn(root) } finally { await rm(root, { recursive: true, force: true }) }
 }
 
-test('SESSION_006 reviewed backfill keeps global 282, writes receipt last, then advances to SESSION_007', async () => {
+test('SESSION_006 reviewed backfill keeps the published global anchor, writes receipt last, then advances to SESSION_007', async () => {
   await withRoot(async (root) => {
     const pack = await completePackage(root)
     const before = JSON.parse(await readFile(resolve(root, graphRef), 'utf8'))
-    assert.equal(before.anchor.save_version, 282)
+    const published = JSON.parse(await readFile(resolve(repoRoot, graphRef), 'utf8'))
+    assert.deepEqual(before.anchor, published.anchor)
 
     const check = await finalizeWikiFactProposal({ root, ...pack, apply: false })
     assert.equal(check.status, 'READY_TO_APPLY')
@@ -159,7 +160,7 @@ test('SESSION_006 reviewed backfill keeps global 282, writes receipt last, then 
     assert.equal(result.receipt_written, true)
 
     const after = JSON.parse(await readFile(resolve(root, graphRef), 'utf8'))
-    assert.equal(after.anchor.save_version, 282)
+    assert.deepEqual(after.anchor, before.anchor)
     assert.equal(after.nodes.find((record) => record.data.label === '최은채').anchor.save_version, 280)
     assert.ok(after.nodes.some((record) => record.data.label === '임관수'))
 
