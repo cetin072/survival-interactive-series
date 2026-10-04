@@ -233,6 +233,42 @@
     "ready_behavior": "If the exact staging is already READY, do not upload again; continue to visual review.",
     "conflict_behavior": "Never overwrite a mismatched staging row. Abort is allowed only for the same leased job, exact staging_id, exact source_sha256 and UPLOADING status; then begin a fresh exact staging.",
     "partial_failure_behavior": "Preserve exact matching chunks for a later resume. Never create a second staging row for the same job.",
-    "chunk_execution": "Generate and submit one base64 chunk at a time from the materialized local file; do not place the full-file base64 into repository files, prompts, logs or user-visible output."
+    "chunk_execution": "Generate and submit one base64 chunk at a time from the materialized local file; do not place the full-file base64 into repository files, prompts, logs or user-visible output.",
+    "chunk_progress": {
+      "authority": "survival_ops.illustration_render_jobs",
+      "uploaded_field": "ingest_uploaded_chunk_count",
+      "expected_field": "ingest_expected_chunk_count",
+      "update_owner": "archive_illustration_review_staging_chunk_put",
+      "lease_heartbeat_seconds": 600,
+      "resume_source": "archive_illustration_review_staging_resume.stored_chunk_indexes"
+    },
+    "failure_policy": {
+      "chunk_put_error_with_valid_lease": {
+        "failure_kind": "INGEST",
+        "error_code": "STAGING_CHUNK_UPLOAD_FAILED",
+        "action": "record_failure_once_then_preserve_current_png_and_partial_staging"
+      },
+      "finalize_error_with_valid_lease": {
+        "failure_kind": "INGEST",
+        "error_code": "STAGING_FINALIZE_FAILED",
+        "action": "record_failure_once_then_preserve_current_png_and_partial_staging"
+      },
+      "lease_lost": {
+        "action": "do_not_reuse_or_force_failure_rpc; preserve bytes and let stale sweep diagnose"
+      },
+      "stale_sweep_codes": [
+        "REVIEWER_STAGING_NOT_STARTED",
+        "STAGING_CHUNK_UPLOAD_NOT_STARTED",
+        "STAGING_CHUNK_UPLOAD_INCOMPLETE",
+        "STAGING_FINALIZE_NOT_COMPLETED",
+        "STAGING_READY_JOB_NOT_ADVANCED"
+      ],
+      "durable_fields": [
+        "last_ingest_error_code",
+        "last_ingest_error_at",
+        "ingest_uploaded_chunk_count",
+        "ingest_expected_chunk_count"
+      ]
+    }
   }
 }
