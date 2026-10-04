@@ -1,5 +1,5 @@
 {
-  "version": "illustration-native-worker-runtime-contract-v1.1",
+  "version": "illustration-native-worker-runtime-contract-v1.2",
   "purpose": "One scheduled ChatGPT worker. Program selects work; AI generates or reviews based only on durable job state. Transfer occurs only after PASS.",
   "roles": {
     "PREPARED": {
@@ -64,5 +64,21 @@
     "automatic": "eligible CHARACTER only; never-attempted CHARACTER before retried CHARACTER; LOCATION/EVENT deferred while eligible CHARACTER exists",
     "manual_subject_override": true,
     "durable_attempt_history_rpc": "archive_illustration_render_attempt_history"
+  },
+  "boot_router": "docs/automation/ILLUSTRATION_B_NATIVE_WORKER_ROUTER.md",
+  "renderer_context_isolation": {
+    "enabled": true,
+    "rule": "For PREPARED, do not load full Automation B project/review/transfer authorities before image generation.",
+    "allowed_before_image_call": [
+      "boot_router",
+      "archive_illustration_render_job_current",
+      "library_current_png_existence_check",
+      "archive_illustration_render_job_lease_acquire",
+      "archive_illustration_render_prompt",
+      "prompt_sha256_check"
+    ],
+    "image_call_must_follow_prompt_sha_gate": true,
+    "scene_input": "EXACT_DB_PROMPT_TEXT_WITH_NO_PREFIX_OR_SUFFIX",
+    "full_authority_load_after_image_generation_only": true
   }
 }
