@@ -23,7 +23,7 @@ Automation B의 목적은 **신규 인물 중심으로 하루 최소 1장의 검
    - INGESTING = Reviewer
    - REVIEW_PASS_STAGED = PASS site asset transfer/resume
    - 그 외 = NOOP
-4. 오래된 장소/사건을 억지로 재시도하지 않는다. 후보 선택은 Program Prep의 current-main 정책을 따른다.
+4. 오래된 장소/사건을 억지로 재시도하지 않는다. Program Prep은 GitHub receipts뿐 아니라 durable DB attempt history도 읽어 **아직 한 번도 시도하지 않은 CHARACTER를 재시도 CHARACTER보다 먼저** 고른다.
 5. 새 Vault 보관을 만들지 않는다. REJECT 원본은 backend로 운반하지 않는다.
 6. HUMAN_REVIEW에서는 Library 원본을 보존하고 자동 진행하지 않는다.
 
@@ -47,7 +47,7 @@ Automation B의 목적은 **신규 인물 중심으로 하루 최소 1장의 검
 5. **파일 전송보다 먼저** `archive_illustration_review_decide_v3`를 한 번 호출하여 판정을 durable DB에 기록한다.
 6. REJECT면 판정 기록 성공 후 `current.png`를 정리하고 종료한다. 원본/썸네일 전송은 하지 않는다.
 7. HUMAN_REVIEW면 `current.png`를 보존하고 종료한다.
-8. PASS면 DB가 REVIEW_PASS_STAGED가 된 뒤에만 아래 PASS transfer를 이어서 수행할 수 있다. 시간이 부족하거나 오류가 나면 원본과 partial staging을 보존하고 종료한다. 다음 실행에서 REVIEW_PASS_STAGED부터 재개한다.
+8. PASS면 DB가 REVIEW_PASS_STAGED가 된 것을 확인한 뒤 **즉시 종료한다. 같은 실행에서 transfer를 시작하지 않는다.** 다음 Native Worker 실행이 REVIEW_PASS_STAGED를 읽고 transfer 역할만 수행한다.
 
 ## REVIEW_PASS_STAGED — PASS site asset transfer/resume
 
