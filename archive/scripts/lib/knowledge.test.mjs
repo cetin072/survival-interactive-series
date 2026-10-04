@@ -60,6 +60,10 @@ async function validateWithReaderBook(data, mutateBook) {
     const downloadPath = join(base, download)
     await mkdir(dirname(downloadPath), { recursive: true })
     await copyFile(join(root, download), downloadPath)
+    const seedRef = 'knowledge/content/experience-seeds/EX-001-apartment-power-outage.json'
+    const seedPath = join(base, seedRef)
+    await mkdir(dirname(seedPath), { recursive: true })
+    await copyFile(join(root, seedRef), seedPath)
     return await validateKnowledge({ ...data, base })
   } finally { await rm(base, { recursive: true, force: true }) }
 }
