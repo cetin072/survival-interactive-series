@@ -257,6 +257,7 @@ export function selectIllustrationCandidates({ catalog, siteAssets, receipts, no
     skipped_daily_cap: 0,
   }
   const eligible = []
+  const attemptCountByIdentity = new Map()
 
   for (const point of ready) {
     if (!validPoint(point)) { counts.skipped_invalid_identity++; continue }
@@ -269,12 +270,31 @@ export function selectIllustrationCandidates({ catalog, siteAssets, receipts, no
     }
     const attemptsForAsset = history.length
     if (attemptsForAsset >= MAX_ASSET_ATTEMPTS) { counts.skipped_retry_cap++; continue }
+    attemptCountByIdentity.set(`${point.point_id}:${point.generation_key}`, attemptsForAsset)
     eligible.push(point)
   }
 
-  let ordered = eligible.sort((a, b) => a.priority - b.priority
-    || a.point_id.localeCompare(b.point_id))
-  if (requested) ordered = ordered.filter((point) => requested.has(point.subject_id))
+  // Automation B operating policy:
+  // - explicit subjectIds remain authoritative for targeted/manual runs;
+  // - otherwise, if any character candidate exists, defer locations/events;
+  // - within the active pool, prefer never-attempted subjects before retries.
+  let pool = requested
+    ? eligible.filter((point) => requested.has(point.subject_id))
+    : eligible
+  if (!requested && pool.some((point) => point.subject_id.startsWith('char-'))) {
+    const deferredNonCharacters = pool.filter((point) => !point.subject_id.startsWith('char-')).length
+    counts.deferred_non_character_priority = deferredNonCharacters
+    pool = pool.filter((point) => point.subject_id.startsWith('char-'))
+  } else {
+    counts.deferred_non_character_priority = 0
+  }
+
+  let ordered = pool.sort((a, b) => {
+    const aAttempts = attemptCountByIdentity.get(`${a.point_id}:${a.generation_key}`) ?? 0
+    const bAttempts = attemptCountByIdentity.get(`${b.point_id}:${b.generation_key}`) ?? 0
+    const freshRank = Number(aAttempts > 0) - Number(bAttempts > 0)
+    return freshRank || a.priority - b.priority || a.point_id.localeCompare(b.point_id)
+  })
   const dailyCapacity = Math.max(0, DAILY_GENERATION_CAP - generationAttemptsToday)
   if (ordered.length > dailyCapacity) counts.skipped_daily_cap = ordered.length - dailyCapacity
   const selected = ordered.slice(0, Math.min(batchLimit, dailyCapacity))
