@@ -60,6 +60,7 @@
 .knowledge-draft-toolbar > div:last-child, .knowledge-draft-block-head > div, .knowledge-draft-section > header > div, .knowledge-draft-add-block { display:flex; flex-wrap:wrap; gap:7px; }
 .knowledge-draft-toolbar button, .knowledge-draft-block-head button, .knowledge-draft-section > header button, .knowledge-draft-add-block button, .knowledge-add-section { min-height:36px; padding:7px 10px; border:1px solid #dcdce0; border-radius:7px; background:#fff; color:#333339; font-weight:650; }
 .knowledge-draft-toolbar button:not(.operator-secondary), .knowledge-publication-decision > div > button:first-child { border-color:#222227; background:#222227; color:#fff; }
+.knowledge-draft-toolbar button:disabled { opacity:.55; cursor:not-allowed; }
 .knowledge-draft-editor { display:grid; gap:14px; margin:14px 0 20px; }
 .knowledge-draft-fixed { display:grid; gap:6px; padding:14px; border:1px solid #e0e0e3; border-radius:9px; background:#f6f6f7; }
 .knowledge-draft-fixed span, .knowledge-draft-field > span, .knowledge-draft-section label > span { color:#6e6e75; font-size:13px; font-weight:700; }
