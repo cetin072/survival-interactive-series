@@ -1,0 +1,13 @@
+{
+  "version": "a-wiki-receipt-v1",
+  "session_id": "SESSION_008",
+  "source_sha256": "3d15073c796967f27b1dd094ceecd948ab28b93aed7971818de48cb0e6cd4dc0",
+  "job_id": "wiki-job-c92e0e5d6a9dc4b5047356f48a1e3f11bc85044b1bec2aa8a5b0a80e6238664d",
+  "proposal_sha256": "03f30a1e4cecb558474bf6dcb140d6675ee3c58b9f9f1be8f4f0ee9d1d289621",
+  "review_sha256": "0609e6813051db9b4851796e08979e43b23c6df8411db3a5d2ebfc8205bc96b0",
+  "outcome": "APPLIED",
+  "fact_sha256": "b0833f958e8c3ea3395f1b9aa1fbe8cd368183e3336971f0d9d85479f710530a",
+  "graph_before_sha256": "0927434cbc30f437381ce55f083903a678447ad1abdbe3df1430800c1901fe82",
+  "graph_after_sha256": "4eae33f49195300c4b538c05eb02c3a91638b2f648af1d4e4d0e84fb0f87303e",
+  "coverage": "COMPLETE"
+}
