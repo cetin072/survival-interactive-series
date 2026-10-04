@@ -1,0 +1,135 @@
+{
+  "id": "K-014",
+  "lead": "전등이 갑자기 꺼졌을 때 한 주민은 먼저 집 안 분전반을 살폈습니다. 변기 물이 한 번 내려가 수도는 괜찮다고 생각했지만, 가족의 제안으로 공용부와 승강기 상태를 확인하면서 판단이 달라졌습니다. 원인을 맞히기 전에 정전이 어디까지 퍼졌는지부터 살펴보세요.",
+  "slug": "apartment-power-outage-scope-check",
+  "basis": "국민안전24 정전 행동요령과 미국 공공기관의 급수·정전 보조자료. 개인 경험은 질문의 출처로만 사용",
+  "label": "아파트 정전 범위 확인",
+  "scope": "대한민국 공동주택에서 갑작스러운 정전의 범위를 안전하게 가늠하고 공식 안내를 확인하는 일반 행동",
+  "title": "전등이 꺼졌을 때 우리 집만의 문제인지 아파트 정전인지 어떻게 구분할까",
+  "tools": [],
+  "footer": "타는 냄새, 스파크, 침수 등 위험 신호가 있으면 전기설비에 접근하지 말고 관리사무소 또는 긴급기관의 안내를 따르세요. 특정 건물의 고장 원인과 급수 상태는 현장 관리주체가 확인해야 합니다.",
+  "status": "PUBLISHED",
+  "sources": [
+    {
+      "id": "S1",
+      "url": "https://www.safekorea.go.kr/safekorea-kor/acts/nacts/action-guide.do?actsHeaderTitle=%EC%A0%95%EC%A0%84+%EB%B0%8F+%EC%A0%84%EB%A0%A5%EB%B6%80%EC%A1%B1&category=powerOutagesandShortages&menuSn=4",
+      "note": "세대 분전반의 이상 유무 확인, 이웃과 함께 정전될 때 관리사무소 연락, 한전 123, 승강기 정지 시 구조요청과 전기 재공급 시 행동을 확인했습니다.",
+      "title": "국민안전24 · 정전 및 전력부족 행동요령",
+      "checked_at": "2026-10-04"
+    },
+    {
+      "id": "S2",
+      "url": "https://www.ready.gov/sites/default/files/2024-03/ready.gov_power-outage_hazard-info-sheet.pdf",
+      "note": "냉장고 문을 닫아 두기, 휴대전화와 충전 수단, 손전등, 물 관련 공식 안내 확인을 검토했습니다. 미국 안내이므로 국내 신고 경로는 국민안전24를 우선합니다.",
+      "title": "Ready.gov · Power Outage Hazard Information Sheet",
+      "checked_at": "2026-10-04"
+    },
+    {
+      "id": "S3",
+      "url": "https://www.energy.gov/eere/buildings/articles/pump-and-fan-technology-characterization-and-rd-assessment",
+      "note": "고층 및 공동주택의 급수 압력을 높이는 펌프와 물탱크 구성의 다양성을 확인했습니다.",
+      "title": "U.S. Department of Energy · Pump and Fan Technology Characterization",
+      "checked_at": "2026-10-04"
+    },
+    {
+      "id": "S4",
+      "url": "https://www.baycountymi.gov/Docs/CitizenCorps/FlushTankProblems.pdf",
+      "note": "탱크형 변기에 이미 담긴 물로 한 번 물을 내릴 수 있고 이후 재급수가 필요한 구조를 확인했습니다.",
+      "title": "Michigan State University Extension · Flush Tank Problems",
+      "checked_at": "2026-10-04"
+    },
+    {
+      "id": "S5",
+      "url": "https://home4.nyc.gov/site/dep/water/detecting-toilet-leaks.page",
+      "note": "물을 내린 뒤 탱크가 다시 채워지는지 관찰하는 방법을 확인했습니다. 국내 공동주택 설비의 상태를 대신 진단하지는 않습니다.",
+      "title": "NYC Department of Environmental Protection · Toilet Leak Detection",
+      "checked_at": "2026-10-04"
+    }
+  ],
+  "summary": "전등이 갑자기 꺼졌을 때 집 안, 공용부, 관리사무소 순서로 정전 범위를 확인하는 방법을 정리합니다. 변기 물 한 번과 승강기 상태를 해석할 때의 한계도 짚습니다.",
+  "guide_id": null,
+  "sections": [
+    {
+      "blocks": [
+        {
+          "text": "한 기기만 꺼졌는지, 한 방인지, 집 전체인지부터 살펴봅니다. 이어 안전한 위치에서 복도 조명이나 공동현관 표시 등 공용부와 이웃의 상태를 확인합니다. 공용부에도 변화가 있다면 세대 내부 문제로 단정하지 말고 관리사무소에 문의하세요. 이 순서는 국민안전24의 ‘우리 집만’과 ‘이웃집도 함께’ 정전된 경우를 나누는 안내를 생활에 적용한 것입니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "원인보다 먼저 범위를 확인합니다"
+    },
+    {
+      "blocks": [
+        {
+          "type": "ordered_list",
+          "items": [
+            "손전등이나 휴대전화 조명으로 주변을 밝히고, 타는 냄새·스파크·물기 등 위험 신호가 있는지 봅니다.",
+            "사용 중이던 전기제품은 스위치를 끄거나 안전하면 플러그를 뽑습니다.",
+            "위험 신호가 없을 때만 세대 분전반의 차단기 상태를 눈으로 확인합니다. 원인을 모른 채 반복해서 올리거나 내부 배선을 만지지 않습니다."
+          ]
+        }
+      ],
+      "heading": "집 안에서는 안전한 범위까지만 봅니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "복도 조명, 공동현관, 승강기 표시가 함께 꺼졌다면 범위가 세대를 넘었을 가능성을 생각할 수 있습니다. 다만 비상전원 때문에 일부 설비만 켜져 있을 수 있으므로 표시 하나로 원인을 확정하지 마세요. 정전이 의심되면 확인을 위해 승강기에 타지 않습니다. 이미 안에 갇혔다면 인터폰으로 구조를 요청하고 임의로 나오려 하지 마세요.",
+          "type": "prose"
+        }
+      ],
+      "heading": "공용부와 승강기는 단서로만 봅니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "탱크형 변기는 저장된 물로 한 번 내려갈 수 있습니다. 수도가 계속 나오는지 알려면 수도꼭지의 실제 흐름과 변기 탱크의 재급수 여부를 따로 확인하세요. 공동주택은 급수 펌프와 물탱크, 비상전원 구성에 따라 정전의 영향이 다르므로 관리사무소 안내를 확인해야 합니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "변기 물 한 번으로 수도를 판단하지 않습니다"
+    },
+    {
+      "blocks": [
+        {
+          "type": "ordered_list",
+          "items": [
+            "관리사무소의 방송이나 공지를 확인하고, 필요하면 한전 123에 정전 상황을 문의합니다.",
+            "정전이 길어질 수 있으면 휴대전화 배터리와 보조배터리, 손전등을 먼저 확보합니다.",
+            "냉장고와 냉동고 문은 가급적 닫아 두고, 수도꼭지의 출수와 공동현관 등 출입 방법을 확인합니다.",
+            "전기가 돌아온 뒤에는 가전제품을 한꺼번에 켜지 말고 순서대로 사용하며 공식 복구 안내를 확인합니다."
+          ]
+        }
+      ],
+      "heading": "공식 확인 뒤 생활 설비를 점검합니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "한 주민은 처음에 집 안 문제라고 생각해 분전반을 확인했고, 변기 물이 한 번 내려가 수도는 정상이라고 오해할 수 있었습니다. 가족이 공용부를 확인하자고 제안했고, 승강기도 작동하지 않는 것을 보고 건물이나 단지 범위의 문제일 가능성으로 판단을 바꿨습니다. 복구 뒤 관리사무소 방송에서 새가 원인이라는 안내를 들었지만, 구체적인 전기설비 접촉 지점이나 고장 경위는 확인하지 않았습니다. 이 경험은 질문의 출처이며 위 행동요령의 증거는 아닙니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "이 질문이 생긴 실제 경험"
+    }
+  ],
+  "topic_id": "household-emergency-preparedness",
+  "risk_level": "HIGH",
+  "story_refs": [],
+  "updated_at": "2026-10-04",
+  "ai_assisted": true,
+  "content_type": "BRIEF",
+  "published_at": "2026-10-04",
+  "risk_domains": [
+    "GENERAL_PREPAREDNESS",
+    "ELECTRICAL"
+  ],
+  "editorial_note": "EX-001은 사용자의 판단 순서만 기록한다. 현실 행동은 국민안전24와 공공기관 자료로 검증했다. 원본 사진은 사용하지 않았다.",
+  "meta_description": "아파트에서 전등이 꺼졌을 때 세대 정전과 건물 정전을 안전하게 구분하고, 수도·승강기·공식 안내를 확인하는 순서를 설명합니다.",
+  "related_brief_ids": [
+    "K-002"
+  ],
+  "source_checked_at": "2026-10-04",
+  "publication_policy": "HUMAN_APPROVED",
+  "semantic_qa_status": "PASS"
+}

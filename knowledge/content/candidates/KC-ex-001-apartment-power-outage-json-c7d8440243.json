@@ -1,0 +1,11 @@
+{
+  "id": "KC-ex-001-apartment-power-outage-json-c7d8440243",
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-014",
+  "question": "전등이 꺼졌을 때 우리 집만의 문제인지 아파트 정전인지 어떻게 구분할까",
+  "topic_id": "household-emergency-preparedness",
+  "source_ref": "knowledge/content/experience-seeds/EX-001-apartment-power-outage.json",
+  "source_kind": "USER_REPORTED_EXPERIENCE",
+  "source_sha256": "e4b57f214981e17df5b232a60835e6ba3c8ea2424c7ba3b089869032c161e8eb",
+  "disposition_note": "EX-001의 개인 경험에서 정전 범위 확인 질문을 얻었다. K-002의 일반 비상용품 준비와 달리 세대·공용부·급수·공식 확인 순서를 다룬다. 현실 주장은 공식 출처로 별도 검증하고 최초 경험 파일럿은 사람 검토로 보낸다."
+}
