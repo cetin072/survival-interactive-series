@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { readFile } from 'node:fs/promises'
 import { discoverWikiSource } from './lib/wiki-semantic-jobs.mjs'
 import { buildWikiFactJob, buildWikiFactReviewJob, WIKI_REVIEW_VERSION } from './lib/wiki-fact-extractor.mjs'
-import { compileSubmittedExtractor, inspectSubmittedReview } from './a-wiki-native-control.mjs'
+import { compileSubmittedExtractor, inspectSubmittedReview, mergedPublication } from './a-wiki-native-control.mjs'
 
 const root = resolve(fileURLToPath(new URL('../..', import.meta.url)))
 
@@ -85,4 +85,33 @@ test('review package rejects a mutated proposal', async () => {
   const alteredProposal = structuredClone(compiled.proposal)
   alteredProposal.note += ' changed'
   assert.throws(() => buildWikiFactReviewJob(job, alteredProposal), /WIKI_REVIEW_PROPOSAL_HASH_INVALID/)
+})
+
+
+test('merged publication recovery accepts only the exact publication branch and main target', () => {
+  const branch = 'automation/a-wiki-publish-006-14675b020602'
+  const result = mergedPublication({
+    number: 372,
+    state: 'MERGED',
+    headRefName: branch,
+    headRefOid: '4'.repeat(40),
+    baseRefName: 'main',
+    mergeCommit: { oid: 'a'.repeat(40) },
+  }, branch)
+  assert.deepEqual(result, {
+    status: 'MERGED',
+    branch,
+    prNumber: 372,
+    headSha: '4'.repeat(40),
+    mergeSha: 'a'.repeat(40),
+  })
+  assert.throws(() => mergedPublication({
+    number: 372,
+    state: 'MERGED',
+    headRefName: 'other-branch',
+    headRefOid: '4'.repeat(40),
+    baseRefName: 'main',
+    mergeCommit: { oid: 'a'.repeat(40) },
+  }, branch), /A_WIKI_MERGED_PR_BINDING_INVALID/)
+  assert.equal(mergedPublication({ state: 'OPEN' }, branch), null)
 })
