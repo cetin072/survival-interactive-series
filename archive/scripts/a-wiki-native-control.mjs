@@ -164,7 +164,7 @@ async function buildPublication(row) {
       })
       insist(['FINALIZED', 'RECOVERED_AND_FINALIZED', 'NOOP_ALREADY_FINALIZED'].includes(result.status), 'A_WIKI_FINALIZER_NOT_APPLIED')
 
-      const changed = run('git', ['status', '--porcelain'], temp).split(/\r?\n/).filter(Boolean)
+      const changed = run('git', ['status', '--porcelain', '--untracked-files=all'], temp).split(/\r?\n/).filter(Boolean)
       insist(changed.length > 0, 'A_WIKI_PUBLICATION_EMPTY')
       const allowedPrefixes = [
         'archive/content/graphs/C03-AFTERFALL/GRAPH.json',
