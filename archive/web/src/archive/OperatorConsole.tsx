@@ -56,6 +56,20 @@ type KnowledgeSemanticJob = {
   stalled_code?: string | null; result_decision?: string | null; final_pr_number?: number | null
   final_head_sha?: string | null; merge_sha?: string | null; blocker_code?: string | null; blocker_stage?: string | null
 }
+type AWikiJob = {
+  job_id?: string; status?: string; session_id?: string; source_ref?: string
+  blocker_code?: string | null; final_pr_number?: number | null; merge_sha?: string | null
+  dispatch_count?: number | null; dispatch_at?: string | null; age_minutes?: number | null
+  created_at?: string | null; updated_at?: string | null; extractor_submitted_at?: string | null
+  review_ready_at?: string | null; review_submitted_at?: string | null; finalizing_at?: string | null
+  published_at?: string | null
+}
+type AWikiStatus = {
+  job_count: number
+  active_count: number
+  published_count: number
+  latest_job: AWikiJob | null
+}
 type SystemStatus = {
   archive: {
     dispatch_count: number
@@ -103,6 +117,7 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
   const [confirmPassword, setConfirmPassword] = useState('')
   const [inbox, setInbox] = useState<Inbox>(emptyInbox)
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null)
+  const [aWikiStatus, setAWikiStatus] = useState<AWikiStatus | null>(null)
   const [productionStatus, setProductionStatus] = useState<ProductionStatus>({ release: null, deploy: null })
   const [statusError, setStatusError] = useState('')
   const [selected, setSelected] = useState<ReviewDetail | null>(null)
@@ -117,16 +132,20 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
     if (!supabaseClient) return
     setBusy(true); setRefreshing(true); setError(''); setStatusError('')
     try {
-      const [inboxResult, systemResult, release, deploy] = await Promise.all([
+      const [inboxResult, systemResult, aWikiResult, release, deploy] = await Promise.all([
         supabaseClient.rpc('archive_operator_review_inbox'),
         supabaseClient.rpc('archive_operator_system_status'),
+        supabaseClient.rpc('archive_operator_a_wiki_status'),
         readJson<ReleaseMarker>('/release/production.json'),
         readJson<DeployMeta>('/deploy-meta.json'),
       ])
       if (inboxResult.error) setError(rpcError(inboxResult.error))
       else setInbox((inboxResult.data ?? emptyInbox) as Inbox)
-      if (systemResult.error) setStatusError('자동화 실행 상태를 불러오지 못했습니다.')
-      else setSystemStatus(systemResult.data as SystemStatus)
+      if (systemResult.error || aWikiResult.error) setStatusError('자동화 실행 상태를 불러오지 못했습니다.')
+      else {
+        setSystemStatus(systemResult.data as SystemStatus)
+        setAWikiStatus(aWikiResult.data as AWikiStatus)
+      }
       setProductionStatus({ release, deploy })
       setLastRefreshedAt(new Date().toISOString())
     } finally {
@@ -258,6 +277,9 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
   const archiveCron = systemStatus?.archive.cron ?? null
   const archiveDispatch = systemStatus?.archive.latest_dispatch ?? null
   const archiveHealthy = archiveCron?.active === true && archiveCron.last_status === 'succeeded'
+  const aWikiLatest = aWikiStatus?.latest_job ?? null
+  const aWikiBlocker = aWikiLatest?.blocker_code ?? null
+  const aWikiBadgeClass = aWikiBlocker ? 'warning' : visualStatusTone(aWikiLatest?.status)
   const visualLatest = systemStatus?.visual.latest_job ?? null
   const visualPrepHealthy = systemStatus?.visual.prep_cron?.active === true
     && systemStatus?.visual.prep_cron?.last_status === 'succeeded'
@@ -267,9 +289,13 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
   const visualBadgeClass = visualBlocker ? 'warning' : visualStatusTone(visualLatest?.status)
   const semanticLatest = systemStatus?.knowledge_semantic?.latest_job ?? null
   const semanticBlocker = semanticLatest?.stalled_code ?? semanticLatest?.blocker_code ?? systemStatus?.knowledge_semantic?.prep?.blocker_code ?? null
-  const semanticBadgeClass = semanticBlocker ? 'warning' : semanticLatest?.status === 'PUBLISHED' ? 'ok' : ['HUMAN_REVIEW','BLOCKED','HOLD'].includes(semanticLatest?.status ?? '') ? 'warning' : 'neutral'
   const knowledgeLatestBrief = operatorStaticStatus.knowledge.latestBriefIds.at(-1) ?? '없음'
   const knowledgeNeedsReview = inbox.pending_count > 0
+  const knowledgeBadgeClass = semanticBlocker || knowledgeNeedsReview
+    ? 'warning'
+    : semanticLatest?.status === 'PUBLISHED'
+      ? 'ok'
+      : operatorStaticStatus.knowledge.workerEnabled ? 'neutral' : 'warning'
   const productionContext = productionStatus.deploy?.context ?? null
 
   return <section className="operator-page"><header className="operator-heading"><div><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>Operator Dashboard</h1><p>{user.email} · 실제 자동화 상태와 검토 대기 항목을 한곳에서 확인합니다.</p></div><div className="operator-heading-actions"><a className="operator-secondary" href="/operator/vault/">일러스트 보관함</a><a className="operator-secondary" href="/operator/knowledge/">Knowledge Inbox</a><a className="operator-secondary" href="/operator/visuals/">시각 제작 메타</a><button className="operator-secondary" disabled={busy} onClick={() => void signOut()}>로그아웃</button></div></header>
@@ -292,6 +318,19 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
         </article>
 
         <article className="operator-system-card">
+          <div className="operator-system-title"><h3>A-Wiki · Wiki <small>세계관 자동 성장</small></h3><span className={`operator-status-badge ${aWikiBadgeClass}`}>{aWikiBlocker ? '확인 필요' : aWikiLatest?.status ? statusWithKorean(aWikiLatest.status) : '실행이력 없음'}</span></div>
+          <dl>
+            <div><dt>최근 세션</dt><dd>{aWikiLatest?.session_id ?? '기록 없음'}</dd></div>
+            <div><dt>활성 / 게시</dt><dd>{aWikiStatus?.active_count ?? 0}건 / {aWikiStatus?.published_count ?? 0}건</dd></div>
+            <div><dt>최근 갱신</dt><dd>{formatOperatorTime(aWikiLatest?.published_at ?? aWikiLatest?.updated_at ?? aWikiLatest?.created_at)}</dd></div>
+            <div><dt>상태 체류</dt><dd>{aWikiLatest?.age_minutes == null ? '—' : `${aWikiLatest.age_minutes}분`}</dd></div>
+            <div><dt>PR / Merge</dt><dd>{aWikiLatest?.final_pr_number ? `#${aWikiLatest.final_pr_number}` : '—'} · {aWikiLatest?.merge_sha?.slice(0, 12) ?? '—'}</dd></div>
+            <div><dt>GitHub 호출</dt><dd>{aWikiLatest?.dispatch_count ?? 0}회 · {formatOperatorTime(aWikiLatest?.dispatch_at)}</dd></div>
+            <div><dt>차단 사유</dt><dd>{aWikiBlocker ? <><code>{aWikiBlocker}</code>{explainMachineCode(aWikiBlocker) && <small className="operator-code-help">{explainMachineCode(aWikiBlocker)}</small>}</> : '없음'}</dd></div>
+          </dl>
+        </article>
+
+        <article className="operator-system-card">
           <div className="operator-system-title"><h3>B · Visual <small>이미지</small></h3><span className={`operator-status-badge ${visualBadgeClass}`}>{visualBlocker ? '확인 필요' : visualLatest?.status ? statusWithKorean(visualLatest.status) : '실행이력 없음'}</span></div>
           <dl>
             <div><dt>Prep 자동실행</dt><dd>{visualPrepHealthy ? '정상' : '확인 필요'}</dd></div>
@@ -308,41 +347,29 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
         </article>
 
         <article className="operator-system-card">
-          <div className="operator-system-title"><h3>C · Semantic <small>Knowledge 작업</small></h3><span className={`operator-status-badge ${semanticBadgeClass}`}>{semanticBlocker ?? semanticLatest?.status ?? '실행이력 없음'}</span></div>
+          <div className="operator-system-title"><h3>C · Knowledge <small>생존 지식</small></h3><span className={`operator-status-badge ${knowledgeBadgeClass}`}>{semanticBlocker ? '확인 필요' : knowledgeNeedsReview ? '검토 필요' : semanticLatest?.status ? statusWithKorean(semanticLatest.status) : operatorStaticStatus.knowledge.workerEnabled ? '대기' : '중지'}</span></div>
           <dl>
             <div><dt>활성 작업</dt><dd>{systemStatus?.knowledge_semantic?.active_count ?? 0}건</dd></div>
-            <div><dt>종류 / 판정</dt><dd>{semanticLatest?.job_type ?? '—'} · {semanticLatest?.result_decision ?? '—'}</dd></div>
+            <div><dt>최근 처리</dt><dd>{knowledgeLatestBrief} · {semanticLatest?.result_decision ?? '—'}</dd></div>
             <div><dt>Source</dt><dd>{semanticLatest?.source_kind ?? '—'} · {semanticLatest?.source_ref?.split('/').slice(-2).join('/') ?? '—'}</dd></div>
             <div><dt>준비 / 제출</dt><dd>{formatOperatorTime(semanticLatest?.prepared_at)} / {formatOperatorTime(semanticLatest?.submitted_at)}</dd></div>
-            <div><dt>경과</dt><dd>{semanticLatest?.age_minutes == null ? '—' : `${semanticLatest.age_minutes}분`}</dd></div>
-            <div><dt>PR / 결과</dt><dd>{semanticLatest?.final_pr_number ? `#${semanticLatest.final_pr_number}` : '—'} · {semanticLatest?.status ?? '—'}</dd></div>
-            <div><dt>Merge SHA</dt><dd>{semanticLatest?.merge_sha?.slice(0, 12) ?? '—'}</dd></div>
-            <div><dt>차단 사유</dt><dd>{semanticBlocker ? <><code>{semanticBlocker}</code>{semanticLatest?.blocker_stage && <small className="operator-code-help">{semanticLatest.blocker_stage}</small>}</> : '없음'}</dd></div>
-            <div><dt>Prep 상태</dt><dd>{systemStatus?.knowledge_semantic?.prep?.last_status ?? '기록 없음'} · {systemStatus?.knowledge_semantic?.prep?.last_stage ?? '—'}</dd></div>
-          </dl>
-        </article>
-
-        <article className="operator-system-card">
-          <div className="operator-system-title"><h3>C · Knowledge <small>생존 지식</small></h3><span className={`operator-status-badge ${knowledgeNeedsReview ? 'warning' : 'ok'}`}>{knowledgeNeedsReview ? '검토 필요' : operatorStaticStatus.knowledge.workerEnabled ? '정상' : '중지'}</span></div>
-          <dl>
-            <div><dt>최근 처리</dt><dd>{knowledgeLatestBrief}</dd></div>
-            <div><dt>처리 시각</dt><dd>{formatOperatorTime(operatorStaticStatus.knowledge.latestProcessedAt)}</dd></div>
             <div><dt>검토 대기</dt><dd>{inbox.pending_count}건</dd></div>
+            <div><dt>PR / 결과</dt><dd>{semanticLatest?.final_pr_number ? `#${semanticLatest.final_pr_number}` : '—'} · {semanticLatest?.status ?? '—'}</dd></div>
+            <div><dt>차단 사유</dt><dd>{semanticBlocker ? <><code>{semanticBlocker}</code>{semanticLatest?.blocker_stage && <small className="operator-code-help">{semanticLatest.blocker_stage}</small>}</> : '없음'}</dd></div>
             <div><dt>주기</dt><dd>{operatorStaticStatus.knowledge.triggerIntervalHours}시간 · {timezoneWithKorean(operatorStaticStatus.knowledge.timezone)}</dd></div>
           </dl>
         </article>
 
-        <article className="operator-system-card">
-          <div className="operator-system-title"><h3>Production <small>실사이트 배포</small></h3><span className={`operator-status-badge ${productionStatusTone(productionContext)}`}>{productionContext === 'production' ? '정상' : productionContext ?? '확인 필요'}</span></div>
-          <dl>
-            <div><dt>원본 기준</dt><dd><code>{shortSha(productionStatus.release?.source_main_sha)}</code><small className="operator-code-help">Source SHA · 배포에 포함된 원본 코드 기준값</small></dd></div>
-            <div><dt>배포 기준</dt><dd><code>{shortSha(productionStatus.deploy?.commit_ref)}</code><small className="operator-code-help">Deploy SHA · 실제 사이트에 올라간 코드 버전</small></dd></div>
-            <div><dt>최근 배치</dt><dd>{productionStatus.release?.released_on_kst ?? '기록 없음'}</dd></div>
-            <div><dt>정책</dt><dd>{operatorStaticStatus.release.productionIntervalDays}일 배치 · {operatorStaticStatus.release.releaseHourKst}시 · 일 최대 {operatorStaticStatus.release.maxProductionDeploysPerDay}회</dd></div>
-          </dl>
-        </article>
       </div>
-      <p className="operator-muted">A는 실제 Supabase Cron과 GitHub 외부 호출 기록, B는 현재 이미지 Render/Review/Finalizer job 상태를 보여줍니다. C는 생존 지식 자동화의 최근 처리 상태를 보여줍니다. 상태는 로그인 시 한 번 불러오며 이후에는 상태 새로고침 버튼을 눌렀을 때 갱신됩니다.</p>
+      <div className="operator-release-strip">
+        <strong>Production <small>실사이트 배포</small></strong>
+        <span className={`operator-status-badge ${productionStatusTone(productionContext)}`}>{productionContext === 'production' ? '정상' : productionContext ?? '확인 필요'}</span>
+        <span>원본 <code>{shortSha(productionStatus.release?.source_main_sha)}</code></span>
+        <span>배포 <code>{shortSha(productionStatus.deploy?.commit_ref)}</code></span>
+        <span>최근 배치 {productionStatus.release?.released_on_kst ?? '기록 없음'}</span>
+        <span>{operatorStaticStatus.release.productionIntervalDays}일 배치 · {operatorStaticStatus.release.releaseHourKst}시 · 일 최대 {operatorStaticStatus.release.maxProductionDeploysPerDay}회</span>
+      </div>
+      <p className="operator-muted">A는 Archive, A-Wiki는 세계관 자동 성장, B는 이미지 Render/Review/Finalizer, C는 생존 지식 자동화 상태를 보여줍니다. 자동화 전광판은 4개이며, Production은 별도 배포 상태로 분리했습니다. 상태는 로그인 시 한 번 불러오며 이후에는 상태 새로고침 버튼을 눌렀을 때 갱신됩니다.</p>
     </section>
 
     <div className="operator-grid"><section className="operator-panel"><header><h2>대기 항목</h2><button className={`operator-secondary operator-refresh-button ${refreshing ? 'refreshing' : ''}`} disabled={busy} aria-busy={refreshing} onClick={() => void refresh()}><span aria-hidden="true">↻</span>{refreshing ? '새로고침 중…' : '새로고침'}</button></header>
