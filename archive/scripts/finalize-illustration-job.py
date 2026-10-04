@@ -167,6 +167,24 @@ def find_open_pr(branch):
 
 
 def wait_pr_and_merge(number):
+    # A freshly-created PR may briefly report no checks before GitHub attaches
+    # workflow/check runs. Treat that as propagation delay, not CI failure.
+    for _ in range(30):
+        heartbeat()
+        view = gh_json(
+            "pr", "view", str(number), "--repo", REPO,
+            "--json", "state,mergeable,headRefOid,mergeCommit,statusCheckRollup",
+        )
+        if view["state"] == "MERGED":
+            return view["mergeCommit"]["oid"]
+        if view["state"] != "OPEN":
+            fail("FINALIZER_PR_NOT_OPEN")
+        if view.get("statusCheckRollup"):
+            break
+        time.sleep(3)
+    else:
+        fail("FINALIZER_PR_CHECKS_NOT_REPORTED_TIMEOUT")
+
     run_with_heartbeat(["gh", "pr", "checks", str(number), "--repo", REPO, "--watch",
         "--fail-fast", "--interval", "10"], capture=False)
     for _ in range(20):
