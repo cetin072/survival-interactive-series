@@ -1,158 +1,210 @@
-# A-Wiki native handoff v1
+# A-Wiki Native Handoff V2 — durable Supabase submit
 
 ## Purpose
 
-Connect the generic A-Wiki semantic pipeline to native ChatGPT with the minimum recurring surface:
+Native ChatGPT performs semantic judgment only. It never writes GitHub files, Graph facts, receipts, branches or PRs.
 
-- **one ChatGPT automation**
-- **one machine-owned operational branch**
-- GitHub event workflows for every deterministic step
-- no new database, paid provider, or scheduler service
+The durable control plane is one Supabase job row. GitHub owns every deterministic transformation and publication action.
 
-The AI automation performs only one semantic role per run. GitHub performs preparation, validation, finalization, CI and merge.
-
-## Flow
+## Final flow
 
 ```text
-A-Core merges verified PUBLIC RAW to main
-                 |
-                 v
-GitHub prepares exact A-Wiki job
-                 |
-                 v
-automation/a-wiki-native
-status = EXTRACTOR_READY
-                 |
-        ChatGPT task run #1
-        Extractor only
-                 |
-                 v
-result.json
-                 |
-          GitHub validates
-          compiles proposal
-          builds review job
-                 |
-                 v
-status = REVIEW_READY
-                 |
-        ChatGPT task run #2
-        fresh Reviewer only
-                 |
-                 v
-review.json
-                 |
-          GitHub validates
-          safe Finalizer
-                 |
-          fact + Graph + receipt
-                 |
-          exact-head PR / CI
-                 |
-               main
-                 |
-        next pending job prepared
+A-Core/main verified PUBLIC source
+          |
+          v
+GitHub prepare
+          |
+          v
+Supabase a_wiki_native_jobs
+phase = EXTRACTOR_READY
+          |
+     Native Worker
+     Extractor only
+          |
+     archive_a_wiki_native_job_submit()
+          |
+          v
+EXTRACTOR_SUBMITTED
+          |
+Supabase dispatch -> GitHub consume
+          |
+GitHub compiles proposal + review-job
+          |
+          v
+REVIEW_READY
+          |
+     Native Worker
+     fresh Reviewer only
+          |
+     archive_a_wiki_native_job_submit()
+          |
+          v
+REVIEW_SUBMITTED
+          |
+Supabase dispatch -> GitHub consume
+          |
+safe Finalizer
+          |
+Fact + Graph + Receipt LAST
+          |
+PR / exact-head CI / merge
+          |
+          v
+PUBLISHED
+          |
+main push prepares next pending session
 ```
 
-A single schedule therefore gives separate native calls: the Extractor and Reviewer never run in the same automation execution.
+## Why this replaced the operational-branch transport
 
-## Operational branch
+The first native task could read GitHub but its scheduled execution could not reliably perform the GitHub write needed for `result.json` / `review.json`.
 
-Branch: `automation/a-wiki-native`
+That transport is removed from the authority path. Native output is now submitted through Supabase, matching the already proven Automation C pattern:
 
-Machine-owned directory:
+```text
+native judgment -> durable submit -> program finalizer -> GitHub
+```
 
-`archive/automation/a-wiki-native/`
+The old `automation/a-wiki-native` branch is legacy evidence only and is not an authority.
 
-Files:
+## Durable job
 
-- `status.json` — current phase and immutable binding summary
-- `job.json` — exact `wiki-fact-job-v1` generated from verified source + current Graph
-- `result.json` — native Extractor output; written only by ChatGPT in EXTRACTOR_READY
-- `proposal.json` — generated only by repository code
-- `review-job.json` — complete prepared job + fixed proposal; generated only by repository code
-- `review.json` — native Reviewer output; written only by ChatGPT in REVIEW_READY
-- `reviewed.json` — repository validation output when present
+Table: `survival_ops.a_wiki_native_jobs`
 
-The operational directory never merges into main. After a publication merge, GitHub resets the operational branch to the new main and prepares the next pending source.
+Only one non-PUBLISHED job may exist.
 
-## Native task contract
+Native-readable phases:
 
-Every run starts by reading `status.json` from branch `automation/a-wiki-native`.
+- `EXTRACTOR_READY`
+- `REVIEW_READY`
+- `HUMAN_REVIEW`
+- `REJECT`
+- `BLOCKED`
 
-### EXTRACTOR_READY
+Program phases:
 
-Read `job.json` and current-main `docs/automation/A_WIKI_FACT_WORKER_V1.md`.
+- `EXTRACTOR_SUBMITTED`
+- `REVIEW_SUBMITTED`
+- `FINALIZING`
+- `PUBLISHED`
 
-Do **only** the Extractor role. Read every supplied GM block and existing public node inventory. Produce one exact `wiki-fact-result-v1` object. Do not review your own result in the same run.
+The immutable prepared job is bound to source SHA, Graph SHA and main SHA.
 
-Write only:
+## Native RPC contract
 
-`archive/automation/a-wiki-native/result.json`
+Project: `jgsxpdflgkqroecfjzxq`
 
-to the same operational branch.
+Read:
 
-Do not modify status, job, Graph, facts, receipts, RAW, Reader or main.
+`public.archive_a_wiki_native_job_current()`
 
-### REVIEW_READY
+Returns either:
 
-Read `review-job.json` and current-main `docs/automation/A_WIKI_FACT_WORKER_V1.md`.
+```json
+{
+  "status": "EXTRACTOR_READY",
+  "job_id": "<db uuid>",
+  "session_id": "SESSION_006",
+  "binding_sha256": "<prepared job sha>",
+  "payload": { "version": "wiki-fact-job-v1" }
+}
+```
 
-This is a new automation execution and therefore a fresh semantic pass. Review both:
+or:
 
-1. precision — each proposed fact is entailed by the GM record;
-2. completeness — no material durable fact is silently omitted while COMPLETE is claimed.
+```json
+{
+  "status": "REVIEW_READY",
+  "job_id": "<db uuid>",
+  "session_id": "SESSION_006",
+  "binding_sha256": "<review job sha>",
+  "proposal_sha256": "<proposal sha>",
+  "payload": { "version": "wiki-fact-review-job-v1" }
+}
+```
 
-Return exactly one `wiki-fact-review-v1` result: APPROVE, HUMAN_REVIEW or REJECT.
+Submit:
 
-Write only:
+`public.archive_a_wiki_native_job_submit(job_id, expected_phase, binding_sha256, result)`
 
-`archive/automation/a-wiki-native/review.json`
+The database rejects the wrong phase, wrong binding, wrong result version, wrong Extractor job ID, wrong Reviewer proposal SHA and conflicting duplicate submissions.
 
-to the operational branch.
+After a successful submit the database attempts to dispatch the GitHub program consumer. The semantic result remains durable even if dispatch itself has a transient failure.
 
-Do not edit the proposal in place.
+Retry dispatcher:
 
-### Other phases
+`public.archive_a_wiki_native_dispatch()`
 
-- `NO_JOB`: no work.
-- `HUMAN_REVIEW`, `REJECT`, `BLOCKED`: do not invent a recovery. Report the phase once.
-- If the expected worker output already exists for the current immutable job/review binding, do not make a new semantic decision.
+## Extractor rules
 
-## GitHub ownership
+For `EXTRACTOR_READY`:
 
-GitHub owns:
+- Use only the supplied verified PUBLIC GM blocks and supplied existing-node inventory.
+- Read every GM block before declaring COMPLETE.
+- USER text, memory, fixture data and other-session summaries are not authority.
+- Future choice menus are not facts.
+- Ambiguous intent is deferred.
+- Produce one `wiki-fact-result-v1` object.
+- Submit that object to Supabase.
+- Do not self-review it in the same run.
 
-- source discovery
-- exact job preparation
-- result/proposal/review hash binding
-- review-job construction
-- Graph freshness checks
-- historical reconciliation
-- fact and receipt writes
-- CI / Deploy Preview
-- publication PR
-- exact tested merge
-- next-job preparation
+## Reviewer rules
 
-The native task never merges a PR and never writes Graph directly.
+For `REVIEW_READY`:
 
-## Queue and failure rules
+- This is a fresh separate native execution.
+- Read the complete prepared source and the fixed proposal.
+- Check precision and completeness.
+- Check identity, chronology, unsupported intent, future-choice leakage and relation strength.
+- Do not edit the proposal.
+- Output one `wiki-fact-review-v1` decision:
+  - `APPROVE`
+  - `HUMAN_REVIEW`
+  - `REJECT`
+- Submit only to Supabase.
 
-- One source at a time, manifest order.
-- Receipt is the only durable completion signal after SESSION_005 legacy baseline.
-- PARTIAL never applies.
-- Same-anchor conflict or newer existing record fails closed.
-- If main Graph changes between preparation and finalization, the operational job is regenerated from current main; stale native output is discarded.
-- If publication CI fails, main remains unchanged.
-- Production remains under the existing batched Archive release gate.
+## GitHub program ownership
+
+`archive/scripts/a-wiki-native-control.mjs` owns:
+
+1. deterministic source discovery and job preparation;
+2. validation of submitted Extractor output;
+3. deterministic proposal and review-job construction;
+4. validation of submitted Reviewer output;
+5. safe historical Graph finalization;
+6. Fact and Receipt-last persistence;
+7. A-Wiki tests;
+8. publication branch and PR;
+9. exact-head CI wait and merge;
+10. PUBLISHED DB state.
+
+Native AI owns none of those mutations.
+
+## Security
+
+- The table lives in `survival_ops`, has RLS enabled and no anon/authenticated/service-role table privileges.
+- Public RPC functions are denied to `public`, `anon` and `authenticated`; only `service_role` is granted execution.
+- Dispatch implementation is private to `survival_ops` and executable only by postgres.
+- All SECURITY DEFINER functions use an empty search path and schema-qualified relations/functions.
+- GitHub and Supabase secrets remain server-only.
+- Production remains owned by the existing batched Archive release gate.
+
+## Failure boundaries
+
+| Failure | Result |
+| --- | --- |
+| wrong binding / stale result | REJECTED, no phase change |
+| Extractor semantic uncertainty | HUMAN_REVIEW |
+| Reviewer omission/ambiguity | HUMAN_REVIEW |
+| current Graph differs from prepared Graph | BLOCKED, no Graph write |
+| Finalizer validation fails | BLOCKED |
+| Fact/Graph persistence fails | no Receipt |
+| PR CI fails | main unchanged |
+| exact merge fails | DB never becomes PUBLISHED |
+| successful merge | DB=PUBLISHED; main push prepares next source |
 
 ## Scheduling
 
-Only one ChatGPT task is required. A four-hour cadence is sufficient for the current daily Archive rate:
+One ChatGPT task is sufficient.
 
-- first eligible run: Extractor
-- next eligible run: Reviewer
-- GitHub finalizes immediately after Reviewer output
-
-No second Reviewer schedule is needed.
+Each run reads the current Supabase phase and performs exactly one native role. A later run sees the next phase. There is no second Reviewer schedule and no GitHub write from the task.

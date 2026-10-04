@@ -4,30 +4,37 @@ on:
   pull_request:
     paths:
       - '.github/workflows/a-wiki-native-handoff.yml'
+      - 'archive/scripts/a-wiki-native-control*'
       - 'archive/scripts/lib/wiki-fact-*'
       - 'archive/scripts/lib/wiki-semantic-jobs*'
       - 'archive/scripts/lib/publication-graph.mjs'
-      - 'archive/scripts/run-wiki-automation.mjs'
-      - 'archive/scripts/run-wiki-fact-*'
-      - 'archive/scripts/a-wiki-native-status*'
+      - 'supabase/migrations/*a_wiki_native_jobs*'
       - 'docs/automation/A_WIKI_NATIVE_HANDOFF_V1.md'
   push:
-    branches:
-      - main
-      - automation/a-wiki-native
+    branches: [main]
     paths:
       - 'archive/content/transcripts/C03-AFTERFALL/S03/**'
-      - 'archive/automation/a-wiki-native/**'
+      - 'archive/content/public-facts/C03-AFTERFALL/S03/**'
+      - 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'
       - '.github/workflows/a-wiki-native-handoff.yml'
+      - 'archive/scripts/a-wiki-native-control*'
       - 'archive/scripts/lib/wiki-fact-*'
       - 'archive/scripts/lib/wiki-semantic-jobs*'
       - 'archive/scripts/lib/publication-graph.mjs'
-      - 'archive/scripts/run-wiki-automation.mjs'
-      - 'archive/scripts/run-wiki-fact-*'
-      - 'archive/scripts/a-wiki-native-status*'
-      - 'docs/automation/A_WIKI_FACT_WORKER_V1.md'
+      - 'supabase/migrations/*a_wiki_native_jobs*'
       - 'docs/automation/A_WIKI_NATIVE_HANDOFF_V1.md'
   workflow_dispatch:
+    inputs:
+      action:
+        description: A-Wiki program action
+        required: false
+        type: choice
+        options: [prepare, consume]
+        default: consume
+      dispatch_origin:
+        description: Dispatch origin
+        required: false
+        default: manual
 
 permissions:
   contents: write
@@ -37,11 +44,6 @@ permissions:
 concurrency:
   group: a-wiki-native-handoff
   cancel-in-progress: false
-
-env:
-  OP_BRANCH: automation/a-wiki-native
-  OP_DIR: archive/automation/a-wiki-native
-  GRAPH_REF: archive/content/graphs/C03-AFTERFALL/GRAPH.json
 
 jobs:
   verify-pr:
@@ -56,252 +58,69 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify A-Wiki native handoff contracts
+      - name: Verify A-Wiki native durable handoff
         run: |
           node --test \
             archive/scripts/lib/publication-graph.test.mjs \
             archive/scripts/lib/wiki-semantic-jobs.test.mjs \
             archive/scripts/lib/wiki-fact-extractor.test.mjs \
             archive/scripts/lib/wiki-fact-finalizer.test.mjs \
-            archive/scripts/a-wiki-native-status.test.mjs
-          node archive/scripts/run-wiki-automation.mjs --prepare > "$RUNNER_TEMP/a-wiki-native-job.json"
-          node --input-type=module <<'NODE'
-          import { readFileSync } from 'node:fs'
-          const job = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/a-wiki-native-job.json', 'utf8'))
-          if (job.version !== 'wiki-fact-job-v1' && job.status !== 'NOOP') {
-            throw new Error('A_WIKI_NATIVE_PREPARE_CONTRACT_INVALID')
-          }
-          NODE
+            archive/scripts/a-wiki-native-control.test.mjs
 
   prepare:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.action == 'prepare')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Require repository write token
+      - name: Require server-only Supabase credentials
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          test -n "$ARCHIVE_SUPABASE_URL"
+          test -n "$ARCHIVE_SUPABASE_SERVICE_ROLE_KEY"
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare one durable native semantic job
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: node archive/scripts/a-wiki-native-control.mjs prepare
+
+  consume:
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'consume'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Require server-only credentials
         env:
           GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
-        run: test -n "$GH_TOKEN" || { echo ARCHIVE_GITHUB_TOKEN_REQUIRED; exit 1; }
-
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          test -n "$GH_TOKEN"
+          test -n "$ARCHIVE_SUPABASE_URL"
+          test -n "$ARCHIVE_SUPABASE_SERVICE_ROLE_KEY"
       - uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
           token: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
-
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-
-      - name: Prepare one exact native job when no active handoff exists
+      - name: Authenticate GitHub CLI
         env:
           GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          git config user.name "a-wiki-native-handoff"
-          git config user.email "a-wiki-native-handoff@users.noreply.github.com"
-          git fetch origin main:refs/remotes/origin/main
-
-          active_phase=""
-          if git ls-remote --exit-code --heads origin "$OP_BRANCH" >/dev/null 2>&1; then
-            git fetch origin "$OP_BRANCH:refs/remotes/origin/$OP_BRANCH"
-            active_phase="$(git show "refs/remotes/origin/$OP_BRANCH:$OP_DIR/status.json" 2>/dev/null               | node --input-type=module -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{console.log(JSON.parse(s).phase??'')}catch{console.log('')}})" || true)"
-          fi
-
-          case "$active_phase" in
-            EXTRACTOR_READY|REVIEW_READY|HUMAN_REVIEW|REJECT|BLOCKED)
-              echo "Existing A-Wiki native phase is active: $active_phase"
-              exit 0
-              ;;
-          esac
-
-          git switch -C "$OP_BRANCH" origin/main
-          rm -rf "$OP_DIR"
-          mkdir -p "$OP_DIR"
-          node archive/scripts/run-wiki-automation.mjs --prepare > "$OP_DIR/job.json"
-
-          BASE_SHA="$(git rev-parse origin/main)"
-          BASE_SHA="$BASE_SHA" node archive/scripts/a-wiki-native-status.mjs             from-job "$OP_DIR/job.json" "$OP_DIR/status.json"
-
-          git add "$OP_DIR"
-          git commit -m "a-wiki: prepare native semantic handoff"
-          git push --force origin "HEAD:refs/heads/$OP_BRANCH"
-
-  consume:
-    if: github.ref == 'refs/heads/automation/a-wiki-native'
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    steps:
-      - name: Require repository write token
+        run: gh auth setup-git
+      - name: Consume one submitted native phase
         env:
           GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
-        run: test -n "$GH_TOKEN" || { echo ARCHIVE_GITHUB_TOKEN_REQUIRED; exit 1; }
-
-      - uses: actions/checkout@v4
-        with:
-          ref: automation/a-wiki-native
-          fetch-depth: 0
-          token: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Consume one native semantic phase
-        env:
-          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          git config user.name "a-wiki-native-handoff"
-          git config user.email "a-wiki-native-handoff@users.noreply.github.com"
-
-          phase="$(node --input-type=module -e "import s from './$OP_DIR/status.json' with {type:'json'}; console.log(s.phase)")"
-          echo "Current phase: $phase"
-
-          if [ "$phase" = "EXTRACTOR_READY" ]; then
-            test -f "$OP_DIR/result.json" || { echo "Waiting for native Extractor result."; exit 0; }
-            node archive/scripts/run-wiki-automation.mjs               --result "$OP_DIR/result.json" --check > "$OP_DIR/proposal.json"
-
-            proposal_status="$(node --input-type=module -e "import p from './$OP_DIR/proposal.json' with {type:'json'}; console.log(p.status)")"
-            if [ "$proposal_status" = "HUMAN_REVIEW" ]; then
-              REASON="EXTRACTOR_HUMAN_REVIEW"                 node archive/scripts/a-wiki-native-status.mjs                 set-phase "$OP_DIR/status.json" HUMAN_REVIEW
-            else
-              node archive/scripts/run-wiki-automation.mjs                 --proposal "$OP_DIR/proposal.json" --prepare-review > "$OP_DIR/review-job.json"
-              PROPOSAL_PATH="$OP_DIR/proposal.json"                 node archive/scripts/a-wiki-native-status.mjs                 set-phase "$OP_DIR/status.json" REVIEW_READY
-            fi
-
-            git add "$OP_DIR/proposal.json" "$OP_DIR/status.json"
-            test -f "$OP_DIR/review-job.json" && git add "$OP_DIR/review-job.json"
-            git commit -m "a-wiki: validate extractor result"
-            git push origin "HEAD:refs/heads/$OP_BRANCH"
-            exit 0
-          fi
-
-          if [ "$phase" != "REVIEW_READY" ]; then
-            echo "No repository action for phase $phase."
-            exit 0
-          fi
-
-          test -f "$OP_DIR/review.json" || { echo "Waiting for independent native Reviewer."; exit 0; }
-          node archive/scripts/run-wiki-automation.mjs             --proposal "$OP_DIR/proposal.json"             --review "$OP_DIR/review.json" --check > "$OP_DIR/reviewed.json"
-
-          decision="$(node --input-type=module -e "import r from './$OP_DIR/reviewed.json' with {type:'json'}; console.log(r.decision)")"
-          if [ "$decision" != "APPROVE" ]; then
-            next_phase="HUMAN_REVIEW"
-            [ "$decision" = "REJECT" ] && next_phase="REJECT"
-            REASON="REVIEWER_$decision"               node archive/scripts/a-wiki-native-status.mjs               set-phase "$OP_DIR/status.json" "$next_phase"
-            git add "$OP_DIR/reviewed.json" "$OP_DIR/status.json"
-            git commit -m "a-wiki: record native review disposition"
-            git push origin "HEAD:refs/heads/$OP_BRANCH"
-            exit 0
-          fi
-
-          OP_ROOT="$PWD"
-          JOB="$OP_ROOT/$OP_DIR/job.json"
-          PROPOSAL="$OP_ROOT/$OP_DIR/proposal.json"
-          REVIEW="$OP_ROOT/$OP_DIR/review.json"
-          EXPECTED_GRAPH="$(node --input-type=module -e "import j from './$OP_DIR/job.json' with {type:'json'}; console.log(j.graph_sha256)")"
-          SESSION="$(node --input-type=module -e "import j from './$OP_DIR/job.json' with {type:'json'}; console.log(j.source.session_id)")"
-          SOURCE_SHA="$(node --input-type=module -e "import j from './$OP_DIR/job.json' with {type:'json'}; console.log(j.source.manifest_sha256)")"
-          NUM="${SESSION#SESSION_}"
-          PUB_BRANCH="automation/a-wiki-publish-${NUM}-${SOURCE_SHA:0:12}"
-
-          build_publication() {
-            git fetch origin main:refs/remotes/origin/main
-            BASE_SHA="$(git rev-parse origin/main)"
-            MAIN_GRAPH="$(git show "origin/main:$GRAPH_REF" | node --input-type=module -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.parse(s).content_sha256))")"
-            if [ "$MAIN_GRAPH" != "$EXPECTED_GRAPH" ]; then
-              echo "A-Wiki Graph moved; native result must be regenerated."
-              return 42
-            fi
-
-            WT="$RUNNER_TEMP/a-wiki-publish"
-            git worktree remove --force "$WT" 2>/dev/null || true
-            git branch -D "$PUB_BRANCH" 2>/dev/null || true
-            git worktree add -b "$PUB_BRANCH" "$WT" origin/main
-            (
-              cd "$WT"
-              node archive/scripts/run-wiki-fact-finalizer.mjs                 --job "$JOB" --proposal "$PROPOSAL" --review "$REVIEW" --check                 > "$RUNNER_TEMP/finalizer-check.json"
-              node archive/scripts/run-wiki-fact-finalizer.mjs                 --job "$JOB" --proposal "$PROPOSAL" --review "$REVIEW" --apply                 > "$RUNNER_TEMP/finalizer-apply.json"
-
-              node archive/scripts/a-wiki-native-status.mjs                 publication-scope "$RUNNER_TEMP/finalizer-apply.json"
-
-              git add archive/content/graphs/C03-AFTERFALL/GRAPH.json                 archive/content/public-facts/C03-AFTERFALL/S03
-              git commit -m "a-wiki: publish $SESSION semantic facts"
-              git push --force origin "HEAD:refs/heads/$PUB_BRANCH"
-              git rev-parse HEAD > "$RUNNER_TEMP/publish-head.txt"
-              git rev-parse HEAD^ > "$RUNNER_TEMP/publish-base.txt"
-            )
-          }
-
-          for attempt in 1 2 3; do
-            set +e
-            build_publication
-            code="$?"
-            set -e
-            if [ "$code" -ne 0 ]; then
-              if [ "$code" -eq 42 ]; then
-                git fetch origin main:refs/remotes/origin/main
-                git switch -C "$OP_BRANCH" origin/main
-                rm -rf "$OP_DIR"
-                mkdir -p "$OP_DIR"
-                node archive/scripts/run-wiki-automation.mjs --prepare > "$OP_DIR/job.json"
-                BASE_SHA="$(git rev-parse origin/main)"
-                BASE_SHA="$BASE_SHA" REASON="REPREPARED_AFTER_GRAPH_MOVE"                   node archive/scripts/a-wiki-native-status.mjs                   from-job "$OP_DIR/job.json" "$OP_DIR/status.json"
-                git add "$OP_DIR"
-                git commit -m "a-wiki: reprepare after Graph moved"
-                git push --force origin "HEAD:refs/heads/$OP_BRANCH"
-                exit 0
-              fi
-              exit "$code"
-            fi
-
-            PUB_HEAD="$(cat "$RUNNER_TEMP/publish-head.txt")"
-            BASE_SHA="$(cat "$RUNNER_TEMP/publish-base.txt")"
-            PR_NUMBER="$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$PUB_BRANCH" --state open --json number --jq '.[0].number // empty')"
-            if [ -z "$PR_NUMBER" ]; then
-              PR_URL="$(gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$PUB_BRANCH"                 --title "A-Wiki semantic $SESSION"                 --body "Native Extractor + independent Reviewer approved. Finalizer applied exact source-bound facts. Receipt is the durable completion signal. Production remains batched.")"
-              PR_NUMBER="${PR_URL##*/}"
-            fi
-
-            registered=0
-            for wait in $(seq 1 30); do
-              count="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json statusCheckRollup --jq '.statusCheckRollup | length')"
-              if [ "$count" -gt 0 ]; then registered=1; break; fi
-              sleep 2
-            done
-            test "$registered" -eq 1 || { echo A_WIKI_CHECK_REGISTRATION_TIMEOUT; exit 1; }
-            gh pr checks "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --watch --interval 10
-
-            git fetch origin main:refs/remotes/origin/main
-            CURRENT_MAIN="$(git rev-parse origin/main)"
-            if [ "$CURRENT_MAIN" != "$BASE_SHA" ]; then
-              CURRENT_GRAPH="$(git show "origin/main:$GRAPH_REF" | node --input-type=module -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.parse(s).content_sha256))")"
-              if [ "$CURRENT_GRAPH" != "$EXPECTED_GRAPH" ]; then
-                echo "Graph changed while publication PR was validating; next run must reprepare."
-                exit 1
-              fi
-              echo "Main moved without Graph change; rebuilding exact publication head."
-              continue
-            fi
-
-            ACTUAL_HEAD="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq .headRefOid)"
-            test "$ACTUAL_HEAD" = "$PUB_HEAD"
-            gh api --method PUT "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/merge"               -f merge_method=squash -f sha="$PUB_HEAD" > "$RUNNER_TEMP/merge.json"
-            MERGE_SHA="$(node --input-type=module -e "import {readFileSync} from 'node:fs';const r=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/merge.json','utf8'));if(!r.merged)process.exit(1);console.log(r.sha)")"
-
-            git fetch origin main:refs/remotes/origin/main
-            git switch -C "$OP_BRANCH" origin/main
-            rm -rf "$OP_DIR"
-            mkdir -p "$OP_DIR"
-            node archive/scripts/run-wiki-automation.mjs --prepare > "$OP_DIR/job.json"
-            BASE_SHA="$(git rev-parse origin/main)"
-            BASE_SHA="$BASE_SHA" PREVIOUS_MERGE_SHA="$MERGE_SHA"               node archive/scripts/a-wiki-native-status.mjs               from-job "$OP_DIR/job.json" "$OP_DIR/status.json"
-            git add "$OP_DIR"
-            git commit -m "a-wiki: prepare next native semantic handoff"
-            git push --force origin "HEAD:refs/heads/$OP_BRANCH"
-            exit 0
-          done
-
-          echo A_WIKI_PUBLICATION_BASE_MOVED_REPEATEDLY
-          exit 1
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: node archive/scripts/a-wiki-native-control.mjs consume
