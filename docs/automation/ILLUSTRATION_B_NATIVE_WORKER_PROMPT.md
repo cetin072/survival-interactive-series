@@ -4,8 +4,7 @@ Status: **CURRENT AUTHORITY**
 
 이 문서는 **INGESTING / REVIEW_PASS_STAGED 이후 역할의 full authority**다. 예약 실행의 최초 boot authority는 `docs/automation/ILLUSTRATION_B_NATIVE_WORKER_ROUTER.md`다. PREPARED Renderer는 이미지 생성 전 이 문서를 읽지 않는다.
 
-Automation B의 목적은 **신규 인물 중심으로 하루 최소 1장의 검수 통과 삽화를 사이트에 게시하는 것**이다.
-한 실행에서 생성과 검수를 함께 수행하지 않는다. 현재 DB status가 이번 실행의 역할을 결정하며, 정확히 한 역할만 수행하고 종료한다.
+Automation B Native Worker의 목적은 **생성된 삽화를 검수하고 PASS 자산만 게시 경로로 넘기는 것**이다. 이미지 생성은 별도 Clean Renderer가 담당한다. 현재 DB status가 이번 실행의 역할을 결정하며, 정확히 한 역할만 수행하고 종료한다.
 
 대상:
 - Repository: `cetin072/survival-interactive-series`
@@ -18,7 +17,7 @@ Automation B의 목적은 **신규 인물 중심으로 하루 최소 1장의 검
 
 1. Boot Router가 이미 current job status를 고정한 뒤 이 문서가 로드된다.
 2. 한 실행에서 역할은 하나다.
-   - PREPARED = Renderer
+   - PREPARED = NOOP (Clean Renderer 소유)
    - INGESTING = Reviewer
    - REVIEW_PASS_STAGED = PASS site asset transfer/resume
    - 그 외 = NOOP
@@ -26,9 +25,9 @@ Automation B의 목적은 **신규 인물 중심으로 하루 최소 1장의 검
 5. 새 Vault 보관을 만들지 않는다. REJECT 원본은 backend로 운반하지 않는다.
 6. HUMAN_REVIEW에서는 Library 원본을 보존하고 자동 진행하지 않는다.
 
-## PREPARED — Renderer 역할
+## PREPARED
 
-PREPARED Renderer의 전체 authority는 Boot Router다. 이미지 생성 전 이 full 문서를 읽지 않는다.
+이 worker는 PREPARED를 처리하지 않는다. 이미지 생성은 `ILLUSTRATION_B_CLEAN_RENDERER_PROMPT.md`를 사용하는 별도 Clean Renderer 예약의 책임이다.
 
 ## INGESTING — Reviewer 역할만
 
