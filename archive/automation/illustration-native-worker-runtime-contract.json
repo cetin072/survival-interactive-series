@@ -1,6 +1,6 @@
 {
-  "version": "illustration-native-worker-runtime-contract-v1.3",
-  "purpose": "Two scheduled ChatGPT workers: isolated Clean Renderer for PREPARED; Native Worker for review/transfer. Program owns Prep/Finalizer.",
+  "version": "illustration-native-worker-runtime-contract-v1.4",
+  "purpose": "Two scheduled ChatGPT workers: isolated Clean Renderer for PREPARED; Native Worker for review/transfer. Program owns Prep, durable review mutation, and Finalizer.",
   "roles": {
     "PREPARED": {
       "role": "RENDERER",
@@ -10,7 +10,9 @@
     },
     "INGESTING": {
       "role": "REVIEWER",
+      "decision_transport": "GITHUB_RUNTIME_HANDOFF",
       "decision_rpc": "archive_illustration_review_decide_v3",
+      "decision_rpc_owner": "PROGRAM_REVIEW_HANDOFF",
       "decision_before_transfer": true,
       "outcomes": {
         "PASS": "REVIEW_PASS_STAGED",
@@ -18,7 +20,7 @@
         "HUMAN_REVIEW": "HUMAN_REVIEW"
       },
       "one_role_per_run": true,
-      "stop_after_status_transition": true,
+      "stop_after_handoff_commit": true,
       "owner": "NATIVE_WORKER"
     },
     "REVIEW_PASS_STAGED": {
@@ -32,7 +34,18 @@
   },
   "source": {
     "library_path": "/IMAGE-RENDER/output/current.png",
-    "generated_format": "image/png"
+    "generated_format": "image/png",
+    "stale_replacement_rule": "A PREPARED job may replace current.png only when its modified_at is earlier than the current job created_at. A same-job file is resumed without regeneration."
+  },
+  "review_handoff": {
+    "version": "illustration-review-handoff-v1",
+    "branch": "automation-b-review-handoff",
+    "path": "archive/automation/runtime/illustration-review-handoff.json",
+    "workflow": ".github/workflows/archive-illustration-review-handoff.yml",
+    "program": "archive/scripts/apply-illustration-review-handoff.mjs",
+    "ai_direct_db_mutation": false,
+    "program_acquires_fresh_lease": true,
+    "program_uses_current_main_code": true
   },
   "pass_asset": {
     "format": "image/png",
@@ -49,7 +62,8 @@
   },
   "reject": {
     "binary_transfer": false,
-    "library_cleanup_after_durable_decision": true
+    "library_cleanup_after_durable_decision": false,
+    "stale_library_source_replaced_by_next_prepared_renderer": true
   },
   "human_review": {
     "binary_transfer": false,
@@ -61,6 +75,7 @@
   },
   "program_owners": {
     "prep": "Supabase/GitHub Program Prep",
+    "review_decision": "GitHub Program Review Handoff",
     "finalizer": "Existing GitHub Program Finalizer"
   },
   "selection_policy": {
@@ -74,7 +89,7 @@
     "allowed_before_image_call": [
       "boot_router",
       "archive_illustration_render_job_current",
-      "library_current_png_existence_check",
+      "library_current_png_metadata_check",
       "archive_illustration_render_job_lease_acquire",
       "archive_illustration_render_prompt",
       "prompt_sha256_check"
@@ -112,10 +127,12 @@
       ],
       "responsibilities": [
         "VISUAL_REVIEW",
+        "GITHUB_REVIEW_HANDOFF",
         "PASS_ONLY_TRANSFER"
       ],
       "forbidden": [
-        "IMAGE_GENERATION"
+        "IMAGE_GENERATION",
+        "DIRECT_REVIEW_DB_MUTATION"
       ]
     }
   }
