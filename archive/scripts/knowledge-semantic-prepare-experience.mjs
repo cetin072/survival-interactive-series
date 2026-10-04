@@ -18,7 +18,7 @@ export function experienceSeedChoice(bytes, ref = EX001_REF) {
     || seed.source_kind !== 'USER_REPORTED_EXPERIENCE' || seed.status !== 'RESEARCH_REQUIRED'
     || !seed.question?.primary || !Array.isArray(seed.experience?.sequence)) throw new Error('EXPERIENCE_SEED_INVALID')
   const sourceKind = 'USER_REPORTED_EXPERIENCE'
-  const sourceSha256 = sha(bytes)
+  const sourceSha256 = sha(Buffer.from(bytes.toString('utf8').replace(/\r\n/g, '\n'), 'utf8'))
   return {
     jobType: 'FRESH_BRIEF', sourceKind, sourceRef: ref, sourceSha256,
     workKey: makeWorkKey({ sourceKind, sourceRef: ref, sourceSha256 }),

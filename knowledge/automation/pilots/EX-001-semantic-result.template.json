@@ -5,7 +5,7 @@
   "code": "EXPERIENCE_SEED_FIRST_PILOT",
   "note": "개인 경험을 질문의 출처로만 사용하고 공식 근거로 행동 내용을 검증했습니다. 최초 경험 Seed 파일럿이므로 운영자 검토와 공개 승인이 필요합니다.",
   "candidate": {
-    "id": "KC-ex-001-apartment-power-outage-8204e5dbae",
+    "id": "KC-ex-001-apartment-power-outage-c7d8440243",
     "question": "전등이 꺼졌을 때 우리 집만의 문제인지 아파트 정전인지 어떻게 구분할까",
     "topic_id": "household-emergency-preparedness",
     "status": "BRIEF_PROPOSED",
@@ -13,7 +13,7 @@
     "brief_id": "K-014",
     "source_kind": "USER_REPORTED_EXPERIENCE",
     "source_ref": "knowledge/content/experience-seeds/EX-001-apartment-power-outage.json",
-    "source_sha256": "a2b3733ad1da7987131a4aeec5dbc0aed91bf9c0b1de563670ddad305672f46d"
+    "source_sha256": "e4b57f214981e17df5b232a60835e6ba3c8ea2424c7ba3b089869032c161e8eb"
   },
   "evidence": {
     "brief_id": "K-014",
@@ -21,7 +21,7 @@
     "experience_provenance": {
       "source_kind": "USER_REPORTED_EXPERIENCE",
       "source_ref": "knowledge/content/experience-seeds/EX-001-apartment-power-outage.json",
-      "source_sha256": "a2b3733ad1da7987131a4aeec5dbc0aed91bf9c0b1de563670ddad305672f46d",
+      "source_sha256": "e4b57f214981e17df5b232a60835e6ba3c8ea2424c7ba3b089869032c161e8eb",
       "scope": "정전 중 사용자가 판단 범위를 바꾼 과정만 기록한다. 외부 사실을 증명하는 Evidence가 아니다.",
       "reported_cause": "복구 뒤 관리사무소 방송에서 새가 원인이라는 안내를 들었다. 기술적 접촉 지점이나 고장 메커니즘은 확인되지 않았다."
     },

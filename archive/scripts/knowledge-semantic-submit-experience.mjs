@@ -16,7 +16,7 @@ export async function runExperienceSeedSubmit() {
   const current = await request('archive_knowledge_semantic_job_current', {})
   const job = current.job
   if (current.status !== 'PREPARED' || !job || job.source_kind !== 'USER_REPORTED_EXPERIENCE' || job.source_ref !== EX001_REF) throw new Error('EXPERIENCE_PREPARED_JOB_REQUIRED')
-  const sourceHash = createHash('sha256').update(await readFile(join(root, EX001_REF))).digest('hex')
+  const sourceHash = createHash('sha256').update(Buffer.from((await readFile(join(root, EX001_REF), 'utf8')).replace(/\r\n/g, '\n'), 'utf8')).digest('hex')
   if (job.source_sha256 !== sourceHash) throw new Error('EXPERIENCE_SOURCE_CHANGED')
   job.semantic_context = job.context
   const result = JSON.parse(await readFile(join(root, 'knowledge/automation/pilots/EX-001-semantic-result.template.json'), 'utf8'))

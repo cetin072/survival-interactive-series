@@ -149,7 +149,7 @@ export async function validateKnowledge(data) {
       fail(candidate.source_ref === 'knowledge/content/experience-seeds/EX-001-apartment-power-outage.json' && /^[a-f0-9]{64}$/.test(candidate.source_sha256), candidate.id + ' experience identity')
       const seedBytes = await readFile(join(base, candidate.source_ref))
       const seed = JSON.parse(seedBytes.toString('utf8'))
-      fail(seed.id === 'EX-001' && seed.source_kind === 'USER_REPORTED_EXPERIENCE' && seed.status === 'RESEARCH_REQUIRED' && createHash('sha256').update(seedBytes).digest('hex') === candidate.source_sha256, candidate.id + ' experience changed')
+      fail(seed.id === 'EX-001' && seed.source_kind === 'USER_REPORTED_EXPERIENCE' && seed.status === 'RESEARCH_REQUIRED' && createHash('sha256').update(Buffer.from(seedBytes.toString('utf8').replace(/\r\n/g, '\n'), 'utf8')).digest('hex') === candidate.source_sha256, candidate.id + ' experience changed')
       const pack = evidence.get(candidate.brief_id)
       fail(pack?.story_source_status === 'USER_REPORTED_EXPERIENCE' && pack.experience_provenance?.source_ref === candidate.source_ref && pack.experience_provenance?.source_sha256 === candidate.source_sha256, candidate.id + ' experience provenance')
     } else fail(/^archive\/content\/transcripts\/C03-AFTERFALL\/S\d{2,3}\/SESSION_\d{3}\/SOURCE_MANIFEST\.json$/.test(candidate.source_manifest_ref) && /^[a-f0-9]{64}$/.test(candidate.source_manifest_sha256), `${candidate.id} public source identity`)
