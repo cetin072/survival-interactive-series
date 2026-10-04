@@ -151,7 +151,21 @@ test('real SESSION_006 and SESSION_007 samples compile with unchanged protected 
   assert.deepEqual(after, before)
 })
 test('real CLI prepares the current pending source and validates a state-agnostic result', async () => {
-  const source = await discoverWikiSource(root)
+  let source
+  try {
+    source = await discoverWikiSource(root)
+  } catch (error) {
+    assert.equal(error.message, 'WIKI_NO_PENDING_SOURCE')
+    const terminal = JSON.parse(await runWikiFactCli(['--prepare']))
+    assert.deepEqual(terminal, {
+      status: 'NOOP',
+      reason: 'WIKI_NO_PENDING_SOURCE',
+      source_marked_processed: false,
+      graph_changed: false,
+    })
+    return
+  }
+
   const job = JSON.parse(await runWikiFactCli(['--prepare']))
   assert.equal(job.source.session_id, source.sourceSession.session_id)
   const dir = await mkdtemp(join(tmpdir(), 'wiki-native-'))
