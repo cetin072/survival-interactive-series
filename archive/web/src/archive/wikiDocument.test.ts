@@ -38,7 +38,7 @@ describe('WikiDocument compiler', () => {
   })
 
   it('compiles every current Graph character through the same WikiDocument contract', () => {
-    expect(wikiCharacterNodeIds).toHaveLength(19)
+    expect(wikiCharacterNodeIds).toHaveLength(wikiCharacterIndex.length)
     expect(wikiCharacterIndex.some((item) => item.id === 'char-seojin' && item.title === '윤서진')).toBe(true)
     const documents = buildWikiDocuments(wikiCharacterNodeIds)
     expect(documents).toHaveLength(wikiCharacterNodeIds.length)
