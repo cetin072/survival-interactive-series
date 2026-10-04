@@ -199,6 +199,7 @@ async function buildPublication(row) {
   pr = JSON.parse(run('gh', ['pr', 'view', String(pr.number), '--repo', repository,
     '--json', 'number,state,headRefOid,baseRefName,baseRefOid,mergeStateStatus,statusCheckRollup'], root))
   insist(pr.headRefOid === headSha && pr.baseRefName === 'main' && pr.mergeStateStatus === 'CLEAN', 'A_WIKI_PR_NOT_CLEAN')
+  run('git', ['fetch', 'origin', 'main'], root)
   const currentGraphAfterChecks = JSON.parse(run('git', ['show', `origin/main:${graphRef}`], root))
   insist(currentGraphAfterChecks.content_sha256 === row.graph_sha256, 'A_WIKI_GRAPH_CHANGED_REPREPARE_REQUIRED')
 
