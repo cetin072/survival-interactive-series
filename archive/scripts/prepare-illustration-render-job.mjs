@@ -105,6 +105,7 @@ export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}
   demand(Array.isArray(observedAttempts), 'ILLUSTRATION_PREP_ATTEMPT_HISTORY_INVALID')
   const plan = selectIllustrationCandidates({
     catalog, siteAssets: effectiveSiteAssets, receipts, observedAttempts, batchLimit: 3,
+    subjectIds: [...profileBySubject.keys()],
   })
   if (!plan.candidates.length) {
     return { status: 'NO_CANDIDATE', active_provider: activeProvider }
