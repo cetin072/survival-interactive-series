@@ -2,7 +2,7 @@
 
 Status: **CURRENT AUTHORITY**
 
-이 문서 본문을 ChatGPT 예약 `Automation B Native Worker`의 운영 프롬프트 권위로 사용한다.
+이 문서는 **INGESTING / REVIEW_PASS_STAGED 이후 역할의 full authority**다. 예약 실행의 최초 boot authority는 `docs/automation/ILLUSTRATION_B_NATIVE_WORKER_ROUTER.md`다. PREPARED Renderer는 이미지 생성 전 이 문서를 읽지 않는다.
 
 Automation B의 목적은 **신규 인물 중심으로 하루 최소 1장의 검수 통과 삽화를 사이트에 게시하는 것**이다.
 한 실행에서 생성과 검수를 함께 수행하지 않는다. 현재 DB status가 이번 실행의 역할을 결정하며, 정확히 한 역할만 수행하고 종료한다.
@@ -16,9 +16,8 @@ Automation B의 목적은 **신규 인물 중심으로 하루 최소 1장의 검
 
 ## 공통
 
-1. 가장 먼저 `public.archive_illustration_render_job_current()`를 정확히 한 번 읽고 immutable binding을 고정한다.
-2. current job이 없으면 NOOP 종료한다.
-3. 한 실행에서 역할은 하나다.
+1. Boot Router가 이미 current job status를 고정한 뒤 이 문서가 로드된다.
+2. 한 실행에서 역할은 하나다.
    - PREPARED = Renderer
    - INGESTING = Reviewer
    - REVIEW_PASS_STAGED = PASS site asset transfer/resume
@@ -27,16 +26,9 @@ Automation B의 목적은 **신규 인물 중심으로 하루 최소 1장의 검
 5. 새 Vault 보관을 만들지 않는다. REJECT 원본은 backend로 운반하지 않는다.
 6. HUMAN_REVIEW에서는 Library 원본을 보존하고 자동 진행하지 않는다.
 
-## PREPARED — Renderer 역할만
+## PREPARED — Renderer 역할
 
-1. `/IMAGE-RENDER/output/current.png`가 이미 존재하면 덮어쓰지 않고 종료한다.
-2. `archive_illustration_render_job_lease_acquire(job_id,'archive-illustration-native-renderer',1800)`로 fresh lease를 얻는다.
-3. `archive_illustration_render_prompt()` exact UTF-8 TEXT를 읽고 SHA-256이 job.prompt_sha256과 정확히 같은지 확인한다.
-4. exact prompt TEXT만 장면 설명 authority로 사용해 네이티브 이미지 생성으로 정확히 1장을 만든다. 별도 negative prompt, 프로젝트명, 시즌명, 운영 문맥을 추가하지 않는다.
-5. Renderer는 품질판정을 하지 않는다. 실제 이미지가 반환되면 metadata prompt가 비어 있어도 폐기하지 않는다.
-6. 원본 PNG를 `/IMAGE-RENDER/output/current.png`에 저장하고 readback으로 존재/bytes>0를 확인한다.
-7. 성공 후에만 `archive_illustration_render_job_provider_complete(job_id,prompt_sha256)`를 한 번 호출해 INGESTING으로 넘긴다.
-8. 여기서 종료한다. 같은 실행에서 Review하지 않는다.
+PREPARED Renderer의 전체 authority는 Boot Router다. 이미지 생성 전 이 full 문서를 읽지 않는다.
 
 ## INGESTING — Reviewer 역할만
 
