@@ -111,6 +111,9 @@ const blockerKorean: Record<string, string> = {
   QUALITY_GATE: '품질 검수 단계',
   PROVIDER_NOT_ACTIVE: '작업 제공 기능이 비활성화됨',
   HUMAN_REVIEW_REQUIRED: '사람의 검토가 필요함',
+  RENDERER_NOT_CONSUMED: 'Renderer 미실행 또는 장기 대기 의심',
+  REVIEWER_NOT_CONSUMED: 'Reviewer 미실행 또는 파일 처리 지연 의심',
+  REVIEWER_NOT_COMPLETED: 'Reviewer 판정 장기 대기 의심',
 }
 
 const knownSubjects: Record<string, string> = {
