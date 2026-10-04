@@ -20,6 +20,14 @@ describe('KnowledgeGuide adapter', () => {
     expect(guide.sources.length).toBeGreaterThanOrEqual(2)
   })
 
+  it('preserves original titles while exposing short labels for K-012 and K-013', () => {
+    const map = new Map(publishedKnowledgeGuides.map((guide) => [guide.id, guide]))
+    expect(map.get('K-012')?.label).toBe('재난 지도 정보공개 범위')
+    expect(map.get('K-012')?.title).toContain('재난 대응 지도')
+    expect(map.get('K-013')?.label).toBe('외부 대응 인력 자격·체크인')
+    expect(map.get('K-013')?.title).toContain('재난 대응에 외부 인력')
+  })
+
   it('compiles every currently published brief with only supported block types', () => {
     expect(publishedKnowledgeGuides.length).toBeGreaterThan(0)
     expect(publishedKnowledgeGuides.some((guide) => guide.id === 'K-002')).toBe(true)

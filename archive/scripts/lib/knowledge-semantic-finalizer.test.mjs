@@ -29,9 +29,9 @@ test('open PR with stale base is treated as a fail-closed revalidation blocker',
 const packagedResult = (decision = 'BRIEF_READY') => ({
   version: 'knowledge-semantic-result-v1', job_id: job.job_id, decision,
   ...(decision === 'HUMAN_REVIEW' ? { code: 'RISK_REVIEW', note: 'Risk requires a person.' } : {}),
-  candidate: { id: 'KC-test', brief_id: 'K-011', topic_id: 'T-1', status: 'BRIEF_PROPOSED', source_kind: 'PUBLIC_ARCHIVE', source_manifest_ref: 'manifest', source_manifest_sha256: 'a'.repeat(64) },
-  evidence: { brief_id: 'K-011', claims: [{ claim: 'Claim', source_ids: ['S1'], context: 'Context', limitation: 'Limit' }] },
-  brief: { id: 'K-011', topic_id: 'T-1', content_type: 'BRIEF', status: 'READY', risk_level: decision === 'HUMAN_REVIEW' ? 'HIGH' : 'LOW', publication_policy: decision === 'HUMAN_REVIEW' ? 'HUMAN_APPROVED' : 'AUTO_LOW_RISK', semantic_qa_status: decision === 'HUMAN_REVIEW' ? 'REVIEW' : 'PASS' },
+  candidate: { id: 'KC-test', brief_id: 'K-011', topic_id: 'T-1', status: 'BRIEF_PROPOSED', source_kind: 'PUBLIC_ARCHIVE', source_manifest_ref: 'manifest', source_manifest_sha256: 'a'.repeat(64), question: '짧은 생존 질문은 무엇일까?' },
+  evidence: { brief_id: 'K-011', question: '짧은 생존 질문은 무엇일까?', claims: [{ claim: 'Claim', source_ids: ['S1'], context: 'Context', limitation: 'Limit' }] },
+  brief: { id: 'K-011', title: '짧은 생존 질문은 무엇일까?', topic_id: 'T-1', content_type: 'BRIEF', status: 'READY', risk_level: decision === 'HUMAN_REVIEW' ? 'HIGH' : 'LOW', publication_policy: decision === 'HUMAN_REVIEW' ? 'HUMAN_APPROVED' : 'AUTO_LOW_RISK', semantic_qa_status: decision === 'HUMAN_REVIEW' ? 'REVIEW' : 'PASS' },
 })
 
 function finalizerHarness({ claimedJob, openJobs = [], pullRequest = null } = {}) {

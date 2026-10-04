@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { readFile } from 'node:fs/promises'
+import { readFile, readdir } from 'node:fs/promises'
 import { execFileSync } from 'node:child_process'
 import { resolve, join } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -16,7 +16,7 @@ const root = resolve(import.meta.dirname, '../..')
 const json = (value) => JSON.stringify(value)
 const sha = (value) => createHash('sha256').update(value).digest('hex')
 
-export function planSemanticPreparation({ activeJobs, handledJobs = [], scanner, backfillIsDue, backfillChoice, legacyBlocker }) {
+export function planSemanticPreparation({ activeJobs, handledJobs = [], scanner, experienceChoice, backfillIsDue, backfillChoice, legacyBlocker }) {
   if (Array.isArray(activeJobs) && activeJobs.length) return { decision: 'NOOP', code: 'ACTIVE_SEMANTIC_JOB_EXISTS' }
   if (legacyBlocker) return { decision: 'BLOCKED', code: legacyBlocker }
   const changed = (scanner?.sources ?? []).find((source) => source.status === 'SOURCE_CHANGED_RESCAN_REQUIRED')
@@ -27,6 +27,7 @@ export function planSemanticPreparation({ activeJobs, handledJobs = [], scanner,
     .filter((source) => source.status === 'PENDING' && !handled.has(`${source.source_manifest_ref}:${source.source_manifest_sha256}`))
     .sort((a, b) => a.source_manifest_ref.localeCompare(b.source_manifest_ref))[0]
   if (fresh) return { decision: 'FRESH', source: fresh }
+  if (experienceChoice) return { decision: 'EXPERIENCE_SEED', source: experienceChoice }
   if (!backfillIsDue) return { decision: 'NOOP', code: 'NO_FRESH_BACKFILL_NOT_DUE' }
   if (!backfillChoice) return { decision: 'NOOP', code: 'NO_UNREVIEWED_BACKFILL_SOURCE' }
   return { decision: 'BACKFILL', source: backfillChoice }
@@ -128,6 +129,32 @@ async function publicReaderBackfillChoice(data, runtimeState) {
   }
 }
 
+export async function selectExperienceSeed({ base = root, handledJobs = [] } = {}) {
+  const dir = join(base, 'knowledge/content/experience-seeds')
+  const handledRefs = new Set(handledJobs.filter((job) => job.source_kind === 'EXPERIENCE_SEED').map((job) => job.source_ref))
+  const choices = []
+  for (const name of (await readdir(dir)).filter((item) => item.endsWith('.json')).sort()) {
+    const sourceRef = 'knowledge/content/experience-seeds/' + name
+    if (handledRefs.has(sourceRef)) continue
+    const bytes = await readFile(join(base, sourceRef))
+    const seed = JSON.parse(bytes.toString('utf8'))
+    if (seed.version !== 'knowledge-experience-seed-v1' || !/^EX-[0-9]{3,}$/.test(seed.id) || !name.startsWith(seed.id + '-')
+      || !/^\d{4}-\d{2}-\d{2}$/.test(seed.recorded_at_kst ?? '')) throw new Error('EXPERIENCE_SEED_INVALID')
+    if (seed.status !== 'RESEARCH_REQUIRED') continue
+    const sourceSha256 = sha(bytes)
+    const workKey = makeWorkKey({ sourceKind: 'EXPERIENCE_SEED', sourceRef, sourceSha256 })
+    choices.push({
+      jobType: 'FRESH_BRIEF', sourceKind: 'EXPERIENCE_SEED', sourceRef, sourceSha256, workKey,
+      refs: [], hashes: [], excerpt: JSON.stringify({
+        id: seed.id, title: seed.title, experience: seed.experience, question: seed.question,
+        knowledge_to_verify: seed.knowledge_to_verify, practical_action_target: seed.practical_action_target,
+      }),
+      recordedAt: seed.recorded_at_kst, seedId: seed.id,
+    })
+  }
+  return choices.sort((a, b) => a.recordedAt.localeCompare(b.recordedAt) || a.seedId.localeCompare(b.seedId))[0] ?? null
+}
+
 async function freshChoice(source) {
   const manifestBytes = await readFile(join(root, source.source_manifest_ref))
   if (sha(manifestBytes) !== source.source_manifest_sha256) throw new Error('PREP_FRESH_SOURCE_HASH_CHANGED')
@@ -219,12 +246,15 @@ export async function runSemanticPrepare({ now = new Date() } = {}) {
   const recent = Number.isFinite(Date.parse(prepState.backfill_last_attempted_at ?? ''))
     ? (now.valueOf() - Date.parse(prepState.backfill_last_attempted_at)) / 3600000 : Infinity
   const backfillIsDue = backfillDue({ policy, runtimeState, now: now.toISOString() }) && recent >= policy.dispatcher.backfill.cadence_hours
+  const initialPlan = planSemanticPreparation({ activeJobs, handledJobs, scanner, backfillIsDue: false, legacyBlocker: blocker })
+  const experienceChoice = initialPlan.decision === 'NOOP' ? await selectExperienceSeed({ handledJobs }) : null
   const handledBackfillWorkKeys = (handledJobs ?? []).filter((job) => job.job_type === 'BACKFILL_BRIEF' && job.source_kind === 'PUBLIC_READER').map((job) => job.work_key)
-  const backfillChoice = backfillIsDue ? await publicReaderBackfillChoice(data, {
-    ...runtimeState,
-    backfill: { ...runtimeState.backfill, reviewed_items: [...runtimeState.backfill.reviewed_items, ...handledBackfillWorkKeys.map((work_key) => ({ work_key }))] },
-  }) : null
-  const plan = planSemanticPreparation({ activeJobs, handledJobs, scanner, backfillIsDue, backfillChoice, legacyBlocker: blocker })
+  const backfillChoice = initialPlan.decision === 'NOOP' && !experienceChoice && backfillIsDue
+    ? await publicReaderBackfillChoice(data, {
+      ...runtimeState,
+      backfill: { ...runtimeState.backfill, reviewed_items: [...runtimeState.backfill.reviewed_items, ...handledBackfillWorkKeys.map((work_key) => ({ work_key }))] },
+    }) : null
+  const plan = planSemanticPreparation({ activeJobs, handledJobs, scanner, experienceChoice, backfillIsDue, backfillChoice, legacyBlocker: blocker })
 
   if (plan.decision === 'NOOP') {
     await recordPrep('NOOP', plan.code, { mainSha })

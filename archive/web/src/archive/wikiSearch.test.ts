@@ -15,6 +15,13 @@ describe('unified public Wiki search', () => {
     expect(publicSearchIndex.some((entry) => entry.id === 'knowledge:K-005')).toBe(false)
   })
 
+  it('shows the short Knowledge label first while keeping the original question searchable', () => {
+    const entry = publicSearchIndex.find((item) => item.id === 'knowledge:K-012')
+    expect(entry?.title).toBe('재난 지도 정보공개 범위')
+    expect(entry?.subtitle).toContain('재난 대응 지도')
+    expect(searchPublicArchive('재난 대응 지도').some((item) => item.id === entry?.id)).toBe(true)
+  })
+
   it('finds world events and groups mixed result types', () => {
     const results = searchPublicArchive('화재')
     expect(results.some((entry) => entry.kind === 'wiki' && entry.title === '서쪽 대형화재 방어선')).toBe(true)

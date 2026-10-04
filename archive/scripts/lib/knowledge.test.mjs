@@ -431,7 +431,8 @@ test('generated golden pages remain static, searchable, linked and downloadable'
     const page = await readFile(join(root, 'archive/web/public/knowledge', brief.slug, 'index.html'), 'utf8')
     assert.match(index, new RegExp(`/knowledge/${brief.slug}/`))
     assert.match(sitemap, new RegExp(`/knowledge/${brief.slug}/`))
-    assert.ok(page.includes(`<h1>${htmlEsc(brief.title)}</h1>`))
+    assert.ok(page.includes('<h1>' + htmlEsc(brief.label) + '</h1>'))
+    assert.ok(page.includes('class="article-question">' + htmlEsc(brief.title) + '</p>'))
     assert.ok(page.includes(`<title>${htmlEsc(`${brief.title} | 생존일기`)}</title>`))
     assert.ok(page.includes(htmlEsc(brief.meta_description)))
     assert.ok(page.includes('https://schema.org'))
@@ -444,19 +445,19 @@ test('generated golden pages remain static, searchable, linked and downloadable'
 })
 
 
-test('worker V2 dispatcher prefers FRESH on twice-daily cadence and uses one daily BACKFILL window', async () => {
+test('worker dispatcher validates the 6-hour cadence and one-source limit', async () => {
   const policy = JSON.parse(await readFile(join(root, 'knowledge/automation/worker-policy.json'), 'utf8'))
   const providerConfig = JSON.parse(await readFile(join(root, 'knowledge/automation/provider-config.json'), 'utf8'))
   assert.equal(validateWorkerPolicy(policy), true)
   assert.equal(validateProviderConfig(providerConfig), true)
-  assert.equal(policy.dispatcher.trigger_interval_hours, 12)
+  assert.equal(policy.dispatcher.trigger_interval_hours, 6)
   assert.equal(policy.editorial_spec_ref, 'docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V1.md')
   assert.equal(policy.research_policy.minimum_authoritative_sources_per_brief, 2)
   assert.equal(policy.research_policy.preferred_authoritative_sources_per_brief, 3)
 
   const pending = [{ source_manifest_ref: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_999/SOURCE_MANIFEST.json' }]
   assert.equal(planWorkerRun({ policy, providerConfig, pendingSources: pending, openWorkerPr: false, localHour: 6 }).decision, 'FRESH')
-  assert.equal(planWorkerRun({ policy, providerConfig, pendingSources: [], openWorkerPr: false, localHour: 6 }).decision, 'BACKFILL')
+  assert.equal(planWorkerRun({ policy, providerConfig, pendingSources: [], openWorkerPr: false, localHour: 5 }).decision, 'BACKFILL')
   assert.equal(planWorkerRun({ policy, providerConfig, pendingSources: [], openWorkerPr: false, localHour: 12 }).decision, 'NOOP_WAIT')
   assert.equal(planWorkerRun({ policy, providerConfig, pendingSources: pending, openWorkerPr: true, localHour: 6 }).decision, 'NOOP_OPEN_WORKER_PR')
 })
@@ -592,8 +593,8 @@ test('editorial policy reference and quality target fail closed', async () => {
   }), /preferred authoritative sources/)
   assert.throws(() => validateWorkerPolicy({
     ...policy,
-    dispatcher: { ...policy.dispatcher, trigger_interval_hours: 6 },
-  }), /dispatcher trigger interval must be 12 hours/)
+    dispatcher: { ...policy.dispatcher, trigger_interval_hours: 12 },
+  }), /dispatcher trigger interval must be 6 hours/)
 })
 
 
@@ -627,14 +628,14 @@ test('runtime state makes BACKFILL durable and allows late retry without wall-cl
   const runtime = { version: 1, backfill: { last_attempted_at: null, last_work_key: null, last_result: null, reviewed_items: [] } }
   assert.equal(validateRuntimeState(runtime), true)
 
-  const sixKst = '2026-09-29T21:00:00.000Z'
-  const eighteenKst = '2026-09-30T09:00:00.000Z'
-  assert.equal(backfillDue({ policy, runtimeState: runtime, now: sixKst }), true)
-  assert.equal(backfillDue({ policy, runtimeState: runtime, now: eighteenKst }), false)
+  const fiveKst = '2026-09-29T20:00:00.000Z'
+  const elevenKst = '2026-09-30T02:00:00.000Z'
+  assert.equal(backfillDue({ policy, runtimeState: runtime, now: fiveKst }), true)
+  assert.equal(backfillDue({ policy, runtimeState: runtime, now: '2026-09-29T22:00:00.000Z' }), false)
 
-  recordBackfillResult(runtime, { workKey: 'PUBLIC_READER:chapter-1:sha-a', status: 'NO_CANDIDATE', now: sixKst })
-  assert.equal(backfillDue({ policy, runtimeState: runtime, now: eighteenKst }), false)
-  assert.equal(backfillDue({ policy, runtimeState: runtime, now: '2026-10-01T09:00:01.000Z' }), true)
+  recordBackfillResult(runtime, { workKey: 'PUBLIC_READER:chapter-1:sha-a', status: 'NO_CANDIDATE', now: fiveKst })
+  assert.equal(backfillDue({ policy, runtimeState: runtime, now: '2026-09-30T01:59:59.000Z' }), false)
+  assert.equal(backfillDue({ policy, runtimeState: runtime, now: elevenKst }), true)
   assert.deepEqual(runtime.backfill.reviewed_items.map((item) => item.work_key), ['PUBLIC_READER:chapter-1:sha-a'])
 })
 

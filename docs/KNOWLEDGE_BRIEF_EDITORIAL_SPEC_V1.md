@@ -194,6 +194,9 @@ AUTO_LOW_RISK 글은 저장소 하드 게이트를 통과해야 하며, 편집 �
 
 - 질문형을 기본으로 한다.
 - 한 글에 질문 하나만 담는다.
+- 한눈에 읽히는 18~30자를 권장한다. 뜻을 희생하며 억지로 줄이지 않는다.
+- 조건·예외·세부 확인 항목은 summary·lead·본문으로 옮긴다.
+- 새 글은 Candidate.question 자체를 짧고 명확하게 작성하고, Evidence.question 및 BRIEF.title과 byte-for-byte 일치시킨다. 별도 display_title 필드를 만들지 않는다.
 - 과장·공포·클릭베이트 표현 금지.
 
 ### summary

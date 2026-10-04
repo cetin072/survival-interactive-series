@@ -30,10 +30,11 @@ export function KnowledgeGuideLibraryPreview({ notice }: { notice?: string }) {
         <div>
           {publishedKnowledgeGuides.map((guide) => <article key={guide.id}>
             <div className="knowledge-library-meta">
-              <span>{guide.label}</span>
+              <span>생존 지식</span>
               <small>{knowledgeRiskLabel(guide.riskLevel)} · {guide.publishedAt}</small>
             </div>
-            <h3><a href={guideHref(guide.id)}>{guide.title}</a></h3>
+            <h3><a href={guideHref(guide.id)}>{guide.label}</a></h3>
+            <p className="knowledge-guide-question">{guide.title}</p>
             <p>{guide.summary}</p>
             <div className="knowledge-library-footer">
               <span>{guide.scope}</span>

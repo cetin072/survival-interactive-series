@@ -3,7 +3,7 @@
   "worker_enabled": true,
   "provider_config_ref": "knowledge/automation/provider-config.json",
   "dispatcher": {
-    "trigger_interval_hours": 12,
+    "trigger_interval_hours": 6,
     "timezone": "Asia/Seoul",
     "fresh_priority": true,
     "max_sources_per_run": 1,
@@ -11,9 +11,9 @@
     "backfill": {
       "enabled": true,
       "only_when_no_fresh": true,
-      "cadence_hours": 24,
+      "cadence_hours": 6,
       "max_new_briefs_per_run": 1,
-      "preferred_hour_local": 6,
+      "preferred_hour_local": 5,
       "allow_late_retry": true,
       "bootstrap_only_at_preferred_hour": true
     }

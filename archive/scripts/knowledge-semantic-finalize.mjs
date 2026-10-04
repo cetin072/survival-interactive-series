@@ -101,6 +101,9 @@ export async function verifyPins(job, base) {
   if (job.source_kind === 'PUBLIC_ARCHIVE') {
     await verifyFile(job.source_ref, job.source_sha256)
     for (let index = 0; index < context.source.refs.length; index += 1) await verifyFile(context.source.refs[index], context.source.hashes[index])
+  } else if (job.source_kind === 'EXPERIENCE_SEED') {
+    if (!/^knowledge\/content\/experience-seeds\/EX-[0-9]{3,}-[a-z0-9-]+\.json$/.test(job.source_ref)) throw new Error('SEMANTIC_EXPERIENCE_REF_INVALID')
+    await verifyFile(job.source_ref, job.source_sha256)
   } else if (job.source_kind === 'PUBLIC_READER') {
     const chapterId = context.source.chapter_id
     if (!chapterId || context.source.chapter_sha256 !== job.source_sha256) throw new Error('SEMANTIC_READER_PIN_INVALID')
