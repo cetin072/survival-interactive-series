@@ -6,9 +6,16 @@ import {
   productionStatusTone,
   shortSha,
   visualStatusTone,
+  statusLabel,
+  blockerLabel,
+  decisionLabel,
+  jobTypeLabel,
+  sessionLabel,
+  sourceKindLabel,
   statusWithKorean,
   explainMachineCode,
   subjectWithKorean,
+  timezoneLabel,
   timezoneWithKorean,
 } from './operatorSystemStatus'
 
@@ -48,5 +55,16 @@ describe('Operator system status helpers', () => {
     expect(explainMachineCode('A_WIKI_COMMAND_GH_1')).toBe('GitHub 처리 실패 · 재시도 또는 권한 상태 확인')
     expect(subjectWithKorean('char-taehoon')).toBe('장태훈 · char-taehoon')
     expect(timezoneWithKorean('Asia/Seoul')).toBe('한국시간 · Asia/Seoul')
+  })
+
+  it('provides plain-language labels for the dashboard', () => {
+    expect(statusLabel('EXTRACTOR_READY')).toBe('내용 추출 대기')
+    expect(statusLabel('INGESTING')).toBe('파일 처리 중')
+    expect(blockerLabel('A_WIKI_COMMAND_GH_1')).toContain('위키 게시 반영')
+    expect(decisionLabel('BRIEF_READY')).toBe('글 초안 준비 완료')
+    expect(jobTypeLabel('BACKFILL_BRIEF')).toBe('기존 기록에서 지식 글 만들기')
+    expect(sourceKindLabel('PUBLIC_READER')).toBe('공개 이야기 기록')
+    expect(sessionLabel('SESSION_007')).toBe('7번째 기록 묶음')
+    expect(timezoneLabel('Asia/Seoul')).toBe('한국시간')
   })
 })
