@@ -1,3 +1,5 @@
+> **SUPERSEDED / HISTORICAL** — 이 문서는 과거 올인원 Scheduled Worker 구조의 기록이다. 현재 운영 권위는 [ILLUSTRATION_B_RENDERER_PROMPT.md](./ILLUSTRATION_B_RENDERER_PROMPT.md)와 [ILLUSTRATION_B_REVIEWER_PROMPT.md](./ILLUSTRATION_B_REVIEWER_PROMPT.md) 두 문서다. 이 문서를 현재 ChatGPT 예약에 붙여넣지 않는다.
+
 # AFTERFALL Illustration B — 예약 작업 프롬프트
 
 이 작업은 한 번 실행될 때 AFTERFALL 시각 후보 중 한 건만 처리한다.
