@@ -26,8 +26,10 @@ assert.ok(initial.graph.relations.length >= minimumExpectedRelations)
 assert.ok(initial.graph.nodes.some((n) => n.id === 'loc-guild-rear-warehouse'))
 for (const source of archiveNodes) assert.deepEqual(initial.graph.nodes.find((n) => n.id === source.id).data, source)
 for (const source of archiveEdges) assert.ok(initial.graph.relations.some((r) => r.data.from === source.from && r.data.to === source.to && r.data.label === source.label && r.data.kind === 'published_relation'))
-for (const source of aWikiFacts.nodes) assert.ok(initial.graph.nodes.some((n) => n.id === source.id && JSON.stringify(n.data) === JSON.stringify(source)))
-for (const source of aWikiFacts.relations) assert.ok(initial.graph.relations.some((r) => r.data.from === source.from && r.data.to === source.to && r.data.label === source.label && r.data.kind === source.kind))
+for (const source of aWikiFacts.nodes) assert.ok(initial.graph.nodes.some((n) =>
+  n.id === source.id && n.data.type === source.type && n.data.label === source.label))
+for (const source of aWikiFacts.relations) assert.ok(initial.graph.relations.some((r) =>
+  r.data.from === source.from && r.data.to === source.to && r.data.kind === source.kind))
 assert.ok(initial.graph.story_links.length > 0)
 assert.equal(initial.report.inferred_relationships, 0)
 assert.equal(initial.report.external_calls, 0)
