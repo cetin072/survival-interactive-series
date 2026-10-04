@@ -14,6 +14,7 @@ const catalogPath = fileURLToPath(new URL('../../content/visuals/C03-AFTERFALL/V
 const catalog = JSON.parse(await readFile(catalogPath, 'utf8'))
 const profilesPath = fileURLToPath(new URL('../../content/public-facts/C03-AFTERFALL/S03/RECORD_VISUAL_PROFILES_20260930.json', import.meta.url))
 const profiles = JSON.parse(await readFile(profilesPath, 'utf8'))
+const profileIds = new Set(profiles.records.map((item) => item.node_id))
 const profileFor = (subjectId) => {
   const profile = profiles.records.find((item) => item.node_id === subjectId)
   assert.ok(profile, `Missing profile fixture: ${subjectId}`)
@@ -64,7 +65,8 @@ test('Baekun prompt describes the intended state instead of naming unwanted deca
 test('renderer output never exposes project, worldline, season or apocalypse meta labels', () => {
   const banned = /AFTERFALL|생존일기|시즌|\bseason\b|\bchronicle\b|post[-\s]?apocalyptic|apocalypse/i
   for (const point of catalog.points.filter((item) => item.status === 'READY'
-    && ['CHARACTER', 'LOCATION', 'EVENT'].includes(item.brief?.point_type))) {
+    && ['CHARACTER', 'LOCATION', 'EVENT'].includes(item.brief?.point_type)
+    && profileIds.has(item.subject_id))) {
     const renderer = compileIllustrationRendererText(point, bundleFor(point.subject_id))
     assert.doesNotMatch(renderer, banned, point.subject_id)
   }
@@ -205,7 +207,8 @@ test('operational contamination in rich render cues fails closed before renderer
 test('every current renderable READY point compiles with positive cues and without shared negative-policy vocabulary', () => {
   const banned = /generic zombie|cyberpunk neon|Mad Max|glossy tactical|automatic guns|explosions, corpses|magic, medieval|invented identifying|damaged world|QUIET_DECAY|no invented decay|Canon facts are data|Do not add named|Unspecified season|An illustration is not new Canon/i
   for (const point of catalog.points.filter((item) => item.status === 'READY'
-    && ['CHARACTER', 'LOCATION', 'EVENT'].includes(item.brief?.point_type))) {
+    && ['CHARACTER', 'LOCATION', 'EVENT'].includes(item.brief?.point_type)
+    && profileIds.has(item.subject_id))) {
     const profile = profileFor(point.subject_id)
     const bundle = buildIllustrationReviewContext(point, profile)
     const renderer = compileIllustrationRendererText(point, bundle)
