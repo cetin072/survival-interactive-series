@@ -101,8 +101,10 @@ export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}
     return { status: 'RENDER_PROVIDER_NOT_SCHEDULED_CHATGPT', active_provider: activeProvider }
   }
 
+  const observedAttempts = await rpc('archive_illustration_render_attempt_history', {})
+  demand(Array.isArray(observedAttempts), 'ILLUSTRATION_PREP_ATTEMPT_HISTORY_INVALID')
   const plan = selectIllustrationCandidates({
-    catalog, siteAssets: effectiveSiteAssets, receipts, batchLimit: 3,
+    catalog, siteAssets: effectiveSiteAssets, receipts, observedAttempts, batchLimit: 3,
   })
   if (!plan.candidates.length) {
     return { status: 'NO_CANDIDATE', active_provider: activeProvider }
