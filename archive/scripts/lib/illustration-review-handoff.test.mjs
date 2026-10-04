@@ -1,5 +1,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
+import { resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import {
   REVIEW_HANDOFF_BRANCH,
   REVIEW_HANDOFF_PATH,
@@ -105,4 +108,32 @@ test('idempotency accepts only the exact already-applied decision', () => {
     provider_asset_id: reviewProviderAssetId(value),
   }), value), true)
   assert.equal(isAlreadyAppliedReview(job(), value), false)
+})
+
+
+test('native reviewer hands off the decision instead of mutating Supabase directly', async () => {
+  const root = resolve(fileURLToPath(new URL('../../..', import.meta.url)))
+  const worker = await readFile(resolve(root, 'docs/automation/ILLUSTRATION_B_NATIVE_WORKER_PROMPT.md'), 'utf8')
+  const router = await readFile(resolve(root, 'docs/automation/ILLUSTRATION_B_NATIVE_WORKER_ROUTER.md'), 'utf8')
+  const contract = JSON.parse(await readFile(
+    resolve(root, 'archive/automation/illustration-native-worker-runtime-contract.json'), 'utf8',
+  ))
+  const workflow = await readFile(
+    resolve(root, '.github/workflows/archive-illustration-review-handoff.yml'), 'utf8',
+  )
+  assert.match(worker, /Supabase의 lease acquire \/ review_decide \/ 상태변경 RPC를 이 AI 실행에서 직접 호출하지 않는다/)
+  assert.match(worker, /automation-b-review-handoff/)
+  assert.match(router, /Program owns durable review-decision mutation/)
+  assert.equal(contract.review_handoff.ai_direct_db_mutation, false)
+  assert.equal(contract.roles.INGESTING.decision_rpc_owner, 'PROGRAM_REVIEW_HANDOFF')
+  assert.match(workflow, /Checkout current main program/)
+  assert.match(workflow, /apply-illustration-review-handoff\.mjs/)
+})
+
+test('clean renderer can replace only a prior-job stale current image', async () => {
+  const root = resolve(fileURLToPath(new URL('../../..', import.meta.url)))
+  const renderer = await readFile(resolve(root, 'docs/automation/ILLUSTRATION_B_CLEAN_RENDERER_PROMPT.md'), 'utf8')
+  assert.match(renderer, /modified_at.*earlier than the current job .*created_at/)
+  assert.match(renderer, /do not generate again/)
+  assert.match(renderer, /Never replace a file while the current DB job is not `PREPARED`/)
 })
