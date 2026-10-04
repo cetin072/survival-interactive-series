@@ -44,8 +44,11 @@ type VisualJob = {
   job_id?: string | null; date_kst?: string | null; status?: string | null; attempt_no?: number | null
   subject_id?: string | null; title?: string | null; review_decision?: string | null
   review_summary?: string | null; blocker_code?: string | null; blocker_stage?: string | null
-  last_error_code?: string | null; last_error_stage?: string | null
-  created_at?: string | null; updated_at?: string | null; reviewed_at?: string | null; finalized_at?: string | null
+  last_error_code?: string | null; last_error_stage?: string | null; stalled_code?: string | null
+  provider_failure_count?: number | null; ingest_failure_count?: number | null; review_failure_count?: number | null
+  age_minutes?: number | null
+  created_at?: string | null; updated_at?: string | null; provider_completed_at?: string | null
+  reviewed_at?: string | null; finalized_at?: string | null
 }
 type KnowledgeSemanticJob = {
   job_id?: string; job_type?: string; status?: string; source_kind?: string; source_ref?: string
@@ -260,6 +263,8 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
     && systemStatus?.visual.prep_cron?.last_status === 'succeeded'
     && systemStatus?.visual.retry_cron?.active === true
     && systemStatus?.visual.retry_cron?.last_status === 'succeeded'
+  const visualBlocker = visualLatest?.stalled_code ?? visualLatest?.blocker_code ?? visualLatest?.last_error_code ?? null
+  const visualBadgeClass = visualBlocker ? 'warning' : visualStatusTone(visualLatest?.status)
   const semanticLatest = systemStatus?.knowledge_semantic?.latest_job ?? null
   const semanticBlocker = semanticLatest?.stalled_code ?? semanticLatest?.blocker_code ?? systemStatus?.knowledge_semantic?.prep?.blocker_code ?? null
   const semanticBadgeClass = semanticBlocker ? 'warning' : semanticLatest?.status === 'PUBLISHED' ? 'ok' : ['HUMAN_REVIEW','BLOCKED','HOLD'].includes(semanticLatest?.status ?? '') ? 'warning' : 'neutral'
@@ -287,15 +292,18 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
         </article>
 
         <article className="operator-system-card">
-          <div className="operator-system-title"><h3>B · Visual <small>이미지</small></h3><span className={`operator-status-badge ${visualStatusTone(visualLatest?.status)}`}>{visualLatest?.status ? statusWithKorean(visualLatest.status) : '실행이력 없음'}</span></div>
+          <div className="operator-system-title"><h3>B · Visual <small>이미지</small></h3><span className={`operator-status-badge ${visualBadgeClass}`}>{visualBlocker ? '확인 필요' : visualLatest?.status ? statusWithKorean(visualLatest.status) : '실행이력 없음'}</span></div>
           <dl>
             <div><dt>Prep 자동실행</dt><dd>{visualPrepHealthy ? '정상' : '확인 필요'}</dd></div>
             <div><dt>오늘 시도 / 성공</dt><dd>{systemStatus?.visual.today_job_count ?? 0}건 / {systemStatus?.visual.today_success_count ?? 0}건</dd></div>
             <div><dt>활성 작업</dt><dd>{systemStatus?.visual.active_count ?? 0}건</dd></div>
             <div><dt>최근 대상</dt><dd>{visualLatest?.title ? `${visualLatest.title} · ${visualLatest.subject_id ?? ''}` : subjectWithKorean(visualLatest?.subject_id)}</dd></div>
             <div><dt>최근 상태 시각</dt><dd>{formatOperatorTime(visualLatest?.finalized_at ?? visualLatest?.reviewed_at ?? visualLatest?.updated_at ?? visualLatest?.created_at)}</dd></div>
+            <div><dt>Renderer 완료</dt><dd>{formatOperatorTime(visualLatest?.provider_completed_at)}</dd></div>
+            <div><dt>상태 체류</dt><dd>{visualLatest?.age_minutes == null ? '—' : `${visualLatest.age_minutes}분`}</dd></div>
+            <div><dt>실패 P / I / R</dt><dd>{visualLatest?.provider_failure_count ?? 0} / {visualLatest?.ingest_failure_count ?? 0} / {visualLatest?.review_failure_count ?? 0}</dd></div>
             <div><dt>검수 판정</dt><dd>{visualLatest?.review_decision ? statusWithKorean(visualLatest.review_decision) : '—'}</dd></div>
-            <div><dt>상세</dt><dd>{visualLatest?.blocker_code || visualLatest?.last_error_code ? <><code>{visualLatest.blocker_code ?? visualLatest.last_error_code}</code>{explainMachineCode(visualLatest.blocker_code ?? visualLatest.last_error_code) && <small className="operator-code-help">{explainMachineCode(visualLatest.blocker_code ?? visualLatest.last_error_code)}</small>}{(visualLatest.blocker_stage ?? visualLatest.last_error_stage) && <small className="operator-code-help">{visualLatest.blocker_stage ?? visualLatest.last_error_stage}</small>}</> : <>attempt {visualLatest?.attempt_no ?? '—'} · 누적 {systemStatus?.visual.job_count ?? 0}건</>}</dd></div>
+            <div><dt>상세</dt><dd>{visualBlocker ? <><code>{visualBlocker}</code>{explainMachineCode(visualBlocker) && <small className="operator-code-help">{explainMachineCode(visualBlocker)}</small>}{(visualLatest?.blocker_stage ?? visualLatest?.last_error_stage) && <small className="operator-code-help">{visualLatest?.blocker_stage ?? visualLatest?.last_error_stage}</small>}</> : <>attempt {visualLatest?.attempt_no ?? '—'} · 누적 {systemStatus?.visual.job_count ?? 0}건</>}</dd></div>
           </dl>
         </article>
 
