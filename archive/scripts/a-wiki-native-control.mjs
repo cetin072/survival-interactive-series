@@ -115,23 +115,33 @@ function findPullRequest(headRef) {
   return all.find((pr) => pr.headRefName === headRef) ?? null
 }
 
+export function mergedPublication(existingPr, branch) {
+  if (!existingPr || existingPr.state !== 'MERGED') return null
+  insist(existingPr.headRefName === branch && existingPr.baseRefName === 'main',
+    'A_WIKI_MERGED_PR_BINDING_INVALID')
+  insist(/^[a-f0-9]{40}$/.test(existingPr.headRefOid ?? '')
+    && /^[a-f0-9]{40}$/.test(existingPr.mergeCommit?.oid ?? ''),
+  'A_WIKI_MERGED_PR_SHA_INVALID')
+  return {
+    status: 'MERGED',
+    branch,
+    prNumber: existingPr.number,
+    headSha: existingPr.headRefOid,
+    mergeSha: existingPr.mergeCommit.oid,
+  }
+}
+
 async function buildPublication(row) {
   run('git', ['fetch', 'origin', 'main'], root)
-  const currentMain = run('git', ['rev-parse', 'origin/main'], root)
-  const currentGraph = JSON.parse(run('git', ['show', `origin/main:${graphRef}`], root))
-  if (currentGraph.content_sha256 !== row.graph_sha256) throw new Error('A_WIKI_GRAPH_CHANGED_REPREPARE_REQUIRED')
 
   const branch = publicationBranch(row.prepared_job)
   const existingPr = findPullRequest(branch)
-  if (existingPr?.state === 'MERGED' && /^[a-f0-9]{40}$/.test(existingPr.mergeCommit?.oid ?? '')) {
-    return {
-      status: 'MERGED',
-      branch,
-      prNumber: existingPr.number,
-      headSha: existingPr.headRefOid,
-      mergeSha: existingPr.mergeCommit.oid,
-    }
-  }
+  const alreadyMerged = mergedPublication(existingPr, branch)
+  if (alreadyMerged) return alreadyMerged
+
+  const currentMain = run('git', ['rev-parse', 'origin/main'], root)
+  const currentGraph = JSON.parse(run('git', ['show', `origin/main:${graphRef}`], root))
+  if (currentGraph.content_sha256 !== row.graph_sha256) throw new Error('A_WIKI_GRAPH_CHANGED_REPREPARE_REQUIRED')
 
   let headSha = existingPr?.headRefOid ?? null
   const remote = run('git', ['ls-remote', '--heads', 'origin', `refs/heads/${branch}`], root)
