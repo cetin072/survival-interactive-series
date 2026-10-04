@@ -391,20 +391,18 @@ test('daily summary is a receipt projection and does not create empty run histor
   })
 })
 
-test('native worker renderer boot stays context-isolated before image generation', async () => {
+test('native worker refuses PREPARED rendering and leaves generation to clean renderer', async () => {
   const root = resolve(fileURLToPath(new URL('../../..', import.meta.url)))
   const router = await readFile(resolve(root, 'docs/automation/ILLUSTRATION_B_NATIVE_WORKER_ROUTER.md'), 'utf8')
   const contract = JSON.parse(await readFile(
     resolve(root, 'archive/automation/illustration-native-worker-runtime-contract.json'), 'utf8',
   ))
-  assert.match(router, /status=`PREPARED`/)
-  assert.match(router, /추가 GitHub 문서, 프로젝트 설명, 과거 결과를 읽지 않는다/)
-  assert.match(router, /exact TEXT 그 자체/)
-  assert.doesNotMatch(router, /Vault|Registry|SITE_ASSETS|Finalizer/)
+  assert.match(router, /PREPARED belongs exclusively to the separate Clean Renderer/)
+  assert.match(router, /If status=`PREPARED`, stop immediately\. Do not generate an image\./)
+  assert.deepEqual(contract.workers.clean_renderer.handles, ['PREPARED'])
+  assert.deepEqual(contract.workers.native_worker.handles, ['INGESTING', 'REVIEW_PASS_STAGED'])
   assert.equal(contract.renderer_context_isolation?.enabled, true)
   assert.equal(contract.renderer_context_isolation?.scene_input, 'EXACT_DB_PROMPT_TEXT_WITH_NO_PREFIX_OR_SUFFIX')
-  assert.equal(contract.renderer_context_isolation?.image_call_must_follow_prompt_sha_gate, true)
-  assert.equal(contract.renderer_context_isolation?.full_authority_load_after_image_generation_only, true)
 })
 
 test('clean renderer is physically separated from review-transfer worker', async () => {
