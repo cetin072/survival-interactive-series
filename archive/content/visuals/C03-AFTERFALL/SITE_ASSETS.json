@@ -101,7 +101,23 @@
       "width": 512,
       "height": 512,
       "mime_type": "image/png"
+    },
+    {
+      "point_id": "point-f4c5c0d4defbfe8cd408bda73f99b9b3b3a855117711eee20cf7368aa069c35e",
+      "generation_key": "generation-f239f8dff6cf07b4dfff76a43a81d0cffa29ee892dcb363af5a15a7195d5e174",
+      "subject_id": "loc-bridge",
+      "source_sha256": "cf2f979382eaaa040d4eb534f5326d619454fd2d14b818af9f2d28697f221e1f",
+      "storage_bucket": "survival-archive-originals",
+      "storage_object_path": "AFTERFALL/point-f4c5c0d4defbfe8cd408bda73f99b9b3b3a855117711eee20cf7368aa069c35e/generation-f239f8dff6cf07b4dfff76a43a81d0cffa29ee892dcb363af5a15a7195d5e174/cf2f979382eaaa040d4eb534f5326d619454fd2d14b818af9f2d28697f221e1f.png",
+      "registry_asset_id": "AF-LOC-F4C5C0D4DEFBFE8CD408BDA7",
+      "derivative_version": "site-png-512-v1",
+      "public_path": "/visual-assets/12267791ac6cafd5bf762135a3794990c7b777269cb3daeded85131796e58149.png",
+      "sha256": "12267791ac6cafd5bf762135a3794990c7b777269cb3daeded85131796e58149",
+      "bytes": 169741,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png"
     }
   ],
-  "content_sha256": "887c57fd5c3542e13146f0aba82d8d064fa9ce07dd9e16a540685e91fe59ee29"
+  "content_sha256": "aa81a85f4704f97fa810ec76034d94f3bff3d37f9e1707b23cf1d1658f142fe0"
 }
