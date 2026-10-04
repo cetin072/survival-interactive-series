@@ -65,5 +65,14 @@
   "related_ip_note": {
     "status": "EDITORIAL_CONTEXT_ONLY",
     "text": "《생존일기》 초반부에서 작은 생활 이상을 집→건물→지역 단위로 재평가하는 상황과 연결해 볼 수 있으나, 작품 서사는 현실 근거로 사용하지 않는다."
+  },
+  "repair_evidence": {
+    "status": "PRIVATE_SOURCE_ASSET_STORED",
+    "captured_after_event": true,
+    "asset_location": "Personal Library /Survival-Diary/Knowledge-Experience/EX-001/repair-site-original.jpg",
+    "public_exposure": "PRIVATE_ONLY_UNTIL_REDACTED_DERIVATIVE",
+    "visual_observation": "사진에는 한국전력 표식이 있는 고소작업차와 작업자가 전주·배전 설비 주변에서 현장 작업을 하는 모습이 보인다.",
+    "evidentiary_scope": "이 사진은 전력 설비 현장 복구 작업이 이루어진 정황을 보강한다. 사진만으로 정전의 정확한 원인이나 새 접촉 여부까지 확정하지 않는다.",
+    "publication_rule": "공개 글에 사용할 경우 위치 식별 가능 요소와 주변 표식을 검토한 뒤 공개용 파생본을 별도로 만든다."
   }
 }
