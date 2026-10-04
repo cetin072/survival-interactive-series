@@ -8,7 +8,7 @@
   "title": "전등이 꺼졌을 때 우리 집만의 문제인지 아파트 정전인지 어떻게 구분할까",
   "tools": [],
   "footer": "타는 냄새, 스파크, 침수 등 위험 신호가 있으면 전기설비에 접근하지 말고 관리사무소 또는 긴급기관의 안내를 따르세요. 특정 건물의 고장 원인과 급수 상태는 현장 관리주체가 확인해야 합니다.",
-  "status": "READY",
+  "status": "PUBLISHED",
   "sources": [
     {
       "id": "S1",
@@ -116,7 +116,7 @@
   "topic_id": "household-emergency-preparedness",
   "risk_level": "HIGH",
   "story_refs": [],
-  "updated_at": "2026-10-05",
+  "updated_at": "2026-10-04",
   "ai_assisted": true,
   "content_type": "BRIEF",
   "published_at": "2026-10-04",
