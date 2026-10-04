@@ -1,0 +1,194 @@
+{
+  "anchor": {
+    "game_time": "2027-10-30 13:20",
+    "save_version": 282
+  },
+  "chronicle_id": "C03-AFTERFALL",
+  "nodes": [
+    {
+      "id": "event-wiki-df3c90d6f885fdb269cd38d3",
+      "label": "길드 표준펌프 보증·장기수리 정책",
+      "source": "S03 SESSION_007 GM 공개 블록 001",
+      "subtitle": "2027년 9월 23일–10월 3일",
+      "summary": "첫 6대 시험에서 정상 4대, 길드 수리책임 1대, 사용자 과실 1대가 확인됐다. 이후 길드는 확인·수리한 기능에 대한 짧은 기본보증과 선택형 유료 장기수리계약을 정식 정책으로 두었다.",
+      "tags": [
+        "S03",
+        "길드",
+        "표준펌프",
+        "보증",
+        "유지보수"
+      ],
+      "type": "event"
+    },
+    {
+      "id": "char-wiki-9cb69d0dc08460c215904370",
+      "label": "정병호",
+      "source": "S03 SESSION_007 GM 공개 블록 003",
+      "subtitle": "언덕 아래 옛 축사 재배지 거점 대표",
+      "summary": "언덕 아래 옛 축사 재배지의 대표로 길드의 급수설비 표준화 협의에 참여했다.",
+      "tags": [
+        "S03",
+        "인물",
+        "생산거점"
+      ],
+      "type": "character"
+    },
+    {
+      "id": "loc-wiki-04beb10f1f92ee26f3f09c2f",
+      "label": "하천변 비닐하우스군",
+      "source": "S03 SESSION_007 GM 공개 블록 003",
+      "subtitle": "표준 급수망 첫 번째 생산거점",
+      "summary": "세 생산거점 현장조사의 첫 번째 대상이다. 기존 배관과 전원은 길드 A형 표준펌프에 거의 그대로 맞았다.",
+      "tags": [
+        "S03",
+        "장소",
+        "생산거점",
+        "급수"
+      ],
+      "type": "location"
+    },
+    {
+      "id": "loc-wiki-5a5b0982ccdae5210d2a6275",
+      "label": "공동 물탱크 농가군",
+      "source": "S03 SESSION_007 GM 공개 블록 003",
+      "subtitle": "표준 급수망 두 번째 생산거점",
+      "summary": "세 생산거점 현장조사의 두 번째 대상이다. 긴 전선의 전압강하 문제는 전선과 연결부를 손봐 A형 표준펌프를 사용할 수 있게 했다.",
+      "tags": [
+        "S03",
+        "장소",
+        "생산거점",
+        "급수"
+      ],
+      "type": "location"
+    },
+    {
+      "id": "loc-wiki-5b717b2a37f7f4375268b82a",
+      "label": "언덕 아래 옛 축사 재배지",
+      "source": "S03 SESSION_007 GM 공개 블록 003",
+      "subtitle": "표준 급수망 세 번째 생산거점",
+      "summary": "정병호가 대표로 있는 세 번째 생산거점이다. 처음에는 A형에 여유가 부족했지만 배관 일부와 취수구조를 조정해 다른 거점과 같은 A형 계열에 들어왔다.",
+      "tags": [
+        "S03",
+        "장소",
+        "생산거점",
+        "급수"
+      ],
+      "type": "location"
+    },
+    {
+      "id": "loc-wiki-6d44db0505ec3dcf97e41a4a",
+      "label": "동쪽 집하장",
+      "source": "S03 SESSION_007 GM 공개 블록 003",
+      "subtitle": "표준 급수망 공동예비·부품 거점",
+      "summary": "첫 표준 급수망 계약 뒤 공동예비펌프와 공용부품함을 보관하는 동쪽 연결 지점이다.",
+      "tags": [
+        "S03",
+        "장소",
+        "집하장",
+        "급수"
+      ],
+      "type": "location"
+    },
+    {
+      "id": "event-wiki-b7ffeffefd90e9765d184979",
+      "label": "세 생산거점 표준 급수망 첫 계약",
+      "source": "S03 SESSION_007 GM 공개 블록 003",
+      "subtitle": "2027년 10월 23일",
+      "summary": "현장조사 뒤 세 생산거점을 같은 A형 계열로 맞추고 운영용 3대와 공동예비 2대, 총 5대를 공급 상한으로 두었다. 공용부품과 유료 유지보수 계약을 묶은 첫 표준 급수망 계약이다.",
+      "tags": [
+        "S03",
+        "계약",
+        "급수",
+        "표준화",
+        "유지보수"
+      ],
+      "type": "event"
+    },
+    {
+      "id": "event-wiki-3fd45d2cb293984e10fb4440",
+      "label": "공공 급수지점 유지보수 요청",
+      "source": "S03 SESSION_007 GM 공개 블록 003",
+      "subtitle": "2027년 10월 30일",
+      "summary": "문하진이 전달한 공공 급수지점 두 곳의 요청은 펌프 공급·예비품·정기점검·고장 대응에 더해 급수 중단 시 길드의 우선 복구 지원까지 포함했다.",
+      "tags": [
+        "S03",
+        "공공급수",
+        "요청",
+        "급수"
+      ],
+      "type": "event"
+    }
+  ],
+  "relations": [
+    {
+      "from": "char-wiki-9cb69d0dc08460c215904370",
+      "kind": "related_to",
+      "label": "거점 대표",
+      "to": "loc-wiki-5b717b2a37f7f4375268b82a"
+    },
+    {
+      "from": "char-jinwoo",
+      "kind": "participated_in",
+      "label": "현장조사·표준화 결정",
+      "to": "event-wiki-b7ffeffefd90e9765d184979"
+    },
+    {
+      "from": "char-taehoon",
+      "kind": "participated_in",
+      "label": "현장조사·설비 판단",
+      "to": "event-wiki-b7ffeffefd90e9765d184979"
+    },
+    {
+      "from": "char-mingyu",
+      "kind": "participated_in",
+      "label": "현장조사·전원 및 수리 판단",
+      "to": "event-wiki-b7ffeffefd90e9765d184979"
+    },
+    {
+      "from": "event-wiki-b7ffeffefd90e9765d184979",
+      "kind": "occurred_at",
+      "label": "첫 번째 계약 대상 생산거점",
+      "to": "loc-wiki-04beb10f1f92ee26f3f09c2f"
+    },
+    {
+      "from": "event-wiki-b7ffeffefd90e9765d184979",
+      "kind": "occurred_at",
+      "label": "두 번째 계약 대상 생산거점",
+      "to": "loc-wiki-5a5b0982ccdae5210d2a6275"
+    },
+    {
+      "from": "event-wiki-b7ffeffefd90e9765d184979",
+      "kind": "occurred_at",
+      "label": "세 번째 계약 대상 생산거점",
+      "to": "loc-wiki-5b717b2a37f7f4375268b82a"
+    },
+    {
+      "from": "event-wiki-b7ffeffefd90e9765d184979",
+      "kind": "related_to",
+      "label": "공동예비펌프·부품 거점",
+      "to": "loc-wiki-6d44db0505ec3dcf97e41a4a"
+    },
+    {
+      "from": "event-wiki-df3c90d6f885fdb269cd38d3",
+      "kind": "related_to",
+      "label": "표준펌프 1호의 후속 보증·유지보수 정책",
+      "to": "event-wiki-a93db7854c7049a3b7c936b2"
+    },
+    {
+      "from": "char-hajin",
+      "kind": "participated_in",
+      "label": "공공 급수지점 요청 전달",
+      "to": "event-wiki-3fd45d2cb293984e10fb4440"
+    },
+    {
+      "from": "event-wiki-3fd45d2cb293984e10fb4440",
+      "kind": "occurred_at",
+      "label": "길드 관리동에서 요청 전달",
+      "to": "loc-sports-complex"
+    }
+  ],
+  "season_id": "S03",
+  "version": "public-graph-facts-v1",
+  "visibility": "PUBLIC_ARCHIVE",
+  "worldline_id": "AFTERFALL"
+}
