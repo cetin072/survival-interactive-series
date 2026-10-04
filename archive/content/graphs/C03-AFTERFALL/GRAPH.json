@@ -190,6 +190,13 @@
           "relation_id": "rel-98cc22ae48c0d01423c4e97b694b37de57d9d4de992c09f0aaa86d00b9da766f"
         },
         {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "공공 급수지점 요청 전달",
+          "other_id": "event-wiki-3fd45d2cb293984e10fb4440",
+          "relation_id": "rel-a7414041a557e8c23bea27b1baf0f7ffa58bee6acc2d973b86138f5b2f2b555a"
+        },
+        {
           "direction": "incoming",
           "kind": "published_relation",
           "label": "시설·급수",
@@ -527,6 +534,13 @@
         },
         {
           "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "현장조사·표준화 결정",
+          "other_id": "event-wiki-b7ffeffefd90e9765d184979",
+          "relation_id": "rel-f38be50120122f44d89f7b01dd2ee8366f3fe99d8a7f87927dafe065b4e6e068"
+        },
+        {
+          "direction": "outgoing",
           "kind": "published_relation",
           "label": "외부 연락축",
           "other_id": "char-minho",
@@ -710,6 +724,13 @@
           "label": "과거 생활권",
           "other_id": "loc-baekun",
           "relation_id": "rel-123de16d8e0d3287baff0a17a4e0af293408d6bdc66fac10b593eab3c6750867"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "현장조사·전원 및 수리 판단",
+          "other_id": "event-wiki-b7ffeffefd90e9765d184979",
+          "relation_id": "rel-1dbf601f473b03b6a3ed9b27fc366ab28ec12c60ba9a88776913f3eaa959b7cd"
         },
         {
           "direction": "incoming",
@@ -1086,6 +1107,13 @@
         {
           "direction": "outgoing",
           "kind": "participated_in",
+          "label": "현장조사·설비 판단",
+          "other_id": "event-wiki-b7ffeffefd90e9765d184979",
+          "relation_id": "rel-ed4f4ce28860d2c8d4035251c78ca9ce5f94636af36793b651b35ff489143b24"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
           "label": "작동 시험",
           "other_id": "event-wiki-a93db7854c7049a3b7c936b2",
           "relation_id": "rel-fe9897192360e1885492989f3a784a96a5c9db25bed303bbf982d6c930e43bc4"
@@ -1289,6 +1317,32 @@
         "S03",
         "인물",
         "남쪽 차량야드"
+      ],
+      "type": "character"
+    },
+    {
+      "facts": {},
+      "id": "char-wiki-9cb69d0dc08460c215904370",
+      "label": "정병호",
+      "overview": "언덕 아래 옛 축사 재배지의 대표로 길드의 급수설비 표준화 협의에 참여했다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "related_to",
+          "label": "거점 대표",
+          "other_id": "loc-wiki-5b717b2a37f7f4375268b82a",
+          "relation_id": "rel-a2f310d7f1fd127afdad0c4df155f6fd738ada3c8ee8796afbb9643fd06c041d"
+        }
+      ],
+      "story_link_ids": [
+        "mention-c610ce49aed073ac76c532fce214c796d482a5c34e4ecd4fb0277cfe4a69fc5e",
+        "mention-d61634f6a676d837143b6f58cb59d690b55265656ce9d4e5c3e3070aa7185010"
+      ],
+      "subtitle": "언덕 아래 옛 축사 재배지 거점 대표",
+      "tags": [
+        "S03",
+        "인물",
+        "생산거점"
       ],
       "type": "character"
     },
@@ -1811,6 +1865,37 @@
     },
     {
       "facts": {},
+      "id": "event-wiki-3fd45d2cb293984e10fb4440",
+      "label": "공공 급수지점 유지보수 요청",
+      "overview": "문하진이 전달한 공공 급수지점 두 곳의 요청은 펌프 공급·예비품·정기점검·고장 대응에 더해 급수 중단 시 길드의 우선 복구 지원까지 포함했다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "길드 관리동에서 요청 전달",
+          "other_id": "loc-sports-complex",
+          "relation_id": "rel-2b50a5ca4959c5ab0c4e57db31a3f14c03d6864997595bc1d19442a9592c2c19"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "공공 급수지점 요청 전달",
+          "other_id": "char-hajin",
+          "relation_id": "rel-a7414041a557e8c23bea27b1baf0f7ffa58bee6acc2d973b86138f5b2f2b555a"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 10월 30일",
+      "tags": [
+        "S03",
+        "공공급수",
+        "요청",
+        "급수"
+      ],
+      "type": "event"
+    },
+    {
+      "facts": {},
       "id": "event-wiki-6fa152109f3897e4ad04b372",
       "label": "길드 거래 서비스 구분 검토",
       "overview": "관리동 논의에서 등록상인은 사람과 이력 확인, 에스크로는 정해진 거래 과정 관리, 보증거래는 특정 거래 결과조건까지 책임범위를 넓히는 구조로 구분했다.",
@@ -1845,6 +1930,13 @@
       "label": "길드 표준펌프 1호",
       "overview": "길드 표준펌프 1호 사업이 시작됐다. 공개 매입가 대신 내부 상한을 두고 지정 규격과 수리조건을 통과한 물건만 기존 기준가로 매입했으며 첫 판매용 두 대를 완성했다. 표준품 가치는 기술력·부품재고·검수기록·수리능력·사후 신뢰를 더하는 데서 만들어졌다.",
       "relations": [
+        {
+          "direction": "incoming",
+          "kind": "related_to",
+          "label": "표준펌프 1호의 후속 보증·유지보수 정책",
+          "other_id": "event-wiki-df3c90d6f885fdb269cd38d3",
+          "relation_id": "rel-4c7bf04321d15d5d5ea19443f10a678dbf1b15cccce4bb847982ec77bc2fefb2"
+        },
         {
           "direction": "outgoing",
           "kind": "occurred_at",
@@ -1940,6 +2032,73 @@
     },
     {
       "facts": {},
+      "id": "event-wiki-b7ffeffefd90e9765d184979",
+      "label": "세 생산거점 표준 급수망 첫 계약",
+      "overview": "현장조사 뒤 세 생산거점을 같은 A형 계열로 맞추고 운영용 3대와 공동예비 2대, 총 5대를 공급 상한으로 두었다. 공용부품과 유료 유지보수 계약을 묶은 첫 표준 급수망 계약이다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "related_to",
+          "label": "공동예비펌프·부품 거점",
+          "other_id": "loc-wiki-6d44db0505ec3dcf97e41a4a",
+          "relation_id": "rel-11f3d635ce40b8f90729fbd83881d2df7ffce35628bb4e5d954108b95b327773"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "현장조사·전원 및 수리 판단",
+          "other_id": "char-mingyu",
+          "relation_id": "rel-1dbf601f473b03b6a3ed9b27fc366ab28ec12c60ba9a88776913f3eaa959b7cd"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "첫 번째 계약 대상 생산거점",
+          "other_id": "loc-wiki-04beb10f1f92ee26f3f09c2f",
+          "relation_id": "rel-443dc241512a9226aa94f281b56367117503b9967af8f625446c7c11d30834a5"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "두 번째 계약 대상 생산거점",
+          "other_id": "loc-wiki-5a5b0982ccdae5210d2a6275",
+          "relation_id": "rel-4973c3e55596fdce56bc66634612df67185d896c2730839a5c39a589ea564ce7"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "현장조사·설비 판단",
+          "other_id": "char-taehoon",
+          "relation_id": "rel-ed4f4ce28860d2c8d4035251c78ca9ce5f94636af36793b651b35ff489143b24"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "현장조사·표준화 결정",
+          "other_id": "char-jinwoo",
+          "relation_id": "rel-f38be50120122f44d89f7b01dd2ee8366f3fe99d8a7f87927dafe065b4e6e068"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "세 번째 계약 대상 생산거점",
+          "other_id": "loc-wiki-5b717b2a37f7f4375268b82a",
+          "relation_id": "rel-fcc261f7acb621391e9cb5512fc99bcc44b3b886be4237f6034a7205e7a59af4"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 10월 23일",
+      "tags": [
+        "S03",
+        "계약",
+        "급수",
+        "표준화",
+        "유지보수"
+      ],
+      "type": "event"
+    },
+    {
+      "facts": {},
       "id": "event-wiki-bf4768814dd7f1559d9f7496",
       "label": "남쪽 차량야드 통행·회차 사용권 합의",
       "overview": "길드는 차량야드 전체를 임대하지 않고 12개월 차량 통행·회차 사용권만 확보했다. 길드는 통로 배수·노면·방해물·소규모 파손 관리와 정기 대가를 맡고, 관수·지연은 계약 구간의 차량 통행을 보장했으며 나머지 야드는 시장에 남았다.",
@@ -2016,6 +2175,31 @@
         "S03",
         "길드",
         "거래규칙"
+      ],
+      "type": "event"
+    },
+    {
+      "facts": {},
+      "id": "event-wiki-df3c90d6f885fdb269cd38d3",
+      "label": "길드 표준펌프 보증·장기수리 정책",
+      "overview": "첫 6대 시험에서 정상 4대, 길드 수리책임 1대, 사용자 과실 1대가 확인됐다. 이후 길드는 확인·수리한 기능에 대한 짧은 기본보증과 선택형 유료 장기수리계약을 정식 정책으로 두었다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "related_to",
+          "label": "표준펌프 1호의 후속 보증·유지보수 정책",
+          "other_id": "event-wiki-a93db7854c7049a3b7c936b2",
+          "relation_id": "rel-4c7bf04321d15d5d5ea19443f10a678dbf1b15cccce4bb847982ec77bc2fefb2"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 9월 23일–10월 3일",
+      "tags": [
+        "S03",
+        "길드",
+        "표준펌프",
+        "보증",
+        "유지보수"
       ],
       "type": "event"
     },
@@ -2456,6 +2640,13 @@
       "relations": [
         {
           "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "길드 관리동에서 요청 전달",
+          "other_id": "event-wiki-3fd45d2cb293984e10fb4440",
+          "relation_id": "rel-2b50a5ca4959c5ab0c4e57db31a3f14c03d6864997595bc1d19442a9592c2c19"
+        },
+        {
+          "direction": "incoming",
           "kind": "published_relation",
           "label": "생활망 연결",
           "other_id": "loc-shelter",
@@ -2573,6 +2764,118 @@
         "도로",
         "관리조",
         "지역질서"
+      ],
+      "type": "location"
+    },
+    {
+      "facts": {},
+      "id": "loc-wiki-04beb10f1f92ee26f3f09c2f",
+      "label": "하천변 비닐하우스군",
+      "overview": "세 생산거점 현장조사의 첫 번째 대상이다. 기존 배관과 전원은 길드 A형 표준펌프에 거의 그대로 맞았다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "첫 번째 계약 대상 생산거점",
+          "other_id": "event-wiki-b7ffeffefd90e9765d184979",
+          "relation_id": "rel-443dc241512a9226aa94f281b56367117503b9967af8f625446c7c11d30834a5"
+        }
+      ],
+      "story_link_ids": [
+        "mention-3d23f5aed6fe4ef6aa3f3ce725f93e98ee27b9468ebfd84be8d892187f2fa50f"
+      ],
+      "subtitle": "표준 급수망 첫 번째 생산거점",
+      "tags": [
+        "S03",
+        "장소",
+        "생산거점",
+        "급수"
+      ],
+      "type": "location"
+    },
+    {
+      "facts": {},
+      "id": "loc-wiki-5a5b0982ccdae5210d2a6275",
+      "label": "공동 물탱크 농가군",
+      "overview": "세 생산거점 현장조사의 두 번째 대상이다. 긴 전선의 전압강하 문제는 전선과 연결부를 손봐 A형 표준펌프를 사용할 수 있게 했다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "두 번째 계약 대상 생산거점",
+          "other_id": "event-wiki-b7ffeffefd90e9765d184979",
+          "relation_id": "rel-4973c3e55596fdce56bc66634612df67185d896c2730839a5c39a589ea564ce7"
+        }
+      ],
+      "story_link_ids": [
+        "mention-75a6e450aaa139042615a1a8b0affb2eb71f2dbc5e355be44880f82ea25a9473"
+      ],
+      "subtitle": "표준 급수망 두 번째 생산거점",
+      "tags": [
+        "S03",
+        "장소",
+        "생산거점",
+        "급수"
+      ],
+      "type": "location"
+    },
+    {
+      "facts": {},
+      "id": "loc-wiki-5b717b2a37f7f4375268b82a",
+      "label": "언덕 아래 옛 축사 재배지",
+      "overview": "정병호가 대표로 있는 세 번째 생산거점이다. 처음에는 A형에 여유가 부족했지만 배관 일부와 취수구조를 조정해 다른 거점과 같은 A형 계열에 들어왔다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "related_to",
+          "label": "거점 대표",
+          "other_id": "char-wiki-9cb69d0dc08460c215904370",
+          "relation_id": "rel-a2f310d7f1fd127afdad0c4df155f6fd738ada3c8ee8796afbb9643fd06c041d"
+        },
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "세 번째 계약 대상 생산거점",
+          "other_id": "event-wiki-b7ffeffefd90e9765d184979",
+          "relation_id": "rel-fcc261f7acb621391e9cb5512fc99bcc44b3b886be4237f6034a7205e7a59af4"
+        }
+      ],
+      "story_link_ids": [
+        "mention-e355b1db8ef1c1f88d1a8e3b59bee94849f08c4ad1c3f5db6040481c93b20064"
+      ],
+      "subtitle": "표준 급수망 세 번째 생산거점",
+      "tags": [
+        "S03",
+        "장소",
+        "생산거점",
+        "급수"
+      ],
+      "type": "location"
+    },
+    {
+      "facts": {},
+      "id": "loc-wiki-6d44db0505ec3dcf97e41a4a",
+      "label": "동쪽 집하장",
+      "overview": "첫 표준 급수망 계약 뒤 공동예비펌프와 공용부품함을 보관하는 동쪽 연결 지점이다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "related_to",
+          "label": "공동예비펌프·부품 거점",
+          "other_id": "event-wiki-b7ffeffefd90e9765d184979",
+          "relation_id": "rel-11f3d635ce40b8f90729fbd83881d2df7ffce35628bb4e5d954108b95b327773"
+        }
+      ],
+      "story_link_ids": [
+        "mention-5066ce48e7c1d0da5a41357ead1b6f094f5575bfffa3cb98141dc01000853bf9",
+        "mention-f9fbcac7ad165de364724970dd425ef9ebb49c3b6515c466ee93d6aecc06e086"
+      ],
+      "subtitle": "표준 급수망 공동예비·부품 거점",
+      "tags": [
+        "S03",
+        "장소",
+        "집하장",
+        "급수"
       ],
       "type": "location"
     },
@@ -2738,7 +3041,7 @@
     }
   ],
   "chronicle_id": "C03-AFTERFALL",
-  "content_sha256": "875ac07a73638ae0ae6ec07af7538c6ba64d0a7aebdc1a7cbb3828b32f245435",
+  "content_sha256": "0927434cbc30f437381ce55f083903a678447ad1abdbe3df1430800c1901fe82",
   "nodes": [
     {
       "anchor": {
@@ -3420,6 +3723,32 @@
     },
     {
       "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "id": "char-wiki-9cb69d0dc08460c215904370",
+        "label": "정병호",
+        "source": "S03 SESSION_007 GM 공개 블록 003",
+        "subtitle": "언덕 아래 옛 축사 재배지 거점 대표",
+        "summary": "언덕 아래 옛 축사 재배지의 대표로 길드의 급수설비 표준화 협의에 참여했다.",
+        "tags": [
+          "S03",
+          "인물",
+          "생산거점"
+        ],
+        "type": "character"
+      },
+      "evidence": {
+        "pointer": "/nodes/1",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "char-wiki-9cb69d0dc08460c215904370"
+    },
+    {
+      "anchor": {
         "game_time": "2027-09-22 16:10",
         "save_version": 280
       },
@@ -3749,6 +4078,33 @@
     },
     {
       "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "id": "event-wiki-3fd45d2cb293984e10fb4440",
+        "label": "공공 급수지점 유지보수 요청",
+        "source": "S03 SESSION_007 GM 공개 블록 003",
+        "subtitle": "2027년 10월 30일",
+        "summary": "문하진이 전달한 공공 급수지점 두 곳의 요청은 펌프 공급·예비품·정기점검·고장 대응에 더해 급수 중단 시 길드의 우선 복구 지원까지 포함했다.",
+        "tags": [
+          "S03",
+          "공공급수",
+          "요청",
+          "급수"
+        ],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/7",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "event-wiki-3fd45d2cb293984e10fb4440"
+    },
+    {
+      "anchor": {
         "game_time": "2027-09-22 16:10",
         "save_version": 280
       },
@@ -3829,6 +4185,34 @@
     },
     {
       "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "id": "event-wiki-b7ffeffefd90e9765d184979",
+        "label": "세 생산거점 표준 급수망 첫 계약",
+        "source": "S03 SESSION_007 GM 공개 블록 003",
+        "subtitle": "2027년 10월 23일",
+        "summary": "현장조사 뒤 세 생산거점을 같은 A형 계열로 맞추고 운영용 3대와 공동예비 2대, 총 5대를 공급 상한으로 두었다. 공용부품과 유료 유지보수 계약을 묶은 첫 표준 급수망 계약이다.",
+        "tags": [
+          "S03",
+          "계약",
+          "급수",
+          "표준화",
+          "유지보수"
+        ],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/6",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "event-wiki-b7ffeffefd90e9765d184979"
+    },
+    {
+      "anchor": {
         "game_time": "2027-09-22 16:10",
         "save_version": 280
       },
@@ -3878,6 +4262,34 @@
       },
       "history": [],
       "id": "event-wiki-d9895688b2873d713ac106cd"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "id": "event-wiki-df3c90d6f885fdb269cd38d3",
+        "label": "길드 표준펌프 보증·장기수리 정책",
+        "source": "S03 SESSION_007 GM 공개 블록 001",
+        "subtitle": "2027년 9월 23일–10월 3일",
+        "summary": "첫 6대 시험에서 정상 4대, 길드 수리책임 1대, 사용자 과실 1대가 확인됐다. 이후 길드는 확인·수리한 기능에 대한 짧은 기본보증과 선택형 유료 장기수리계약을 정식 정책으로 두었다.",
+        "tags": [
+          "S03",
+          "길드",
+          "표준펌프",
+          "보증",
+          "유지보수"
+        ],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/0",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "event-wiki-df3c90d6f885fdb269cd38d3"
     },
     {
       "anchor": {
@@ -4199,6 +4611,114 @@
     },
     {
       "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "id": "loc-wiki-04beb10f1f92ee26f3f09c2f",
+        "label": "하천변 비닐하우스군",
+        "source": "S03 SESSION_007 GM 공개 블록 003",
+        "subtitle": "표준 급수망 첫 번째 생산거점",
+        "summary": "세 생산거점 현장조사의 첫 번째 대상이다. 기존 배관과 전원은 길드 A형 표준펌프에 거의 그대로 맞았다.",
+        "tags": [
+          "S03",
+          "장소",
+          "생산거점",
+          "급수"
+        ],
+        "type": "location"
+      },
+      "evidence": {
+        "pointer": "/nodes/2",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "loc-wiki-04beb10f1f92ee26f3f09c2f"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "id": "loc-wiki-5a5b0982ccdae5210d2a6275",
+        "label": "공동 물탱크 농가군",
+        "source": "S03 SESSION_007 GM 공개 블록 003",
+        "subtitle": "표준 급수망 두 번째 생산거점",
+        "summary": "세 생산거점 현장조사의 두 번째 대상이다. 긴 전선의 전압강하 문제는 전선과 연결부를 손봐 A형 표준펌프를 사용할 수 있게 했다.",
+        "tags": [
+          "S03",
+          "장소",
+          "생산거점",
+          "급수"
+        ],
+        "type": "location"
+      },
+      "evidence": {
+        "pointer": "/nodes/3",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "loc-wiki-5a5b0982ccdae5210d2a6275"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "id": "loc-wiki-5b717b2a37f7f4375268b82a",
+        "label": "언덕 아래 옛 축사 재배지",
+        "source": "S03 SESSION_007 GM 공개 블록 003",
+        "subtitle": "표준 급수망 세 번째 생산거점",
+        "summary": "정병호가 대표로 있는 세 번째 생산거점이다. 처음에는 A형에 여유가 부족했지만 배관 일부와 취수구조를 조정해 다른 거점과 같은 A형 계열에 들어왔다.",
+        "tags": [
+          "S03",
+          "장소",
+          "생산거점",
+          "급수"
+        ],
+        "type": "location"
+      },
+      "evidence": {
+        "pointer": "/nodes/4",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "loc-wiki-5b717b2a37f7f4375268b82a"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "id": "loc-wiki-6d44db0505ec3dcf97e41a4a",
+        "label": "동쪽 집하장",
+        "source": "S03 SESSION_007 GM 공개 블록 003",
+        "subtitle": "표준 급수망 공동예비·부품 거점",
+        "summary": "첫 표준 급수망 계약 뒤 공동예비펌프와 공용부품함을 보관하는 동쪽 연결 지점이다.",
+        "tags": [
+          "S03",
+          "장소",
+          "집하장",
+          "급수"
+        ],
+        "type": "location"
+      },
+      "evidence": {
+        "pointer": "/nodes/5",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "loc-wiki-6d44db0505ec3dcf97e41a4a"
+    },
+    {
+      "anchor": {
         "game_time": "2027-09-22 16:10",
         "save_version": 280
       },
@@ -4426,6 +4946,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "from": "event-wiki-b7ffeffefd90e9765d184979",
+        "kind": "related_to",
+        "label": "공동예비펌프·부품 거점",
+        "to": "loc-wiki-6d44db0505ec3dcf97e41a4a"
+      },
+      "evidence": {
+        "pointer": "/relations/7",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "rel-11f3d635ce40b8f90729fbd83881d2df7ffce35628bb4e5d954108b95b327773"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -4480,6 +5019,25 @@
       },
       "history": [],
       "id": "rel-18789393be4960a40a6c4833ab7ed82116183a4bbcd77180667441110f7be2e7"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "from": "char-mingyu",
+        "kind": "participated_in",
+        "label": "현장조사·전원 및 수리 판단",
+        "to": "event-wiki-b7ffeffefd90e9765d184979"
+      },
+      "evidence": {
+        "pointer": "/relations/3",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "rel-1dbf601f473b03b6a3ed9b27fc366ab28ec12c60ba9a88776913f3eaa959b7cd"
     },
     {
       "anchor": {
@@ -4594,6 +5152,25 @@
       },
       "history": [],
       "id": "rel-297df0d034fcf1cb2d66c8323fda77b0dadd1cb23b5bc8ce2b1eedea80a8090e"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "from": "event-wiki-3fd45d2cb293984e10fb4440",
+        "kind": "occurred_at",
+        "label": "길드 관리동에서 요청 전달",
+        "to": "loc-sports-complex"
+      },
+      "evidence": {
+        "pointer": "/relations/10",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "rel-2b50a5ca4959c5ab0c4e57db31a3f14c03d6864997595bc1d19442a9592c2c19"
     },
     {
       "anchor": {
@@ -4746,6 +5323,63 @@
       },
       "history": [],
       "id": "rel-3cdc60e26b82bd270bfce072cbc1c223c1ba653fbbecb6d6074a9dcc4fdebc4b"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "from": "event-wiki-b7ffeffefd90e9765d184979",
+        "kind": "occurred_at",
+        "label": "첫 번째 계약 대상 생산거점",
+        "to": "loc-wiki-04beb10f1f92ee26f3f09c2f"
+      },
+      "evidence": {
+        "pointer": "/relations/4",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "rel-443dc241512a9226aa94f281b56367117503b9967af8f625446c7c11d30834a5"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "from": "event-wiki-b7ffeffefd90e9765d184979",
+        "kind": "occurred_at",
+        "label": "두 번째 계약 대상 생산거점",
+        "to": "loc-wiki-5a5b0982ccdae5210d2a6275"
+      },
+      "evidence": {
+        "pointer": "/relations/5",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "rel-4973c3e55596fdce56bc66634612df67185d896c2730839a5c39a589ea564ce7"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "from": "event-wiki-df3c90d6f885fdb269cd38d3",
+        "kind": "related_to",
+        "label": "표준펌프 1호의 후속 보증·유지보수 정책",
+        "to": "event-wiki-a93db7854c7049a3b7c936b2"
+      },
+      "evidence": {
+        "pointer": "/relations/8",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "rel-4c7bf04321d15d5d5ea19443f10a678dbf1b15cccce4bb847982ec77bc2fefb2"
     },
     {
       "anchor": {
@@ -5395,6 +6029,44 @@
     },
     {
       "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "from": "char-wiki-9cb69d0dc08460c215904370",
+        "kind": "related_to",
+        "label": "거점 대표",
+        "to": "loc-wiki-5b717b2a37f7f4375268b82a"
+      },
+      "evidence": {
+        "pointer": "/relations/0",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "rel-a2f310d7f1fd127afdad0c4df155f6fd738ada3c8ee8796afbb9643fd06c041d"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "from": "char-hajin",
+        "kind": "participated_in",
+        "label": "공공 급수지점 요청 전달",
+        "to": "event-wiki-3fd45d2cb293984e10fb4440"
+      },
+      "evidence": {
+        "pointer": "/relations/9",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "rel-a7414041a557e8c23bea27b1baf0f7ffa58bee6acc2d973b86138f5b2f2b555a"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -5889,6 +6561,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "from": "char-taehoon",
+        "kind": "participated_in",
+        "label": "현장조사·설비 판단",
+        "to": "event-wiki-b7ffeffefd90e9765d184979"
+      },
+      "evidence": {
+        "pointer": "/relations/2",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "rel-ed4f4ce28860d2c8d4035251c78ca9ce5f94636af36793b651b35ff489143b24"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -5965,6 +6656,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "from": "char-jinwoo",
+        "kind": "participated_in",
+        "label": "현장조사·표준화 결정",
+        "to": "event-wiki-b7ffeffefd90e9765d184979"
+      },
+      "evidence": {
+        "pointer": "/relations/1",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "rel-f38be50120122f44d89f7b01dd2ee8366f3fe99d8a7f87927dafe065b4e6e068"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -6038,6 +6748,25 @@
       },
       "history": [],
       "id": "rel-fc695b0c51945980589835f0704261ada78cb161af7e7e8ab9083728795f3c32"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-10-30 13:20",
+        "save_version": 282
+      },
+      "data": {
+        "from": "event-wiki-b7ffeffefd90e9765d184979",
+        "kind": "occurred_at",
+        "label": "세 번째 계약 대상 생산거점",
+        "to": "loc-wiki-5b717b2a37f7f4375268b82a"
+      },
+      "evidence": {
+        "pointer": "/relations/6",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+        "source_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+      },
+      "history": [],
+      "id": "rel-fcc261f7acb621391e9cb5512fc99bcc44b3b886be4237f6034a7205e7a59af4"
     },
     {
       "anchor": {
@@ -8559,6 +9288,26 @@
       ]
     },
     {
+      "body_sha256": "7c580d2bc613be8121c6fd820da9237b2e164ed390502487757082c7898ca6a7",
+      "chapter_id": "c03-afterfall-auto-98f99842cff79a0b375d8254704296943cd3dc53ba101d81116c0f201d062924",
+      "chapter_title": "2027년 9월 23일 ~ 10월 14일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "53af20b4f4c499838399eb60b6b3046dae4e2a60c066fcaf7bad095e9154db64"
+      },
+      "id": "mention-3d23f5aed6fe4ef6aa3f3ce725f93e98ee27b9468ebfd84be8d892187f2fa50f",
+      "node_id": "loc-wiki-04beb10f1f92ee26f3f09c2f",
+      "reasons": [
+        {
+          "alias": "하천변 비닐하우스군",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            3238
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "1338f9044cde2f346b0c94d62811b4c80fe8faccc5958da560bea5a76da10055",
       "chapter_id": "c03-afterfall-chapter-03",
       "chapter_title": "폐쇄된 체육시설",
@@ -9206,6 +9955,26 @@
             12525,
             13865,
             14355
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "b9c7c9db6a785834a5afa51302905661443a61ea0970f8ccd618d039a513f82d",
+      "chapter_id": "c03-afterfall-auto-a4fae733c4c5f58987a52d6ce1061f9f82e055bbfb41a851fc24d4cea450cc7c",
+      "chapter_title": "2027년 5월 4일 09:00",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "53af20b4f4c499838399eb60b6b3046dae4e2a60c066fcaf7bad095e9154db64"
+      },
+      "id": "mention-5066ce48e7c1d0da5a41357ead1b6f094f5575bfffa3cb98141dc01000853bf9",
+      "node_id": "loc-wiki-6d44db0505ec3dcf97e41a4a",
+      "reasons": [
+        {
+          "alias": "동쪽 집하장",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            173
           ]
         }
       ]
@@ -10477,6 +11246,26 @@
             6942,
             9541,
             9816
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "7c580d2bc613be8121c6fd820da9237b2e164ed390502487757082c7898ca6a7",
+      "chapter_id": "c03-afterfall-auto-98f99842cff79a0b375d8254704296943cd3dc53ba101d81116c0f201d062924",
+      "chapter_title": "2027년 9월 23일 ~ 10월 14일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "53af20b4f4c499838399eb60b6b3046dae4e2a60c066fcaf7bad095e9154db64"
+      },
+      "id": "mention-75a6e450aaa139042615a1a8b0affb2eb71f2dbc5e355be44880f82ea25a9473",
+      "node_id": "loc-wiki-5a5b0982ccdae5210d2a6275",
+      "reasons": [
+        {
+          "alias": "공동 물탱크 농가군",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            3436
           ]
         }
       ]
@@ -12902,6 +13691,26 @@
       ]
     },
     {
+      "body_sha256": "7c580d2bc613be8121c6fd820da9237b2e164ed390502487757082c7898ca6a7",
+      "chapter_id": "c03-afterfall-auto-98f99842cff79a0b375d8254704296943cd3dc53ba101d81116c0f201d062924",
+      "chapter_title": "2027년 9월 23일 ~ 10월 14일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "53af20b4f4c499838399eb60b6b3046dae4e2a60c066fcaf7bad095e9154db64"
+      },
+      "id": "mention-c610ce49aed073ac76c532fce214c796d482a5c34e4ecd4fb0277cfe4a69fc5e",
+      "node_id": "char-wiki-9cb69d0dc08460c215904370",
+      "reasons": [
+        {
+          "alias": "정병호",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            3889
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "c1671d7762f9ca8245da91ffeb60ac5e84edbc4f6013ac5ba95ae0d81719ce8d",
       "chapter_id": "c03-afterfall-chapter-08",
       "chapter_title": "겨울 전 갈무리",
@@ -13561,6 +14370,26 @@
       ]
     },
     {
+      "body_sha256": "8c707558b3002f0e63f6c3196de60efa1169c8b0f4558cc38c7df8cba18809d2",
+      "chapter_id": "c03-afterfall-auto-7a589e3a941834319a82033e0169df5b7270a24315fbe18f30d8a368daee6b4a",
+      "chapter_title": "2027년 10월 31일 ~ 11월 4일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "53af20b4f4c499838399eb60b6b3046dae4e2a60c066fcaf7bad095e9154db64"
+      },
+      "id": "mention-d61634f6a676d837143b6f58cb59d690b55265656ce9d4e5c3e3070aa7185010",
+      "node_id": "char-wiki-9cb69d0dc08460c215904370",
+      "reasons": [
+        {
+          "alias": "정병호",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            1653
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "7fbc2f5998ca1b2238cfd3311ea0bd78e06be8f5d0594c1f29a05d4e135678a9",
       "chapter_id": "c03-afterfall-chapter-02",
       "chapter_title": "정식 연합체",
@@ -13886,6 +14715,26 @@
             28478,
             30711,
             30755
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "7c580d2bc613be8121c6fd820da9237b2e164ed390502487757082c7898ca6a7",
+      "chapter_id": "c03-afterfall-auto-98f99842cff79a0b375d8254704296943cd3dc53ba101d81116c0f201d062924",
+      "chapter_title": "2027년 9월 23일 ~ 10월 14일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "53af20b4f4c499838399eb60b6b3046dae4e2a60c066fcaf7bad095e9154db64"
+      },
+      "id": "mention-e355b1db8ef1c1f88d1a8e3b59bee94849f08c4ad1c3f5db6040481c93b20064",
+      "node_id": "loc-wiki-5b717b2a37f7f4375268b82a",
+      "reasons": [
+        {
+          "alias": "언덕 아래 옛 축사 재배지",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            3750
           ]
         }
       ]
@@ -14599,6 +15448,28 @@
           "offsets": [
             6858,
             9645
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "7c580d2bc613be8121c6fd820da9237b2e164ed390502487757082c7898ca6a7",
+      "chapter_id": "c03-afterfall-auto-98f99842cff79a0b375d8254704296943cd3dc53ba101d81116c0f201d062924",
+      "chapter_title": "2027년 9월 23일 ~ 10월 14일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "53af20b4f4c499838399eb60b6b3046dae4e2a60c066fcaf7bad095e9154db64"
+      },
+      "id": "mention-f9fbcac7ad165de364724970dd425ef9ebb49c3b6515c466ee93d6aecc06e086",
+      "node_id": "loc-wiki-6d44db0505ec3dcf97e41a4a",
+      "reasons": [
+        {
+          "alias": "동쪽 집하장",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            5263,
+            5695,
+            5951
           ]
         }
       ]
