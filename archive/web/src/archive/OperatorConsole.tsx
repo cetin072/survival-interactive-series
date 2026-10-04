@@ -64,12 +64,6 @@ type AWikiJob = {
   review_ready_at?: string | null; review_submitted_at?: string | null; finalizing_at?: string | null
   published_at?: string | null
 }
-type AWikiStatus = {
-  job_count: number
-  active_count: number
-  published_count: number
-  latest_job: AWikiJob | null
-}
 type SystemStatus = {
   archive: {
     dispatch_count: number
@@ -86,6 +80,7 @@ type SystemStatus = {
     retry_cron: CronStatus | null
   }
   review: { pending_count: number; automation_error_count: number }
+  a_wiki?: { job_count: number; active_count: number; published_count: number; latest_job: AWikiJob | null }
   knowledge_semantic?: { active_count: number; latest_job: KnowledgeSemanticJob | null; prep: { last_status?: string; last_stage?: string; blocker_code?: string | null; checked_at?: string | null } | null }
 }
 type ReleaseMarker = {
@@ -117,7 +112,6 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
   const [confirmPassword, setConfirmPassword] = useState('')
   const [inbox, setInbox] = useState<Inbox>(emptyInbox)
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null)
-  const [aWikiStatus, setAWikiStatus] = useState<AWikiStatus | null>(null)
   const [productionStatus, setProductionStatus] = useState<ProductionStatus>({ release: null, deploy: null })
   const [statusError, setStatusError] = useState('')
   const [selected, setSelected] = useState<ReviewDetail | null>(null)
@@ -132,20 +126,16 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
     if (!supabaseClient) return
     setBusy(true); setRefreshing(true); setError(''); setStatusError('')
     try {
-      const [inboxResult, systemResult, aWikiResult, release, deploy] = await Promise.all([
+      const [inboxResult, systemResult, release, deploy] = await Promise.all([
         supabaseClient.rpc('archive_operator_review_inbox'),
         supabaseClient.rpc('archive_operator_system_status'),
-        supabaseClient.rpc('archive_operator_a_wiki_status'),
         readJson<ReleaseMarker>('/release/production.json'),
         readJson<DeployMeta>('/deploy-meta.json'),
       ])
       if (inboxResult.error) setError(rpcError(inboxResult.error))
       else setInbox((inboxResult.data ?? emptyInbox) as Inbox)
-      if (systemResult.error || aWikiResult.error) setStatusError('자동화 실행 상태를 불러오지 못했습니다.')
-      else {
-        setSystemStatus(systemResult.data as SystemStatus)
-        setAWikiStatus(aWikiResult.data as AWikiStatus)
-      }
+      if (systemResult.error) setStatusError('자동화 실행 상태를 불러오지 못했습니다.')
+      else setSystemStatus(systemResult.data as SystemStatus)
       setProductionStatus({ release, deploy })
       setLastRefreshedAt(new Date().toISOString())
     } finally {
@@ -277,7 +267,7 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
   const archiveCron = systemStatus?.archive.cron ?? null
   const archiveDispatch = systemStatus?.archive.latest_dispatch ?? null
   const archiveHealthy = archiveCron?.active === true && archiveCron.last_status === 'succeeded'
-  const aWikiLatest = aWikiStatus?.latest_job ?? null
+  const aWikiLatest = systemStatus?.a_wiki?.latest_job ?? null
   const aWikiBlocker = aWikiLatest?.blocker_code ?? null
   const aWikiBadgeClass = aWikiBlocker ? 'warning' : visualStatusTone(aWikiLatest?.status)
   const visualLatest = systemStatus?.visual.latest_job ?? null
@@ -321,7 +311,7 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
           <div className="operator-system-title"><h3>A-Wiki · Wiki <small>세계관 자동 성장</small></h3><span className={`operator-status-badge ${aWikiBadgeClass}`}>{aWikiBlocker ? '확인 필요' : aWikiLatest?.status ? statusWithKorean(aWikiLatest.status) : '실행이력 없음'}</span></div>
           <dl>
             <div><dt>최근 세션</dt><dd>{aWikiLatest?.session_id ?? '기록 없음'}</dd></div>
-            <div><dt>활성 / 게시</dt><dd>{aWikiStatus?.active_count ?? 0}건 / {aWikiStatus?.published_count ?? 0}건</dd></div>
+            <div><dt>활성 / 게시</dt><dd>{systemStatus?.a_wiki?.active_count ?? 0}건 / {systemStatus?.a_wiki?.published_count ?? 0}건</dd></div>
             <div><dt>최근 갱신</dt><dd>{formatOperatorTime(aWikiLatest?.published_at ?? aWikiLatest?.updated_at ?? aWikiLatest?.created_at)}</dd></div>
             <div><dt>상태 체류</dt><dd>{aWikiLatest?.age_minutes == null ? '—' : `${aWikiLatest.age_minutes}분`}</dd></div>
             <div><dt>PR / Merge</dt><dd>{aWikiLatest?.final_pr_number ? `#${aWikiLatest.final_pr_number}` : '—'} · {aWikiLatest?.merge_sha?.slice(0, 12) ?? '—'}</dd></div>
