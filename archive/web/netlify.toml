@@ -14,7 +14,8 @@ command = "npm run build:verified"
 # Archive content lives outside this site's base directory. Keep Preview builds
 # when the Reader inputs or build scripts change.
 [context.deploy-preview]
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ':(top)archive/content' ':(top)archive/web' ':(top)archive/scripts'"
+# Rebuilt proposal branches must get a new Preview even when their content matches the old cached ref.
+  ignore = "git merge-base --is-ancestor $CACHED_COMMIT_REF $COMMIT_REF && git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ':(top)archive/content' ':(top)archive/web' ':(top)archive/scripts'"
 
 [[headers]]
   for = "/*"
