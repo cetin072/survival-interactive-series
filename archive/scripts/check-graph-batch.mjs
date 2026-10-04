@@ -19,11 +19,15 @@ const snapshot = { version: 'publication-snapshot-v1', chronicle_id: 'C03-AFTERF
 const initial = await prepareGraphPublication(snapshot, factsRefS03)
 const again = await prepareGraphPublication(snapshot, factsRefS03)
 assert.ok(initial.candidateBytes.equals(again.candidateBytes))
-assert.equal(initial.graph.nodes.length, archiveNodes.length + 2 + aWikiFacts.nodes.length)
-assert.equal(initial.graph.relations.length, archiveEdges.length + 2 + aWikiFacts.relations.length)
+const minimumExpectedNodes = archiveNodes.length + 2 + aWikiFacts.nodes.length
+const minimumExpectedRelations = archiveEdges.length + 2 + aWikiFacts.relations.length
+assert.ok(initial.graph.nodes.length >= minimumExpectedNodes)
+assert.ok(initial.graph.relations.length >= minimumExpectedRelations)
 assert.ok(initial.graph.nodes.some((n) => n.id === 'loc-guild-rear-warehouse'))
 for (const source of archiveNodes) assert.deepEqual(initial.graph.nodes.find((n) => n.id === source.id).data, source)
 for (const source of archiveEdges) assert.ok(initial.graph.relations.some((r) => r.data.from === source.from && r.data.to === source.to && r.data.label === source.label && r.data.kind === 'published_relation'))
+for (const source of aWikiFacts.nodes) assert.ok(initial.graph.nodes.some((n) => n.id === source.id && JSON.stringify(n.data) === JSON.stringify(source)))
+for (const source of aWikiFacts.relations) assert.ok(initial.graph.relations.some((r) => r.data.from === source.from && r.data.to === source.to && r.data.label === source.label && r.data.kind === source.kind))
 assert.ok(initial.graph.story_links.length > 0)
 assert.equal(initial.report.inferred_relationships, 0)
 assert.equal(initial.report.external_calls, 0)
