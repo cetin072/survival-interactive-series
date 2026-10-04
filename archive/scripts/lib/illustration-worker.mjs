@@ -16,6 +16,11 @@ export const RECEIPT_STATUSES = ['FAILED', 'SUCCEEDED']
 export const RECEIPT_REASON_CODES = ['GENERATION_FAILED', 'PROVIDER_UNAVAILABLE']
 export const RECEIPT_VERSION = 'illustration-receipts-v2'
 const ALLOWED_PRIORITIES = [0, 10, 20, 25, 30]
+const OBSERVED_JOB_STATUSES = [
+  'PREPARED', 'INGESTING', 'READY_FOR_REVIEW', 'REVIEW_REJECTED', 'HUMAN_REVIEW',
+  'REVIEW_PASS_STAGED', 'FINALIZE_QUEUED', 'FINALIZING', 'SUCCEEDED', 'BLOCKED',
+]
+const OBSERVED_REVIEW_DECISIONS = [null, 'PASS', 'REJECT', 'HUMAN_REVIEW']
 
 const ID = {
   point: /^point-[a-f0-9]{64}$/,
@@ -207,6 +212,21 @@ function validPoint(point) {
     && typeof point.subject_id === 'string' && point.subject_id.length > 0
 }
 
+function validateObservedAttempts(attempts) {
+  if (!Array.isArray(attempts)) throw new Error('INVALID_ILLUSTRATION_OBSERVED_ATTEMPTS')
+  for (const attempt of attempts) {
+    if (!attempt || typeof attempt !== 'object' || Array.isArray(attempt)
+      || !ID.point.test(attempt.point_id ?? '') || !ID.generation.test(attempt.generation_key ?? '')
+      || typeof attempt.subject_id !== 'string' || attempt.subject_id.trim().length === 0
+      || !Number.isInteger(attempt.attempt_no) || attempt.attempt_no < 1 || attempt.attempt_no > MAX_ASSET_ATTEMPTS
+      || !OBSERVED_JOB_STATUSES.includes(attempt.status)
+      || !OBSERVED_REVIEW_DECISIONS.includes(attempt.review_decision ?? null)) {
+      throw new Error('INVALID_ILLUSTRATION_OBSERVED_ATTEMPTS')
+    }
+  }
+  return attempts
+}
+
 function handoffContract(point) {
   const brief = point.brief ?? {}
   return {
@@ -236,8 +256,9 @@ function handoffContract(point) {
   }
 }
 
-export function selectIllustrationCandidates({ catalog, siteAssets, receipts, now = new Date(), batchLimit = DEFAULT_BATCH_LIMIT, subjectIds = null }) {
+export function selectIllustrationCandidates({ catalog, siteAssets, receipts, observedAttempts = [], now = new Date(), batchLimit = DEFAULT_BATCH_LIMIT, subjectIds = null }) {
   validateReceipts(receipts)
+  validateObservedAttempts(observedAttempts)
   if (!Number.isInteger(batchLimit) || batchLimit < 1 || batchLimit > BATCH_GENERATION_CAP) throw new Error('INVALID_ILLUSTRATION_BATCH_LIMIT')
   if (!Array.isArray(catalog?.points) || !Array.isArray(siteAssets?.assets)) throw new Error('INVALID_ILLUSTRATION_INPUT')
 
@@ -264,11 +285,14 @@ export function selectIllustrationCandidates({ catalog, siteAssets, receipts, no
     if (!ALLOWED_PRIORITIES.includes(point.priority)) { counts.skipped_invalid_priority++; continue }
     if (published.some((asset) => sameIdentity(asset, point))) { counts.skipped_existing_assets++; continue }
     const history = attempts.filter((attempt) => sameIdentity(attempt, point))
-    if (history.some((attempt) => attempt.status === 'SUCCEEDED')) {
+    const durableHistory = observedAttempts.filter((attempt) => sameIdentity(attempt, point))
+    if (history.some((attempt) => attempt.status === 'SUCCEEDED')
+      || durableHistory.some((attempt) => attempt.status === 'SUCCEEDED')) {
       counts.skipped_previous_success++
       continue
     }
-    const attemptsForAsset = history.length
+    const durableAttemptNo = durableHistory.reduce((max, attempt) => Math.max(max, attempt.attempt_no), 0)
+    const attemptsForAsset = Math.max(history.length, durableAttemptNo)
     if (attemptsForAsset >= MAX_ASSET_ATTEMPTS) { counts.skipped_retry_cap++; continue }
     attemptCountByIdentity.set(`${point.point_id}:${point.generation_key}`, attemptsForAsset)
     eligible.push(point)
@@ -281,10 +305,11 @@ export function selectIllustrationCandidates({ catalog, siteAssets, receipts, no
   let pool = requested
     ? eligible.filter((point) => requested.has(point.subject_id))
     : eligible
-  if (!requested && pool.some((point) => point.subject_id.startsWith('char-'))) {
-    const deferredNonCharacters = pool.filter((point) => !point.subject_id.startsWith('char-')).length
+  const isCharacter = (point) => point.brief?.point_type === 'CHARACTER'
+  if (!requested && pool.some(isCharacter)) {
+    const deferredNonCharacters = pool.filter((point) => !isCharacter(point)).length
     counts.deferred_non_character_priority = deferredNonCharacters
-    pool = pool.filter((point) => point.subject_id.startsWith('char-'))
+    pool = pool.filter(isCharacter)
   } else {
     counts.deferred_non_character_priority = 0
   }
