@@ -1,14 +1,18 @@
 import { chronicleRegistry } from './chronicleRegistry'
 import {
-  explainMachineCode,
+  blockerLabel,
+  decisionLabel,
   formatOperatorRefreshTime,
   formatOperatorTime,
+  jobTypeLabel,
   operatorStaticStatus,
   productionStatusTone,
   shortSha,
-  statusWithKorean,
+  sessionLabel,
+  sourceKindLabel,
+  statusLabel,
   subjectWithKorean,
-  timezoneWithKorean,
+  timezoneLabel,
   visualStatusTone,
 } from './operatorSystemStatus'
 
@@ -155,13 +159,13 @@ export function OperatorDashboard({
     <header className="operator-heading">
       <div>
         <p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p>
-        <h1>Operator Dashboard</h1>
-        <p>{email} · 실제 자동화 상태와 검토 대기 항목을 한곳에서 확인합니다.</p>
+        <h1>운영 상황판</h1>
+        <p>{email} · 자동화가 잘 돌아가는지와 확인이 필요한 항목을 한눈에 봅니다.</p>
       </div>
       <div className="operator-heading-actions">
         <a className="operator-secondary" href="/operator/vault/">일러스트 보관함</a>
-        <a className="operator-secondary" href="/operator/knowledge/">Knowledge Inbox</a>
-        <a className="operator-secondary" href="/operator/visuals/">시각 제작 메타</a>
+        <a className="operator-secondary" href="/operator/knowledge/">생존 지식 검토함</a>
+        <a className="operator-secondary" href="/operator/visuals/">이미지 제작 정보</a>
         <button className="operator-secondary" disabled={busy} onClick={onSignOut}>로그아웃</button>
       </div>
     </header>
@@ -170,16 +174,16 @@ export function OperatorDashboard({
     {statusError && <p className="operator-error" role="alert">{statusError}</p>}
 
     <div className="operator-counts">
-      <article><span>사람 검토 · Human Review</span><strong>{inbox.pending_count}</strong></article>
-      <article><span>자동화 오류 · Automation Error</span><strong>{inbox.automation_error_count}</strong></article>
-      <article><span>보안 알림 · Security</span><strong className="operator-unwired">미연결</strong></article>
-      <article><span>비용 알림 · Cost</span><strong className="operator-unwired">미연결</strong></article>
+      <article><span>사람이 확인할 항목</span><strong>{inbox.pending_count}</strong></article>
+      <article><span>자동화 문제</span><strong>{inbox.automation_error_count}</strong></article>
+      <article><span>보안 알림</span><strong className="operator-unwired">미연결</strong></article>
+      <article><span>비용 알림</span><strong className="operator-unwired">미연결</strong></article>
     </div>
 
     <section className="operator-system">
       <header>
         <div>
-          <p className="archive-eyebrow">SYSTEM STATUS</p>
+          <p className="archive-eyebrow">자동화 운영 현황</p>
           <h2>자동화 상태</h2>
           <p className="operator-refresh-time" aria-live="polite">마지막 갱신 {formatOperatorRefreshTime(lastRefreshedAt)}</p>
         </div>
@@ -191,82 +195,126 @@ export function OperatorDashboard({
       <div className="operator-system-grid">
         <article className="operator-system-card">
           <div className="operator-system-title">
-            <h3>A · Archive <small>아카이브</small></h3>
+            <h3>A · 기록 보관 <small>게임 기록 자동 저장</small></h3>
             <span className={`operator-status-badge ${archiveHealthy ? 'ok' : archiveCron ? 'warning' : 'neutral'}`}>
-              {archiveHealthy ? '작동 중' : archiveCron?.active === false ? '중지' : archiveCron ? statusWithKorean(archiveCron.last_status) : '기록 없음'}
+              {archiveHealthy ? '정상 작동' : archiveCron?.active === false ? '중지됨' : archiveCron ? statusLabel(archiveCron.last_status) : '기록 없음'}
             </span>
           </div>
           <dl>
-            <div><dt>모드</dt><dd>{statusWithKorean(operatorStaticStatus.archive.mode)}</dd></div>
-            <div><dt>자동 실행</dt><dd>{archiveCron?.active ? '켜짐' : archiveCron ? '꺼짐' : '기록 없음'} · {statusWithKorean(archiveCron?.last_status)}</dd></div>
-            <div><dt>최근 Cron</dt><dd>{formatOperatorTime(archiveCron?.last_end_at ?? archiveCron?.last_start_at)}</dd></div>
-            <div><dt>최근 GitHub 호출</dt><dd>{formatOperatorTime(archiveDispatch?.requested_at)}{archiveDispatch?.request_id ? ` · #${archiveDispatch.request_id}` : ''}</dd></div>
-            <div><dt>누적 외부 호출</dt><dd>{systemStatus?.archive.dispatch_count ?? 0}건</dd></div>
+            <div><dt>운영 방식</dt><dd>{statusLabel(operatorStaticStatus.archive.mode)}</dd></div>
+            <div><dt>자동 실행</dt><dd>{archiveCron?.active ? '켜짐' : archiveCron ? '꺼짐' : '기록 없음'} · {statusLabel(archiveCron?.last_status)}</dd></div>
+            <div><dt>최근 실행</dt><dd>{formatOperatorTime(archiveCron?.last_end_at ?? archiveCron?.last_start_at)}</dd></div>
+            <div><dt>최근 작업 전달</dt><dd>{formatOperatorTime(archiveDispatch?.requested_at)}</dd></div>
+            <div><dt>누적 작업 전달</dt><dd>{systemStatus?.archive.dispatch_count ?? 0}건</dd></div>
           </dl>
+          <details className="operator-tech-details">
+            <summary>기술 상세</summary>
+            <dl>
+              <div><dt>상태 코드</dt><dd><code>{archiveCron?.last_status ?? '없음'}</code></dd></div>
+              <div><dt>작업 요청 번호</dt><dd>{archiveDispatch?.request_id ? `#${archiveDispatch.request_id}` : '없음'}</dd></div>
+              <div><dt>작업 이름</dt><dd><code>{archiveCron?.jobname ?? '없음'}</code></dd></div>
+            </dl>
+          </details>
         </article>
 
         <article className="operator-system-card">
           <div className="operator-system-title">
-            <h3>A-Wiki · Wiki <small>세계관 자동 성장</small></h3>
-            <span className={`operator-status-badge ${aWikiBadgeClass}`}>{aWikiBlocker ? '확인 필요' : aWikiLatest?.status ? statusWithKorean(aWikiLatest.status) : '실행이력 없음'}</span>
+            <h3>A-Wiki · 세계관 위키 <small>인물·장소·사건 자동 정리</small></h3>
+            <span className={`operator-status-badge ${aWikiBadgeClass}`}>{aWikiBlocker ? '확인 필요' : aWikiLatest?.status ? statusLabel(aWikiLatest.status) : '실행 이력 없음'}</span>
           </div>
           <dl>
-            <div><dt>최근 세션</dt><dd>{aWikiLatest?.session_id ?? '기록 없음'}</dd></div>
-            <div><dt>활성 / 게시</dt><dd>{systemStatus?.a_wiki?.active_count ?? 0}건 / {systemStatus?.a_wiki?.published_count ?? 0}건</dd></div>
+            <div><dt>최근 작업</dt><dd>{sessionLabel(aWikiLatest?.session_id)}</dd></div>
+            <div><dt>진행 중 / 완료</dt><dd>{systemStatus?.a_wiki?.active_count ?? 0}건 / {systemStatus?.a_wiki?.published_count ?? 0}건</dd></div>
             <div><dt>최근 갱신</dt><dd>{formatOperatorTime(aWikiLatest?.published_at ?? aWikiLatest?.updated_at ?? aWikiLatest?.created_at)}</dd></div>
-            <div><dt>상태 체류</dt><dd>{aWikiLatest?.age_minutes == null ? '—' : `${aWikiLatest.age_minutes}분`}</dd></div>
-            <div><dt>PR / Merge</dt><dd>{aWikiLatest?.final_pr_number ? `#${aWikiLatest.final_pr_number}` : '—'} · {aWikiLatest?.merge_sha?.slice(0, 12) ?? '—'}</dd></div>
-            <div><dt>GitHub 호출</dt><dd>{aWikiLatest?.dispatch_count ?? 0}회 · {formatOperatorTime(aWikiLatest?.dispatch_at)}</dd></div>
-            <div><dt>차단 사유</dt><dd>{aWikiBlocker ? <><code>{aWikiBlocker}</code>{explainMachineCode(aWikiBlocker) && <small className="operator-code-help">{explainMachineCode(aWikiBlocker)}</small>}</> : '없음'}</dd></div>
+            <div><dt>현재 상태 시간</dt><dd>{aWikiLatest?.age_minutes == null ? '—' : `${aWikiLatest.age_minutes}분`}</dd></div>
+            <div><dt>막힌 이유</dt><dd>{aWikiBlocker ? blockerLabel(aWikiBlocker) : '없음'}</dd></div>
           </dl>
+          <details className="operator-tech-details">
+            <summary>기술 상세</summary>
+            <dl>
+              <div><dt>상태 코드</dt><dd><code>{aWikiLatest?.status ?? '없음'}</code></dd></div>
+              <div><dt>기록 ID</dt><dd><code>{aWikiLatest?.session_id ?? '없음'}</code></dd></div>
+              <div><dt>게시 검증</dt><dd>{aWikiLatest?.final_pr_number ? `#${aWikiLatest.final_pr_number}` : '없음'}</dd></div>
+              <div><dt>반영 코드</dt><dd><code>{aWikiLatest?.merge_sha?.slice(0, 12) ?? '없음'}</code></dd></div>
+              <div><dt>작업 전달</dt><dd>{aWikiLatest?.dispatch_count ?? 0}회 · {formatOperatorTime(aWikiLatest?.dispatch_at)}</dd></div>
+              <div><dt>문제 코드</dt><dd><code>{aWikiBlocker ?? '없음'}</code></dd></div>
+            </dl>
+          </details>
         </article>
 
         <article className="operator-system-card">
           <div className="operator-system-title">
-            <h3>B · Visual <small>이미지</small></h3>
-            <span className={`operator-status-badge ${visualBadgeClass}`}>{visualBlocker ? '확인 필요' : visualLatest?.status ? statusWithKorean(visualLatest.status) : '실행이력 없음'}</span>
+            <h3>B · 일러스트 <small>이미지 자동 제작</small></h3>
+            <span className={`operator-status-badge ${visualBadgeClass}`}>{visualBlocker ? '확인 필요' : visualLatest?.status ? statusLabel(visualLatest.status) : '실행 이력 없음'}</span>
           </div>
           <dl>
-            <div><dt>Prep 자동실행</dt><dd>{visualPrepHealthy ? '정상' : '확인 필요'}</dd></div>
+            <div><dt>자동 실행</dt><dd>{visualPrepHealthy ? '정상' : '확인 필요'}</dd></div>
             <div><dt>오늘 시도 / 성공</dt><dd>{systemStatus?.visual.today_job_count ?? 0}건 / {systemStatus?.visual.today_success_count ?? 0}건</dd></div>
-            <div><dt>활성 작업</dt><dd>{systemStatus?.visual.active_count ?? 0}건</dd></div>
-            <div><dt>최근 대상</dt><dd>{visualLatest?.title ? `${visualLatest.title} · ${visualLatest.subject_id ?? ''}` : subjectWithKorean(visualLatest?.subject_id)}</dd></div>
-            <div><dt>최근 상태 시각</dt><dd>{formatOperatorTime(visualLatest?.finalized_at ?? visualLatest?.reviewed_at ?? visualLatest?.updated_at ?? visualLatest?.created_at)}</dd></div>
-            <div><dt>Renderer 완료</dt><dd>{formatOperatorTime(visualLatest?.provider_completed_at)}</dd></div>
-            <div><dt>상태 체류</dt><dd>{visualLatest?.age_minutes == null ? '—' : `${visualLatest.age_minutes}분`}</dd></div>
-            <div><dt>실패 P / I / R</dt><dd>{visualLatest?.provider_failure_count ?? 0} / {visualLatest?.ingest_failure_count ?? 0} / {visualLatest?.review_failure_count ?? 0}</dd></div>
-            <div><dt>검수 판정</dt><dd>{visualLatest?.review_decision ? statusWithKorean(visualLatest.review_decision) : '—'}</dd></div>
-            <div><dt>상세</dt><dd>{visualBlocker ? <><code>{visualBlocker}</code>{explainMachineCode(visualBlocker) && <small className="operator-code-help">{explainMachineCode(visualBlocker)}</small>}{(visualLatest?.blocker_stage ?? visualLatest?.last_error_stage) && <small className="operator-code-help">{visualLatest?.blocker_stage ?? visualLatest?.last_error_stage}</small>}</> : <>attempt {visualLatest?.attempt_no ?? '—'} · 누적 {systemStatus?.visual.job_count ?? 0}건</>}</dd></div>
+            <div><dt>진행 중</dt><dd>{systemStatus?.visual.active_count ?? 0}건</dd></div>
+            <div><dt>최근 대상</dt><dd>{visualLatest?.title ?? subjectWithKorean(visualLatest?.subject_id).split(' · ')[0]}</dd></div>
+            <div><dt>최근 갱신</dt><dd>{formatOperatorTime(visualLatest?.finalized_at ?? visualLatest?.reviewed_at ?? visualLatest?.updated_at ?? visualLatest?.created_at)}</dd></div>
+            <div><dt>이미지 생성 완료</dt><dd>{formatOperatorTime(visualLatest?.provider_completed_at)}</dd></div>
+            <div><dt>현재 상태 시간</dt><dd>{visualLatest?.age_minutes == null ? '—' : `${visualLatest.age_minutes}분`}</dd></div>
+            <div><dt>실패 횟수</dt><dd>생성 {visualLatest?.provider_failure_count ?? 0} · 저장 {visualLatest?.ingest_failure_count ?? 0} · 검수 {visualLatest?.review_failure_count ?? 0}</dd></div>
+            <div><dt>검수 결과</dt><dd>{visualLatest?.review_decision ? statusLabel(visualLatest.review_decision) : '아직 없음'}</dd></div>
+            <div><dt>문제</dt><dd>{visualBlocker ? blockerLabel(visualBlocker) : '없음'}</dd></div>
           </dl>
+          <details className="operator-tech-details">
+            <summary>기술 상세</summary>
+            <dl>
+              <div><dt>상태 코드</dt><dd><code>{visualLatest?.status ?? '없음'}</code></dd></div>
+              <div><dt>대상 ID</dt><dd><code>{visualLatest?.subject_id ?? '없음'}</code></dd></div>
+              <div><dt>이번 시도</dt><dd>{visualLatest?.attempt_no ?? '—'}회</dd></div>
+              <div><dt>누적 작업</dt><dd>{systemStatus?.visual.job_count ?? 0}건</dd></div>
+              <div><dt>문제 코드</dt><dd><code>{visualBlocker ?? '없음'}</code></dd></div>
+              <div><dt>문제 단계</dt><dd><code>{visualLatest?.blocker_stage ?? visualLatest?.last_error_stage ?? '없음'}</code></dd></div>
+            </dl>
+          </details>
         </article>
 
         <article className="operator-system-card">
           <div className="operator-system-title">
-            <h3>C · Knowledge <small>생존 지식</small></h3>
-            <span className={`operator-status-badge ${knowledgeBadgeClass}`}>{semanticBlocker ? '확인 필요' : knowledgeNeedsReview ? '검토 필요' : semanticLatest?.status ? statusWithKorean(semanticLatest.status) : operatorStaticStatus.knowledge.workerEnabled ? '대기' : '중지'}</span>
+            <h3>C · 생존 지식 <small>지식 글 자동 제작</small></h3>
+            <span className={`operator-status-badge ${knowledgeBadgeClass}`}>{semanticBlocker ? '확인 필요' : knowledgeNeedsReview ? '검토 필요' : semanticLatest?.status ? statusLabel(semanticLatest.status) : operatorStaticStatus.knowledge.workerEnabled ? '대기 중' : '중지됨'}</span>
           </div>
           <dl>
-            <div><dt>활성 작업</dt><dd>{systemStatus?.knowledge_semantic?.active_count ?? 0}건</dd></div>
-            <div><dt>최근 처리</dt><dd>{knowledgeLatestBrief} · {semanticLatest?.result_decision ?? '—'}</dd></div>
-            <div><dt>Source</dt><dd>{semanticLatest?.source_kind ?? '—'} · {semanticLatest?.source_ref?.split('/').slice(-2).join('/') ?? '—'}</dd></div>
-            <div><dt>준비 / 제출</dt><dd>{formatOperatorTime(semanticLatest?.prepared_at)} / {formatOperatorTime(semanticLatest?.submitted_at)}</dd></div>
-            <div><dt>검토 대기</dt><dd>{inbox.pending_count}건</dd></div>
-            <div><dt>PR / 결과</dt><dd>{semanticLatest?.final_pr_number ? `#${semanticLatest.final_pr_number}` : '—'} · {semanticLatest?.status ?? '—'}</dd></div>
-            <div><dt>차단 사유</dt><dd>{semanticBlocker ? <><code>{semanticBlocker}</code>{semanticLatest?.blocker_stage && <small className="operator-code-help">{semanticLatest.blocker_stage}</small>}</> : '없음'}</dd></div>
-            <div><dt>주기</dt><dd>{operatorStaticStatus.knowledge.triggerIntervalHours}시간 · {timezoneWithKorean(operatorStaticStatus.knowledge.timezone)}</dd></div>
+            <div><dt>진행 중</dt><dd>{systemStatus?.knowledge_semantic?.active_count ?? 0}건</dd></div>
+            <div><dt>최근 글</dt><dd>{knowledgeLatestBrief} · {decisionLabel(semanticLatest?.result_decision)}</dd></div>
+            <div><dt>원본</dt><dd>{sourceKindLabel(semanticLatest?.source_kind)}</dd></div>
+            <div><dt>작업 시작 / 제출</dt><dd>{formatOperatorTime(semanticLatest?.prepared_at)} / {formatOperatorTime(semanticLatest?.submitted_at)}</dd></div>
+            <div><dt>사람 검토 대기</dt><dd>{inbox.pending_count}건</dd></div>
+            <div><dt>게시 상태</dt><dd>{statusLabel(semanticLatest?.status)}</dd></div>
+            <div><dt>막힌 이유</dt><dd>{semanticBlocker ? blockerLabel(semanticBlocker) : '없음'}</dd></div>
+            <div><dt>자동 실행 주기</dt><dd>{operatorStaticStatus.knowledge.triggerIntervalHours}시간 · {timezoneLabel(operatorStaticStatus.knowledge.timezone)}</dd></div>
           </dl>
+          <details className="operator-tech-details">
+            <summary>기술 상세</summary>
+            <dl>
+              <div><dt>작업 종류</dt><dd><code>{semanticLatest?.job_type ?? '없음'}</code> · {jobTypeLabel(semanticLatest?.job_type)}</dd></div>
+              <div><dt>원본 종류</dt><dd><code>{semanticLatest?.source_kind ?? '없음'}</code></dd></div>
+              <div><dt>원본 경로</dt><dd><code>{semanticLatest?.source_ref ?? '없음'}</code></dd></div>
+              <div><dt>게시 검증</dt><dd>{semanticLatest?.final_pr_number ? `#${semanticLatest.final_pr_number}` : '없음'}</dd></div>
+              <div><dt>상태 코드</dt><dd><code>{semanticLatest?.status ?? '없음'}</code></dd></div>
+              <div><dt>문제 코드</dt><dd><code>{semanticBlocker ?? '없음'}</code></dd></div>
+              <div><dt>문제 단계</dt><dd><code>{semanticLatest?.blocker_stage ?? '없음'}</code></dd></div>
+            </dl>
+          </details>
         </article>
       </div>
 
       <div className="operator-release-strip">
-        <strong>Production <small>실사이트 배포</small></strong>
-        <span className={`operator-status-badge ${productionStatusTone(productionContext)}`}>{productionContext === 'production' ? '정상' : productionContext ?? '확인 필요'}</span>
-        <span>원본 <code>{shortSha(productionStatus.release?.source_main_sha)}</code></span>
-        <span>배포 <code>{shortSha(productionStatus.deploy?.commit_ref)}</code></span>
-        <span>최근 배치 {productionStatus.release?.released_on_kst ?? '기록 없음'}</span>
-        <span>{operatorStaticStatus.release.productionIntervalDays}일 배치 · {operatorStaticStatus.release.releaseHourKst}시 · 일 최대 {operatorStaticStatus.release.maxProductionDeploysPerDay}회</span>
+        <strong>실사이트 배포 <small>공개 사이트에 반영된 상태</small></strong>
+        <span className={`operator-status-badge ${productionStatusTone(productionContext)}`}>{productionContext === 'production' ? '정상' : '확인 필요'}</span>
+        <span>최근 배포 {productionStatus.release?.released_on_kst ?? '기록 없음'}</span>
+        <span>배포 주기 {operatorStaticStatus.release.productionIntervalDays}일 · {operatorStaticStatus.release.releaseHourKst}시 · 하루 최대 {operatorStaticStatus.release.maxProductionDeploysPerDay}회</span>
+        <details className="operator-tech-details operator-release-tech">
+          <summary>기술 상세</summary>
+          <span>원본 코드 <code>{shortSha(productionStatus.release?.source_main_sha)}</code></span>
+          <span>배포 코드 <code>{shortSha(productionStatus.deploy?.commit_ref)}</code></span>
+          <span>환경 <code>{productionContext ?? '없음'}</code></span>
+        </details>
       </div>
-      <p className="operator-muted">A는 Archive, A-Wiki는 세계관 자동 성장, B는 이미지 Render/Review/Finalizer, C는 생존 지식 자동화 상태를 보여줍니다. 자동화 전광판은 4개이며, Production은 별도 배포 상태로 분리했습니다. 상태는 로그인 시 한 번 불러오며 이후에는 상태 새로고침 버튼을 눌렀을 때 갱신됩니다.</p>
+      <p className="operator-muted">A는 게임 기록 저장, A-Wiki는 세계관 위키 갱신, B는 일러스트 제작, C는 생존 지식 글 제작 상태입니다. 평소에는 쉬운 상태만 보고, 문제가 있을 때만 각 카드의 ‘기술 상세’를 열어보면 됩니다.</p>
     </section>
 
     <div className="operator-grid">
@@ -294,10 +342,10 @@ export function OperatorDashboard({
           <p>{selected.summary}</p>
           <dl>
             <div><dt>유형</dt><dd>{selected.source_worker} / {selected.item_type}</dd></div>
-            <div><dt>Chronicle</dt><dd>{selected.chronicle_id ?? '공용'}</dd></div>
+            <div><dt>생존기</dt><dd>{selected.chronicle_id ?? '공용'}</dd></div>
             <div><dt>원본</dt><dd><a href={selected.source_ref} target="_blank" rel="noreferrer">원본 열기</a></dd></div>
           </dl>
-          <details><summary>Payload</summary><pre>{JSON.stringify(selected.payload, null, 2)}</pre></details>
+          <details><summary>기술 상세 데이터</summary><pre>{JSON.stringify(selected.payload, null, 2)}</pre></details>
           {!!selected.decision_history.length && <div className="operator-history"><h4>결정 기록</h4>{selected.decision_history.map((entry, index) => <p key={index}>{entry.decision} · {entry.actor ?? '운영자'} · {new Date(entry.created_at).toLocaleString()} {entry.note && `· ${entry.note}`}</p>)}</div>}
           {selected.status === 'PENDING' && <div className="operator-decision">
             <label>검토 메모<textarea maxLength={1000} value={note} onChange={(event) => onNoteChange(event.target.value)} /></label>
