@@ -1,11 +1,12 @@
 {
-  "version": "illustration-native-worker-runtime-contract-v1.2",
-  "purpose": "One scheduled ChatGPT worker. Program selects work; AI generates or reviews based only on durable job state. Transfer occurs only after PASS.",
+  "version": "illustration-native-worker-runtime-contract-v1.3",
+  "purpose": "Two scheduled ChatGPT workers: isolated Clean Renderer for PREPARED; Native Worker for review/transfer. Program owns Prep/Finalizer.",
   "roles": {
     "PREPARED": {
       "role": "RENDERER",
       "one_role_per_run": true,
-      "next_status": "INGESTING"
+      "next_status": "INGESTING",
+      "owner": "CLEAN_RENDERER"
     },
     "INGESTING": {
       "role": "REVIEWER",
@@ -17,14 +18,16 @@
         "HUMAN_REVIEW": "HUMAN_REVIEW"
       },
       "one_role_per_run": true,
-      "stop_after_status_transition": true
+      "stop_after_status_transition": true,
+      "owner": "NATIVE_WORKER"
     },
     "REVIEW_PASS_STAGED": {
       "role": "PASS_SITE_ASSET_TRANSFER",
       "re_review": false,
       "next_status": "FINALIZE_QUEUED",
       "one_role_per_run": true,
-      "stop_after_status_transition": true
+      "stop_after_status_transition": true,
+      "owner": "NATIVE_WORKER"
     }
   },
   "source": {
@@ -65,7 +68,6 @@
     "manual_subject_override": true,
     "durable_attempt_history_rpc": "archive_illustration_render_attempt_history"
   },
-  "boot_router": "docs/automation/ILLUSTRATION_B_NATIVE_WORKER_ROUTER.md",
   "renderer_context_isolation": {
     "enabled": true,
     "rule": "For PREPARED, do not load full Automation B project/review/transfer authorities before image generation.",
@@ -79,6 +81,42 @@
     ],
     "image_call_must_follow_prompt_sha_gate": true,
     "scene_input": "EXACT_DB_PROMPT_TEXT_WITH_NO_PREFIX_OR_SUFFIX",
-    "full_authority_load_after_image_generation_only": true
+    "full_authority_load_after_image_generation_only": true,
+    "authority": "docs/automation/ILLUSTRATION_B_CLEAN_RENDERER_PROMPT.md"
+  },
+  "workers": {
+    "clean_renderer": {
+      "authority": "docs/automation/ILLUSTRATION_B_CLEAN_RENDERER_PROMPT.md",
+      "handles": [
+        "PREPARED"
+      ],
+      "responsibilities": [
+        "NATIVE_IMAGE_GENERATION",
+        "LIBRARY_WRITE",
+        "PROVIDER_COMPLETE"
+      ],
+      "forbidden": [
+        "REVIEW",
+        "BINARY_TRANSFER",
+        "FINALIZER",
+        "VAULT",
+        "REGISTRY",
+        "SITE_ASSETS"
+      ]
+    },
+    "native_worker": {
+      "boot_router": "docs/automation/ILLUSTRATION_B_NATIVE_WORKER_ROUTER.md",
+      "handles": [
+        "INGESTING",
+        "REVIEW_PASS_STAGED"
+      ],
+      "responsibilities": [
+        "VISUAL_REVIEW",
+        "PASS_ONLY_TRANSFER"
+      ],
+      "forbidden": [
+        "IMAGE_GENERATION"
+      ]
+    }
   }
 }
