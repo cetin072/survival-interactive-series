@@ -34,8 +34,9 @@ export function KnowledgeGuidePage({ guide }: { guide: KnowledgeGuide }) {
 
       <article className="knowledge-guide">
         <header className="knowledge-guide-header">
-          <p className="wiki-document-kicker">생존 지식 · {guide.label}</p>
-          <h1>{guide.title}</h1>
+          <p className="wiki-document-kicker">생존 지식 · {guide.id}</p>
+          <h1>{guide.label}</h1>
+          <p className="knowledge-guide-question">{guide.title}</p>
           <p className="knowledge-guide-lead">{guide.lead}</p>
           <div className="knowledge-guide-meta">
             <span>{knowledgeRiskLabel(guide.riskLevel)}</span>

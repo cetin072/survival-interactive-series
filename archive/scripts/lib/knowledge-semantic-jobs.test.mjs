@@ -8,7 +8,7 @@ import { execFileSync } from 'node:child_process'
 import { applySemanticPackage, buildSemanticContext, chapterHash, hashPolicyBytes, knowledgeOperationalDate, makeWorkKey, nextBriefId, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
 import { finalizerAction, semanticBranchRef, reconcilePullRequest, runSemanticFinalizer, verifyPins } from '../knowledge-semantic-finalize.mjs'
 import { runPackage } from '../knowledge-semantic-finalize.mjs'
-import { detectLegacyWorkerBlocker, planSemanticPreparation } from '../knowledge-semantic-prepare.mjs'
+import { detectLegacyWorkerBlocker, planSemanticPreparation, selectExperienceSeed } from '../knowledge-semantic-prepare.mjs'
 
 const digest = (value) => createHash('sha256').update(value).digest('hex')
 const sourceRef = 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_001/SOURCE_MANIFEST.json'
@@ -25,9 +25,9 @@ const baseJob = {
 const packageResult = (decision = 'BRIEF_READY') => ({
   version: 'knowledge-semantic-result-v1', job_id: baseJob.job_id, decision,
   ...(decision === 'HUMAN_REVIEW' ? { code: 'RISK_REVIEW', note: 'Risk requires a person.' } : {}),
-  candidate: { id: 'KC-session-001-abcdef1234', brief_id: 'K-011', topic_id: 'T-PREP', status: 'BRIEF_PROPOSED', source_kind: 'PUBLIC_ARCHIVE', source_manifest_ref: sourceRef, source_manifest_sha256: sourceSha },
-  evidence: { brief_id: 'K-011', claims: [{ claim: 'Fixture claim', source_ids: ['S1'], context: 'Public fact', limitation: 'Limited scope' }] },
-  brief: { id: 'K-011', topic_id: 'T-PREP', content_type: 'BRIEF', status: 'READY', risk_level: decision === 'HUMAN_REVIEW' ? 'HIGH' : 'LOW', publication_policy: decision === 'HUMAN_REVIEW' ? 'HUMAN_APPROVED' : 'AUTO_LOW_RISK', semantic_qa_status: decision === 'HUMAN_REVIEW' ? 'REVIEW' : 'PASS' },
+  candidate: { id: 'KC-session-001-abcdef1234', brief_id: 'K-011', topic_id: 'T-PREP', status: 'BRIEF_PROPOSED', source_kind: 'PUBLIC_ARCHIVE', source_manifest_ref: sourceRef, source_manifest_sha256: sourceSha, question: '짧고 분명한 생존 질문은 무엇일까?' },
+  evidence: { brief_id: 'K-011', question: '짧고 분명한 생존 질문은 무엇일까?', claims: [{ claim: 'Fixture claim', source_ids: ['S1'], context: 'Public fact', limitation: 'Limited scope' }] },
+  brief: { id: 'K-011', title: '짧고 분명한 생존 질문은 무엇일까?', topic_id: 'T-PREP', content_type: 'BRIEF', status: 'READY', risk_level: decision === 'HUMAN_REVIEW' ? 'HIGH' : 'LOW', publication_policy: decision === 'HUMAN_REVIEW' ? 'HUMAN_APPROVED' : 'AUTO_LOW_RISK', semantic_qa_status: decision === 'HUMAN_REVIEW' ? 'REVIEW' : 'PASS' },
 })
 
 test('Knowledge operational date follows Asia/Seoul across the UTC midnight boundary', () => {
@@ -52,6 +52,25 @@ test('C-PREP prioritizes oldest eligible fresh source and excludes durable handl
 test('C-PREP only selects BACKFILL when no fresh source is pending', () => {
   const backfillChoice = { sourceRef: 'reader#chapter-1' }
   assert.equal(planSemanticPreparation({ activeJobs: [], scanner: { sources: [] }, backfillIsDue: true, backfillChoice }).decision, 'BACKFILL')
+})
+
+test('C-PREP chooses FRESH then EXPERIENCE_SEED then due BACKFILL, once per run', () => {
+  const seed = { sourceRef: 'knowledge/content/experience-seeds/EX-001-apartment-power-outage.json' }
+  const reader = { sourceRef: 'reader#chapter-1' }
+  const fresh = { status: 'PENDING', source_manifest_ref: 'fresh', source_manifest_sha256: 'a'.repeat(64) }
+  assert.equal(planSemanticPreparation({ activeJobs: [], scanner: { sources: [fresh] }, experienceChoice: seed, backfillIsDue: true, backfillChoice: reader }).decision, 'FRESH')
+  assert.equal(planSemanticPreparation({ activeJobs: [], scanner: { sources: [] }, experienceChoice: seed, backfillIsDue: true, backfillChoice: reader }).decision, 'EXPERIENCE_SEED')
+  assert.equal(planSemanticPreparation({ activeJobs: [], scanner: { sources: [] }, backfillIsDue: true, backfillChoice: reader }).decision, 'BACKFILL')
+  assert.equal(planSemanticPreparation({ activeJobs: [{ status: 'HUMAN_REVIEW' }], scanner: { sources: [] }, experienceChoice: seed, backfillIsDue: true, backfillChoice: reader }).decision, 'NOOP')
+})
+
+test('EX-001 is a deterministic Seed candidate and a handled identity is not selected again', async () => {
+  const base = resolve(import.meta.dirname, '../../..')
+  const choice = await selectExperienceSeed({ base })
+  assert.equal(choice.seedId, 'EX-001')
+  assert.equal(choice.sourceKind, 'USER_REPORTED_EXPERIENCE')
+  assert.equal(choice.sourceSha256.length, 64)
+  assert.equal(await selectExperienceSeed({ base, handledJobs: [{ source_kind: 'USER_REPORTED_EXPERIENCE', source_ref: choice.sourceRef, status: 'HOLD' }] }), null)
 })
 
 test('legacy branch guard ignores squash-integrated content but blocks a genuinely unmerged package', async () => {
@@ -142,10 +161,29 @@ test('semantic context is compact and bounded', () => {
 test('result contract binds BRIEF_READY and HUMAN_REVIEW packages to one job and reserved target', () => {
   assert.equal(validateSemanticResult(baseJob, packageResult()).briefId, 'K-011')
   assert.equal(validateSemanticResult(baseJob, packageResult('HUMAN_REVIEW')).decision, 'HUMAN_REVIEW')
+  assert.throws(() => validateSemanticResult(baseJob, { ...packageResult(), brief: { ...packageResult().brief, title: '다른 질문' } }), /SEMANTIC_QUESTION_TITLE_MISMATCH/)
   assert.throws(() => validateSemanticResult(baseJob, { ...packageResult(), job_id: 'stale' }), /SEMANTIC_RESULT_JOB_BINDING_MISMATCH/)
   assert.throws(() => validateSemanticResult(baseJob, { ...packageResult(), extra: true }), /SEMANTIC_RESULT_PROPERTY_UNKNOWN/)
   assert.throws(() => validateSemanticResult(baseJob, { version: 'knowledge-semantic-result-v1', job_id: baseJob.job_id, decision: 'HOLD', code: 'NO_DISTINCT_SAFE_QUESTION', note: 'No distinct safe question.', brief: {} }), /SEMANTIC_HOLD_PACKAGE_FORBIDDEN/)
   assert.throws(() => validateSemanticResult(baseJob, { ...packageResult(), brief: { ...packageResult().brief, id: 'K-012' } }), /SEMANTIC_RESERVED_ID_MISMATCH/)
+})
+
+test('EX-001 requires a full ELECTRICAL HUMAN_REVIEW package and experience is provenance only', () => {
+  const ref = 'knowledge/content/experience-seeds/EX-001-apartment-power-outage.json'
+  const seedJob = {
+    ...baseJob, source_kind: 'USER_REPORTED_EXPERIENCE', source_ref: ref,
+    semantic_context: { ...baseJob.semantic_context, source: { kind: 'USER_REPORTED_EXPERIENCE', ref, sha256: sourceSha, refs: [], hashes: [] } },
+  }
+  const original = packageResult('HUMAN_REVIEW')
+  const result = {
+    ...original,
+    candidate: { ...original.candidate, source_kind: 'USER_REPORTED_EXPERIENCE', source_ref: ref, source_sha256: sourceSha },
+    evidence: { ...original.evidence, story_source_status: 'USER_REPORTED_EXPERIENCE', experience_provenance: { source_ref: ref, source_sha256: sourceSha } },
+    brief: { ...original.brief, risk_domains: ['ELECTRICAL'] },
+  }
+  assert.equal(validateSemanticResult(seedJob, result).decision, 'HUMAN_REVIEW')
+  assert.throws(() => validateSemanticResult(seedJob, { ...result, evidence: { ...result.evidence, story_source_status: 'VERIFIED_PUBLIC_ARCHIVE' } }), /SEMANTIC_EXPERIENCE_EVIDENCE_BOUNDARY_INVALID/)
+  assert.throws(() => validateSemanticResult(seedJob, { ...result, brief: { ...result.brief, risk_domains: ['GENERAL_PREPAREDNESS'] } }), /SEMANTIC_EX001_RISK_DOWNGRADE_FORBIDDEN/)
 })
 
 test('HOLD is terminal intent and does not create a content package', () => {

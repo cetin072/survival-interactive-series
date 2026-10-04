@@ -36,7 +36,7 @@ export function nextBriefId(briefs) {
 export function makeWorkKey({ sourceKind, sourceRef, sourceSha256 }) {
   fail(['PUBLIC_ARCHIVE', 'PUBLIC_READER', 'USER_REPORTED_EXPERIENCE'].includes(sourceKind), 'SEMANTIC_SOURCE_KIND_INVALID')
   fail(typeof sourceRef === 'string' && sourceRef.length > 0, 'SEMANTIC_SOURCE_REF_REQUIRED')
-  if (sourceKind === 'USER_REPORTED_EXPERIENCE') fail(sourceRef === 'knowledge/content/experience-seeds/EX-001-apartment-power-outage.json', 'SEMANTIC_EXPERIENCE_REF_INVALID')
+  if (sourceKind === 'USER_REPORTED_EXPERIENCE') fail(/^knowledge\/content\/experience-seeds\/EX-[0-9]{3,}-[a-z0-9-]+\.json$/.test(sourceRef), 'SEMANTIC_EXPERIENCE_REF_INVALID')
   fail(/^[a-f0-9]{64}$/.test(sourceSha256 ?? ''), 'SEMANTIC_SOURCE_SHA_INVALID')
   return `${sourceKind}:${sourceRef}:${sourceSha256}`
 }
@@ -146,6 +146,7 @@ export function validateSemanticResult(job, result) {
   fail(candidate.id === target.candidate_id && brief.id === target.brief_id, 'SEMANTIC_RESERVED_ID_MISMATCH')
   fail(candidate.brief_id === brief.id && evidence.brief_id === brief.id, 'SEMANTIC_PACKAGE_RELATION_MISMATCH')
   fail(candidate.topic_id === brief.topic_id && (topic === null || topic.id === brief.topic_id), 'SEMANTIC_TOPIC_RELATION_MISMATCH')
+  fail(candidate.question === evidence.question && candidate.question === brief.title, 'SEMANTIC_QUESTION_TITLE_MISMATCH')
   // The existing Worker Gate requires a resolved BRIEF_PROPOSED candidate. It
   // deterministically routes high risk, conflicts, unknowns, or weak support
   // to the existing Operator Inbox after this package opens as a Draft PR.
@@ -162,10 +163,15 @@ export function validateSemanticResult(job, result) {
   if (source.kind === 'PUBLIC_ARCHIVE') {
     fail(candidate.source_manifest_ref === job.source_ref && candidate.source_manifest_sha256 === job.source_sha256, 'SEMANTIC_ARCHIVE_SOURCE_BINDING_MISMATCH')
   } else if (source.kind === 'USER_REPORTED_EXPERIENCE') {
-    fail(job.source_ref === 'knowledge/content/experience-seeds/EX-001-apartment-power-outage.json', 'SEMANTIC_EXPERIENCE_REF_INVALID')
+    fail(/^knowledge\/content\/experience-seeds\/EX-[0-9]{3,}-[a-z0-9-]+\.json$/.test(job.source_ref), 'SEMANTIC_EXPERIENCE_REF_INVALID')
     fail(candidate.source_ref === job.source_ref && candidate.source_sha256 === job.source_sha256,
       'SEMANTIC_EXPERIENCE_SOURCE_BINDING_MISMATCH')
+    fail(evidence.story_source_status === 'USER_REPORTED_EXPERIENCE'
+      && evidence.experience_provenance?.source_ref === job.source_ref
+      && evidence.experience_provenance?.source_sha256 === job.source_sha256, 'SEMANTIC_EXPERIENCE_EVIDENCE_BOUNDARY_INVALID')
     fail(result.decision === 'HUMAN_REVIEW', 'SEMANTIC_EXPERIENCE_REVIEW_REQUIRED')
+    if (job.source_ref.endsWith('/EX-001-apartment-power-outage.json'))
+      fail(brief.risk_level === 'HIGH' && brief.risk_domains?.includes('ELECTRICAL'), 'SEMANTIC_EX001_RISK_DOWNGRADE_FORBIDDEN')
   } else {
     fail(candidate.reader_book_ref === READER_BOOK_REF
       && candidate.reader_book_sha256 === source.reader_book_sha256

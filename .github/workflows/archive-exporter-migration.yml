@@ -172,7 +172,7 @@ jobs:
           ) $fn$;
           CREATE TABLE vault.decrypted_secrets (name text, decrypted_secret text, created_at timestamptz);
           CREATE TABLE cron.job (jobname text primary key, schedule text not null, active boolean not null);
-          CREATE FUNCTION cron.schedule(text,text,text) RETURNS bigint LANGUAGE plpgsql AS $fn$ BEGIN INSERT INTO cron.job(jobname,schedule,active) VALUES ($1,$2,true); RETURN 1; END $fn$;
+          CREATE FUNCTION cron.schedule(text,text,text) RETURNS bigint LANGUAGE plpgsql AS $fn$ BEGIN INSERT INTO cron.job(jobname,schedule,active) VALUES ($1,$2,true) ON CONFLICT (jobname) DO UPDATE SET schedule=excluded.schedule,active=true; RETURN 1; END $fn$;
           CREATE FUNCTION net.http_post(url text, body jsonb, headers jsonb, timeout_milliseconds integer) RETURNS bigint LANGUAGE sql AS $fn$ SELECT 1::bigint $fn$;
           CREATE TABLE survival_rpg.archive_publication_daily_runs (scheduled_date date,status text,attempt_count integer,last_error_code text,started_at timestamptz,finished_at timestamptz,created_at timestamptz);
           CREATE TABLE survival_rpg.archive_publication_tasks (task_id uuid,task_kind text,chronicle_id text,season_id text,status text,attempt_count integer,last_error_code text,updated_at timestamptz,completed_at timestamptz,created_at timestamptz);
@@ -202,6 +202,8 @@ jobs:
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_finalizer_retry.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261004144834_knowledge_ex001_explicit_source.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_ex001_source_verification.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261005000000_knowledge_semantic_frequency_experience.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_frequency_experience.sql
 
   illustration-db-contract:
     runs-on: ubuntu-latest

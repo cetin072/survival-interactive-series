@@ -735,3 +735,7 @@
 .survival-public-shell a:active {
   transform: translateY(1px);
 }
+
+.knowledge-guide-question { color: #5f6068; font-size: clamp(15px, 1.7vw, 19px); line-height: 1.6; font-weight: 400; }
+.knowledge-guide-header .knowledge-guide-question { margin: 0 0 14px; }
+.knowledge-library-list .knowledge-guide-question { margin: 0 0 8px; }
