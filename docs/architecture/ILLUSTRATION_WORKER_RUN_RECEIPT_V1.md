@@ -1,3 +1,5 @@
+> **HISTORICAL / NOT CURRENT LIVE LEDGER** — 현재 Automation B의 운영 상태는 `survival_ops.illustration_render_jobs`와 Operator Dashboard가 권위다. `illustration_worker_runs`는 과거 올인원 Worker 진단 설계 기록으로 유지하며 현재 Renderer/Reviewer 예약에서는 사용하지 않는다.
+
 # AFTERFALL Illustration Worker Run Receipt v1
 
 ## Purpose
