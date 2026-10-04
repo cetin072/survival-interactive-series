@@ -22,7 +22,7 @@ describe('WikiDocument compiler', () => {
     expect(document.transcriptPartIds).toContain('c03-s01-001')
     expect(document.metaRows).toEqual(expect.arrayContaining([
       { label: '유형', value: '인물' },
-      { label: '생존기', value: 'C03 AFTERFALL' },
+      { label: '생존기', value: 'C03 · 서진우의 생존기' },
       { label: '상태', value: '활동 중' },
       { label: '소속', value: '핵심 4인' },
     ]))
