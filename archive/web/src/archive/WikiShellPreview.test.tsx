@@ -9,7 +9,7 @@ describe('Wiki staged public structure', () => {
     const markup = renderToStaticMarkup(createElement(WikiShellPreview))
     expect(markup).toContain('생존 이야기를 읽고')
     expect(markup).toContain('현재 진행 중')
-    expect(markup).toContain('AFTERFALL')
+    expect(markup).toContain('서진우의 생존기')
     expect(markup).toContain('최근 세계관 기록')
     expect(markup).toContain('세계관 분류')
     expect(markup).toContain('최근 생존 지식')
@@ -21,7 +21,7 @@ describe('Wiki staged public structure', () => {
       page: 'chronicle',
       chronicleId: 'C03-AFTERFALL',
     }))
-    expect(markup).toContain('AFTERFALL')
+    expect(markup).toContain('서진우의 생존기')
     expect(markup).toContain('서진우의 생존 기록')
     expect(markup).toContain('세계관')
     expect(markup).toContain('최근 기록')

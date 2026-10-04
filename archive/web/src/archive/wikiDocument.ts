@@ -1,5 +1,6 @@
 import publicGraph from '../../../content/graphs/C03-AFTERFALL/GRAPH.json'
 import type { ArchiveNode, ArchiveNodeType } from './archiveData'
+import { getChronicle } from './chronicleRegistry'
 import { archiveArticleByNodeId, type ArchiveArticleSection, type ArchiveTimelineItem } from './archiveArticleData'
 import { confirmedAppearanceFor } from './characterAppearance'
 import { chapterForNode, type ReaderChapter } from './storyData'
@@ -45,6 +46,8 @@ const typeLabels: Record<ArchiveNodeType, string> = {
   reference: '자료',
 }
 
+const c03Chronicle = getChronicle('C03-AFTERFALL')
+
 const metaValueLabels: Record<string, string> = {
   ACTIVE: '활동 중',
   INACTIVE: '비활성',
@@ -87,7 +90,7 @@ export function requireWikiNode(nodeId: string): ArchiveNode {
 function metaRowsFor(node: ArchiveNode): WikiDocumentMetaRow[] {
   const rows: WikiDocumentMetaRow[] = [
     { label: '유형', value: typeLabels[node.type] },
-    { label: '생존기', value: 'C03 AFTERFALL' },
+    { label: '생존기', value: `C03 · ${c03Chronicle.title}` },
   ]
 
   if (node.subtitle) {

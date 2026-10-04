@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { getChronicle } from './chronicleRegistry'
 import type { WikiDocument } from './wikiDocument'
 import { WikiTopbar } from './WikiTopbar'
 import './wikiShell.css'
@@ -34,6 +35,7 @@ export function WikiDocumentPage({
   relationHref?: (relation: WikiDocument['relations'][number]) => string
 }) {
   const plan = wikiSectionPlan(document)
+  const chronicle = getChronicle(document.chronicleId)
   const numberFor = (kind: PlannedSection['kind']) => plan.findIndex((section) => section.kind === kind) + 1
   const roleSection = document.sections.find((section) => /(?:^|-)role$/.test(section.id))
   const historySections = document.sections.filter((section) => section !== roleSection)
@@ -46,13 +48,13 @@ export function WikiDocumentPage({
       {previewTools}
       <nav className="wiki-breadcrumb" aria-label="현재 위치">
         <a href="/?view=wiki-preview">생존일기</a><span>›</span>
-        <a href="/?view=wiki-preview&page=chronicle&chronicle=C03-AFTERFALL">AFTERFALL</a><span>›</span>
+        <a href="/?view=wiki-preview&page=chronicle&chronicle=C03-AFTERFALL">{chronicle.title}</a><span>›</span>
         <span>{document.typeLabel}</span><span>›</span><strong>{document.title}</strong>
       </nav>
 
       <article className="wiki-document">
         <header className="wiki-document-header">
-          <p className="wiki-document-kicker">{document.chronicleId.replace('-', ' ')} · {document.typeLabel}</p>
+          <p className="wiki-document-kicker">생존기 {String(chronicle.number).padStart(2, '0')} · {chronicle.title} · {document.typeLabel}</p>
           <h1>{document.title}</h1>
           <p>{document.subtitle}</p>
         </header>
