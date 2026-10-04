@@ -8,7 +8,10 @@
     },
     "normal_transition": "PREPARED -> INGESTING",
     "called_only_after": "The exact bound PNG exists in the neutral Library output path and readback confirms a non-empty PNG.",
-    "idempotent_statuses": ["INGESTING", "READY_FOR_REVIEW"]
+    "idempotent_statuses": [
+      "INGESTING",
+      "READY_FOR_REVIEW"
+    ]
   },
   "lease_acquire": {
     "rpc": "archive_illustration_render_job_lease_acquire",
@@ -198,7 +201,9 @@
       "perform_visual_review",
       "submit_PASS_REJECT_or_HUMAN_REVIEW"
     ],
-    "reason": "Every generated render must enter the 30-day private illustration vault, including rejected and human-review outputs."
+    "reason": "Every generated render must enter the 30-day private illustration vault, including rejected and human-review outputs.",
+    "vault_enqueue_at": "READY_FOR_REVIEW",
+    "vault_enqueue_owner": "archive_illustration_review_staging_finalize"
   },
   "vault": {
     "storage_bucket": "survival-illustration-vault",
@@ -208,7 +213,10 @@
     "ai_schedule_added": false,
     "pass_behavior": "Keep a temporary vault copy while the accepted original also proceeds through the existing permanent Storage/Registry/SITE_ASSETS pipeline.",
     "reject_behavior": "Keep only the temporary vault copy; remove transport staging after the vault upload succeeds.",
-    "human_review_behavior": "Keep only the temporary vault copy unless later approved through a separate operator flow."
+    "human_review_behavior": "Keep only the temporary vault copy unless later approved through a separate operator flow.",
+    "enqueue_status": "READY_FOR_REVIEW",
+    "enqueue_owner": "Program review-staging finalize",
+    "guarantee": "Every render whose exact PNG reaches READY review staging is queued to the 30-day private vault before visual decision."
   },
   "staging_transport": {
     "source_path": "/IMAGE-RENDER/output/current.png",
