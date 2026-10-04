@@ -108,6 +108,23 @@ rejection('duplicate relation rejected', (f) => { f.result.relations.push(struct
 rejection('no-facts result cannot smuggle nodes', (f) => { f.result.decision = 'NO_FACTS' }, /WIKI_NONREADY_FACTS_FORBIDDEN/)
 rejection('completion cannot skip unreviewed GM blocks', (f) => { f.result.coverage.reviewed_blocks = [] }, /WIKI_COVERAGE_INCOMPLETE/)
 
+function isolateSampleGraph(graph, sample) {
+  const labels = new Set((sample.nodes ?? [])
+    .filter((node) => node.existing_id === null)
+    .map((node) => node.label))
+  const removedIds = new Set(graph.nodes
+    .filter((record) => labels.has(record.data.label))
+    .map((record) => record.id))
+
+  const { content_sha256: _contentSha, ...body } = structuredClone(graph)
+  body.nodes = body.nodes.filter((record) => !removedIds.has(record.id))
+  body.relations = body.relations.filter((record) =>
+    !removedIds.has(record.data.from) && !removedIds.has(record.data.to))
+  body.story_links = body.story_links.filter((link) => !removedIds.has(link.node_id))
+  body.articles = body.articles.filter((article) => !removedIds.has(article.id))
+  return { ...body, content_sha256: graphHash(body) }
+}
+
 test('real SESSION_006 and SESSION_007 samples compile with unchanged protected files', async () => {
   const samples = JSON.parse(await readFile(new URL('./fixtures/wiki-fact-results-v1.json', import.meta.url)))
   const protectedRefs = ['archive/content/graphs/C03-AFTERFALL/GRAPH.json', 'archive/content/stories/C03-AFTERFALL/BOOK.json',
@@ -118,8 +135,9 @@ test('real SESSION_006 and SESSION_007 samples compile with unchanged protected 
   for (const session of ['SESSION_006', 'SESSION_007']) {
     const source = sources.find((item) => item.sourceSession.session_id === session)
     assert.ok(source)
-    const job = buildWikiFactJob(source, graph)
-    // Replay an assistant-authored extraction, not a runtime fixture-based model.
+    const sampleGraph = isolateSampleGraph(graph, samples[session])
+    const job = buildWikiFactJob(source, sampleGraph)
+    // Replay an assistant-authored extraction against an isolated pre-sample identity context.
     const result = { version: WIKI_RESULT_VERSION, job_id: job.job_id, ...samples[session] }
     const proposal = compileWikiFactProposal(job, result)
     assert.equal(proposal.status, 'FACTS_PROPOSED'); assert.equal(proposal.coverage.status, 'PARTIAL')
