@@ -10,6 +10,12 @@ const OPERATIONAL_TERM = /\b(github|supabase|netlify|workflow|provider|storage|r
 const GENERATION_META_TERM = /(?:AFTERFALL|생존일기|시즌(?:\s*\d+)?|\bchronicle\b(?:\s*\d+)?|\bseason\b(?:\s*\d+)?|\bpost[-\s]?apocalyptic\b|\bapocalypse\b)/i
 const NEGATING_RENDER_CUE = /(?:아니라|아닌|추가하지|사용하지|식별되지|과장하지|제외|금지|넣지|보이지 않|읽을 수 있는[^.;]*없이|\bno\b|\bwithout\b|\bdo not\b|\bnever\b|\bexclude\w*\b|\bforbid\w*\b)/i
 const NEGATING_RENDER_STYLE = /(?:\bnon-photorealistic\b|\bno\b|\bwithout\b|\bdo not\b|\bnever\b)/i
+const SHARED_RENDER_GUIDANCE = [
+  '배경의 글자·간판·표지판·안내문은 장면의 핵심 요소가 되지 않도록 최소화한다',
+  '불필요한 읽을 수 있는 문구, 브랜드명, 지명, 숫자, 광고 문구를 새로 만들어 넣지 않는다',
+  '필요한 생활 표식은 작고 비식별적인 배경 요소로만 표현한다',
+  '사진처럼 과도하게 사실적인 렌더링보다 붓터치와 회화성이 분명하게 느껴지는 painterly illustration을 유지한다',
+].join('. ')
 
 const isRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value)
 const requireRecord = (value) => {
@@ -163,13 +169,12 @@ function compileEventPositiveText(source, brief, art, reviewContextBundle, { req
 
 function compilePositiveText(source, reviewContextBundle, { requireContext = false } = {}) {
   const { brief, art } = validateBriefStructure(source)
-  if (brief.point_type === 'CHARACTER') {
-    return compileCharacterPositiveText(source, brief, art, reviewContextBundle, { requireContext })
-  }
-  if (brief.point_type === 'LOCATION') {
-    return compileLocationPositiveText(source, brief, art, reviewContextBundle, { requireContext })
-  }
-  return compileEventPositiveText(source, brief, art, reviewContextBundle, { requireContext })
+  const sceneText = brief.point_type === 'CHARACTER'
+    ? compileCharacterPositiveText(source, brief, art, reviewContextBundle, { requireContext })
+    : brief.point_type === 'LOCATION'
+      ? compileLocationPositiveText(source, brief, art, reviewContextBundle, { requireContext })
+      : compileEventPositiveText(source, brief, art, reviewContextBundle, { requireContext })
+  return `${sceneText}. ${SHARED_RENDER_GUIDANCE}`
 }
 
 function assertNoOutputContamination(positivePrompt, negativePrompt, checklist) {
