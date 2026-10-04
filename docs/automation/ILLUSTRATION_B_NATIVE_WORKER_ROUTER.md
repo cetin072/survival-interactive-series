@@ -12,6 +12,7 @@ This worker does not render images. PREPARED belongs exclusively to the separate
    - `archive/automation/illustration-native-worker-runtime-contract.json`
    - `archive/automation/illustration-review-provider.json`
    and perform exactly the one role bound to that status.
-5. All other statuses are NOOP.
+5. For `INGESTING`, the AI worker may make the semantic/visual decision and write only the dedicated GitHub review handoff JSON. It must not directly mutate the review decision in Supabase.
+6. All other statuses are NOOP.
 
-Invariant: **Clean Renderer owns PREPARED. Native Worker owns review/transfer only.**
+Invariant: **Clean Renderer owns PREPARED. Native Worker owns review/transfer only. Program owns durable review-decision mutation.**

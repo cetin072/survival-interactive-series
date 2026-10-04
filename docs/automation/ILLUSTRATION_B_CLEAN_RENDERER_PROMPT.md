@@ -11,11 +11,15 @@ Target:
 Execution:
 1. Read `public.archive_illustration_render_job_current()` once.
 2. If there is no current job or status is not `PREPARED`, stop with no mutation.
-3. If `/IMAGE-RENDER/output/current.png` already exists, stop and do not overwrite it.
+3. Check `/IMAGE-RENDER/output/current.png` metadata before generation.
+   - If no file exists, continue normally.
+   - If a file exists and its `modified_at` is earlier than the current job `created_at`, it is residue from a prior terminal job. Replace that stale file and continue.
+   - If a file exists and its `modified_at` is equal to or later than the current job `created_at`, do not generate again. Read it back, require bytes > 0, then continue directly to provider-complete for this same current job.
+   - Never replace a file while the current DB job is not `PREPARED`.
 4. Acquire a fresh lease with `archive_illustration_render_job_lease_acquire(job_id,'archive-illustration-clean-renderer',1800)`.
 5. Read `public.archive_illustration_render_prompt()` exact UTF-8 TEXT.
 6. Compute SHA-256 and require exact equality with job.prompt_sha256.
-7. Immediately call native ChatGPT image generation for exactly one image.
+7. If step 3 did not identify a same-job already-generated PNG, immediately call native ChatGPT image generation for exactly one image.
    - Scene input = exact DB prompt TEXT only.
    - Do not prepend or append titles, project names, worldline names, status text, review instructions, explanations, or operational context.
    - Do not add a separate negative prompt.
