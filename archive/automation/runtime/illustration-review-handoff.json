@@ -1,17 +1,17 @@
 {
   "version": "illustration-review-handoff-v1",
-  "job_id": "illustration-loc-shelter-fb0ceda87b9c-20261005-37211709040",
-  "main_sha": "5ec6670e047e581acdce0dbcdc6b6ec87364c09a",
-  "point_id": "point-e444bb71ce1d10ea4c96ac2bce52ef05e55da0b3750d434e7197e4c6b0ad6eea",
-  "generation_key": "generation-fb0ceda87b9cd070f7e11e4c47109e0bd81a405390d1d05edadb02a4ec2c857c",
-  "subject_id": "loc-shelter",
-  "prompt_sha256": "fb446da0c53d367a0d289d6094c0892e97051fe81c834fdc91154859b90daf3d",
-  "review_context_sha256": "18621277a827affac5f36c0550f73022f2237587bc6d0a65995c9cfae694f3e8",
+  "job_id": "illustration-loc-bridge-f239f8dff6cf-20261005-37220296124",
+  "main_sha": "a2604ebe8044ce1e6522de1367419e44c8e3e1a2",
+  "point_id": "point-f4c5c0d4defbfe8cd408bda73f99b9b3b3a855117711eee20cf7368aa069c35e",
+  "generation_key": "generation-f239f8dff6cf07b4dfff76a43a81d0cffa29ee892dcb363af5a15a7195d5e174",
+  "subject_id": "loc-bridge",
+  "prompt_sha256": "48b6f537e9e307db4e56326f5e821ee47a2bcbdf722fd6c156d14c37393d3255",
+  "review_context_sha256": "36bd67489baab8013457898d49f40721485e05d62ee52e5bbaed1c70028298a1",
   "source_library_path": "/IMAGE-RENDER/output/current.png",
-  "source_library_file_id": "file_000000006ce082099a2c758aefd0c70d",
+  "source_library_file_id": "file_00000000fca88209991777867e012e5b",
   "decision": "PASS",
   "review_provider": "native_chatgpt_vision",
-  "review_summary": "Matches the bound residents-welfare-facility scene: contemporary Korean public interior, lived-in communal supplies and utilities, cool blue-gray painterly rendering, realistic scale, and no material invented identity or narrative.",
+  "review_summary": "Matches the bound bridge scene: a contemporary Korean small road bridge over water with a natural traffic bottleneck, ordinary maintenance traces, open sightlines, cool blue-gray painterly rendering, and minimal non-identifying signage.",
   "rejection_codes": [],
-  "created_at": "2026-10-04T15:30:10.173Z"
+  "created_at": "2026-10-04T17:33:49.022Z"
 }
