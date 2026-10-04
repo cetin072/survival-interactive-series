@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { cp, mkdir, mkdtemp, readFile, readdir, rm, unlink, writeFile } from 'node:fs/promises'
 import { resolve, dirname } from 'node:path'
 import { tmpdir } from 'node:os'
-import { graphHash } from './publication-graph.mjs'
+import { byteHash, graphHash, reconcileReaderOnlyGraph } from './publication-graph.mjs'
 import {
   discoverWikiSource, expectedWikiFactPath, expectedWikiReceiptPath,
 } from './wiki-semantic-jobs.mjs'
@@ -18,6 +18,57 @@ const transcriptRoot = 'archive/content/transcripts/C03-AFTERFALL/S03'
 const factsRoot = 'archive/content/public-facts/C03-AFTERFALL/S03'
 const graphRef = 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'
 const bookRef = 'archive/content/stories/C03-AFTERFALL/BOOK.json'
+
+function aWikiSessionFromEvidence(evidence) {
+  const match = evidence?.source_ref?.match(/\/AWIKI_SESSION_(\d{3})_[a-f0-9]{64}\.json$/)
+  return match ? Number(match[1]) : null
+}
+
+function rollbackRecordBeforeSession(record, cutoffSession = 6) {
+  let current = structuredClone(record)
+  while ((aWikiSessionFromEvidence(current.evidence) ?? -1) >= cutoffSession) {
+    if (!current.history.length) return null
+    const previous = current.history.at(-1)
+    current = {
+      id: current.id,
+      data: structuredClone(previous.data),
+      anchor: structuredClone(previous.anchor),
+      evidence: structuredClone(previous.evidence),
+      history: current.history.slice(0, -1),
+    }
+  }
+  return current
+}
+
+async function writePreSessionGraph(root, cutoffSession = 6) {
+  const graph = JSON.parse(await readFile(resolve(repoRoot, graphRef), 'utf8'))
+  const keptNodes = graph.nodes
+    .map((record) => rollbackRecordBeforeSession(record, cutoffSession))
+    .filter(Boolean)
+  const keptNodeIds = new Set(keptNodes.map((record) => record.id))
+  const keptRelations = graph.relations
+    .map((record) => rollbackRecordBeforeSession(record, cutoffSession))
+    .filter((record) => record && keptNodeIds.has(record.data.from) && keptNodeIds.has(record.data.to))
+
+  const { content_sha256: _ignored, ...body } = structuredClone(graph)
+  body.nodes = keptNodes
+  body.relations = keptRelations
+  body.story_links = []
+  body.articles = []
+  const rolled = { ...body, content_sha256: graphHash(body) }
+
+  const bookBytes = await readFile(resolve(repoRoot, bookRef))
+  const book = JSON.parse(bookBytes.toString('utf8'))
+  const rebuilt = reconcileReaderOnlyGraph({
+    previous: rolled,
+    book,
+    bookSource: { source_ref: bookRef, source_sha256: byteHash(bookBytes) },
+    boundary: rolled.anchor,
+  }).graph
+
+  await writeFile(resolve(root, graphRef), JSON.stringify(rebuilt, null, 2) + '\n')
+  await writeFile(resolve(root, bookRef), bookBytes)
+}
 
 async function makeRoot(sessionIds = ['SESSION_005', 'SESSION_006', 'SESSION_007']) {
   const root = await mkdtemp(resolve(tmpdir(), 'a-wiki-finalizer-'))
@@ -37,8 +88,7 @@ async function makeRoot(sessionIds = ['SESSION_005', 'SESSION_006', 'SESSION_007
 
   await mkdir(dirname(resolve(root, graphRef)), { recursive: true })
   await mkdir(dirname(resolve(root, bookRef)), { recursive: true })
-  await cp(resolve(repoRoot, graphRef), resolve(root, graphRef))
-  await cp(resolve(repoRoot, bookRef), resolve(root, bookRef))
+  await writePreSessionGraph(root, 6)
   return root
 }
 
