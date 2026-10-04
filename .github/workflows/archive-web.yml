@@ -13,6 +13,7 @@ on:
       - '.github/workflows/archive-site-derivative.yml'
       - '.github/workflows/archive-illustration-finalizer.yml'
       - '.github/workflows/archive-illustration-prep.yml'
+      - '.github/workflows/archive-illustration-review-handoff.yml'
   push:
     branches:
       - main
@@ -50,6 +51,7 @@ jobs:
           node --test ../scripts/lib/illustration-generation-provider.test.mjs
           node --test ../scripts/lib/illustration-run-receipt.test.mjs
           node --test ../scripts/lib/illustration-worker.test.mjs
+          node --test ../scripts/lib/illustration-review-handoff.test.mjs
       - name: Test original image storage provider boundary
         run: |
           python3 ../scripts/test_original_storage_provider.py
@@ -62,6 +64,7 @@ jobs:
           python3 ../scripts/test_finalize_illustration_job.py
           node --check ../scripts/run-production-release.mjs
           node --check ../scripts/prepare-illustration-render-job.mjs
+          node --check ../scripts/apply-illustration-review-handoff.mjs
           python3 -m py_compile ../scripts/original_storage_provider.py ../scripts/illustration_storage_handoff.py ../scripts/draft_release_illustration_handoff.py ../scripts/staged_illustration_handoff.py ../scripts/resolve_illustration_handoff_request.py ../scripts/execute_trusted_illustration_handoff.py ../scripts/prepare_site_derivative.py ../scripts/finalize-illustration-job.py
       - name: Verify deterministic S02 dry-run (no external services)
         run: |
