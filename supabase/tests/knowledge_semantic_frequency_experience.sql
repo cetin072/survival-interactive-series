@@ -13,9 +13,9 @@ begin
   end if;
 
   prepared := public.archive_knowledge_semantic_job_prepare(
-    'FRESH_BRIEF','EXPERIENCE_SEED',
+    'FRESH_BRIEF','USER_REPORTED_EXPERIENCE',
     'knowledge/content/experience-seeds/EX-001-apartment-power-outage.json',
-    repeat('a',64),'EXPERIENCE_SEED:EX-001','c3-test-v1',repeat('b',64),
+    repeat('a',64),'USER_REPORTED_EXPERIENCE:EX-001','c3-test-v1',repeat('b',64),
     '{"synthetic":true}'::jsonb,repeat('1',40),
     '{"source":{"kind":"EXPERIENCE_SEED"},"target":{"brief_id":"K-999","candidate_id":"KC-synthetic"}}'::jsonb,
     'BLOCKED','SYNTHETIC_TEST'

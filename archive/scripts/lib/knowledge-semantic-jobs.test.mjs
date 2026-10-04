@@ -68,9 +68,9 @@ test('EX-001 is a deterministic Seed candidate and a handled identity is not sel
   const base = resolve(import.meta.dirname, '../../..')
   const choice = await selectExperienceSeed({ base })
   assert.equal(choice.seedId, 'EX-001')
-  assert.equal(choice.sourceKind, 'EXPERIENCE_SEED')
+  assert.equal(choice.sourceKind, 'USER_REPORTED_EXPERIENCE')
   assert.equal(choice.sourceSha256.length, 64)
-  assert.equal(await selectExperienceSeed({ base, handledJobs: [{ source_kind: 'EXPERIENCE_SEED', source_ref: choice.sourceRef, status: 'HOLD' }] }), null)
+  assert.equal(await selectExperienceSeed({ base, handledJobs: [{ source_kind: 'USER_REPORTED_EXPERIENCE', source_ref: choice.sourceRef, status: 'HOLD' }] }), null)
 })
 
 test('legacy branch guard ignores squash-integrated content but blocks a genuinely unmerged package', async () => {
@@ -171,14 +171,14 @@ test('result contract binds BRIEF_READY and HUMAN_REVIEW packages to one job and
 test('EX-001 requires a full ELECTRICAL HUMAN_REVIEW package and experience is provenance only', () => {
   const ref = 'knowledge/content/experience-seeds/EX-001-apartment-power-outage.json'
   const seedJob = {
-    ...baseJob, source_kind: 'EXPERIENCE_SEED', source_ref: ref,
-    semantic_context: { ...baseJob.semantic_context, source: { kind: 'EXPERIENCE_SEED', ref, sha256: sourceSha, refs: [], hashes: [] } },
+    ...baseJob, source_kind: 'USER_REPORTED_EXPERIENCE', source_ref: ref,
+    semantic_context: { ...baseJob.semantic_context, source: { kind: 'USER_REPORTED_EXPERIENCE', ref, sha256: sourceSha, refs: [], hashes: [] } },
   }
   const original = packageResult('HUMAN_REVIEW')
   const result = {
     ...original,
-    candidate: { ...original.candidate, source_kind: 'EXPERIENCE_SEED', experience_seed_ref: ref, experience_seed_sha256: sourceSha },
-    evidence: { ...original.evidence, story_source_status: 'EXPERIENCE_PROVENANCE_ONLY' },
+    candidate: { ...original.candidate, source_kind: 'USER_REPORTED_EXPERIENCE', source_ref: ref, source_sha256: sourceSha },
+    evidence: { ...original.evidence, story_source_status: 'USER_REPORTED_EXPERIENCE', experience_provenance: { source_ref: ref, source_sha256: sourceSha } },
     brief: { ...original.brief, risk_domains: ['ELECTRICAL'] },
   }
   assert.equal(validateSemanticResult(seedJob, result).decision, 'HUMAN_REVIEW')

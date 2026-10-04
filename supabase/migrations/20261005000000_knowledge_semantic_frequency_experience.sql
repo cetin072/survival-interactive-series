@@ -1,9 +1,8 @@
--- Extend the existing C3 job identity and reuse its dispatcher schedules.
-alter table survival_ops.knowledge_semantic_jobs
-  drop constraint if exists knowledge_semantic_jobs_source_kind_check;
-alter table survival_ops.knowledge_semantic_jobs
-  add constraint knowledge_semantic_jobs_source_kind_check
-  check (source_kind in ('PUBLIC_ARCHIVE','PUBLIC_READER','EXPERIENCE_SEED'));
+-- Extend the merged EX-001 source contract for deterministic seed selection and four daily runs.
+-- EX-001 only: admit an explicitly prepared user experience as question provenance.
+-- Existing scheduled C-PREP selection and public source kinds are unchanged.
+alter table survival_ops.knowledge_semantic_jobs drop constraint if exists knowledge_semantic_jobs_source_kind_check;
+alter table survival_ops.knowledge_semantic_jobs add constraint knowledge_semantic_jobs_source_kind_check check (source_kind in ('PUBLIC_ARCHIVE','PUBLIC_READER','USER_REPORTED_EXPERIENCE'));
 
 create or replace function public.archive_knowledge_semantic_job_prepare(
   p_job_type text,
@@ -29,7 +28,8 @@ declare
   active_job survival_ops.knowledge_semantic_jobs%rowtype;
 begin
   if p_job_type is null or p_job_type not in ('FRESH_BRIEF','BACKFILL_BRIEF')
-     or p_source_kind is null or p_source_kind not in ('PUBLIC_ARCHIVE','PUBLIC_READER','EXPERIENCE_SEED')
+     or p_source_kind is null or p_source_kind not in ('PUBLIC_ARCHIVE','PUBLIC_READER','USER_REPORTED_EXPERIENCE')
+     or (p_source_kind = 'USER_REPORTED_EXPERIENCE' and (p_job_type <> 'FRESH_BRIEF' or p_source_ref !~ '^knowledge/content/experience-seeds/EX-[0-9]{3,}-[a-z0-9-]+[.]json$'))
      or p_source_ref is null or p_work_key is null or p_policy_version is null
      or p_policy_sha256 is null or p_source_sha256 is null or p_main_sha is null
      or p_source_sha256 !~ '^[a-f0-9]{64}$'
@@ -41,7 +41,7 @@ begin
     raise exception 'KNOWLEDGE_SEMANTIC_PREPARE_INVALID';
   end if;
 
-  -- Four scheduled windows per Korea operational day. Manual/fallback dispatches share this cap.
+  -- Four prepared packages at most per Korea operational day.
   if p_initial_status = 'PREPARED' and (
     select count(*) from survival_ops.knowledge_semantic_jobs
     where status <> 'BLOCKED'
@@ -224,20 +224,19 @@ begin
           'status','REJECTED','reason','PACKAGE_SOURCE_BINDING_INVALID'
         );
       end if;
-    elsif target.source_kind = 'EXPERIENCE_SEED' then
-      if candidate->>'experience_seed_ref' is distinct from target.source_ref
-         or candidate->>'experience_seed_sha256' is distinct from target.source_sha256
-         or evidence->>'story_source_status' is distinct from 'EXPERIENCE_PROVENANCE_ONLY' then
+    elsif target.source_kind = 'USER_REPORTED_EXPERIENCE' then
+      if target.source_ref !~ '^knowledge/content/experience-seeds/EX-[0-9]{3,}-[a-z0-9-]+[.]json$'
+         or candidate->>'source_ref' is distinct from target.source_ref
+         or candidate->>'source_sha256' is distinct from target.source_sha256
+         or decision <> 'HUMAN_REVIEW'
+         or evidence->>'story_source_status' is distinct from 'USER_REPORTED_EXPERIENCE'
+         or evidence->'experience_provenance'->>'source_ref' is distinct from target.source_ref
+         or evidence->'experience_provenance'->>'source_sha256' is distinct from target.source_sha256
+         or (target.source_ref = 'knowledge/content/experience-seeds/EX-001-apartment-power-outage.json'
+           and (brief->>'risk_level' is distinct from 'HIGH'
+             or coalesce(brief->'risk_domains' ? 'ELECTRICAL', false) is not true)) then
         return pg_catalog.jsonb_build_object(
-          'status','REJECTED','reason','PACKAGE_SOURCE_BINDING_INVALID'
-        );
-      end if;
-      if target.source_ref like '%/EX-001-apartment-power-outage.json'
-         and (decision is distinct from 'HUMAN_REVIEW'
-           or brief->>'risk_level' is distinct from 'HIGH'
-           or coalesce(brief->'risk_domains' ? 'ELECTRICAL', false) is not true) then
-        return pg_catalog.jsonb_build_object(
-          'status','REJECTED','reason','EX001_RISK_DOWNGRADE_FORBIDDEN'
+          'status','REJECTED','reason','PACKAGE_EXPERIENCE_SOURCE_INVALID'
         );
       end if;
     end if;
@@ -284,14 +283,11 @@ begin
   );
 end;
 $function$;
-revoke all on function public.archive_knowledge_semantic_job_prepare(text,text,text,text,text,text,text,jsonb,text,jsonb,text,text)
-  from public, anon, authenticated;
-grant execute on function public.archive_knowledge_semantic_job_prepare(text,text,text,text,text,text,text,jsonb,text,jsonb,text,text)
-  to service_role;
-revoke all on function public.archive_knowledge_semantic_job_submit(uuid,text,text,jsonb)
-  from public, anon, authenticated;
-grant execute on function public.archive_knowledge_semantic_job_submit(uuid,text,text,jsonb)
-  to service_role;
+
+revoke all on function public.archive_knowledge_semantic_job_prepare(text,text,text,text,text,text,text,jsonb,text,jsonb,text,text) from public,anon,authenticated;
+grant execute on function public.archive_knowledge_semantic_job_prepare(text,text,text,text,text,text,text,jsonb,text,jsonb,text,text) to service_role;
+revoke all on function public.archive_knowledge_semantic_job_submit(uuid,text,text,jsonb) from public,anon,authenticated;
+grant execute on function public.archive_knowledge_semantic_job_submit(uuid,text,text,jsonb) to service_role;
 
 -- Keep the same named C-PREP jobs and finalizer. pg_cron updates a named schedule in place.
 select cron.schedule('afterfall-knowledge-semantic-prep-am', '45 20,2 * * *',

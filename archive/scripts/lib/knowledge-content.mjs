@@ -146,10 +146,10 @@ export async function validateKnowledge(data) {
     fail(nonempty(candidate.question) && topicIds.has(candidate.topic_id), `${candidate.id} question/topic`)
     if (candidate.source_kind === 'PUBLIC_READER') await verifiedReaderReference(candidate, base, candidate.id)
     else if (candidate.source_kind === 'USER_REPORTED_EXPERIENCE') {
-      fail(candidate.source_ref === 'knowledge/content/experience-seeds/EX-001-apartment-power-outage.json' && /^[a-f0-9]{64}$/.test(candidate.source_sha256), candidate.id + ' experience identity')
+      fail(/^knowledge\/content\/experience-seeds\/EX-[0-9]{3,}-[a-z0-9-]+\.json$/.test(candidate.source_ref) && /^[a-f0-9]{64}$/.test(candidate.source_sha256), candidate.id + ' experience identity')
       const seedBytes = await readFile(join(base, candidate.source_ref))
       const seed = JSON.parse(seedBytes.toString('utf8'))
-      fail(seed.id === 'EX-001' && seed.source_kind === 'USER_REPORTED_EXPERIENCE' && seed.status === 'RESEARCH_REQUIRED' && createHash('sha256').update(Buffer.from(seedBytes.toString('utf8').replace(/\r\n/g, '\n'), 'utf8')).digest('hex') === candidate.source_sha256, candidate.id + ' experience changed')
+      fail(candidate.source_ref.split('/').at(-1).startsWith(seed.id + '-') && seed.source_kind === 'USER_REPORTED_EXPERIENCE' && seed.status === 'RESEARCH_REQUIRED' && createHash('sha256').update(Buffer.from(seedBytes.toString('utf8').replace(/\r\n/g, '\n'), 'utf8')).digest('hex') === candidate.source_sha256, candidate.id + ' experience changed')
       const pack = evidence.get(candidate.brief_id)
       fail(pack?.story_source_status === 'USER_REPORTED_EXPERIENCE' && pack.experience_provenance?.source_ref === candidate.source_ref && pack.experience_provenance?.source_sha256 === candidate.source_sha256, candidate.id + ' experience provenance')
     } else fail(/^archive\/content\/transcripts\/C03-AFTERFALL\/S\d{2,3}\/SESSION_\d{3}\/SOURCE_MANIFEST\.json$/.test(candidate.source_manifest_ref) && /^[a-f0-9]{64}$/.test(candidate.source_manifest_sha256), `${candidate.id} public source identity`)

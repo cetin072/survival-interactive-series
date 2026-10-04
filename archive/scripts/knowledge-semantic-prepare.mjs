@@ -131,7 +131,7 @@ async function publicReaderBackfillChoice(data, runtimeState) {
 
 export async function selectExperienceSeed({ base = root, handledJobs = [] } = {}) {
   const dir = join(base, 'knowledge/content/experience-seeds')
-  const handledRefs = new Set(handledJobs.filter((job) => job.source_kind === 'EXPERIENCE_SEED').map((job) => job.source_ref))
+  const handledRefs = new Set(handledJobs.filter((job) => job.source_kind === 'USER_REPORTED_EXPERIENCE').map((job) => job.source_ref))
   const choices = []
   for (const name of (await readdir(dir)).filter((item) => item.endsWith('.json')).sort()) {
     const sourceRef = 'knowledge/content/experience-seeds/' + name
@@ -139,15 +139,17 @@ export async function selectExperienceSeed({ base = root, handledJobs = [] } = {
     const bytes = await readFile(join(base, sourceRef))
     const seed = JSON.parse(bytes.toString('utf8'))
     if (seed.version !== 'knowledge-experience-seed-v1' || !/^EX-[0-9]{3,}$/.test(seed.id) || !name.startsWith(seed.id + '-')
+      || seed.source_kind !== 'USER_REPORTED_EXPERIENCE' || !seed.question?.primary || !Array.isArray(seed.experience?.sequence)
       || !/^\d{4}-\d{2}-\d{2}$/.test(seed.recorded_at_kst ?? '')) throw new Error('EXPERIENCE_SEED_INVALID')
     if (seed.status !== 'RESEARCH_REQUIRED') continue
-    const sourceSha256 = sha(bytes)
-    const workKey = makeWorkKey({ sourceKind: 'EXPERIENCE_SEED', sourceRef, sourceSha256 })
+    const sourceSha256 = sha(Buffer.from(bytes.toString('utf8').replace(/\r\n/g, '\n'), 'utf8'))
+    const workKey = makeWorkKey({ sourceKind: 'USER_REPORTED_EXPERIENCE', sourceRef, sourceSha256 })
     choices.push({
-      jobType: 'FRESH_BRIEF', sourceKind: 'EXPERIENCE_SEED', sourceRef, sourceSha256, workKey,
+      jobType: 'FRESH_BRIEF', sourceKind: 'USER_REPORTED_EXPERIENCE', sourceRef, sourceSha256, workKey,
       refs: [], hashes: [], excerpt: JSON.stringify({
-        id: seed.id, title: seed.title, experience: seed.experience, question: seed.question,
-        knowledge_to_verify: seed.knowledge_to_verify, practical_action_target: seed.practical_action_target,
+        id: seed.id, experience: { sequence: seed.experience.sequence, decision_shift: seed.experience.decision_shift, reported_cause: seed.experience.reported_cause }, question: seed.question,
+        knowledge_to_verify: seed.knowledge_to_verify,
+        provenance_rule: 'Experience is question provenance only; external official sources support reality claims.',
       }),
       recordedAt: seed.recorded_at_kst, seedId: seed.id,
     })

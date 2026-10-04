@@ -105,7 +105,7 @@ function candidateFor(brief, candidates) {
 async function sourceIsCurrent(candidate, base) {
   if (candidate.source_kind === 'PUBLIC_READER') return { current: true }
   if (candidate.source_kind === 'USER_REPORTED_EXPERIENCE') {
-    if (candidate.source_ref !== 'knowledge/content/experience-seeds/EX-001-apartment-power-outage.json' || !/^[a-f0-9]{64}$/.test(candidate.source_sha256 ?? '')) return { current: false, reason: 'SOURCE_PATH_INVALID' }
+    if (!/^knowledge\/content\/experience-seeds\/EX-[0-9]{3,}-[a-z0-9-]+\.json$/.test(candidate.source_ref) || !/^[a-f0-9]{64}$/.test(candidate.source_sha256 ?? '')) return { current: false, reason: 'SOURCE_PATH_INVALID' }
     const bytes = await readFile(resolve(base, candidate.source_ref))
     return createHash('sha256').update(Buffer.from(bytes.toString('utf8').replace(/\r\n/g, '\n'), 'utf8')).digest('hex') === candidate.source_sha256 ? { current: true } : { current: false, reason: 'SOURCE_CHANGED' }
   }
