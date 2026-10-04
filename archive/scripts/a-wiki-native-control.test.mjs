@@ -75,7 +75,7 @@ test('submitted HUMAN_REVIEW never reaches publication', async () => {
   assert.equal(disposition.action, 'HUMAN_REVIEW')
 })
 
-test('review package cannot be rebound to another proposal', async () => {
+test('review package rejects a mutated proposal', async () => {
   const { job, result } = await session006Package()
   const compiled = compileSubmittedExtractor({
     status: 'EXTRACTOR_SUBMITTED',
@@ -84,6 +84,5 @@ test('review package cannot be rebound to another proposal', async () => {
   })
   const alteredProposal = structuredClone(compiled.proposal)
   alteredProposal.note += ' changed'
-  const alteredReviewJob = buildWikiFactReviewJob(job, alteredProposal)
-  assert.notEqual(alteredReviewJob.review_job_id, compiled.reviewJob.review_job_id)
+  assert.throws(() => buildWikiFactReviewJob(job, alteredProposal), /WIKI_REVIEW_PROPOSAL_HASH_INVALID/)
 })
