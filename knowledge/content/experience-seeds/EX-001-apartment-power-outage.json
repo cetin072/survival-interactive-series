@@ -1,0 +1,81 @@
+{
+  "version": "knowledge-experience-seed-v1",
+  "id": "EX-001",
+  "status": "RESEARCH_REQUIRED",
+  "recorded_at_kst": "2026-10-04",
+  "event_date_kst": "2026-10-03",
+  "title": "전등이 갑자기 꺼졌을 때 우리 집 문제인지 아파트 전체 정전인지 어떻게 구분할까?",
+  "source_kind": "USER_REPORTED_EXPERIENCE",
+  "privacy": "PUBLIC_SAFE_SUMMARY",
+  "experience": {
+    "setting": "대한민국 공동주택 단지. 정확한 주소·동·호수는 저장하지 않음.",
+    "sequence": [
+      "집 안 전등이 갑자기 켜지지 않아 처음에는 우리 집 내부 전기 문제라고 생각했다.",
+      "분전반(두꺼비집)을 확인하며 집 안 문제를 찾는 데 시간을 썼다.",
+      "화장실 변기 물이 한 번 정상적으로 내려가 수도에는 문제가 없다고 생각했다.",
+      "가족이 '우리 집만의 문제가 아닐 수 있으니 엘리베이터도 확인해봐'라고 제안했다.",
+      "엘리베이터도 작동하지 않는 것을 확인하면서 집 하나가 아니라 공용부 또는 단지 전체 문제일 가능성을 인식했다.",
+      "이후 단지 전체의 전기와 수도 사용에 문제가 생긴 상황임을 확인했다."
+    ],
+    "reported_cause": {
+      "status": "CONFIRMED_BY_MANAGEMENT_OFFICE_PUBLIC_ANNOUNCEMENT",
+      "confirmation_channel": "아파트 관리사무소 공개방송",
+      "confirmation_timing": "복구 완료 후",
+      "text": "아파트 관리사무소가 복구 완료 후 공개방송으로 이번 정전의 원인이 새였다고 안내했다.",
+      "limitation": "방송에서 새가 원인이라고 확인되었지만, 사진만으로 접촉 지점이나 구체적인 전기적 고장 메커니즘까지 확정하지 않는다."
+    },
+    "decision_shift": "집 내부 원인 탐색에서 공용부·단지 전체의 장애 범위 확인으로 판단이 전환됐다."
+  },
+  "question": {
+    "primary": "전등이 갑자기 꺼졌을 때 우리 집 문제인지 아파트 전체 정전인지 어떻게 빠르게 구분할까?",
+    "core_principle_candidate": "고장 원인을 맞히기 전에 장애 범위를 먼저 확인한다."
+  },
+  "knowledge_to_verify": [
+    {
+      "topic": "변기 잔수와 급수 상태",
+      "question": "변기 물이 한 번 내려가는 현상이 현재 수도 공급 정상 여부를 판단하는 근거가 될 수 있는가?"
+    },
+    {
+      "topic": "공동주택 정전과 급수",
+      "question": "공동주택의 급수 방식·가압펌프·비상전원 구성에 따라 정전이 수도 사용에 어떤 영향을 줄 수 있는가?"
+    },
+    {
+      "topic": "정전 범위 확인",
+      "question": "세대 내부 정전과 건물·단지 정전을 구분할 때 안전하게 확인할 수 있는 공용부 신호와 공식 확인 경로는 무엇인가?"
+    },
+    {
+      "topic": "엘리베이터",
+      "question": "정전 의심 시 엘리베이터를 범위 확인 신호로 보되 실제 이용을 피해야 하는 안전 기준은 무엇인가?"
+    },
+    {
+      "topic": "복구 전후 행동",
+      "question": "공동주택 정전이 확인됐을 때 전기·수도·통신·냉장·출입설비 등에서 우선 확인할 실전 행동은 무엇인가?"
+    }
+  ],
+  "practical_action_target": {
+    "guide_type": "EXPERIENCE_PLUS_VERIFIED_GUIDE",
+    "intended_flow": [
+      "위험 신호 확인",
+      "한 기기·한 방·세대 전체 여부 확인",
+      "세대 분전반 확인",
+      "복도·공동현관·엘리베이터 등 공용부 확인",
+      "수도는 변기 한 번이 아니라 실제 급수 상태로 재확인",
+      "관리사무소·전력 공급기관의 공식 안내 확인",
+      "장기화 시 생활 인프라와 비상 준비 확인"
+    ],
+    "final_article_rule": "경험은 도입 사례로 보존하고, 각 실전 지식은 별도 Evidence로 검증된 내용만 확정한다."
+  },
+  "related_ip_note": {
+    "status": "EDITORIAL_CONTEXT_ONLY",
+    "text": "《생존일기》 초반부에서 작은 생활 이상을 집→건물→지역 단위로 재평가하는 상황과 연결해 볼 수 있으나, 작품 서사는 현실 근거로 사용하지 않는다."
+  },
+  "repair_evidence": {
+    "status": "PRIVATE_SOURCE_ASSET_STORED",
+    "captured_after_event": true,
+    "asset_location": "Personal Library /Survival-Diary/Knowledge-Experience/EX-001/repair-site-original.jpg",
+    "public_exposure": "PRIVATE_ONLY_UNTIL_REDACTED_DERIVATIVE",
+    "visual_observation": "사진에는 한국전력 표식이 있는 고소작업차와 작업자가 전주·배전 설비 주변에서 현장 작업을 하는 모습이 보인다.",
+    "evidentiary_scope": "이 사진은 전력 설비 현장 복구 작업이 이루어진 정황을 보강한다. 사진만으로 정전의 정확한 원인이나 새 접촉 여부까지 확정하지 않는다.",
+    "publication_rule": "공개 글에 사용할 경우 위치 식별 가능 요소와 주변 표식을 검토한 뒤 공개용 파생본을 별도로 만든다."
+  }
+}
