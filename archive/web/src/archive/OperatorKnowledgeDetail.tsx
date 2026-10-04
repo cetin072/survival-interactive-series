@@ -41,6 +41,7 @@ export function OperatorKnowledgeDetail({
   const [draftEditable, setDraftEditable] = useState(false)
   const [editing, setEditing] = useState(false)
   const [draftDirty, setDraftDirty] = useState(false)
+  const [savingDraft, setSavingDraft] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -92,7 +93,7 @@ export function OperatorKnowledgeDetail({
 
   const saveDraft = useCallback(async () => {
     if (!supabaseClient || !selected || !draftBrief || !draftEditable) return
-    setBusy(true); setError('')
+    setBusy(true); setSavingDraft(true); setError('')
     const { data, error: saveError } = await supabaseClient.rpc('archive_operator_knowledge_draft_save', {
       p_job_id: selected.job_id,
       p_expected_revision: draftRevision,
@@ -109,7 +110,7 @@ export function OperatorKnowledgeDetail({
       setDraftDirty(false)
       setEditing(false)
     }
-    setBusy(false)
+    setSavingDraft(false); setBusy(false)
   }, [draftBrief, draftEditable, draftRevision, selected])
 
   const uploadDraftImage = useCallback(async (file: File) => {
@@ -175,7 +176,7 @@ export function OperatorKnowledgeDetail({
           </div>
           {draftEditable && <div>
             <button className="operator-secondary" disabled={busy} onClick={() => setEditing((value) => !value)}>{editing ? '미리보기' : '편집'}</button>
-            <button disabled={busy || !draftDirty} onClick={() => void saveDraft()}>초안 저장</button>
+            <button type="button" disabled={busy || (!draftDirty && draftRevision > 0)} onClick={() => void saveDraft()}>{savingDraft ? '저장 중…' : '초안 저장'}</button>
           </div>}
         </div>
 
@@ -196,7 +197,7 @@ export function OperatorKnowledgeDetail({
             <button className="operator-danger" disabled={busy} onClick={() => void decideReview('REJECTED')}>거절</button>
           </div>
           <p className="operator-muted">공개 승인은 저장된 정확한 편집본 revision에 묶입니다. 이후 기존 C3가 계약 검증·PR·CI·exact-head 병합을 수행하고 Production은 기존 배치 정책을 따릅니다.</p>
-          {draftRevision < 1 && <p className="operator-muted">한 번 이상 초안을 저장해야 공개 승인할 수 있습니다.</p>}
+          {draftRevision < 1 && <p className="operator-muted">한 번 이상 초안을 저장해야 공개 승인할 수 있습니다. 수정 없이 검토를 마쳤다면 원문을 그대로 초안 저장할 수 있습니다.</p>}
           {draftDirty && <p className="operator-muted">저장되지 않은 수정이 있습니다. 먼저 초안 저장을 눌러주세요.</p>}
         </div>}
       </>}
