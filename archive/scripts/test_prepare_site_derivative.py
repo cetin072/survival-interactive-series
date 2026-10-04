@@ -2,6 +2,7 @@
 import hashlib
 import io
 import json
+import random
 import sys
 import unittest
 from pathlib import Path
@@ -16,6 +17,41 @@ import prepare_site_derivative as site
 def png_bytes(width=20, height=10):
     output = io.BytesIO()
     Image.new("RGB", (width, height), (30, 50, 70)).save(output, format="PNG")
+    return output.getvalue()
+
+
+def deterministic_overflow_png():
+    rng = random.Random(88)
+    pixels = []
+    for y in range(512):
+        for x in range(512):
+            base = (x * 3 + y * 5) % 256
+            noise = rng.randrange(-4, 5)
+            pixels.append(tuple(max(0, min(255, base + offset + noise))
+                                for offset in (0, 40, 80)))
+    image = Image.new("RGB", (512, 512))
+    image.putdata(pixels)
+    output = io.BytesIO()
+    image.save(output, format="PNG")
+    return output.getvalue()
+
+
+def deterministic_256_color_png():
+    image = Image.new("RGB", (512, 512))
+    image.putdata([((x % 16) * 17, (y % 16) * 17, ((x + y) % 16) * 17)
+                   for y in range(512) for x in range(512)])
+    output = io.BytesIO()
+    image.save(output, format="PNG")
+    return output.getvalue()
+
+
+def deterministic_uncompressible_png():
+    rng = random.Random(0)
+    image = Image.new("RGB", (512, 512))
+    image.putdata([(rng.randrange(256), rng.randrange(256), rng.randrange(256))
+                   for _ in range(512 * 512)])
+    output = io.BytesIO()
+    image.save(output, format="PNG")
     return output.getvalue()
 
 
@@ -36,6 +72,29 @@ class SiteDerivativeTests(unittest.TestCase):
             f"AFTERFALL/{self.record['point_id']}/"
             f"{self.record['generation_key']}/{self.record['source_sha256']}.png"
         )
+
+    def test_256_color_derivative_under_limit_is_kept(self):
+        result = site.derive(deterministic_256_color_png())
+        with Image.open(io.BytesIO(result)) as derivative:
+            self.assertEqual(derivative.size, (512, 512))
+            self.assertEqual(len(derivative.getcolors(maxcolors=257)), 256)
+        self.assertLessEqual(len(result), 200_000)
+
+    def test_256_color_overflow_falls_back_to_128_colors(self):
+        source = deterministic_overflow_png()
+        result = site.derive(source)
+        with Image.open(io.BytesIO(result)) as derivative:
+            self.assertEqual(derivative.size, (512, 512))
+            self.assertLessEqual(len(derivative.getcolors(maxcolors=257)), 128)
+        self.assertLessEqual(len(result), 200_000)
+
+    def test_128_color_overflow_still_fails(self):
+        with self.assertRaisesRegex(ValueError, "DERIVATIVE_TOO_LARGE"):
+            site.derive(deterministic_uncompressible_png())
+
+    def test_derivative_is_deterministic_for_same_source(self):
+        source = deterministic_overflow_png()
+        self.assertEqual(site.derive(source), site.derive(source))
 
     def test_original_validation_accepts_exact_png(self):
         site.validate_original(self.source, self.record)

@@ -8,6 +8,13 @@ from pathlib import Path
 from PIL import Image
 
 
+def encode_quantized_png(rgb: Image.Image, colors: int) -> bytes:
+    image = rgb.quantize(colors=colors, method=Image.Quantize.MEDIANCUT)
+    output = io.BytesIO()
+    image.save(output, format="PNG", optimize=True)
+    return output.getvalue()
+
+
 def derive(source: bytes) -> bytes:
     if not source.startswith(b"\x89PNG\r\n\x1a\n") or len(source) > 20 * 1024 * 1024:
         raise ValueError("SOURCE_PNG_INVALID")
@@ -17,11 +24,11 @@ def derive(source: bytes) -> bytes:
         if original.width > 8192 or original.height > 8192:
             raise ValueError("SOURCE_DIMENSIONS_INVALID")
         rgb = original.convert("RGB")
-    image = rgb.resize((512, 512), Image.Resampling.LANCZOS)
-    image = image.quantize(colors=256, method=Image.Quantize.MEDIANCUT)
-    output = io.BytesIO()
-    image.save(output, format="PNG", optimize=True)
-    result = output.getvalue()
+    resized = rgb.resize((512, 512), Image.Resampling.LANCZOS)
+    result = encode_quantized_png(resized, 256)
+    if len(result) <= 200_000:
+        return result
+    result = encode_quantized_png(resized, 128)
     if len(result) > 200_000:
         raise ValueError("DERIVATIVE_TOO_LARGE")
     return result
