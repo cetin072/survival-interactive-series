@@ -11,6 +11,7 @@ on:
       - 'supabase/tests/knowledge_semantic_jobs_verification.sql'
       - 'supabase/tests/knowledge_ex001_source_verification.sql'
       - 'supabase/tests/knowledge_ex001_review_revalidation.sql'
+      - 'supabase/tests/knowledge_ex001_existing_review_rebind.sql'
       - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
       - 'supabase/tests/knowledge_semantic_review_e2e.sql'
       - 'supabase/tests/knowledge_semantic_published_reconcile.sql'
@@ -31,6 +32,7 @@ on:
       - 'supabase/tests/knowledge_semantic_jobs_verification.sql'
       - 'supabase/tests/knowledge_ex001_source_verification.sql'
       - 'supabase/tests/knowledge_ex001_review_revalidation.sql'
+      - 'supabase/tests/knowledge_ex001_existing_review_rebind.sql'
       - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
       - 'supabase/tests/knowledge_semantic_review_e2e.sql'
       - 'supabase/tests/knowledge_semantic_published_reconcile.sql'
@@ -208,6 +210,8 @@ jobs:
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_frequency_experience.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261005010000_knowledge_ex001_review_revalidation.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_ex001_review_revalidation.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261005013000_knowledge_ex001_existing_review_rebind.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_ex001_existing_review_rebind.sql
 
   illustration-db-contract:
     runs-on: ubuntu-latest
