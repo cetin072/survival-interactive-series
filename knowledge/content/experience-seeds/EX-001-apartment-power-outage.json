@@ -18,8 +18,11 @@
       "이후 단지 전체의 전기와 수도 사용에 문제가 생긴 상황임을 확인했다."
     ],
     "reported_cause": {
-      "status": "USER_REPORTED_NOT_YET_EVIDENCE_VERIFIED",
-      "text": "사용자가 파악한 원인은 단지로 들어오는 전력 설비 쪽에 새가 접촉하면서 발생한 정전이다."
+      "status": "CONFIRMED_BY_MANAGEMENT_OFFICE_PUBLIC_ANNOUNCEMENT",
+      "confirmation_channel": "아파트 관리사무소 공개방송",
+      "confirmation_timing": "복구 완료 후",
+      "text": "아파트 관리사무소가 복구 완료 후 공개방송으로 이번 정전의 원인이 새였다고 안내했다.",
+      "limitation": "방송에서 새가 원인이라고 확인되었지만, 사진만으로 접촉 지점이나 구체적인 전기적 고장 메커니즘까지 확정하지 않는다."
     },
     "decision_shift": "집 내부 원인 탐색에서 공용부·단지 전체의 장애 범위 확인으로 판단이 전환됐다."
   },
