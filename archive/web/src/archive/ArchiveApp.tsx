@@ -3,7 +3,9 @@ import { ExplorerView, buildPositions, buildVisibleGraph } from './ExplorerView'
 import { ChronicleRoom, chronicleFilterFor, type ChronicleSection } from './ChronicleRoom'
 import { RawTranscriptReader } from './RawTranscriptReader'
 import { StoryBookReader } from './StoryBookReader'
-import { StoryLibrary } from './StoryLibrary'
+import { WikiStoryLibrary } from './WikiStoryLibrary'
+import { WikiToolsPage } from './WikiToolsPage'
+import { WikiMediaPage } from './WikiMediaPage'
 import { WikiShellPreview } from './WikiShellPreview'
 import { KnowledgeGuidePreview } from './KnowledgeGuidePreview'
 import { activeChronicle, getChronicle } from './transcriptData'
@@ -45,25 +47,25 @@ export function ArchiveApp() {
 
   if (route.view === 'wiki-preview') return <WikiShellPreview nodeId={route.nodeId} page={route.page} chronicleId={route.chronicleId} />
   if (route.view === 'knowledge-preview') return <KnowledgeGuidePreview briefId={route.briefId} />
+  if (route.view === 'story' || route.view === 'home') return <WikiStoryLibrary />
+  if (route.view === 'tools') return <WikiToolsPage />
+  if (route.view === 'media') return <WikiMediaPage />
 
   return <main className="archive-shell">
     <header className="archive-header">
       <button className="archive-brand" onClick={() => open({ view: 'wiki-preview', chronicleId: activeChronicle.id, page: 'home' })}><p className="archive-kicker">SURVIVAL DIARY</p><h1>생존일기 <span>ARCHIVE</span></h1></button>
       <nav className="archive-primary-nav" aria-label="주요 탐색">
-        <button className={route.view === 'home' || route.view === 'story' || route.view === 'chronicle' || route.view === 'book' ? 'active' : ''} onClick={() => open({ view: 'story', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[0]}</button>
+        <button className={route.view === 'chronicle' || route.view === 'book' ? 'active' : ''} onClick={() => open({ view: 'story', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[0]}</button>
         <a href="/knowledge/">{primaryNavigationLabels[1]}</a>
-        <button className={route.view === 'tools' ? 'active' : ''} onClick={() => open({ view: 'tools', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[2]}</button>
-        <button className={route.view === 'media' ? 'active' : ''} onClick={() => open({ view: 'media', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[3]}</button>
+        <button onClick={() => open({ view: 'tools', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[2]}</button>
+        <button onClick={() => open({ view: 'media', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[3]}</button>
       </nav>
     </header>
-    {(route.view === 'home' || route.view === 'story') && <StoryLibrary onOpenChronicle={(id) => openRoom(id)} onOpenBook={(id) => openBook(id)} onOpenExplorer={(id) => openRoom(id, 'explorer')} />}
     {route.view === 'chronicle' && <ChronicleRoom key={route.chronicleId} chronicleId={route.chronicleId} section={roomSection} onSection={(section) => open({ ...route, section })} onRead={() => openBook(route.chronicleId)} onExplore={() => openRoom(route.chronicleId, 'graph')} onRaw={() => open({ view: 'raw', chronicleId: route.chronicleId })} onOpenHub={() => open({ view: 'story', chronicleId: activeChronicle.id })} />}
     {roomHasGraph && <ExplorerView key={route.chronicleId + ':' + roomSection} initialFilter={chronicleFilterFor(roomSection)} onOpenStory={(chapterId) => openBook(route.chronicleId, chapterId)} />}
     {route.view === 'archive' && <ExplorerView key={route.nodeId ?? 'default'} initialNodeId={route.nodeId} onOpenStory={(chapterId) => openBook('C03-AFTERFALL', chapterId)} />}
     {route.view === 'book' && <StoryBookReader key={route.chronicleId} chronicleId={route.chronicleId} initialChapterId={route.chapterId} onChapterChange={(chapterId) => open({ ...route, chapterId })} onOpenNode={(nodeId) => open({ view: 'archive', chronicleId: activeChronicle.id, nodeId })} onBack={() => open({ view: 'chronicle', chronicleId: route.chronicleId, section: 'overview' })} />}
     {route.view === 'raw' && <RawTranscriptReader key={rawChronicle.id} chronicleId={rawChronicle.id} initialPartId={route.partId} onPartChange={(partId) => open({ ...route, partId })} onOpenNode={(nodeId) => open({ view: 'archive', chronicleId: activeChronicle.id, nodeId })} onOpenExplorer={() => open({ view: 'archive', chronicleId: activeChronicle.id })} />}
-    {route.view === 'tools' && <section className="archive-panel future-archive"><p className="archive-eyebrow">TOOLS</p><h1>생존 도구</h1><p>체크리스트와 자료 도구를 연결할 자리입니다.</p><div className="future-cards"><article>PDF 자료 <span>아직 기록 없음</span></article><article>XLSX 관리표 <span>준비 중</span></article><article>체크리스트 <span>준비 중</span></article></div></section>}
-    {route.view === 'media' && <section className="archive-panel future-archive"><p className="archive-eyebrow">MEDIA</p><h1>미디어 Archive</h1><p>공개 허용된 시각 자료와 향후 미디어 진입점을 모읍니다.</p><div className="future-cards"><article>삽화 <span>Chronicle 안의 공개 Visual 자료</span></article><article>영상 <span>아직 기록 없음</span></article><article>웹툰 · 교육 <span>아직 기록 없음</span></article></div></section>}
     {(route.view === 'operator' || route.view === 'operator-visuals' || route.view === 'operator-knowledge' || route.view === 'operator-knowledge-detail' || route.view === 'operator-vault') && <Suspense fallback={<section className="operator-page" aria-live="polite">운영자 화면을 불러오는 중…</section>}><OperatorConsole
       view={route.view === 'operator-visuals' ? 'visuals' : route.view === 'operator-knowledge' ? 'knowledge' : route.view === 'operator-knowledge-detail' ? 'knowledge-detail' : route.view === 'operator-vault' ? 'vault' : 'dashboard'}
       knowledgeJobId={route.view === 'operator-knowledge-detail' ? route.jobId : undefined}
