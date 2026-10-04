@@ -1,0 +1,19 @@
+{
+  "version": "illustration-review-handoff-v1",
+  "job_id": "illustration-char-doyoon-377d18532ae4-20261004-37205326583",
+  "main_sha": "91f52a2a653045b0b7ca5deee9e75e1309636942",
+  "point_id": "point-142aa7bc9462b8273a4d27aabb4d01b298fea771661b4fcedb257e888b87d19b",
+  "generation_key": "generation-377d18532ae4da7a862984d6cc88340b86fa67e84a894960c17943e4aff5c0c2",
+  "subject_id": "char-doyoon",
+  "prompt_sha256": "60cf641871c0afd590efb4375a8a155cff22e823cc9b1ca59157ef48e3650019",
+  "review_context_sha256": "03a8f7f910eb11934812c99b3ff6e664a30b0746f32809703c6ccbc7978ac7de",
+  "source_library_path": "/IMAGE-RENDER/output/current.png",
+  "source_library_file_id": "file_0000000066fc823093670e1a224f3ed4",
+  "decision": "REJECT",
+  "review_provider": "native_chatgpt_vision",
+  "review_summary": "Generated portrait does not match the bound Kim Do-yoon character appearance: apparent age, short sports haircut, broad sturdy build, and neutral contemporary Korean setting are materially mismatched.",
+  "rejection_codes": [
+    "CHARACTER_APPEARANCE_MISMATCH"
+  ],
+  "created_at": "2026-10-04T14:12:53.373Z"
+}
