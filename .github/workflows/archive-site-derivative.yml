@@ -75,8 +75,18 @@ jobs:
         run: |
           set -euo pipefail
           git checkout -b "$BRANCH"
+          set +e
           python archive/scripts/prepare_site_derivative.py             --request "$REQUEST_PATH" > "$RUNNER_TEMP/site-derivative.json"
-          cat "$RUNNER_TEMP/site-derivative.json"
+          prepare_status=$?
+          set -e
+          if [[ -f "$RUNNER_TEMP/site-derivative.json" ]]; then
+            cat "$RUNNER_TEMP/site-derivative.json"
+          else
+            echo "SITE_DERIVATIVE_RESULT_FILE_MISSING"
+          fi
+          if [[ "$prepare_status" -ne 0 ]]; then
+            exit "$prepare_status"
+          fi
           python - <<'PY'
           import json, os
           result=json.load(open(os.environ["RUNNER_TEMP"]+"/site-derivative.json"))
