@@ -1,21 +1,17 @@
 {
   "version": "illustration-review-handoff-v1",
-  "job_id": "illustration-loc-clinic-ab0a6e24c3e1-20261004-37208572429",
-  "main_sha": "a8166153d37186ed0b0e323481a7b7e8a082a30d",
-  "point_id": "point-c0e0668052879a806b3453892c610d913ca9cf7ea2ab9a60eb904f86d7933185",
-  "generation_key": "generation-ab0a6e24c3e1b35ff2b66440f5853ebe317a52a08c6ac1cc111ad0152a8b8d2f",
-  "subject_id": "loc-clinic",
-  "prompt_sha256": "52b573af98332754d222628e8e49d011adf1ff825035be5c98549a4ea8ef74f2",
-  "review_context_sha256": "d9bf0a9b13c5ab7245368731b70f54081d51450b4c1f2443c82d44cb1746004d",
+  "job_id": "illustration-loc-shelter-fb0ceda87b9c-20261005-37211709040",
+  "main_sha": "5ec6670e047e581acdce0dbcdc6b6ec87364c09a",
+  "point_id": "point-e444bb71ce1d10ea4c96ac2bce52ef05e55da0b3750d434e7197e4c6b0ad6eea",
+  "generation_key": "generation-fb0ceda87b9cd070f7e11e4c47109e0bd81a405390d1d05edadb02a4ec2c857c",
+  "subject_id": "loc-shelter",
+  "prompt_sha256": "fb446da0c53d367a0d289d6094c0892e97051fe81c834fdc91154859b90daf3d",
+  "review_context_sha256": "18621277a827affac5f36c0550f73022f2237587bc6d0a65995c9cfae694f3e8",
   "source_library_path": "/IMAGE-RENDER/output/current.png",
-  "source_library_file_id": "file_0000000017ac8210b8b974a73fcf7d14",
-  "decision": "REJECT",
+  "source_library_file_id": "file_000000006ce082099a2c758aefd0c70d",
+  "decision": "PASS",
   "review_provider": "native_chatgpt_vision",
-  "review_summary": "Bright pristine photorealistic clinic with extensive embedded signage conflicts with the bound painterly quiet-decay brief and invents identifying clinic details.",
-  "rejection_codes": [
-    "EMBEDDED_TYPOGRAPHY",
-    "STYLE_MISMATCH",
-    "INVENTED_IDENTIFYING_FEATURES"
-  ],
-  "created_at": "2026-10-04T14:20:28.000Z"
+  "review_summary": "Matches the bound residents-welfare-facility scene: contemporary Korean public interior, lived-in communal supplies and utilities, cool blue-gray painterly rendering, realistic scale, and no material invented identity or narrative.",
+  "rejection_codes": [],
+  "created_at": "2026-10-04T15:30:10.173Z"
 }
