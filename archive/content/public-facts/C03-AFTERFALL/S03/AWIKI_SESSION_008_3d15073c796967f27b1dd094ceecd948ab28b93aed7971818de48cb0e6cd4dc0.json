@@ -1,0 +1,178 @@
+{
+  "anchor": {
+    "game_time": "2027-11-22 22:40",
+    "save_version": 285
+  },
+  "chronicle_id": "C03-AFTERFALL",
+  "nodes": [
+    {
+      "id": "event-wiki-a0da729cf563fe4b71f80b21",
+      "label": "공공 급수지점 일반 유지보수·상황별 대응 원칙",
+      "source": "S03 SESSION_008 GM 공개 블록 001",
+      "subtitle": "2027년 11월 5일",
+      "summary": "공공 급수지점의 일상 운영·배급·대체수원·1차 대응은 행정 잔존팀이 맡고, 길드는 표준펌프·부품 판매와 일반 유지보수·기술지원을 제공하기로 했다. 공공이라는 이유의 자동 최우선 복구는 두지 않고 실제 인명위험·대체수단·저장량·동시 긴급상황을 비교해 대응한다.",
+      "tags": [
+        "S03",
+        "공공급수",
+        "길드",
+        "유지보수",
+        "운영경계"
+      ],
+      "type": "event"
+    },
+    {
+      "id": "event-wiki-aca3696fd78c3c8a9332aeb6",
+      "label": "공공급수·생산거점 동시 펌프 고장 대응",
+      "source": "S03 SESSION_008 GM 공개 블록 001",
+      "subtitle": "2027년 11월 9일",
+      "summary": "공공 급수지점과 동쪽 생산거점의 펌프가 거의 동시에 멈췄다. 공공 급수는 저장량과 대체수단이 있어 저녁까지 버틸 수 있었고 생산거점은 오전을 넘기면 작물 피해가 예상돼 생산거점을 먼저 복구한 뒤 같은 날 공공 급수지점을 복구했다.",
+      "tags": [
+        "S03",
+        "급수",
+        "생산거점",
+        "공공급수",
+        "긴급대응"
+      ],
+      "type": "event"
+    },
+    {
+      "id": "event-wiki-d12d5299a253870e3748a92e",
+      "label": "길드 표준품 진품확인 체계 확립",
+      "source": "S03 SESSION_008 GM 공개 블록 003",
+      "subtitle": "2027년 11월 중순",
+      "summary": "길드 표준품은 제품 번호, 길드 판매·수리 장부 기록, 현재 보증·수리 상태를 함께 확인하는 체계로 정리됐다. 겉표식 하나만으로는 진품을 증명하지 않는다.",
+      "tags": [
+        "S03",
+        "길드",
+        "표준품",
+        "진품확인",
+        "장부"
+      ],
+      "type": "event"
+    },
+    {
+      "id": "char-wiki-b862f3d27582267fb5da3320",
+      "label": "황대식",
+      "source": "S03 SESSION_008 GM 공개 블록 003",
+      "subtitle": "길드 표준품을 사칭한 이동상인",
+      "summary": "길드 표식과 번호를 흉내 낸 펌프 네 대의 판매망에서 확인된 이동상인이다. 확인된 거래를 정산하고 가짜 표식을 제거할 때까지 길드 시장·중개·에스크로·수리서비스 이용 제한을 받았다.",
+      "tags": [
+        "S03",
+        "인물",
+        "상인",
+        "사칭"
+      ],
+      "type": "character"
+    },
+    {
+      "id": "event-wiki-281823f8f1b6fb2c770b1925",
+      "label": "황대식 가짜 표준펌프 사칭 사건",
+      "source": "S03 SESSION_008 GM 공개 블록 003",
+      "subtitle": "2027년 11월 17–20일",
+      "summary": "길드 표식을 흉내 낸 비정품 펌프 네 대가 황대식 판매망에서 확인됐다. 길드는 외부 장사를 몰수하거나 금지하지 않고 피해거래 정산, 가짜 표식 제거, 길드 서비스 이용 제한으로 대응했고 확인된 네 건은 환불 2건, 가격조정 1건, 회수 1건으로 정리됐다.",
+      "tags": [
+        "S03",
+        "표준품",
+        "사칭",
+        "시장분쟁",
+        "길드"
+      ],
+      "type": "event"
+    },
+    {
+      "id": "loc-wiki-f73ae01ebcb8d89952911bbc",
+      "label": "북쪽 연료장 생활권",
+      "source": "S03 SESSION_008 GM 공개 블록 003",
+      "subtitle": "겨울 전 연료·운송 협의 발신 생활권",
+      "summary": "겨울 전 운송 가능한 집단과 거래거점을 불러 실제 배분 가능한 연료량과 운송능력을 논의하는 회의를 제안한 북쪽 생활권이다.",
+      "tags": [
+        "S03",
+        "장소",
+        "연료",
+        "북쪽"
+      ],
+      "type": "location"
+    },
+    {
+      "id": "event-wiki-934cea538155fc7bc102a21c",
+      "label": "북쪽 연료장 겨울 전 연료·운송 회의 초청",
+      "source": "S03 SESSION_008 GM 공개 블록 003",
+      "subtitle": "2027년 11월 22일",
+      "summary": "북쪽 연료장 생활권이 운송 가능한 집단과 거래거점을 겨울 전 회의에 초청했다. 의제는 이번 겨울 실제로 풀 수 있는 연료량과 누가 어디까지 운반할 수 있는지였고 길드도 초청 대상에 포함됐다.",
+      "tags": [
+        "S03",
+        "연료",
+        "운송",
+        "회의",
+        "초청"
+      ],
+      "type": "event"
+    }
+  ],
+  "relations": [
+    {
+      "from": "event-wiki-a0da729cf563fe4b71f80b21",
+      "kind": "related_to",
+      "label": "공공 급수지점 요청에 대한 최종 운영원칙",
+      "to": "event-wiki-3fd45d2cb293984e10fb4440"
+    },
+    {
+      "from": "char-jinwoo",
+      "kind": "participated_in",
+      "label": "상황별 우선순위 결정",
+      "to": "event-wiki-aca3696fd78c3c8a9332aeb6"
+    },
+    {
+      "from": "char-taehoon",
+      "kind": "participated_in",
+      "label": "생산거점 복구",
+      "to": "event-wiki-aca3696fd78c3c8a9332aeb6"
+    },
+    {
+      "from": "char-mingyu",
+      "kind": "participated_in",
+      "label": "생산거점 복구",
+      "to": "event-wiki-aca3696fd78c3c8a9332aeb6"
+    },
+    {
+      "from": "char-wiki-9cb69d0dc08460c215904370",
+      "kind": "participated_in",
+      "label": "생산거점 고장 보고",
+      "to": "event-wiki-aca3696fd78c3c8a9332aeb6"
+    },
+    {
+      "from": "event-wiki-d12d5299a253870e3748a92e",
+      "kind": "related_to",
+      "label": "표준펌프 보증·사후서비스의 진품 확인 기반",
+      "to": "event-wiki-df3c90d6f885fdb269cd38d3"
+    },
+    {
+      "from": "char-wiki-b862f3d27582267fb5da3320",
+      "kind": "participated_in",
+      "label": "사칭 판매망 당사자",
+      "to": "event-wiki-281823f8f1b6fb2c770b1925"
+    },
+    {
+      "from": "event-wiki-281823f8f1b6fb2c770b1925",
+      "kind": "occurred_at",
+      "label": "길드 접수·정산에서 사건 확인 및 처리",
+      "to": "loc-sports-complex"
+    },
+    {
+      "from": "event-wiki-934cea538155fc7bc102a21c",
+      "kind": "related_to",
+      "label": "초청 발신 생활권",
+      "to": "loc-wiki-f73ae01ebcb8d89952911bbc"
+    },
+    {
+      "from": "char-hayoung",
+      "kind": "participated_in",
+      "label": "북쪽 초청장 전달",
+      "to": "event-wiki-934cea538155fc7bc102a21c"
+    }
+  ],
+  "season_id": "S03",
+  "version": "public-graph-facts-v1",
+  "visibility": "PUBLIC_ARCHIVE",
+  "worldline_id": "AFTERFALL"
+}
