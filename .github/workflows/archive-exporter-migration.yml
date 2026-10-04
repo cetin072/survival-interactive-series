@@ -9,6 +9,7 @@ on:
       - 'supabase/tests/illustration_registry_dedup_v1_verification.sql'
       - '.github/workflows/archive-exporter-migration.yml'
       - 'supabase/tests/knowledge_semantic_jobs_verification.sql'
+      - 'supabase/tests/knowledge_ex001_source_verification.sql'
       - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
       - 'supabase/tests/knowledge_semantic_review_e2e.sql'
       - 'supabase/tests/knowledge_semantic_published_reconcile.sql'
@@ -27,6 +28,7 @@ on:
       - 'supabase/tests/illustration_registry_dedup_v1_verification.sql'
       - '.github/workflows/archive-exporter-migration.yml'
       - 'supabase/tests/knowledge_semantic_jobs_verification.sql'
+      - 'supabase/tests/knowledge_ex001_source_verification.sql'
       - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
       - 'supabase/tests/knowledge_semantic_review_e2e.sql'
       - 'supabase/tests/knowledge_semantic_published_reconcile.sql'
@@ -198,6 +200,8 @@ jobs:
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261003220726_knowledge_semantic_finalizer_retry_v1.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_published_reconcile.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_semantic_finalizer_retry.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261004144834_knowledge_ex001_explicit_source.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_ex001_source_verification.sql
 
   illustration-db-contract:
     runs-on: ubuntu-latest

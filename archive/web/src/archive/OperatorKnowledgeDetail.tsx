@@ -4,6 +4,7 @@ import { uploadKnowledgeImage } from './knowledgeMedia'
 import {
   knowledgeBucketFor,
   knowledgeBucketLabel,
+  knowledgeSourceLabel,
   type KnowledgeDetail,
 } from './knowledgeOperatorModel'
 import { formatOperatorTime } from './operatorSystemStatus'
@@ -158,7 +159,7 @@ export function OperatorKnowledgeDetail({
       <dl>
         <div><dt>Candidate</dt><dd>{selected.candidate_id ?? '아직 미작성'}</dd></div>
         <div><dt>BRIEF</dt><dd>{selected.brief_id ?? '아직 미작성'}</dd></div>
-        <div><dt>Source</dt><dd>{selected.source_ref ?? '—'}</dd></div>
+        <div><dt>원본 유형</dt><dd>{knowledgeSourceLabel(selected.source_kind)}</dd></div>
         <div><dt>준비</dt><dd>{formatOperatorTime(selected.prepared_at)}</dd></div>
         <div><dt>제출</dt><dd>{formatOperatorTime(selected.submitted_at)}</dd></div>
         <div><dt>PR</dt><dd>{selected.final_pr_number ? `#${selected.final_pr_number}` : '—'}</dd></div>
@@ -204,6 +205,7 @@ export function OperatorKnowledgeDetail({
 
       {selected.review_status && selected.review_status !== 'PENDING' && <p className="operator-muted">검토 결과: {selected.review_status}{selected.review_decision_note ? ` · ${selected.review_decision_note}` : ''}</p>}
 
+      <details><summary>기술 상세 · 원본 경로</summary><pre>{selected.source_ref ?? '—'}</pre></details>
       <details><summary>Prepared context</summary><pre>{JSON.stringify(selected.context, null, 2)}</pre></details>
       <details><summary>AI 원본 · Candidate / Evidence / BRIEF</summary><pre>{JSON.stringify(selected.result, null, 2)}</pre></details>
     </section>}

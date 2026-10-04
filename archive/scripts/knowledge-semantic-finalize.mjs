@@ -110,6 +110,9 @@ export async function verifyPins(job, base) {
     if (job.source_ref !== `archive/content/stories/C03-AFTERFALL/BOOK.json#${chapterId}`
       || json(chapter.sourceRefs) !== json(context.source.refs) || json(chapter.sourceHashes) !== json(context.source.hashes)) throw new Error('SEMANTIC_READER_PROVENANCE_CHANGED')
     for (let index = 0; index < context.source.refs.length; index += 1) await verifyFile(context.source.refs[index], context.source.hashes[index])
+  } else if (job.source_kind === 'USER_REPORTED_EXPERIENCE') {
+    if (job.source_ref !== 'knowledge/content/experience-seeds/EX-001-apartment-power-outage.json' || context.source.refs.length !== 0) throw new Error('SEMANTIC_EXPERIENCE_SOURCE_INVALID')
+    await verifyFile(job.source_ref, job.source_sha256)
   } else throw new Error('SEMANTIC_SOURCE_KIND_INVALID')
   return { context, config }
 }

@@ -21,3 +21,7 @@
 
 이 디렉터리는 durable 수동 Seed 저장소다. 현재 C-PREP이 이 디렉터리를 자동 스캔하도록 연결하지 않는다.
 자동 소비 기능은 실제 Seed가 쌓여 필요성이 확인된 뒤 별도 변경으로 추가한다. 그 전까지는 기존 Automation C의 Candidate/Evidence/BRIEF 계약을 우회하지 않는다.
+
+## EX-001 단건 파일럿
+
+EX-001은 전체 디렉터리 스캔에 넣지 않습니다. C3 계약 변경과 DB migration이 적용된 뒤 기존 knowledge-semantic-prep.yml을 수동 실행할 때 experience_seed_ref에 knowledge/content/experience-seeds/EX-001-apartment-power-outage.json을 정확히 넣습니다. 이 입력만 기존 C3 job으로 준비하고, knowledge/automation/pilots/EX-001-semantic-result.template.json의 Candidate·Evidence·BRIEF를 예약된 ID에 맞춰 제출합니다. 기존 C-FINALIZER가 패키지를 검증해 Draft PR과 Operator HUMAN_REVIEW를 만듭니다. 자동 게시나 원본 사진 공개는 하지 않습니다.

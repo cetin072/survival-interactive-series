@@ -104,6 +104,11 @@ function candidateFor(brief, candidates) {
 
 async function sourceIsCurrent(candidate, base) {
   if (candidate.source_kind === 'PUBLIC_READER') return { current: true }
+  if (candidate.source_kind === 'USER_REPORTED_EXPERIENCE') {
+    if (candidate.source_ref !== 'knowledge/content/experience-seeds/EX-001-apartment-power-outage.json' || !/^[a-f0-9]{64}$/.test(candidate.source_sha256 ?? '')) return { current: false, reason: 'SOURCE_PATH_INVALID' }
+    const bytes = await readFile(resolve(base, candidate.source_ref))
+    return createHash('sha256').update(bytes).digest('hex') === candidate.source_sha256 ? { current: true } : { current: false, reason: 'SOURCE_CHANGED' }
+  }
   if (candidate.source_kind !== 'PUBLIC_ARCHIVE') return { current: false, reason: 'SOURCE_KIND_INVALID' }
   if (!/^archive\/content\/transcripts\/C03-AFTERFALL\/S\d{2,3}\/SESSION_\d{3}\/SOURCE_MANIFEST\.json$/.test(candidate.source_manifest_ref)) return { current: false, reason: 'SOURCE_PATH_INVALID' }
   if (!/^[a-f0-9]{64}$/.test(candidate.source_manifest_sha256)) return { current: false, reason: 'SOURCE_HASH_INVALID' }
@@ -188,7 +193,7 @@ export async function checkHumanApprovedRelease(data, { changedFiles, briefIds, 
     if (pack.conflicts?.length) reasons.push(`EVIDENCE_CONFLICT:${id}`)
     if (pack.unknowns?.length) reasons.push(`MATERIAL_UNKNOWNS:${id}`)
     if (pack.copyright_status !== 'CLEAR') reasons.push(`COPYRIGHT_UNCLEAR:${id}`)
-    if (!['VERIFIED_PUBLIC_READER_BACKFILL', 'VERIFIED_PUBLIC_ARCHIVE'].includes(pack.story_source_status)) {
+    if (!['VERIFIED_PUBLIC_READER_BACKFILL', 'VERIFIED_PUBLIC_ARCHIVE', 'USER_REPORTED_EXPERIENCE'].includes(pack.story_source_status)) {
       reasons.push(`STORY_SOURCE_NOT_VERIFIED:${id}`)
     }
     if (!hasAuthoritativeClaimSupport(brief, pack, data.config.site_origin)) {
@@ -200,6 +205,7 @@ export async function checkHumanApprovedRelease(data, { changedFiles, briefIds, 
       reasons.push(`${candidateResult.reason}:${id}`)
       continue
     }
+    if ((pack.story_source_status === 'USER_REPORTED_EXPERIENCE') !== (candidateResult.candidate.source_kind === 'USER_REPORTED_EXPERIENCE')) reasons.push('EXPERIENCE_SOURCE_STATUS_MISMATCH:' + id)
     try {
       const source = await sourceIsCurrent(candidateResult.candidate, base)
       if (!source.current) reasons.push(`${source.reason}:${id}`)
