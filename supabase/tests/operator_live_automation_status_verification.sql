@@ -23,6 +23,12 @@ begin
     raise exception 'OPERATOR_VISUAL_RETIRED_SOURCE_STILL_USED';
   end if;
 
+  if position('survival_ops.a_wiki_native_jobs' in v_def)=0
+     or position('EXTRACTOR_READY' in v_def)=0
+     or position('FINALIZING' in v_def)=0 then
+    raise exception 'OPERATOR_A_WIKI_LIVE_STATUS_SOURCE_MISSING';
+  end if;
+
   if position('survival_ops.knowledge_semantic_jobs' in v_def)=0
      or position('survival_ops.knowledge_semantic_prep_runs' in v_def)=0 then
     raise exception 'OPERATOR_KNOWLEDGE_LIVE_STATUS_SOURCE_MISSING';
