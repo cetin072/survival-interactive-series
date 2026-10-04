@@ -407,6 +407,23 @@ test('native worker renderer boot stays context-isolated before image generation
   assert.equal(contract.renderer_context_isolation?.full_authority_load_after_image_generation_only, true)
 })
 
+test('clean renderer is physically separated from review-transfer worker', async () => {
+  const root = resolve(fileURLToPath(new URL('../../..', import.meta.url)))
+  const renderer = await readFile(resolve(root, 'docs/automation/ILLUSTRATION_B_CLEAN_RENDERER_PROMPT.md'), 'utf8')
+  const router = await readFile(resolve(root, 'docs/automation/ILLUSTRATION_B_NATIVE_WORKER_ROUTER.md'), 'utf8')
+  const contract = JSON.parse(await readFile(
+    resolve(root, 'archive/automation/illustration-native-worker-runtime-contract.json'), 'utf8',
+  ))
+  assert.match(renderer, /status is not \`PREPARED\`/)
+  assert.match(renderer, /exact DB prompt TEXT only/)
+  assert.match(renderer, /Do not read or perform Reviewer, Vault, staging, Finalizer, Storage, Registry, SITE_ASSETS/)
+  assert.match(router, /PREPARED belongs exclusively to the separate Clean Renderer/)
+  assert.match(router, /Do not generate an image/)
+  assert.deepEqual(contract.workers.clean_renderer.handles, ['PREPARED'])
+  assert.deepEqual(contract.workers.native_worker.handles, ['INGESTING', 'REVIEW_PASS_STAGED'])
+  assert.equal(contract.roles.PREPARED.owner, 'CLEAN_RENDERER')
+})
+
 test('preserves approved images and validates the site asset contract', async () => {
   const root = resolve(fileURLToPath(new URL('../../..', import.meta.url)))
   const manifestPath = resolve(root, 'archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json')
