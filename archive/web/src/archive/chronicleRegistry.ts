@@ -13,7 +13,7 @@ export type Chronicle = {
 export const chronicleRegistry: Chronicle[] = [
   { id: 'C01-HAN-JUNHO', number: 1, ipId: 'survival-diary', label: 'C01 · 한준호', title: '한준호의 생존기', protagonist: '한준호', worldlineId: 'CANON-V2', active: false, status: 'COMPLETE', sourceClass: 'LEGACY_RPG', transcriptStatus: 'partial', sourceRoot: 'seasons_v2', readerAvailable: true, availabilityNote: '검증된 공개 원문 구간을 수록합니다.' },
   { id: 'C02-STRONGHOLD', number: 2, ipId: 'survival-diary', label: 'C02 · 박도현', title: '박도현의 생존기', protagonist: '박도현', worldlineId: 'STRONGHOLD', active: false, status: 'COMPLETE', sourceClass: 'LEGACY_RPG', transcriptStatus: 'partial', sourceRoot: 'worldlines/STRONGHOLD', readerAvailable: true, availabilityNote: '복구된 공개 GM 원문 구간을 수록합니다.' },
-  { id: 'C03-AFTERFALL', number: 3, ipId: 'survival-diary', label: 'C03 AFTERFALL · 서진우', title: 'AFTERFALL', protagonist: '서진우', worldlineId: 'AFTERFALL', active: true, status: 'LIVE', sourceClass: 'LIVE_RPG', transcriptStatus: 'partial', sourceRoot: 'worldlines/AFTERFALL', readerAvailable: true, availabilityNote: '검증된 공개 GM 원문 구간을 수록합니다.' },
+  { id: 'C03-AFTERFALL', number: 3, ipId: 'survival-diary', label: 'C03 · 서진우', title: '서진우의 생존기', protagonist: '서진우', worldlineId: 'AFTERFALL', active: true, status: 'LIVE', sourceClass: 'LIVE_RPG', transcriptStatus: 'partial', sourceRoot: 'worldlines/AFTERFALL', readerAvailable: true, availabilityNote: '검증된 공개 GM 원문 구간을 수록합니다.' },
 ]
 
 export function partitionChronicles(registry: Chronicle[] = chronicleRegistry) {
