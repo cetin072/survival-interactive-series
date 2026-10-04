@@ -1,0 +1,63 @@
+{
+  "version": "illustration-native-worker-runtime-contract-v1",
+  "purpose": "One scheduled ChatGPT worker. Program selects work; AI generates or reviews based only on durable job state. Transfer occurs only after PASS.",
+  "roles": {
+    "PREPARED": {
+      "role": "RENDERER",
+      "one_role_per_run": true,
+      "next_status": "INGESTING"
+    },
+    "INGESTING": {
+      "role": "REVIEWER",
+      "decision_rpc": "archive_illustration_review_decide_v3",
+      "decision_before_transfer": true,
+      "outcomes": {
+        "PASS": "REVIEW_PASS_STAGED",
+        "REJECT": "REVIEW_REJECTED",
+        "HUMAN_REVIEW": "HUMAN_REVIEW"
+      }
+    },
+    "REVIEW_PASS_STAGED": {
+      "role": "PASS_SITE_ASSET_TRANSFER",
+      "re_review": false,
+      "next_status": "FINALIZE_QUEUED"
+    }
+  },
+  "source": {
+    "library_path": "/IMAGE-RENDER/output/current.png",
+    "generated_format": "image/png"
+  },
+  "pass_asset": {
+    "format": "image/png",
+    "width": 512,
+    "height": 512,
+    "conversion": "RGB -> LANCZOS 512x512 -> 256-color quantize -> optimize; if >200000 bytes retry 128-color",
+    "max_bytes": 1000000,
+    "preferred_chunk_b64_chars": 220000,
+    "max_chunks": 8,
+    "staging_begin_rpc": "archive_illustration_site_staging_begin",
+    "staging_resume_rpc": "archive_illustration_review_staging_resume",
+    "chunk_put_rpc": "archive_illustration_review_staging_chunk_put",
+    "staging_finalize_rpc": "archive_illustration_site_staging_finalize"
+  },
+  "reject": {
+    "binary_transfer": false,
+    "library_cleanup_after_durable_decision": true
+  },
+  "human_review": {
+    "binary_transfer": false,
+    "preserve_library_source": true
+  },
+  "vault": {
+    "current_runtime": false,
+    "legacy_functions_retained_for_old_jobs_only": true
+  },
+  "program_owners": {
+    "prep": "Supabase/GitHub Program Prep",
+    "finalizer": "Existing GitHub Program Finalizer"
+  },
+  "selection_policy": {
+    "automatic": "fresh CHARACTER before retried CHARACTER; defer LOCATION/EVENT while eligible CHARACTER candidates exist",
+    "manual_subject_override": true
+  }
+}
