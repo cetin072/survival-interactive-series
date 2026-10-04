@@ -183,6 +183,52 @@ class FinalizerIdentityTests(unittest.TestCase):
             "p_lease_seconds": 7200,
         })
 
+    def test_wait_pr_and_merge_waits_for_checks_to_appear(self):
+        head = "a" * 40
+        merged = "d" * 40
+        views = [
+            {
+                "state": "OPEN", "mergeable": "UNKNOWN", "headRefOid": head,
+                "mergeCommit": None, "statusCheckRollup": [],
+            },
+            {
+                "state": "OPEN", "mergeable": "UNKNOWN", "headRefOid": head,
+                "mergeCommit": None, "statusCheckRollup": [{"name": "Validate archive"}],
+            },
+            {
+                "state": "OPEN", "mergeable": "MERGEABLE", "headRefOid": head,
+                "mergeCommit": None,
+            },
+            {"merged": True, "sha": merged},
+        ]
+        with mock.patch.object(MODULE, "heartbeat"), \
+             mock.patch.object(MODULE.time, "sleep"), \
+             mock.patch.object(MODULE, "gh_json", side_effect=views) as gh_json, \
+             mock.patch.object(MODULE, "run_with_heartbeat", return_value=(0, "")) as watch:
+            self.assertEqual(MODULE.wait_pr_and_merge(418), merged)
+
+        self.assertEqual(gh_json.call_count, 4)
+        watch.assert_called_once_with(
+            ["gh", "pr", "checks", "418", "--repo", MODULE.REPO, "--watch",
+             "--fail-fast", "--interval", "10"],
+            capture=False,
+        )
+
+    def test_wait_pr_and_merge_times_out_when_checks_never_attach(self):
+        no_checks = {
+            "state": "OPEN", "mergeable": "UNKNOWN", "headRefOid": "a" * 40,
+            "mergeCommit": None, "statusCheckRollup": [],
+        }
+        with mock.patch.object(MODULE, "heartbeat"), \
+             mock.patch.object(MODULE.time, "sleep"), \
+             mock.patch.object(MODULE, "gh_json", return_value=no_checks), \
+             mock.patch.object(MODULE, "run_with_heartbeat") as watch:
+            with self.assertRaisesRegex(
+                ValueError, "FINALIZER_PR_CHECKS_NOT_REPORTED_TIMEOUT"
+            ):
+                MODULE.wait_pr_and_merge(418)
+        watch.assert_not_called()
+
     def test_heartbeat_loss_kills_wait_and_prevents_later_side_effects(self):
         class Process:
             def __init__(self):
