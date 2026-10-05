@@ -74,11 +74,11 @@ declare outcome jsonb;
 begin
   insert into survival_ops.knowledge_semantic_jobs(job_type,status,source_kind,source_ref,source_sha256,work_key,
     policy_version,policy_sha256,policy_pin,main_sha_at_prepare,semantic_context,semantic_result,semantic_result_sha256,
-    result_decision,blocker_code,blocker_stage)
+    result_decision,blocker_code,blocker_stage,final_pr_number,final_head_sha,merge_sha,published_at)
   values('BACKFILL_BRIEF','BLOCKED','PUBLIC_READER','synthetic://old',repeat('d',64),'historical-blocked','ci',repeat('e',64),'{}',repeat('1',40),'{}',
-    '{"brief":{"id":"K-999"}}',repeat('f',64),'BRIEF_READY','MAIN_MOVED_REVALIDATION_REQUIRED','PR_RECONCILE'),
+    '{"brief":{"id":"K-999"}}',repeat('f',64),'BRIEF_READY','MAIN_MOVED_REVALIDATION_REQUIRED','PR_RECONCILE',null,null,null,null),
     ('BACKFILL_BRIEF','PUBLISHED','PUBLIC_READER','synthetic://published',repeat('d',64),'historical-published','ci',repeat('e',64),'{}',repeat('1',40),'{}',
-    '{"brief":{"id":"K-999"}}',repeat('f',64),'BRIEF_READY',null,null);
+    '{"brief":{"id":"K-999"}}',repeat('f',64),'BRIEF_READY',null,null,999,repeat('a',40),repeat('b',40),clock_timestamp());
   if jsonb_array_length(public.archive_knowledge_semantic_job_list_active())<>0 then raise exception 'published target still reserves admission'; end if;
   if exists(select 1 from jsonb_array_elements(public.archive_knowledge_semantic_job_list_handled()) h
     where h->>'work_key'='historical-blocked' and h->>'recovery_available'<>'false') then raise exception 'handled inventory falsely recoverable'; end if;
