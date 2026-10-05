@@ -46,7 +46,9 @@
       "p_job_id": "illustration-event-fireline-56d5c65b6320-20261005-liveaccept1",
       "p_prompt_sha256": "4c3d04c06c3b63328e3202539ac3da041881a3693c8f99420c74ff0b3164daa9"
     },
-    "provider_completed_at": null
+    "provider_completed_at": "2026-10-05T02:15:41.355355+00:00",
+    "job_status_after_provider_complete": "INGESTING",
+    "readback_at": "2026-10-05T02:15:59.968Z"
   },
   "result": null,
   "trial": {
