@@ -193,6 +193,13 @@
     "finalizer_dispatch_request_id": 142,
     "finalizer_dispatch_at": "2026-10-05T04:12:10.10607+00:00",
     "job_status_readback": "FINALIZING",
-    "completed_at": "2026-10-05T04:12:52.569Z"
+    "completed_at": "2026-10-05T04:12:52.569Z",
+    "source_cleanup": {
+      "status": "TRASHED",
+      "file_id": "file_0000000018e481fd828652c5c1377af0",
+      "library_file_id": "libfile_a1e80988e2748191bf6f3881444683f8",
+      "path": "/IMAGE-RENDER/output/current.png",
+      "completed_at": "2026-10-05T04:13:10.201Z"
+    }
   }
 }
