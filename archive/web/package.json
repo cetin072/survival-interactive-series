@@ -5,14 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node ../scripts/build-knowledge.mjs --check && node ../scripts/knowledge-scan.mjs --check && tsc --noEmit && vite build && node ../scripts/write-deploy-meta.mjs",
+    "build": "node ../scripts/build-knowledge.mjs --check && node ../scripts/knowledge-scan.mjs --check && tsc --noEmit && vite build && node ../scripts/write-deploy-meta.mjs && node ../scripts/check-knowledge-public.mjs",
     "build:verified": "npm run reader:check && npm run build",
     "test": "vitest run",
     "reader:build": "node ../scripts/build-reader-edition.mjs",
     "reader:check": "node ../scripts/check-reader-edition.mjs",
     "knowledge:build": "node ../scripts/build-knowledge.mjs",
     "knowledge:check": "node ../scripts/build-knowledge.mjs --check && node ../scripts/knowledge-scan.mjs --check",
-    "knowledge:test": "node --test ../scripts/lib/knowledge.test.mjs ../scripts/lib/knowledge-experience.test.mjs",
+    "knowledge:test": "node --test ../scripts/lib/knowledge.test.mjs ../scripts/lib/knowledge-experience.test.mjs ../scripts/lib/knowledge-public.test.mjs",
     "knowledge:semantic:test": "node --test ../scripts/lib/knowledge-semantic-jobs.test.mjs ../scripts/lib/knowledge-semantic-finalizer.test.mjs",
     "knowledge:publish-prepare": "node ../scripts/knowledge-publish-prepare.mjs",
     "knowledge:review-sync": "node ../scripts/knowledge-review-sync.mjs"

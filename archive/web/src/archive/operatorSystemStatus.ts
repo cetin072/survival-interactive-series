@@ -100,6 +100,7 @@ const statusKorean: Record<string, string> = {
   FINALIZING: '게시 반영 중',
   REVIEW_REJECTED: '품질 검수 재시도',
   HUMAN_REVIEW: '사람 검토 필요',
+  SUPERSEDED: '새 승인 결과로 대체됨',
   HOLD: '보류',
   SUBMITTED: '제출 완료',
   PR_OPEN: '게시 전 검증 중',

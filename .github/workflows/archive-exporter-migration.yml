@@ -13,6 +13,8 @@ on:
       - 'supabase/tests/knowledge_ex001_review_revalidation.sql'
       - 'supabase/tests/knowledge_ex001_existing_review_rebind.sql'
       - 'supabase/tests/knowledge_ex001_published_reconcile.sql'
+      - 'supabase/tests/knowledge_operational_recovery.sql'
+      - 'supabase/tests/knowledge_review_supersession.sql'
       - 'supabase/migrations/20261005020000_knowledge_ex001_published_reconcile.sql'
       - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
       - 'supabase/tests/knowledge_semantic_review_e2e.sql'
@@ -36,6 +38,8 @@ on:
       - 'supabase/tests/knowledge_ex001_review_revalidation.sql'
       - 'supabase/tests/knowledge_ex001_existing_review_rebind.sql'
       - 'supabase/tests/knowledge_ex001_published_reconcile.sql'
+      - 'supabase/tests/knowledge_operational_recovery.sql'
+      - 'supabase/tests/knowledge_review_supersession.sql'
       - 'supabase/migrations/20261005020000_knowledge_ex001_published_reconcile.sql'
       - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
       - 'supabase/tests/knowledge_semantic_review_e2e.sql'
@@ -218,6 +222,10 @@ jobs:
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_ex001_existing_review_rebind.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261005020000_knowledge_ex001_published_reconcile.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_ex001_published_reconcile.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261005022404_knowledge_operational_recovery_v1.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_operational_recovery.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261005022935_knowledge_review_supersession_v1.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_review_supersession.sql
 
   illustration-db-contract:
     runs-on: ubuntu-latest

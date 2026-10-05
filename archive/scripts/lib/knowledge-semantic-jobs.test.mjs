@@ -455,6 +455,8 @@ test('C-FINALIZER drives an exact-target package through a Git worker branch to 
       },
     }
     const result = { version: 'knowledge-semantic-result-v1', job_id: job.job_id, decision: 'BRIEF_READY', candidate, evidence, brief }
+    // Generate canonical baseline bytes before git records the isolated fixture.
+    execFileSync(process.execPath, ['archive/scripts/build-knowledge.mjs'], { cwd: root, stdio: 'pipe' })
 
     git(['init', '-b', 'main'])
     git(['config', 'user.name', 'C3 integration test'])
@@ -500,7 +502,7 @@ test('C-FINALIZER drives an exact-target package through a Git worker branch to 
         return { number: createdPr.number, url: createdPr.url }
       },
     })
-    assert.equal(outcome.status, 'PR_OPEN')
+    assert.equal(outcome.status, 'PR_OPEN', JSON.stringify(outcome))
     assert.equal(outcome.pr_number, 501)
     assert.equal(outcome.head_sha, createdPr.headSha)
     assert.equal(outcome.release_decision, 'AUTO_PUBLISH_ELIGIBLE')

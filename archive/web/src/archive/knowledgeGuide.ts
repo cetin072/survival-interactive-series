@@ -1,3 +1,5 @@
+import publicBriefFiles from 'virtual:knowledge-public'
+
 export type KnowledgeGuideBlock =
   | { type: 'prose'; text: string }
   | { type: 'note'; text: string }
@@ -66,10 +68,7 @@ type KnowledgeBriefFile = {
   tools?: KnowledgeGuideTool[]
 }
 
-const briefFiles = import.meta.glob('../../../../knowledge/content/briefs/*.json', {
-  eager: true,
-  import: 'default',
-}) as Record<string, KnowledgeBriefFile>
+const briefFiles = publicBriefFiles as KnowledgeBriefFile[]
 
 export const supportedKnowledgeBlockTypes = new Set([
   'prose',
@@ -91,8 +90,7 @@ function assertSupportedBlocks(brief: KnowledgeBriefFile) {
   return brief
 }
 
-export const publishedKnowledgeGuides = Object.values(briefFiles)
-  .filter((brief) => brief.status === 'PUBLISHED')
+export const publishedKnowledgeGuides = briefFiles
   .map(assertSupportedBlocks)
   .map((brief): KnowledgeGuide => ({
     id: brief.id,
