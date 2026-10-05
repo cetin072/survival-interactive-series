@@ -47,6 +47,7 @@ describe('Operator system status helpers', () => {
     expect(statusWithKorean('EXTRACTOR_READY')).toBe('EXTRACTOR_READY · 내용 추출 대기')
     expect(statusWithKorean('REVIEW_READY')).toBe('REVIEW_READY · 내용 검수 대기')
     expect(statusWithKorean('REJECT')).toBe('REJECT · 반려')
+    expect(statusWithKorean('SUPERSEDED')).toBe('SUPERSEDED · 새 승인 결과로 대체됨')
     expect(explainMachineCode('NO_ACCEPTABLE_CANDIDATE')).toBe('사용할 수 있는 결과가 없음')
     expect(explainMachineCode('QUALITY_GATE')).toBe('품질 검수 단계')
     expect(explainMachineCode('RENDERER_NOT_CONSUMED')).toBe('이미지 생성 작업이 오래 시작되지 않았습니다.')

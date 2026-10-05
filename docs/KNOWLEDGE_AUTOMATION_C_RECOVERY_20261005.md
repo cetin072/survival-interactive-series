@@ -14,6 +14,8 @@ The forward review migration adds SUPERSEDED without fabricating a human decisio
 
 Both forward migrations were applied and their live definitions and schedules read back. Repository migration files and live migration timestamps are separate records. CI applies all previous migrations before these forward migrations and runs transactional regression fixtures in an isolated database.
 
+Live migration receipts: `20261005022639` (operational recovery) and `20261005023127` (review supersession). The isolated DB CI passed admission/day-boundary/retry and approval/receipt/supersession preservation checks. Earlier crash-recovery fixtures are cleared only inside the admission test transaction and restored by rollback.
+
 ## Actual K-015 cycle
 
 The existing SESSION_008 job was reused, with its exact source/policy pins verified against Git bytes. Official FEMA, EPA and USFA sources informed a full Candidate/Evidence/BRIEF package about prioritizing emergency restoration requests. Because this concerns life safety, the package retains HIGH/OTHER_SEVERE_HARM and HUMAN_APPROVED rather than requesting automatic publication.

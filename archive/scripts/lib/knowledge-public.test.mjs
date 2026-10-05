@@ -24,6 +24,21 @@ test('public projection preserves approved bodies, sources and tools and strips 
   assert.ok(!JSON.stringify(projected).includes(brief.editorial_note))
 })
 
+test('PUBLISHED alone cannot bypass existing public approval conditions', async () => {
+  for (const mutation of [
+    (brief, data) => { data.evidence.delete(brief.id) },
+    (brief) => { brief.publication_policy = 'UNKNOWN' },
+    (brief) => { brief.risk_level = 'HIGH' },
+  ]) {
+    const data = await loadKnowledge()
+    const brief = data.briefs.find((item) => item.id === 'K-004')
+    brief.status = 'PUBLISHED'
+    brief.published_at = '2026-10-05'
+    mutation(brief, data)
+    await assert.rejects(publicBriefs(data), /KNOWLEDGE_PUBLIC_INELIGIBLE:K-004/)
+  }
+})
+
 test('actual artifact scanner rejects draft content, escaped source maps and editorial notes', async () => {
   const data = await loadKnowledge()
   const dir = await mkdtemp(join(tmpdir(), 'knowledge-public-test-'))
