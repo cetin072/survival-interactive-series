@@ -2,6 +2,12 @@
 
 Status: **CANDIDATE, regular B schedules remain OFF until live acceptance.**
 
+Golden reference / 검증 표준 사례:
+[`ILLUSTRATION_B_REFERENCE_CASE_2026-10-05.md`](./ILLUSTRATION_B_REFERENCE_CASE_2026-10-05.md)
+
+이 reference case는 실제 PASS 증거, 실패 교정, 금지 규칙과 최종 LIVE acceptance 조건을 보존한다.
+transport PASS를 LIVE E2E PASS로 오판하지 않도록 이 문서와 함께 읽는다.
+
 The existing Prep, `native_chatgpt` provider, DB queue, review handoff,
 Transfer and Finalizer remain the authorities. This bridge only transports
 the exact visual prompt into a reusable scheduled Renderer and collects its
