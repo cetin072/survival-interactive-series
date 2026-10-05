@@ -29,5 +29,12 @@
     "surface": "library",
     "sha256": "b5eec8f8cffe39a012d264d0a2a18903fdb894257acef086110f9accae501c27"
   },
-  "dispatch": null
+  "dispatch": {
+    "status": "DISPATCHED",
+    "requested_at": "2026-10-05T01:09:10.204Z",
+    "renderer_id": "6ac2e58fc3848191aba731468f6c3e18",
+    "renderer_prompt_sha256": "f5f06238b98c3c595377d635c7e107cba1e7898aa35a01c47be59f7465bc8e5f",
+    "next_run_time": null,
+    "task_updated_at": "2026-10-05T01:08:22.057036+00:00"
+  }
 }
