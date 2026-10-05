@@ -157,5 +157,19 @@
     },
     "prepared_at": "2026-10-05T01:47:58.105301+00:00",
     "prepared_via": "ONE_EXTRA_LIVE_ACCEPTANCE_JOB_AUTHORIZED_2026-10-05"
+  },
+  "review": {
+    "status": "HANDOFF_SUBMITTED",
+    "review_handoff_commit": "d94af03a285a5386b01aa947b639fae36de57d07",
+    "decision": "PASS",
+    "review_provider": "native_chatgpt_vision",
+    "review_summary": "Matches the bound fireline scene: a contemporary Korean agricultural facility after a contained fire, with localized greenhouse and irrigation damage, wet post-response ground and soot, most surrounding structures intact, small responders, and a quiet cool blue-gray painterly composition without embedded identifying text or invented spectacle.",
+    "rejection_codes": [],
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_0000000018e481fd828652c5c1377af0",
+    "source_library_file_id": "libfile_a1e80988e2748191bf6f3881444683f8",
+    "source_version_id": "5",
+    "source_sha256": "ad752c36ba67542ee0533e8df697bb5a03e326ab0e792d6e8558c6230d97e98d",
+    "created_at": "2026-10-05T03:17:09.990Z"
   }
 }
