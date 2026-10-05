@@ -12,6 +12,7 @@ const recentWorldDocuments = buildWikiDocuments(wikiSupportedNodeIds)
 const wikiHref = (nodeId: string) => '/?view=wiki-preview&node=' + encodeURIComponent(nodeId)
 const chronicleHref = (chronicleId: string) => '/?view=wiki-preview&page=chronicle&chronicle=' + encodeURIComponent(chronicleId)
 const storyHref = (chronicleId: string) => '/?view=story&chronicle=' + encodeURIComponent(chronicleId)
+const worldHref = (chronicleId: string, section?: 'characters' | 'locations' | 'events') => '/?view=wiki-preview&page=world&chronicle=' + encodeURIComponent(chronicleId) + (section ? '#' + section : '')
 
 export function WikiHomePreview() {
   return <main className="wiki-shell wiki-home-shell">
@@ -53,9 +54,9 @@ export function WikiHomePreview() {
           <section className="wiki-home-section" aria-labelledby="wiki-category-title">
             <div className="wiki-section-heading"><h2 id="wiki-category-title">세계관 분류</h2><span>현재 공개 Graph 기준</span></div>
             <div className="wiki-category-grid">
-              <section><strong>인물</strong><b>{wikiCharacterIndex.length}</b><div>{wikiCharacterIndex.slice(0, 6).map((item) => <a key={item.id} href={wikiHref(item.id)}>{item.title}</a>)}</div></section>
-              <section><strong>장소</strong><b>{wikiLocationIndex.length}</b><div>{wikiLocationIndex.slice(0, 6).map((item) => <a key={item.id} href={wikiHref(item.id)}>{item.title}</a>)}</div></section>
-              <section><strong>사건</strong><b>{wikiEventIndex.length}</b><div>{wikiEventIndex.slice(0, 6).map((item) => <a key={item.id} href={wikiHref(item.id)}>{item.title}</a>)}</div></section>
+              <section><strong>인물</strong><b>{wikiCharacterIndex.length}</b><div>{wikiCharacterIndex.slice(0, 6).map((item) => <a key={item.id} href={wikiHref(item.id)}>{item.title}</a>)}</div><a className="wiki-category-more" href={worldHref(activeChronicle.id, 'characters')}>인물 전체보기 →</a></section>
+              <section><strong>장소</strong><b>{wikiLocationIndex.length}</b><div>{wikiLocationIndex.slice(0, 6).map((item) => <a key={item.id} href={wikiHref(item.id)}>{item.title}</a>)}</div><a className="wiki-category-more" href={worldHref(activeChronicle.id, 'locations')}>장소 전체보기 →</a></section>
+              <section><strong>사건</strong><b>{wikiEventIndex.length}</b><div>{wikiEventIndex.slice(0, 6).map((item) => <a key={item.id} href={wikiHref(item.id)}>{item.title}</a>)}</div><a className="wiki-category-more" href={worldHref(activeChronicle.id, 'events')}>사건 전체보기 →</a></section>
             </div>
           </section>
         </div>
