@@ -1,6 +1,9 @@
 \set ON_ERROR_STOP on
 -- Isolated CI database only; all fixture rows roll back.
 begin;
+-- Earlier crash-recovery tests retain a fixture row. Establish a clean budget
+-- only in this isolated CI transaction; rollback restores those earlier fixtures.
+truncate survival_ops.knowledge_semantic_jobs cascade;
 do $verify$
 declare
   v_result jsonb;
