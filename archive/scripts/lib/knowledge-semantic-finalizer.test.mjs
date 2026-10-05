@@ -21,9 +21,16 @@ test('deterministic branch identity rejects invalid job ids', () => {
   assert.throws(() => semanticBranchRef('not-a-uuid'), /SEMANTIC_JOB_ID_INVALID/)
 })
 
-test('open PR with stale base is treated as a fail-closed revalidation blocker', () => {
-  const outcome = reconcilePullRequest({ final_pr_number: 9, final_head_sha: 'a'.repeat(40), result_decision: 'BRIEF_READY' }, { state: 'open', head: { sha: 'a'.repeat(40) }, base: { ref: 'main', sha: 'b'.repeat(40) } }, 'c'.repeat(40))
-  assert.deepEqual(outcome, { status: 'BLOCKED', code: 'MAIN_MOVED_REVALIDATION_REQUIRED' })
+test('unrelated main movement preserves both human and low-risk PRs with strict transport checks', () => {
+  for (const decision of ['HUMAN_REVIEW','BRIEF_READY']) {
+    const j={final_pr_number:9,final_head_sha:'a'.repeat(40),final_head_ref:'knowledge/worker/semantic-test',result_decision:decision}
+    const pr={state:'open',head:{sha:j.final_head_sha,ref:j.final_head_ref,repo:{full_name:'cetin072/survival-interactive-series'}},base:{ref:'main',sha:'b'.repeat(40)}}
+    assert.deepEqual(reconcilePullRequest(j,pr,'c'.repeat(40)),{status:decision==='HUMAN_REVIEW'?'HUMAN_REVIEW':'PR_OPEN',revalidation_required:true})
+    assert.equal(reconcilePullRequest(j,{...pr,head:{...pr.head,sha:'d'.repeat(40)}}).code,'PR_HEAD_CHANGED')
+    assert.equal(reconcilePullRequest(j,{...pr,state:'closed',merged:false}).code,'PR_CLOSED_WITHOUT_MERGE')
+    assert.equal(reconcilePullRequest(j,{...pr,head:{...pr.head,ref:'changed'}}).code,'PR_REF_CHANGED')
+    assert.equal(reconcilePullRequest(j,{...pr,head:{...pr.head,repo:{full_name:'other/repo'}}}).code,'PR_REPOSITORY_MISMATCH')
+  }
 })
 
 const packagedResult = (decision = 'BRIEF_READY') => ({
@@ -39,7 +46,7 @@ function finalizerHarness({ claimedJob, openJobs = [], pullRequest = null } = {}
   const requestRpc = async (name, args) => {
     calls.push(['rpc', name, args])
     if (name === 'archive_knowledge_semantic_job_claim_finalizer') return claimedJob
-    if (name === 'archive_knowledge_semantic_job_list_reconcile') return openJobs
+    if (name === 'archive_knowledge_semantic_job_list_reconcile_v2') return openJobs
     return { ok: true }
   }
   const shell = (command, args) => {
@@ -106,13 +113,25 @@ test('finalizer blocks a changed pinned source before packaging or opening a PR'
   assert.ok(calls.some((call) => call[0] === 'rpc' && call[1] === 'archive_knowledge_semantic_job_update' && call[2].p_status === 'BLOCKED'))
 })
 
-test('no new submit reconciles an exact-head PR but blocks and closes when main moved', async () => {
-  const submitted = { ...job, status: 'PR_OPEN', result_decision: 'BRIEF_READY', final_pr_number: 14, final_head_sha: 'e'.repeat(40) }
-  const stalePr = { state: 'open', merged: false, head: { sha: 'e'.repeat(40) }, base: { ref: 'main', sha: 'f'.repeat(40) } }
-  const { calls, requestRpc, shell } = finalizerHarness({ claimedJob: { status: 'NO_SUBMITTED_JOB' }, openJobs: [submitted], pullRequest: stalePr })
-  const outcome = await runSemanticFinalizer({ requestRpc, shell, mainSha: '0'.repeat(40) })
-  assert.equal(outcome.status, 'RECONCILED')
-  assert.deepEqual(outcome.jobs[0], { job_id: job.job_id, status: 'BLOCKED', code: 'MAIN_MOVED_REVALIDATION_REQUIRED' })
-  assert.ok(calls.some((call) => call[0] === 'shell' && call[1] === 'gh' && call[2][0] === 'pr' && call[2][1] === 'close'))
-  assert.ok(calls.some((call) => call[0] === 'rpc' && call[1] === 'archive_knowledge_semantic_job_update' && call[2].p_status === 'BLOCKED'))
+test('main drift leaves HUMAN_REVIEW and BRIEF_READY open; semantic, source and policy changes still fail closed', async () => {
+  for (const decision of ['HUMAN_REVIEW','BRIEF_READY']) {
+    const result=packagedResult(decision)
+    const submitted={...job,status:decision==='HUMAN_REVIEW'?'HUMAN_REVIEW':'PR_OPEN',result_decision:decision,semantic_result:result,
+      result_digest_verified:true,final_pr_number:14,final_head_ref:semanticBranchRef(job.job_id),final_head_sha:'e'.repeat(40)}
+    const pr={state:'open',merged:false,head:{sha:submitted.final_head_sha,ref:submitted.final_head_ref,repo:{full_name:'cetin072/survival-interactive-series'}},base:{ref:'main',sha:'f'.repeat(40)}}
+    const harness=finalizerHarness({claimedJob:{status:'NO_SUBMITTED_JOB'},openJobs:[submitted],pullRequest:pr})
+    const outcome=await runSemanticFinalizer({...harness,mainSha:'0'.repeat(40),verifyPinsFn:async()=>({context:job.semantic_context})})
+    assert.equal(outcome.jobs[0].status,submitted.status)
+    assert.equal(outcome.jobs[0].revalidation_required,true)
+    assert.ok(!harness.calls.some(c=>c[0]==='shell'&&c[2][1]==='close'))
+    assert.ok(!harness.calls.some(c=>c[1]==='archive_knowledge_semantic_job_update'))
+    for(const code of ['SEMANTIC_SOURCE_SHA_CHANGED','SEMANTIC_POLICY_PIN_CHANGED']) {
+      const h=finalizerHarness({claimedJob:{status:'NO_SUBMITTED_JOB'},openJobs:[submitted],pullRequest:pr})
+      const failed=await runSemanticFinalizer({...h,mainSha:'0'.repeat(40),verifyPinsFn:async()=>{throw Error(code)}})
+      assert.equal(failed.jobs[0].code,code)
+    }
+    const h=finalizerHarness({claimedJob:{status:'NO_SUBMITTED_JOB'},openJobs:[{...submitted,result_digest_verified:false}],pullRequest:pr})
+    const failed=await runSemanticFinalizer({...h,mainSha:'0'.repeat(40),verifyPinsFn:async()=>{}})
+    assert.equal(failed.jobs[0].code,'SEMANTIC_RESULT_IDENTITY_CHANGED')
+  }
 })

@@ -57,7 +57,7 @@ jobs:
           node --input-type=module <<'NODE' >> "$GITHUB_OUTPUT"
           import { readFileSync } from 'node:fs'
           const result = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/review.json', 'utf8'))
-          const fields = ['status','reason','item_id','decided_at','brief_id','approved_head_sha','prepared_head_sha','pr_number','head_ref','current_main','merge_sha','operator_job_id','operator_draft_revision','operator_draft_sha256']
+          const fields = ['status','reason','item_id','decided_at','brief_id','approved_head_sha','expected_head_sha','prepared_head_sha','pr_number','head_ref','current_main','merge_sha','operator_job_id','operator_draft_revision','operator_draft_sha256','c3_job_id','semantic_result_sha256','source_sha256','policy_sha256']
           for (const field of fields) {
             if (result[field] !== undefined && result[field] !== null) console.log(`${field}=${result[field]}`)
           }
@@ -113,6 +113,37 @@ jobs:
             --decided-at "$DECIDED_AT" \
             --outcome CONSUMED \
             --result-json "$RESULT_JSON"
+
+      - name: Reapply approved C3 data using current-main code
+        if: steps.inspect.outputs.status == 'REVALIDATE_PACKAGE'
+        id: revalidate
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          node archive/scripts/knowledge-review-revalidate.mjs "$RUNNER_TEMP/review.json" > "$RUNNER_TEMP/revalidation.json"
+          node --input-type=module <<'NODE' >> "$GITHUB_OUTPUT"
+          import { readFileSync } from 'node:fs'
+          const result=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/revalidation.json','utf8'))
+          console.log(`ready=${result.status==='READY'}`)
+          console.log(`status=${result.status}`)
+          console.log(`reason=${result.reason??''}`)
+          NODE
+
+      - name: Record current-main revalidation outcome
+        if: steps.inspect.outputs.status == 'REVALIDATE_PACKAGE' && steps.revalidate.outputs.ready != 'true'
+        env:
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          ITEM_ID: ${{ steps.inspect.outputs.item_id }}
+          DECIDED_AT: ${{ steps.inspect.outputs.decided_at }}
+          OUTCOME: ${{ steps.revalidate.outputs.status }}
+          REASON: ${{ steps.revalidate.outputs.reason }}
+        run: |
+          RESULT_JSON="$(node --input-type=module -e 'console.log(JSON.stringify({reason:process.env.REASON}))')"
+          node archive/scripts/knowledge-review-consumer.mjs record --item-id "$ITEM_ID" \
+            --decided-at "$DECIDED_AT" --outcome "$OUTCOME" --result-json "$RESULT_JSON"
 
       - name: Checkout approved Worker branch
         if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
@@ -212,11 +243,11 @@ jobs:
           test "$rejected" -eq 0
 
       - name: Move Worker PR to publication handoff phase
-        if: steps.inspect.outputs.status == 'READY'
+        if: steps.inspect.outputs.status == 'READY' || steps.revalidate.outputs.ready == 'true'
         env:
           GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
           PR_NUMBER: ${{ steps.inspect.outputs.pr_number }}
-          APPROVED_SHA: ${{ steps.inspect.outputs.approved_head_sha }}
+          APPROVED_SHA: ${{ steps.inspect.outputs.expected_head_sha || steps.inspect.outputs.approved_head_sha }}
         run: |
           set -euo pipefail
           gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > "$RUNNER_TEMP/review-pr.json"
@@ -240,24 +271,51 @@ jobs:
             --input "$RUNNER_TEMP/review-pr-update.json" > "$RUNNER_TEMP/review-pr-updated.json"
 
       - name: Commit prepared human-approved publication
-        if: steps.inspect.outputs.status == 'READY'
+        if: steps.inspect.outputs.status == 'READY' || steps.revalidate.outputs.ready == 'true'
         id: prepared
         env:
           BRIEF_ID: ${{ steps.inspect.outputs.brief_id }}
           HEAD_REF: ${{ steps.inspect.outputs.head_ref }}
+          C3_JOB_ID: ${{ steps.inspect.outputs.c3_job_id }}
+          EXPECTED_SHA: ${{ steps.inspect.outputs.expected_head_sha }}
+          VALIDATED_MAIN: ${{ steps.inspect.outputs.current_main }}
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           set -euo pipefail
-          git add "knowledge/content/briefs/$BRIEF_ID.json" archive/web/public/knowledge archive/web/public/sitemap.xml
+          if [ -n "$C3_JOB_ID" ]; then
+            git add knowledge/content knowledge/automation/state.json knowledge/automation/runtime-state.json archive/web/public/knowledge archive/web/public/sitemap.xml
+          else
+            git add "knowledge/content/briefs/$BRIEF_ID.json" archive/web/public/knowledge archive/web/public/sitemap.xml
+          fi
           git diff --cached --quiet && { echo "HUMAN_APPROVED_PREPARE_NO_CHANGES"; exit 1; }
           git config user.name "knowledge-human-review-bot"
           git config user.email "knowledge-human-review-bot@users.noreply.github.com"
-          git commit -m "knowledge: prepare $BRIEF_ID human-approved publication"
-          PREPARED_SHA="$(git rev-parse HEAD)"
+          if [ -n "$C3_JOB_ID" ]; then
+            git fetch origin "$HEAD_REF"
+            test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED_SHA"
+            # Validated tree is from current main; the old transport is a history parent only.
+            PREPARED_SHA="$(git commit-tree "$(git write-tree)" -p "$VALIDATED_MAIN" -p "$EXPECTED_SHA" -m "knowledge: prepare $BRIEF_ID human-approved publication")"
+            git reset --hard "$PREPARED_SHA"
+            PREPARED_SHA="$PREPARED_SHA" node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs'
+          import { postSupabaseRpc } from './archive/scripts/lib/knowledge-semantic-jobs.mjs'
+          const review=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/review.json','utf8'))
+          await postSupabaseRpc({projectUrl:process.env.ARCHIVE_SUPABASE_URL,serviceRoleKey:process.env.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY,
+            name:'archive_knowledge_review_record_preparation',args:{p_item_id:review.item_id,p_decided_at:review.decided_at,
+              p_result_sha256:review.semantic_result_sha256,p_source_sha256:review.source_sha256,p_policy_sha256:review.policy_sha256,
+              p_validated_main_sha:review.current_main,p_prepared_head_sha:process.env.PREPARED_SHA,
+              p_operator_revision:review.operator_draft_revision,p_operator_sha256:review.operator_draft_sha256}})
+          NODE
+          else
+            git commit -m "knowledge: prepare $BRIEF_ID human-approved publication"
+            PREPARED_SHA="$(git rev-parse HEAD)"
+          fi
           git push origin "HEAD:$HEAD_REF"
           echo "sha=$PREPARED_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Resolve prepared head
-        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
+        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED' || steps.revalidate.outputs.ready == 'true'
         id: head
         env:
           NEW_SHA: ${{ steps.prepared.outputs.sha }}
@@ -270,7 +328,7 @@ jobs:
           echo "sha=$PREPARED_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Exact-head machine revalidation
-        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
+        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED' || steps.revalidate.outputs.ready == 'true'
         working-directory: archive/web
         env:
           BRIEF_ID: ${{ steps.inspect.outputs.brief_id }}
@@ -297,7 +355,7 @@ jobs:
           NODE
 
       - name: Wait for prepared PR checks
-        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
+        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED' || steps.revalidate.outputs.ready == 'true'
         env:
           GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
           PR_NUMBER: ${{ steps.inspect.outputs.pr_number }}
@@ -313,15 +371,28 @@ jobs:
           gh pr checks "$PR_NUMBER" --watch --interval 10
 
       - name: Recheck current main and exact PR head
-        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
+        id: final_identity
+        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED' || steps.revalidate.outputs.ready == 'true'
         env:
           GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
           PR_NUMBER: ${{ steps.inspect.outputs.pr_number }}
           PREPARED_SHA: ${{ steps.head.outputs.sha }}
+          VALIDATED_MAIN: ${{ steps.inspect.outputs.current_main }}
+          ITEM_ID: ${{ steps.inspect.outputs.item_id }}
+          DECIDED_AT: ${{ steps.inspect.outputs.decided_at }}
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           set -euo pipefail
           git fetch origin main:refs/remotes/origin/main
-          test "$(git merge-base origin/main "$PREPARED_SHA")" = "$(git rev-parse origin/main)" || {
+          CURRENT_MAIN="$(git rev-parse origin/main)"
+          if [ "$CURRENT_MAIN" != "$VALIDATED_MAIN" ]; then
+            node archive/scripts/knowledge-review-consumer.mjs record --item-id "$ITEM_ID" --decided-at "$DECIDED_AT" \
+              --outcome RETRYABLE --result-json '{"reason":"MAIN_MOVED_BEFORE_MERGE"}'
+            echo "unchanged=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          test "$(git merge-base origin/main "$PREPARED_SHA")" = "$CURRENT_MAIN" || {
             echo "MAIN_MOVED_HUMAN_APPROVAL_REVALIDATION_REQUIRED"
             exit 1
           }
@@ -335,16 +406,28 @@ jobs:
           if (pr.head?.sha !== process.env.PREPARED_SHA) throw new Error('FINAL_REVIEW_PR_HEAD_CHANGED')
           if (!pr.body?.includes('<!-- knowledge-worker-phase-v1:PUBLICATION_HANDOFF -->')) throw new Error('FINAL_REVIEW_PHASE_INVALID')
           NODE
+          echo "unchanged=true" >> "$GITHUB_OUTPUT"
 
       - name: Merge exact human-approved head
-        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
+        if: steps.final_identity.outputs.unchanged == 'true' && (steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED' || steps.revalidate.outputs.ready == 'true')
         id: merge
         env:
           GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
           PR_NUMBER: ${{ steps.inspect.outputs.pr_number }}
           PREPARED_SHA: ${{ steps.head.outputs.sha }}
+          VALIDATED_MAIN: ${{ steps.inspect.outputs.current_main }}
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          ITEM_ID: ${{ steps.inspect.outputs.item_id }}
+          DECIDED_AT: ${{ steps.inspect.outputs.decided_at }}
         run: |
           set -euo pipefail
+          CURRENT_MAIN="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+          if [ "$CURRENT_MAIN" != "$VALIDATED_MAIN" ]; then
+            node archive/scripts/knowledge-review-consumer.mjs record --item-id "$ITEM_ID" \
+              --decided-at "$DECIDED_AT" --outcome RETRYABLE --result-json '{"reason":"MAIN_MOVED_BEFORE_MERGE"}'
+            exit 0
+          fi
           gh api --method PUT "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/merge" \
             -f merge_method=squash \
             -f sha="$PREPARED_SHA" > "$RUNNER_TEMP/human-review-merge.json"
@@ -359,7 +442,7 @@ jobs:
           echo "sha=$MERGE_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Record consumed human review
-        if: steps.inspect.outputs.status == 'READY' || steps.inspect.outputs.status == 'RESUME_PREPARED'
+        if: steps.merge.outputs.sha != ''
         env:
           ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
           ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
