@@ -36,13 +36,21 @@ export function finalizerAction(job, result) {
 
 export function reconcilePullRequest(job, pr, currentMainSha = null) {
   if (!Number.isInteger(job.final_pr_number) || !/^[a-f0-9]{40}$/.test(job.final_head_sha ?? '')) return { status: 'BLOCKED', code: 'PR_REFERENCE_MISSING' }
-  if (pr?.head?.sha !== job.final_head_sha) return { status: 'BLOCKED', code: 'PR_HEAD_CHANGED' }
+  if (pr?.base?.ref !== 'main') return { status: 'BLOCKED', code: 'PR_BASE_NOT_MAIN' }
+  if (pr?.head?.repo?.full_name !== repository) return { status: 'BLOCKED', code: 'PR_REPOSITORY_MISMATCH' }
+  if (pr?.head?.ref !== job.final_head_ref) return { status: 'BLOCKED', code: 'PR_REF_CHANGED' }
+  const registered = job.publication_heads?.includes(pr?.head?.sha)
+  if (pr?.head?.sha !== job.final_head_sha && !registered) return { status: 'BLOCKED', code: 'PR_HEAD_CHANGED' }
   if (pr.state === 'open' && pr.merged !== true) {
-    if (pr.base?.ref !== 'main' || (currentMainSha && pr.base?.sha !== currentMainSha)) return { status: 'BLOCKED', code: 'MAIN_MOVED_REVALIDATION_REQUIRED' }
-    return { status: job.result_decision === 'HUMAN_REVIEW' ? 'HUMAN_REVIEW' : 'PR_OPEN' }
+    return { status: job.result_decision === 'HUMAN_REVIEW' ? 'HUMAN_REVIEW' : 'PR_OPEN',
+      ...(currentMainSha && pr.base.sha !== currentMainSha ? { revalidation_required: true } : {}),
+      ...(registered && pr.head.sha !== job.final_head_sha ? { registered_head_sha: pr.head.sha } : {}),
+    }
   }
   if (pr.state === 'closed' && pr.merged === true && /^[a-f0-9]{40}$/.test(pr.merge_commit_sha ?? '')) {
-    return { status: 'PUBLISHED', mergeSha: pr.merge_commit_sha }
+    return { status: 'PUBLISHED', mergeSha: pr.merge_commit_sha,
+      ...(registered && pr.head.sha !== job.final_head_sha ? { registered_head_sha: pr.head.sha } : {}),
+    }
   }
   return { status: 'BLOCKED', code: 'PR_CLOSED_WITHOUT_MERGE' }
 }
@@ -187,9 +195,9 @@ async function createOrReuseDraft(job, result, headRef, headSha) {
   return { number: pr.number, url: pr.url }
 }
 
-async function reconcileOpenJobs({ requestRpc = rpc, shell = run, currentRoot = root, mainSha = null } = {}) {
+async function reconcileOpenJobs({ requestRpc = rpc, shell = run, currentRoot = root, mainSha = null, verifyPinsFn = verifyPins } = {}) {
   const currentMainSha = mainSha ?? shell('git', ['rev-parse', 'origin/main'], currentRoot)
-  const jobs = await requestRpc('archive_knowledge_semantic_job_list_reconcile', {})
+  const jobs = await requestRpc('archive_knowledge_semantic_job_list_reconcile_v2', {})
   const outcomes = []
   for (const job of jobs ?? []) {
     if (!Number.isInteger(job.final_pr_number)) {
@@ -199,11 +207,24 @@ async function reconcileOpenJobs({ requestRpc = rpc, shell = run, currentRoot = 
       continue
     }
     const pr = JSON.parse(shell('gh', ['api', `repos/${repository}/pulls/${job.final_pr_number}`], currentRoot))
-    const outcome = reconcilePullRequest(job, pr, currentMainSha)
+    let outcome = reconcilePullRequest(job, pr, currentMainSha)
+    if (outcome.status !== 'BLOCKED') {
+      try {
+        if (job.result_digest_verified !== true) throw new Error('SEMANTIC_RESULT_IDENTITY_CHANGED')
+        validateSemanticResult(job, job.semantic_result)
+        await verifyPinsFn(job, currentRoot)
+        if (pr.state === 'open') {
+          const existing = shell('git', ['ls-tree', '--name-only', currentMainSha, '--', `knowledge/content/briefs/${job.semantic_result.brief.id}.json`], currentRoot)
+          if (existing) throw new Error('SEMANTIC_TARGET_BRIEF_ALREADY_EXISTS')
+        }
+      } catch (error) {
+        outcome = { status: 'BLOCKED', code: error.message.split(':')[0] }
+      }
+    }
     if (outcome.status === 'BLOCKED' && pr.state === 'open') {
       shell('gh', ['pr', 'close', String(job.final_pr_number), '--comment', `C3 finalizer closed this PR because ${outcome.code}. A new exact-head review is required.`], currentRoot)
     }
-    if (outcome.status !== job.status) await updateJob(requestRpc, job.job_id, job.status, outcome.status, { blockerCode: outcome.code ?? null, blockerStage: outcome.code ? 'PR_RECONCILE' : null, mergeSha: outcome.mergeSha ?? null })
+    if (outcome.status !== job.status || outcome.registered_head_sha) await updateJob(requestRpc, job.job_id, job.status, outcome.status, { blockerCode: outcome.code ?? null, blockerStage: outcome.code ? 'PR_RECONCILE' : null, mergeSha: outcome.mergeSha ?? null, headSha: outcome.registered_head_sha ?? null })
     outcomes.push({ job_id: job.job_id, ...outcome })
   }
   return outcomes
@@ -212,7 +233,7 @@ async function reconcileOpenJobs({ requestRpc = rpc, shell = run, currentRoot = 
 export async function runSemanticFinalizer({ requestRpc = rpc, shell = run, packageSemantic = runPackage, createDraft = createOrReuseDraft, enqueueReviewEntry = enqueueReview, verifyPinsFn = verifyPins, currentRoot = root, mainSha = null } = {}) {
   const currentMainSha = mainSha ?? shell('git', ['rev-parse', 'origin/main'], currentRoot)
   const job = await requestRpc('archive_knowledge_semantic_job_claim_finalizer', {})
-  if (job.status === 'NO_SUBMITTED_JOB') return { status: 'RECONCILED', jobs: await reconcileOpenJobs({ requestRpc, shell, currentRoot, mainSha: currentMainSha }) }
+  if (job.status === 'NO_SUBMITTED_JOB') return { status: 'RECONCILED', jobs: await reconcileOpenJobs({ requestRpc, shell, currentRoot, mainSha: currentMainSha, verifyPinsFn }) }
   try {
     const result = job.semantic_result
     const action = finalizerAction(job, result)

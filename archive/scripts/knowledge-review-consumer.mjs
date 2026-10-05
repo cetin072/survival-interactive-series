@@ -148,6 +148,28 @@ export async function inspectApprovedReview({ projectUrl, serviceRoleKey, github
   const failedBase = baseChecks.find(([ok]) => !ok)
   if (failedBase) return { status: 'BLOCKED', reason: failedBase[1], item_id: item.id, decided_at: item.decided_at }
 
+  const semantic = await jsonFetch(`${projectUrl.replace(/\/$/, '')}/rest/v1/rpc/archive_knowledge_review_package`, {
+    method: 'POST', headers: supabaseHeaders(serviceRoleKey),
+    body: JSON.stringify({ p_item_id: item.id, p_decided_at: item.decided_at }),
+  }, fetchImpl)
+  if (semantic.status === 'C3') {
+    const expected = pr.head?.sha === identity.headSha || semantic.prepared_heads?.includes(pr.head?.sha)
+    if (!expected) return { status: 'BLOCKED', reason: 'REVIEW_PR_HEAD_CHANGED', item_id: item.id, decided_at: item.decided_at }
+    if (pr.state === 'closed' && pr.merged_at && semantic.prepared_heads?.includes(pr.head.sha) && shaPattern.test(pr.merge_commit_sha ?? '')) {
+      return { status: 'RECOVER_CONSUMED', item_id: item.id, decided_at: item.decided_at, brief_id: identity.briefId,
+        prepared_head_sha: pr.head.sha, merge_sha: pr.merge_commit_sha }
+    }
+    if (pr.state !== 'open') return { status: 'BLOCKED', reason: 'REVIEW_PR_NOT_OPEN', item_id: item.id, decided_at: item.decided_at }
+    return { status: 'REVALIDATE_PACKAGE', item_id: item.id, decided_at: item.decided_at, brief_id: identity.briefId,
+      approved_head_sha: identity.headSha, expected_head_sha: pr.head.sha, pr_number: identity.prNumber,
+      head_ref: identity.headRef, current_main: currentMain, c3_job_id: semantic.job.job_id,
+      semantic_result_sha256: semantic.job.semantic_result_sha256,
+      source_sha256: semantic.job.source_sha256, policy_sha256: semantic.job.policy_sha256,
+      operator_job_id: identity.operatorJobId, operator_draft_revision: identity.operatorDraftRevision,
+      operator_draft_sha256: identity.operatorDraftSha256 }
+  }
+  if (semantic.status !== 'NOT_C3') throw new Error('REVIEW_SEMANTIC_PACKAGE_RESPONSE_INVALID')
+
   if (pr.head?.sha !== identity.headSha) {
     const continuation = await preparedContinuation({
       approvedHead: identity.headSha,

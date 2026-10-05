@@ -58,6 +58,8 @@ jobs:
           cache: npm
           cache-dependency-path: archive/web/package-lock.json
       - run: npm ci
+      - name: Read existing canonical Reader provenance for drift regression
+        run: git fetch origin worldline/afterfall-rpg:refs/remotes/origin/worldline/afterfall-rpg
       - name: Knowledge scanner, contract, generator and gate tests
         run: npm run knowledge:test
       - name: C3 semantic-job contracts and recovery tests
@@ -74,6 +76,7 @@ jobs:
           node --check ../scripts/knowledge-production-verify.mjs
           node --check ../scripts/knowledge-review-sync.mjs
           node --check ../scripts/knowledge-review-consumer.mjs
+          node --check ../scripts/knowledge-review-revalidate.mjs
           node --check ../scripts/knowledge-human-approved-prepare.mjs
           node --check ../scripts/knowledge-human-approved-release-check.mjs
           node --check ../scripts/knowledge-operator-draft-apply.mjs

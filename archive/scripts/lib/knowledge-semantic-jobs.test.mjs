@@ -198,10 +198,11 @@ test('finalizer uses a deterministic worker branch and routes review packages to
 })
 
 test('PR reconciliation requires the exact submitted head and records only a merged exact head', () => {
-  const job = { result_decision: 'BRIEF_READY', final_pr_number: 51, final_head_sha: 'a'.repeat(40) }
-  assert.deepEqual(reconcilePullRequest(job, { state: 'open', merged: false, head: { sha: 'a'.repeat(40) }, base: { ref: 'main' } }), { status: 'PR_OPEN' })
-  assert.deepEqual(reconcilePullRequest(job, { state: 'closed', merged: true, merge_commit_sha: 'b'.repeat(40), head: { sha: 'a'.repeat(40) } }), { status: 'PUBLISHED', mergeSha: 'b'.repeat(40) })
-  assert.deepEqual(reconcilePullRequest(job, { state: 'open', merged: false, head: { sha: 'c'.repeat(40) }, base: { ref: 'main' } }), { status: 'BLOCKED', code: 'PR_HEAD_CHANGED' })
+  const job = { result_decision: 'BRIEF_READY', final_pr_number: 51, final_head_sha: 'a'.repeat(40), final_head_ref: 'knowledge/worker/test' }
+  const pr = {state:'open',merged:false,base:{ref:'main'},head:{sha:job.final_head_sha,ref:job.final_head_ref,repo:{full_name:'cetin072/survival-interactive-series'}}}
+  assert.deepEqual(reconcilePullRequest(job, pr), { status: 'PR_OPEN' })
+  assert.deepEqual(reconcilePullRequest(job, {...pr,state:'closed',merged:true,merge_commit_sha:'b'.repeat(40)}), { status: 'PUBLISHED', mergeSha: 'b'.repeat(40) })
+  assert.deepEqual(reconcilePullRequest(job, {...pr,head:{...pr.head,sha:'c'.repeat(40)}}), { status: 'BLOCKED', code: 'PR_HEAD_CHANGED' })
 })
 
 test('source and policy pins fail closed on modified bytes', async () => {

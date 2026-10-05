@@ -15,6 +15,7 @@ on:
       - 'supabase/tests/knowledge_ex001_published_reconcile.sql'
       - 'supabase/tests/knowledge_operational_recovery.sql'
       - 'supabase/tests/knowledge_review_supersession.sql'
+      - 'supabase/tests/knowledge_main_drift.sql'
       - 'supabase/migrations/20261005020000_knowledge_ex001_published_reconcile.sql'
       - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
       - 'supabase/tests/knowledge_semantic_review_e2e.sql'
@@ -40,6 +41,7 @@ on:
       - 'supabase/tests/knowledge_ex001_published_reconcile.sql'
       - 'supabase/tests/knowledge_operational_recovery.sql'
       - 'supabase/tests/knowledge_review_supersession.sql'
+      - 'supabase/tests/knowledge_main_drift.sql'
       - 'supabase/migrations/20261005020000_knowledge_ex001_published_reconcile.sql'
       - 'supabase/tests/knowledge_semantic_jobs_crash_recovery.psql'
       - 'supabase/tests/knowledge_semantic_review_e2e.sql'
@@ -226,6 +228,9 @@ jobs:
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_operational_recovery.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261005022935_knowledge_review_supersession_v1.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_review_supersession.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261005075315_knowledge_main_drift_v1.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261005083800_knowledge_main_drift_admission_v2.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_main_drift.sql
 
   illustration-db-contract:
     runs-on: ubuntu-latest

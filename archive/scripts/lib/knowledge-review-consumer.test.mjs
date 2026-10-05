@@ -53,6 +53,7 @@ test('approved exact head is READY only when current main is its ancestor', asyn
     githubToken: 'github-token',
     fetchImpl: async (url) => {
       calls.push(url)
+      if (url.includes('archive_knowledge_review_package')) return response({status:'NOT_C3'})
       if (url.includes('archive_worker_list_approved_reviews')) return response([item])
       if (url.endsWith('/pulls/321')) return response({
         state: 'open',
@@ -67,7 +68,7 @@ test('approved exact head is READY only when current main is its ancestor', asyn
   assert.equal(result.status, 'READY')
   assert.equal(result.brief_id, 'K-104')
   assert.equal(result.current_main, 'b'.repeat(40))
-  assert.equal(calls.length, 4)
+  assert.equal(calls.length, 5)
 })
 
 
@@ -78,6 +79,7 @@ test('prepared human-review commit is resumable instead of treated as stale', as
     serviceRoleKey: 'server-key',
     githubToken: 'github-token',
     fetchImpl: async (url) => {
+      if (url.includes('archive_knowledge_review_package')) return response({status:'NOT_C3'})
       if (url.includes('archive_worker_list_approved_reviews')) return response([item])
       if (url.endsWith('/pulls/321')) return response({
         state: 'open',
@@ -111,6 +113,7 @@ test('main drift blocks a stale approval', async () => {
     serviceRoleKey: 'server-key',
     githubToken: 'github-token',
     fetchImpl: async (url) => {
+      if (url.includes('archive_knowledge_review_package')) return response({status:'NOT_C3'})
       if (url.includes('archive_worker_list_approved_reviews')) return response([item])
       if (url.endsWith('/pulls/321')) return response({
         state: 'open',
@@ -200,6 +203,7 @@ test('READY approval carries exact operator draft identity to the workflow bound
     serviceRoleKey: 'server-key',
     githubToken: 'github-token',
     fetchImpl: async (url) => {
+      if (url.includes('archive_knowledge_review_package')) return response({status:'NOT_C3'})
       if (url.includes('archive_worker_list_approved_reviews')) return response([operator])
       if (url.endsWith('/pulls/321')) return response({
         state: 'open',

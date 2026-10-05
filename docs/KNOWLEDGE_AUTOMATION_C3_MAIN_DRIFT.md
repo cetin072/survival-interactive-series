@@ -1,0 +1,15 @@
+# C3 main drift and immutable package recovery
+
+Unrelated main commits do not invalidate a completed semantic package or a pending human review. Finalizer verifies the repository, main base ref, worker ref, expected transport head, stored result digest, source and policy pins, and target availability. A changed main SHA marks the open package for publication revalidation; it does not close the PR.
+
+Human approval remains bound to the original review and immutable result/source/policy/target identities, including an approved Operator Draft revision and hash when present. Publication preparation starts from current main code, reapplies the stored data, and executes existing Knowledge, release, web and public-boundary gates. It does not execute the old worker branch's code or invoke an LLM.
+
+The validated tree is transported by a commit with current main and the existing worker head as parents. A normal fast-forward push preserves transport history. A durable preparation audit binds that head to the approved package. Finalizer accepts only the original or registered transport head. Main is read again after validation and immediately before the existing merge gate. If it moved, a RETRYABLE receipt leaves the approval available for the next program-owned run. Each run makes one validation attempt. GitHub's merge API binds the exact PR head; it does not offer an atomic expected-base-SHA argument, so a main commit arriving between the final read and the API call remains a platform race.
+
+Complete BLOCKED packages with MAIN_MOVED_REVALIDATION_REQUIRED at PR_RECONCILE reserve the existing single-work admission boundary. Both the active inventory and the preparation RPC enforce this rule; no additional allocator or schedule is introduced.
+
+A historical blocked package whose target was already published by another durable job is not recoverable and does not reserve admission. Its terminal record remains unchanged.
+
+An administrator can recover a matching pending human-review package using `survival_ops.recover_knowledge_main_drift`. It requires the original PR/ref/head, result digest, source/policy pins, no publication record, matching undecided PENDING review, and a current-main target-absence attestation after local reapplication and machine checks. The transaction preserves the original review/result/head and records the previous blocker. This function is not granted to API roles.
+
+Until this implementation is merged, restored packages are excluded from the legacy reconcile inventory so old main code cannot close them again. The v2 inventory includes them with digest and transport audit information. Preparation remains reserved during that interval. The implementation PR stays Draft; recovery does not approve, publish, or merge the content PR.
