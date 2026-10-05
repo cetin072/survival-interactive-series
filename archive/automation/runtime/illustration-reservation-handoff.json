@@ -1,0 +1,20 @@
+{
+  "receipt": null,
+  "dispatch": null,
+  "collection": null,
+  "result": null,
+  "trial": {
+    "version": "illustration-reservation-live-trial-v1",
+    "source_commit": "7ae22b9ba5b4185b4c2f214cb6b5451c89ceea03",
+    "coordinator_task_id": "6ac24401ee1881919ac19b158102b752",
+    "renderer_task_id": "6ac2e58fc3848191aba731468f6c3e18",
+    "max_jobs": 1,
+    "not_before": "2026-10-06T05:37:00+09:00",
+    "regular_schedules_must_remain_off": [
+      "6ac252c96ea88191841241364adafb82",
+      "6ac234656c0481918269852a2ada19fc"
+    ],
+    "transport_probe_commit": "ecf4b29c5f7cb7efd2e6b3b428056cd322043773",
+    "code_pr": 424
+  }
+}
