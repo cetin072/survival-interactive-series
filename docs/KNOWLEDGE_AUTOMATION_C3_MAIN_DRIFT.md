@@ -8,6 +8,8 @@ The validated tree is transported by a commit with current main and the existing
 
 Complete BLOCKED packages with MAIN_MOVED_REVALIDATION_REQUIRED at PR_RECONCILE reserve the existing single-work admission boundary. Both the active inventory and the preparation RPC enforce this rule; no additional allocator or schedule is introduced.
 
+A historical blocked package whose target was already published by another durable job is not recoverable and does not reserve admission. Its terminal record remains unchanged.
+
 An administrator can recover a matching pending human-review package using `survival_ops.recover_knowledge_main_drift`. It requires the original PR/ref/head, result digest, source/policy pins, no publication record, matching undecided PENDING review, and a current-main target-absence attestation after local reapplication and machine checks. The transaction preserves the original review/result/head and records the previous blocker. This function is not granted to API roles.
 
 Until this implementation is merged, restored packages are excluded from the legacy reconcile inventory so old main code cannot close them again. The v2 inventory includes them with digest and transport audit information. Preparation remains reserved during that interval. The implementation PR stays Draft; recovery does not approve, publish, or merge the content PR.

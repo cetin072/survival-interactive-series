@@ -10,6 +10,7 @@ import { planSemanticPreparation } from '../knowledge-semantic-prepare.mjs'
 import { buildSemanticContext, hashPolicyBytes, reservedCandidateId } from './knowledge-semantic-jobs.mjs'
 import { inspectApprovedReview } from '../knowledge-review-consumer.mjs'
 import { reconcilePullRequest, verifyPins } from '../knowledge-semantic-finalize.mjs'
+import { checkHumanApprovedRelease } from './knowledge-release.mjs'
 
 test('recoverable BLOCKED package reserves the single-work boundary without another brief allocator', () => {
   for (const decision of ['BRIEF_READY','HUMAN_REVIEW']) assert.equal(planSemanticPreparation({activeJobs:[],
@@ -91,6 +92,9 @@ test('real Git main drift fixture reapplies approved immutable data on new main;
     assert.equal(git('rev-parse','HEAD'),current)
     assert.equal(await readFile(join(base,'unrelated-main.txt'),'utf8'),'other automation\n')
     assert.equal(JSON.parse(await readFile(join(base,'knowledge/content/briefs/K-015.json'))).title,brief.title)
+    const gate=await checkHumanApprovedRelease(await loadKnowledge(base),{base,briefIds:['K-015'],changedFiles:[
+      'knowledge/content/briefs/K-015.json',`knowledge/content/candidates/${candidate.id}.json`,'knowledge/content/evidence/K-015.json','knowledge/automation/runtime-state.json']})
+    assert.equal(gate.decision,'HUMAN_APPROVED_ELIGIBLE',JSON.stringify(gate))
     await assert.rejects(applyApprovedPackageOnMain({inspection,packageData,base}),/SEMANTIC_TARGET_BRIEF_ALREADY_EXISTS/)
   } finally {await rm(base,{recursive:true,force:true})}
 })

@@ -17,7 +17,7 @@ const json = (value) => JSON.stringify(value)
 const sha = (value) => createHash('sha256').update(value).digest('hex')
 
 export function planSemanticPreparation({ activeJobs, handledJobs = [], scanner, experienceChoice, backfillIsDue, backfillChoice, legacyBlocker }) {
-  if (handledJobs.some((job) => job.status === 'BLOCKED' && job.blocker_code === 'MAIN_MOVED_REVALIDATION_REQUIRED'
+  if (handledJobs.some((job) => job.recovery_available !== false && job.status === 'BLOCKED' && job.blocker_code === 'MAIN_MOVED_REVALIDATION_REQUIRED'
     && job.blocker_stage === 'PR_RECONCILE' && ['HUMAN_REVIEW', 'BRIEF_READY'].includes(job.result_decision))) {
     return { decision: 'NOOP', code: 'ACTIVE_RECOVERABLE_JOB_EXISTS' }
   }
