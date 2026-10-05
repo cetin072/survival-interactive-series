@@ -2,6 +2,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { WikiShellPreview } from './WikiShellPreview'
+import { wikiCharacterIndex, wikiEventIndex, wikiLocationIndex } from './wikiDocument'
 import { archiveRouteUrl, parseArchiveRoute } from './readerNavigation'
 
 describe('Wiki staged public structure', () => {
@@ -28,7 +29,28 @@ describe('Wiki staged public structure', () => {
     expect(markup).toContain('인물')
     expect(markup).toContain('장소')
     expect(markup).toContain('사건')
+    expect(markup).toContain('인물 전체보기')
+    expect(markup).toContain('장소 전체보기')
+    expect(markup).toContain('사건 전체보기')
+    expect(markup).toContain('page=world')
     expect(markup).toContain('이야기 읽기')
+  })
+
+  it('renders every public character location and event on the full world index', () => {
+    const markup = renderToStaticMarkup(createElement(WikiShellPreview, {
+      page: 'world',
+      chronicleId: 'C03-AFTERFALL',
+    }))
+
+    expect(markup).toContain('세계관 전체보기')
+    expect(markup).toContain(`인물 ${wikiCharacterIndex.length}`)
+    expect(markup).toContain(`장소 ${wikiLocationIndex.length}`)
+    expect(markup).toContain(`사건 ${wikiEventIndex.length}`)
+
+    for (const item of [...wikiCharacterIndex, ...wikiLocationIndex, ...wikiEventIndex]) {
+      expect(markup).toContain(item.title)
+      expect(markup).toContain('node=' + item.id)
+    }
   })
 
   it('keeps older Chronicles readable without fabricating Wiki world data', () => {
@@ -98,6 +120,11 @@ describe('Wiki staged public structure', () => {
       chronicleId: 'C03-AFTERFALL',
       page: 'chronicle',
     })
+    expect(parseArchiveRoute('?view=wiki-preview&page=world&chronicle=C03-AFTERFALL')).toMatchObject({
+      view: 'wiki-preview',
+      chronicleId: 'C03-AFTERFALL',
+      page: 'world',
+    })
     expect(parseArchiveRoute('?view=wiki-preview&node=char-seojin')).toMatchObject({
       view: 'wiki-preview',
       nodeId: 'char-seojin',
@@ -110,5 +137,13 @@ describe('Wiki staged public structure', () => {
     }, 'https://archive.example/')
     expect(chronicleUrl.searchParams.get('page')).toBe('chronicle')
     expect(chronicleUrl.searchParams.get('chronicle')).toBe('C03-AFTERFALL')
+
+    const worldUrl = archiveRouteUrl({
+      view: 'wiki-preview',
+      chronicleId: 'C03-AFTERFALL',
+      page: 'world',
+    }, 'https://archive.example/')
+    expect(worldUrl.searchParams.get('page')).toBe('world')
+    expect(worldUrl.searchParams.get('chronicle')).toBe('C03-AFTERFALL')
   })
 })

@@ -1,6 +1,7 @@
 import { WikiChroniclePreview } from './WikiChroniclePreview'
 import { WikiDocumentPage } from './WikiDocumentPage'
 import { WikiHomePreview } from './WikiHomePreview'
+import { WikiWorldIndexPreview } from './WikiWorldIndexPreview'
 import {
   buildWikiDocument,
   isWikiSupportedNodeId,
@@ -19,7 +20,7 @@ export function WikiShellPreview({
   chronicleId = 'C03-AFTERFALL',
 }: {
   nodeId?: string
-  page?: 'home' | 'chronicle'
+  page?: 'home' | 'chronicle' | 'world'
   chronicleId?: string
 }) {
   if (nodeId && isWikiSupportedNodeId(nodeId)) {
@@ -55,5 +56,6 @@ export function WikiShellPreview({
   }
 
   if (page === 'chronicle') return <WikiChroniclePreview chronicleId={chronicleId} />
+  if (page === 'world') return <WikiWorldIndexPreview chronicleId={chronicleId} />
   return <WikiHomePreview />
 }
