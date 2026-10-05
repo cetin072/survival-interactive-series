@@ -117,7 +117,23 @@
       "width": 512,
       "height": 512,
       "mime_type": "image/png"
+    },
+    {
+      "point_id": "point-376b71213d04ff0d608134a0ac02ff04337a0bd8bf26de5a40f197cb9f9397c0",
+      "generation_key": "generation-56d5c65b6320fd3f02c5aba6fd7cbef7da6212fc3cb6644d96eaeba1852f5162",
+      "subject_id": "event-fireline",
+      "source_sha256": "f1a01bbc7f00e1dd6fa2cf44378bc8d76eeae49cf12f198f3771e376a8fcfede",
+      "storage_bucket": "survival-archive-originals",
+      "storage_object_path": "AFTERFALL/point-376b71213d04ff0d608134a0ac02ff04337a0bd8bf26de5a40f197cb9f9397c0/generation-56d5c65b6320fd3f02c5aba6fd7cbef7da6212fc3cb6644d96eaeba1852f5162/f1a01bbc7f00e1dd6fa2cf44378bc8d76eeae49cf12f198f3771e376a8fcfede.png",
+      "registry_asset_id": "AF-EVENT-376B71213D04FF0D608134A0",
+      "derivative_version": "site-png-512-v1",
+      "public_path": "/visual-assets/f4705f85469f455f938ce289ce78ae30ce6edf1c5d326649abfc88b70ed1c811.png",
+      "sha256": "f4705f85469f455f938ce289ce78ae30ce6edf1c5d326649abfc88b70ed1c811",
+      "bytes": 175038,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png"
     }
   ],
-  "content_sha256": "aa81a85f4704f97fa810ec76034d94f3bff3d37f9e1707b23cf1d1658f142fe0"
+  "content_sha256": "8596f6c70d9a5f3f21423e92c52536f1acc39394f0db39052b5d7840566b7e3c"
 }
