@@ -1,0 +1,33 @@
+{
+  "version": "illustration-reservation-probe-v1",
+  "mode": "PROMPT_TRANSPORT_ONLY",
+  "created_at": "2026-10-05T01:04:13.055Z",
+  "prep_status": "PREVIEW_ONLY",
+  "subject_id": "event-fireline",
+  "point_id": "point-376b71213d04ff0d608134a0ac02ff04337a0bd8bf26de5a40f197cb9f9397c0",
+  "generation_key": "generation-56d5c65b6320fd3f02c5aba6fd7cbef7da6212fc3cb6644d96eaeba1852f5162",
+  "source_main_sha": "aca1152b57685c2a33aaf93aeeef0fe6e1778bf4",
+  "prompt_text": "현대 한국 생활권의 사건을 한 순간의 현실적인 환경 장면으로 보여주는 일러스트레이션. 장면에 보이는 구체적 요소: 화재 직후의 연기 낀 외곽 농업시설과 방어선 분위기; 시설 대부분은 형태를 유지하고 일부 온실과 관수 설비에만 제한적인 손상이 남은 상태; 소방·차단 작업이 끝난 뒤의 젖은 바닥과 그을음 같은 현실적 흔적; 소방·차단 작업이 끝난 뒤의 조용하고 현실적인 재난 후 장면. 사건의 의미는 실제 공간과 생활 흔적의 변화로 전달하고 장면 자체가 자연스럽게 상황을 설명하게 한다. 인물은 장면 이해에 필요한 수만 작고 자연스럽게 배치해 환경과 행동이 함께 보이게 한다. 빛·색감·화풍: cool blue-gray; 회화적 반실사; 붓터치가 느껴지는 현대적 painterly illustration; realistic human proportions; believable contemporary Korean environment; quiet cinematic composition; low-to-medium saturation; natural light; atmospheric depth and negative space. 배경의 글자·간판·표지판·안내문은 장면의 핵심 요소가 되지 않도록 최소화한다. 불필요한 읽을 수 있는 문구, 브랜드명, 지명, 숫자, 광고 문구를 새로 만들어 넣지 않는다. 필요한 생활 표식은 작고 비식별적인 배경 요소로만 표현한다. 사진처럼 과도하게 사실적인 렌더링보다 붓터치와 회화성이 분명하게 느껴지는 painterly illustration을 유지한다",
+  "prompt_sha256": "4c3d04c06c3b63328e3202539ac3da041881a3693c8f99420c74ff0b3164daa9",
+  "renderer_id": "6ac2e58fc3848191aba731468f6c3e18",
+  "renderer_prompt": "현대 한국 생활권의 사건을 한 순간의 현실적인 환경 장면으로 보여주는 일러스트레이션. 장면에 보이는 구체적 요소: 화재 직후의 연기 낀 외곽 농업시설과 방어선 분위기; 시설 대부분은 형태를 유지하고 일부 온실과 관수 설비에만 제한적인 손상이 남은 상태; 소방·차단 작업이 끝난 뒤의 젖은 바닥과 그을음 같은 현실적 흔적; 소방·차단 작업이 끝난 뒤의 조용하고 현실적인 재난 후 장면. 사건의 의미는 실제 공간과 생활 흔적의 변화로 전달하고 장면 자체가 자연스럽게 상황을 설명하게 한다. 인물은 장면 이해에 필요한 수만 작고 자연스럽게 배치해 환경과 행동이 함께 보이게 한다. 빛·색감·화풍: cool blue-gray; 회화적 반실사; 붓터치가 느껴지는 현대적 painterly illustration; realistic human proportions; believable contemporary Korean environment; quiet cinematic composition; low-to-medium saturation; natural light; atmospheric depth and negative space. 배경의 글자·간판·표지판·안내문은 장면의 핵심 요소가 되지 않도록 최소화한다. 불필요한 읽을 수 있는 문구, 브랜드명, 지명, 숫자, 광고 문구를 새로 만들어 넣지 않는다. 필요한 생활 표식은 작고 비식별적인 배경 요소로만 표현한다. 사진처럼 과도하게 사실적인 렌더링보다 붓터치와 회화성이 분명하게 느껴지는 painterly illustration을 유지한다\n\n이 설명으로 이미지 1장을 생성한다. 생성한 PNG를 개인 Library의 `/IMAGE-RENDER/output/current.png`에 저장한다. 같은 경로의 파일이 있으면 기존 파일을 교체한다. 저장 지시는 이미지에 표현하지 않는다. 다른 문서·이전 이미지·다른 대화를 읽지 않는다.",
+  "renderer_prompt_sha256": "f5f06238b98c3c595377d635c7e107cba1e7898aa35a01c47be59f7465bc8e5f",
+  "baseline": {
+    "id": "file_00000000fca88209991777867e012e5b",
+    "kind": "file",
+    "name": "current.png",
+    "path": "/IMAGE-RENDER/output/current.png",
+    "file_id": "file_00000000fca88209991777867e012e5b",
+    "library_file_id": "libfile_a1e80988e2748191bf6f3881444683f8",
+    "library_artifact_type": null,
+    "version_id": "3",
+    "mime_type": "image/png",
+    "size_bytes": 3901752,
+    "created_at": "2026-10-04T13:33:48.543042Z",
+    "modified_at": "2026-10-04T17:33:15.147580Z",
+    "model_generated": false,
+    "surface": "library",
+    "sha256": "b5eec8f8cffe39a012d264d0a2a18903fdb894257acef086110f9accae501c27"
+  },
+  "dispatch": null
+}
