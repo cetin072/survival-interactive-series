@@ -1,3 +1,4 @@
+import publicBriefFiles from 'virtual:knowledge-public'
 import { isWikiSupportedNodeId, requireWikiNode, wikiNodeIndex } from './wikiDocument'
 import { siteVisualsFor } from './siteVisual'
 
@@ -27,10 +28,7 @@ type KnowledgeBrief = {
   risk_level?: string
 }
 
-const knowledgeBriefs = import.meta.glob('../../../../knowledge/content/briefs/*.json', {
-  eager: true,
-  import: 'default',
-}) as Record<string, KnowledgeBrief>
+const knowledgeBriefs = publicBriefFiles as KnowledgeBrief[]
 
 const normalize = (value: string) => value
   .normalize('NFKC')

@@ -1,3 +1,4 @@
+import { publicBriefs } from './lib/knowledge-public.mjs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { loadKnowledge, validateKnowledge, root, youtubeVideoId } from './lib/knowledge-content.mjs'
@@ -5,8 +6,7 @@ import { loadKnowledge, validateKnowledge, root, youtubeVideoId } from './lib/kn
 const check = process.argv.includes('--check')
 const data = await loadKnowledge()
 await validateKnowledge(data)
-const published = data.briefs.filter((brief) => brief.status === 'PUBLISHED')
-  .sort((a, b) => b.published_at.localeCompare(a.published_at) || a.id.localeCompare(b.id))
+const published = await publicBriefs(data)
 const byId = new Map(data.briefs.map((brief) => [brief.id, brief]))
 const guides = new Map(data.guides.map((guide) => [guide.id, guide]))
 const stories = new Map(data.stories.map((story) => [story.id, story]))
