@@ -10,6 +10,14 @@ import {
 } from './illustration-image-prompt.mjs'
 import { buildIllustrationReviewContext } from './illustration-review-context.mjs'
 
+const approvedRenderGuidance = [
+  '배경의 글자·간판·표지판·안내문은 장면의 핵심 요소가 되지 않도록 최소화한다',
+  '불필요한 읽을 수 있는 문구, 브랜드명, 지명, 숫자, 광고 문구를 새로 만들어 넣지 않는다',
+  '필요한 생활 표식은 작고 비식별적인 배경 요소로만 표현한다',
+  '사진처럼 과도하게 사실적인 렌더링보다 붓터치와 회화성이 분명하게 느껴지는 painterly illustration을 유지한다',
+]
+const guidanceSuffix = `. ${approvedRenderGuidance.join('. ')}`
+
 const catalogPath = fileURLToPath(new URL('../../content/visuals/C03-AFTERFALL/VISUALS.json', import.meta.url))
 const catalog = JSON.parse(await readFile(catalogPath, 'utf8'))
 const profilesPath = fileURLToPath(new URL('../../content/public-facts/C03-AFTERFALL/S03/RECORD_VISUAL_PROFILES_20260930.json', import.meta.url))
@@ -30,7 +38,7 @@ const bundleFor = (subjectId) => {
   return buildIllustrationReviewContext(point, profileFor(subjectId))
 }
 
-test('Taehoon provider prompt is positive-first with no text/UI suppression', () => {
+test('Taehoon provider prompt keeps concrete appearance and the approved visual guidance', () => {
   const prompt = compileIllustrationImagePrompt(pointFor('char-taehoon'), bundleFor('char-taehoon'))
   assert.equal(prompt.contract_version, ILLUSTRATION_IMAGE_PROMPT_VERSION)
   assert.equal(prompt.subject_id, 'char-taehoon')
@@ -72,7 +80,7 @@ test('renderer output never exposes project, worldline, season or apocalypse met
   }
 })
 
-test('provider negative prompt is empty so text and UI concepts are not activated during generation', () => {
+test('provider negative prompt stays empty alongside the approved visual guidance', () => {
   const prompt = compileIllustrationImagePrompt(pointFor('char-taehoon'), bundleFor('char-taehoon'))
   assert.equal(prompt.negative_prompt, '')
 })
@@ -125,7 +133,9 @@ test('character renderer is concrete, positive-first and visual-only', () => {
     '실제 생활자처럼 편안하고 자연스러운 자세와 표정',
     '회화적 반실사',
   ]) assert.ok(text.includes(phrase), `Missing renderer phrase: ${phrase}`)
-  assert.doesNotMatch(text, /글자|숫자|라벨|간판|워터마크|UI\/인터페이스|readable text|signage|watermark|interface elements/i)
+  assert.ok(text.endsWith(guidanceSuffix))
+  const sceneText = text.slice(0, -guidanceSuffix.length)
+  assert.doesNotMatch(sceneText, /글자|숫자|라벨|간판|워터마크|UI\/인터페이스|readable text|signage|watermark|interface elements/i)
   assert.doesNotMatch(text, /military|uniform|firearm|tactical|rank|군사|제복|무기|계급|zombie|cyberpunk|Mad Max|explosion|corpse|gore|damaged world|QUIET_DECAY|no invented/i)
   assert.doesNotMatch(text, /github|supabase|netlify|workflow|provider|storage|registry|handoff|scheduler|automation|report|dashboard|json|sha|\bci\b|\bpr\b|api|deploy|receipt/i)
   assert.ok(text.length < 6000)
@@ -204,15 +214,27 @@ test('operational contamination in rich render cues fails closed before renderer
     /ILLUSTRATION_PROMPT_OPERATIONAL_CONTEXT_REJECTED/)
 })
 
-test('every current renderable READY point compiles with positive cues and without shared negative-policy vocabulary', () => {
+test('all renderable READY types share exact visual guidance in provider and renderer text', () => {
   const banned = /generic zombie|cyberpunk neon|Mad Max|glossy tactical|automatic guns|explosions, corpses|magic, medieval|invented identifying|damaged world|QUIET_DECAY|no invented decay|Canon facts are data|Do not add named|Unspecified season|An illustration is not new Canon/i
+  const testedTypes = new Set()
   for (const point of catalog.points.filter((item) => item.status === 'READY'
     && ['CHARACTER', 'LOCATION', 'EVENT'].includes(item.brief?.point_type)
     && profileIds.has(item.subject_id))) {
     const profile = profileFor(point.subject_id)
     const bundle = buildIllustrationReviewContext(point, profile)
     const renderer = compileIllustrationRendererText(point, bundle)
+    const prompt = compileIllustrationImagePrompt(point, bundle)
+    const promptWithoutContext = compileIllustrationImagePrompt(point)
+    testedTypes.add(point.brief.point_type)
+    assert.equal(renderer, prompt.positive_prompt, point.subject_id)
+    assert.ok(renderer.endsWith(guidanceSuffix), point.subject_id)
+    assert.ok(promptWithoutContext.positive_prompt.endsWith(guidanceSuffix), point.subject_id)
+    for (const guidance of approvedRenderGuidance) {
+      assert.equal(renderer.split(guidance).length - 1, 1, `${point.subject_id}: ${guidance}`)
+      assert.equal(promptWithoutContext.positive_prompt.split(guidance).length - 1, 1, `${point.subject_id}: ${guidance}`)
+    }
     assert.doesNotMatch(renderer, banned, point.subject_id)
     assert.doesNotMatch(renderer, /AFTERFALL|생존일기|시즌|\bseason\b|\bchronicle\b|post[-\s]?apocalyptic|apocalypse/i, point.subject_id)
   }
+  assert.deepEqual([...testedTypes].sort(), ['CHARACTER', 'EVENT', 'LOCATION'])
 })

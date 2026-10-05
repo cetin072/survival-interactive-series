@@ -72,8 +72,12 @@ async function rpc(name, body) {
   return text ? JSON.parse(text) : null
 }
 
-export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}) {
+export async function prepareRenderJob({
+  mainSha = process.env.GITHUB_SHA, previewOnly = false, attemptHistory = null,
+} = {}) {
   demand(/^[a-f0-9]{40}$/.test(mainSha ?? ''), 'ILLUSTRATION_PREP_MAIN_SHA_INVALID')
+  demand(typeof previewOnly === 'boolean' && (attemptHistory === null || previewOnly),
+    'ILLUSTRATION_PREP_HISTORY_OVERRIDE_REQUIRES_PREVIEW')
   const [catalog, siteAssets, manualAssets, acceptedIdentities, visualProfiles, receipts, providerConfig] = await Promise.all([
     readJson(visualPath), readJson(assetsPath), readJson(manualAssetsPath), readAcceptedIdentityAssets(),
     readJson(visualProfilesPath), readJson(receiptsPath), readJson(providerPath),
@@ -101,7 +105,7 @@ export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}
     return { status: 'RENDER_PROVIDER_NOT_SCHEDULED_CHATGPT', active_provider: activeProvider }
   }
 
-  const observedAttempts = await rpc('archive_illustration_render_attempt_history', {})
+  const observedAttempts = attemptHistory ?? await rpc('archive_illustration_render_attempt_history', {})
   demand(Array.isArray(observedAttempts), 'ILLUSTRATION_PREP_ATTEMPT_HISTORY_INVALID')
   const plan = selectIllustrationCandidates({
     catalog, siteAssets: effectiveSiteAssets, receipts, observedAttempts, batchLimit: 3,
@@ -122,23 +126,25 @@ export async function prepareRenderJob({ mainSha = process.env.GITHUB_SHA } = {}
     const safeSubject = candidate.subject_id.replace(/[^a-z0-9-]/g, '-')
     const generationSuffix = candidate.generation_key.slice('generation-'.length, 'generation-'.length + 12)
     const jobId = `illustration-${safeSubject}-${generationSuffix}-${kstDate()}-${renderRunSuffix()}`
-    const result = await rpc('archive_illustration_render_job_enqueue', {
-      p_job: {
-        job_id: jobId,
-        main_sha: mainSha,
-        point_id: candidate.point_id,
-        generation_key: candidate.generation_key,
-        subject_id: candidate.subject_id,
-        title: point.title,
-        active_provider: activeProvider,
-        prompt_contract: ILLUSTRATION_IMAGE_PROMPT_VERSION,
-        prompt_text: promptText,
-        prompt_sha256: promptSha256,
-        review_context_version: reviewContextBundle.review_context_version,
-        review_context_sha256: reviewContextBundle.review_context_sha256,
-        review_context: reviewContextBundle.review_context,
-      },
-    })
+    const payload = {
+      job_id: jobId,
+      main_sha: mainSha,
+      point_id: candidate.point_id,
+      generation_key: candidate.generation_key,
+      subject_id: candidate.subject_id,
+      title: point.title,
+      active_provider: activeProvider,
+      prompt_contract: ILLUSTRATION_IMAGE_PROMPT_VERSION,
+      prompt_text: promptText,
+      prompt_sha256: promptSha256,
+      review_context_version: reviewContextBundle.review_context_version,
+      review_context_sha256: reviewContextBundle.review_context_sha256,
+      review_context: reviewContextBundle.review_context,
+    }
+    // Transport rehearsal uses the same candidate/compiler without creating a
+    // DB job or bypassing the daily-success gate. Never report it as PREPARED.
+    if (previewOnly) return { status: 'PREVIEW_ONLY', active_provider: activeProvider, job: payload }
+    const result = await rpc('archive_illustration_render_job_enqueue', { p_job: payload })
     if (result?.status === 'PREPARED' || result?.status === 'WAITING_EXISTING_JOB'
       || result?.status === 'DAILY_JOB_CAP_REACHED'
       || result?.status === 'DAILY_SUCCESS_TARGET_REACHED'
