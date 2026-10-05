@@ -30,7 +30,24 @@
     "scheduled_for": "2026-10-05T10:59:35+09:00",
     "prompt_exact_readback": true
   },
-  "collection": null,
+  "collection": {
+    "status": "READY_FOR_PROVIDER_COMPLETE",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_0000000018e481fd828652c5c1377af0",
+    "source_library_file_id": "libfile_a1e80988e2748191bf6f3881444683f8",
+    "source_version_id": "5",
+    "source_sha256": "ad752c36ba67542ee0533e8df697bb5a03e326ab0e792d6e8558c6230d97e98d",
+    "source_width": 1774,
+    "source_height": 887,
+    "source_size_bytes": 2844084,
+    "source_modified_at": "2026-10-05T02:06:22.909769Z",
+    "observed_at": "2026-10-05T02:14:21.073Z",
+    "provider_complete": {
+      "p_job_id": "illustration-event-fireline-56d5c65b6320-20261005-liveaccept1",
+      "p_prompt_sha256": "4c3d04c06c3b63328e3202539ac3da041881a3693c8f99420c74ff0b3164daa9"
+    },
+    "provider_completed_at": null
+  },
   "result": null,
   "trial": {
     "version": "illustration-reservation-live-trial-v2",
