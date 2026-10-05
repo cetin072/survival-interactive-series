@@ -61,7 +61,10 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
       ])
       if (inboxResult.error) setError(rpcError(inboxResult.error))
       else setInbox((inboxResult.data ?? emptyInbox) as Inbox)
-      if (systemResult.error) setStatusError('자동화 실행 상태를 불러오지 못했습니다.')
+      if (systemResult.error) {
+        setSystemStatus(null)
+        setStatusError('자동화 실행 상태를 불러오지 못했습니다.')
+      }
       else setSystemStatus(systemResult.data as SystemStatus)
       setProductionStatus({ release, deploy })
       setLastRefreshedAt(new Date().toISOString())

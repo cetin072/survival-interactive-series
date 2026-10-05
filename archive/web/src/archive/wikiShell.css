@@ -174,6 +174,17 @@
 .wiki-muted {
   color: #7c7f85 !important;
 }
+.wiki-previous-context { margin: 12px 0 22px; }
+.wiki-previous-context summary { cursor: pointer; color: #64676d; font-size: 14px; }
+.wiki-previous-context[open] summary { margin-bottom: 14px; }
+.wiki-record-sources { margin-top: 8px; font-size: 13px; }
+.wiki-record-sources span { display: inline-flex; gap: 12px; margin-right: 12px; }
+.wiki-timeline .wiki-activity-role { margin-bottom: 7px; font-weight: 650; }
+.wiki-history-facts { margin: 8px 0; font-size: 13px; }
+.wiki-history-facts div { display: flex; gap: 10px; }
+.wiki-history-facts dt { color: #74777d; }
+.wiki-history-facts dd { margin: 0; }
+.wiki-source-box .wiki-inline-source { display: inline-block; padding: 0 10px 4px 0; border: 0; }
 .wiki-bullet-list {
   margin: 0 0 22px;
   padding-left: 23px;

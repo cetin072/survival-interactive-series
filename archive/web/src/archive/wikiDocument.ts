@@ -3,8 +3,39 @@ import type { ArchiveNode, ArchiveNodeType } from './archiveData'
 import { getChronicle } from './chronicleRegistry'
 import { archiveArticleByNodeId, type ArchiveArticleSection, type ArchiveTimelineItem } from './archiveArticleData'
 import { confirmedAppearanceFor } from './characterAppearance'
-import { chapterForNode, type ReaderChapter } from './storyData'
+import { chapterForNode, readerChapters, type ReaderChapter } from './storyData'
 import { siteVisualFor, type SiteAsset } from './siteVisual'
+import { graphChangeTime, graphWorldTime, sortGraphEvents, sortGraphHistory } from './graphWorldTime'
+import { wikiSourcesForRecord, type WikiSourceLink, type WikiSourceRecord } from './wikiSources'
+
+type GraphSnapshot = {
+  anchor: { game_time: string; save_version: number }
+  data?: ArchiveNode
+  data_sha256?: string
+  evidence: WikiSourceRecord['evidence']
+}
+export type WikiGraphRecord = WikiSourceRecord & {
+  anchor: GraphSnapshot['anchor']
+  data: ArchiveNode
+  history: GraphSnapshot[]
+}
+export type WikiDocumentHistory = {
+  date: string
+  current: boolean
+  title?: string
+  subtitle?: string
+  summary?: string
+  metaRows: WikiDocumentMetaRow[]
+  sources: WikiSourceLink[]
+}
+export type WikiDocumentActivity = {
+  date: string
+  nodeId: string
+  title: string
+  relationship: string
+  summary: string
+  sources: WikiSourceLink[]
+}
 
 export type WikiDocumentRelation = {
   label: string
@@ -33,6 +64,9 @@ export type WikiDocument = {
   lead: string[]
   sections: ArchiveArticleSection[]
   timeline: ArchiveTimelineItem[]
+  history: WikiDocumentHistory[]
+  activities: WikiDocumentActivity[]
+  sources: WikiSourceLink[]
   relations: WikiDocumentRelation[]
   visual?: SiteAsset
   relatedChapter?: ReaderChapter
@@ -54,9 +88,9 @@ const metaValueLabels: Record<string, string> = {
   CORE_FOUR: '핵심 4인',
 }
 
-const nodeById = new Map(
-  publicGraph.nodes.map((record) => [record.id, record.data as ArchiveNode]),
-)
+const graphRecords = publicGraph.nodes as WikiGraphRecord[]
+const nodeById = new Map(graphRecords.map((record) => [record.id, record.data]))
+const recordById = new Map(graphRecords.map((record) => [record.id, record]))
 
 export const wikiSupportedTypes: ArchiveNodeType[] = ['character', 'location', 'event']
 
@@ -125,13 +159,57 @@ function relationsFor(nodeId: string): WikiDocumentRelation[] {
   })
 }
 
+export function wikiHistoryForRecord(record: WikiGraphRecord): WikiDocumentHistory[] {
+  if (!record.history.length) return []
+  return [record, ...sortGraphHistory(record.history)].map((snapshot, index) => ({
+    date: graphChangeTime(snapshot),
+    current: index === 0,
+    title: snapshot.data?.label,
+    subtitle: snapshot.data?.subtitle,
+    summary: snapshot.data?.summary,
+    metaRows: Object.entries(snapshot.data?.meta ?? {}).map(([label, value]) => ({ label, value: metaValueLabels[value] ?? value })),
+    sources: wikiSourcesForRecord({ id: record.id, evidence: snapshot.evidence }),
+  }))
+}
+
+function activitiesFor(nodeId: string): WikiDocumentActivity[] {
+  const eventRelations = new Map<string, string[]>()
+  for (const { data } of publicGraph.relations) {
+    if (data.from !== nodeId && data.to !== nodeId) continue
+    const otherId = data.from === nodeId ? data.to : data.from
+    if (nodeById.get(otherId)?.type !== 'event') continue
+    const labels = eventRelations.get(otherId) ?? []
+    if (!labels.includes(data.label)) labels.push(data.label)
+    eventRelations.set(otherId, labels)
+  }
+  return sortGraphEvents([...eventRelations.keys()].map((id) => recordById.get(id)!)).map((record) => ({
+    date: record.data.subtitle || graphWorldTime(record),
+    nodeId: record.id,
+    title: record.data.label,
+    relationship: eventRelations.get(record.id)!.join(' · '),
+    summary: record.data.summary,
+    sources: wikiSourcesForRecord(record),
+  }))
+}
+
+const uniqueSources = (sources: WikiSourceLink[]) => [...new Map(
+  sources.map((source) => [source.chapterId + ':' + source.partId, source]),
+).values()]
+
 export function buildWikiDocument(nodeId: string): WikiDocument {
-  const graphRecord = publicGraph.nodes.find((record) => record.id === nodeId)
+  const graphRecord = recordById.get(nodeId)
   if (!graphRecord) throw new Error('Wiki source record missing: ' + nodeId)
 
   const node = requireWikiNode(nodeId)
   const article = archiveArticleByNodeId[nodeId]
   const appearance = node.type === 'character' ? confirmedAppearanceFor(node)?.publicDescription : undefined
+  const history = wikiHistoryForRecord(graphRecord)
+  const activities = activitiesFor(nodeId)
+  const sources = uniqueSources([
+    ...wikiSourcesForRecord(graphRecord),
+    ...history.flatMap((item) => item.sources),
+    ...activities.flatMap((item) => item.sources),
+  ])
 
   return {
     id: node.id,
@@ -150,10 +228,13 @@ export function buildWikiDocument(nodeId: string): WikiDocument {
     lead: article?.lead ?? [],
     sections: article?.sections ?? [],
     timeline: article?.timeline ?? [],
+    history,
+    activities,
+    sources,
     relations: relationsFor(nodeId),
     visual: siteVisualFor(nodeId),
-    relatedChapter: chapterForNode(nodeId),
-    transcriptPartIds: article?.transcriptPartIds ?? [],
+    relatedChapter: readerChapters.find((chapter) => chapter.id === sources[0]?.chapterId) ?? chapterForNode(nodeId),
+    transcriptPartIds: [...new Set([...sources.map((source) => source.partId), ...(article?.transcriptPartIds ?? [])])],
   }
 }
 

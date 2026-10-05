@@ -4,7 +4,8 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { discoverWikiSource } from './lib/wiki-semantic-jobs.mjs'
+import { discoverWikiSource, discoverWikiSources } from './lib/wiki-semantic-jobs.mjs'
+import { collectCompletedWikiPublication } from './lib/a-wiki-publication-evidence.mjs'
 import {
   buildWikiFactJob, buildWikiFactReviewJob, compileWikiFactProposal, validateWikiFactReview,
 } from './lib/wiki-fact-extractor.mjs'
@@ -71,8 +72,8 @@ export function inspectSubmittedReview(row) {
   return { action: 'PUBLISH', review }
 }
 
-async function advance(row, expected, status, extra = {}) {
-  return rpc('archive_a_wiki_native_job_advance', {
+async function advance(row, expected, status, extra = {}, requestRpc = rpc) {
+  return requestRpc('archive_a_wiki_native_job_advance', {
     p_job_id: row.job_id,
     p_expected_status: expected,
     p_status: status,
@@ -86,27 +87,78 @@ async function advance(row, expected, status, extra = {}) {
   })
 }
 
-export async function prepareNativeJob({ requestRpc = rpc, base = root } = {}) {
+export async function prepareNativeJob({
+  requestRpc = rpc, base = root, collectCompletion = collectCompletedWikiPublication,
+} = {}) {
+  const mainSha = run('git', ['rev-parse', 'HEAD'], base)
+  insist(/^[a-f0-9]{40}$/.test(mainSha), 'A_WIKI_MAIN_SHA_INVALID')
+  // Reconcile the durable ledger BEFORE looking for an unprocessed source.
+  // Otherwise an already-merged receipt makes discovery return NO_JOB while
+  // the one-active-job constraint keeps every later source blocked forever.
+  const active = await requestRpc('archive_a_wiki_native_job_recovery_current', {})
+  let reconciledJobId = null
+  if (active && active.status !== 'NO_JOB') {
+    if (['HUMAN_REVIEW', 'REJECT'].includes(active.status)) {
+      return { status: active.status, session_id: active.session_id, job_id: active.job_id }
+    }
+    const sources = await discoverWikiSources(base)
+    const evidence = await collectCompletion({ row: active, base, mainSha, sources })
+    if (evidence) {
+      const reconciled = await requestRpc('archive_a_wiki_native_job_reconcile_publication', {
+        p_job_id: active.job_id, p_expected_status: active.status, p_evidence: evidence,
+      })
+      insist(['PUBLISHED', 'ALREADY_RECONCILED'].includes(reconciled?.status),
+        'A_WIKI_COMPLETION_RECONCILE_FAILED')
+      reconciledJobId = active.job_id
+    } else if (active.status === 'BLOCKED'
+      && active.blocker_code === 'A_WIKI_GRAPH_CHANGED_REPREPARE_REQUIRED') {
+      const source = sources.find((candidate) => candidate.sourceManifestRef === active.source_ref
+        && candidate.sourceDigest === active.source_sha256)
+      insist(source, 'A_WIKI_REPREPARE_SOURCE_UNAVAILABLE')
+      const graph = JSON.parse(await readFile(join(base, graphRef), 'utf8'))
+      if (graph.content_sha256 === active.graph_sha256) {
+        return { status: 'BLOCKED', session_id: active.session_id,
+          job_id: active.job_id, blocker_code: active.blocker_code }
+      }
+      const replacement = await requestRpc('archive_a_wiki_native_job_supersede_reprepare', {
+        p_job_id: active.job_id, p_expected_status: 'BLOCKED',
+        p_job: buildWikiFactJob(source, graph), p_main_sha: mainSha,
+      })
+      insist(['EXTRACTOR_READY', 'ALREADY_REPREPARED'].includes(replacement?.status),
+        'A_WIKI_REPREPARE_FAILED')
+      return { status: replacement.status, session_id: source.sourceSession.session_id,
+        season_id: source.seasonId, job_id: replacement.job_id, superseded_job_id: active.job_id }
+    } else {
+      return { status: active.status, session_id: active.session_id,
+        season_id: active.prepared_job?.season_id, job_id: active.job_id }
+    }
+  }
   let source
   try { source = await discoverWikiSource(base) }
   catch (error) {
-    if (error.message === 'WIKI_NO_PENDING_SOURCE') return { status: 'NO_JOB', source_session: error.source_session ?? null }
+    if (error.message === 'WIKI_NO_PENDING_SOURCE') return { status: 'NO_JOB',
+      source_session: error.source_session ?? null, source_season: error.source_season ?? null,
+      ...(reconciledJobId ? { reconciled_job_id: reconciledJobId } : {}) }
     throw error
   }
   const graph = JSON.parse(await readFile(join(base, graphRef), 'utf8'))
   const job = buildWikiFactJob(source, graph)
-  const mainSha = run('git', ['rev-parse', 'HEAD'], base)
-  insist(/^[a-f0-9]{40}$/.test(mainSha), 'A_WIKI_MAIN_SHA_INVALID')
   const prepared = await requestRpc('archive_a_wiki_native_job_prepare', {
     p_job: job,
     p_main_sha: mainSha,
   })
-  return { status: prepared?.status ?? 'UNKNOWN', session_id: source.sourceSession.session_id, job_id: prepared?.job_id ?? null }
+  return { status: prepared?.status ?? 'UNKNOWN', season_id: source.seasonId,
+    session_id: source.sourceSession.session_id, job_id: prepared?.job_id ?? null,
+    ...(reconciledJobId ? { reconciled_job_id: reconciledJobId } : {}) }
 }
 
-function publicationBranch(job) {
+export function publicationBranch(job, superseded = false) {
   const number = job.source.session_id.replace('SESSION_', '')
-  return `automation/a-wiki-publish-${number}-${job.source.manifest_sha256.slice(0, 12)}`
+  insist(/^S\d{2,3}$/.test(job.season_id) && Number(job.season_id.slice(1)) >= 3,
+    'A_WIKI_PUBLICATION_SEASON_INVALID')
+  const season = job.season_id === 'S03' ? '' : `${job.season_id.toLowerCase()}-`
+  return `automation/a-wiki-publish-${season}${number}-${job.source.manifest_sha256.slice(0, 12)}`
+    + (superseded ? `-g${job.graph_sha256.slice(0, 12)}` : '')
 }
 
 function findPullRequest(headRef) {
@@ -131,15 +183,48 @@ export function mergedPublication(existingPr, branch) {
   }
 }
 
+export function confirmMergedPublication(row, publication, evidence) {
+  const review = validateWikiFactReview(row.review_job, row.review_result)
+  insist(evidence && review.decision === 'APPROVE'
+    && evidence.pr_number === publication.prNumber && evidence.head_ref === publication.branch
+    && evidence.head_sha === publication.headSha && evidence.merge_sha === publication.mergeSha
+    && evidence.source_ref === row.source_ref && evidence.source_sha256 === row.source_sha256
+    && evidence.receipt_job_id === row.prepared_job.job_id
+    && evidence.proposal_sha256 === row.proposal.proposal_sha256
+    && evidence.review_sha256 === review.review_sha256,
+  'A_WIKI_MERGED_PUBLICATION_EVIDENCE_INVALID')
+  return publication
+}
+
+async function withMainWorktree(prefix, work) {
+  const temp = await mkdtemp(join(tmpdir(), prefix))
+  let worktree = false
+  try {
+    run('git', ['worktree', 'add', '--detach', temp, 'origin/main'], root)
+    worktree = true
+    return await work(temp)
+  } finally {
+    if (worktree) {
+      try { run('git', ['worktree', 'remove', '--force', temp], root) } catch {}
+    }
+    await rm(temp, { recursive: true, force: true })
+  }
+}
+
 async function buildPublication(row) {
   run('git', ['fetch', 'origin', 'main'], root)
 
-  const branch = publicationBranch(row.prepared_job)
+  const branch = publicationBranch(row.prepared_job, Boolean(row.supersedes_job_id))
   const existingPr = findPullRequest(branch)
   const alreadyMerged = mergedPublication(existingPr, branch)
-  if (alreadyMerged) return alreadyMerged
-
   const currentMain = run('git', ['rev-parse', 'origin/main'], root)
+  if (alreadyMerged) {
+    return withMainWorktree('a-wiki-merged-proof-', async (base) => {
+      const evidence = await collectCompletedWikiPublication({ row, base, mainSha: currentMain })
+      return confirmMergedPublication(row, alreadyMerged, evidence)
+    })
+  }
+
   const currentGraph = JSON.parse(run('git', ['show', `origin/main:${graphRef}`], root))
   if (currentGraph.content_sha256 !== row.graph_sha256) throw new Error('A_WIKI_GRAPH_CHANGED_REPREPARE_REQUIRED')
 
@@ -180,15 +265,15 @@ async function buildPublication(row) {
       insist(changedPaths.length > 0, 'A_WIKI_PUBLICATION_EMPTY')
       const allowedPrefixes = [
         'archive/content/graphs/C03-AFTERFALL/GRAPH.json',
-        'archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_',
-        'archive/content/public-facts/C03-AFTERFALL/S03/receipts/AWIKI_',
+        `archive/content/public-facts/C03-AFTERFALL/${row.prepared_job.season_id}/AWIKI_`,
+        `archive/content/public-facts/C03-AFTERFALL/${row.prepared_job.season_id}/receipts/AWIKI_`,
       ]
       const invalidPaths = changedPaths.filter((path) =>
         !allowedPrefixes.some((allowed) => path === allowed || path.startsWith(allowed)))
       insist(invalidPaths.length === 0,
         `A_WIKI_PUBLICATION_SCOPE_INVALID|${invalidPaths[0]?.slice(0, 80) ?? 'UNKNOWN'}`)
       run('git', ['add', 'archive/content/graphs/C03-AFTERFALL/GRAPH.json',
-        'archive/content/public-facts/C03-AFTERFALL/S03'], temp)
+        `archive/content/public-facts/C03-AFTERFALL/${row.prepared_job.season_id}`], temp)
       run('git', ['config', 'user.name', 'a-wiki-native-finalizer'], temp)
       run('git', ['config', 'user.email', 'a-wiki-native-finalizer@users.noreply.github.com'], temp)
       run('git', ['commit', '-m', `a-wiki: publish ${row.session_id} semantic facts`], temp)
@@ -227,17 +312,25 @@ async function buildPublication(row) {
   return { status: 'MERGED', branch, prNumber: pr.number, headSha, mergeSha: merged.sha }
 }
 
-export async function consumeNativeJob({ requestRpc = rpc } = {}) {
+async function reprepareOnLatestMain({ requestRpc }) {
+  run('git', ['fetch', 'origin', 'main'], root)
+  return withMainWorktree('a-wiki-reprepare-', (base) => prepareNativeJob({ requestRpc, base }))
+}
+
+export async function consumeNativeJob({
+  requestRpc = rpc, publish = buildPublication, reprepare = reprepareOnLatestMain,
+} = {}) {
   const row = await requestRpc('archive_a_wiki_native_job_program_current', {})
   if (!row || row.status === 'NO_PROGRAM_JOB') return { status: 'NO_PROGRAM_JOB' }
+  const change = (expected, status, extra) => advance(row, expected, status, extra, requestRpc)
 
   if (row.status === 'EXTRACTOR_SUBMITTED') {
     const compiled = compileSubmittedExtractor(row)
     if (compiled.action === 'HUMAN_REVIEW') {
-      const update = await advance(row, 'EXTRACTOR_SUBMITTED', 'HUMAN_REVIEW', { blockerCode: compiled.code })
+      const update = await change('EXTRACTOR_SUBMITTED', 'HUMAN_REVIEW', { blockerCode: compiled.code })
       return { status: 'HUMAN_REVIEW', session_id: row.session_id, update }
     }
-    const update = await advance(row, 'EXTRACTOR_SUBMITTED', 'REVIEW_READY', {
+    const update = await change('EXTRACTOR_SUBMITTED', 'REVIEW_READY', {
       proposal: compiled.proposal,
       reviewJob: compiled.reviewJob,
     })
@@ -247,29 +340,36 @@ export async function consumeNativeJob({ requestRpc = rpc } = {}) {
   if (row.status === 'REVIEW_SUBMITTED') {
     const disposition = inspectSubmittedReview(row)
     if (disposition.action !== 'PUBLISH') {
-      const update = await advance(row, 'REVIEW_SUBMITTED', disposition.action, {
+      const update = await change('REVIEW_SUBMITTED', disposition.action, {
         blockerCode: `REVIEWER_${disposition.action}`,
       })
       return { status: disposition.action, session_id: row.session_id, update }
     }
-    const claimed = await advance(row, 'REVIEW_SUBMITTED', 'FINALIZING')
+    const claimed = await change('REVIEW_SUBMITTED', 'FINALIZING')
     insist(claimed?.status === 'FINALIZING', 'A_WIKI_FINALIZING_CLAIM_FAILED')
     row.status = 'FINALIZING'
   }
 
   if (row.status === 'FINALIZING') {
     try {
-      const publication = await buildPublication(row)
-      const update = await advance(row, 'FINALIZING', 'PUBLISHED', {
+      const publication = await publish(row)
+      const update = await change('FINALIZING', 'PUBLISHED', {
         prNumber: publication.prNumber,
         headRef: publication.branch,
         headSha: publication.headSha,
         mergeSha: publication.mergeSha,
       })
-      return { status: 'PUBLISHED', session_id: row.session_id, ...publication, update }
+      insist(update?.status === 'PUBLISHED', 'A_WIKI_PUBLISHED_STATE_NOT_CONFIRMED')
+      return { ...publication, status: 'PUBLISHED', session_id: row.session_id, update }
     } catch (error) {
       const code = error.message.split(':')[0].slice(0, 120)
-      await advance(row, 'FINALIZING', 'BLOCKED', { blockerCode: code }).catch(() => {})
+      const blocked = await change('FINALIZING', 'BLOCKED', { blockerCode: code }).catch(() => null)
+      if (code === 'A_WIKI_GRAPH_CHANGED_REPREPARE_REQUIRED' && blocked?.status === 'BLOCKED') {
+        // A fresh source-bound extraction and a fresh independent review are
+        // required. Retrying the old approved proposal cannot repair drift.
+        const next = await reprepare({ requestRpc })
+        return { ...next, previous_job_id: row.job_id }
+      }
       return { status: 'BLOCKED', session_id: row.session_id, blocker_code: code }
     }
   }

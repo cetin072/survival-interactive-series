@@ -31,17 +31,24 @@ function validateGraphHash(graph) {
 
 function sourceStub(job) {
   return {
+    seasonId: job.season_id,
+    sourceManifestRef: job.source.manifest_ref,
     sourceSession: { session_id: job.source.session_id },
     sourceDigest: job.source.manifest_sha256,
   }
 }
 
 function assertSourceBinding(job, source) {
+  const expectedParts = job.source.raw_parts ?? [{ ref: job.source.raw_ref, sha256: job.source.raw_sha256 }]
+  const actualParts = source.rawParts ?? [{ ref: source.rawRef, sha256: source.rawSha256 }]
   insist(source.sourceSession.session_id === job.source.session_id
+    && source.seasonId === job.season_id
     && source.sourceManifestRef === job.source.manifest_ref
     && source.sourceDigest === job.source.manifest_sha256
     && source.rawRef === job.source.raw_ref
     && source.rawSha256 === job.source.raw_sha256
+    && Array.isArray(expectedParts) && expectedParts.length === actualParts.length
+    && expectedParts.every((part, index) => part.ref === actualParts[index].ref && part.sha256 === actualParts[index].sha256)
     && sameAnchor(source.anchor, job.source.anchor),
   'WIKI_FINALIZER_SOURCE_CHANGED')
 }
@@ -67,7 +74,9 @@ function proposalAlreadyApplied(graph, facts, factRef, factSha) {
 function receiptBody({ job, proposal, review, outcome, factSha, graphBefore, graphAfter }) {
   return {
     version: 'a-wiki-receipt-v1',
+    season_id: job.season_id,
     session_id: job.source.session_id,
+    source_ref: job.source.manifest_ref,
     source_sha256: job.source.manifest_sha256,
     job_id: job.job_id,
     proposal_sha256: proposal.proposal_sha256,
@@ -82,7 +91,9 @@ function receiptBody({ job, proposal, review, outcome, factSha, graphBefore, gra
 
 function validateExistingReceipt(receipt, { job, proposal, review }) {
   insist(receipt?.version === 'a-wiki-receipt-v1'
+    && (receipt.season_id === undefined || receipt.season_id === job.season_id)
     && receipt.session_id === job.source.session_id
+    && (receipt.source_ref === undefined || receipt.source_ref === job.source.manifest_ref)
     && receipt.source_sha256 === job.source.manifest_sha256
     && receipt.job_id === job.job_id
     && receipt.proposal_sha256 === proposal.proposal_sha256
@@ -131,11 +142,13 @@ export async function finalizeWikiFactProposal({
 
   const sources = await discoverWikiSources(root)
   const source = sources.find((item) => item.sourceSession.session_id === job.source.session_id
+    && item.sourceManifestRef === job.source.manifest_ref
     && item.sourceDigest === job.source.manifest_sha256)
   insist(source, 'WIKI_FINALIZER_SOURCE_MISSING')
   assertSourceBinding(job, source)
   const pending = await discoverWikiSource(root)
   insist(pending.sourceSession.session_id === source.sourceSession.session_id
+    && pending.sourceManifestRef === source.sourceManifestRef
     && pending.sourceDigest === source.sourceDigest, 'WIKI_FINALIZER_OUT_OF_ORDER_SOURCE')
 
   const graphPath = resolve(root, graphRef)

@@ -20,7 +20,7 @@ const graphRef = 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'
 const bookRef = 'archive/content/stories/C03-AFTERFALL/BOOK.json'
 
 function aWikiSessionFromEvidence(evidence) {
-  const match = evidence?.source_ref?.match(/\/AWIKI_SESSION_(\d{3})_[a-f0-9]{64}\.json$/)
+  const match = evidence?.source_ref?.match(/\/AWIKI_(?:AMENDMENT_)?SESSION_(\d{3})_[A-Za-z0-9_-]+\.json$/)
   return match ? Number(match[1]) : null
 }
 
@@ -279,4 +279,121 @@ test('Graph success plus receipt failure recovers the receipt on retry', async (
     assert.equal(recovered.receipt_written, true)
     await readFile(receiptPath)
   })
+})
+
+async function syntheticS04Package(root) {
+  // A temporary synthetic public capture, never real S04 gameplay or Canon.
+  // SESSION_005 deliberately repeats the completed legacy S03 session number.
+  const seasonRoot = 'archive/content/transcripts/C03-AFTERFALL/S04'
+  const prefix = `${seasonRoot}/SESSION_005`
+  await mkdir(resolve(root, prefix), { recursive: true })
+  const range = { start: '2099-01-01 10:00', end: '2099-01-01 10:00' }
+  const session = { session_id: 'SESSION_005', visibility: 'PUBLIC_ARCHIVE', capture_quality: 'VERIFIED_CONTIGUOUS_TURN_PAIRS', atomic_pairing_complete: true,
+    source_manifest: 'SESSION_005/SOURCE_MANIFEST.json', coverage_basis: 'captured_message_range', captured_message_range: range,
+    user_messages: 2, gm_public_blocks: 2 }
+  const manifest = { chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', season_id: 'S04',
+    archive_class: 'COLD_RAW', visibility: 'PUBLIC_ARCHIVE', sessions: [session] }
+  const parts = {}, content = []
+  for (const [index, gm] of ['TEST_FIRST_PUBLIC_BLOCK', 'S04 합성 검증만 수행했다.'].entries()) {
+    const user = `TEST_INPUT_${index}`
+    const name = `PART_${String(index + 1).padStart(3, '0')}.md`
+    const raw = Buffer.from(`## USER ${String(index * 2).padStart(3, '0')}\n\n${user}\n\n## GM ${String(index * 2 + 1).padStart(3, '0')}\n\n${gm}\n`)
+    parts[name] = byteHash(raw)
+    content.push({ message_order: index * 2, role: 'USER', sha256: byteHash(user) },
+      { message_order: index * 2 + 1, role: 'GM', sha256: byteHash(gm), state_link: { outcome: 'APPLIED', linked_save_version: 9999 } })
+    await writeFile(resolve(root, prefix, name), raw)
+  }
+  const sourceManifest = { ...manifest, sessions: undefined, ...session, public_safe_only: true, closed_at: '2099-01-01T10:00:00Z',
+    counts: { user: 2, gm: 2, total: 4 }, message_order: { min: 0, max: 3, contiguous: true },
+    content_sha256: content, parts: Object.keys(parts), parts_sha256: parts }
+  await writeFile(resolve(root, prefix, 'SOURCE_MANIFEST.json'), JSON.stringify(sourceManifest))
+  await writeFile(resolve(root, seasonRoot, 'MANIFEST.json'), JSON.stringify(manifest))
+  const source = await discoverWikiSource(root)
+  assert.equal(source.seasonId, 'S04')
+  const graph = JSON.parse(await readFile(resolve(root, graphRef), 'utf8'))
+  const job = buildWikiFactJob(source, graph)
+  const result = { version: WIKI_RESULT_VERSION, job_id: job.job_id, decision: 'FACTS_READY',
+    coverage: { status: 'COMPLETE', reviewed_blocks: ['001', '003'] },
+    nodes: [{ key: 'new:s04-test', existing_id: null, type: 'event', label: '합성 검증 사건',
+      changes: { subtitle: 'TEST_ONLY', summary: 'S04 합성 검증만 수행했다.' },
+      evidence: Object.fromEntries(['type', 'label', 'subtitle', 'summary'].map((field) => [field, ['q1']])) }],
+    relations: [], citations: [{ id: 'q1', block_id: '003', quote: 'S04 합성 검증만 수행했다.' }], deferred: [], note: 'TEST_ONLY_SYNTHETIC_S04' }
+  const proposal = compileWikiFactProposal(job, result)
+  const review = { version: WIKI_REVIEW_VERSION, proposal_sha256: proposal.proposal_sha256,
+    decision: 'APPROVE', note: 'TEST_ONLY independent fixture approval, not a real S04 review.' }
+  return { source, job, proposal, review, result }
+}
+
+test('S04 repeated session number finalizes into its own season and a second apply is byte-identical NOOP', async () => {
+  const root = await makeRoot(['SESSION_005'])
+  try {
+    const pack = await syntheticS04Package(root)
+    const legacyNames = await readdir(resolve(root, factsRoot))
+    const beforeBook = await readFile(resolve(root, bookRef))
+    const beforeRaw = await Promise.all(pack.job.source.raw_parts.map((part) => readFile(resolve(root, part.ref))))
+    const check = await finalizeWikiFactProposal({ root, ...pack })
+    assert.equal(check.status, 'READY_TO_APPLY')
+    const applied = await finalizeWikiFactProposal({ root, ...pack, apply: true })
+    assert.equal(applied.status, 'FINALIZED')
+    assert.match(applied.fact_ref, /\/S04\/AWIKI_SESSION_005_/)
+    assert.match(applied.receipt_ref, /\/S04\/receipts\/AWIKI_SESSION_005_/)
+    const persistedGraph = await readFile(resolve(root, graphRef))
+    const persistedFact = await readFile(resolve(root, applied.fact_ref))
+    const persistedReceipt = await readFile(resolve(root, applied.receipt_ref))
+    const receipt = JSON.parse(persistedReceipt)
+    assert.equal(receipt.season_id, 'S04')
+    assert.equal(receipt.source_ref, pack.source.sourceManifestRef)
+    assert.equal(receipt.fact_sha256, byteHash(persistedFact))
+    assert.equal(receipt.graph_after_sha256, JSON.parse(persistedGraph).content_sha256)
+    assert.equal((await finalizeWikiFactProposal({ root, ...pack, apply: true })).status, 'NOOP_ALREADY_FINALIZED')
+    assert.deepEqual(await readFile(resolve(root, graphRef)), persistedGraph)
+    assert.deepEqual(await readFile(resolve(root, applied.fact_ref)), persistedFact)
+    assert.deepEqual(await readFile(resolve(root, applied.receipt_ref)), persistedReceipt)
+    assert.deepEqual(await readFile(resolve(root, bookRef)), beforeBook)
+    assert.deepEqual(await Promise.all(pack.job.source.raw_parts.map((part) => readFile(resolve(root, part.ref)))), beforeRaw)
+    assert.deepEqual(await readdir(resolve(root, factsRoot)), legacyNames)
+    await assert.rejects(discoverWikiSource(root), /WIKI_NO_PENDING_SOURCE/)
+  } finally { await rm(root, { recursive: true, force: true }) }
+})
+
+test('finalizer rejects a rehashed multipart job with a changed later-part binding before any writes', async () => {
+  const root = await makeRoot(['SESSION_005'])
+  try {
+    const pack = await syntheticS04Package(root)
+    const beforeGraph = await readFile(resolve(root, graphRef))
+    for (const mutate of [
+      (parts) => { parts[1].sha256 = 'e'.repeat(64) },
+      (parts) => { parts.pop() },
+      (parts) => { parts.reverse() },
+    ]) {
+      const job = structuredClone(pack.job)
+      mutate(job.source.raw_parts)
+      const { job_id: _old, ...body } = job
+      job.job_id = `wiki-job-${graphHash(body)}`
+      const proposal = compileWikiFactProposal(job, { ...pack.result, job_id: job.job_id })
+      const review = { ...pack.review, proposal_sha256: proposal.proposal_sha256 }
+      await assert.rejects(finalizeWikiFactProposal({ root, job, proposal, review, apply: true }), /WIKI_FINALIZER_SOURCE_CHANGED/)
+      assert.deepEqual(await readFile(resolve(root, graphRef)), beforeGraph)
+      await assert.rejects(readFile(resolve(root, expectedWikiFactPath(pack.source))), /ENOENT/)
+      await assert.rejects(readFile(resolve(root, expectedWikiReceiptPath(pack.source))), /ENOENT/)
+    }
+  } finally { await rm(root, { recursive: true, force: true }) }
+})
+
+test('receipt season metadata is checked when present and older receipts remain compatible', async () => {
+  const root = await makeRoot(['SESSION_005'])
+  try {
+    const pack = await syntheticS04Package(root)
+    const applied = await finalizeWikiFactProposal({ root, ...pack, apply: true })
+    const receiptPath = resolve(root, applied.receipt_ref)
+    const receipt = JSON.parse(await readFile(receiptPath, 'utf8'))
+    await writeFile(receiptPath, JSON.stringify({ ...receipt, season_id: 'S03' }))
+    await assert.rejects(finalizeWikiFactProposal({ root, ...pack, apply: true }), /WIKI_FINALIZER_RECEIPT_COLLISION/)
+    await writeFile(receiptPath, JSON.stringify({ ...receipt, source_ref: receipt.source_ref.replace('/S04/', '/S03/') }))
+    await assert.rejects(finalizeWikiFactProposal({ root, ...pack, apply: true }), /WIKI_FINALIZER_RECEIPT_COLLISION/)
+    delete receipt.season_id
+    delete receipt.source_ref
+    await writeFile(receiptPath, JSON.stringify(receipt))
+    assert.equal((await finalizeWikiFactProposal({ root, ...pack, apply: true })).status, 'NOOP_ALREADY_FINALIZED')
+  } finally { await rm(root, { recursive: true, force: true }) }
 })

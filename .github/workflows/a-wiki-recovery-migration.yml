@@ -1,0 +1,58 @@
+name: A-Wiki recovery database contract
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/a-wiki-recovery-migration.yml'
+      - 'supabase/migrations/*a_wiki*'
+      - 'supabase/tests/a_wiki_native_jobs*'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/a-wiki-recovery-migration.yml'
+      - 'supabase/migrations/*a_wiki*'
+      - 'supabase/tests/a_wiki_native_jobs*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recovery-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+      - name: Apply native contracts and recovery migration in an isolated database
+        run: |
+          psql -v ON_ERROR_STOP=1 --file supabase/tests/a_wiki_native_jobs_test_bootstrap.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261004012234_a_wiki_native_jobs_v1.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261004053216_a_wiki_review_proposal_sha_contract_v2.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261004053526_a_wiki_blocked_retry_v1.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261005101808_a_wiki_native_jobs_recovery_v1.sql
+      - name: Verify publication evidence, supersession, and operator readback
+        run: psql -v ON_ERROR_STOP=1 --file supabase/tests/a_wiki_native_jobs_recovery_verification.sql

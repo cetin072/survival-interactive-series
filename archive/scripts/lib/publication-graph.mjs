@@ -231,9 +231,11 @@ export function reconcilePublicGraphBackfill({ previous, facts, source, book, bo
   validatePrevious(previous)
   keys(facts, ['version', 'chronicle_id', 'worldline_id', 'season_id', 'visibility', 'anchor', 'nodes', 'relations'])
   namespace(facts); anchor(facts.anchor)
-  demand(facts.version === 'public-graph-facts-v1' && facts.season_id === 'S03', 'GRAPH_FACT_SCOPE_MISMATCH')
+  demand(facts.version === 'public-graph-facts-v1' && /^S\d{2,3}$/.test(facts.season_id ?? '')
+    && Number(facts.season_id.slice(1)) >= 3, 'GRAPH_FACT_SCOPE_MISMATCH')
   keys(source, ['source_ref', 'source_sha256'])
-  demand(source.source_ref.startsWith('archive/content/public-facts/C03-AFTERFALL/S03/'), 'GRAPH_SOURCE_SEASON_MISMATCH')
+  demand(typeof source.source_ref === 'string'
+    && source.source_ref.startsWith(`archive/content/public-facts/C03-AFTERFALL/${facts.season_id}/`), 'GRAPH_SOURCE_SEASON_MISMATCH')
   evidence({ ...source, pointer: '/nodes/0' })
   demand(Array.isArray(facts.nodes) && facts.nodes.length <= 5000
     && Array.isArray(facts.relations) && facts.relations.length <= 20000, 'INVALID_GRAPH_INVENTORY')

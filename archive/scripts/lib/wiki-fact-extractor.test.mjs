@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFile, mkdtemp, writeFile, rm } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { byteHash, graphHash, reconcilePublicGraph } from './publication-graph.mjs'
+import { byteHash, graphHash, reconcilePublicGraph, reconcilePublicGraphBackfill } from './publication-graph.mjs'
 import { discoverWikiSources, discoverWikiSource } from './wiki-semantic-jobs.mjs'
 import { buildWikiFactJob, buildWikiFactReviewJob, compileWikiFactProposal, extractWikiFacts, reviewWikiFactProposal, validateWikiFactReview, WIKI_RESULT_VERSION, WIKI_REVIEW_VERSION } from './wiki-fact-extractor.mjs'
 import { runWikiFactCli } from '../run-wiki-fact-extractor.mjs'
@@ -67,6 +67,70 @@ test('compiled facts use the existing reconciler, including history and replay N
   assert.equal(first.report.nodes_added, 2); assert.equal(first.report.nodes_updated, 1)
   assert.equal(first.graph.nodes.find((n) => n.id === 'char-existing').history.length, 1)
   assert.equal(reconcilePublicGraph({ ...args, previous: first.graph }).report.status, 'NOOP')
+})
+
+test('S04 jobs separate source identity while keeping existing and new entity IDs stable', () => {
+  const f = fixture('SESSION_005')
+  const s03 = compileWikiFactProposal(f.job, f.result)
+  f.source.seasonId = 'S04'
+  f.source.sourceManifestRef = f.source.sourceManifestRef.replace('/S03/', '/S04/')
+  f.source.rawRef = f.source.rawRef.replace('/S03/', '/S04/')
+  const job = buildWikiFactJob(f.source, f.graph)
+  const s04 = compileWikiFactProposal(job, { ...f.result, job_id: job.job_id })
+  assert.notEqual(job.job_id, f.job.job_id)
+  assert.equal(job.season_id, 'S04')
+  assert.equal(s04.facts.season_id, 'S04')
+  assert.deepEqual(s04.facts.nodes.map((node) => node.id), s03.facts.nodes.map((node) => node.id))
+  assert.ok(s04.facts.nodes.every((node) => node.source.startsWith('S04 SESSION_005 ')))
+  assert.equal(job.existing_nodes[0].anchor.save_version, ANCHOR.save_version)
+  const args = { previous: f.graph, facts: s04.facts,
+    source: { source_ref: 'archive/content/public-facts/C03-AFTERFALL/S04/TEST.json', source_sha256: graphHash(s04.facts) }, book, bookSource }
+  const applied = reconcilePublicGraphBackfill(args)
+  const existing = applied.graph.nodes.find((node) => node.id === 'char-existing')
+  assert.equal(existing.history.length, 1)
+  assert.equal(existing.history[0].data.summary, seed.summary)
+  assert.equal(existing.data.meta.보존항목, '그대로')
+  assert.equal(reconcilePublicGraphBackfill({ ...args, previous: applied.graph }).report.status, 'NOOP')
+  assert.throws(() => reconcilePublicGraphBackfill({ ...args,
+    source: { ...args.source, source_ref: args.source.source_ref.replace('/S04/', '/S03/') } }), /GRAPH_SOURCE_SEASON_MISMATCH/)
+})
+
+test('existing relation inventory permits an evidenced update without a second edge', () => {
+  const f = fixture()
+  const first = compileWikiFactProposal(f.job, f.result)
+  const graph = reconcilePublicGraphBackfill({ previous: f.graph, facts: first.facts,
+    source: { source_ref: 'archive/content/public-facts/C03-AFTERFALL/S03/TEST_FIRST.json', source_sha256: graphHash(first.facts) }, book, bookSource }).graph
+  const source = { ...f.source, seasonId: 'S04',
+    sourceManifestRef: f.source.sourceManifestRef.replace('/S03/', '/S04/'), rawRef: f.source.rawRef.replace('/S03/', '/S04/'),
+    anchor: { save_version: 12, game_time: '2027-01-03 12:00' } }
+  const job = buildWikiFactJob(source, graph)
+  assert.equal(job.existing_relations.length, 1)
+  assert.equal(job.existing_relations[0].anchor.save_version, 11)
+  const proposal = compileWikiFactProposal(job, { ...f.result, job_id: job.job_id, nodes: [],
+    relations: [{ ...first.facts.relations[0], label: '작업장 근무', evidence: ['q1'] }] })
+  const applied = reconcilePublicGraphBackfill({ previous: graph, facts: proposal.facts,
+    source: { source_ref: 'archive/content/public-facts/C03-AFTERFALL/S04/TEST_RELATION.json', source_sha256: graphHash(proposal.facts) }, book, bookSource })
+  assert.equal(applied.graph.relations.length, 1)
+  assert.equal(applied.graph.relations[0].id, graph.relations[0].id)
+  assert.equal(applied.graph.relations[0].history.length, 1)
+  assert.equal(applied.report.relations_updated, 1)
+})
+
+test('a rehashed job cannot mix a source from another season', () => {
+  const f = fixture()
+  f.job.season_id = 'S04'
+  const { job_id: _old, ...body } = f.job
+  f.job.job_id = `wiki-job-${graphHash(body)}`
+  assert.throws(() => compileWikiFactProposal(f.job, { ...f.result, job_id: f.job.job_id }), /WIKI_JOB_SEASON_MISMATCH/)
+})
+
+test('already prepared S03 jobs remain valid without the new relation inventory', () => {
+  const f = fixture()
+  delete f.job.existing_relations
+  f.job.existing_nodes = f.job.existing_nodes.map(({ id, data }) => ({ id, data }))
+  const { job_id: _old, ...body } = f.job
+  f.job.job_id = `wiki-job-${graphHash(body)}`
+  assert.equal(compileWikiFactProposal(f.job, { ...f.result, job_id: f.job.job_id }).status, 'FACTS_PROPOSED')
 })
 test('a proven quote is not automatically treated as semantic approval', () => {
   const f = fixture(); f.result.nodes[0].changes.summary = '근거가 실제로 함의하는지 별도 검토가 필요한 주장'

@@ -109,6 +109,20 @@ describe('Wiki staged public structure', () => {
     expect(markup).toContain('view=wiki-preview&amp;node=event-guild-warehouse-option')
   })
 
+  it('shows current activity before the older role text and links the exact published sources', () => {
+    const markup = renderToStaticMarkup(createElement(WikiShellPreview, { nodeId: 'char-taehoon' }))
+    expect(markup.indexOf('id="wiki-activities"')).toBeLessThan(markup.indexOf('id="wiki-history"'))
+    expect(markup).toContain('공공급수·생산거점 동시 펌프 고장 대응')
+    expect(markup).toContain('part=c03-s03-session-008-001')
+    expect(markup).toContain('<summary>이전 기록의 개요와 해설</summary>')
+    expect(markup).toContain('핵심 시설 담당')
+
+    const event = renderToStaticMarkup(createElement(WikiShellPreview, { nodeId: 'event-wiki-934cea538155fc7bc102a21c' }))
+    expect(event).toContain('part=c03-s03-session-008-001')
+    expect(event).toContain('chapter=c03-afterfall-auto-7a589e3a941834319a82033e0169df5b7270a24315fbe18f30d8a368daee6b4a')
+    expect(event).not.toContain('연결된 공개 원문 없음')
+  })
+
   it('roundtrips home Chronicle and document preview states', () => {
     expect(parseArchiveRoute('?view=wiki-preview')).toMatchObject({
       view: 'wiki-preview',

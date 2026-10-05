@@ -1,5 +1,7 @@
 import { chronicleRegistry } from './chronicleRegistry'
 import {
+  aWikiPublicationStatus,
+  aWikiStatusLabel,
   blockerLabel,
   decisionLabel,
   formatOperatorRefreshTime,
@@ -53,7 +55,8 @@ type KnowledgeSemanticJob = {
   final_head_sha?: string | null; merge_sha?: string | null; blocker_code?: string | null; blocker_stage?: string | null
 }
 type AWikiJob = {
-  job_id?: string; status?: string; session_id?: string; source_ref?: string
+  job_id?: string; status?: string; session_id?: string; season_id?: string; source_ref?: string
+  completion_origin?: 'NATIVE' | 'NATIVE_REVIEWED_MERGE' | 'EXTERNAL_REVIEWED_MERGE' | null
   blocker_code?: string | null; final_pr_number?: number | null; merge_sha?: string | null
   dispatch_count?: number | null; dispatch_at?: string | null; age_minutes?: number | null
   created_at?: string | null; updated_at?: string | null; extractor_submitted_at?: string | null
@@ -133,7 +136,14 @@ export function OperatorDashboard({
 
   const aWikiLatest = systemStatus?.a_wiki?.latest_job ?? null
   const aWikiBlocker = aWikiLatest?.blocker_code ?? null
-  const aWikiBadgeClass = aWikiBlocker ? 'warning' : visualStatusTone(aWikiLatest?.status)
+  const aWikiPublication = aWikiPublicationStatus(aWikiLatest, productionStatus)
+  const aWikiBadgeClass = aWikiBlocker ? 'warning'
+    : aWikiLatest?.status === 'PUBLISHED' ? aWikiPublication.deploymentVerified ? 'ok' : 'neutral'
+    : visualStatusTone(aWikiLatest?.status)
+  const aWikiBadge = !systemStatus?.a_wiki ? '상태 조회 필요'
+    : aWikiBlocker ? '확인 필요'
+    : aWikiLatest?.status === 'PUBLISHED' ? aWikiPublication.deployment
+    : aWikiLatest?.status ? aWikiStatusLabel(aWikiLatest.status) : '실행 이력 없음'
 
   const visualLatest = systemStatus?.visual.latest_job ?? null
   const visualPrepHealthy = systemStatus?.visual.prep_cron?.active === true
@@ -220,25 +230,33 @@ export function OperatorDashboard({
         <article className="operator-system-card">
           <div className="operator-system-title">
             <h3>A-Wiki · 세계관 위키 <small>인물·장소·사건 자동 정리</small></h3>
-            <span className={`operator-status-badge ${aWikiBadgeClass}`}>{aWikiBlocker ? '확인 필요' : aWikiLatest?.status ? statusLabel(aWikiLatest.status) : '실행 이력 없음'}</span>
+            <span className={`operator-status-badge ${aWikiBadgeClass}`}>{aWikiBadge}</span>
           </div>
           <dl>
-            <div><dt>최근 작업</dt><dd>{sessionLabel(aWikiLatest?.session_id)}</dd></div>
-            <div><dt>진행 중 / 완료</dt><dd>{systemStatus?.a_wiki?.active_count ?? 0}건 / {systemStatus?.a_wiki?.published_count ?? 0}건</dd></div>
+            <div><dt>최근 작업</dt><dd>{aWikiLatest?.season_id ? `${aWikiLatest.season_id} · ` : ''}{sessionLabel(aWikiLatest?.session_id)}</dd></div>
+            <div><dt>작업 수</dt><dd>{systemStatus?.a_wiki ? `진행 ${systemStatus.a_wiki.active_count}건 · 저장소 반영 ${systemStatus.a_wiki.published_count}건` : '조회 필요'}</dd></div>
+            <div><dt>내용 검수</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.review : '조회 필요'}</dd></div>
+            <div><dt>저장소 반영</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.repository : '조회 필요'}</dd></div>
+            <div><dt>공개 사이트</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.deployment : '조회 필요'}</dd></div>
+            <div><dt>다음 작업</dt><dd>{!systemStatus?.a_wiki ? '조회 필요' : aWikiBlocker ? '현재 작업 확인 필요' : systemStatus.a_wiki.active_count > 0 ? '현재 기록 처리 중' : '다음 공개 원문 처리 대기'}</dd></div>
             <div><dt>최근 갱신</dt><dd>{formatOperatorTime(aWikiLatest?.published_at ?? aWikiLatest?.updated_at ?? aWikiLatest?.created_at)}</dd></div>
-            <div><dt>현재 상태 시간</dt><dd>{aWikiLatest?.age_minutes == null ? '—' : `${aWikiLatest.age_minutes}분`}</dd></div>
-            <div><dt>막힌 이유</dt><dd>{aWikiBlocker ? blockerLabel(aWikiBlocker) : '없음'}</dd></div>
+            <div><dt>막힌 이유</dt><dd>{!systemStatus?.a_wiki ? '조회 필요' : aWikiBlocker ? blockerLabel(aWikiBlocker) : '없음'}</dd></div>
           </dl>
+          <p className="operator-status-help">{systemStatus?.a_wiki ? aWikiPublication.deploymentDetail : '위키 실행 상태를 불러오지 못했습니다. 상태를 새로고침해 주세요.'}</p>
           <details className="operator-tech-details">
             <summary>기술 상세</summary>
             <dl>
-              <div><dt>상태 코드</dt><dd><code>{aWikiLatest?.status ?? '없음'}</code></dd></div>
+              <div><dt>상태 코드</dt><dd><code>{aWikiLatest?.status ?? '없음'}</code>{aWikiLatest?.status ? aWikiStatusLabel(aWikiLatest.status) : ''}</dd></div>
               <div><dt>기록 ID</dt><dd><code>{aWikiLatest?.session_id ?? '없음'}</code></dd></div>
-              <div><dt>게시 검증</dt><dd>{aWikiLatest?.final_pr_number ? `#${aWikiLatest.final_pr_number}` : '없음'}</dd></div>
+              <div><dt>반영 방식</dt><dd>{aWikiLatest?.completion_origin === 'EXTERNAL_REVIEWED_MERGE' ? '외부 검수·병합 결과 확인' : aWikiLatest?.completion_origin === 'NATIVE' || aWikiLatest?.completion_origin === 'NATIVE_REVIEWED_MERGE' ? '기본 위키 처리 경로' : '기록 없음'}</dd></div>
+              <div><dt>저장소 검증</dt><dd>{aWikiLatest?.final_pr_number ? `#${aWikiLatest.final_pr_number}` : '없음'}</dd></div>
               <div><dt>반영 코드</dt><dd><code>{aWikiLatest?.merge_sha?.slice(0, 12) ?? '없음'}</code></dd></div>
+              <div><dt>배포 원본</dt><dd><code>{shortSha(productionStatus.release?.source_main_sha)}</code></dd></div>
+              <div><dt>현재 상태 시간</dt><dd>{aWikiLatest?.age_minutes == null ? '—' : `${aWikiLatest.age_minutes}분`}</dd></div>
               <div><dt>작업 전달</dt><dd>{aWikiLatest?.dispatch_count ?? 0}회 · {formatOperatorTime(aWikiLatest?.dispatch_at)}</dd></div>
               <div><dt>문제 코드</dt><dd><code>{aWikiBlocker ?? '없음'}</code></dd></div>
             </dl>
+            <p>다음 작업 대기는 현재 진행 중인 작업이 없다는 뜻입니다. 새 공개 원문 유무는 원문 탐색 결과에서 별도로 확인해야 합니다.</p>
           </details>
         </article>
 

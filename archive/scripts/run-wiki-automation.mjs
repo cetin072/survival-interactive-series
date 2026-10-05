@@ -79,7 +79,7 @@ export async function runWikiAutomation(mode, { discover = discoverWikiSource } 
 
 export async function runCli(args, { discover = discoverWikiSource } = {}) {
   if (['--prepare', '--result', '--proposal'].includes(args[0])) return runWikiFactCli(args, { root, discover })
-  if (args.length === 1 && args[0] === '--help') return 'Usage: node archive/scripts/run-wiki-automation.mjs (--check|--apply)\nNative semantic path: --prepare | --result <result.json> --check | --proposal <proposal.json> --prepare-review | --proposal <proposal.json> --review <review.json> --check.\nReads the first unprocessed verified S03 PUBLIC_ARCHIVE session in manifest order; extracts GM blocks only.\n--check writes nothing; --apply writes one deterministic AWiki fact and reconciles GRAPH.json.\n'
+  if (args.length === 1 && args[0] === '--help') return 'Usage: node archive/scripts/run-wiki-automation.mjs (--check|--apply)\nNative semantic path: --prepare | --result <result.json> --check | --proposal <proposal.json> --prepare-review | --proposal <proposal.json> --review <review.json> --check.\nNative preparation reads the first unprocessed approved AFTERFALL season (S03 onward) in catalog order; extracts GM blocks only.\nStandalone --check/--apply preserve the legacy S03 SESSION_005 replay only. New sources require native extraction and independent review before finalization.\n'
   demand(args.length === 1, 'INVALID_WIKI_CLI_ARGUMENTS')
   try { return JSON.stringify(await runWikiAutomation(args[0], { discover }), null, 2) + '\n' }
   catch (error) {

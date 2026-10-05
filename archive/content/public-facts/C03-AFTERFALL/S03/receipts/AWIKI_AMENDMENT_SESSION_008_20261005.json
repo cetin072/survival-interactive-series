@@ -1,0 +1,17 @@
+{
+  "version": "a-wiki-amendment-receipt-v1",
+  "amendment_id": "SESSION_008_20261005",
+  "season_id": "S03",
+  "session_id": "SESSION_008",
+  "source_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/SOURCE_MANIFEST.json",
+  "source_sha256": "3d15073c796967f27b1dd094ceecd948ab28b93aed7971818de48cb0e6cd4dc0",
+  "job_id": "wiki-job-43d7a670d6532d7cd41d4913c8febf1e281e81ef9321f732573e7e8d13f99046",
+  "proposal_sha256": "0ea966a442b22bbc30e46377373d546b8c5d2af0009808b656a8d7c09a4f9f24",
+  "review_sha256": "4bb20f2ee2021012e91e735d8decc6e06d1a7971043494cb6e8a84a8ac1083b2",
+  "bundle_sha256": "a3f61d38e42eaf93eafc27e908eea15809ee7ad35c8087921782cb07f3792d69",
+  "outcome": "APPLIED",
+  "fact_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187",
+  "graph_before_sha256": "4eae33f49195300c4b538c05eb02c3a91638b2f648af1d4e4d0e84fb0f87303e",
+  "graph_after_sha256": "f63dd099a5457b3a2f60190e0fa22084ac3a96acd4016912a1d39fed14ac3ed3",
+  "coverage": "COMPLETE"
+}

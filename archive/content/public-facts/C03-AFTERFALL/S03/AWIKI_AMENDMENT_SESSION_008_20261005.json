@@ -1,0 +1,174 @@
+{
+  "anchor": {
+    "game_time": "2027-11-22 22:40",
+    "save_version": 285
+  },
+  "chronicle_id": "C03-AFTERFALL",
+  "nodes": [
+    {
+      "id": "char-jinwoo",
+      "label": "서진우",
+      "meta": {
+        "상태": "ACTIVE",
+        "소속": "CORE_FOUR"
+      },
+      "source": "S03 SESSION_008 GM 공개 블록 001, 003, 005",
+      "subtitle": "응급실 간호사 · 플레이어",
+      "summary": "공공 급수지점에는 일반 유지보수와 기술지원을 제공하고 일상 운영은 행정 잔존팀이 맡도록 책임을 나눴다. 2027년 11월 9일에는 저장량과 대체수단을 비교해 생산거점을 먼저 복구하도록 결정했다. 길드 표식 사칭 문제에서는 상인의 물건을 빼앗거나 외부 장사를 금지하지 않고 피해거래 정산과 길드 서비스 이용 제한으로 대응했다.",
+      "tags": [
+        "PLAYER",
+        "핵심 4인",
+        "응급의료",
+        "외부정찰"
+      ],
+      "type": "character"
+    },
+    {
+      "id": "char-eunchae",
+      "label": "최은채",
+      "meta": {
+        "겨울역할": "물류·기록 지원",
+        "상태": "ACTIVE"
+      },
+      "source": "S03 SESSION_008 GM 공개 블록 001, 003, 005",
+      "subtitle": "병원 행정직 출신 · 물류·기록",
+      "summary": "공공 급수지점 실태조사에서 운영기록을 확인했다. 길드 표준품의 번호체계를 정하고 판매·수리 장부와 대조해 사칭품을 확인했으며, 하루 거래 정산을 마감했다.",
+      "tags": [
+        "CORE",
+        "핵심 4인",
+        "물류",
+        "기록"
+      ],
+      "type": "character"
+    },
+    {
+      "id": "char-hayoung",
+      "label": "신하영",
+      "meta": {
+        "별칭": "이소라",
+        "상태": "ACTIVE",
+        "연합원": "아님"
+      },
+      "source": "S03 SESSION_008 GM 공개 블록 003",
+      "subtitle": "조리·위생·단체생활 전문가",
+      "summary": "길드 표준펌프 사칭 문제가 생기자 시장에서 구매 사례와 장부 확인 여부를 알아봤다. 2027년 11월 22일에는 북쪽 연료장 생활권에서 보낸 겨울 전 연료·운송 회의 초청장을 길드에 전달했다.",
+      "tags": [
+        "MAJOR",
+        "겨울편 주도",
+        "조리",
+        "위생",
+        "TRUSTED_EXTERNAL"
+      ],
+      "type": "character"
+    },
+    {
+      "id": "char-mingyu",
+      "label": "정민규",
+      "meta": {
+        "거점출입": "없음",
+        "상태": "ACTIVE"
+      },
+      "source": "S03 SESSION_008 GM 공개 블록 001, 003",
+      "subtitle": "외부 전기·시설 기술자",
+      "summary": "공공 급수지점 실태조사에서 설비를 살폈다. 2027년 11월 9일 장태훈과 생산거점 펌프를 먼저 복구한 뒤 공공 급수지점 복구에 참여했고, 표준품 진품 확인용 금속표를 만들었다.",
+      "tags": [
+        "MAJOR",
+        "전기",
+        "시설",
+        "외부협력"
+      ],
+      "type": "character"
+    },
+    {
+      "id": "char-taehoon",
+      "label": "장태훈",
+      "meta": {
+        "겨울역할": "설비·난방·급수 지원",
+        "상태": "ACTIVE"
+      },
+      "source": "S03 SESSION_008 GM 공개 블록 001, 005",
+      "subtitle": "시설운영 기술자",
+      "summary": "공공 급수지점 두 곳의 설비를 조사하고 오래된 펌프 교체가 필요하다고 판단했다. 2027년 11월 9일에는 정민규와 생산거점 펌프를 오전 안에 복구하고, 이어 공공 급수지점 펌프를 교체해 오후에 정상화했다.",
+      "tags": [
+        "CORE",
+        "핵심 4인",
+        "시설",
+        "난방",
+        "급수"
+      ],
+      "type": "character"
+    }
+  ],
+  "relations": [
+    {
+      "from": "char-jinwoo",
+      "kind": "participated_in",
+      "label": "일반 유지보수·상황별 대응 원칙 확정",
+      "to": "event-wiki-a0da729cf563fe4b71f80b21"
+    },
+    {
+      "from": "char-hajin",
+      "kind": "participated_in",
+      "label": "상황별 대응 원칙 확인·동의",
+      "to": "event-wiki-a0da729cf563fe4b71f80b21"
+    },
+    {
+      "from": "char-jinwoo",
+      "kind": "participated_in",
+      "label": "진품 확인체계 구축 착수",
+      "to": "event-wiki-d12d5299a253870e3748a92e"
+    },
+    {
+      "from": "char-eunchae",
+      "kind": "participated_in",
+      "label": "표준품 번호체계·장부 확인",
+      "to": "event-wiki-d12d5299a253870e3748a92e"
+    },
+    {
+      "from": "char-mingyu",
+      "kind": "participated_in",
+      "label": "진품 확인용 금속표 제작",
+      "to": "event-wiki-d12d5299a253870e3748a92e"
+    },
+    {
+      "from": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+      "kind": "participated_in",
+      "label": "접수대 장부 확인 안내",
+      "to": "event-wiki-d12d5299a253870e3748a92e"
+    },
+    {
+      "from": "event-wiki-d12d5299a253870e3748a92e",
+      "kind": "occurred_at",
+      "label": "길드 접수대 진품 확인체계 운영",
+      "to": "loc-sports-complex"
+    },
+    {
+      "from": "char-hayoung",
+      "kind": "participated_in",
+      "label": "시장 구매 사례 확인",
+      "to": "event-wiki-281823f8f1b6fb2c770b1925"
+    },
+    {
+      "from": "char-wiki-cc15e0b3875ce0e734646be4",
+      "kind": "participated_in",
+      "label": "고객 거래사례 확인",
+      "to": "event-wiki-281823f8f1b6fb2c770b1925"
+    },
+    {
+      "from": "char-eunchae",
+      "kind": "participated_in",
+      "label": "판매·수리 장부 대조",
+      "to": "event-wiki-281823f8f1b6fb2c770b1925"
+    },
+    {
+      "from": "char-jinwoo",
+      "kind": "participated_in",
+      "label": "피해거래 정산·서비스 이용 제한 판단",
+      "to": "event-wiki-281823f8f1b6fb2c770b1925"
+    }
+  ],
+  "season_id": "S03",
+  "version": "public-graph-facts-v1",
+  "visibility": "PUBLIC_ARCHIVE",
+  "worldline_id": "AFTERFALL"
+}

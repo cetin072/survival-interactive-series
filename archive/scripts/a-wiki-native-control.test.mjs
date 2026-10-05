@@ -1,11 +1,15 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
+import { resolve } from 'node:path'
+import { discoverWikiSources } from './lib/wiki-semantic-jobs.mjs'
 import { byteHash, reconcilePublicGraph } from './lib/publication-graph.mjs'
 import {
-  buildWikiFactJob, buildWikiFactReviewJob, WIKI_REVIEW_VERSION,
+  buildWikiFactJob, buildWikiFactReviewJob, validateWikiFactReview, WIKI_REVIEW_VERSION,
 } from './lib/wiki-fact-extractor.mjs'
 import {
-  compileSubmittedExtractor, inspectSubmittedReview, mergedPublication,
+  compileSubmittedExtractor, inspectSubmittedReview, mergedPublication, confirmMergedPublication,
+  prepareNativeJob, publicationBranch, consumeNativeJob,
 } from './a-wiki-native-control.mjs'
 
 const NS = { chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', visibility: 'PUBLIC_ARCHIVE' }
@@ -176,4 +180,139 @@ test('merged publication recovery accepts only the exact publication branch and 
     mergeCommit: { oid: 'a'.repeat(40) },
   }, branch), /A_WIKI_MERGED_PR_BINDING_INVALID/)
   assert.equal(mergedPublication({ state: 'OPEN' }, branch), null)
+})
+
+test('publication identity keeps legacy branches and separates seasons and graph revisions', () => {
+  const { job } = syntheticPackage()
+  const legacy = publicationBranch(job)
+  assert.match(legacy, /^automation\/a-wiki-publish-999-c{12}$/)
+  assert.notEqual(publicationBranch({ ...job, season_id: 'S04' }), legacy)
+  assert.notEqual(publicationBranch(job, true), legacy)
+  assert.notEqual(publicationBranch({ ...job, graph_sha256: 'e'.repeat(64) }, true), publicationBranch(job, true))
+})
+
+const base = resolve(import.meta.dirname, '../..')
+async function currentSourceRow(status = 'EXTRACTOR_READY') {
+  const source = (await discoverWikiSources(base)).find((item) => item.seasonId === 'S03'
+    && item.sourceSession.session_id === 'SESSION_007')
+  assert.ok(source)
+  return { source, row: { status, job_id: 'test-db-job', session_id: source.sourceSession.session_id,
+    source_ref: source.sourceManifestRef, source_sha256: source.sourceDigest,
+    prepared_job: { season_id: source.seasonId }, graph_sha256: 'f'.repeat(64) } }
+}
+
+test('prepare reconciles completed stale ledger BEFORE returning no pending source and is idempotent', async () => {
+  const { row } = await currentSourceRow()
+  let completed = false
+  const calls = []
+  const requestRpc = async (name, args) => {
+    calls.push(name)
+    if (name === 'archive_a_wiki_native_job_recovery_current') return completed ? { status: 'NO_JOB' } : row
+    if (name === 'archive_a_wiki_native_job_reconcile_publication') {
+      assert.equal(args.p_expected_status, 'EXTRACTOR_READY')
+      assert.deepEqual(args.p_evidence, { verified: true })
+      completed = true
+      return { status: 'PUBLISHED' }
+    }
+    assert.fail(`Unexpected RPC ${name}`)
+  }
+  let collections = 0
+  const collectCompletion = async () => { collections++; return { verified: true } }
+  const first = await prepareNativeJob({ base, requestRpc, collectCompletion })
+  assert.equal(first.status, 'NO_JOB')
+  assert.equal(first.reconciled_job_id, row.job_id)
+  const second = await prepareNativeJob({ base, requestRpc, collectCompletion })
+  assert.equal(second.status, 'NO_JOB')
+  assert.equal(second.reconciled_job_id, undefined)
+  assert.equal(collections, 1)
+  assert.deepEqual(calls, ['archive_a_wiki_native_job_recovery_current',
+    'archive_a_wiki_native_job_reconcile_publication', 'archive_a_wiki_native_job_recovery_current'])
+})
+
+test('invalid receipt evidence blocks prepare without faking completion or hiding it as NO_JOB', async () => {
+  const { row } = await currentSourceRow()
+  const calls = []
+  await assert.rejects(prepareNativeJob({ base,
+    requestRpc: async (name) => { calls.push(name); return row },
+    collectCompletion: async () => { throw new Error('A_WIKI_COMPLETION_FACT_HASH_MISMATCH') },
+  }), /FACT_HASH_MISMATCH/)
+  assert.deepEqual(calls, ['archive_a_wiki_native_job_recovery_current'])
+})
+
+test('unfinished graph drift creates a fresh source-bound job instead of mutating approved work', async () => {
+  const { row } = await currentSourceRow('BLOCKED')
+  row.blocker_code = 'A_WIKI_GRAPH_CHANGED_REPREPARE_REQUIRED'
+  const original = structuredClone(row)
+  const graph = JSON.parse(await readFile(resolve(base, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json')))
+  let replacements = 0
+  const result = await prepareNativeJob({ base, collectCompletion: async () => null,
+    requestRpc: async (name, args) => {
+      if (name === 'archive_a_wiki_native_job_recovery_current') return row
+      assert.equal(name, 'archive_a_wiki_native_job_supersede_reprepare')
+      assert.equal(args.p_job.source.manifest_ref, row.source_ref)
+      assert.equal(args.p_job.source.manifest_sha256, row.source_sha256)
+      assert.equal(args.p_job.graph_sha256, graph.content_sha256)
+      replacements++
+      return { status: 'EXTRACTOR_READY', job_id: 'replacement-job' }
+    },
+  })
+  assert.equal(result.superseded_job_id, row.job_id)
+  assert.equal(result.job_id, 'replacement-job')
+  assert.equal(replacements, 1)
+  assert.deepEqual(row, original)
+})
+
+test('consumer records graph drift then requests a fresh main preparation without retrying stale approval', async () => {
+  const row = { job_id: 'old-job', session_id: 'SESSION_999', status: 'FINALIZING' }
+  const changes = []
+  const requestRpc = async (name, args) => {
+    if (name === 'archive_a_wiki_native_job_program_current') return row
+    assert.equal(name, 'archive_a_wiki_native_job_advance')
+    changes.push(args)
+    return { status: args.p_status }
+  }
+  let fresh = 0
+  const result = await consumeNativeJob({ requestRpc,
+    publish: async () => { throw new Error('A_WIKI_GRAPH_CHANGED_REPREPARE_REQUIRED') },
+    reprepare: async ({ requestRpc: actualRpc }) => {
+      assert.equal(actualRpc, requestRpc)
+      fresh++
+      return { status: 'EXTRACTOR_READY', job_id: 'new-job' }
+    },
+  })
+  assert.equal(changes.length, 1)
+  assert.equal(changes[0].p_status, 'BLOCKED')
+  assert.equal(changes[0].p_blocker_code, 'A_WIKI_GRAPH_CHANGED_REPREPARE_REQUIRED')
+  assert.equal(fresh, 1)
+  assert.equal(result.status, 'EXTRACTOR_READY')
+  assert.equal(result.previous_job_id, 'old-job')
+})
+
+test('consumer reports PUBLISHED only after the matching DB transition is confirmed', async () => {
+  const row = { job_id: 'published-job', session_id: 'SESSION_999', status: 'FINALIZING' }
+  const result = await consumeNativeJob({
+    requestRpc: async (name, args) => name === 'archive_a_wiki_native_job_program_current'
+      ? row : { status: args.p_status },
+    publish: async () => ({ status: 'MERGED', branch: 'review/test', prNumber: 1,
+      headSha: 'a'.repeat(40), mergeSha: 'b'.repeat(40) }),
+  })
+  assert.equal(result.status, 'PUBLISHED')
+})
+
+test('merged native retry requires source, receipt, exact proposal and independent review evidence', () => {
+  const { job, result } = syntheticPackage()
+  const compiled = compileSubmittedExtractor({ status: 'EXTRACTOR_SUBMITTED', prepared_job: job, extractor_result: result })
+  const reviewResult = { version: WIKI_REVIEW_VERSION, proposal_sha256: compiled.proposal.proposal_sha256,
+    decision: 'APPROVE', note: 'Independent test review.' }
+  const review = validateWikiFactReview(compiled.reviewJob, reviewResult)
+  const row = { prepared_job: job, proposal: compiled.proposal, review_job: compiled.reviewJob,
+    review_result: reviewResult, source_ref: job.source.manifest_ref, source_sha256: job.source.manifest_sha256 }
+  const publication = { prNumber: 1, branch: publicationBranch(job), headSha: 'a'.repeat(40), mergeSha: 'b'.repeat(40) }
+  const evidence = { pr_number: 1, head_ref: publication.branch, head_sha: publication.headSha,
+    merge_sha: publication.mergeSha, source_ref: row.source_ref, source_sha256: row.source_sha256,
+    receipt_job_id: job.job_id, proposal_sha256: compiled.proposal.proposal_sha256, review_sha256: review.review_sha256 }
+  assert.deepEqual(confirmMergedPublication(row, publication, evidence), publication)
+  assert.throws(() => confirmMergedPublication(row, publication, null), /EVIDENCE_INVALID/)
+  assert.throws(() => confirmMergedPublication(row, publication, { ...evidence, review_sha256: 'c'.repeat(64) }), /EVIDENCE_INVALID/)
+  assert.throws(() => confirmMergedPublication(row, publication, { ...evidence, receipt_job_id: 'different-job' }), /EVIDENCE_INVALID/)
 })
