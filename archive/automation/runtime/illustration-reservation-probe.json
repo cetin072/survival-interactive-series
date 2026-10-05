@@ -36,5 +36,39 @@
     "renderer_prompt_sha256": "f5f06238b98c3c595377d635c7e107cba1e7898aa35a01c47be59f7465bc8e5f",
     "next_run_time": null,
     "task_updated_at": "2026-10-05T01:08:22.057036+00:00"
+  },
+  "result": {
+    "status": "TRANSPORT_PASS",
+    "observed_at": "2026-10-05T01:13:00.000Z",
+    "scheduled_dispatcher_task_id": "6ac24401ee1881919ac19b158102b752",
+    "renderer_prompt_exact": true,
+    "source_library": {
+      "id": "file_00000000e62081f69ad4668ac7044d25",
+      "kind": "file",
+      "name": "current.png",
+      "path": "/IMAGE-RENDER/output/current.png",
+      "file_id": "file_00000000e62081f69ad4668ac7044d25",
+      "library_file_id": "libfile_a1e80988e2748191bf6f3881444683f8",
+      "library_artifact_type": null,
+      "version_id": "4",
+      "mime_type": "image/png",
+      "size_bytes": 2912260,
+      "created_at": "2026-10-04T13:33:48.543042Z",
+      "modified_at": "2026-10-05T01:11:00.081169Z",
+      "model_generated": false,
+      "surface": "library"
+    },
+    "png": {
+      "format": "PNG",
+      "width": 1672,
+      "height": 941,
+      "size_bytes": 2912260,
+      "sha256": "36f861adce87a772d8d5f5e219b78efc6ce057ab977768c2f682757f5c288c8d",
+      "fully_decoded": true
+    },
+    "live_provider_complete": false,
+    "live_e2e": "NOT_RUN_NO_PREPARED_JOB",
+    "reason": "DAILY_SUCCESS_TARGET_REACHED",
+    "visual_observation": "The image depicts the requested agricultural-facility aftermath; no dashboard or operational UI is visible. This is transport inspection, not a durable Automation B Reviewer decision."
   }
 }
