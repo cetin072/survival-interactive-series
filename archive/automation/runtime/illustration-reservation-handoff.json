@@ -21,7 +21,15 @@
       "sha256": "36f861adce87a772d8d5f5e219b78efc6ce057ab977768c2f682757f5c288c8d"
     }
   },
-  "dispatch": null,
+  "dispatch": {
+    "status": "DISPATCHED",
+    "renderer_id": "6ac2e58fc3848191aba731468f6c3e18",
+    "renderer_prompt_sha256": "f5f06238b98c3c595377d635c7e107cba1e7898aa35a01c47be59f7465bc8e5f",
+    "task_updated_at": "2026-10-05T01:49:36.122709+00:00",
+    "schedule": "BEGIN:VEVENT\nDTSTART:20261005T015935Z\nEND:VEVENT",
+    "scheduled_for": "2026-10-05T10:59:35+09:00",
+    "prompt_exact_readback": true
+  },
   "collection": null,
   "result": null,
   "trial": {
