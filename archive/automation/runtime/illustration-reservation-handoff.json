@@ -155,6 +155,17 @@
     "prepared_at": "2026-10-05T01:47:58.105301+00:00",
     "prepared_via": "ONE_EXTRA_LIVE_ACCEPTANCE_JOB_AUTHORIZED_2026-10-05"
   },
-  "review": null,
+  "review": {
+    "status": "PROGRAM_DECISION_APPLIED",
+    "review_handoff_commit": "48ff149cc44e12d7dd516251e66371080395e905",
+    "workflow_run_id": 37473841953,
+    "decision": "PASS",
+    "review_provider": "native_chatgpt_vision",
+    "reviewed_at": "2026-10-06T13:49:33.394855+00:00",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_00000000cdfc81f582fa8c0671ca4b20",
+    "source_library_file_id": "libfile_1532be3d794c8191b91906fa5d006014",
+    "source_sha256": "88712f315cc9ef38ece598d9b828143d2bd564604819a5b29deaa6c28adbc2ec"
+  },
   "transfer": null
 }
