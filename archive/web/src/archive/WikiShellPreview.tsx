@@ -26,7 +26,11 @@ export function WikiShellPreview({
   if (nodeId && isWikiSupportedNodeId(nodeId)) {
     const document = buildWikiDocument(nodeId)
 
-    const previewTools = <form className="wiki-preview-tools" action="/" method="get">
+    const previewTools = <form className="wiki-preview-tools" action="/" method="get" onSubmit={(event) => {
+      event.preventDefault()
+      const selected = new FormData(event.currentTarget).get('node')
+      if (typeof selected === 'string' && isWikiSupportedNodeId(selected)) window.location.assign(wikiHref(selected))
+    }}>
       <input type="hidden" name="view" value="wiki-preview" />
       <label>
         <span>Wiki 문서 미리보기</span>
