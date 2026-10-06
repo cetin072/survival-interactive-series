@@ -1,17 +1,17 @@
 {
   "version": "illustration-review-handoff-v1",
-  "job_id": "illustration-event-network-decay-b709bedf4fae-20261006-37392537655",
-  "main_sha": "d864f7f8481208392bbf3f6dc0cdd7f174c3d78b",
-  "point_id": "point-53a062c44d358ff024594b6789f682d56820c14e9fe14f6b2817fea03bc4e157",
-  "generation_key": "generation-b709bedf4fae9f0bff641c43a8a2a7862266e605f03081e4a845934ddde353db",
-  "subject_id": "event-network-decay",
-  "prompt_sha256": "e0b3ceb020926c89acbd2a596ba238f7578e62fa0080394ceac04bffc85cbe6c",
-  "review_context_sha256": "052ed63db25554cb118ea6f4e9161b28854423a6100d584ba5f1c89acbf4ce76",
+  "job_id": "illustration-event-shelter-22e758f3837c-20261007-37526903478",
+  "main_sha": "55c935cfc1e895091d4c83754229f3af6c1febec",
+  "point_id": "point-678e9d03df307380c620f2c88986b88cf0a22b28e1e986174a0578b81dbb6b3b",
+  "generation_key": "generation-22e758f3837ca6257f34706b00f77087498858d9005b8c1cf69619801c1736f7",
+  "subject_id": "event-shelter",
+  "prompt_sha256": "79ea3f12fc72f4a8278b1b275c9df12f15e25f692af5dc886011195023b1bd4b",
+  "review_context_sha256": "e79b9db79e71af031ae8643fc84ce500d8cc7753758e4050a2dc750ba0b921ab",
   "source_library_path": "/IMAGE-RENDER/output/current.png",
-  "source_library_file_id": "file_00000000cdfc81f582fa8c0671ca4b20",
+  "source_library_file_id": "file_0000000092a0822f8a823e5a333f35c5",
   "decision": "PASS",
   "review_provider": "native_chatgpt_vision",
-  "review_summary": "Matches the bound network-decay scene: a contemporary Korean roadside exchange/logistics point with sparse human presence, empty road and loading space, waiting goods and equipment, intact facilities, and a quiet cool blue-gray painterly atmosphere that conveys weakening connections without invented spectacle or identifying text.",
+  "review_summary": "Matches the bound shelter scene: a contemporary Korean public-facility interior where bedding and supplies are organized, water, hygiene, and simple cooking are visibly functioning, and a few non-identifying people work quietly. The wide cool blue-gray painterly composition conveys orderly early shelter operation without invented spectacle, violence, identity text, or unsupported architecture.",
   "rejection_codes": [],
-  "created_at": "2026-10-06T13:46:41.107Z"
+  "created_at": "2026-10-06T23:30:06.412Z"
 }
