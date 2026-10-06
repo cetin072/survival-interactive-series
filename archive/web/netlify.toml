@@ -9,7 +9,7 @@ command = "npm run build:verified"
 # and only a release-marker commit is allowed to create a Production deploy.
 # Netlify ignore commands exit 0 to skip and 1 to continue.
 [context.production]
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- public/release/production.json"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ':(top)archive/web/public/release/production.json'"
 
 # Archive content lives outside this site's base directory. Keep Preview builds
 # when the Reader inputs or build scripts change.
