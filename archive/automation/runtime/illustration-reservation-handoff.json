@@ -2,134 +2,22 @@
   "receipt": {
     "version": "illustration-reservation-handoff-v1",
     "mode": "LIVE",
-    "job_id": "illustration-event-fireline-56d5c65b6320-20261005-liveaccept1",
-    "main_sha": "22e080d6f77fc0a2d963ad428e18b73e424db4ed",
-    "point_id": "point-376b71213d04ff0d608134a0ac02ff04337a0bd8bf26de5a40f197cb9f9397c0",
-    "generation_key": "generation-56d5c65b6320fd3f02c5aba6fd7cbef7da6212fc3cb6644d96eaeba1852f5162",
-    "subject_id": "event-fireline",
-    "prompt_sha256": "4c3d04c06c3b63328e3202539ac3da041881a3693c8f99420c74ff0b3164daa9",
-    "review_context_sha256": "c85ef6618137c78ec6d21ff2e74343f95ff19b9d005dc9467c51e9af3943cf70",
+    "job_id": "illustration-event-network-decay-b709bedf4fae-20261006-37392537655",
+    "main_sha": "d864f7f8481208392bbf3f6dc0cdd7f174c3d78b",
+    "point_id": "point-53a062c44d358ff024594b6789f682d56820c14e9fe14f6b2817fea03bc4e157",
+    "generation_key": "generation-b709bedf4fae9f0bff641c43a8a2a7862266e605f03081e4a845934ddde353db",
+    "subject_id": "event-network-decay",
+    "prompt_sha256": "e0b3ceb020926c89acbd2a596ba238f7578e62fa0080394ceac04bffc85cbe6c",
+    "review_context_sha256": "052ed63db25554cb118ea6f4e9161b28854423a6100d584ba5f1c89acbf4ce76",
     "renderer_id": "6ac2e58fc3848191aba731468f6c3e18",
-    "requested_at": "2026-10-05T01:48:56Z",
-    "job_created_at": "2026-10-05T01:47:58.105301+00:00",
-    "renderer_prompt_sha256": "f5f06238b98c3c595377d635c7e107cba1e7898aa35a01c47be59f7465bc8e5f",
-    "baseline": {
-      "library_file_id": "libfile_a1e80988e2748191bf6f3881444683f8",
-      "file_id": "file_00000000e62081f69ad4668ac7044d25",
-      "version_id": "4",
-      "modified_at": "2026-10-05T01:11:00.157977+00:00",
-      "sha256": "36f861adce87a772d8d5f5e219b78efc6ce057ab977768c2f682757f5c288c8d"
-    }
+    "requested_at": "2026-10-06T13:30:48.309959+00:00",
+    "job_created_at": "2026-10-06T00:10:18.997736+00:00",
+    "renderer_prompt_sha256": "2996e6611a6b5bd2c3210780c8193361a5527caf86fffcc6699453f49ea2aaba",
+    "baseline": null
   },
-  "dispatch": {
-    "status": "DISPATCHED",
-    "renderer_id": "6ac2e58fc3848191aba731468f6c3e18",
-    "renderer_prompt_sha256": "f5f06238b98c3c595377d635c7e107cba1e7898aa35a01c47be59f7465bc8e5f",
-    "task_updated_at": "2026-10-05T01:49:36.122709+00:00",
-    "schedule": "BEGIN:VEVENT\nDTSTART:20261005T015935Z\nEND:VEVENT",
-    "scheduled_for": "2026-10-05T10:59:35+09:00",
-    "prompt_exact_readback": true
-  },
-  "collection": {
-    "status": "READY_FOR_PROVIDER_COMPLETE",
-    "source_library_path": "/IMAGE-RENDER/output/current.png",
-    "source_file_id": "file_0000000018e481fd828652c5c1377af0",
-    "source_library_file_id": "libfile_a1e80988e2748191bf6f3881444683f8",
-    "source_version_id": "5",
-    "source_sha256": "ad752c36ba67542ee0533e8df697bb5a03e326ab0e792d6e8558c6230d97e98d",
-    "source_width": 1774,
-    "source_height": 887,
-    "source_size_bytes": 2844084,
-    "source_modified_at": "2026-10-05T02:06:22.909769Z",
-    "observed_at": "2026-10-05T02:14:21.073Z",
-    "provider_complete": {
-      "p_job_id": "illustration-event-fireline-56d5c65b6320-20261005-liveaccept1",
-      "p_prompt_sha256": "4c3d04c06c3b63328e3202539ac3da041881a3693c8f99420c74ff0b3164daa9"
-    },
-    "provider_completed_at": "2026-10-05T02:15:41.355355+00:00",
-    "job_status_after_provider_complete": "INGESTING",
-    "readback_at": "2026-10-05T02:15:59.968Z"
-  },
-  "result": {
-    "status": "LIVE_E2E_PASS",
-    "main_sha": "22e080d6f77fc0a2d963ad428e18b73e424db4ed",
-    "audit_main_head_sha": "f23f020d2be3360cfe2960dd9b6dd76f870d0b67",
-    "job_id": "illustration-event-fireline-56d5c65b6320-20261005-liveaccept1",
-    "job_status": "SUCCEEDED",
-    "prompt_sha256": "4c3d04c06c3b63328e3202539ac3da041881a3693c8f99420c74ff0b3164daa9",
-    "point_id": "point-376b71213d04ff0d608134a0ac02ff04337a0bd8bf26de5a40f197cb9f9397c0",
-    "generation_key": "generation-56d5c65b6320fd3f02c5aba6fd7cbef7da6212fc3cb6644d96eaeba1852f5162",
-    "subject_id": "event-fireline",
-    "library": {
-      "source_path": "/IMAGE-RENDER/output/current.png",
-      "file_id": "file_0000000018e481fd828652c5c1377af0",
-      "library_file_id": "libfile_a1e80988e2748191bf6f3881444683f8",
-      "version_id": "5",
-      "sha256": "ad752c36ba67542ee0533e8df697bb5a03e326ab0e792d6e8558c6230d97e98d"
-    },
-    "review": {
-      "decision": "PASS",
-      "provider": "native_chatgpt_vision",
-      "handoff_commit": "d94af03a285a5386b01aa947b639fae36de57d07",
-      "reviewed_at": "2026-10-05T03:17:20.92172+00:00"
-    },
-    "transfer": {
-      "status": "FINALIZE_QUEUED",
-      "staging_id": "staging-event-fireline-liveaccept1-f1a01bbc7f00",
-      "derivative_sha256": "f1a01bbc7f00e1dd6fa2cf44378bc8d76eeae49cf12f198f3771e376a8fcfede",
-      "derivative_size_bytes": 175035,
-      "derivative_width": 512,
-      "derivative_height": 512,
-      "finalizer_dispatch_request_id": 142,
-      "finalizer_dispatch_at": "2026-10-05T04:12:10.10607+00:00"
-    },
-    "finalizer": {
-      "status": "SUCCEEDED",
-      "finalized_at": "2026-10-05T04:21:49.787267+00:00",
-      "source_commit": "dfdb1a9f2acec885fe005dc1f05edb338362724d",
-      "identity_path": "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_FIRELINE.json",
-      "output_sha256": "f1a01bbc7f00e1dd6fa2cf44378bc8d76eeae49cf12f198f3771e376a8fcfede",
-      "output_bytes": 175035,
-      "output_width": 512,
-      "output_height": 512
-    },
-    "storage": {
-      "provider": "supabase",
-      "bucket": "survival-archive-originals",
-      "object_path": "AFTERFALL/point-376b71213d04ff0d608134a0ac02ff04337a0bd8bf26de5a40f197cb9f9397c0/generation-56d5c65b6320fd3f02c5aba6fd7cbef7da6212fc3cb6644d96eaeba1852f5162/f1a01bbc7f00e1dd6fa2cf44378bc8d76eeae49cf12f198f3771e376a8fcfede.png",
-      "storage_verified": true,
-      "object_exists": true,
-      "object_size_bytes": 175035,
-      "object_created_at": "2026-10-05T04:16:54.775217+00:00"
-    },
-    "registry": {
-      "status": "READY",
-      "exact_match_count": 1,
-      "asset_id": "AF-EVENT-376B71213D04FF0D608134A0",
-      "point_id": "point-376b71213d04ff0d608134a0ac02ff04337a0bd8bf26de5a40f197cb9f9397c0",
-      "generation_key": "generation-56d5c65b6320fd3f02c5aba6fd7cbef7da6212fc3cb6644d96eaeba1852f5162",
-      "subject_id": "event-fireline",
-      "source_sha256": "f1a01bbc7f00e1dd6fa2cf44378bc8d76eeae49cf12f198f3771e376a8fcfede",
-      "storage_verified": true
-    },
-    "site_assets": {
-      "path": "archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json",
-      "exact_subject_count": 1,
-      "subject_id": "event-fireline",
-      "source_sha256": "f1a01bbc7f00e1dd6fa2cf44378bc8d76eeae49cf12f198f3771e376a8fcfede",
-      "registry_asset_id": "AF-EVENT-376B71213D04FF0D608134A0",
-      "derivative_version": "site-png-512-v1",
-      "public_path": "/visual-assets/f4705f85469f455f938ce289ce78ae30ce6edf1c5d326649abfc88b70ed1c811.png",
-      "derivative_sha256": "f4705f85469f455f938ce289ce78ae30ce6edf1c5d326649abfc88b70ed1c811",
-      "derivative_bytes": 175038,
-      "derivative_width": 512,
-      "derivative_height": 512,
-      "derivative_exists": true,
-      "published_main_sha": "f23f020d2be3360cfe2960dd9b6dd76f870d0b67"
-    },
-    "binding_mismatch": false,
-    "completed_at": "2026-10-05T05:15:24.648409Z"
-  },
+  "dispatch": null,
+  "collection": null,
+  "result": null,
   "trial": {
     "version": "illustration-reservation-live-trial-v2",
     "source_commit": "22e080d6f77fc0a2d963ad428e18b73e424db4ed",
@@ -237,48 +125,6 @@
     "prepared_at": "2026-10-05T01:47:58.105301+00:00",
     "prepared_via": "ONE_EXTRA_LIVE_ACCEPTANCE_JOB_AUTHORIZED_2026-10-05"
   },
-  "review": {
-    "status": "HANDOFF_SUBMITTED",
-    "review_handoff_commit": "d94af03a285a5386b01aa947b639fae36de57d07",
-    "decision": "PASS",
-    "review_provider": "native_chatgpt_vision",
-    "review_summary": "Matches the bound fireline scene: a contemporary Korean agricultural facility after a contained fire, with localized greenhouse and irrigation damage, wet post-response ground and soot, most surrounding structures intact, small responders, and a quiet cool blue-gray painterly composition without embedded identifying text or invented spectacle.",
-    "rejection_codes": [],
-    "source_library_path": "/IMAGE-RENDER/output/current.png",
-    "source_file_id": "file_0000000018e481fd828652c5c1377af0",
-    "source_library_file_id": "libfile_a1e80988e2748191bf6f3881444683f8",
-    "source_version_id": "5",
-    "source_sha256": "ad752c36ba67542ee0533e8df697bb5a03e326ab0e792d6e8558c6230d97e98d",
-    "created_at": "2026-10-05T03:17:09.990Z"
-  },
-  "transfer": {
-    "status": "FINALIZE_QUEUED",
-    "source_library_path": "/IMAGE-RENDER/output/current.png",
-    "source_file_id": "file_0000000018e481fd828652c5c1377af0",
-    "source_library_file_id": "libfile_a1e80988e2748191bf6f3881444683f8",
-    "source_version_id": "5",
-    "source_sha256": "ad752c36ba67542ee0533e8df697bb5a03e326ab0e792d6e8558c6230d97e98d",
-    "staging_id": "staging-event-fireline-liveaccept1-f1a01bbc7f00",
-    "derivative_sha256": "f1a01bbc7f00e1dd6fa2cf44378bc8d76eeae49cf12f198f3771e376a8fcfede",
-    "derivative_size_bytes": 175035,
-    "derivative_width": 512,
-    "derivative_height": 512,
-    "derivative_mime_type": "image/png",
-    "chunk_count": 2,
-    "stored_chunk_indexes": [
-      0,
-      1
-    ],
-    "finalizer_dispatch_request_id": 142,
-    "finalizer_dispatch_at": "2026-10-05T04:12:10.10607+00:00",
-    "job_status_readback": "FINALIZING",
-    "completed_at": "2026-10-05T04:12:52.569Z",
-    "source_cleanup": {
-      "status": "TRASHED",
-      "file_id": "file_0000000018e481fd828652c5c1377af0",
-      "library_file_id": "libfile_a1e80988e2748191bf6f3881444683f8",
-      "path": "/IMAGE-RENDER/output/current.png",
-      "completed_at": "2026-10-05T04:13:10.201Z"
-    }
-  }
+  "review": null,
+  "transfer": null
 }
