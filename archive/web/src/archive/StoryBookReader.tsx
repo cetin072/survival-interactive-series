@@ -32,6 +32,7 @@ export function StoryBookReader({ chronicleId, initialChapterId, onChapterChange
   const [openGroups, setOpenGroups] = useState(() => new Set(current ? [current.groupId] : []))
   const [tocOpen, setTocOpen] = useState(true)
   const tocRef = useRef<HTMLDetailsElement>(null)
+  const tocContentRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const media = window.matchMedia('(min-width: 861px)')
@@ -51,9 +52,10 @@ export function StoryBookReader({ chronicleId, initialChapterId, onChapterChange
   useEffect(() => {
     const toc = tocRef.current
     const button = toc?.querySelector<HTMLElement>('[aria-current="page"]')
-    if (!toc || !button || !tocOpen) return
-    const top = button.getBoundingClientRect().top - toc.getBoundingClientRect().top
-    if (top < 0 || top > toc.clientHeight - button.offsetHeight) toc.scrollTop += top - 80
+    const scrollContainer = window.matchMedia('(max-width: 860px)').matches ? tocContentRef.current : toc
+    if (!scrollContainer || !button || !tocOpen || !button.getClientRects().length) return
+    const top = button.getBoundingClientRect().top - scrollContainer.getBoundingClientRect().top
+    if (top < 0 || top > scrollContainer.clientHeight - button.offsetHeight) scrollContainer.scrollTop += top - 80
   }, [selected?.id, openGroups, tocOpen])
 
   const openChapter = (entry: ReaderEntry) => {
@@ -76,7 +78,7 @@ export function StoryBookReader({ chronicleId, initialChapterId, onChapterChange
         <aside className="book-toc">
           <details className="book-toc-disclosure" ref={tocRef} open={tocOpen} onToggle={(event) => setTocOpen(event.currentTarget.open)}>
             <summary>목차 · {contents.entries.length}장</summary>
-            <div className="book-toc-content">
+            <div className="book-toc-content" ref={tocContentRef}>
               <p className="wiki-document-kicker">{title}</p><h2>목차 <small>{contents.entries.length}장</small></h2>
               {contents.groups.map((group) => <details className="book-toc-group" key={group.id} open={openGroups.has(group.id)} onToggle={(event) => {
                 const open = event.currentTarget.open

@@ -272,6 +272,7 @@ def audit_story_shell(page, base: str, width: int, screenshots: str | None):
         summary.focus()
         page.keyboard.press('Space')
         expect(outer).to_have_attribute('open', '')
+        expect(page.locator('.book-toc [aria-current="page"]')).to_be_in_viewport()
         assert summary.evaluate('(item) => getComputedStyle(item).outlineStyle') != 'none'
         tap_toc(page, 'c03-afterfall-chapter-07', True)
         expect(outer).not_to_have_attribute('open', '')
