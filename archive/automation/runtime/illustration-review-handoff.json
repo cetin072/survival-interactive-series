@@ -1,17 +1,17 @@
 {
   "version": "illustration-review-handoff-v1",
-  "job_id": "illustration-event-fireline-56d5c65b6320-20261005-liveaccept1",
-  "main_sha": "22e080d6f77fc0a2d963ad428e18b73e424db4ed",
-  "point_id": "point-376b71213d04ff0d608134a0ac02ff04337a0bd8bf26de5a40f197cb9f9397c0",
-  "generation_key": "generation-56d5c65b6320fd3f02c5aba6fd7cbef7da6212fc3cb6644d96eaeba1852f5162",
-  "subject_id": "event-fireline",
-  "prompt_sha256": "4c3d04c06c3b63328e3202539ac3da041881a3693c8f99420c74ff0b3164daa9",
-  "review_context_sha256": "c85ef6618137c78ec6d21ff2e74343f95ff19b9d005dc9467c51e9af3943cf70",
+  "job_id": "illustration-event-network-decay-b709bedf4fae-20261006-37392537655",
+  "main_sha": "d864f7f8481208392bbf3f6dc0cdd7f174c3d78b",
+  "point_id": "point-53a062c44d358ff024594b6789f682d56820c14e9fe14f6b2817fea03bc4e157",
+  "generation_key": "generation-b709bedf4fae9f0bff641c43a8a2a7862266e605f03081e4a845934ddde353db",
+  "subject_id": "event-network-decay",
+  "prompt_sha256": "e0b3ceb020926c89acbd2a596ba238f7578e62fa0080394ceac04bffc85cbe6c",
+  "review_context_sha256": "052ed63db25554cb118ea6f4e9161b28854423a6100d584ba5f1c89acbf4ce76",
   "source_library_path": "/IMAGE-RENDER/output/current.png",
-  "source_library_file_id": "file_0000000018e481fd828652c5c1377af0",
+  "source_library_file_id": "file_00000000cdfc81f582fa8c0671ca4b20",
   "decision": "PASS",
   "review_provider": "native_chatgpt_vision",
-  "review_summary": "Matches the bound fireline scene: a contemporary Korean agricultural facility after a contained fire, with localized greenhouse and irrigation damage, wet post-response ground and soot, most surrounding structures intact, small responders, and a quiet cool blue-gray painterly composition without embedded identifying text or invented spectacle.",
+  "review_summary": "Matches the bound network-decay scene: a contemporary Korean roadside exchange/logistics point with sparse human presence, empty road and loading space, waiting goods and equipment, intact facilities, and a quiet cool blue-gray painterly atmosphere that conveys weakening connections without invented spectacle or identifying text.",
   "rejection_codes": [],
-  "created_at": "2026-10-05T03:17:09.990Z"
+  "created_at": "2026-10-06T13:46:41.107969Z"
 }
