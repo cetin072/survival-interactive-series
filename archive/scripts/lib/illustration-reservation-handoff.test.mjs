@@ -10,6 +10,7 @@ import {
   assertReservationJobBinding,
   assertReservationPromptReadback,
   collectReservationResult,
+  routeReservationJob,
 } from './illustration-reservation-handoff.mjs'
 
 const hash = (value) => createHash('sha256').update(value).digest('hex')
@@ -172,4 +173,62 @@ test('already completed and terminal jobs never produce another provider mutatio
     assert.equal(result.provider_complete, undefined)
   }
   assert.throws(() => collectReservationResult(input({ job: job({ status: 'UNKNOWN' }) })), /JOB_NOT_PREPARED/)
+})
+
+const runtime = () => ({ receipt: dispatch().receipt, collection: {
+  source_file_id: currentFile().file_id,
+  source_sha256: currentFile().sha256,
+  source_library_path: RESERVATION_OUTPUT_PATH,
+  provider_complete: { p_job_id: job().job_id, p_prompt_sha256: job().prompt_sha256 },
+  provider_completed_at: '2026-10-05T01:06:00Z',
+} })
+const route = (overrides = {}) => routeReservationJob({
+  job: job(), runtime: null, rendererPending: false, ...overrides,
+})
+
+test('regular coordinator dispatch and collect are distinct single roles; CLI dispatch gates the writer', async () => {
+  const { runReservationBridge } = await import('../illustration-reservation-bridge.mjs')
+  assert.equal(route().role, 'DISPATCH')
+  assert.equal(route({ runtime: runtime() }).role, 'COLLECT')
+  const args = { job: job(), promptText, rendererId, baselineFile: null,
+    requestedAt: '2026-10-05T01:01:00Z', runtime: null, rendererPending: false }
+  assert.equal(runReservationBridge('dispatch', args).renderer_prompt,
+    `${promptText}\n\n${RESERVATION_RENDER_SUFFIX}`)
+  assert.throws(() => runReservationBridge('dispatch', { ...args, runtime: runtime() }), /UNRESOLVED_DISPATCH/)
+  assert.throws(() => route({ rendererPending: true }), /RENDERER_PENDING/)
+  assert.throws(() => route({ rendererPending: undefined }), /RENDERER_STATE_REQUIRED/)
+  assert.throws(() => route({ runtime: undefined }), /RUNTIME_READ_REQUIRED/)
+})
+
+test('stale or missing DB current job cannot clear unresolved receipt; completed exact prior job can', () => {
+  const nextJob = job({ job_id: 'illustration-next-job-12345678' })
+  assert.throws(() => route({ job: null, runtime: runtime() }), /UNRESOLVED_DISPATCH/)
+  assert.throws(() => route({ job: nextJob, runtime: runtime() }), /UNRESOLVED_DISPATCH/)
+  for (const status of ['BLOCKED', 'HUMAN_REVIEW', 'INGESTING', 'PREPARED']) {
+    assert.throws(() => route({ job: nextJob, runtime: runtime(), previousJob: job({ status }) }), /UNRESOLVED_DISPATCH/)
+  }
+  for (const status of ['SUCCEEDED', 'REVIEW_REJECTED']) {
+    const previousJob = job({ status, provider_asset_id: `chatgpt-library:${currentFile().file_id}` })
+    assert.equal(route({ job: nextJob, runtime: runtime(), previousJob }).role, 'DISPATCH')
+    assert.throws(() => route({ job: nextJob, runtime: { ...runtime(), collection: null }, previousJob }), /UNRESOLVED_DISPATCH/)
+    assert.throws(() => route({ job: nextJob, runtime: runtime(),
+      previousJob: { ...previousJob, provider_asset_id: 'wrong' } }), /COLLECTION_BINDING_MISMATCH/)
+  }
+  // A new uncollected version must be recovered, even after prior success.
+  assert.throws(() => dispatch({ baselineFile: currentFile() }), /EXISTING_JOB_IMAGE_MUST_BE_RESUMED/)
+})
+
+test('review handoff, later PASS transfer, program finalizer wait, and terminal audit stay separate', () => {
+  for (const [status, role] of [['INGESTING', 'REVIEWER'], ['REVIEW_PASS_STAGED', 'TRANSFER'],
+    ['FINALIZE_QUEUED', 'WAIT_PROGRAM_FINALIZER'], ['FINALIZING', 'WAIT_PROGRAM_FINALIZER'],
+    ['SUCCEEDED', 'AUDIT'], ['REVIEW_REJECTED', 'NOOP'], ['HUMAN_REVIEW', 'NOOP']]) {
+    const currentJob = job({ status, provider_asset_id: `chatgpt-library:${currentFile().file_id}`,
+      provider_completed_at: '2026-10-05T01:06:00Z' })
+    assert.deepEqual(route({ job: currentJob, runtime: runtime() }), { role, job_id: currentJob.job_id })
+  }
+  assert.equal(route({ job: job({ status: 'INGESTING', provider_asset_id: null,
+    provider_completed_at: '2026-10-05T01:06:00Z' }), runtime: runtime() }).role, 'REVIEWER')
+  assert.throws(() => route({ job: job({ status: 'INGESTING', provider_asset_id: 'wrong',
+    provider_completed_at: '2026-10-05T01:06:00Z' }), runtime: runtime() }), /COLLECTION_BINDING_MISMATCH/)
+  assert.throws(() => route({ job: job({ active_provider: 'api_openai' }) }), /PROVIDER_INVALID/)
 })

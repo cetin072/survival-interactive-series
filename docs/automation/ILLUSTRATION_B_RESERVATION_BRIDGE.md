@@ -1,6 +1,8 @@
-# Automation B — reservation bridge candidate
+# Automation B — regular reservation bridge
 
-Status: **CANDIDATE, regular B schedules remain OFF until live acceptance.**
+Status: **REGULAR ROUTE — LIVE acceptance completed on 2026-10-05.**
+
+Runtime activation still requires actual native task readback; code promotion is not an ON-state claim.
 
 Golden reference / 검증 표준 사례:
 [`ILLUSTRATION_B_REFERENCE_CASE_2026-10-05.md`](./ILLUSTRATION_B_REFERENCE_CASE_2026-10-05.md)
@@ -44,7 +46,10 @@ review in the same execution. Existing review/transfer rules remain in
 - Runtime file: `archive/automation/runtime/illustration-reservation-handoff.json`.
   Its changes do not match the existing review workflow's file trigger.
 - Read-only helper CLI: `node archive/scripts/illustration-reservation-bridge.mjs ACTION INPUT.json`.
-- `ACTION`: `prompt`, `inspect`, `dispatch`, `readback`, or `collect`.
+- `ACTION`: `route`, `prompt`, `inspect`, `dispatch`, `readback`, or `collect`.
+- Before DISPATCH, `route` requires actual `{job,runtime,rendererPending}` reads;
+  use `previousJob` to resolve a completed prior receipt. The `dispatch` CLI
+  applies the same gate before building a prompt.
 - Collector mutation: existing
   `public.archive_illustration_render_job_provider_complete(p_job_id,p_prompt_sha256)`.
 
@@ -63,8 +68,7 @@ an existing designated task can be reused.
    Report the unresolved dispatch and retain its output. Do not infer that a
    ChatGPT execution stopped because its DB job expired.
 3. Inspect the designated Renderer with `automations.peek`. Require no
-   unresolved prior execution or pending one-time dispatch. Regular legacy
-   Clean Renderer and Native Worker remain OFF during the trial.
+   unresolved prior execution or pending one-time dispatch. Legacy Clean Renderer and redundant Native Worker remain OFF in regular operation.
 4. Acquire the existing job lease for `archive-illustration-reservation-dispatch`
    (7200 seconds, covering the next hourly collection). A failed lease means no schedule mutation. Read the job
    again and require the same immutable binding.
@@ -73,7 +77,7 @@ an existing designated task can be reused.
    `inspect` with `{imagePath,fileId}`. Add the returned SHA to its metadata.
    If absent, pass explicit `null`; a failed lookup is not absence.
 6. Run `dispatch` with
-   `{job,promptText,rendererId,baselineFile,requestedAt}`. This validates the
+   `{job,promptText,rendererId,baselineFile,requestedAt,runtime,previousJob,rendererPending}`. This validates the
    prompt, job and baseline. An image modified since the job was created is
    a recovery case, not permission to overwrite it.
 7. Before task mutation, create/update the runtime JSON with fresh blob SHA:
@@ -152,13 +156,19 @@ candidate selection and prompt compiler without enqueue. It returns
 Preview may verify dynamic task-prompt transport and exact-path saving; it
 must never call provider_complete or claim the live job E2E passed.
 
-During the 2026-10-05 trial, today's existing two SUCCEEDED jobs cause normal
-Prep to return DAILY_SUCCESS_TARGET_REACHED. Do not change those jobs,
-their dates, or the daily gate to manufacture a live test.
+## Regular operation
 
-Live acceptance requires one actual Prep job through DISPATCH, isolated
-scheduled render, COLLECT/provider_complete, existing Reviewer, Program
-decision, Transfer, Finalizer and SITE_ASSETS/SUCCEEDED. Only then promote
-this candidate route into the regular Native Worker router and convert the
-regular Renderer into a reusable visual-only one-shot task. Do not enable
-the regular schedules merely because unit or transport tests passed.
+The completed LIVE fireline case is recorded in the existing Golden Reference.
+Use `ILLUSTRATION_B_NATIVE_WORKER_ROUTER.md` as the regular Coordinator entry.
+Reuse the Coordinator and designated one-shot Renderer; do not create tests or
+turn the legacy operational Clean Renderer back ON.
+
+Target one successful image per KST day. Existing Prep daily-success and
+attempt/semantic caps stay authoritative; retry before success at about two
+hours. HUMAN_REVIEW stops automatically, REJECT remains a quality decision.
+The ONE_EXTRA_LIVE_ACCEPTANCE_JOB exception ended with the 2026-10-05 trial;
+it is historical evidence only, never a regular enqueue/DB policy option.
+
+Transfer lease expiry preserves the original and partial staging. With exact
+job/source binding, acquire a fresh lease and use the existing resume path;
+do not reinterpret PASS or regenerate. Program Finalizer remains unchanged.

@@ -391,35 +391,41 @@ test('daily summary is a receipt projection and does not create empty run histor
   })
 })
 
-test('native worker refuses PREPARED rendering and leaves generation to clean renderer', async () => {
+test('regular coordinator routes PREPARED through bridge and never generates images', async () => {
   const root = resolve(fileURLToPath(new URL('../../..', import.meta.url)))
   const router = await readFile(resolve(root, 'docs/automation/ILLUSTRATION_B_NATIVE_WORKER_ROUTER.md'), 'utf8')
   const contract = JSON.parse(await readFile(
     resolve(root, 'archive/automation/illustration-native-worker-runtime-contract.json'), 'utf8',
   ))
-  assert.match(router, /PREPARED belongs exclusively to the separate Clean Renderer/)
-  assert.match(router, /If status=`PREPARED`, stop immediately\. Do not generate an image\./)
-  assert.deepEqual(contract.workers.clean_renderer.handles, ['PREPARED'])
-  assert.deepEqual(contract.workers.native_worker.handles, ['INGESTING', 'REVIEW_PASS_STAGED'])
-  assert.equal(contract.renderer_context_isolation?.enabled, true)
-  assert.equal(contract.renderer_context_isolation?.scene_input, 'EXACT_DB_PROMPT_TEXT_WITH_NO_PREFIX_OR_SUFFIX')
+  assert.match(router, /Coordinator never generates an image/)
+  assert.match(router, /DISPATCH/)
+  assert.match(router, /COLLECT/)
+  assert.match(router, /PASS handoff does not permit same-run Transfer/)
+  assert.deepEqual(contract.workers.reservation_coordinator.handles, ['PREPARED', 'INGESTING', 'REVIEW_PASS_STAGED'])
+  assert.ok(contract.workers.reservation_coordinator.forbidden.includes('IMAGE_GENERATION'))
+  assert.ok(contract.workers.reservation_coordinator.forbidden.includes('DIRECT_REVIEW_DB_MUTATION'))
+  assert.equal(contract.roles.PREPARED.owner, 'RESERVATION_COORDINATOR')
+  assert.equal(contract.roles.PREPARED.one_role_per_run, true)
+  assert.equal(contract.roles.INGESTING.stop_after_handoff_commit, true)
+  assert.equal(contract.roles.REVIEW_PASS_STAGED.re_review, false)
+  assert.equal(contract.pass_asset.staging_resume_rpc, 'archive_illustration_review_staging_resume')
 })
 
-test('clean renderer is physically separated from review-transfer worker', async () => {
+test('one-shot renderer is physically separated, visual only, and legacy workers remain off', async () => {
   const root = resolve(fileURLToPath(new URL('../../..', import.meta.url)))
-  const renderer = await readFile(resolve(root, 'docs/automation/ILLUSTRATION_B_CLEAN_RENDERER_PROMPT.md'), 'utf8')
-  const router = await readFile(resolve(root, 'docs/automation/ILLUSTRATION_B_NATIVE_WORKER_ROUTER.md'), 'utf8')
   const contract = JSON.parse(await readFile(
     resolve(root, 'archive/automation/illustration-native-worker-runtime-contract.json'), 'utf8',
   ))
-  assert.match(renderer, /status is not \`PREPARED\`/)
-  assert.match(renderer, /exact DB prompt TEXT only/)
-  assert.match(renderer, /Do not read or perform Reviewer, Vault, staging, Finalizer, Storage, Registry, SITE_ASSETS/)
-  assert.match(router, /PREPARED belongs exclusively to the separate Clean Renderer/)
-  assert.match(router, /Do not generate an image/)
-  assert.deepEqual(contract.workers.clean_renderer.handles, ['PREPARED'])
-  assert.deepEqual(contract.workers.native_worker.handles, ['INGESTING', 'REVIEW_PASS_STAGED'])
-  assert.equal(contract.roles.PREPARED.owner, 'CLEAN_RENDERER')
+  assert.equal(contract.renderer_context_isolation.enabled, true)
+  assert.equal(contract.renderer_context_isolation.scene_input, 'BYTE_EQUIVALENT_DB_PROMPT_PLUS_RESERVATION_RENDER_SUFFIX')
+  assert.deepEqual(contract.renderer_context_isolation.allowed_before_image_call,
+    ['EXACT_VISUAL_PROMPT', 'FIXED_LIBRARY_SAVE_SUFFIX'])
+  assert.equal(contract.workers.isolated_renderer.recurring, false)
+  assert.equal(contract.workers.isolated_renderer.prompt_builder, 'buildReservationRendererPrompt')
+  assert.deepEqual(contract.workers.isolated_renderer.responsibilities, ['NATIVE_IMAGE_GENERATION', 'LIBRARY_WRITE'])
+  assert.equal(contract.workers.legacy_workers.enabled, false)
+  assert.equal(contract.workers.legacy_workers.preserve_off_task_ids.length, 2)
+  assert.notEqual(contract.workers.reservation_coordinator.task_id, contract.workers.isolated_renderer.task_id)
 })
 
 test('preserves approved images and validates the site asset contract', async () => {

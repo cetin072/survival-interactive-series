@@ -19,7 +19,7 @@ Automation B Native Worker의 목적은 **생성된 삽화를 검수하고 PASS 
 
 1. Boot Router가 이미 current job status를 고정한 뒤 이 문서가 로드된다.
 2. 한 실행에서 역할은 하나다.
-   - PREPARED = NOOP (Clean Renderer 소유)
+   - PREPARED = reservation bridge DISPATCH 또는 COLLECT (Boot Router 소유)
    - INGESTING = Reviewer + review handoff 작성
    - REVIEW_PASS_STAGED = PASS site asset transfer/resume
    - 그 외 = NOOP
@@ -30,7 +30,7 @@ Automation B Native Worker의 목적은 **생성된 삽화를 검수하고 PASS 
 
 ## PREPARED
 
-이 worker는 PREPARED를 처리하지 않는다. 이미지 생성은 `ILLUSTRATION_B_CLEAN_RENDERER_PROMPT.md`를 사용하는 별도 Clean Renderer 예약의 책임이다.
+PREPARED는 Boot Router가 `ILLUSTRATION_B_RESERVATION_BRIDGE.md`의 DISPATCH/COLLECT로 처리한다. 이 문서는 Reviewer/Transfer 실행에만 로드한다. 이미지는 exact visual prompt와 고정 저장 suffix만 받는 격리 one-shot Renderer가 생성한다.
 
 ## INGESTING — Reviewer 역할만
 
@@ -59,7 +59,7 @@ Automation B Native Worker의 목적은 **생성된 삽화를 검수하고 PASS 
 8. handoff commit이 성공하면 즉시 종료한다. 같은 실행에서 DB 판정 재확정, transfer, Finalizer를 수행하지 않는다.
 9. REJECT/HUMAN_REVIEW/PASS 어느 경우에도 이 단계에서는 `current.png`를 삭제하지 않는다.
    - PASS는 다음 Native Worker가 DB의 `REVIEW_PASS_STAGED`를 읽어 transfer한다.
-   - REJECT는 다음 PREPARED job의 Clean Renderer가 job.created_at보다 오래된 stale `current.png`만 안전하게 교체한다.
+   - REJECT는 다음 PREPARED job의 격리 reservation Renderer가 job.created_at보다 오래된 stale `current.png`만 안전하게 교체한다.
    - HUMAN_REVIEW는 새 PREPARED job이 생기지 않으므로 원본이 그대로 보존된다.
 
 ## REVIEW_PASS_STAGED — PASS site asset transfer/resume

@@ -1,12 +1,13 @@
 {
-  "version": "illustration-native-worker-runtime-contract-v1.4",
-  "purpose": "Two scheduled ChatGPT workers: isolated Clean Renderer for PREPARED; Native Worker for review/transfer. Program owns Prep, durable review mutation, and Finalizer.",
+  "version": "illustration-native-worker-runtime-contract-v1.5",
+  "purpose": "Regular reservation Coordinator: dispatch/collect, then existing review/transfer, one role per run. Visual-only one-shot Renderer writes Library. Program owns Prep, durable review mutation and Finalizer.",
   "roles": {
     "PREPARED": {
-      "role": "RENDERER",
+      "role": "DISPATCH_OR_COLLECT",
       "one_role_per_run": true,
       "next_status": "INGESTING",
-      "owner": "CLEAN_RENDERER"
+      "owner": "RESERVATION_COORDINATOR",
+      "route_helper": "archive/scripts/illustration-reservation-bridge.mjs route"
     },
     "INGESTING": {
       "role": "REVIEWER",
@@ -21,7 +22,7 @@
       },
       "one_role_per_run": true,
       "stop_after_handoff_commit": true,
-      "owner": "NATIVE_WORKER"
+      "owner": "RESERVATION_COORDINATOR"
     },
     "REVIEW_PASS_STAGED": {
       "role": "PASS_SITE_ASSET_TRANSFER",
@@ -29,7 +30,7 @@
       "next_status": "FINALIZE_QUEUED",
       "one_role_per_run": true,
       "stop_after_status_transition": true,
-      "owner": "NATIVE_WORKER"
+      "owner": "RESERVATION_COORDINATOR"
     }
   },
   "source": {
@@ -85,54 +86,51 @@
   },
   "renderer_context_isolation": {
     "enabled": true,
-    "rule": "For PREPARED, do not load full Automation B project/review/transfer authorities before image generation.",
+    "rule": "Separate scheduled Renderer gets only exact visual prompt and RESERVATION_RENDER_SUFFIX.",
     "allowed_before_image_call": [
-      "boot_router",
-      "archive_illustration_render_job_current",
-      "library_current_png_metadata_check",
-      "archive_illustration_render_job_lease_acquire",
-      "archive_illustration_render_prompt",
-      "prompt_sha256_check"
+      "EXACT_VISUAL_PROMPT",
+      "FIXED_LIBRARY_SAVE_SUFFIX"
     ],
-    "image_call_must_follow_prompt_sha_gate": true,
-    "scene_input": "EXACT_DB_PROMPT_TEXT_WITH_NO_PREFIX_OR_SUFFIX",
-    "full_authority_load_after_image_generation_only": true,
-    "authority": "docs/automation/ILLUSTRATION_B_CLEAN_RENDERER_PROMPT.md"
+    "scene_input": "BYTE_EQUIVALENT_DB_PROMPT_PLUS_RESERVATION_RENDER_SUFFIX",
+    "authority": "archive/scripts/lib/illustration-reservation-handoff.mjs"
   },
   "workers": {
-    "clean_renderer": {
-      "authority": "docs/automation/ILLUSTRATION_B_CLEAN_RENDERER_PROMPT.md",
-      "handles": [
-        "PREPARED"
-      ],
-      "responsibilities": [
-        "NATIVE_IMAGE_GENERATION",
-        "LIBRARY_WRITE",
-        "PROVIDER_COMPLETE"
-      ],
-      "forbidden": [
-        "REVIEW",
-        "BINARY_TRANSFER",
-        "FINALIZER",
-        "VAULT",
-        "REGISTRY",
-        "SITE_ASSETS"
-      ]
-    },
-    "native_worker": {
+    "reservation_coordinator": {
       "boot_router": "docs/automation/ILLUSTRATION_B_NATIVE_WORKER_ROUTER.md",
+      "task_id": "6ac24401ee1881919ac19b158102b752",
       "handles": [
+        "PREPARED",
         "INGESTING",
         "REVIEW_PASS_STAGED"
       ],
-      "responsibilities": [
-        "VISUAL_REVIEW",
-        "GITHUB_REVIEW_HANDOFF",
-        "PASS_ONLY_TRANSFER"
-      ],
+      "one_role_per_run": true,
       "forbidden": [
         "IMAGE_GENERATION",
-        "DIRECT_REVIEW_DB_MUTATION"
+        "DIRECT_REVIEW_DB_MUTATION",
+        "PROGRAM_FINALIZER"
+      ]
+    },
+    "isolated_renderer": {
+      "task_id": "6ac2e58fc3848191aba731468f6c3e18",
+      "recurring": false,
+      "prompt_builder": "buildReservationRendererPrompt",
+      "responsibilities": [
+        "NATIVE_IMAGE_GENERATION",
+        "LIBRARY_WRITE"
+      ],
+      "forbidden": [
+        "OPERATIONAL_CONTEXT",
+        "DB",
+        "REVIEW",
+        "BINARY_TRANSFER",
+        "FINALIZER"
+      ]
+    },
+    "legacy_workers": {
+      "enabled": false,
+      "preserve_off_task_ids": [
+        "6ac252c96ea88191841241364adafb82",
+        "6ac234656c0481918269852a2ada19fc"
       ]
     }
   }
