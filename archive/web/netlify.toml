@@ -6,10 +6,12 @@ command = "npm run build:verified"
   NODE_VERSION = "22"
 
 # Production is intentionally cost-gated. Ordinary main merges are accumulated
-# and only a release-marker commit is allowed to create a Production deploy.
+# and only the commit that itself changes the release marker may create a Production deploy.
+# Compare the current commit to its first parent, not the last successful deploy: a failed
+# release must never let a later A/A-Wiki/B/C/UI merge inherit the old marker change.
 # Netlify ignore commands exit 0 to skip and 1 to continue.
 [context.production]
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- public/release/production.json"
+  ignore = "git diff --quiet $COMMIT_REF^1 $COMMIT_REF -- public/release/production.json"
 
 # Archive content lives outside this site's base directory. Keep Preview builds
 # when the Reader inputs or build scripts change.
