@@ -3,7 +3,7 @@
 기준일: 2026-10-05  
 Repository: `cetin072/survival-interactive-series`  
 범위: 《생존일기》 Automation B illustration pipeline  
-상태: **REFERENCE CASE — LIVE E2E acceptance 직전**
+상태: **GOLDEN REFERENCE — LIVE E2E PASS**
 
 ## 1. 이 문서의 목적
 
@@ -329,7 +329,7 @@ INGESTING
 4. **Renderer에 운영 문맥을 넣지 않는다.**
 5. **current.png는 단일 writer만 사용한다.**
 6. **미해결 dispatch에서 blind retry하지 않는다.**
-7. **정규 B 예약은 최종 LIVE acceptance 전에 ON하지 않는다.**
+7. **정규 B는 검증된 reservation Coordinator + visual-only one-shot Renderer를 재사용한다.**
 8. **daily success guard를 테스트 편의를 위해 우회하지 않는다.**
 9. **새 provider/새 DB table/유료 API를 먼저 만들지 않는다.**
 10. **기존 Reviewer 이후 성공 구조를 갈아엎지 않는다.**
@@ -422,3 +422,47 @@ PREPARED
 - 사용한 main SHA
 
 그 뒤 이 문서는 Automation B 예약형 완전격리 Renderer의 **golden reference / 회귀 비교 기준**으로 유지한다.
+
+## 10. LIVE Golden Case — event-fireline (완료)
+
+2026-10-06 current main `d864f7f8481208392bbf3f6dc0cdd7f174c3d78b`와
+실제 DB/Storage/Registry, runtime branch를 재확인했다.
+
+- job_id: `illustration-event-fireline-56d5c65b6320-20261005-liveaccept1`
+- subject_id: `event-fireline`
+- job main SHA: `22e080d6f77fc0a2d963ad428e18b73e424db4ed`
+- prompt SHA: `4c3d04c06c3b63328e3202539ac3da041881a3693c8f99420c74ff0b3164daa9`
+- Renderer task: `6ac2e58fc3848191aba731468f6c3e18`; exact visual prompt + fixed suffix만 전달, task prompt exact readback=true.
+- renderer prompt SHA: `f5f06238b98c3c595377d635c7e107cba1e7898aa35a01c47be59f7465bc8e5f`
+- Library: `/IMAGE-RENDER/output/current.png`; stable ID `libfile_a1e80988e2748191bf6f3881444683f8`, version **4 → 5**.
+- 생성 file ID: `file_0000000018e481fd828652c5c1377af0`
+- 생성 PNG SHA: `ad752c36ba67542ee0533e8df697bb5a03e326ab0e792d6e8558c6230d97e98d`; 1774×887, 2,844,084 bytes; full decode PASS (runtime collection evidence).
+- provider_complete: `2026-10-05T02:15:41.355355+00:00`, DB INGESTING readback.
+- Reviewer: native_chatgpt_vision PASS; handoff commit `d94af03a285a5386b01aa947b639fae36de57d07`.
+- Program durable decision: DB PASS, reviewed_at `2026-10-05T03:17:20.92172+00:00`.
+- PASS Transfer: 512×512, 175,035 bytes, SHA `f1a01bbc7f00e1dd6fa2cf44378bc8d76eeae49cf12f198f3771e376a8fcfede`; 2/2 chunks.
+- `PASS_ASSET_TRANSFER_LEASE_EXPIRED` 1회: `2026-10-05T04:10:00.145629+00:00`; original/staging 보존 후 기존 recovery로 FINALIZE_QUEUED, dispatch request 142.
+- Finalizer SUCCEEDED: `2026-10-05T04:21:49.787267+00:00`; source commit `dfdb1a9f2acec885fe005dc1f05edb338362724d`.
+- Storage: `survival-archive-originals`의 exact point/generation/source-SHA object 존재, 175,035 bytes; Registry `generation_meta.storage_verified=true`.
+- Registry: `AF-EVENT-376B71213D04FF0D608134A0`, READY, exact source/job binding.
+- SITE_ASSETS: exact subject **1건**, derivative `site-png-512-v1`, 512×512, 175,038 bytes.
+- 실제 main derivative 파일 존재 및 재계산 SHA 일치: `f4705f85469f455f938ce289ce78ae30ce6edf1c5d326649abfc88b70ed1c811`.
+- 최종 DB status **SUCCEEDED** / review_decision **PASS** / runtime **LIVE_E2E_PASS**, binding_mismatch=false.
+
+불변 runtime 증거:
+[reservation handoff](https://github.com/cetin072/survival-interactive-series/blob/5edbc84f21339065a8298f70db28f1b4066bcc1a/archive/automation/runtime/illustration-reservation-handoff.json),
+[review handoff](https://github.com/cetin072/survival-interactive-series/blob/5edbc84f21339065a8298f70db28f1b4066bcc1a/archive/automation/runtime/illustration-review-handoff.json).
+
+Registry의 legacy `unattended_generation_proven=false`는 남아 있다.
+예약 생성 증거는 task/Library/runtime 기록으로 확인하며 이 legacy 필드를
+조용히 수정하거나 그 필드가 true라고 보고하지 않는다.
+이 검수에서는 Library 원본을 다시 가져오지 못했으므로 생성 PNG full decode는
+당시 immutable collection evidence이고, 실제 main derivative SHA는 이번에 재검증했다.
+
+> Transfer lease 만료는 즉시 전체 실패로 판단하지 않는다.
+> exact job/source binding이 유지되고 resume 가능한 staging이 존재하면 기존 recovery path를 사용한다.
+
+`ONE_EXTRA_LIVE_ACCEPTANCE_JOB`는 이 검증 1건의 역사적 예외로 종료했다.
+정규 운영은 기존 daily success/attempt/semantic cap을 그대로 사용한다.
+앞 절의 acceptance 직전 설명과 PREVIEW_ONLY 판정은 당시 연대기이며,
+현재 최종 판정은 이 LIVE Golden Case가 권위다.

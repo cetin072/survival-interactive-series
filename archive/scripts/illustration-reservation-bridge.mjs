@@ -8,6 +8,7 @@ import {
   buildReservationDispatch,
   buildReservationRendererPrompt,
   collectReservationResult,
+  routeReservationJob,
 } from './lib/illustration-reservation-handoff.mjs'
 
 // Reuses the verify/reopen pattern and limits from derive_site_original.py.
@@ -39,12 +40,18 @@ print(json.dumps(dict(format='PNG', fully_decoded=True, width=width, height=heig
 }
 
 export function runReservationBridge(action, input) {
+  if (action === 'route') return routeReservationJob(input)
   if (action === 'prompt') {
     const renderer_prompt = buildReservationRendererPrompt(input.promptText, input.promptSha256)
     return { renderer_prompt, renderer_prompt_sha256: createHash('sha256').update(renderer_prompt).digest('hex') }
   }
   if (action === 'inspect') return inspectReservationPng(input.imagePath, input.fileId)
-  if (action === 'dispatch') return buildReservationDispatch(input)
+  if (action === 'dispatch') {
+    if (routeReservationJob(input).role !== 'DISPATCH') {
+      throw new Error('ILLUSTRATION_RESERVATION_UNRESOLVED_DISPATCH')
+    }
+    return buildReservationDispatch(input)
+  }
   if (action === 'readback') {
     assertReservationPromptReadback(input)
     return { status: 'EXACT_PROMPT_CONFIRMED' }

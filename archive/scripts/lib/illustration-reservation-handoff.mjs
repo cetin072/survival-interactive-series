@@ -57,6 +57,57 @@ function validateFileIdentity(file) {
   demand(SHA256.test(file.sha256 ?? ''), 'FILE_SHA256_REQUIRED')
 }
 
+// Read-only routing gate. Unknown observations are never permission to re-arm
+// the single Library writer. The caller still owns fresh reads and blob CAS.
+export function routeReservationJob({ job, runtime, previousJob, rendererPending }) {
+  demand(runtime === null || object(runtime), 'RUNTIME_READ_REQUIRED')
+  demand(typeof rendererPending === 'boolean', 'RENDERER_STATE_REQUIRED')
+  if (runtime !== null) {
+    const receipt = validateReservationReceipt(runtime.receipt)
+    const boundJob = job?.job_id === receipt.job_id ? job : previousJob
+    demand(boundJob, 'UNRESOLVED_DISPATCH')
+    assertReservationJobBinding(boundJob, receipt)
+    if (boundJob !== job) {
+      demand(['SUCCEEDED', 'REVIEW_REJECTED'].includes(boundJob.status), 'UNRESOLVED_DISPATCH')
+      demand(runtime.collection?.provider_complete?.p_job_id === receipt.job_id
+        && runtime.collection.provider_complete.p_prompt_sha256 === receipt.prompt_sha256,
+      'UNRESOLVED_DISPATCH')
+      timestamp(runtime.collection.provider_completed_at, 'PROVIDER_COMPLETED_AT')
+      const sourceId = runtime.collection.source_file_id
+      demand(FILE_ID.test(sourceId ?? '')
+        && boundJob.provider_asset_id === `chatgpt-library:${sourceId}`, 'COLLECTION_BINDING_MISMATCH')
+    }
+  }
+  if (!job) return { role: 'NOOP' }
+  validateBinding(job)
+  demand(job.active_provider === 'native_chatgpt', 'PROVIDER_INVALID')
+  if (job.status === 'PREPARED') {
+    if (runtime?.receipt.job_id === job.job_id) return { role: 'COLLECT', job_id: job.job_id }
+    demand(rendererPending === false, 'RENDERER_PENDING')
+    return { role: 'DISPATCH', job_id: job.job_id }
+  }
+  if (job.status === 'INGESTING' || job.status === 'REVIEW_PASS_STAGED') {
+    demand(runtime?.receipt.job_id === job.job_id, 'COLLECTION_BINDING_MISMATCH')
+    const sourceId = runtime.collection?.source_file_id
+    demand(FILE_ID.test(sourceId ?? '')
+      && SHA256.test(runtime.collection?.source_sha256 ?? '')
+      && runtime.collection?.source_library_path === RESERVATION_OUTPUT_PATH,
+    'COLLECTION_BINDING_MISMATCH')
+    // provider_complete sets time/status only. The Program review decision
+    // binds provider_asset_id later; requiring it before review deadlocks INGESTING.
+    timestamp(job.provider_completed_at, 'PROVIDER_COMPLETED_AT')
+    demand((job.status === 'INGESTING' && job.provider_asset_id == null)
+      || job.provider_asset_id === `chatgpt-library:${sourceId}`, 'COLLECTION_BINDING_MISMATCH')
+    return { role: job.status === 'INGESTING' ? 'REVIEWER' : 'TRANSFER', job_id: job.job_id }
+  }
+  if (job.status === 'FINALIZE_QUEUED' || job.status === 'FINALIZING') {
+    return { role: 'WAIT_PROGRAM_FINALIZER', job_id: job.job_id }
+  }
+  if (job.status === 'SUCCEEDED') return { role: 'AUDIT', job_id: job.job_id }
+  demand(NOOP_STATUSES.has(job.status), 'JOB_STATUS_INVALID')
+  return { role: 'NOOP', job_id: job.job_id }
+}
+
 // The visual prompt is immutable. The only addition is the fixed output instruction.
 export function buildReservationRendererPrompt(promptText, promptSha256) {
   demand(typeof promptText === 'string' && promptText.trim().length > 0, 'PROMPT_REQUIRED')

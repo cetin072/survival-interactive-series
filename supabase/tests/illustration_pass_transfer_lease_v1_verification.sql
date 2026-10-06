@@ -1,5 +1,11 @@
 -- PASS transfer lease regression; fixture and dispatch stub roll back.
 begin;
+-- Serialize this rollback-only fixture against Prep/worker writes. Existing
+-- active rows are hidden only within this transaction, never committed.
+lock table survival_ops.illustration_render_jobs in share row exclusive mode;
+update survival_ops.illustration_render_jobs set status='BLOCKED'
+where status in ('PREPARED','INGESTING','READY_FOR_REVIEW','HUMAN_REVIEW',
+  'REVIEW_PASS_STAGED','FINALIZE_QUEUED','FINALIZING');
 create or replace function archive_ops.dispatch_afterfall_illustration_finalize(p_job_id text)
 returns bigint language sql volatile security definer set search_path=pg_catalog as $$
   select -999::bigint
@@ -48,6 +54,28 @@ begin
   ));
   if v_result->>'status'<>'UPLOADING' then raise exception 'PASS_TRANSFER_STAGING_BEGIN_FAILED'; end if;
   perform public.archive_illustration_review_staging_chunk_put(v_job,v_token,v_stage,0,v_png_b64);
+  -- Preserve exact partial staging across lease expiry, then send no duplicate
+  -- chunks after a fresh lease. Never regenerate or change the PASS decision.
+  update survival_ops.illustration_render_jobs
+  set lease_until=clock_timestamp()-interval '1 second' where job_id=v_job;
+  begin
+    perform public.archive_illustration_review_staging_resume(v_job,v_token);
+    raise exception 'EXPIRED_TRANSFER_LEASE_ACCEPTED';
+  exception when sqlstate '22023' then
+    if sqlerrm not like 'ILLUSTRATION_LEASE_%' then raise; end if;
+  end;
+  v_lease:=public.archive_illustration_render_job_lease_acquire(v_job,'test-native-transfer-resume',600);
+  v_token:=(v_lease->>'lease_token')::uuid;
+  v_result:=public.archive_illustration_review_staging_resume(v_job,v_token);
+  if v_lease->>'status'<>'LEASE_ACQUIRED'
+     or v_result->>'staging_id'<>v_stage
+     or v_result->>'source_sha256'<>v_sha
+     or v_result->'stored_chunk_indexes'<>'[0]'::jsonb
+     or v_result->>'point_id'<>'point-'||repeat('1',64)
+     or v_result->>'generation_key'<>'generation-'||repeat('2',64)
+     or v_result->>'subject_id'<>'loc-pass-lease-fixture' then
+    raise exception 'PASS_TRANSFER_EXACT_STAGING_NOT_RESUMED';
+  end if;
   v_result:=public.archive_illustration_site_staging_finalize(v_job,v_token,v_stage);
   select status into v_status from survival_ops.illustration_render_jobs where job_id=v_job;
   if v_result->>'status'<>'FINALIZE_QUEUED' or v_status<>'FINALIZE_QUEUED'
