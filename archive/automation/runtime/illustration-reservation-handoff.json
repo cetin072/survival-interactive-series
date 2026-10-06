@@ -25,7 +25,25 @@
     "next_run_time": null,
     "prompt_exact_readback": true
   },
-  "collection": null,
+  "collection": {
+    "status": "READY_FOR_PROVIDER_COMPLETE",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_00000000cdfc81f582fa8c0671ca4b20",
+    "source_library_file_id": "libfile_1532be3d794c8191b91906fa5d006014",
+    "source_version_id": null,
+    "source_sha256": "88712f315cc9ef38ece598d9b828143d2bd564604819a5b29deaa6c28adbc2ec",
+    "source_width": 1774,
+    "source_height": 887,
+    "source_size_bytes": 2573930,
+    "source_modified_at": "2026-10-06T13:35:20.328223Z",
+    "observed_at": "2026-10-06T13:44:58.607598Z",
+    "png_verify": true,
+    "png_full_decode": true,
+    "provider_complete": {
+      "p_job_id": "illustration-event-network-decay-b709bedf4fae-20261006-37392537655",
+      "p_prompt_sha256": "e0b3ceb020926c89acbd2a596ba238f7578e62fa0080394ceac04bffc85cbe6c"
+    }
+  },
   "result": null,
   "trial": {
     "version": "illustration-reservation-live-trial-v2",
