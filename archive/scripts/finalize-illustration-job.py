@@ -73,6 +73,9 @@ def rpc(name, payload):
 
 
 HEARTBEAT_INTERVAL_SECONDS = 30
+PR_CHECK_PROPAGATION_ATTEMPTS = 200
+PR_CHECK_PROPAGATION_POLL_SECONDS = 3
+RECOVERABLE_CHECK_TIMEOUT = "FINALIZER_PR_CHECKS_NOT_REPORTED_TIMEOUT"
 
 
 def heartbeat():
@@ -169,7 +172,7 @@ def find_open_pr(branch):
 def wait_pr_and_merge(number):
     # A freshly-created PR may briefly report no checks before GitHub attaches
     # workflow/check runs. Treat that as propagation delay, not CI failure.
-    for _ in range(30):
+    for _ in range(PR_CHECK_PROPAGATION_ATTEMPTS):
         heartbeat()
         view = gh_json(
             "pr", "view", str(number), "--repo", REPO,
@@ -181,7 +184,7 @@ def wait_pr_and_merge(number):
             fail("FINALIZER_PR_NOT_OPEN")
         if view.get("statusCheckRollup"):
             break
-        time.sleep(3)
+        time.sleep(PR_CHECK_PROPAGATION_POLL_SECONDS)
     else:
         fail("FINALIZER_PR_CHECKS_NOT_REPORTED_TIMEOUT")
 
@@ -210,6 +213,69 @@ def wait_pr_and_merge(number):
             fail("FINALIZER_PR_CONFLICT")
         time.sleep(3)
     fail("FINALIZER_PR_MERGEABILITY_TIMEOUT")
+
+
+def validate_check_timeout_recovery_pr(job):
+    if (job.get("status") != "BLOCKED"
+        or job.get("blocker_code") != RECOVERABLE_CHECK_TIMEOUT
+        or job.get("blocker_stage") != "PROGRAM_FINALIZER"
+        or job.get("review_decision") != "PASS"):
+        fail("FINALIZER_RECOVERY_NOT_ELIGIBLE")
+    for key in ("review_staging_id", "output_sha256", "provider_asset_id", "prompt_sha256"):
+        if not job.get(key):
+            fail("FINALIZER_RECOVERY_BINDING_INCOMPLETE")
+
+    identity_path = identity_path_for_subject(job["subject_id"])
+    branch = f"automation/finalize-identity-{job['job_id']}"
+    existing = find_open_pr(branch)
+    if not existing:
+        fail("FINALIZER_RECOVERY_PR_NOT_FOUND")
+
+    view = gh_json(
+        "pr", "view", str(existing["number"]), "--repo", REPO,
+        "--json", "state,mergeable,headRefName,headRefOid,baseRefName,statusCheckRollup,files",
+    )
+    if (view.get("state") != "OPEN"
+        or view.get("headRefName") != branch
+        or view.get("headRefOid") != existing.get("headRefOid")
+        or view.get("baseRefName") != "main"
+        or view.get("mergeable") != "MERGEABLE"):
+        fail("FINALIZER_RECOVERY_PR_STATE_INVALID")
+    checks = view.get("statusCheckRollup") or []
+    if not checks:
+        fail("FINALIZER_RECOVERY_PR_CHECKS_MISSING")
+    files = [item.get("path") for item in (view.get("files") or [])]
+    if files != [identity_path]:
+        fail("FINALIZER_RECOVERY_PR_FILES_INVALID")
+
+    checked = subprocess.run(
+        ["gh", "pr", "checks", str(existing["number"]), "--repo", REPO],
+        cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=os.environ,
+    )
+    if checked.returncode != 0:
+        fail("FINALIZER_RECOVERY_PR_CHECKS_NOT_PASSING")
+
+    run("git", "fetch", "origin", branch)
+    observed = json.loads(run("git", "show", f"FETCH_HEAD:{identity_path}"))
+    if observed != identity_payload(job):
+        fail("FINALIZER_RECOVERY_IDENTITY_MISMATCH")
+    return existing["number"]
+
+
+def recover_check_timeout_job(job):
+    validate_check_timeout_recovery_pr(job)
+    recovered = rpc("archive_illustration_finalizer_recover_check_timeout", {
+        "p_job_id": job["job_id"],
+        "p_expected_output_sha256": job["output_sha256"],
+        "p_expected_provider_asset_id": job["provider_asset_id"],
+        "p_expected_review_staging_id": job["review_staging_id"],
+    })
+    if not isinstance(recovered, dict) or recovered.get("status") != "FINALIZE_QUEUED":
+        fail("FINALIZER_RECOVERY_RPC_FAILED")
+    readback = rpc("archive_illustration_render_job_readback", {"p_job_id": job["job_id"]})
+    if not isinstance(readback, dict) or readback.get("status") != "FINALIZE_QUEUED":
+        fail("FINALIZER_RECOVERY_READBACK_FAILED")
+    return readback
 
 
 def ensure_json_request(path, payload, branch, title, body):
@@ -424,6 +490,9 @@ def finalize(job_id):
     CURRENT_JOB = job
     if job.get("status") == "SUCCEEDED":
         return {"status": "NOOP_ALREADY_SUCCEEDED", "job_id": job_id}
+    if job.get("status") == "BLOCKED" and job.get("blocker_code") == RECOVERABLE_CHECK_TIMEOUT:
+        job = recover_check_timeout_job(job)
+        CURRENT_JOB = job
     if job.get("status") not in ("FINALIZE_QUEUED", "FINALIZING"):
         fail("FINALIZER_JOB_NOT_QUEUED")
     if job.get("review_decision") != "PASS":
