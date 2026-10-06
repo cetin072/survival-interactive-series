@@ -466,3 +466,103 @@ Registry의 legacy `unattended_generation_proven=false`는 남아 있다.
 정규 운영은 기존 daily success/attempt/semantic cap을 그대로 사용한다.
 앞 절의 acceptance 직전 설명과 PREVIEW_ONLY 판정은 당시 연대기이며,
 현재 최종 판정은 이 LIVE Golden Case가 권위다.
+
+## 11. 정규 운영 Golden Case — event-network-decay (완료)
+
+2026-10-07 정규 Reservation Coordinator가 실제 Program Prep의 다음 후보를 사람 개입 없이 받아
+`event-network-decay`를 처음부터 끝까지 처리했다.
+
+- job_id: `illustration-event-network-decay-b709bedf4fae-20261006-37392537655`
+- subject_id: `event-network-decay`
+- job main SHA: `d864f7f8481208392bbf3f6dc0cdd7f174c3d78b`
+- prompt SHA: `e0b3ceb020926c89acbd2a596ba238f7578e62fa0080394ceac04bffc85cbe6c`
+- 정규 Coordinator: `6ac24401ee1881919ac19b158102b752`
+- 격리 Renderer: `6ac2e58fc3848191aba731468f6c3e18`
+- Renderer는 exact visual prompt + fixed Library suffix만 받았고, 운영 문맥은 전달되지 않았다.
+- Library source: `/IMAGE-RENDER/output/current.png`
+- source file ID: `file_00000000cdfc81f582fa8c0671ca4b20`
+- source library ID: `libfile_1532be3d794c8191b91906fa5d006014`
+- source PNG SHA: `88712f315cc9ef38ece598d9b828143d2bd564604819a5b29deaa6c28adbc2ec`
+- source PNG: 1774×887, 2,573,930 bytes, verify + reopen full decode PASS.
+- provider_complete: DB `INGESTING` 전환 PASS.
+- Reviewer: `native_chatgpt_vision` PASS.
+- review handoff commit: `48ff149cc44e12d7dd516251e66371080395e905`
+- Program durable decision: `REVIEW_PASS_STAGED` / PASS.
+- Transfer derivative: 512×512, 165,909 bytes, 128-color fallback,
+  SHA `da22faf4814cd8a4537c7961dff0825c1984db66d9e88cbf8329ef81aa1d0010`.
+- staging: `site-event-network-decay-da22faf4814c`, 2/2 chunks.
+- identity PR #436, handoff PR #440, derivative request PR #441, derivative publish PR #442.
+- trusted Storage: exact point/generation/source-SHA object 존재, `storage_verified=true`.
+- Registry: `AF-EVENT-53A062C44D358FF024594B67`, READY.
+- SITE_ASSETS: exact subject 1건.
+- public derivative:
+  `/visual-assets/45fab80e742074589ad442ad404fae0f49c647783a1e677e38c0a9542b861eb2.png`
+  / 512×512 / 165,909 bytes.
+- publication main SHA: `9d35970461af0a1d92b0f7b4021a627266d18fad`
+- 최종 DB status: **SUCCEEDED**
+- runtime result: **REGULAR_E2E_PASS**
+- paid API calls: 0
+- binding mismatch: false
+
+### 11.1 실전 장애 — Finalizer PR check propagation timeout
+
+첫 Finalizer 실행에서 identity PR #436은 정상 생성되었지만,
+GitHub checks가 기존 약 90초 propagation budget 안에 보이지 않아
+`FINALIZER_PR_CHECKS_NOT_REPORTED_TIMEOUT`으로 BLOCKED 되었다.
+
+실제 확인 결과:
+
+- PR #436은 open/clean/mergeable 상태였다.
+- 변경 파일은 exact identity JSON 1개였다.
+- checks는 늦게 붙었지만 모두 PASS였다.
+- 이미지, Reviewer decision, staging, derivative binding에는 문제가 없었다.
+
+따라서 새 이미지 생성이나 재검수는 하지 않았다.
+
+### 11.2 최소 복구
+
+PR #438:
+
+- fresh PR checks propagation budget을 **10분**으로 확대.
+- 오직 `FINALIZER_PR_CHECKS_NOT_REPORTED_TIMEOUT`에만 적용되는 fail-closed recovery 추가.
+- exact BLOCKED code/stage, PASS decision, source/output/staging binding,
+  512×512 output, failure count, lease 상태,
+  exact PR branch/head/base/단일 identity file/passing checks/identity payload를 모두 검증한 뒤에만 복구한다.
+
+PR #439:
+
+- recovery RPC 권한을 Automation B 기존 정상 패턴과 동일하게 정리.
+- PostgreSQL `REVOKE/GRANT`를 권위로 사용하고,
+  불안정한 `request.jwt.claim.role` 이중 검사를 제거.
+- public/anon/authenticated는 호출 불가, service_role만 실행 가능.
+- DB contract에서 authenticated 거부 + service_role 함수 진입을 실제 검증.
+
+복구 결과:
+
+```text
+BLOCKED
+→ exact existing PR #436 검증
+→ FINALIZE_QUEUED
+→ FINALIZING
+→ 기존 PR #436 merge
+→ trusted handoff
+→ Storage / Registry READY
+→ site derivative
+→ SITE_ASSETS
+→ SUCCEEDED
+```
+
+새 이미지 생성 없음. 재검수 없음. 새 staging 없음.
+
+### 11.3 추가 불변 규칙
+
+1. fresh PR의 `no checks reported`는 최소 **10분 propagation budget** 안에서는 실패로 확정하지 않는다.
+2. propagation timeout 복구는 임의 BLOCKED job에 적용하지 않는다.
+3. exact PR과 immutable identity/source binding을 먼저 검증한 뒤 같은 job만 재개한다.
+4. recovery RPC 접근 제어는 프로젝트의 검증된 PostgreSQL 권한 패턴을 따른다.
+5. 이미 PASS된 이미지/Reviewer/staging이 있으면 재생성·재검수하지 않는다.
+6. 정규 운영 성공 증거는 `SUCCEEDED + Storage verified + Registry READY + SITE_ASSETS`가 모두 일치할 때만 확정한다.
+
+이 사례는 **정규 Coordinator → visual-only one-shot Renderer → 기존 후반부** 구조가
+테스트 예외가 아닌 실제 정규 운영에서도 작동하고,
+Finalizer의 외부 CI 지연까지 기존 자산을 보존한 채 복구할 수 있음을 증명한다.
