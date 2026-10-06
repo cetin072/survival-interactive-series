@@ -38,8 +38,11 @@ A mismatch stops the run. PASS handoff does not permit same-run Transfer.
 Renderer receives only exact visual prompt plus `RESERVATION_RENDER_SUFFIX`;
 none of these authorities or metadata belong in its task prompt.
 
-Regular Coordinator cadence: every two hours in Asia/Seoul, reusing the
-existing task. Program Prep and Finalizer stay unchanged. After one daily
+Regular Coordinator cadence: hourly in Asia/Seoul, reusing the existing task
+so collection occurs within the existing 7200-second dispatch lease. Failed
+generation retries remain bound to the existing approximately two-hour Prep
+pulse; an hourly Coordinator run cannot re-arm an unresolved Renderer.
+Program Prep and Finalizer stay unchanged. After one daily
 success, normal Prep's daily-success gate stops further generation. Existing
 semantic/attempt caps remain authoritative; no acceptance override is used.
 Schedule migration is performed once using supported native ChatGPT tools,
