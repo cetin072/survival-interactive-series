@@ -77,6 +77,18 @@ def tap(locator, mobile: bool):
         locator.click()
 
 
+
+def tap_toc(page, chapter_id: str, mobile: bool):
+    outer = page.locator('.book-toc-disclosure')
+    if not outer.evaluate('(item) => item.open'):
+        tap(outer.locator(':scope > summary'), mobile)
+    button = page.locator(f'.book-toc [data-chapter-id="{chapter_id}"]')
+    group = button.locator('xpath=ancestor::details[contains(@class,"book-toc-group")]')
+    if not group.evaluate('(item) => item.open'):
+        tap(group.locator(':scope > summary'), mobile)
+    tap(button, mobile)
+
+
 def query_url(base: str, **params) -> str:
     return base.rstrip('/') + '/?' + urlencode(params)
 
@@ -131,7 +143,7 @@ def audit_book(page, base: str, chronicle: str, width: int):
         page.goto(query_url(base, view='story', chronicle=chronicle, chapter=chapters[0]['id']))
         selected_book(page, chapters[0], chronicle)
     for index in [1, 2]:
-        tap(page.locator(f'.book-toc [data-chapter-id="{chapters[index]["id"]}"]'), mobile)
+        tap_toc(page, chapters[index]["id"], mobile)
         selected_book(page, chapters[index], chronicle)
         top = page.locator('.book-prose').bounding_box()['y']
         assert -2 <= top < 180, f'New chapter is not in view: {top}'
@@ -147,10 +159,11 @@ def audit_book(page, base: str, chronicle: str, width: int):
     selected_book(page, chapters[2], chronicle)
     page.goto(query_url(base, view='story', chronicle=chronicle))
     selected_book(page, chapters[2], chronicle)  # unqualified URL resumes bookmark
-    tap(page.locator(f'.book-toc [data-chapter-id="{chapters[-1]["id"]}"]'), mobile)
+    tap_toc(page, chapters[-1]["id"], mobile)
     selected_book(page, chapters[-1], chronicle)
     expect(page.locator('.book-pager button')).to_have_count(1)
-    tap(page.locator('.book-toc .text-button'), mobile)
+    tap(page.get_by_role('link', name='이야기 목록', exact=True), mobile)
+    expect(page.get_by_role('heading', name='전체 생존기 목록', exact=True)).to_be_visible()
     expect(page.locator('.book-reader')).to_have_count(0)
     report('book deep link / one-tap TOC / pager / back-forward / reload / resume / final chapter', width=width, chronicle=chronicle)
 
@@ -228,6 +241,77 @@ def audit_extra(page, base: str, width: int):
     report('Explorer search / empty result recovery / filter / Story-to-Wiki route', width=width)
 
 
+
+def audit_story_shell(page, base: str, width: int, screenshots: str | None):
+    mobile = width < 700
+    page.goto(query_url(base, view='story'))
+    expect(page.locator('.wiki-topbar')).to_have_count(1)
+    tap(page.locator('.wiki-current-chronicle').get_by_role('link', name='이야기 읽기', exact=True), mobile)
+    expect(page.locator('.book-prose')).to_be_visible()
+    expect(page.locator('.wiki-topbar')).to_have_count(1)
+    expect(page.locator('.archive-header')).to_have_count(0)
+    page.goto(query_url(base, view='story', chronicle='C03-AFTERFALL', chapter='c03-afterfall-chapter-06'))
+    chapter = next(item for item in BOOKS['C03-AFTERFALL']['chapters'] if item['id'] == 'c03-afterfall-chapter-06')
+    selected_book(page, chapter, 'C03-AFTERFALL')
+    expect(page.locator('.wiki-breadcrumb')).to_contain_text('시즌 1')
+    expect(page.locator('.book-prose > header')).to_contain_text('시즌 1 · 제15장')
+    expect(page.locator('.book-pager')).to_contain_text('제14장 산림교육원')
+    expect(page.locator('.book-pager')).to_contain_text('제16장 교환지의 사람들')
+    current_group = page.locator('.book-toc [aria-current="page"]').locator('xpath=ancestor::details[contains(@class,"book-toc-group")]')
+    expect(current_group).to_have_attribute('open', '')
+    assert len(page.locator('.book-toc [data-chapter-id]').all()) == len(BOOKS['C03-AFTERFALL']['chapters'])
+    counters = {}
+    for item in BOOKS['C03-AFTERFALL']['chapters']:
+        group = item.get('seasonId') or item.get('partId') or 'record'
+        counters[group] = counters.get(group, 0) + 1
+        expect(page.locator(f'.book-toc [data-chapter-id="{item["id"]}"] span')).to_have_text(f'제{counters[group]}장')
+    if mobile:
+        outer = page.locator('.book-toc-disclosure')
+        expect(outer).not_to_have_attribute('open', '')
+        summary = outer.locator(':scope > summary')
+        summary.focus()
+        page.keyboard.press('Space')
+        expect(outer).to_have_attribute('open', '')
+        expect(page.locator('.book-toc [aria-current="page"]')).to_be_in_viewport()
+        assert summary.evaluate('(item) => getComputedStyle(item).outlineStyle') != 'none'
+        tap_toc(page, 'c03-afterfall-chapter-07', True)
+        expect(outer).not_to_have_attribute('open', '')
+        page.go_back()
+        selected_book(page, chapter, 'C03-AFTERFALL')
+    else:
+        expect(page.locator('.book-toc-disclosure')).to_have_attribute('open', '')
+        toc = page.locator('.book-toc').bounding_box()
+        prose = page.locator('.book-prose').bounding_box()
+        assert toc['x'] + toc['width'] < prose['x'], 'Desktop TOC must be left of prose'
+        assert 580 <= prose['width'] <= 760, 'Comfortable desktop prose width'
+        summary = current_group.locator(':scope > summary')
+        summary.focus()
+        page.keyboard.press('Space')
+        expect(current_group).not_to_have_attribute('open', '')
+        page.keyboard.press('Space')
+        expect(current_group).to_have_attribute('open', '')
+    assert abs(page.locator('.wiki-topbar').bounding_box()['y']) <= 1, 'Shared header stays visible after Reader scroll'
+    if screenshots and width in [390, 1440]:
+        folder = Path(screenshots)
+        folder.mkdir(parents=True, exist_ok=True)
+        page.screenshot(path=str(folder / f'reader-{width}.png'), full_page=False)
+        if mobile:
+            tap(page.locator('.book-toc-disclosure > summary'), True)
+            page.screenshot(path=str(folder / f'reader-{width}-toc.png'), full_page=False)
+            tap(page.locator('.book-toc-disclosure > summary'), True)
+    tap(page.get_by_role('link', name='생존기 소개', exact=True), mobile)
+    expect(page.locator('.wiki-chronicle-header h1')).to_have_text('서진우의 생존기')
+    page.go_back()
+    selected_book(page, chapter, 'C03-AFTERFALL')
+    tap(page.locator('.book-related').get_by_role('button').first, mobile)
+    expect(page.locator('.wiki-document')).to_be_visible()
+    expect(page.locator('.archive-header')).to_have_count(0)
+    page.go_back()
+    selected_book(page, chapter, 'C03-AFTERFALL')
+    no_overflow(page)
+    report('shared shell / chapter-06 / season numbering / collapsible TOC / keyboard focus / introduction / related Wiki', width=width)
+
+
 def probe_original(browser, url: str):
     context = browser.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
     page = context.new_page()
@@ -248,6 +332,7 @@ def probe_original(browser, url: str):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--screenshots', help='Save Reader screenshots for visual review')
     parser.add_argument('--url', help='Audit this deployed site instead of local dist')
     parser.add_argument('--wait-assets', action='store_true', help='Wait for deployment identity and assets to match this build')
     parser.add_argument('--allow-ancestor-equivalent', action='store_true', help='For Deploy Preview only, allow a verified ancestor deploy when all site inputs match exactly')
@@ -269,7 +354,7 @@ def main():
             if args.probe_original:
                 probe_original(browser, base)
                 return
-            for width in [360, 390, 430, 1280]:
+            for width in [360, 390, 430, 1280, 1440]:
                 context = browser.new_context(viewport={'width': width, 'height': 844}, is_mobile=width < 700, has_touch=width < 700)
                 page = context.new_page()
                 errors, failures = [], []
@@ -280,6 +365,7 @@ def main():
                     audit_book(page, base, chronicle, width)
                     audit_raw(page, base, chronicle, width)
                 audit_extra(page, base, width)
+                audit_story_shell(page, base, width, args.screenshots)
                 assert not errors, f'Browser runtime errors: {errors}'
                 assert not failures, f'HTTP failures: {failures}'
                 report('no runtime exceptions or same-site HTTP errors', width=width)
@@ -289,7 +375,7 @@ def main():
             page = blocked.new_page()
             page.goto(query_url(base, view='story', chronicle='C01-HAN-JUNHO', chapter='invalid'))
             expect(page.locator('.book-prose > header h1')).to_have_text(BOOKS['C01-HAN-JUNHO']['chapters'][0]['title'])
-            tap(page.locator('.book-toc section button').nth(1), True)
+            tap_toc(page, BOOKS['C01-HAN-JUNHO']['chapters'][1]['id'], True)
             expect(page.locator('.book-prose > header h1')).to_have_text(BOOKS['C01-HAN-JUNHO']['chapters'][1]['title'])
             page.goto(query_url(base, view='story', chronicle='C03-AFTERFALL'))
             selected_book(page, BOOKS['C03-AFTERFALL']['chapters'][0], 'C03-AFTERFALL')
