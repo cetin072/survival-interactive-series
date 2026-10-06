@@ -5,23 +5,30 @@ import { splitRoleBlocks } from './reader-transform.mjs'
 import { byteHash, graphHash } from './publication-graph.mjs'
 
 const namespace = { chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', visibility: 'PUBLIC_ARCHIVE' }
-const seasonRoot = 'archive/content/transcripts/C03-AFTERFALL/S03'
-const factsRoot = 'archive/content/public-facts/C03-AFTERFALL/S03'
-const receiptsRoot = `${factsRoot}/receipts`
+const transcriptRoot = 'archive/content/transcripts/C03-AFTERFALL'
+const factsRoot = 'archive/content/public-facts/C03-AFTERFALL'
 const demand = (condition, code) => { if (!condition) throw new Error(code) }
 const jsonBytes = (value) => Buffer.from(JSON.stringify(value, null, 2) + '\n')
 
+export function wikiSourceSeason(source) {
+  const fromRef = source.sourceManifestRef?.match(/^archive\/content\/transcripts\/C03-AFTERFALL\/(S\d{2,3})\/SESSION_\d{3}\/SOURCE_MANIFEST\.json$/)?.[1]
+  const season = source.seasonId ?? fromRef
+  demand(/^S\d{2,3}$/.test(season ?? '') && Number(season.slice(1)) >= 3
+    && (!fromRef || fromRef === season), 'WIKI_SOURCE_SEASON_INVALID')
+  return season
+}
+
 export function expectedWikiFactPath(source) {
-  return `${factsRoot}/AWIKI_${source.sourceSession.session_id}_${source.sourceDigest}.json`
+  return `${factsRoot}/${wikiSourceSeason(source)}/AWIKI_${source.sourceSession.session_id}_${source.sourceDigest}.json`
 }
 
 export function expectedWikiReceiptPath(source) {
-  return `${receiptsRoot}/AWIKI_${source.sourceSession.session_id}_${source.sourceDigest}.json`
+  return `${factsRoot}/${wikiSourceSeason(source)}/receipts/AWIKI_${source.sourceSession.session_id}_${source.sourceDigest}.json`
 }
 
-async function existingWikiFactNames(root) {
+async function existingWikiFactNames(root, seasonId) {
   try {
-    return new Set((await readdir(resolve(root, factsRoot)))
+    return new Set((await readdir(resolve(root, factsRoot, seasonId)))
       .filter((name) => /^AWIKI_SESSION_\d{3}_[a-f0-9]{64}\.json$/.test(name)))
   } catch (error) {
     if (error.code === 'ENOENT') return new Set()
@@ -29,9 +36,9 @@ async function existingWikiFactNames(root) {
   }
 }
 
-async function existingWikiReceiptNames(root) {
+async function existingWikiReceiptNames(root, seasonId) {
   try {
-    return new Set((await readdir(resolve(root, receiptsRoot)))
+    return new Set((await readdir(resolve(root, factsRoot, seasonId, 'receipts')))
       .filter((name) => /^AWIKI_SESSION_\d{3}_[a-f0-9]{64}\.json$/.test(name)))
   } catch (error) {
     if (error.code === 'ENOENT') return new Set()
@@ -39,7 +46,8 @@ async function existingWikiReceiptNames(root) {
   }
 }
 
-async function materializeWikiSource(root, approved, session) {
+async function materializeWikiSource(root, seasonId, approved, session) {
+  const seasonRoot = `${transcriptRoot}/${seasonId}`
   demand(/^SESSION_\d{3}$/.test(session?.session_id ?? ''), 'WIKI_SOURCE_SESSION_ID_INVALID')
   const sourceManifestRef = `${seasonRoot}/${session.source_manifest}`
   const sourceManifestBytes = await readFile(resolve(root, sourceManifestRef))
@@ -47,17 +55,22 @@ async function materializeWikiSource(root, approved, session) {
   demand(sourceManifest.session_id === session.session_id
     && sourceManifest.chronicle_id === namespace.chronicle_id
     && sourceManifest.worldline_id === namespace.worldline_id
-    && sourceManifest.season_id === 'S03'
+    && sourceManifest.season_id === seasonId
     && sourceManifest.visibility === namespace.visibility,
   'WIKI_SOURCE_MANIFEST_SCOPE_INVALID')
 
-  const part = approved.find((entry) => entry.autoPublication.sessionId === session.session_id)
-  demand(part, 'WIKI_SOURCE_NOT_APPROVED')
-  const rawPath = resolve(root, part.archivePath)
-  demand((await lstat(rawPath)).isFile(), 'WIKI_SOURCE_PART_NOT_REGULAR_FILE')
-  const rawBytes = await readFile(rawPath)
-  const blocks = splitRoleBlocks(rawBytes.toString('utf8'))
-  const gmBlocks = blocks.filter((block) => block.header.role === 'GM')
+  const parts = approved.filter((entry) => entry.autoPublication.sessionId === session.session_id)
+  demand(parts.length > 0, 'WIKI_SOURCE_NOT_APPROVED')
+  const rawParts = [], gmBlocks = []
+  for (const part of parts) {
+    demand(part.autoPublication.sourceManifestSha256 === byteHash(sourceManifestBytes), 'WIKI_SOURCE_CHANGED_DURING_READ')
+    const rawPath = resolve(root, part.archivePath)
+    demand((await lstat(rawPath)).isFile(), 'WIKI_SOURCE_PART_NOT_REGULAR_FILE')
+    const rawBytes = await readFile(rawPath)
+    demand(byteHash(rawBytes) === part.autoPublication.rawSha256, 'WIKI_SOURCE_CHANGED_DURING_READ')
+    rawParts.push({ ref: part.archivePath, sha256: byteHash(rawBytes) })
+    gmBlocks.push(...splitRoleBlocks(rawBytes.toString('utf8')).filter((block) => block.header.role === 'GM'))
+  }
   demand(gmBlocks.length === session.gm_public_blocks && gmBlocks.length === session.user_messages, 'WIKI_GM_PAIR_COUNT_MISMATCH')
   demand(gmBlocks.every((block) => block.header.messageLabel !== undefined), 'WIKI_GM_BLOCK_ORDER_MISSING')
 
@@ -72,71 +85,82 @@ async function materializeWikiSource(root, approved, session) {
   'WIKI_SOURCE_ANCHOR_INVALID')
 
   return {
+    seasonId,
     manifestRef: `${seasonRoot}/MANIFEST.json`,
     sourceManifestRef,
     sourceManifestSha256: byteHash(sourceManifestBytes),
     sourceDigest: byteHash(sourceManifestBytes),
     sourceSession: session,
     anchor,
-    rawRef: part.archivePath,
-    rawSha256: byteHash(rawBytes),
+    rawRef: rawParts[0].ref,
+    rawSha256: rawParts[0].sha256,
+    ...(rawParts.length > 1 ? { rawParts } : {}),
     gmBlocks: gmBlocks.map((block) => ({ messageLabel: block.header.messageLabel, body: block.body })),
   }
 }
 
 /**
  * A-Core owns source visibility/pairing/hash validation. A-Wiki walks the
- * verified S03 sessions in manifest order and selects the first source whose
- * exact immutable AWIKI fact file does not yet exist.
+ * approved AFTERFALL seasons in order. S03 keeps its already-applied legacy
+ * baseline; later seasons start at their first approved source. Private/open
+ * captures never enter the catalog and no live Runtime or Canon is queried.
  */
 export async function discoverWikiSources(root) {
-  const manifestRef = `${seasonRoot}/MANIFEST.json`
-  const manifestBytes = await readFile(resolve(root, manifestRef))
-  const manifest = JSON.parse(manifestBytes.toString('utf8'))
-  demand(manifest.chronicle_id === namespace.chronicle_id && manifest.worldline_id === namespace.worldline_id, 'WIKI_SOURCE_NAMESPACE_INVALID')
-  demand(manifest.season_id === 'S03' && manifest.archive_class === 'COLD_RAW' && manifest.visibility === namespace.visibility, 'WIKI_SOURCE_NOT_PUBLIC_ARCHIVE')
-  demand(Array.isArray(manifest.sessions) && manifest.sessions.length > 0, 'WIKI_SOURCE_MANIFEST_EMPTY')
-
-  const existingNames = await existingWikiFactNames(root)
-  const trackedSessionIds = new Set([...existingNames]
-    .map((name) => name.match(/^AWIKI_(SESSION_\d{3})_[a-f0-9]{64}\.json$/)?.[1])
-    .filter(Boolean))
-  const firstTrackedIndex = manifest.sessions.findIndex((session) => trackedSessionIds.has(session.session_id))
-  const trackedSessions = firstTrackedIndex >= 0 ? manifest.sessions.slice(firstTrackedIndex) : manifest.sessions
-
+  const seasons = (await readdir(resolve(root, transcriptRoot), { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory() && /^S\d{2,3}$/.test(entry.name) && Number(entry.name.slice(1)) >= 3)
+    .map((entry) => entry.name)
+    .sort((a, b) => Number(a.slice(1)) - Number(b.slice(1)) || a.localeCompare(b))
   const io = {
     read: (ref) => readFile(resolve(root, ref)),
     listParts: async (prefix) => (await readdir(resolve(root, prefix))).filter((name) => /^PART_\d{3}\.md$/.test(name)),
   }
-  const approved = await approvedSeasonCatalog(manifest, 'S03', io)
   const sources = []
-  for (const session of trackedSessions) sources.push(await materializeWikiSource(root, approved, session))
+  for (const seasonId of seasons) {
+    const manifestBytes = await readFile(resolve(root, transcriptRoot, seasonId, 'MANIFEST.json'))
+      .catch((error) => { if (error.code === 'ENOENT') return null; throw error })
+    if (!manifestBytes) continue
+    const manifest = JSON.parse(manifestBytes.toString('utf8'))
+    const approved = await approvedSeasonCatalog(manifest, seasonId, io)
+    if (!approved.length) continue
+    const approvedIds = new Set(approved.map((part) => part.autoPublication.sessionId))
+    let sessions = manifest.sessions.filter((session) => approvedIds.has(session.session_id))
+    if (seasonId === 'S03') {
+      const existingNames = await existingWikiFactNames(root, seasonId)
+      const legacyApplied = [...existingNames].some((name) => /^AWIKI_SESSION_005_/.test(name))
+      const baseline = sessions.findIndex((session) => session.session_id === 'SESSION_005')
+      if (legacyApplied && baseline >= 0) sessions = sessions.slice(baseline)
+    }
+    for (const session of sessions) sources.push(await materializeWikiSource(root, seasonId, approved, session))
+  }
   return sources
 }
 
 export async function discoverWikiSource(root) {
-  const [sources, existingNames, receiptNames] = await Promise.all([
-    discoverWikiSources(root),
-    existingWikiFactNames(root),
-    existingWikiReceiptNames(root),
-  ])
+  const sources = await discoverWikiSources(root)
+  const completed = new Map(await Promise.all([...new Set(sources.map((source) => source.seasonId))].map(async (seasonId) => [seasonId, {
+    facts: await existingWikiFactNames(root, seasonId),
+    receipts: await existingWikiReceiptNames(root, seasonId),
+  }])))
   const source = sources.find((candidate) => {
     const factName = expectedWikiFactPath(candidate).split('/').at(-1)
     const receiptName = expectedWikiReceiptPath(candidate).split('/').at(-1)
-    const legacyApplied = candidate.sourceSession.session_id === 'SESSION_005' && existingNames.has(factName)
-    return !legacyApplied && !receiptNames.has(receiptName)
+    const { facts, receipts } = completed.get(candidate.seasonId)
+    const legacyApplied = candidate.seasonId === 'S03'
+      && candidate.sourceSession.session_id === 'SESSION_005' && facts.has(factName)
+    return !legacyApplied && !receipts.has(receiptName)
   })
 
   if (!source) {
     const error = new Error('WIKI_NO_PENDING_SOURCE')
     error.source_session = sources.at(-1)?.sourceSession.session_id ?? null
+    error.source_season = sources.at(-1)?.seasonId ?? null
     throw error
   }
   return source
 }
 
 function semanticFacts(source) {
-  if (source.sourceSession.session_id !== 'SESSION_005') {
+  if (wikiSourceSeason(source) !== 'S03' || source.sourceSession.session_id !== 'SESSION_005') {
     const error = new Error('WIKI_SEMANTIC_EXTRACTOR_REQUIRED')
     error.source_session = source.sourceSession.session_id
     throw error

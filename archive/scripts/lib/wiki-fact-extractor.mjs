@@ -41,10 +41,18 @@ export function buildWikiFactJob(source, graph) {
   validAnchor(source.anchor)
   const session = source.sourceSession?.session_id
   insist(/^SESSION_\d{3}$/.test(session ?? ''), 'WIKI_SESSION_INVALID')
-  const prefix = `archive/content/transcripts/C03-AFTERFALL/S03/${session}/`
+  const season = source.sourceManifestRef?.match(/^archive\/content\/transcripts\/C03-AFTERFALL\/(S\d{2,3})\//)?.[1]
+  insist(season && Number(season.slice(1)) >= 3 && (!source.seasonId || source.seasonId === season), 'WIKI_SOURCE_SEASON_INVALID')
+  const prefix = `archive/content/transcripts/C03-AFTERFALL/${season}/${session}/`
   insist(source.sourceManifestRef === prefix + 'SOURCE_MANIFEST.json' && source.rawRef.startsWith(prefix)
     && /^PART_\d{3}\.md$/.test(source.rawRef.slice(prefix.length)), 'WIKI_SOURCE_PATH_INVALID')
   insist(hashOK(source.sourceDigest) && hashOK(source.rawSha256), 'WIKI_SOURCE_HASH_INVALID')
+  if (source.rawParts) {
+    insist(Array.isArray(source.rawParts) && source.rawParts.length > 1
+      && source.rawParts.every((part) => part.ref.startsWith(prefix) && /^PART_\d{3}\.md$/.test(part.ref.slice(prefix.length)) && hashOK(part.sha256))
+      && new Set(source.rawParts.map((part) => part.ref)).size === source.rawParts.length
+      && source.rawParts[0].ref === source.rawRef && source.rawParts[0].sha256 === source.rawSha256, 'WIKI_SOURCE_PARTS_INVALID')
+  }
   insist(Array.isArray(source.gmBlocks) && source.gmBlocks.length > 0, 'WIKI_GM_BLOCKS_REQUIRED')
   const seen = new Set()
   const blocks = source.gmBlocks.map(({ messageLabel, body }) => {
@@ -56,12 +64,14 @@ export function buildWikiFactJob(source, graph) {
   // Never silently truncate later GM turns; split a too-large source explicitly.
   insist(blocks.length <= 1000 && blocks.reduce((sum, block) => sum + block.text.length, 0) <= 200000, 'WIKI_SOURCE_SPLIT_REQUIRED')
   const body = {
-    version: WIKI_JOB_VERSION, ...NS, season_id: 'S03',
+    version: WIKI_JOB_VERSION, ...NS, season_id: season,
     instructions_ref: 'docs/automation/A_WIKI_FACT_WORKER_V1.md',
     source: { session_id: session, manifest_ref: source.sourceManifestRef, manifest_sha256: source.sourceDigest,
-      raw_ref: source.rawRef, raw_sha256: source.rawSha256, anchor: source.anchor, gm_blocks: blocks },
+      raw_ref: source.rawRef, raw_sha256: source.rawSha256,
+      ...(source.rawParts ? { raw_parts: source.rawParts } : {}), anchor: source.anchor, gm_blocks: blocks },
     graph_sha256: content_sha256, graph_anchor: graph.anchor,
-    existing_nodes: graph.nodes.map(({ id, data }) => ({ id, data })),
+    existing_nodes: graph.nodes.map(({ id, data, anchor }) => ({ id, data, anchor })),
+    existing_relations: graph.relations.map(({ id, data, anchor }) => ({ id, data, anchor })),
     relation_kinds: KINDS,
   }
   return { ...structuredClone(body), job_id: `wiki-job-${graphHash(body)}` }
@@ -71,6 +81,8 @@ function verifyJob(job) {
   insist(plain(job), 'WIKI_JOB_INVALID')
   const { job_id, ...body } = job
   insist(job.version === WIKI_JOB_VERSION && job_id === `wiki-job-${graphHash(body)}`, 'WIKI_JOB_BINDING_INVALID')
+  insist(/^S\d{2,3}$/.test(job.season_id ?? '') && Number(job.season_id.slice(1)) >= 3
+    && job.source?.manifest_ref === `archive/content/transcripts/C03-AFTERFALL/${job.season_id}/${job.source?.session_id}/SOURCE_MANIFEST.json`, 'WIKI_JOB_SEASON_MISMATCH')
 }
 function quoteEvidence(job, proof) {
   insist(Array.isArray(proof) && proof.length > 0 && proof.length <= 16, 'WIKI_EVIDENCE_REQUIRED')
@@ -174,7 +186,7 @@ export function compileWikiFactProposal(job, result) {
       ...(old ? structuredClone(old) : { id, type: candidate.type, label: candidate.label, tags: [] }),
       ...structuredClone(candidate.changes),
       tags: [...new Set([...(old?.tags ?? []), ...(candidate.changes.tags ?? [])])],
-      source: `S03 ${job.source.session_id} GM 공개 블록 ${labels.join(', ')}`,
+      source: `${job.season_id} ${job.source.session_id} GM 공개 블록 ${labels.join(', ')}`,
     }
     if (old?.meta || candidate.changes.meta) data.meta = { ...(old?.meta ?? {}), ...(candidate.changes.meta ?? {}) }
     resolved.set(candidate.key, data); resolved.set(id, data)
@@ -201,7 +213,7 @@ export function compileWikiFactProposal(job, result) {
   })
   for (const entry of evidence) for (const proof of Object.values(entry.fields).flat()) insist(reviewed.has(proof.block_id), 'WIKI_UNREVIEWED_BLOCK')
   for (const entry of deferred) for (const proof of entry.evidence) insist(reviewed.has(proof.block_id), 'WIKI_UNREVIEWED_BLOCK')
-  const facts = { version: 'public-graph-facts-v1', ...NS, season_id: 'S03', anchor: structuredClone(job.source.anchor), nodes, relations }
+  const facts = { version: 'public-graph-facts-v1', ...NS, season_id: job.season_id, anchor: structuredClone(job.source.anchor), nodes, relations }
   const backfill = job.source.anchor.save_version < job.graph_anchor.save_version || job.source.anchor.game_time < job.graph_anchor.game_time
   const body = { version: 'wiki-fact-proposal-v1', job_id: job.job_id, source: {
     session_id: job.source.session_id, manifest_ref: job.source.manifest_ref, manifest_sha256: job.source.manifest_sha256,

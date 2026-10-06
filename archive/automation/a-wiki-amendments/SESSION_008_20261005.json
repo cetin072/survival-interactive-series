@@ -1,0 +1,4322 @@
+{
+  "version": "a-wiki-amendment-bundle-v1",
+  "amendment_id": "SESSION_008_20261005",
+  "status": "PROPOSED_AWAITING_INDEPENDENT_REVIEW",
+  "scope": {
+    "chronicle_id": "C03-AFTERFALL",
+    "worldline_id": "AFTERFALL",
+    "season_id": "S03",
+    "session_id": "SESSION_008",
+    "visibility": "PUBLIC_ARCHIVE"
+  },
+  "fact_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+  "fact_byte_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187",
+  "protected_files": [
+    {
+      "ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_008_3d15073c796967f27b1dd094ceecd948ab28b93aed7971818de48cb0e6cd4dc0.json",
+      "byte_sha256": "b0833f958e8c3ea3395f1b9aa1fbe8cd368183e3336971f0d9d85479f710530a"
+    },
+    {
+      "ref": "archive/content/public-facts/C03-AFTERFALL/S03/receipts/AWIKI_SESSION_008_3d15073c796967f27b1dd094ceecd948ab28b93aed7971818de48cb0e6cd4dc0.json",
+      "byte_sha256": "2a37b2721ab9d74b9de54c547d98015539ee4c57fdd530842df05381f2e7cacf"
+    },
+    {
+      "ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+      "byte_sha256": "e5c0131add015cfacc5d15a23fa29ef8b3fec4cac9950f38228d9350d9ef6c85"
+    },
+    {
+      "ref": "archive/content/public-facts/C03-AFTERFALL/S03/receipts/AWIKI_SESSION_007_747424d3b8d0ff30a328fc95a8ba818b4d5a7e0694e6bedb05e4d88f31675015.json",
+      "byte_sha256": "1dce2d986ad3cfcb3f79af6d2cf0ff4c875b5d2449d71427e90ab7ddf7d1ee3d"
+    },
+    {
+      "ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/SOURCE_MANIFEST.json",
+      "byte_sha256": "3d15073c796967f27b1dd094ceecd948ab28b93aed7971818de48cb0e6cd4dc0"
+    },
+    {
+      "ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "byte_sha256": "4f3f927f3a5cee583d47cc94dc375d43467c92bd54930426a8b434a12e2dfa2f"
+    },
+    {
+      "ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+      "byte_sha256": "53af20b4f4c499838399eb60b6b3046dae4e2a60c066fcaf7bad095e9154db64"
+    }
+  ],
+  "expected_graph": {
+    "ref": "archive/content/graphs/C03-AFTERFALL/GRAPH.json",
+    "content_sha256": "4eae33f49195300c4b538c05eb02c3a91638b2f648af1d4e4d0e84fb0f87303e",
+    "byte_sha256": "cfc673aceefb08b733b82e203193835091e2c0e46243eaf21b92e73d4336fac5",
+    "anchor": {
+      "game_time": "2027-11-22 22:40",
+      "save_version": 285
+    }
+  },
+  "prepared_job": {
+    "version": "wiki-fact-job-v1",
+    "chronicle_id": "C03-AFTERFALL",
+    "worldline_id": "AFTERFALL",
+    "visibility": "PUBLIC_ARCHIVE",
+    "season_id": "S03",
+    "instructions_ref": "docs/automation/A_WIKI_FACT_WORKER_V1.md",
+    "source": {
+      "session_id": "SESSION_008",
+      "manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/SOURCE_MANIFEST.json",
+      "manifest_sha256": "3d15073c796967f27b1dd094ceecd948ab28b93aed7971818de48cb0e6cd4dc0",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "raw_sha256": "4f3f927f3a5cee583d47cc94dc375d43467c92bd54930426a8b434a12e2dfa2f",
+      "anchor": {
+        "save_version": 285,
+        "game_time": "2027-11-22 22:40"
+      },
+      "gm_blocks": [
+        {
+          "block_id": "001",
+          "text": "# 2027년 10월 31일 ~ 11월 4일\n### 공공 급수지점 2곳 — 실태조사\n\n진우는 ‘공공’이라는 말부터 믿고 계약하지 않았다.\n\n문하진과 행정 잔존팀 사람들에게 먼저 물었다.\n\n“몇 명이 쓰고 있습니까?”\n\n“펌프 멈추면 몇 시간 버팁니까?”\n\n“대체 수원은요?”\n\n“밤에 고장 나면 누가 현장에 남습니까?”\n\n태훈과 민규는 설비를 봤고,\n은채는 운영기록을 봤다.\n\n---\n\n## 첫 번째 급수지점\n\n이용자는 날마다 달랐지만\n평소에는 수십 명,\n배급이 몰리는 날에는 그보다 훨씬 많았다.\n\n다행히 저장탱크가 있었다.\n\n펌프가 멈춰도 사용량을 줄이면\n하루 가까이는 버틸 수 있었다.\n\n조금 멀지만 다른 급수지점에서\n통으로 물을 옮겨오는 우회방법도 있었다.\n\n행정팀 직원 두 명이 교대로\n수위와 배급량을 확인하고 있었다.\n\n문제는 펌프였다.\n\n오래된 규격이었고\n임시수리를 반복한 흔적이 많았다.\n\n태훈이 말했다.\n\n“이건 바꾸는 게 맞아.”\n\n---\n\n## 두 번째 급수지점\n\n이쪽은 이용자는 조금 적었지만\n예비설비 상태가 더 나빴다.\n\n대신 가까운 곳에 다른 수원이 하나 있었고,\n행정팀이 손수레와 물통으로\n최소량을 옮길 계획까지 갖고 있었다.\n\n민규가 물었다.\n\n“펌프 나가면 길드 기다릴 겁니까?”\n\n현장 담당자가 고개를 저었다.\n\n“기다리면 안 되죠. 우린 우리대로 물부터 돌려야죠.”\n\n그 대답 때문에 오히려 계약하기 쉬워졌다.\n\n**운영을 길드에 떠넘길 생각은 없는 사람들**이었다.\n\n---\n\n# 11월 5일 — 계약 정리\n\n진우는 세 가지를 분명히 했다.\n\n“펌프와 부품은 팔 수 있습니다.”\n\n“일반 유지보수 계약도 받을 수 있고요.”\n\n그리고 마지막 말을 붙였다.\n\n“하지만 공공급수라고 해서\n길드가 무조건 먼저 뛰어오는 계약은 안 합니다.”\n\n행정팀 쪽에서 바로 물었다.\n\n“사람들 물이 끊겨도요?”\n\n진우가 대답했다.\n\n“그 상황을 보고 움직이죠.”\n\n“그게 무슨 차이입니까?”\n\n“급수지점에 하루치 물이 남아 있고,\n다른 데는 지금 안 가면 오늘 설비가 완전히 죽는 상황일 수도 있습니다.”\n\n진우가 말했다.\n\n“반대로 여기가 물 한 방울 안 나오고\n대체수단도 없고\n사람 수십 명이 바로 위험해지면\n당연히 여기부터 보겠죠.”\n\n잠시 조용해졌다.\n\n“**공공이라서 우선이 아니라,\n실제 피해가 큰 일이 우선입니다.**”\n\n문하진이 먼저 고개를 끄덕였다.\n\n“그게 맞아.”\n\n---\n\n## 최종 구조\n\n**행정 잔존팀**\n- 급수지점 운영책임\n- 배급기준\n- 일상점검\n- 대체수원 확보\n- 현장 인력\n- 비상시 1차 대응\n\n**길드**\n- 표준펌프·부품 판매\n- 일반 유지보수 계약\n- 수리 요청 접수\n- 상황에 따른 기술지원\n\n그리고 한 줄이 계약에서 빠졌다.\n\n> 급수 중단 시 길드 최우선 복구\n\n대신 이렇게 바뀌었다.\n\n> **긴급 고장은 당시 인명·대체수단·저장량·다른 현장 상황을 함께 판단해 대응한다.**\n\n공공기관도 일반 고객과 다른 특권은 없었다.\n\n책임도 떠넘길 수 없었다.\n\n---\n\n# 2027년 11월 9일 07:50\n### 원칙이 바로 시험대에 올랐다\n\n아침에 거의 동시에 두 건이 들어왔다.\n\n공공 급수지점 한 곳의 펌프가 멈췄다.\n\n그리고 동쪽 생산거점에서도\n운영펌프 하나가 심한 소음을 내며 정지했다.\n\n행정팀 쪽에서 먼저 연락이 왔다.\n\n“공공급수입니다. 빨리 사람 보내주세요.”\n\n동쪽에서는 정병호가 말했다.\n\n“오늘 오전에 물 못 넣으면\n지금 옮겨놓은 모종 일부가 위험합니다.”\n\n둘 다 급했다.\n\n진우는 ‘공공’이라는 단어부터 보지 않았다.\n\n현황부터 물었다.\n\n---\n\n## 공공 급수지점\n\n저장탱크 잔량은\n배급을 줄이면 저녁까지 버틸 정도였다.\n\n행정팀이 이미 제한배급을 시작했다.\n\n다른 수원에서 물통을 옮길 준비도 됐다.\n\n당장 편하지는 않지만\n**몇 시간 안에 사람이 물을 완전히 잃는 상황은 아니었다.**\n\n---\n\n## 생산거점\n\n반대로 이쪽은\n예비펌프가 이미 다른 곳에서 사용 중이었다.\n\n수동으로 옮길 수 있는 물량에도 한계가 있었다.\n\n태훈이 말했다.\n\n“여긴 오전 넘기면 작물 쪽 피해가 바로 나와.”\n\n진우가 결정했다.\n\n“생산거점 먼저.”\n\n행정팀 담당자가 불편한 목소리로 말했다.\n\n“공공급수보다 농장이 먼저라는 겁니까?”\n\n진우가 대답했다.\n\n“오늘은요.”\n\n“왜죠?”\n\n“당신들은 저녁까지 버틸 물이 있고\n우회수단도 있습니다.”\n\n그리고 덧붙였다.\n\n“저쪽은 지금 몇 시간 놓치면 피해가 확정돼요.”\n\n---\n\n# 결과\n\n태훈과 민규가 생산거점부터 들어갔다.\n\n문제는 베어링 쪽이었다.\n\n예비부품으로 오전 안에 복구했다.\n\n그 뒤 바로 공공 급수지점으로 넘어갔다.\n\n급수지점은 그동안 제한배급과 외부 물통 운반으로 버텼다.\n\n오후에는 펌프를 교체해 정상화했다.\n\n사람이 물을 못 받아 위험해지는 상황도 없었고,\n생산거점의 작물 손실도 크게 막았다.\n\n진우가 원했던 건 바로 이런 구조였다.\n\n**공공을 무시한 것도 아니다.  \n공공이라는 이름 때문에 다른 계약을 무조건 밀어낸 것도 아니다.**\n\n그날의 피해를 보고 순서를 정했다.\n\n---\n\n## 반대로 상황이 바뀌면?\n\n은채가 저녁에 물었다.\n\n“만약 공공급수 쪽 탱크도 비어 있었으면?”\n\n“거기 먼저 갔겠지.”\n\n“생산거점 계약보다?”\n\n“응.”\n\n진우가 말했다.\n\n“계약순서보다 사람이 당장 물을 못 먹는 게 크면.”\n\n그게 길드식 우선순위였다.\n\n**신분도 아니고,\n간판도 아니고,\n돈을 더 냈다는 이유만도 아니다.**\n\n상황을 본다.\n\n---\n\n# 11월 중순 — 예상하지 못한 문제\n\n표준펌프가 알려지면서\n이번에는 다른 문제가 생겼다.\n\n한 남자가 길드 접수대로 펌프 하나를 들고 왔다.\n\n“이거 보증수리 해주세요.”\n\n세린이 물건을 보다가 멈췄다.\n\n옆면에 길드 표식 비슷한 게 있었다.\n\n하지만 수리기록 번호가 없었다.\n\n은채가 장부를 뒤졌다.\n\n없었다.\n\n민규가 열어보더니 바로 말했다.\n\n“이거 우리 물건 아닙니다.”\n\n겉에는 길드 표식을 흉내 냈지만,\n안쪽에는 길드가 쓰지 않는 부품이 들어 있었다.\n\n구매자는 당황했다.\n\n“길드 표준품이라고 샀는데요?”\n\n누군가가\n**길드의 신뢰 자체를 상품에 붙여 팔기 시작한 것**이었다.\n\n길드 PB가 진짜 가치가 생겼다는 증거이기도 했다.\n\n그리고 동시에\n그 이름을 훔쳐 돈을 벌 사람이 생겼다는 뜻이었다.\n\n하영이 물건을 보며 말했다.\n\n“이제 짝퉁까지 나오네.”\n\n진우는 웃지 않았다.\n\n고장 난 펌프 하나의 문제가 아니었다.\n\n이걸 방치하면\n가짜 제품이 사고를 내도\n사람들은 길드를 욕하게 된다.\n\n---\n\n## 다음 큰 판단\n\n**1. 길드 표준품에 고유번호와 수리장부 확인표시를 붙인다.**  \n진품 여부를 누구나 길드 접수대에서 확인할 수 있게 만든다.\n\n**2. 가짜 표식을 붙인 판매자를 찾아 경고하고, 반복하면 길드 시장·중개·수리서비스 이용을 제한한다.**\n\n**3. 1번과 2번을 같이 한다.**  \n진품 확인체계를 먼저 만들고, 사칭 판매자는 추적해 책임을 묻는다.\n\n**4. 아직 판매자를 쫓지 않는다.**  \n먼저 가짜 제품이 몇 개나 돌고 있는지 시장에서 조용히 확인한다.",
+          "sha256": "ba386edf6053df69dd92debbe5b86778a68d9f044abc0b9db6f17a6ce6b51323"
+        },
+        {
+          "block_id": "003",
+          "text": "# 2027년 11월 16일\n### 폐쇄 체육시설 — 길드 접수대\n\n진우는 바로 사람부터 쫓지 않았다.\n\n먼저 **진품 확인체계**를 만들었다.\n\n민규가 얇은 금속표를 잘랐고,\n은채가 번호체계를 정했다.\n\n> 제품군 코드  \n> 개별 연번  \n> 판매·수리 이력은 길드 장부와 연결\n\n겉표식은 참고일 뿐이었다.\n\n누가 비슷한 색을 칠하고,\n금속표를 흉내 내도\n**장부에 번호가 없으면 길드 표준품이 아니다.**\n\n세린이 접수대에 한 줄을 붙였다.\n\n> **길드 표준품은 번호만 보지 말고 길드 장부 확인 가능 여부를 확인하십시오.**\n\n구매자가 종이를 잃어도 상관없었다.\n\n번호만 가져오면\n길드에서 판매기록과 수리이력을 확인할 수 있었다.\n\n---\n\n## 첫 가짜의 정체\n\n처음 들어온 가짜 펌프의 번호는\n\n**A-07**\n\n이었다.\n\n은채가 장부를 펼치자 바로 문제가 나왔다.\n\n진짜 A-07은 이미 동쪽 생산거점에 설치돼 있었다.\n\n같은 번호가 두 개일 수 없었다.\n\n민규가 말했다.\n\n“그냥 비슷하게 만든 게 아니라 번호까지 베꼈네.”\n\n이건 우연으로 보기 어려웠다.\n\n---\n\n# 11월 17일 ~ 18일\n### 조용한 확인\n\n하영이 시장 쪽에서 말을 돌렸다.\n\n“길드 표준펌프 산 사람 중에 장부 확인 안 한 사람 있어?”\n\n대놓고 범인을 찾지는 않았다.\n\n최광석도 자기 손님들 이야기를 몇 군데 확인했다.\n\n그가 도와준 이유도 착해서가 아니었다.\n\n“짝퉁이 돌아다니면 우리 장사까지 다 의심받습니다.”\n\n자기 이해관계였다.\n\n그게 더 현실적이었다.\n\n이틀 만에 비슷한 물건이 네 대까지 확인됐다.\n\n공통점이 있었다.\n\n모두 이동상인 **황대식**을 거쳤다.\n\n---\n\n## 황대식\n\n대식은 처음부터 인정하지 않았다.\n\n“내가 언제 길드에서 만든 거라고 했습니까?”\n\n진우가 가짜 펌프를 책상에 올렸다.\n\n“이 표식은요?”\n\n“비슷하게 정비했다는 표시죠.”\n\n“번호는?”\n\n“그건 내가 편하게 붙인 겁니다.”\n\n은채가 장부를 펼쳤다.\n\n“A-07은 이미 다른 곳에 있는 길드 물건이에요.”\n\n대식이 잠깐 입을 다물었다.\n\n진우가 말했다.\n\n“우연히 같은 번호를 붙인 겁니까?”\n\n“그럴 수도 있죠.”\n\n이번엔 구매자 두 명이 직접 나왔다.\n\n한 사람은 분명히 기억했다.\n\n“길드 표준품이랑 같은 거라고 했잖아요.”\n\n다른 사람도 비슷했다.\n\n“길드에서 고치는 규격이라 문제 없다고 했고.”\n\n대식은 말을 바꿨다.\n\n“같은 규격이라고 했지,\n길드가 보증한다고는 안 했습니다.”\n\n완전히 멍청한 사람은 아니었다.\n\n선을 애매하게 타고 있었다.\n\n---\n\n## 진우가 내린 판단\n\n진우는 대식 물건을 빼앗지 않았다.\n\n길드가 경찰도 아니고,\n밖에서 장사하는 것까지 막을 권리도 없었다.\n\n대신 길드가 통제할 수 있는 것만 건드렸다.\n\n“밖에서 장사하는 건 마음대로 하세요.”\n\n대식이 쳐다봤다.\n\n“대신 길드 이름이랑 표식 비슷한 걸 써서 판 건 정리해야 합니다.”\n\n조건은 세 가지였다.\n\n**1. 확인된 네 건에 대해 구매자와 직접 정산한다.**  \n환불이든 가격조정이든 당사자끼리 합의한다.\n\n**2. 길드 표식을 흉내 낸 표시는 전부 제거한다.**\n\n**3. 정리될 때까지 길드 시장·중개·에스크로·수리서비스 이용을 제한한다.**\n\n대식이 목소리를 높였다.\n\n“길드가 무슨 자격으로 내 장사를 막습니까?”\n\n진우가 대답했다.\n\n“밖에서 하는 장사는 안 막습니다.”\n\n그리고 접수대를 가리켰다.\n\n“우리 서비스 이용을 안 받겠다는 겁니다.”\n\n그건 달랐다.\n\n길드가 가진 권한 안에서만 제재했다.\n\n---\n\n# 11월 20일\n\n대식은 결국 계산했다.\n\n길드와 완전히 틀어져\n시장 접근,\n수리,\n중개,\n에스크로를 다 못 쓰는 손해가\n\n가짜 네 대에서 더 남길 이익보다 컸다.\n\n두 건은 환불.\n\n한 건은 큰 폭으로 가격을 깎고 구매자가 그대로 사용.\n\n한 건은 물건을 회수했다.\n\n대식은 끝까지 미안하다는 말을 길게 하지는 않았다.\n\n“다시는 길드표식 안 씁니다.”\n\n진우도 훈계하지 않았다.\n\n“그럼 끝입니다.”\n\n사이다는 거창한 처벌이 아니었다.\n\n**길드 신뢰를 빌려 돈 벌려던 사람이,\n그 신뢰망에서 빠지는 비용을 직접 계산하게 된 것.**\n\n그걸로 충분했다.\n\n---\n\n# 진품 확인체계\n\n그 뒤부터 표준품은 세 가지가 맞아야 했다.\n\n**제품 번호.**\n\n**길드 판매·수리 장부 기록.**\n\n**현재 보증·수리 상태.**\n\n표식 하나만으로는 아무 의미가 없었다.\n\n누군가 번호를 복제해도\n장부를 확인하면 바로 걸린다.\n\n그리고 구매자들도 배우기 시작했다.\n\n“번호만 보지 말고 길드에 한번 물어봐.”\n\n길드 브랜드가\n단순한 도장이 아니라\n**기록과 사후서비스까지 포함한 체계**가 됐다.\n\n---\n\n# 2027년 11월 22일 18:10\n### 관리동\n\n가짜 문제는 정리됐다.\n\n그날 저녁,\n하영이 북쪽에서 넘어온 쪽지를 하나 내려놨다.\n\n보낸 곳은 **북쪽 연료장 생활권**이었다.\n\n겨울 전,\n운송 가능한 집단과 거래거점을 불러\n한 번 모이겠다는 내용이었다.\n\n핵심은 두 가지였다.\n\n**이번 겨울에 실제로 풀 수 있는 연료량.**\n\n그리고\n\n**누가 그 연료를 어디까지 운반할 수 있는가.**\n\n길드 이름도 들어 있었다.\n\n하영이 말했다.\n\n“이번엔 물건 하나 사는 얘기가 아닌데.”\n\n은채가 쪽지를 읽었다.\n\n서쪽길 관리조.\n\n동쪽 생산거점.\n\n공공 급수지점.\n\n길드 물류.\n\n겨울철 연료가 줄면\n전부 영향을 받는다.\n\n진우가 물었다.\n\n“우리가 가면 뭘 원하는데?”\n\n“아직 정확히 안 써놨어.”\n\n하영이 말했다.\n\n“근데 느낌은 알겠어.”\n\n“뭔데?”\n\n“이제 길드를 그냥 손님으로 안 보는 거지.”\n\n길드는 어느새\n\n**사람과 물자가 모이는 시장,  \n도로와 연결된 물류거점,  \n수리와 표준장비를 가진 조직**\n\n이 되어 있었다.\n\n북쪽 연료장 입장에서는\n연료 몇 통을 팔 상대가 아니라,\n\n**지역에 연료를 실제로 흘려보낼 수 있는 축 중 하나**가 된 것이다.\n\n시즌3의 이야기가 다시 커지고 있었다.\n\n---\n\n## 다음 큰 판단\n\n**1. 회의에는 참석한다.**  \n단, 길드가 지역 전체의 연료배분 책임을 맡겠다는 약속은 하지 않는다.\n\n**2. 하영만 먼저 보내 조건과 참석자부터 파악한다.**  \n진우는 요구사항이 명확해진 뒤 움직인다.\n\n**3. 길드는 필요한 연료만 구매한다.**  \n지역 배분이나 운송조정에는 들어가지 않는다.\n\n**4. 참석하되, 길드가 얻을 수 있는 실질적 이익부터 계산한다.**  \n연료 우선구매권, 운송수수료, 보관·중개수익 같은 조건 없이는 지역 역할을 맡지 않는다.",
+          "sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b"
+        },
+        {
+          "block_id": "005",
+          "text": "# AFTERFALL — SEASON 3 FINALE\n## 2027년 11월 22일 22:40\n### 폐쇄 직업훈련원 — 핵심 4인 생활거점\n\n하루가 끝난 뒤였다.\n\n체육시설 쪽 시장은 이미 문을 닫았고,\n마지막 차량도 빠져나갔다.\n\n오세린은 접수장부를 넘겼고,\n박동철은 뒤편 창고 문을 확인했다.\n\n민규가 맡은 수리품 몇 개는 다음 작업일로 넘어갔다.\n\n동쪽 집하장에는 길드 표준펌프의 공동예비품이 놓여 있었다.\n\n서쪽길은 장마 이후에도\n관리조가 자기 구역을 관리하고 있었다.\n\n공공 급수지점은 행정 잔존팀이 운영했다.\n\n길드는 그 모든 걸 소유하지 않았다.\n\n그럴 필요도 없었다.\n\n---\n\n거실 테이블에는 네 사람이 앉아 있었다.\n\n서진우.\n\n윤서진.\n\n최은채.\n\n장태훈.\n\n예전에는 하루가 끝나면\n내일 먹을 것,\n물이 얼지 않을지,\n전기가 살아 있을지부터 확인했다.\n\n지금도 그런 문제는 사라지지 않았다.\n\n다만 이제는\n그 문제를 다루는 방식이 달라졌다.\n\n은채가 장부 하나를 덮었다.\n\n“오늘 정산 끝.”\n\n태훈이 난로 옆에 앉으며 말했다.\n\n“내일 아침엔 체육시설 배수 한 번만 보면 돼.”\n\n서진은 조용히 물을 마시다가 물었다.\n\n“이렇게 아무 일 없이 끝나는 날도 생기네.”\n\n진우가 웃었다.\n\n“생겼지.”\n\n---\n\n## 길드\n\n처음에는 의뢰 몇 건을 이어주는 장소였다.\n\n사람이 찾아오면\n진우와 핵심 인원들이 직접 뛰어야 했다.\n\n이제는 달랐다.\n\n직원이 접수를 받고,\n\n창고가 돌아가고,\n\n수리품이 들어오고,\n\n숙박 두 자리가 예약되고,\n\n에스크로 거래가 기록되고,\n\n외부 상인은 길드 밖에서 자기 장사를 했다.\n\n길드는 모든 일을 하지 않았다.\n\n**해야 할 일과 하지 않을 일을 구분하기 시작했다.**\n\n그게 가장 큰 변화였다.\n\n---\n\n## 자유시장\n\n진우는 주변 상권을 전부 삼키지 않았다.\n\n길드가 실제 권리를 가진 곳만 통제했다.\n\n다른 사람은 자기 자리에서\n식당을 열고,\n잠자리를 팔고,\n물건을 사고팔았다.\n\n경쟁자가 생겼다.\n\n계산 빠른 사람도 생겼고,\n\n길드 수요를 미리 읽고 물건을 사모았다가\n손해를 본 사람도 있었다.\n\n길드 표식을 베껴\n신뢰를 훔쳐 팔려는 사람도 나왔다.\n\n사람들은 착하기만 하지 않았다.\n\n그렇다고 모두 적도 아니었다.\n\n각자 자기 몫을 계산하면서\n필요할 때 협력했다.\n\n진우가 살아가게 될 세계는\n점점 그런 곳이 되어갔다.\n\n---\n\n## 길드 표준품\n\n고장 난 펌프를 싸게 사서\n\n검수하고,\n\n수리하고,\n\n규격을 줄이고,\n\n기록을 붙이고,\n\n길드 이름으로 다시 팔았다.\n\n완제품을 비싸게 사들여\n가격을 올려 파는 사업이 아니었다.\n\n**길드가 가치를 만들었다.**\n\n그리고 그 힘은\n펌프 몇 대를 파는 데서 끝나지 않았다.\n\n동쪽의 세 생산거점이\n같은 규격을 사용하기 시작했다.\n\n예비품과 부품을 공유했고,\n\n수리기록이 길드에 쌓였다.\n\n길드는 상품을 팔면서\n지역 생산기반이 어떻게 돌아가는지까지 알게 됐다.\n\n작은 사업 하나가\n지역의 연결망이 됐다.\n\n---\n\n## 길드가 가지 않은 길도 있었다\n\n등록상인 제도는 열지 않았다.\n\n정보관리 인력과 체계가 부족했다.\n\n위험물 사업도 열지 않았다.\n\n부지는 확보했지만\n필요해질 때까지 그대로 뒀다.\n\n더 먼 동쪽으로도\n계속 밀고 나가지 않았다.\n\n돈이 될 만한 일이 보여도\n모두 잡지 않았다.\n\n진우는 길드를 크게 만드는 것보다\n\n**무너지지 않게 만드는 쪽을 먼저 택했다.**\n\n그래서 오히려 조금씩 커졌다.\n\n---\n\n### 은채가 테이블 한쪽의 종이를 집었다.\n\n“이건?”\n\n북쪽 연료장에서 온 쪽지였다.\n\n겨울 전 연료량.\n\n운송능력.\n\n지역 거점들의 참석 요청.\n\n아직 답하지 않은 초청장.\n\n태훈이 읽어보더니 말했다.\n\n“가면 또 일 커질 것 같은데.”\n\n서진이 웃었다.\n\n“안 가도 커질 것 같은데.”\n\n진우는 종이를 받아 들었다.\n\n작년 겨울이었다면\n연료를 조금이라도 확보하기 위해\n누군가에게 부탁하러 갔을지도 모른다.\n\n지금은 반대였다.\n\n북쪽에서 먼저\n길드를 불렀다.\n\n길드가 가진 연료 때문이 아니었다.\n\n길드가 가진\n\n시장,\n\n창고,\n\n도로연결,\n\n수리능력,\n\n거래망,\n\n사람,\n\n그리고 신뢰.\n\n그것들이 필요했기 때문이었다.\n\n진우는 초청장을 접어 테이블 위에 다시 내려놓았다.\n\n“오늘은 여기까지 하자.”\n\n누구도 반대하지 않았다.\n\n---\n\n# SEASON 3 — GUILD\n\n봄에는\n사람이 모일 장소를 만들었다.\n\n여름에는\n그 장소가 돈을 벌기 시작했다.\n\n가을에는\n사람들이 길드를 기준으로 움직이기 시작했다.\n\n그리고 다시 겨울이 오기 직전,\n\n다른 지역의 세력들이\n서진우에게 먼저 자리를 내어주기 시작했다.\n\n창밖에서는 차가운 바람이 불었다.\n\n테이블 한가운데에는\n북쪽 연료장의 초청장이 놓여 있었다.\n\n진우는 아직 답하지 않았다.\n\n그 답은 다음 겨울의 일이었다.\n\n---\n\n# **S03 COMPLETE**\n\n### 다음 시즌 훅\n**북쪽 연료장 — 겨울 전 지역 연료·운송 회의**\n\n길드는 참석 여부도,\n조건도,\n역할도 아직 결정하지 않았다.\n\n**이번 겨울은, 지난겨울과는 달랐다.**",
+          "sha256": "b78ffe1b4cadbdd8680113147791ccddcd8921c69dd23ded4468390aad188c1a"
+        }
+      ]
+    },
+    "graph_sha256": "4eae33f49195300c4b538c05eb02c3a91638b2f648af1d4e4d0e84fb0f87303e",
+    "graph_anchor": {
+      "game_time": "2027-11-22 22:40",
+      "save_version": 285
+    },
+    "existing_nodes": [
+      {
+        "id": "char-cheolsu",
+        "data": {
+          "id": "char-cheolsu",
+          "label": "배철수",
+          "meta": {
+            "상태": "ACTIVE"
+          },
+          "source": "Supabase survival_rpg.characters / PERSISTENT_CANON.md",
+          "subtitle": "폐시설·창고 수거·교환자",
+          "summary": "외곽 폐시설·창고·도로 정보를 가진 이동형 수거·교환자. 박재민과 함께 움직이며 부품·물류 정보 가치가 높다.",
+          "tags": [
+            "RECURRING",
+            "거래",
+            "물류",
+            "외곽"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-doyoon",
+        "data": {
+          "id": "char-doyoon",
+          "label": "김도윤",
+          "meta": {
+            "상태": "ACTIVE"
+          },
+          "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+          "subtitle": "실증단지 시설직",
+          "summary": "실증단지의 현장 실무자. 생활공간·경계 부담과 개인 소유권이 흐려지지 않는 협력을 중시한다.",
+          "tags": [
+            "RECURRING",
+            "시설",
+            "실증단지"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-eunchae",
+        "data": {
+          "id": "char-eunchae",
+          "label": "최은채",
+          "meta": {
+            "겨울역할": "물류·기록 지원",
+            "상태": "ACTIVE"
+          },
+          "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+          "subtitle": "병원 행정직 출신 · 물류·기록",
+          "summary": "핵심 4인의 물류·기록·접근권·관계 경계 담당. 위치 비밀 유지와 재고·규칙의 구분을 중요하게 다룬다.",
+          "tags": [
+            "CORE",
+            "핵심 4인",
+            "물류",
+            "기록"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-hajin",
+        "data": {
+          "id": "char-hajin",
+          "label": "문하진",
+          "meta": {
+            "상태": "ACTIVE"
+          },
+          "source": "Supabase survival_rpg.characters / PERSISTENT_CANON.md",
+          "subtitle": "잔존 행정·급수·시설 실무자",
+          "summary": "북서권 지방행정 잔존 대응팀의 시설·급수 실무자. 공공수원 복구와 제한적 연락망을 유지한다.",
+          "tags": [
+            "RECURRING",
+            "행정",
+            "급수",
+            "공공시설"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-hayoung",
+        "data": {
+          "id": "char-hayoung",
+          "label": "신하영",
+          "meta": {
+            "별칭": "이소라",
+            "상태": "ACTIVE",
+            "연합원": "아님"
+          },
+          "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+          "subtitle": "조리·위생·단체생활 전문가",
+          "summary": "백운생활관을 자발적으로 이탈해 공개 생활망에서 자립 중. 현재 겨울편에서 음식·조리·위생·생활연료 절약을 주도한다. 과거 기록의 이소라는 동일 인물 alias다.",
+          "tags": [
+            "MAJOR",
+            "겨울편 주도",
+            "조리",
+            "위생",
+            "TRUSTED_EXTERNAL"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-hyerin",
+        "data": {
+          "id": "char-hyerin",
+          "label": "강혜린",
+          "meta": {
+            "거점": "북쪽 외곽 의원",
+            "상태": "ACTIVE"
+          },
+          "source": "Supabase survival_rpg.characters / PERSISTENT_CANON.md",
+          "subtitle": "북쪽 외곽 의원 의료인",
+          "summary": "소형 의원의 핵심 의료인. 환자 상태를 우선하는 제한 의료질서를 유지하며 진우와 의료·정보 연락선을 만들었다.",
+          "tags": [
+            "MAJOR",
+            "의료",
+            "북쪽 의원"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-jaemin",
+        "data": {
+          "id": "char-jaemin",
+          "label": "박재민",
+          "meta": {
+            "상태": "ACTIVE"
+          },
+          "source": "Supabase survival_rpg.characters / PERSISTENT_CANON.md",
+          "subtitle": "수거·운반자",
+          "summary": "배철수와 함께 외곽을 돌며 수거·운반을 담당한다. 과거 손 부상 치료를 계기로 진우와 후속 관계가 생겼다.",
+          "tags": [
+            "RECURRING",
+            "운반",
+            "외곽"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-jinwoo",
+        "data": {
+          "id": "char-jinwoo",
+          "label": "서진우",
+          "meta": {
+            "상태": "ACTIVE",
+            "소속": "CORE_FOUR"
+          },
+          "source": "Supabase survival_rpg.characters / CURRENT_STATE.json",
+          "subtitle": "응급실 간호사 · 플레이어",
+          "summary": "핵심 4인의 한 축. 외부정찰·응급의료·정보·거점 연결을 담당하며 자동 지휘관이나 지역대표로 취급하지 않는다.",
+          "tags": [
+            "PLAYER",
+            "핵심 4인",
+            "응급의료",
+            "외부정찰"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-jisu",
+        "data": {
+          "id": "char-jisu",
+          "label": "한지수",
+          "meta": {
+            "상태": "ACTIVE"
+          },
+          "source": "Supabase survival_rpg.characters / PERSISTENT_CANON.md",
+          "subtitle": "동천교 관리조 실무 접점",
+          "summary": "동천교의 통행질서와 긴급의료 면제를 실제로 운영하는 현장 접점. 진우와 응급상황을 함께 처리한 경험이 있다.",
+          "tags": [
+            "RECURRING",
+            "동천교",
+            "통행",
+            "응급우선"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-jo-hansu",
+        "data": {
+          "id": "char-jo-hansu",
+          "label": "조한수",
+          "meta": {
+            "역할": "관리조 장부 담당"
+          },
+          "source": "S03 SESSION_005 GM 공개 블록 001, 003, 005",
+          "subtitle": "서쪽길 관리조 장부 담당",
+          "summary": "서쪽길 관리조에서 장부를 맡는다. 2027년 7월 긴급보강 예상표와 비용 항목을 설명하고 실제 투입분과 예비분을 구분하는 논의에 참여했다.",
+          "tags": [
+            "S03",
+            "인물",
+            "서쪽길 관리조"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-07-12 17:30",
+          "save_version": 274
+        }
+      },
+      {
+        "id": "char-kyunghee",
+        "data": {
+          "id": "char-kyunghee",
+          "label": "최경희",
+          "meta": {
+            "거점": "산림교육원",
+            "상태": "ACTIVE"
+          },
+          "source": "Supabase survival_rpg.characters / PERSISTENT_CANON.md",
+          "subtitle": "산림교육원 대외거래 접점",
+          "summary": "산림교육원 생활권의 경계를 지키면서 필요한 거래와 의료접점을 연다. 교육원 무단진입에는 명확한 선을 긋는다.",
+          "tags": [
+            "MAJOR",
+            "거래",
+            "경계",
+            "산림교육원"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-mingyu",
+        "data": {
+          "id": "char-mingyu",
+          "label": "정민규",
+          "meta": {
+            "거점출입": "없음",
+            "상태": "ACTIVE"
+          },
+          "source": "Supabase survival_rpg.characters / PERSISTENT_CANON.md",
+          "subtitle": "외부 전기·시설 기술자",
+          "summary": "백운생활관 이탈 후 검증을 거쳐 외부 시설·전기 협력자로 승인됐다. 거점 출입권은 없고 작업 전 대가·회수품·위험범위를 합의한다.",
+          "tags": [
+            "MAJOR",
+            "전기",
+            "시설",
+            "외부협력"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-minho",
+        "data": {
+          "id": "char-minho",
+          "label": "박민호",
+          "meta": {
+            "관계": "신뢰 높은 외부협력자",
+            "상태": "ACTIVE"
+          },
+          "source": "Supabase survival_rpg.characters / PERSISTENT_CANON.md",
+          "subtitle": "119 응급구조사 · 이동형 외부협력자",
+          "summary": "흩어진 현장과 사람을 연결하는 이동형 정보·응급 축. 북서2동 폐업 세차장을 정기 접촉지로 사용한다.",
+          "tags": [
+            "MAJOR",
+            "119",
+            "응급",
+            "정보망"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-mira",
+        "data": {
+          "id": "char-mira",
+          "label": "한미라",
+          "meta": {
+            "거점": "북유성 농업기술 실증단지",
+            "상태": "ACTIVE"
+          },
+          "source": "Supabase survival_rpg.characters / PERSISTENT_CANON.md",
+          "subtitle": "농업연구원 · 실증단지 생산축",
+          "summary": "북유성 농업기술 실증단지의 농업·생산 판단 핵심. 관정·종자·생산시설의 장기가치와 독립 운영을 지킨다.",
+          "tags": [
+            "MAJOR",
+            "농업",
+            "생산",
+            "실증단지"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-sehoon",
+        "data": {
+          "id": "char-sehoon",
+          "label": "오세훈",
+          "meta": {
+            "상태": "ACTIVE"
+          },
+          "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+          "subtitle": "실증단지 시설직",
+          "summary": "북유성 농업기술 실증단지 시설직. 모르는 것은 모른다고 말하는 신중한 기술축으로 연합 논의에 참여한다.",
+          "tags": [
+            "RECURRING",
+            "시설",
+            "실증단지"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-seojin",
+        "data": {
+          "id": "char-seojin",
+          "label": "윤서진",
+          "meta": {
+            "겨울역할": "의료·건강 지원",
+            "상태": "ACTIVE"
+          },
+          "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+          "subtitle": "응급의학과 전공의",
+          "summary": "핵심 4인의 의료 판단과 건강관리 축. 중증환자 인계 후 북서 실습센터에 합류했고 겨울편에서는 의료·건강 지원을 맡는다.",
+          "tags": [
+            "CORE",
+            "핵심 4인",
+            "의료"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-seongho",
+        "data": {
+          "id": "char-seongho",
+          "label": "김성호",
+          "meta": {
+            "상태": "ACTIVE"
+          },
+          "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+          "subtitle": "서쪽길 관리조 접점",
+          "summary": "실제 도로정비를 수행하는 관리조의 접점. 통행 기여의 정당성과 사설권력화 사이의 경계가 핵심 관찰 포인트다.",
+          "tags": [
+            "MAJOR",
+            "도로",
+            "서쪽길",
+            "관리조"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-taehoon",
+        "data": {
+          "id": "char-taehoon",
+          "label": "장태훈",
+          "meta": {
+            "겨울역할": "설비·난방·급수 지원",
+            "상태": "ACTIVE"
+          },
+          "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+          "subtitle": "시설운영 기술자",
+          "summary": "핵심 4인의 발전기·급수·난방·설비·부품·수리 담당. 실증단지 관정 계통에도 실제 기술지원을 제공했다.",
+          "tags": [
+            "CORE",
+            "핵심 4인",
+            "시설",
+            "난방",
+            "급수"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "char-wiki-14b41bbae77f8558c571d384",
+        "data": {
+          "id": "char-wiki-14b41bbae77f8558c571d384",
+          "label": "한재욱",
+          "source": "S03 SESSION_006 GM 공개 블록 003",
+          "subtitle": "이동상인",
+          "summary": "말린 곡물을 판 이동상인으로 길드 밖 직접거래 분쟁의 당사자였다. 길드는 그에게 길드 이름을 거래 신용처럼 끌어다 쓰지 말라고 선을 그었다.",
+          "tags": [
+            "S03",
+            "인물",
+            "상인"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "char-wiki-322a5a52d57198d4a6f25429",
+        "data": {
+          "id": "char-wiki-322a5a52d57198d4a6f25429",
+          "label": "임관수",
+          "source": "S03 SESSION_006 GM 공개 블록 001",
+          "subtitle": "남쪽 차량야드 현장 관리자",
+          "summary": "남쪽 차량야드를 오래 관리해온 현장 관리자다. 누나 임지연과 권리구조가 연결되어 있어 혼자 장기계약을 확정하는 구조는 아니었다.",
+          "tags": [
+            "S03",
+            "인물",
+            "남쪽 차량야드"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+        "data": {
+          "id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+          "label": "오세린",
+          "source": "S03 SESSION_006 GM 공개 블록 003, 005",
+          "subtitle": "길드 접수·관리 실무자",
+          "summary": "길드 접수와 관리동 논의에 참여하며 거래 책임범위를 안내하고 등록상인·에스크로·보증거래의 차이를 정리하는 실무 접점이다.",
+          "tags": [
+            "S03",
+            "인물",
+            "길드"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "char-wiki-8499006fbd51eb7a8c88ab1f",
+        "data": {
+          "id": "char-wiki-8499006fbd51eb7a8c88ab1f",
+          "label": "이원혁",
+          "source": "S03 SESSION_006 GM 공개 블록 009, 013",
+          "subtitle": "외부 장비 상인",
+          "summary": "인버터와 소형 펌프를 취급한 외부 상인이다. 길드의 표준펌프 사업을 예상해 펌프를 선매입했지만 길드가 매입상한을 따라 올리지 않아, 지정 규격과 수리조건을 통과한 일부만 기존 제시가로 매각했다.",
+          "tags": [
+            "S03",
+            "인물",
+            "상인",
+            "장비"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "char-wiki-97e31f6fd22a6841eb7def52",
+        "data": {
+          "id": "char-wiki-97e31f6fd22a6841eb7def52",
+          "label": "임지연",
+          "source": "S03 SESSION_006 GM 공개 블록 001",
+          "subtitle": "남쪽 차량야드 공동권리자",
+          "summary": "임관수의 누나이자 남쪽 차량야드의 공동권리자다. 길드의 12개월 차량 통행·회차 사용권 합의 당사자로 참여했다.",
+          "tags": [
+            "S03",
+            "인물",
+            "남쪽 차량야드"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "char-wiki-9cb69d0dc08460c215904370",
+        "data": {
+          "id": "char-wiki-9cb69d0dc08460c215904370",
+          "label": "정병호",
+          "source": "S03 SESSION_007 GM 공개 블록 003",
+          "subtitle": "언덕 아래 옛 축사 재배지 거점 대표",
+          "summary": "언덕 아래 옛 축사 재배지의 대표로 길드의 급수설비 표준화 협의에 참여했다.",
+          "tags": [
+            "S03",
+            "인물",
+            "생산거점"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "char-wiki-b862f3d27582267fb5da3320",
+        "data": {
+          "id": "char-wiki-b862f3d27582267fb5da3320",
+          "label": "황대식",
+          "source": "S03 SESSION_008 GM 공개 블록 003",
+          "subtitle": "길드 표준품을 사칭한 이동상인",
+          "summary": "길드 표식과 번호를 흉내 낸 펌프 네 대의 판매망에서 확인된 이동상인이다. 확인된 거래를 정산하고 가짜 표식을 제거할 때까지 길드 시장·중개·에스크로·수리서비스 이용 제한을 받았다.",
+          "tags": [
+            "S03",
+            "인물",
+            "상인",
+            "사칭"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "char-wiki-cc15e0b3875ce0e734646be4",
+        "data": {
+          "id": "char-wiki-cc15e0b3875ce0e734646be4",
+          "label": "최광석",
+          "source": "S03 SESSION_006 GM 공개 블록 001, 003",
+          "subtitle": "길드 주변 시장의 기존 상인",
+          "summary": "길드 주변에서 계속 장사해온 상인이다. 남쪽 차량야드의 남는 일부를 잡아 숙박 손님 차량과 손수레 공간으로 사용했고, 자신의 거래이력을 외부 손님이 확인할 수 있는 표시를 원했다.",
+          "tags": [
+            "S03",
+            "인물",
+            "상인"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "char-yujin",
+        "data": {
+          "id": "char-yujin",
+          "label": "최유진",
+          "meta": {
+            "상태": "ACTIVE",
+            "연합원": "아님"
+          },
+          "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+          "subtitle": "세탁·침구·생활물자 전문가",
+          "summary": "신하영과 함께 백운생활관을 떠나 공개 접점에서 자립 중. 겨울편에서 침구·세탁·수면공간·생활물자·일상 유지를 주도한다.",
+          "tags": [
+            "MAJOR",
+            "겨울편 주도",
+            "세탁",
+            "침구",
+            "TRUSTED_EXTERNAL"
+          ],
+          "type": "character"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "event-fireline",
+        "data": {
+          "id": "event-fireline",
+          "label": "서쪽 대형화재 방어선",
+          "source": "Supabase scene S02_FIRELINE_HOLD",
+          "subtitle": "2026-11-22 ~ 11-23",
+          "summary": "대형화재는 제한됐고 핵심 거점은 유지됐다. 준비가 피해를 줄였지만 실증단지 외곽 온실 1구간과 관수라인 일부 손실이 남았다.",
+          "tags": [
+            "S02",
+            "화재",
+            "거점손실"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "event-guild-warehouse-option",
+        "data": {
+          "id": "event-guild-warehouse-option",
+          "label": "뒤편 창고 사용 합의",
+          "source": "S03 turn 20 GM, message order 49; APPLIED state link save 258",
+          "subtitle": "2027년 4월 10–11일",
+          "summary": "진우와 배종필은 창고의 6개월 독점사용과 첫 60일의 우선매입 조건에 합의했다. 계약 후 보관품 일부가 뒤편 창고로 옮겨졌다.",
+          "tags": [
+            "S03",
+            "보관업",
+            "계약"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-04-11 17:20",
+          "save_version": 258
+        }
+      },
+      {
+        "id": "event-network-decay",
+        "data": {
+          "id": "event-network-decay",
+          "label": "외부 생활망 약화 징후",
+          "source": "Supabase scene S02_LIVING_NETWORK_PATTERN_RECOGNITION",
+          "subtitle": "2026-12-10 17:40",
+          "summary": "두 거점 내부는 비교적 안정적이지만 외부 생활세계의 이동·교환·정보·회복 능력이 서서히 약화되고 있다는 관찰이 쌓였다.",
+          "tags": [
+            "S02",
+            "겨울",
+            "생활망",
+            "고립"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "event-s02-finale",
+        "data": {
+          "id": "event-s02-finale",
+          "label": "봄 전환과 동천교 외곽 신호",
+          "source": "S02 END_CHECKPOINT_2027-03-23.md / S02 RAW transcript",
+          "subtitle": "2027-03-23 17:50",
+          "summary": "대혹한 뒤 이동과 교환의 압박이 이어지는 가운데, 동천교 외곽에서 정체가 확정되지 않은 차량 행렬이 관측됐다. 의도와 후속 관계는 미결 상태다.",
+          "tags": [
+            "S02",
+            "봄전환",
+            "동천교",
+            "미결"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "event-shelter",
+        "data": {
+          "id": "event-shelter",
+          "label": "두 번째 공공대피시설 가동",
+          "source": "Supabase scene S02_SECOND_SHELTER",
+          "subtitle": "2026-11-23 13:08 ~ 17:34",
+          "summary": "공개 대피시설이 가동됐고 신하영·최유진이 연합원이 아닌 신뢰 가능한 생활운영 접점으로 자리잡았다.",
+          "tags": [
+            "S02",
+            "대피시설",
+            "생활망"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "event-west-road-rain-response",
+        "data": {
+          "id": "event-west-road-rain-response",
+          "label": "서쪽길 긴급복구와 공동 장마계획",
+          "meta": {
+            "기준시각": "2027-07-05 09:00"
+          },
+          "source": "S03 SESSION_005 GM 공개 블록 001, 003, 005",
+          "subtitle": "2027년 7월 5일",
+          "summary": "도로 침하 대응에서 임시 흙 보강만으로는 반복을 막기 어렵다고 판단했다. 양측은 위험구간 공동 표시, 큰 차량의 우회·대기, 가용 자재 등록, 긴급공사 비용의 사건별 계산을 포함한 장마철 공동계획을 세웠다.",
+          "tags": [
+            "S03",
+            "서쪽길",
+            "긴급복구",
+            "장마계획"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-07-12 17:30",
+          "save_version": 274
+        }
+      },
+      {
+        "id": "event-west-road-trial-agreement",
+        "data": {
+          "id": "event-west-road-trial-agreement",
+          "label": "서쪽길 6주 시험협정",
+          "meta": {
+            "기준시각": "2027-06-22 11:00"
+          },
+          "source": "S03 SESSION_005 GM 공개 블록 001, 003, 005",
+          "subtitle": "2027년 6월 22일",
+          "summary": "장마철 전 6주 시험협정을 맺었다. 길드 부담은 실제 통행부담을 기준으로 정하고 관리조 노동을 비용에 포함했으며, 도로 관리권과 통행 통제권은 길드로 넘기지 않았다.",
+          "tags": [
+            "S03",
+            "서쪽길",
+            "시험협정"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-07-12 17:30",
+          "save_version": 274
+        }
+      },
+      {
+        "id": "event-wide-area",
+        "data": {
+          "id": "event-wide-area",
+          "label": "광역 이상 교차확인",
+          "source": "Supabase scene S02_WIDE_AREA_LISTENING",
+          "subtitle": "2026-11-23 19:18 ~ 11-24 07:52",
+          "summary": "대전 밖 여러 권역에서 전력·무선·위성항법 이상이 교차확인됐다. 단기 완전복구를 전제로 하지 않기로 했다.",
+          "tags": [
+            "S02",
+            "전력",
+            "통신",
+            "광역이상"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "event-wiki-111fe570a078504a9c47714f",
+        "data": {
+          "id": "event-wiki-111fe570a078504a9c47714f",
+          "label": "길드 직매입·검수·재판매 사업 재정의",
+          "source": "S03 SESSION_006 GM 공개 블록 007, 011",
+          "subtitle": "2027년 8월 5일",
+          "summary": "등록상인은 보류하고 에스크로는 유지하며, 보증거래는 폐기해 길드가 물건을 직접 매입·검수·수리·재판매하는 모델로 재정의했다. 길드는 검사·수리·지속수요 기준을 충족하는 물건만 사고 기준 밖이면 매입하지 않는 원칙을 세웠다.",
+          "tags": [
+            "S03",
+            "길드",
+            "직매입",
+            "표준품"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "event-wiki-281823f8f1b6fb2c770b1925",
+        "data": {
+          "id": "event-wiki-281823f8f1b6fb2c770b1925",
+          "label": "황대식 가짜 표준펌프 사칭 사건",
+          "source": "S03 SESSION_008 GM 공개 블록 003",
+          "subtitle": "2027년 11월 17–20일",
+          "summary": "길드 표식을 흉내 낸 비정품 펌프 네 대가 황대식 판매망에서 확인됐다. 길드는 외부 장사를 몰수하거나 금지하지 않고 피해거래 정산, 가짜 표식 제거, 길드 서비스 이용 제한으로 대응했고 확인된 네 건은 환불 2건, 가격조정 1건, 회수 1건으로 정리됐다.",
+          "tags": [
+            "S03",
+            "표준품",
+            "사칭",
+            "시장분쟁",
+            "길드"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "event-wiki-37bff157632c4ca2e1e99420",
+        "data": {
+          "id": "event-wiki-37bff157632c4ca2e1e99420",
+          "label": "한재욱 곡물 직접거래 분쟁",
+          "source": "S03 SESSION_006 GM 공개 블록 003",
+          "subtitle": "2027년 7월 24일",
+          "summary": "길드 밖 직접거래한 곡물에서 문제가 생겼지만 에스크로·중개·검수가 없어 길드는 배상하지 않았다. 길드는 한재욱에게 길드 이름을 거래 신용처럼 끌어다 쓰지 말라고 선을 그었다.",
+          "tags": [
+            "S03",
+            "분쟁",
+            "자유거래"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "event-wiki-3fd45d2cb293984e10fb4440",
+        "data": {
+          "id": "event-wiki-3fd45d2cb293984e10fb4440",
+          "label": "공공 급수지점 유지보수 요청",
+          "source": "S03 SESSION_007 GM 공개 블록 003",
+          "subtitle": "2027년 10월 30일",
+          "summary": "문하진이 전달한 공공 급수지점 두 곳의 요청은 펌프 공급·예비품·정기점검·고장 대응에 더해 급수 중단 시 길드의 우선 복구 지원까지 포함했다.",
+          "tags": [
+            "S03",
+            "공공급수",
+            "요청",
+            "급수"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "event-wiki-6fa152109f3897e4ad04b372",
+        "data": {
+          "id": "event-wiki-6fa152109f3897e4ad04b372",
+          "label": "길드 거래 서비스 구분 검토",
+          "source": "S03 SESSION_006 GM 공개 블록 005",
+          "subtitle": "2027년 8월 4일",
+          "summary": "관리동 논의에서 등록상인은 사람과 이력 확인, 에스크로는 정해진 거래 과정 관리, 보증거래는 특정 거래 결과조건까지 책임범위를 넓히는 구조로 구분했다.",
+          "tags": [
+            "S03",
+            "길드",
+            "거래서비스"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "event-wiki-934cea538155fc7bc102a21c",
+        "data": {
+          "id": "event-wiki-934cea538155fc7bc102a21c",
+          "label": "북쪽 연료장 겨울 전 연료·운송 회의 초청",
+          "source": "S03 SESSION_008 GM 공개 블록 003",
+          "subtitle": "2027년 11월 22일",
+          "summary": "북쪽 연료장 생활권이 운송 가능한 집단과 거래거점을 겨울 전 회의에 초청했다. 의제는 이번 겨울 실제로 풀 수 있는 연료량과 누가 어디까지 운반할 수 있는지였고 길드도 초청 대상에 포함됐다.",
+          "tags": [
+            "S03",
+            "연료",
+            "운송",
+            "회의",
+            "초청"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "event-wiki-a0da729cf563fe4b71f80b21",
+        "data": {
+          "id": "event-wiki-a0da729cf563fe4b71f80b21",
+          "label": "공공 급수지점 일반 유지보수·상황별 대응 원칙",
+          "source": "S03 SESSION_008 GM 공개 블록 001",
+          "subtitle": "2027년 11월 5일",
+          "summary": "공공 급수지점의 일상 운영·배급·대체수원·1차 대응은 행정 잔존팀이 맡고, 길드는 표준펌프·부품 판매와 일반 유지보수·기술지원을 제공하기로 했다. 공공이라는 이유의 자동 최우선 복구는 두지 않고 실제 인명위험·대체수단·저장량·동시 긴급상황을 비교해 대응한다.",
+          "tags": [
+            "S03",
+            "공공급수",
+            "길드",
+            "유지보수",
+            "운영경계"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "event-wiki-a93db7854c7049a3b7c936b2",
+        "data": {
+          "id": "event-wiki-a93db7854c7049a3b7c936b2",
+          "label": "길드 표준펌프 1호",
+          "source": "S03 SESSION_006 GM 공개 블록 013",
+          "subtitle": "2027년 9월 19–22일",
+          "summary": "길드 표준펌프 1호 사업이 시작됐다. 공개 매입가 대신 내부 상한을 두고 지정 규격과 수리조건을 통과한 물건만 기존 기준가로 매입했으며 첫 판매용 두 대를 완성했다. 표준품 가치는 기술력·부품재고·검수기록·수리능력·사후 신뢰를 더하는 데서 만들어졌다.",
+          "tags": [
+            "S03",
+            "길드",
+            "표준품",
+            "급수"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "event-wiki-aca3696fd78c3c8a9332aeb6",
+        "data": {
+          "id": "event-wiki-aca3696fd78c3c8a9332aeb6",
+          "label": "공공급수·생산거점 동시 펌프 고장 대응",
+          "source": "S03 SESSION_008 GM 공개 블록 001",
+          "subtitle": "2027년 11월 9일",
+          "summary": "공공 급수지점과 동쪽 생산거점의 펌프가 거의 동시에 멈췄다. 공공 급수는 저장량과 대체수단이 있어 저녁까지 버틸 수 있었고 생산거점은 오전을 넘기면 작물 피해가 예상돼 생산거점을 먼저 복구한 뒤 같은 날 공공 급수지점을 복구했다.",
+          "tags": [
+            "S03",
+            "급수",
+            "생산거점",
+            "공공급수",
+            "긴급대응"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+        "data": {
+          "id": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+          "label": "길드 표준품 후보 관찰기간",
+          "source": "S03 SESSION_006 GM 공개 블록 009",
+          "subtitle": "2027년 8월 6–28일",
+          "summary": "길드는 직매입 사업을 바로 열지 않고 실제 거래가격·고장·수리·부품·구매문의·판매기간을 기록했다. 급수·배관은 반복수요, 표준화 가능성, 미판매 재고의 자체 사용가치가 높았고, 길드의 구매의사 자체가 시장가격에 영향을 주는 점도 확인됐다.",
+          "tags": [
+            "S03",
+            "길드",
+            "시장관찰",
+            "표준품"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "event-wiki-b7ffeffefd90e9765d184979",
+        "data": {
+          "id": "event-wiki-b7ffeffefd90e9765d184979",
+          "label": "세 생산거점 표준 급수망 첫 계약",
+          "source": "S03 SESSION_007 GM 공개 블록 003",
+          "subtitle": "2027년 10월 23일",
+          "summary": "현장조사 뒤 세 생산거점을 같은 A형 계열로 맞추고 운영용 3대와 공동예비 2대, 총 5대를 공급 상한으로 두었다. 공용부품과 유료 유지보수 계약을 묶은 첫 표준 급수망 계약이다.",
+          "tags": [
+            "S03",
+            "계약",
+            "급수",
+            "표준화",
+            "유지보수"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "event-wiki-bf4768814dd7f1559d9f7496",
+        "data": {
+          "id": "event-wiki-bf4768814dd7f1559d9f7496",
+          "label": "남쪽 차량야드 통행·회차 사용권 합의",
+          "source": "S03 SESSION_006 GM 공개 블록 001",
+          "subtitle": "2027년 7월 13–20일",
+          "summary": "길드는 차량야드 전체를 임대하지 않고 12개월 차량 통행·회차 사용권만 확보했다. 길드는 통로 배수·노면·방해물·소규모 파손 관리와 정기 대가를 맡고, 관수·지연은 계약 구간의 차량 통행을 보장했으며 나머지 야드는 시장에 남았다.",
+          "tags": [
+            "S03",
+            "계약",
+            "차량야드"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "event-wiki-d12d5299a253870e3748a92e",
+        "data": {
+          "id": "event-wiki-d12d5299a253870e3748a92e",
+          "label": "길드 표준품 진품확인 체계 확립",
+          "source": "S03 SESSION_008 GM 공개 블록 003",
+          "subtitle": "2027년 11월 중순",
+          "summary": "길드 표준품은 제품 번호, 길드 판매·수리 장부 기록, 현재 보증·수리 상태를 함께 확인하는 체계로 정리됐다. 겉표식 하나만으로는 진품을 증명하지 않는다.",
+          "tags": [
+            "S03",
+            "길드",
+            "표준품",
+            "진품확인",
+            "장부"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "event-wiki-d9895688b2873d713ac106cd",
+        "data": {
+          "id": "event-wiki-d9895688b2873d713ac106cd",
+          "label": "길드 거래 책임범위 공개",
+          "source": "S03 SESSION_006 GM 공개 블록 003",
+          "subtitle": "2027년 7월 21일",
+          "summary": "길드는 중개한 거래, 에스크로를 받은 거래, 직접 운영한 서비스는 기록된 약속 범위에서 책임지고, 시장 바깥이나 주변 점포의 당사자 직접거래는 보증하지 않는다고 공개했다.",
+          "tags": [
+            "S03",
+            "길드",
+            "거래규칙"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "event-wiki-df3c90d6f885fdb269cd38d3",
+        "data": {
+          "id": "event-wiki-df3c90d6f885fdb269cd38d3",
+          "label": "길드 표준펌프 보증·장기수리 정책",
+          "source": "S03 SESSION_007 GM 공개 블록 001",
+          "subtitle": "2027년 9월 23일–10월 3일",
+          "summary": "첫 6대 시험에서 정상 4대, 길드 수리책임 1대, 사용자 과실 1대가 확인됐다. 이후 길드는 확인·수리한 기능에 대한 짧은 기본보증과 선택형 유료 장기수리계약을 정식 정책으로 두었다.",
+          "tags": [
+            "S03",
+            "길드",
+            "표준펌프",
+            "보증",
+            "유지보수"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "event-winter-council",
+        "data": {
+          "id": "event-winter-council",
+          "label": "겨울 비상협의",
+          "source": "Supabase scene S02_WINTER_EMERGENCY_COUNCIL",
+          "subtitle": "2026-12-05 06:32 ~ 17:50",
+          "summary": "두 거점은 합병하지 않고 독립 운영과 소유권을 유지한 채 인명·핵심물자·설비기술·비상수용을 상호 백업하기로 했다.",
+          "tags": [
+            "S02",
+            "겨울",
+            "두 거점 연합"
+          ],
+          "type": "event"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "loc-agri",
+        "data": {
+          "id": "loc-agri",
+          "label": "북유성 농업기술 실증단지",
+          "source": "PERSISTENT_CANON.md / S02_FIRELINE_HOLD",
+          "subtitle": "물·농업·종자·장기생산 거점",
+          "summary": "한미라·오세훈·김도윤의 생산 거점. 관정과 농업 기반을 갖고 있으며 화재 이후 외곽 온실 1구간과 관수라인 일부 손실이 남아 있다.",
+          "tags": [
+            "거점",
+            "농업",
+            "관정",
+            "생산"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "loc-baekun",
+        "data": {
+          "id": "loc-baekun",
+          "label": "백운생활관",
+          "source": "PERSISTENT_CANON.md / S01 ARC_ARCHIVE.md",
+          "subtitle": "해산된 생활권",
+          "summary": "과거의 대형 생활권. 배급·차량·수색 권한 갈등 뒤 인력 이탈이 이어졌고, 현재는 해산된 것으로 정리한다.",
+          "tags": [
+            "집단",
+            "백운",
+            "해산"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "loc-bridge",
+        "data": {
+          "id": "loc-bridge",
+          "label": "동천교",
+          "source": "PERSISTENT_CANON.md",
+          "subtitle": "자연 병목 · 통행관리",
+          "summary": "우회비용이 큰 교량 병목. 고정 기여기준, 공개장부 일부, 긴급의료 면제, 실제 교량 유지가 확인됐다.",
+          "tags": [
+            "교량",
+            "병목",
+            "통행"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "loc-clinic",
+        "data": {
+          "id": "loc-clinic",
+          "label": "북쪽 외곽 의원",
+          "source": "PERSISTENT_CANON.md",
+          "subtitle": "제한 의료·교환 거점",
+          "summary": "강혜린이 운영의 핵심을 맡는 소형 의료거점. 의료·현물·단기일손 교환과 제한 연락선이 작동한다.",
+          "tags": [
+            "의료",
+            "교환",
+            "외부망"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "loc-contact",
+        "data": {
+          "id": "loc-contact",
+          "label": "북서2동 폐업 세차장",
+          "source": "PERSISTENT_CANON.md",
+          "subtitle": "박민호 정기 접촉지",
+          "summary": "정확한 거점 위치를 노출하지 않고 박민호와 접촉하는 외곽 연락 지점.",
+          "tags": [
+            "연락망",
+            "외부접점"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "loc-forest",
+        "data": {
+          "id": "loc-forest",
+          "label": "산림교육원",
+          "source": "PERSISTENT_CANON.md",
+          "subtitle": "폐쇄적 생활권 · 외부 거래 가능",
+          "summary": "약 8명 전후가 관찰된 생활권. 교환은 가능하지만 내부 생활구역의 경계가 엄격하다.",
+          "tags": [
+            "생활권",
+            "거래",
+            "경계"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "loc-guild-rear-warehouse",
+        "data": {
+          "id": "loc-guild-rear-warehouse",
+          "label": "길드 뒤편 창고",
+          "meta": {
+            "상태": "길드 독점사용",
+            "소유": "길드 소유 아님"
+          },
+          "source": "S03 turn 20 GM, message order 49; APPLIED state link save 258",
+          "subtitle": "2027년 4월 11일부터 6개월 독점사용",
+          "summary": "폐쇄 체육시설 본관 뒤편의 창고. 진우 측은 배종필과 6개월 독점사용에 합의했고, 첫 60일 동안 미리 정한 조건으로 우선 매입할 수 있다. 창고는 아직 길드 소유가 아니다.",
+          "tags": [
+            "S03",
+            "창고",
+            "보관업"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-04-11 17:20",
+          "save_version": 258
+        }
+      },
+      {
+        "id": "loc-nw-center",
+        "data": {
+          "id": "loc-nw-center",
+          "label": "서림대학교 북서 실습센터",
+          "source": "PERSISTENT_CANON.md / Supabase scenes",
+          "subtitle": "제한 공개 지원 거점",
+          "summary": "의료와 생활 지원을 잇는 제한 공개 거점이다. 현재 상주·접근·위치와 운영 세부는 공개 기록에 싣지 않는다.",
+          "tags": [
+            "거점",
+            "제한공개",
+            "의료",
+            "지원"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "loc-shelter",
+        "data": {
+          "id": "loc-shelter",
+          "label": "외곽 주민복지관",
+          "source": "Supabase scene S02_SECOND_SHELTER",
+          "subtitle": "공개 전진기지·생활망",
+          "summary": "전기·급수·화장실·접근성을 살려 가동한 공개 생활시설. 신하영·최유진이 생활운영의 신뢰 가능한 접점으로 자리잡았다.",
+          "tags": [
+            "공공",
+            "주민복지관",
+            "생활망"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "loc-sports-complex",
+        "data": {
+          "id": "loc-sports-complex",
+          "label": "폐쇄 체육시설",
+          "source": "Supabase survival_rpg.saves / S02 RAW transcript",
+          "subtitle": "공개 작업·물류·정기시장 거점",
+          "summary": "공개 작업과 물류, 교환이 이어지는 생활망 노드다. 접근·재고·운영 인력의 세부는 공개 기록에 싣지 않는다.",
+          "tags": [
+            "공개",
+            "작업",
+            "물류",
+            "정기시장"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "loc-west-road",
+        "data": {
+          "id": "loc-west-road",
+          "label": "서쪽길",
+          "source": "PERSISTENT_CANON.md",
+          "subtitle": "도로관리·통행 기여 갈등",
+          "summary": "관리조가 실제 도로정비와 야간순찰을 수행하지만 통행기여의 자발성과 강제성 사이에서 변화 중이다.",
+          "tags": [
+            "도로",
+            "관리조",
+            "지역질서"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "loc-wiki-04beb10f1f92ee26f3f09c2f",
+        "data": {
+          "id": "loc-wiki-04beb10f1f92ee26f3f09c2f",
+          "label": "하천변 비닐하우스군",
+          "source": "S03 SESSION_007 GM 공개 블록 003",
+          "subtitle": "표준 급수망 첫 번째 생산거점",
+          "summary": "세 생산거점 현장조사의 첫 번째 대상이다. 기존 배관과 전원은 길드 A형 표준펌프에 거의 그대로 맞았다.",
+          "tags": [
+            "S03",
+            "장소",
+            "생산거점",
+            "급수"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "loc-wiki-5a5b0982ccdae5210d2a6275",
+        "data": {
+          "id": "loc-wiki-5a5b0982ccdae5210d2a6275",
+          "label": "공동 물탱크 농가군",
+          "source": "S03 SESSION_007 GM 공개 블록 003",
+          "subtitle": "표준 급수망 두 번째 생산거점",
+          "summary": "세 생산거점 현장조사의 두 번째 대상이다. 긴 전선의 전압강하 문제는 전선과 연결부를 손봐 A형 표준펌프를 사용할 수 있게 했다.",
+          "tags": [
+            "S03",
+            "장소",
+            "생산거점",
+            "급수"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "loc-wiki-5b717b2a37f7f4375268b82a",
+        "data": {
+          "id": "loc-wiki-5b717b2a37f7f4375268b82a",
+          "label": "언덕 아래 옛 축사 재배지",
+          "source": "S03 SESSION_007 GM 공개 블록 003",
+          "subtitle": "표준 급수망 세 번째 생산거점",
+          "summary": "정병호가 대표로 있는 세 번째 생산거점이다. 처음에는 A형에 여유가 부족했지만 배관 일부와 취수구조를 조정해 다른 거점과 같은 A형 계열에 들어왔다.",
+          "tags": [
+            "S03",
+            "장소",
+            "생산거점",
+            "급수"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "loc-wiki-6d44db0505ec3dcf97e41a4a",
+        "data": {
+          "id": "loc-wiki-6d44db0505ec3dcf97e41a4a",
+          "label": "동쪽 집하장",
+          "source": "S03 SESSION_007 GM 공개 블록 003",
+          "subtitle": "표준 급수망 공동예비·부품 거점",
+          "summary": "첫 표준 급수망 계약 뒤 공동예비펌프와 공용부품함을 보관하는 동쪽 연결 지점이다.",
+          "tags": [
+            "S03",
+            "장소",
+            "집하장",
+            "급수"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "loc-wiki-b1be03144484391b40b8ecc4",
+        "data": {
+          "id": "loc-wiki-b1be03144484391b40b8ecc4",
+          "label": "남쪽 차량야드",
+          "source": "S03 SESSION_006 GM 공개 블록 001",
+          "subtitle": "길드 남쪽 차량 통행·회차 동선",
+          "summary": "임관수가 현장을 관리하고 임지연이 공동권리를 가진 차량야드다. 길드는 야드 전체를 가져오지 않고 12개월 차량 통행·회차 사용권만 확보했으며 나머지는 시장에 남겼다.",
+          "tags": [
+            "S03",
+            "장소",
+            "차량야드"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "loc-wiki-f73ae01ebcb8d89952911bbc",
+        "data": {
+          "id": "loc-wiki-f73ae01ebcb8d89952911bbc",
+          "label": "북쪽 연료장 생활권",
+          "source": "S03 SESSION_008 GM 공개 블록 003",
+          "subtitle": "겨울 전 연료·운송 협의 발신 생활권",
+          "summary": "겨울 전 운송 가능한 집단과 거래거점을 불러 실제 배분 가능한 연료량과 운송능력을 논의하는 회의를 제안한 북쪽 생활권이다.",
+          "tags": [
+            "S03",
+            "장소",
+            "연료",
+            "북쪽"
+          ],
+          "type": "location"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "ref-character-bible",
+        "data": {
+          "id": "ref-character-bible",
+          "label": "Character Bible",
+          "source": "worldlines/AFTERFALL/CHARACTER_BIBLE.md",
+          "subtitle": "캐릭터 장기 정본",
+          "summary": "반복 NPC를 기능 담당자로 납작하게 쓰지 않기 위한 캐릭터 설계 정본. 플레이어 공개 아카이브에는 숨은 동기·미래관계 정보를 노출하지 않는다.",
+          "tags": [
+            "REFERENCE",
+            "캐릭터",
+            "정본"
+          ],
+          "type": "reference"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "ref-persistent-canon",
+        "data": {
+          "id": "ref-persistent-canon",
+          "label": "Persistent Canon",
+          "source": "worldlines/AFTERFALL/PERSISTENT_CANON.md",
+          "subtitle": "시즌 간 지속 정본",
+          "summary": "S01 이후 다음 시즌으로 승계되는 거점·관계·운영원칙·지역 상태를 보존하는 지속 Canon.",
+          "tags": [
+            "CANON",
+            "정본",
+            "연속성"
+          ],
+          "type": "reference"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "ref-s01-archive",
+        "data": {
+          "id": "ref-s01-archive",
+          "label": "Season 1 ARC Archive",
+          "source": "worldlines/AFTERFALL/seasons/S01/ARC_ARCHIVE.md",
+          "subtitle": "S01 운영 아카이브",
+          "summary": "시즌 1 전체를 다음 시즌 연속성과 IP 활용을 위해 압축 보존한 운영 아카이브.",
+          "tags": [
+            "S01",
+            "ARCHIVE",
+            "회고"
+          ],
+          "type": "reference"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "ref-visual",
+        "data": {
+          "id": "ref-visual",
+          "label": "Visual Reference Notes",
+          "source": "worldlines/AFTERFALL/VISUAL_REFERENCE_NOTES.md",
+          "subtitle": "비주얼 참고자료 · NOT CANON",
+          "summary": "거대한 자연 속 작은 인간, 생활감 있는 정착지, 평온함과 탐험욕구가 공존하는 시각적 선호를 기록한 참고자료.",
+          "tags": [
+            "REFERENCE",
+            "비주얼",
+            "NOT CANON"
+          ],
+          "type": "reference"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      }
+    ],
+    "existing_relations": [
+      {
+        "id": "rel-033c82e029cad84fd8632a0c264cab7a8d1823d36d9ab42f853ca28af36fce29",
+        "data": {
+          "from": "char-doyoon",
+          "kind": "published_relation",
+          "label": "시설직",
+          "to": "loc-agri"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-05c0ddfe2e37dd38c623c251288b3de923c3228ed4b853c1edec30267d6a3339",
+        "data": {
+          "from": "event-shelter",
+          "kind": "published_relation",
+          "label": "생활운영",
+          "to": "char-yujin"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-05d1eb1eace7023308e2f773415c17ed4a5c593eef0d1e1a97cd8ab272f7132f",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "participated_in",
+          "label": "보증거래 폐기·직매입 재판매 방향 결정",
+          "to": "event-wiki-111fe570a078504a9c47714f"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-0e77240921c8e1916dd267add5ceb3249638ca06208bad6f69a310ef532bded4",
+        "data": {
+          "from": "char-yujin",
+          "kind": "published_relation",
+          "label": "생활운영 접점",
+          "to": "loc-shelter"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-10d5e63ebd10729b7a0e23bb0f473cc3d269793d3cceaf80294f90824bf4fc97",
+        "data": {
+          "from": "char-wiki-97e31f6fd22a6841eb7def52",
+          "kind": "participated_in",
+          "label": "차량야드 공동권리자 측 합의 당사자",
+          "to": "event-wiki-bf4768814dd7f1559d9f7496"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-11f3d635ce40b8f90729fbd83881d2df7ffce35628bb4e5d954108b95b327773",
+        "data": {
+          "from": "event-wiki-b7ffeffefd90e9765d184979",
+          "kind": "related_to",
+          "label": "공동예비펌프·부품 거점",
+          "to": "loc-wiki-6d44db0505ec3dcf97e41a4a"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "rel-123de16d8e0d3287baff0a17a4e0af293408d6bdc66fac10b593eab3c6750867",
+        "data": {
+          "from": "char-mingyu",
+          "kind": "published_relation",
+          "label": "과거 생활권",
+          "to": "loc-baekun"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-127d3bff010ec75747a844e93dbdaf8d72f625a11f364bad61239cb5cc0e86db",
+        "data": {
+          "from": "event-wiki-d12d5299a253870e3748a92e",
+          "kind": "related_to",
+          "label": "표준펌프 보증·사후서비스의 진품 확인 기반",
+          "to": "event-wiki-df3c90d6f885fdb269cd38d3"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "rel-151d9b8dab27ee69c398f6b0bfcaac05b0605c674389561d42d93bf4e4f6c2a1",
+        "data": {
+          "from": "event-winter-council",
+          "kind": "published_relation",
+          "label": "협의 거점",
+          "to": "loc-nw-center"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-18789393be4960a40a6c4833ab7ed82116183a4bbcd77180667441110f7be2e7",
+        "data": {
+          "from": "ref-character-bible",
+          "kind": "published_relation",
+          "label": "설정 출처",
+          "to": "char-hayoung"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-1dbf601f473b03b6a3ed9b27fc366ab28ec12c60ba9a88776913f3eaa959b7cd",
+        "data": {
+          "from": "char-mingyu",
+          "kind": "participated_in",
+          "label": "현장조사·전원 및 수리 판단",
+          "to": "event-wiki-b7ffeffefd90e9765d184979"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "rel-2074e24c4cfd19cc2ad12752515cfd78bbf430f8504cc32e2d44fa48e05280b9",
+        "data": {
+          "from": "ref-s01-archive",
+          "kind": "published_relation",
+          "label": "시즌 연속성",
+          "to": "event-fireline"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-2228f5f7258766d81fe92db1e4cd627c89cd0dd87c2edb5fbccf12ac115b05bb",
+        "data": {
+          "from": "event-fireline",
+          "kind": "published_relation",
+          "label": "참여",
+          "to": "char-seojin"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-2247b1dcf861bbfbb9b39afec127f39fb89cbb218e99361aac3eed8eae65383f",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "published_relation",
+          "label": "의료 협력",
+          "to": "char-hyerin"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-24355c6112acde8deb454abeb3bf1a45b7c58edf8391522eddc5b9bb92cbaf6c",
+        "data": {
+          "from": "char-eunchae",
+          "kind": "participated_in",
+          "label": "표준품 후보 관찰표 작성·기록",
+          "to": "event-wiki-ad8b8dbcdc75bcabfcae2cf7"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-268d0314e2b8d8cb4e98eff44573b47f6aca60fc7ef3aa4204aefa89a7131274",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "participated_in",
+          "label": "창고 사용 조건 합의",
+          "to": "event-guild-warehouse-option"
+        },
+        "anchor": {
+          "game_time": "2027-04-11 17:20",
+          "save_version": 258
+        }
+      },
+      {
+        "id": "rel-297df0d034fcf1cb2d66c8323fda77b0dadd1cb23b5bc8ce2b1eedea80a8090e",
+        "data": {
+          "from": "char-seongho",
+          "kind": "published_relation",
+          "label": "관리조 접점",
+          "to": "loc-west-road"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-2b50a5ca4959c5ab0c4e57db31a3f14c03d6864997595bc1d19442a9592c2c19",
+        "data": {
+          "from": "event-wiki-3fd45d2cb293984e10fb4440",
+          "kind": "occurred_at",
+          "label": "길드 관리동에서 요청 전달",
+          "to": "loc-sports-complex"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "rel-2f8ad14936dd46d8f08325022edd1c80295ca07e8b1b797966c86635b340b871",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "participated_in",
+          "label": "사용권 협상·합의에 참여",
+          "to": "event-wiki-bf4768814dd7f1559d9f7496"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-3510e6869b355e11b8a75b25c1074e5c881d34714d55c67e50a345b16725cf8b",
+        "data": {
+          "from": "char-mira",
+          "kind": "published_relation",
+          "label": "실증단지 동료",
+          "to": "char-doyoon"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-37051bd84a6ea9f347ab6ab42dbd3562a5e9d2e1fb5bf1f94afb5d897a6b09a3",
+        "data": {
+          "from": "event-west-road-rain-response",
+          "kind": "occurred_at",
+          "label": "서쪽길 침하 구간",
+          "to": "loc-west-road"
+        },
+        "anchor": {
+          "game_time": "2027-07-12 17:30",
+          "save_version": 274
+        }
+      },
+      {
+        "id": "rel-371f50d7000d779aabe499e795a56a7fef4605e3817e8c27dbf0c0b139f53486",
+        "data": {
+          "from": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+          "kind": "participated_in",
+          "label": "제도 차이를 질문하고 정리 논의에 참여",
+          "to": "event-wiki-6fa152109f3897e4ad04b372"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-379921507d951549980d75a5036d96ce51a37ba682e79a003f7dc807ab14e1eb",
+        "data": {
+          "from": "char-eunchae",
+          "kind": "participated_in",
+          "label": "권리 확인과 협상 준비에 참여",
+          "to": "event-wiki-bf4768814dd7f1559d9f7496"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-39648dbe9f57d2df86f65fe11c6199f907b93dcc639973bff1cb66f2b0f4d205",
+        "data": {
+          "from": "char-hayoung",
+          "kind": "published_relation",
+          "label": "생활 동료",
+          "to": "char-yujin"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-3b5de4f7440218f14f25e06cc6875d77b44b84f09221b0cd2ceb417ce8613476",
+        "data": {
+          "from": "event-network-decay",
+          "kind": "published_relation",
+          "label": "관찰 거점",
+          "to": "loc-nw-center"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-3cdc60e26b82bd270bfce072cbc1c223c1ba653fbbecb6d6074a9dcc4fdebc4b",
+        "data": {
+          "from": "ref-persistent-canon",
+          "kind": "published_relation",
+          "label": "정본 출처",
+          "to": "loc-nw-center"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-443dc241512a9226aa94f281b56367117503b9967af8f625446c7c11d30834a5",
+        "data": {
+          "from": "event-wiki-b7ffeffefd90e9765d184979",
+          "kind": "occurred_at",
+          "label": "첫 번째 계약 대상 생산거점",
+          "to": "loc-wiki-04beb10f1f92ee26f3f09c2f"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "rel-4973c3e55596fdce56bc66634612df67185d896c2730839a5c39a589ea564ce7",
+        "data": {
+          "from": "event-wiki-b7ffeffefd90e9765d184979",
+          "kind": "occurred_at",
+          "label": "두 번째 계약 대상 생산거점",
+          "to": "loc-wiki-5a5b0982ccdae5210d2a6275"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "rel-4c7bf04321d15d5d5ea19443f10a678dbf1b15cccce4bb847982ec77bc2fefb2",
+        "data": {
+          "from": "event-wiki-df3c90d6f885fdb269cd38d3",
+          "kind": "related_to",
+          "label": "표준펌프 1호의 후속 보증·유지보수 정책",
+          "to": "event-wiki-a93db7854c7049a3b7c936b2"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "rel-4d603f6b4fb0d93fdeacf5346da1e512c7bbc13ab21d1d1d1a28a199fd25549a",
+        "data": {
+          "from": "char-wiki-9cb69d0dc08460c215904370",
+          "kind": "participated_in",
+          "label": "생산거점 고장 보고",
+          "to": "event-wiki-aca3696fd78c3c8a9332aeb6"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "rel-4e1fed328b397369d40fc6c5c18b6b84ef3da7b4a73ac2af507acbe543300d78",
+        "data": {
+          "from": "char-jisu",
+          "kind": "published_relation",
+          "label": "관리조 접점",
+          "to": "loc-bridge"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-56f8c169cc6059c0724a14a1e8111ce615c230e70dad89cf9b229f293b76d9cc",
+        "data": {
+          "from": "char-kyunghee",
+          "kind": "published_relation",
+          "label": "대외거래 접점",
+          "to": "loc-forest"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-5c7187de6195e6fe6eb5859ff372302c24bb697677474e55ab55cda305f3d8de",
+        "data": {
+          "from": "char-jo-hansu",
+          "kind": "participated_in",
+          "label": "긴급보강 장부와 비용 설명",
+          "to": "event-west-road-rain-response"
+        },
+        "anchor": {
+          "game_time": "2027-07-12 17:30",
+          "save_version": 274
+        }
+      },
+      {
+        "id": "rel-5e447bae9bc82b989fc0a76a073402527ae9e1a7e99fd80f5fe8d4e96542ec66",
+        "data": {
+          "from": "loc-shelter",
+          "kind": "published_relation",
+          "label": "생활망 연결",
+          "to": "loc-sports-complex"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-5f80a15d7073ac713bf260b37db7197ddfaf077e5596c8a9d55f53018f8dd14e",
+        "data": {
+          "from": "char-wiki-322a5a52d57198d4a6f25429",
+          "kind": "participated_in",
+          "label": "차량야드 권리자 측 합의 당사자",
+          "to": "event-wiki-bf4768814dd7f1559d9f7496"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-613fae39010e851cbfb5f88dba384b141a30d377ae1c065affb3eed717aa31f2",
+        "data": {
+          "from": "char-yujin",
+          "kind": "published_relation",
+          "label": "과거 생활권",
+          "to": "loc-baekun"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-62798d4ef2d71801ff0861441c7544587bcda0fe63ac5f4a9d790f02fbca7f7d",
+        "data": {
+          "from": "loc-nw-center",
+          "kind": "published_relation",
+          "label": "두 거점 연합",
+          "to": "loc-agri"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-62dc4ec0646187eb934cb6f6469d25b6f6b2352c416fd88b65dfb27fdf72b1cc",
+        "data": {
+          "from": "event-fireline",
+          "kind": "published_relation",
+          "label": "참여",
+          "to": "char-jinwoo"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-648972d8e2d9c279e9afcd209442952371f15088c6f0e729c25e8820e0c72bc4",
+        "data": {
+          "from": "event-network-decay",
+          "kind": "published_relation",
+          "label": "관찰",
+          "to": "char-mira"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-661cb1a147e956644e3479208e2b8cba00256abac0fb114a83b37f4752ce5cb9",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "published_relation",
+          "label": "핵심 동료",
+          "to": "char-taehoon"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-6b5ad09b43d062858e5ec4f4d54ad4dfb464825eaaa33770ccb606d408989a28",
+        "data": {
+          "from": "event-wiki-a93db7854c7049a3b7c936b2",
+          "kind": "occurred_at",
+          "label": "폐쇄 체육시설 길드 매입대에서 운영",
+          "to": "loc-sports-complex"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-71856021974e34eab5e2335f863bdbfcaed336e276b45aaba0fa24126834a0e6",
+        "data": {
+          "from": "char-wiki-8499006fbd51eb7a8c88ab1f",
+          "kind": "participated_in",
+          "label": "펌프 선매입 후 일부를 길드에 매각",
+          "to": "event-wiki-a93db7854c7049a3b7c936b2"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-7250782c7b60e910cfef3e1f8fd72fdba2620b6328f36ba08a46a5a026090850",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "participated_in",
+          "label": "매입상한을 넘는 거래 거부",
+          "to": "event-wiki-a93db7854c7049a3b7c936b2"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-75851ccfe6432721e580e11c4a2abc4fa34c35046e950abf1d6288b2c658f788",
+        "data": {
+          "from": "char-hayoung",
+          "kind": "published_relation",
+          "label": "과거 생활권",
+          "to": "loc-baekun"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-76ce107fd3b4d8d91b45eb5a0d5aa5e8db1b91285fe01523566aeb370723cc9b",
+        "data": {
+          "from": "event-network-decay",
+          "kind": "published_relation",
+          "label": "관찰",
+          "to": "char-taehoon"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-7b0092d55129dce2701492bb279617d02fbd57213632fb0f7398d0cf651455e4",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "published_relation",
+          "label": "통행·의료 접점",
+          "to": "char-jisu"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-7fed574d0d80fc45598687d0702155d3d19f074cc4631db284d89017e1005443",
+        "data": {
+          "from": "char-mira",
+          "kind": "published_relation",
+          "label": "실증단지 동료",
+          "to": "char-sehoon"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-812dedd68c83531601dbffd67b7d1cde26743e2bb3b865398b393da3a946f229",
+        "data": {
+          "from": "char-hayoung",
+          "kind": "published_relation",
+          "label": "생활운영 접점",
+          "to": "loc-shelter"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-815b396db6d9b11274a6f096d5cf4fbf85e822d7b26d59ea8344df468e6b60bf",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "published_relation",
+          "label": "외부 기술 협력",
+          "to": "char-mingyu"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-8188183855a42a26abd765239faec7b368879dfc5d7208526426b5f0ce6551a4",
+        "data": {
+          "from": "char-hyerin",
+          "kind": "published_relation",
+          "label": "의료축",
+          "to": "loc-clinic"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-81dcb76bc1fdeb20aab4a802d23ee3894f5d1cf8f8fb77c5313a3c65af56259d",
+        "data": {
+          "from": "event-wide-area",
+          "kind": "published_relation",
+          "label": "분산 관측",
+          "to": "char-hajin"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-831cc82831bb2546e0e70eb3b2d54e84c67a8bffefef19381f87ebb4ca61272a",
+        "data": {
+          "from": "event-wiki-a0da729cf563fe4b71f80b21",
+          "kind": "related_to",
+          "label": "공공 급수지점 요청에 대한 최종 운영원칙",
+          "to": "event-wiki-3fd45d2cb293984e10fb4440"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "rel-8473e8ef8967ef9a4b4c6cbdf11c901074fe54a78e772a2b4e9c2d750ab4b864",
+        "data": {
+          "from": "event-wiki-281823f8f1b6fb2c770b1925",
+          "kind": "occurred_at",
+          "label": "길드 접수·정산에서 사건 확인 및 처리",
+          "to": "loc-sports-complex"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "rel-89b72fd64dd7f0d79dcd8e90e0a2b1a56a415a4b077935843c248449687e587d",
+        "data": {
+          "from": "event-fireline",
+          "kind": "published_relation",
+          "label": "참여",
+          "to": "char-mira"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-8ab5781477f4d2bbf2b2925da0ec62cbe9060d10879a71952b3a4d71ca4fe452",
+        "data": {
+          "from": "char-minho",
+          "kind": "published_relation",
+          "label": "정기 접촉",
+          "to": "loc-contact"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-8cdba942d0de7f416f92d41245bc3d5169297da7c5bd7dba2d190fd23f778637",
+        "data": {
+          "from": "char-mingyu",
+          "kind": "participated_in",
+          "label": "생산거점 복구",
+          "to": "event-wiki-aca3696fd78c3c8a9332aeb6"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "rel-8d06ac889fd04119c11ef01fdbed3840afe7cf7fcafd53e02fc83d4d6e3689a0",
+        "data": {
+          "from": "event-s02-finale",
+          "kind": "published_relation",
+          "label": "생활망 압박",
+          "to": "loc-sports-complex"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-8ff0ed65beaeac6d206399852e2d6705b198675e0fc28c93d3307dceeb99cd19",
+        "data": {
+          "from": "event-wide-area",
+          "kind": "published_relation",
+          "label": "분산 관측",
+          "to": "char-kyunghee"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-91d0c5adb0622b9f99a759454015df1c57ccd0c61982907a48fb367bc4e783de",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "published_relation",
+          "label": "신뢰 접점",
+          "to": "char-yujin"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-927639b0b5b5741ece673ff9a6e88183be3034d22c555443630eb95683174b91",
+        "data": {
+          "from": "char-wiki-322a5a52d57198d4a6f25429",
+          "kind": "related_to",
+          "label": "남매",
+          "to": "char-wiki-97e31f6fd22a6841eb7def52"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-9400983df6134872bb97e876a645803b0c1efa23c28d8dba4f76c5ee3aa539e5",
+        "data": {
+          "from": "event-s02-finale",
+          "kind": "published_relation",
+          "label": "관측 지점",
+          "to": "loc-bridge"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-963e44001f71ceaa0a8f65fd46a737c95a63445f2b2cbf3a3f54a58517afefd6",
+        "data": {
+          "from": "event-wide-area",
+          "kind": "published_relation",
+          "label": "분산 관측",
+          "to": "char-hyerin"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-9887cbe19fc7de95d747d9e666cf3324872aa4942f8802a71045d3041b8ab50e",
+        "data": {
+          "from": "event-wiki-934cea538155fc7bc102a21c",
+          "kind": "related_to",
+          "label": "초청 발신 생활권",
+          "to": "loc-wiki-f73ae01ebcb8d89952911bbc"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "rel-98cc22ae48c0d01423c4e97b694b37de57d9d4de992c09f0aaa86d00b9da766f",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "published_relation",
+          "label": "공공시설 협력",
+          "to": "char-hajin"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-99850ee670e9c5180585b8de5a6ee27693c1d824ed426094c4fca3234e21f438",
+        "data": {
+          "from": "event-wiki-d9895688b2873d713ac106cd",
+          "kind": "occurred_at",
+          "label": "폐쇄 체육시설 시장 입구에서 책임범위 공개",
+          "to": "loc-sports-complex"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-99c12405d831cfbf91aeacc7cb30f2f52979472dfef637b65e5a0060f72a6125",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "published_relation",
+          "label": "교환 접점",
+          "to": "char-kyunghee"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-9b68e9bb1adcc22ff4f485e96d0b8b80ed55321f9fe16fc89989a42bd69cfe68",
+        "data": {
+          "from": "char-wiki-97e31f6fd22a6841eb7def52",
+          "kind": "related_to",
+          "label": "공동권리자",
+          "to": "loc-wiki-b1be03144484391b40b8ecc4"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-a23f755f04040c753fa814de697f6e3d8742a57ca08644d63a6633135bcfda8d",
+        "data": {
+          "from": "char-wiki-cc15e0b3875ce0e734646be4",
+          "kind": "participated_in",
+          "label": "등록상인 필요를 제기한 기존 상인",
+          "to": "event-wiki-6fa152109f3897e4ad04b372"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-a2f310d7f1fd127afdad0c4df155f6fd738ada3c8ee8796afbb9643fd06c041d",
+        "data": {
+          "from": "char-wiki-9cb69d0dc08460c215904370",
+          "kind": "related_to",
+          "label": "거점 대표",
+          "to": "loc-wiki-5b717b2a37f7f4375268b82a"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "rel-a7414041a557e8c23bea27b1baf0f7ffa58bee6acc2d973b86138f5b2f2b555a",
+        "data": {
+          "from": "char-hajin",
+          "kind": "participated_in",
+          "label": "공공 급수지점 요청 전달",
+          "to": "event-wiki-3fd45d2cb293984e10fb4440"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "rel-a989f1e7aa2914ab7767f28615a77a9a5d4b13233ffbf59561d8539f042cce3d",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "published_relation",
+          "label": "신뢰 형성",
+          "to": "char-hayoung"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-aca99fa51fd80538228dc54c0479dfeaf3b75aa17ad0feab5801f7517cd7674f",
+        "data": {
+          "from": "char-hayoung",
+          "kind": "participated_in",
+          "label": "북쪽 초청장 전달",
+          "to": "event-wiki-934cea538155fc7bc102a21c"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "rel-acdda7eafae0ee86dae52f4ce4224fc17b9ba4dadd7b520d3191f403c1437f56",
+        "data": {
+          "from": "char-taehoon",
+          "kind": "published_relation",
+          "label": "시설·생산 협력",
+          "to": "char-mira"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-ae11d88c34713a93191f5667701b4ecc60b0a7be03ed285611ac9e3e44268837",
+        "data": {
+          "from": "char-wiki-8499006fbd51eb7a8c88ab1f",
+          "kind": "participated_in",
+          "label": "전력장비 관찰 사례를 제공한 외부 상인",
+          "to": "event-wiki-ad8b8dbcdc75bcabfcae2cf7"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-af3a86632f5ed3d9cac5d2e848b0a971e9481b9db93911ce1fac25515a7c8813",
+        "data": {
+          "from": "event-wide-area",
+          "kind": "published_relation",
+          "label": "관측 거점",
+          "to": "loc-nw-center"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-af5492e1d459418cc6d9f92e1119d981bac4a0e36883bd0255e729a63b05fc6f",
+        "data": {
+          "from": "event-wiki-bf4768814dd7f1559d9f7496",
+          "kind": "occurred_at",
+          "label": "남쪽 차량야드 사용권 합의",
+          "to": "loc-wiki-b1be03144484391b40b8ecc4"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-b01343ccf3e964bee0139c96ba599265d14dc43701ec7542dccf9a26da583545",
+        "data": {
+          "from": "ref-persistent-canon",
+          "kind": "published_relation",
+          "label": "정본 출처",
+          "to": "loc-agri"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-b101246c94ba7317552545a26ff1456ba5a00d6662a5d1bfd340b024a1b23fb6",
+        "data": {
+          "from": "event-shelter",
+          "kind": "published_relation",
+          "label": "전기·시설",
+          "to": "char-mingyu"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-b21904bde57949a1f2d27cb43fe43efabc3a143b1cccdcfaf017d4f35afe802a",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "published_relation",
+          "label": "핵심 동료",
+          "to": "char-eunchae"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-b26d518a8e698e6858e428de83fb1777d1b02e6145cbdde794e4c1eec08e0ef1",
+        "data": {
+          "from": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
+          "kind": "occurred_at",
+          "label": "폐쇄 체육시설 길드 시장 관찰기간",
+          "to": "loc-sports-complex"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-b808579e2bd7719dc687412bc80373f7063244c09d0bd20d33c1c5d990ebcec5",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "published_relation",
+          "label": "핵심 동료",
+          "to": "char-seojin"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-c01a49b5bea44ec8503f095d95594fdd8427e9031c17e3afc8d9838de86d260c",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "participated_in",
+          "label": "길드 배상 거부 및 책임경계 집행",
+          "to": "event-wiki-37bff157632c4ca2e1e99420"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-c063828e3e7af00e436314de36e43504458837d16e72e0a14742fef368b981a6",
+        "data": {
+          "from": "event-fireline",
+          "kind": "published_relation",
+          "label": "주요 피해지역",
+          "to": "loc-agri"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-c451c5546915b078ebc2d8ddb4d676a08558b9408798ff445684e2895e5c2ca2",
+        "data": {
+          "from": "event-fireline",
+          "kind": "published_relation",
+          "label": "참여",
+          "to": "char-taehoon"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-ca7f05dcc6903dd9136bbf1834c71c5f81046c3283055dbe3b94ea7f1f584d2a",
+        "data": {
+          "from": "char-mira",
+          "kind": "published_relation",
+          "label": "생산 거점",
+          "to": "loc-agri"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-cb45632abd508d72c4fbcbf855c6db4e205cd02c47b372091b88965680ee9440",
+        "data": {
+          "from": "char-eunchae",
+          "kind": "participated_in",
+          "label": "수리내역 기록과 내부 매입상한 관리",
+          "to": "event-wiki-a93db7854c7049a3b7c936b2"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-d54a4521487899d2b7611e6f71a7833d2ce75af0a06834bff7f844e1d06e5214",
+        "data": {
+          "from": "char-wiki-322a5a52d57198d4a6f25429",
+          "kind": "works_at",
+          "label": "현장 관리",
+          "to": "loc-wiki-b1be03144484391b40b8ecc4"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-d656d1af53e80ca99ea66cad4d8d07ba559c96e80165b16e32c2035249d3a6a6",
+        "data": {
+          "from": "event-guild-warehouse-option",
+          "kind": "occurred_at",
+          "label": "뒤편 창고 사용 합의",
+          "to": "loc-guild-rear-warehouse"
+        },
+        "anchor": {
+          "game_time": "2027-04-11 17:20",
+          "save_version": 258
+        }
+      },
+      {
+        "id": "rel-d7073f1a5e301740c448f42b9fbe46721779c039c1d63d10a406968a9ef016d5",
+        "data": {
+          "from": "event-wiki-111fe570a078504a9c47714f",
+          "kind": "occurred_at",
+          "label": "폐쇄 체육시설 관리동에서 사업구조 재정의",
+          "to": "loc-sports-complex"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-d7ac0c01ce2a598fdc4a63635a003259b2327237cd2babcf4a4162fe2ac42c2e",
+        "data": {
+          "from": "char-wiki-14b41bbae77f8558c571d384",
+          "kind": "participated_in",
+          "label": "직접거래 판매자",
+          "to": "event-wiki-37bff157632c4ca2e1e99420"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-d9600315a2f6f453fd4b44beee790607435e0f3ff0b514555570ac8f689c0870",
+        "data": {
+          "from": "char-mingyu",
+          "kind": "participated_in",
+          "label": "분해·수리 작업",
+          "to": "event-wiki-a93db7854c7049a3b7c936b2"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-dba3dbc9d682eb642aed58cfc8fa8a54cc97e06b9f4e9cedd10ee2e2bd0e0985",
+        "data": {
+          "from": "event-shelter",
+          "kind": "published_relation",
+          "label": "시설·급수",
+          "to": "char-hajin"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-dcc97441f0652387be8ce6f24cb16fb959e8cf13dfc7558dbc7a19ffcd49540a",
+        "data": {
+          "from": "event-shelter",
+          "kind": "published_relation",
+          "label": "생활운영",
+          "to": "char-hayoung"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-e051a8019e3b74a357fb0dcb5cccc40f0a8f7518c61bac630b32083c0f6813c4",
+        "data": {
+          "from": "char-wiki-cc15e0b3875ce0e734646be4",
+          "kind": "related_to",
+          "label": "남는 야드 일부를 숙박 손님 차량·손수레 공간으로 사용",
+          "to": "loc-wiki-b1be03144484391b40b8ecc4"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-e27bdf76c984bc703a2683837a7f6fa508e909abb971182e1a95c9efbe19ffa1",
+        "data": {
+          "from": "char-cheolsu",
+          "kind": "published_relation",
+          "label": "이동·거래 동료",
+          "to": "char-jaemin"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-e3198123614c280f420e8437ab8e9f9126b5bf57fac98136dc09177ceb455863",
+        "data": {
+          "from": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+          "kind": "participated_in",
+          "label": "접수대에서 책임범위 안내",
+          "to": "event-wiki-d9895688b2873d713ac106cd"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-e3a73c841f082798ec4eb7c536999e098be8221530066578c1663c79c3d7fe52",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "published_relation",
+          "label": "두 거점 연합",
+          "to": "char-mira"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-e460fe3bdd950983f6a38df4e66916083fa31e5bbea69bd5651d107d4e18abd5",
+        "data": {
+          "from": "char-wiki-b862f3d27582267fb5da3320",
+          "kind": "participated_in",
+          "label": "사칭 판매망 당사자",
+          "to": "event-wiki-281823f8f1b6fb2c770b1925"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "rel-ed4f4ce28860d2c8d4035251c78ca9ce5f94636af36793b651b35ff489143b24",
+        "data": {
+          "from": "char-taehoon",
+          "kind": "participated_in",
+          "label": "현장조사·설비 판단",
+          "to": "event-wiki-b7ffeffefd90e9765d184979"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "rel-edc486ae87722bf1f5aa8e7752f4c01745b2f6ea576065d4ac0d175ecc5b3256",
+        "data": {
+          "from": "char-minho",
+          "kind": "published_relation",
+          "label": "응급 이송망",
+          "to": "char-hyerin"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-eff05976e7d83260b5608152794452c7686fe0dc50356542507162f206d83e23",
+        "data": {
+          "from": "event-wide-area",
+          "kind": "published_relation",
+          "label": "분산 관측",
+          "to": "char-minho"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-f0d09a9631801e6ea4a64039c9d259d775127ac6ad766c3f1530d4af9d5c2e6a",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "participated_in",
+          "label": "상황별 우선순위 결정",
+          "to": "event-wiki-aca3696fd78c3c8a9332aeb6"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "rel-f0e8416a698423ff943606167ec5d425e360faff563162d1f6309aaa671b36a6",
+        "data": {
+          "from": "ref-character-bible",
+          "kind": "published_relation",
+          "label": "설정 출처",
+          "to": "char-yujin"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-f10bf5870e80e53f8a940dc2bba89938b5a1641961b9c44fb4eeae0f302cb636",
+        "data": {
+          "from": "event-shelter",
+          "kind": "published_relation",
+          "label": "발생 장소",
+          "to": "loc-shelter"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-f38be50120122f44d89f7b01dd2ee8366f3fe99d8a7f87927dafe065b4e6e068",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "participated_in",
+          "label": "현장조사·표준화 결정",
+          "to": "event-wiki-b7ffeffefd90e9765d184979"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "rel-f3a4b9d1217fd0f380e8a2b82c4ccfc8688130af92f7ec025f9f08b24f7f7d95",
+        "data": {
+          "from": "char-sehoon",
+          "kind": "published_relation",
+          "label": "시설직",
+          "to": "loc-agri"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-f59f48aac4f15e3aee0221ec2fe8a51f86c23b6e7043e79d7278100fe101ea85",
+        "data": {
+          "from": "char-taehoon",
+          "kind": "participated_in",
+          "label": "생산거점 복구",
+          "to": "event-wiki-aca3696fd78c3c8a9332aeb6"
+        },
+        "anchor": {
+          "game_time": "2027-11-22 22:40",
+          "save_version": 285
+        }
+      },
+      {
+        "id": "rel-fa21e314d2a5084f9e5a57e221d82feaced367ed9a85e1b681fdc10e6d17f089",
+        "data": {
+          "from": "char-jinwoo",
+          "kind": "published_relation",
+          "label": "외부 연락축",
+          "to": "char-minho"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-fb5cfd9afd59c79007a0681c8435f75becf915442b6020e15ba494ff62557f68",
+        "data": {
+          "from": "event-wide-area",
+          "kind": "published_relation",
+          "label": "분산 관측",
+          "to": "char-jisu"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-fc695b0c51945980589835f0704261ada78cb161af7e7e8ab9083728795f3c32",
+        "data": {
+          "from": "event-winter-council",
+          "kind": "published_relation",
+          "label": "상호 백업",
+          "to": "loc-agri"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-fcc261f7acb621391e9cb5512fc99bcc44b3b886be4237f6034a7205e7a59af4",
+        "data": {
+          "from": "event-wiki-b7ffeffefd90e9765d184979",
+          "kind": "occurred_at",
+          "label": "세 번째 계약 대상 생산거점",
+          "to": "loc-wiki-5b717b2a37f7f4375268b82a"
+        },
+        "anchor": {
+          "game_time": "2027-10-30 13:20",
+          "save_version": 282
+        }
+      },
+      {
+        "id": "rel-fd1eaffc08eaa64179d93e4303e27ce5f387fb57ffe902bbe3e489b14eab4974",
+        "data": {
+          "from": "event-fireline",
+          "kind": "published_relation",
+          "label": "참여",
+          "to": "char-eunchae"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-fe656cefceb75f1851d1c41da9a41d7946557721df61567e56d23e834c123438",
+        "data": {
+          "from": "event-network-decay",
+          "kind": "published_relation",
+          "label": "관찰",
+          "to": "char-eunchae"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      },
+      {
+        "id": "rel-fe9897192360e1885492989f3a784a96a5c9db25bed303bbf982d6c930e43bc4",
+        "data": {
+          "from": "char-taehoon",
+          "kind": "participated_in",
+          "label": "작동 시험",
+          "to": "event-wiki-a93db7854c7049a3b7c936b2"
+        },
+        "anchor": {
+          "game_time": "2027-09-22 16:10",
+          "save_version": 280
+        }
+      },
+      {
+        "id": "rel-fee5572fb1b6b1f70f77e953181680143834f7118b7661a12bc24c0ad8fd7151",
+        "data": {
+          "from": "event-west-road-trial-agreement",
+          "kind": "occurred_at",
+          "label": "서쪽길 관리구간",
+          "to": "loc-west-road"
+        },
+        "anchor": {
+          "game_time": "2027-07-12 17:30",
+          "save_version": 274
+        }
+      },
+      {
+        "id": "rel-ff07e0d1046ddba54ca825c7edd99e612ef5d042e0ff8e6f71c111c7e4b98329",
+        "data": {
+          "from": "ref-visual",
+          "kind": "published_relation",
+          "label": "창작 참고",
+          "to": "ref-s01-archive"
+        },
+        "anchor": {
+          "game_time": "2027-03-23 17:50",
+          "save_version": 253
+        }
+      }
+    ],
+    "relation_kinds": [
+      "related_to",
+      "participated_in",
+      "occurred_at",
+      "lives_at",
+      "works_at"
+    ],
+    "job_id": "wiki-job-43d7a670d6532d7cd41d4913c8febf1e281e81ef9321f732573e7e8d13f99046"
+  },
+  "extractor_result": {
+    "version": "wiki-fact-result-v1",
+    "job_id": "wiki-job-43d7a670d6532d7cd41d4913c8febf1e281e81ef9321f732573e7e8d13f99046",
+    "decision": "FACTS_READY",
+    "coverage": {
+      "status": "COMPLETE",
+      "reviewed_blocks": [
+        "001",
+        "003",
+        "005"
+      ]
+    },
+    "nodes": [
+      {
+        "key": "char-jinwoo",
+        "existing_id": "char-jinwoo",
+        "type": "character",
+        "label": "서진우",
+        "changes": {
+          "summary": "공공 급수지점에는 일반 유지보수와 기술지원을 제공하고 일상 운영은 행정 잔존팀이 맡도록 책임을 나눴다. 2027년 11월 9일에는 저장량과 대체수단을 비교해 생산거점을 먼저 복구하도록 결정했다. 길드 표식 사칭 문제에서는 상인의 물건을 빼앗거나 외부 장사를 금지하지 않고 피해거래 정산과 길드 서비스 이용 제한으로 대응했다."
+        },
+        "evidence": {
+          "type": [
+            "core-four-names"
+          ],
+          "label": [
+            "core-four-names"
+          ],
+          "summary": [
+            "public-contract",
+            "repair-priority",
+            "sanction-boundary"
+          ]
+        }
+      },
+      {
+        "key": "char-eunchae",
+        "existing_id": "char-eunchae",
+        "type": "character",
+        "label": "최은채",
+        "changes": {
+          "summary": "공공 급수지점 실태조사에서 운영기록을 확인했다. 길드 표준품의 번호체계를 정하고 판매·수리 장부와 대조해 사칭품을 확인했으며, 하루 거래 정산을 마감했다."
+        },
+        "evidence": {
+          "type": [
+            "core-four-names"
+          ],
+          "label": [
+            "core-four-names"
+          ],
+          "summary": [
+            "survey-roles",
+            "authenticity-setup",
+            "copied-number",
+            "eunchae-settlement"
+          ]
+        }
+      },
+      {
+        "key": "char-hayoung",
+        "existing_id": "char-hayoung",
+        "type": "character",
+        "label": "신하영",
+        "changes": {
+          "summary": "길드 표준펌프 사칭 문제가 생기자 시장에서 구매 사례와 장부 확인 여부를 알아봤다. 2027년 11월 22일에는 북쪽 연료장 생활권에서 보낸 겨울 전 연료·운송 회의 초청장을 길드에 전달했다."
+        },
+        "evidence": {
+          "type": [
+            "market-investigation"
+          ],
+          "label": [
+            "market-investigation"
+          ],
+          "summary": [
+            "market-investigation",
+            "northern-invitation"
+          ]
+        }
+      },
+      {
+        "key": "char-mingyu",
+        "existing_id": "char-mingyu",
+        "type": "character",
+        "label": "정민규",
+        "changes": {
+          "summary": "공공 급수지점 실태조사에서 설비를 살폈다. 2027년 11월 9일 장태훈과 생산거점 펌프를 먼저 복구한 뒤 공공 급수지점 복구에 참여했고, 표준품 진품 확인용 금속표를 만들었다."
+        },
+        "evidence": {
+          "type": [
+            "survey-roles"
+          ],
+          "label": [
+            "survey-roles"
+          ],
+          "summary": [
+            "survey-roles",
+            "repair-priority",
+            "authenticity-setup"
+          ]
+        }
+      },
+      {
+        "key": "char-taehoon",
+        "existing_id": "char-taehoon",
+        "type": "character",
+        "label": "장태훈",
+        "changes": {
+          "summary": "공공 급수지점 두 곳의 설비를 조사하고 오래된 펌프 교체가 필요하다고 판단했다. 2027년 11월 9일에는 정민규와 생산거점 펌프를 오전 안에 복구하고, 이어 공공 급수지점 펌프를 교체해 오후에 정상화했다."
+        },
+        "evidence": {
+          "type": [
+            "core-four-names"
+          ],
+          "label": [
+            "core-four-names"
+          ],
+          "summary": [
+            "survey-roles",
+            "pump-replacement",
+            "repair-priority"
+          ]
+        }
+      }
+    ],
+    "relations": [
+      {
+        "from": "char-jinwoo",
+        "to": "event-wiki-a0da729cf563fe4b71f80b21",
+        "kind": "participated_in",
+        "label": "일반 유지보수·상황별 대응 원칙 확정",
+        "evidence": [
+          "public-contract"
+        ]
+      },
+      {
+        "from": "char-hajin",
+        "to": "event-wiki-a0da729cf563fe4b71f80b21",
+        "kind": "participated_in",
+        "label": "상황별 대응 원칙 확인·동의",
+        "evidence": [
+          "public-contract"
+        ]
+      },
+      {
+        "from": "char-jinwoo",
+        "to": "event-wiki-d12d5299a253870e3748a92e",
+        "kind": "participated_in",
+        "label": "진품 확인체계 구축 착수",
+        "evidence": [
+          "authenticity-setup"
+        ]
+      },
+      {
+        "from": "char-eunchae",
+        "to": "event-wiki-d12d5299a253870e3748a92e",
+        "kind": "participated_in",
+        "label": "표준품 번호체계·장부 확인",
+        "evidence": [
+          "authenticity-setup",
+          "copied-number"
+        ]
+      },
+      {
+        "from": "char-mingyu",
+        "to": "event-wiki-d12d5299a253870e3748a92e",
+        "kind": "participated_in",
+        "label": "진품 확인용 금속표 제작",
+        "evidence": [
+          "authenticity-setup"
+        ]
+      },
+      {
+        "from": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+        "to": "event-wiki-d12d5299a253870e3748a92e",
+        "kind": "participated_in",
+        "label": "접수대 장부 확인 안내",
+        "evidence": [
+          "authenticity-setup"
+        ]
+      },
+      {
+        "from": "event-wiki-d12d5299a253870e3748a92e",
+        "to": "loc-sports-complex",
+        "kind": "occurred_at",
+        "label": "길드 접수대 진품 확인체계 운영",
+        "evidence": [
+          "authenticity-setup"
+        ]
+      },
+      {
+        "from": "char-hayoung",
+        "to": "event-wiki-281823f8f1b6fb2c770b1925",
+        "kind": "participated_in",
+        "label": "시장 구매 사례 확인",
+        "evidence": [
+          "market-investigation"
+        ]
+      },
+      {
+        "from": "char-wiki-cc15e0b3875ce0e734646be4",
+        "to": "event-wiki-281823f8f1b6fb2c770b1925",
+        "kind": "participated_in",
+        "label": "고객 거래사례 확인",
+        "evidence": [
+          "market-investigation"
+        ]
+      },
+      {
+        "from": "char-eunchae",
+        "to": "event-wiki-281823f8f1b6fb2c770b1925",
+        "kind": "participated_in",
+        "label": "판매·수리 장부 대조",
+        "evidence": [
+          "copied-number",
+          "authenticity-setup"
+        ]
+      },
+      {
+        "from": "char-jinwoo",
+        "to": "event-wiki-281823f8f1b6fb2c770b1925",
+        "kind": "participated_in",
+        "label": "피해거래 정산·서비스 이용 제한 판단",
+        "evidence": [
+          "sanction-boundary"
+        ]
+      }
+    ],
+    "citations": [
+      {
+        "id": "survey-roles",
+        "block_id": "001",
+        "quote": "# 2027년 10월 31일 ~ 11월 4일\n### 공공 급수지점 2곳 — 실태조사\n\n진우는 ‘공공’이라는 말부터 믿고 계약하지 않았다.\n\n문하진과 행정 잔존팀 사람들에게 먼저 물었다.\n\n“몇 명이 쓰고 있습니까?”\n\n“펌프 멈추면 몇 시간 버팁니까?”\n\n“대체 수원은요?”\n\n“밤에 고장 나면 누가 현장에 남습니까?”\n\n태훈과 민규는 설비를 봤고,\n은채는 운영기록을 봤다."
+      },
+      {
+        "id": "pump-replacement",
+        "block_id": "001",
+        "quote": "문제는 펌프였다.\n\n오래된 규격이었고\n임시수리를 반복한 흔적이 많았다.\n\n태훈이 말했다.\n\n“이건 바꾸는 게 맞아.”"
+      },
+      {
+        "id": "public-contract",
+        "block_id": "001",
+        "quote": "# 11월 5일 — 계약 정리\n\n진우는 세 가지를 분명히 했다.\n\n“펌프와 부품은 팔 수 있습니다.”\n\n“일반 유지보수 계약도 받을 수 있고요.”\n\n그리고 마지막 말을 붙였다.\n\n“하지만 공공급수라고 해서\n길드가 무조건 먼저 뛰어오는 계약은 안 합니다.”\n\n행정팀 쪽에서 바로 물었다.\n\n“사람들 물이 끊겨도요?”\n\n진우가 대답했다.\n\n“그 상황을 보고 움직이죠.”\n\n“그게 무슨 차이입니까?”\n\n“급수지점에 하루치 물이 남아 있고,\n다른 데는 지금 안 가면 오늘 설비가 완전히 죽는 상황일 수도 있습니다.”\n\n진우가 말했다.\n\n“반대로 여기가 물 한 방울 안 나오고\n대체수단도 없고\n사람 수십 명이 바로 위험해지면\n당연히 여기부터 보겠죠.”\n\n잠시 조용해졌다.\n\n“**공공이라서 우선이 아니라,\n실제 피해가 큰 일이 우선입니다.**”\n\n문하진이 먼저 고개를 끄덕였다.\n\n“그게 맞아.”\n\n---\n\n## 최종 구조\n\n**행정 잔존팀**\n- 급수지점 운영책임\n- 배급기준\n- 일상점검\n- 대체수원 확보\n- 현장 인력\n- 비상시 1차 대응\n\n**길드**\n- 표준펌프·부품 판매\n- 일반 유지보수 계약\n- 수리 요청 접수\n- 상황에 따른 기술지원\n\n그리고 한 줄이 계약에서 빠졌다.\n\n> 급수 중단 시 길드 최우선 복구\n\n대신 이렇게 바뀌었다.\n\n> **긴급 고장은 당시 인명·대체수단·저장량·다른 현장 상황을 함께 판단해 대응한다.**\n\n공공기관도 일반 고객과 다른 특권은 없었다.\n\n책임도 떠넘길 수 없었다."
+      },
+      {
+        "id": "repair-priority",
+        "block_id": "001",
+        "quote": "# 2027년 11월 9일 07:50\n### 원칙이 바로 시험대에 올랐다\n\n아침에 거의 동시에 두 건이 들어왔다.\n\n공공 급수지점 한 곳의 펌프가 멈췄다.\n\n그리고 동쪽 생산거점에서도\n운영펌프 하나가 심한 소음을 내며 정지했다.\n\n행정팀 쪽에서 먼저 연락이 왔다.\n\n“공공급수입니다. 빨리 사람 보내주세요.”\n\n동쪽에서는 정병호가 말했다.\n\n“오늘 오전에 물 못 넣으면\n지금 옮겨놓은 모종 일부가 위험합니다.”\n\n둘 다 급했다.\n\n진우는 ‘공공’이라는 단어부터 보지 않았다.\n\n현황부터 물었다.\n\n---\n\n## 공공 급수지점\n\n저장탱크 잔량은\n배급을 줄이면 저녁까지 버틸 정도였다.\n\n행정팀이 이미 제한배급을 시작했다.\n\n다른 수원에서 물통을 옮길 준비도 됐다.\n\n당장 편하지는 않지만\n**몇 시간 안에 사람이 물을 완전히 잃는 상황은 아니었다.**\n\n---\n\n## 생산거점\n\n반대로 이쪽은\n예비펌프가 이미 다른 곳에서 사용 중이었다.\n\n수동으로 옮길 수 있는 물량에도 한계가 있었다.\n\n태훈이 말했다.\n\n“여긴 오전 넘기면 작물 쪽 피해가 바로 나와.”\n\n진우가 결정했다.\n\n“생산거점 먼저.”\n\n행정팀 담당자가 불편한 목소리로 말했다.\n\n“공공급수보다 농장이 먼저라는 겁니까?”\n\n진우가 대답했다.\n\n“오늘은요.”\n\n“왜죠?”\n\n“당신들은 저녁까지 버틸 물이 있고\n우회수단도 있습니다.”\n\n그리고 덧붙였다.\n\n“저쪽은 지금 몇 시간 놓치면 피해가 확정돼요.”\n\n---\n\n# 결과\n\n태훈과 민규가 생산거점부터 들어갔다.\n\n문제는 베어링 쪽이었다.\n\n예비부품으로 오전 안에 복구했다.\n\n그 뒤 바로 공공 급수지점으로 넘어갔다.\n\n급수지점은 그동안 제한배급과 외부 물통 운반으로 버텼다.\n\n오후에는 펌프를 교체해 정상화했다.\n\n사람이 물을 못 받아 위험해지는 상황도 없었고,\n생산거점의 작물 손실도 크게 막았다.\n\n진우가 원했던 건 바로 이런 구조였다.\n\n**공공을 무시한 것도 아니다.  \n공공이라는 이름 때문에 다른 계약을 무조건 밀어낸 것도 아니다.**\n\n그날의 피해를 보고 순서를 정했다."
+      },
+      {
+        "id": "counterfeit-check",
+        "block_id": "001",
+        "quote": "민규가 열어보더니 바로 말했다.\n\n“이거 우리 물건 아닙니다.”\n\n겉에는 길드 표식을 흉내 냈지만,\n안쪽에는 길드가 쓰지 않는 부품이 들어 있었다."
+      },
+      {
+        "id": "authenticity-setup",
+        "block_id": "003",
+        "quote": "# 2027년 11월 16일\n### 폐쇄 체육시설 — 길드 접수대\n\n진우는 바로 사람부터 쫓지 않았다.\n\n먼저 **진품 확인체계**를 만들었다.\n\n민규가 얇은 금속표를 잘랐고,\n은채가 번호체계를 정했다.\n\n> 제품군 코드  \n> 개별 연번  \n> 판매·수리 이력은 길드 장부와 연결\n\n겉표식은 참고일 뿐이었다.\n\n누가 비슷한 색을 칠하고,\n금속표를 흉내 내도\n**장부에 번호가 없으면 길드 표준품이 아니다.**\n\n세린이 접수대에 한 줄을 붙였다.\n\n> **길드 표준품은 번호만 보지 말고 길드 장부 확인 가능 여부를 확인하십시오.**\n\n구매자가 종이를 잃어도 상관없었다.\n\n번호만 가져오면\n길드에서 판매기록과 수리이력을 확인할 수 있었다."
+      },
+      {
+        "id": "copied-number",
+        "block_id": "003",
+        "quote": "은채가 장부를 펼치자 바로 문제가 나왔다.\n\n진짜 A-07은 이미 동쪽 생산거점에 설치돼 있었다.\n\n같은 번호가 두 개일 수 없었다.\n\n민규가 말했다.\n\n“그냥 비슷하게 만든 게 아니라 번호까지 베꼈네.”"
+      },
+      {
+        "id": "market-investigation",
+        "block_id": "003",
+        "quote": "# 11월 17일 ~ 18일\n### 조용한 확인\n\n하영이 시장 쪽에서 말을 돌렸다.\n\n“길드 표준펌프 산 사람 중에 장부 확인 안 한 사람 있어?”\n\n대놓고 범인을 찾지는 않았다.\n\n최광석도 자기 손님들 이야기를 몇 군데 확인했다.\n\n그가 도와준 이유도 착해서가 아니었다.\n\n“짝퉁이 돌아다니면 우리 장사까지 다 의심받습니다.”\n\n자기 이해관계였다.\n\n그게 더 현실적이었다.\n\n이틀 만에 비슷한 물건이 네 대까지 확인됐다.\n\n공통점이 있었다.\n\n모두 이동상인 **황대식**을 거쳤다."
+      },
+      {
+        "id": "sanction-boundary",
+        "block_id": "003",
+        "quote": "## 진우가 내린 판단\n\n진우는 대식 물건을 빼앗지 않았다.\n\n길드가 경찰도 아니고,\n밖에서 장사하는 것까지 막을 권리도 없었다.\n\n대신 길드가 통제할 수 있는 것만 건드렸다.\n\n“밖에서 장사하는 건 마음대로 하세요.”\n\n대식이 쳐다봤다.\n\n“대신 길드 이름이랑 표식 비슷한 걸 써서 판 건 정리해야 합니다.”\n\n조건은 세 가지였다.\n\n**1. 확인된 네 건에 대해 구매자와 직접 정산한다.**  \n환불이든 가격조정이든 당사자끼리 합의한다.\n\n**2. 길드 표식을 흉내 낸 표시는 전부 제거한다.**\n\n**3. 정리될 때까지 길드 시장·중개·에스크로·수리서비스 이용을 제한한다.**\n\n대식이 목소리를 높였다.\n\n“길드가 무슨 자격으로 내 장사를 막습니까?”\n\n진우가 대답했다.\n\n“밖에서 하는 장사는 안 막습니다.”\n\n그리고 접수대를 가리켰다.\n\n“우리 서비스 이용을 안 받겠다는 겁니다.”\n\n그건 달랐다.\n\n길드가 가진 권한 안에서만 제재했다."
+      },
+      {
+        "id": "northern-invitation",
+        "block_id": "003",
+        "quote": "# 2027년 11월 22일 18:10\n### 관리동\n\n가짜 문제는 정리됐다.\n\n그날 저녁,\n하영이 북쪽에서 넘어온 쪽지를 하나 내려놨다.\n\n보낸 곳은 **북쪽 연료장 생활권**이었다.\n\n겨울 전,\n운송 가능한 집단과 거래거점을 불러\n한 번 모이겠다는 내용이었다.\n\n핵심은 두 가지였다.\n\n**이번 겨울에 실제로 풀 수 있는 연료량.**\n\n그리고\n\n**누가 그 연료를 어디까지 운반할 수 있는가.**\n\n길드 이름도 들어 있었다."
+      },
+      {
+        "id": "core-four-names",
+        "block_id": "005",
+        "quote": "서진우.\n\n윤서진.\n\n최은채.\n\n장태훈."
+      },
+      {
+        "id": "eunchae-settlement",
+        "block_id": "005",
+        "quote": "은채가 장부 하나를 덮었다.\n\n“오늘 정산 끝.”"
+      },
+      {
+        "id": "northern-pending",
+        "block_id": "005",
+        "quote": "길드는 참석 여부도,\n조건도,\n역할도 아직 결정하지 않았다."
+      },
+      {
+        "id": "dongcheol-warehouse-check",
+        "block_id": "005",
+        "quote": "박동철은 뒤편 창고 문을 확인했다."
+      },
+      {
+        "id": "vocational-living-base",
+        "block_id": "005",
+        "quote": "### 폐쇄 직업훈련원 — 핵심 4인 생활거점"
+      }
+    ],
+    "deferred": [
+      {
+        "reason": "북쪽 초청은 참석 여부·조건·역할 모두 미정이다. 기존 초청 사건 record가 이미 save 285이므로 같은 revision 변경 guard를 유지하고 이 보완안에서는 수정하지 않는다.",
+        "evidence": [
+          "northern-pending"
+        ]
+      },
+      {
+        "reason": "박동철이라는 이름과 뒤편 창고 문을 확인한 행동이 공개 GM 005에 나오지만 현재 기존 인물 목록에는 확인 가능한 연결이 없다. 한 장면만으로 새 인물의 장기 직위·고용관계를 정하지 않고 동일인 여부와 공개 가능한 역할 확인을 별도 검수로 유보한다.",
+        "evidence": [
+          "dongcheol-warehouse-check"
+        ]
+      },
+      {
+        "reason": "폐쇄 직업훈련원이 핵심 4인 생활거점으로 서술되지만 현재 Graph 장소 목록에 일치하는 정식 ID가 없고 기존 제한 공개·비공개 거점과의 관계도 확정되지 않았다. 장소 동일성과 공개 범위를 확인할 때까지 새 장소·거주관계 추가와 위치 정보 노출을 유보한다.",
+        "evidence": [
+          "vocational-living-base"
+        ]
+      }
+    ],
+    "note": "기존 SESSION_008 APPLIED 사실·receipt를 보존한 별도 보완안이다. 공개 GM 001/003/005 전체를 검토하고, 기존에 반영된 사건과 새 인물·장소는 재생성하지 않는다. anchor 253인 기존 인물 5명의 확인된 최근 활동만 summary에 보강하고 누락된 명시 참여관계를 추가한다. 기존 이름·유형·직업·소속·거점출입 메타는 그대로 보존한다. 거점 접근권, 새 직위, 사적 관계, 미선택 초청 참석을 추론하지 않는다. COMPLETE는 전체 008 공개 블록 검토를 뜻하며 기존 receipt를 바꾸거나 새 source 처리 완료를 주장하지 않는다."
+  },
+  "proposal": {
+    "version": "wiki-fact-proposal-v1",
+    "job_id": "wiki-job-43d7a670d6532d7cd41d4913c8febf1e281e81ef9321f732573e7e8d13f99046",
+    "source": {
+      "session_id": "SESSION_008",
+      "manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/SOURCE_MANIFEST.json",
+      "manifest_sha256": "3d15073c796967f27b1dd094ceecd948ab28b93aed7971818de48cb0e6cd4dc0",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "raw_sha256": "4f3f927f3a5cee583d47cc94dc375d43467c92bd54930426a8b434a12e2dfa2f"
+    },
+    "expected_graph_sha256": "4eae33f49195300c4b538c05eb02c3a91638b2f648af1d4e4d0e84fb0f87303e",
+    "result_sha256": "e5447cb20325b4681f51cd59a823df3cf67aa61d571eb83936c09ce1f12e2534",
+    "status": "FACTS_PROPOSED",
+    "review_required": true,
+    "application_status": "SEMANTIC_REVIEW_REQUIRED",
+    "coverage": {
+      "status": "COMPLETE",
+      "reviewed_blocks": [
+        "001",
+        "003",
+        "005"
+      ]
+    },
+    "facts": {
+      "version": "public-graph-facts-v1",
+      "chronicle_id": "C03-AFTERFALL",
+      "worldline_id": "AFTERFALL",
+      "visibility": "PUBLIC_ARCHIVE",
+      "season_id": "S03",
+      "anchor": {
+        "save_version": 285,
+        "game_time": "2027-11-22 22:40"
+      },
+      "nodes": [
+        {
+          "id": "char-jinwoo",
+          "label": "서진우",
+          "meta": {
+            "상태": "ACTIVE",
+            "소속": "CORE_FOUR"
+          },
+          "source": "S03 SESSION_008 GM 공개 블록 001, 003, 005",
+          "subtitle": "응급실 간호사 · 플레이어",
+          "summary": "공공 급수지점에는 일반 유지보수와 기술지원을 제공하고 일상 운영은 행정 잔존팀이 맡도록 책임을 나눴다. 2027년 11월 9일에는 저장량과 대체수단을 비교해 생산거점을 먼저 복구하도록 결정했다. 길드 표식 사칭 문제에서는 상인의 물건을 빼앗거나 외부 장사를 금지하지 않고 피해거래 정산과 길드 서비스 이용 제한으로 대응했다.",
+          "tags": [
+            "PLAYER",
+            "핵심 4인",
+            "응급의료",
+            "외부정찰"
+          ],
+          "type": "character"
+        },
+        {
+          "id": "char-eunchae",
+          "label": "최은채",
+          "meta": {
+            "겨울역할": "물류·기록 지원",
+            "상태": "ACTIVE"
+          },
+          "source": "S03 SESSION_008 GM 공개 블록 001, 003, 005",
+          "subtitle": "병원 행정직 출신 · 물류·기록",
+          "summary": "공공 급수지점 실태조사에서 운영기록을 확인했다. 길드 표준품의 번호체계를 정하고 판매·수리 장부와 대조해 사칭품을 확인했으며, 하루 거래 정산을 마감했다.",
+          "tags": [
+            "CORE",
+            "핵심 4인",
+            "물류",
+            "기록"
+          ],
+          "type": "character"
+        },
+        {
+          "id": "char-hayoung",
+          "label": "신하영",
+          "meta": {
+            "별칭": "이소라",
+            "상태": "ACTIVE",
+            "연합원": "아님"
+          },
+          "source": "S03 SESSION_008 GM 공개 블록 003",
+          "subtitle": "조리·위생·단체생활 전문가",
+          "summary": "길드 표준펌프 사칭 문제가 생기자 시장에서 구매 사례와 장부 확인 여부를 알아봤다. 2027년 11월 22일에는 북쪽 연료장 생활권에서 보낸 겨울 전 연료·운송 회의 초청장을 길드에 전달했다.",
+          "tags": [
+            "MAJOR",
+            "겨울편 주도",
+            "조리",
+            "위생",
+            "TRUSTED_EXTERNAL"
+          ],
+          "type": "character"
+        },
+        {
+          "id": "char-mingyu",
+          "label": "정민규",
+          "meta": {
+            "거점출입": "없음",
+            "상태": "ACTIVE"
+          },
+          "source": "S03 SESSION_008 GM 공개 블록 001, 003",
+          "subtitle": "외부 전기·시설 기술자",
+          "summary": "공공 급수지점 실태조사에서 설비를 살폈다. 2027년 11월 9일 장태훈과 생산거점 펌프를 먼저 복구한 뒤 공공 급수지점 복구에 참여했고, 표준품 진품 확인용 금속표를 만들었다.",
+          "tags": [
+            "MAJOR",
+            "전기",
+            "시설",
+            "외부협력"
+          ],
+          "type": "character"
+        },
+        {
+          "id": "char-taehoon",
+          "label": "장태훈",
+          "meta": {
+            "겨울역할": "설비·난방·급수 지원",
+            "상태": "ACTIVE"
+          },
+          "source": "S03 SESSION_008 GM 공개 블록 001, 005",
+          "subtitle": "시설운영 기술자",
+          "summary": "공공 급수지점 두 곳의 설비를 조사하고 오래된 펌프 교체가 필요하다고 판단했다. 2027년 11월 9일에는 정민규와 생산거점 펌프를 오전 안에 복구하고, 이어 공공 급수지점 펌프를 교체해 오후에 정상화했다.",
+          "tags": [
+            "CORE",
+            "핵심 4인",
+            "시설",
+            "난방",
+            "급수"
+          ],
+          "type": "character"
+        }
+      ],
+      "relations": [
+        {
+          "from": "char-jinwoo",
+          "to": "event-wiki-a0da729cf563fe4b71f80b21",
+          "kind": "participated_in",
+          "label": "일반 유지보수·상황별 대응 원칙 확정"
+        },
+        {
+          "from": "char-hajin",
+          "to": "event-wiki-a0da729cf563fe4b71f80b21",
+          "kind": "participated_in",
+          "label": "상황별 대응 원칙 확인·동의"
+        },
+        {
+          "from": "char-jinwoo",
+          "to": "event-wiki-d12d5299a253870e3748a92e",
+          "kind": "participated_in",
+          "label": "진품 확인체계 구축 착수"
+        },
+        {
+          "from": "char-eunchae",
+          "to": "event-wiki-d12d5299a253870e3748a92e",
+          "kind": "participated_in",
+          "label": "표준품 번호체계·장부 확인"
+        },
+        {
+          "from": "char-mingyu",
+          "to": "event-wiki-d12d5299a253870e3748a92e",
+          "kind": "participated_in",
+          "label": "진품 확인용 금속표 제작"
+        },
+        {
+          "from": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+          "to": "event-wiki-d12d5299a253870e3748a92e",
+          "kind": "participated_in",
+          "label": "접수대 장부 확인 안내"
+        },
+        {
+          "from": "event-wiki-d12d5299a253870e3748a92e",
+          "to": "loc-sports-complex",
+          "kind": "occurred_at",
+          "label": "길드 접수대 진품 확인체계 운영"
+        },
+        {
+          "from": "char-hayoung",
+          "to": "event-wiki-281823f8f1b6fb2c770b1925",
+          "kind": "participated_in",
+          "label": "시장 구매 사례 확인"
+        },
+        {
+          "from": "char-wiki-cc15e0b3875ce0e734646be4",
+          "to": "event-wiki-281823f8f1b6fb2c770b1925",
+          "kind": "participated_in",
+          "label": "고객 거래사례 확인"
+        },
+        {
+          "from": "char-eunchae",
+          "to": "event-wiki-281823f8f1b6fb2c770b1925",
+          "kind": "participated_in",
+          "label": "판매·수리 장부 대조"
+        },
+        {
+          "from": "char-jinwoo",
+          "to": "event-wiki-281823f8f1b6fb2c770b1925",
+          "kind": "participated_in",
+          "label": "피해거래 정산·서비스 이용 제한 판단"
+        }
+      ]
+    },
+    "evidence": [
+      {
+        "pointer": "/nodes/0",
+        "operation": "UPDATE",
+        "fields": {
+          "type": [
+            {
+              "block_id": "005",
+              "block_sha256": "b78ffe1b4cadbdd8680113147791ccddcd8921c69dd23ded4468390aad188c1a",
+              "start": 357,
+              "end": 379,
+              "quote": "서진우.\n\n윤서진.\n\n최은채.\n\n장태훈."
+            }
+          ],
+          "label": [
+            {
+              "block_id": "005",
+              "block_sha256": "b78ffe1b4cadbdd8680113147791ccddcd8921c69dd23ded4468390aad188c1a",
+              "start": 357,
+              "end": 379,
+              "quote": "서진우.\n\n윤서진.\n\n최은채.\n\n장태훈."
+            }
+          ],
+          "summary": [
+            {
+              "block_id": "001",
+              "block_sha256": "ba386edf6053df69dd92debbe5b86778a68d9f044abc0b9db6f17a6ce6b51323",
+              "start": 735,
+              "end": 1466,
+              "quote": "# 11월 5일 — 계약 정리\n\n진우는 세 가지를 분명히 했다.\n\n“펌프와 부품은 팔 수 있습니다.”\n\n“일반 유지보수 계약도 받을 수 있고요.”\n\n그리고 마지막 말을 붙였다.\n\n“하지만 공공급수라고 해서\n길드가 무조건 먼저 뛰어오는 계약은 안 합니다.”\n\n행정팀 쪽에서 바로 물었다.\n\n“사람들 물이 끊겨도요?”\n\n진우가 대답했다.\n\n“그 상황을 보고 움직이죠.”\n\n“그게 무슨 차이입니까?”\n\n“급수지점에 하루치 물이 남아 있고,\n다른 데는 지금 안 가면 오늘 설비가 완전히 죽는 상황일 수도 있습니다.”\n\n진우가 말했다.\n\n“반대로 여기가 물 한 방울 안 나오고\n대체수단도 없고\n사람 수십 명이 바로 위험해지면\n당연히 여기부터 보겠죠.”\n\n잠시 조용해졌다.\n\n“**공공이라서 우선이 아니라,\n실제 피해가 큰 일이 우선입니다.**”\n\n문하진이 먼저 고개를 끄덕였다.\n\n“그게 맞아.”\n\n---\n\n## 최종 구조\n\n**행정 잔존팀**\n- 급수지점 운영책임\n- 배급기준\n- 일상점검\n- 대체수원 확보\n- 현장 인력\n- 비상시 1차 대응\n\n**길드**\n- 표준펌프·부품 판매\n- 일반 유지보수 계약\n- 수리 요청 접수\n- 상황에 따른 기술지원\n\n그리고 한 줄이 계약에서 빠졌다.\n\n> 급수 중단 시 길드 최우선 복구\n\n대신 이렇게 바뀌었다.\n\n> **긴급 고장은 당시 인명·대체수단·저장량·다른 현장 상황을 함께 판단해 대응한다.**\n\n공공기관도 일반 고객과 다른 특권은 없었다.\n\n책임도 떠넘길 수 없었다."
+            },
+            {
+              "block_id": "001",
+              "block_sha256": "ba386edf6053df69dd92debbe5b86778a68d9f044abc0b9db6f17a6ce6b51323",
+              "start": 1473,
+              "end": 2477,
+              "quote": "# 2027년 11월 9일 07:50\n### 원칙이 바로 시험대에 올랐다\n\n아침에 거의 동시에 두 건이 들어왔다.\n\n공공 급수지점 한 곳의 펌프가 멈췄다.\n\n그리고 동쪽 생산거점에서도\n운영펌프 하나가 심한 소음을 내며 정지했다.\n\n행정팀 쪽에서 먼저 연락이 왔다.\n\n“공공급수입니다. 빨리 사람 보내주세요.”\n\n동쪽에서는 정병호가 말했다.\n\n“오늘 오전에 물 못 넣으면\n지금 옮겨놓은 모종 일부가 위험합니다.”\n\n둘 다 급했다.\n\n진우는 ‘공공’이라는 단어부터 보지 않았다.\n\n현황부터 물었다.\n\n---\n\n## 공공 급수지점\n\n저장탱크 잔량은\n배급을 줄이면 저녁까지 버틸 정도였다.\n\n행정팀이 이미 제한배급을 시작했다.\n\n다른 수원에서 물통을 옮길 준비도 됐다.\n\n당장 편하지는 않지만\n**몇 시간 안에 사람이 물을 완전히 잃는 상황은 아니었다.**\n\n---\n\n## 생산거점\n\n반대로 이쪽은\n예비펌프가 이미 다른 곳에서 사용 중이었다.\n\n수동으로 옮길 수 있는 물량에도 한계가 있었다.\n\n태훈이 말했다.\n\n“여긴 오전 넘기면 작물 쪽 피해가 바로 나와.”\n\n진우가 결정했다.\n\n“생산거점 먼저.”\n\n행정팀 담당자가 불편한 목소리로 말했다.\n\n“공공급수보다 농장이 먼저라는 겁니까?”\n\n진우가 대답했다.\n\n“오늘은요.”\n\n“왜죠?”\n\n“당신들은 저녁까지 버틸 물이 있고\n우회수단도 있습니다.”\n\n그리고 덧붙였다.\n\n“저쪽은 지금 몇 시간 놓치면 피해가 확정돼요.”\n\n---\n\n# 결과\n\n태훈과 민규가 생산거점부터 들어갔다.\n\n문제는 베어링 쪽이었다.\n\n예비부품으로 오전 안에 복구했다.\n\n그 뒤 바로 공공 급수지점으로 넘어갔다.\n\n급수지점은 그동안 제한배급과 외부 물통 운반으로 버텼다.\n\n오후에는 펌프를 교체해 정상화했다.\n\n사람이 물을 못 받아 위험해지는 상황도 없었고,\n생산거점의 작물 손실도 크게 막았다.\n\n진우가 원했던 건 바로 이런 구조였다.\n\n**공공을 무시한 것도 아니다.  \n공공이라는 이름 때문에 다른 계약을 무조건 밀어낸 것도 아니다.**\n\n그날의 피해를 보고 순서를 정했다."
+            },
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 1265,
+              "end": 1738,
+              "quote": "## 진우가 내린 판단\n\n진우는 대식 물건을 빼앗지 않았다.\n\n길드가 경찰도 아니고,\n밖에서 장사하는 것까지 막을 권리도 없었다.\n\n대신 길드가 통제할 수 있는 것만 건드렸다.\n\n“밖에서 장사하는 건 마음대로 하세요.”\n\n대식이 쳐다봤다.\n\n“대신 길드 이름이랑 표식 비슷한 걸 써서 판 건 정리해야 합니다.”\n\n조건은 세 가지였다.\n\n**1. 확인된 네 건에 대해 구매자와 직접 정산한다.**  \n환불이든 가격조정이든 당사자끼리 합의한다.\n\n**2. 길드 표식을 흉내 낸 표시는 전부 제거한다.**\n\n**3. 정리될 때까지 길드 시장·중개·에스크로·수리서비스 이용을 제한한다.**\n\n대식이 목소리를 높였다.\n\n“길드가 무슨 자격으로 내 장사를 막습니까?”\n\n진우가 대답했다.\n\n“밖에서 하는 장사는 안 막습니다.”\n\n그리고 접수대를 가리켰다.\n\n“우리 서비스 이용을 안 받겠다는 겁니다.”\n\n그건 달랐다.\n\n길드가 가진 권한 안에서만 제재했다."
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/nodes/1",
+        "operation": "UPDATE",
+        "fields": {
+          "type": [
+            {
+              "block_id": "005",
+              "block_sha256": "b78ffe1b4cadbdd8680113147791ccddcd8921c69dd23ded4468390aad188c1a",
+              "start": 357,
+              "end": 379,
+              "quote": "서진우.\n\n윤서진.\n\n최은채.\n\n장태훈."
+            }
+          ],
+          "label": [
+            {
+              "block_id": "005",
+              "block_sha256": "b78ffe1b4cadbdd8680113147791ccddcd8921c69dd23ded4468390aad188c1a",
+              "start": 357,
+              "end": 379,
+              "quote": "서진우.\n\n윤서진.\n\n최은채.\n\n장태훈."
+            }
+          ],
+          "summary": [
+            {
+              "block_id": "001",
+              "block_sha256": "ba386edf6053df69dd92debbe5b86778a68d9f044abc0b9db6f17a6ce6b51323",
+              "start": 0,
+              "end": 209,
+              "quote": "# 2027년 10월 31일 ~ 11월 4일\n### 공공 급수지점 2곳 — 실태조사\n\n진우는 ‘공공’이라는 말부터 믿고 계약하지 않았다.\n\n문하진과 행정 잔존팀 사람들에게 먼저 물었다.\n\n“몇 명이 쓰고 있습니까?”\n\n“펌프 멈추면 몇 시간 버팁니까?”\n\n“대체 수원은요?”\n\n“밤에 고장 나면 누가 현장에 남습니까?”\n\n태훈과 민규는 설비를 봤고,\n은채는 운영기록을 봤다."
+            },
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 0,
+              "end": 357,
+              "quote": "# 2027년 11월 16일\n### 폐쇄 체육시설 — 길드 접수대\n\n진우는 바로 사람부터 쫓지 않았다.\n\n먼저 **진품 확인체계**를 만들었다.\n\n민규가 얇은 금속표를 잘랐고,\n은채가 번호체계를 정했다.\n\n> 제품군 코드  \n> 개별 연번  \n> 판매·수리 이력은 길드 장부와 연결\n\n겉표식은 참고일 뿐이었다.\n\n누가 비슷한 색을 칠하고,\n금속표를 흉내 내도\n**장부에 번호가 없으면 길드 표준품이 아니다.**\n\n세린이 접수대에 한 줄을 붙였다.\n\n> **길드 표준품은 번호만 보지 말고 길드 장부 확인 가능 여부를 확인하십시오.**\n\n구매자가 종이를 잃어도 상관없었다.\n\n번호만 가져오면\n길드에서 판매기록과 수리이력을 확인할 수 있었다."
+            },
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 412,
+              "end": 526,
+              "quote": "은채가 장부를 펼치자 바로 문제가 나왔다.\n\n진짜 A-07은 이미 동쪽 생산거점에 설치돼 있었다.\n\n같은 번호가 두 개일 수 없었다.\n\n민규가 말했다.\n\n“그냥 비슷하게 만든 게 아니라 번호까지 베꼈네.”"
+            },
+            {
+              "block_id": "005",
+              "block_sha256": "b78ffe1b4cadbdd8680113147791ccddcd8921c69dd23ded4468390aad188c1a",
+              "start": 484,
+              "end": 511,
+              "quote": "은채가 장부 하나를 덮었다.\n\n“오늘 정산 끝.”"
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/nodes/2",
+        "operation": "UPDATE",
+        "fields": {
+          "type": [
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 551,
+              "end": 821,
+              "quote": "# 11월 17일 ~ 18일\n### 조용한 확인\n\n하영이 시장 쪽에서 말을 돌렸다.\n\n“길드 표준펌프 산 사람 중에 장부 확인 안 한 사람 있어?”\n\n대놓고 범인을 찾지는 않았다.\n\n최광석도 자기 손님들 이야기를 몇 군데 확인했다.\n\n그가 도와준 이유도 착해서가 아니었다.\n\n“짝퉁이 돌아다니면 우리 장사까지 다 의심받습니다.”\n\n자기 이해관계였다.\n\n그게 더 현실적이었다.\n\n이틀 만에 비슷한 물건이 네 대까지 확인됐다.\n\n공통점이 있었다.\n\n모두 이동상인 **황대식**을 거쳤다."
+            }
+          ],
+          "label": [
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 551,
+              "end": 821,
+              "quote": "# 11월 17일 ~ 18일\n### 조용한 확인\n\n하영이 시장 쪽에서 말을 돌렸다.\n\n“길드 표준펌프 산 사람 중에 장부 확인 안 한 사람 있어?”\n\n대놓고 범인을 찾지는 않았다.\n\n최광석도 자기 손님들 이야기를 몇 군데 확인했다.\n\n그가 도와준 이유도 착해서가 아니었다.\n\n“짝퉁이 돌아다니면 우리 장사까지 다 의심받습니다.”\n\n자기 이해관계였다.\n\n그게 더 현실적이었다.\n\n이틀 만에 비슷한 물건이 네 대까지 확인됐다.\n\n공통점이 있었다.\n\n모두 이동상인 **황대식**을 거쳤다."
+            }
+          ],
+          "summary": [
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 551,
+              "end": 821,
+              "quote": "# 11월 17일 ~ 18일\n### 조용한 확인\n\n하영이 시장 쪽에서 말을 돌렸다.\n\n“길드 표준펌프 산 사람 중에 장부 확인 안 한 사람 있어?”\n\n대놓고 범인을 찾지는 않았다.\n\n최광석도 자기 손님들 이야기를 몇 군데 확인했다.\n\n그가 도와준 이유도 착해서가 아니었다.\n\n“짝퉁이 돌아다니면 우리 장사까지 다 의심받습니다.”\n\n자기 이해관계였다.\n\n그게 더 현실적이었다.\n\n이틀 만에 비슷한 물건이 네 대까지 확인됐다.\n\n공통점이 있었다.\n\n모두 이동상인 **황대식**을 거쳤다."
+            },
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 2306,
+              "end": 2545,
+              "quote": "# 2027년 11월 22일 18:10\n### 관리동\n\n가짜 문제는 정리됐다.\n\n그날 저녁,\n하영이 북쪽에서 넘어온 쪽지를 하나 내려놨다.\n\n보낸 곳은 **북쪽 연료장 생활권**이었다.\n\n겨울 전,\n운송 가능한 집단과 거래거점을 불러\n한 번 모이겠다는 내용이었다.\n\n핵심은 두 가지였다.\n\n**이번 겨울에 실제로 풀 수 있는 연료량.**\n\n그리고\n\n**누가 그 연료를 어디까지 운반할 수 있는가.**\n\n길드 이름도 들어 있었다."
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/nodes/3",
+        "operation": "UPDATE",
+        "fields": {
+          "type": [
+            {
+              "block_id": "001",
+              "block_sha256": "ba386edf6053df69dd92debbe5b86778a68d9f044abc0b9db6f17a6ce6b51323",
+              "start": 0,
+              "end": 209,
+              "quote": "# 2027년 10월 31일 ~ 11월 4일\n### 공공 급수지점 2곳 — 실태조사\n\n진우는 ‘공공’이라는 말부터 믿고 계약하지 않았다.\n\n문하진과 행정 잔존팀 사람들에게 먼저 물었다.\n\n“몇 명이 쓰고 있습니까?”\n\n“펌프 멈추면 몇 시간 버팁니까?”\n\n“대체 수원은요?”\n\n“밤에 고장 나면 누가 현장에 남습니까?”\n\n태훈과 민규는 설비를 봤고,\n은채는 운영기록을 봤다."
+            }
+          ],
+          "label": [
+            {
+              "block_id": "001",
+              "block_sha256": "ba386edf6053df69dd92debbe5b86778a68d9f044abc0b9db6f17a6ce6b51323",
+              "start": 0,
+              "end": 209,
+              "quote": "# 2027년 10월 31일 ~ 11월 4일\n### 공공 급수지점 2곳 — 실태조사\n\n진우는 ‘공공’이라는 말부터 믿고 계약하지 않았다.\n\n문하진과 행정 잔존팀 사람들에게 먼저 물었다.\n\n“몇 명이 쓰고 있습니까?”\n\n“펌프 멈추면 몇 시간 버팁니까?”\n\n“대체 수원은요?”\n\n“밤에 고장 나면 누가 현장에 남습니까?”\n\n태훈과 민규는 설비를 봤고,\n은채는 운영기록을 봤다."
+            }
+          ],
+          "summary": [
+            {
+              "block_id": "001",
+              "block_sha256": "ba386edf6053df69dd92debbe5b86778a68d9f044abc0b9db6f17a6ce6b51323",
+              "start": 0,
+              "end": 209,
+              "quote": "# 2027년 10월 31일 ~ 11월 4일\n### 공공 급수지점 2곳 — 실태조사\n\n진우는 ‘공공’이라는 말부터 믿고 계약하지 않았다.\n\n문하진과 행정 잔존팀 사람들에게 먼저 물었다.\n\n“몇 명이 쓰고 있습니까?”\n\n“펌프 멈추면 몇 시간 버팁니까?”\n\n“대체 수원은요?”\n\n“밤에 고장 나면 누가 현장에 남습니까?”\n\n태훈과 민규는 설비를 봤고,\n은채는 운영기록을 봤다."
+            },
+            {
+              "block_id": "001",
+              "block_sha256": "ba386edf6053df69dd92debbe5b86778a68d9f044abc0b9db6f17a6ce6b51323",
+              "start": 1473,
+              "end": 2477,
+              "quote": "# 2027년 11월 9일 07:50\n### 원칙이 바로 시험대에 올랐다\n\n아침에 거의 동시에 두 건이 들어왔다.\n\n공공 급수지점 한 곳의 펌프가 멈췄다.\n\n그리고 동쪽 생산거점에서도\n운영펌프 하나가 심한 소음을 내며 정지했다.\n\n행정팀 쪽에서 먼저 연락이 왔다.\n\n“공공급수입니다. 빨리 사람 보내주세요.”\n\n동쪽에서는 정병호가 말했다.\n\n“오늘 오전에 물 못 넣으면\n지금 옮겨놓은 모종 일부가 위험합니다.”\n\n둘 다 급했다.\n\n진우는 ‘공공’이라는 단어부터 보지 않았다.\n\n현황부터 물었다.\n\n---\n\n## 공공 급수지점\n\n저장탱크 잔량은\n배급을 줄이면 저녁까지 버틸 정도였다.\n\n행정팀이 이미 제한배급을 시작했다.\n\n다른 수원에서 물통을 옮길 준비도 됐다.\n\n당장 편하지는 않지만\n**몇 시간 안에 사람이 물을 완전히 잃는 상황은 아니었다.**\n\n---\n\n## 생산거점\n\n반대로 이쪽은\n예비펌프가 이미 다른 곳에서 사용 중이었다.\n\n수동으로 옮길 수 있는 물량에도 한계가 있었다.\n\n태훈이 말했다.\n\n“여긴 오전 넘기면 작물 쪽 피해가 바로 나와.”\n\n진우가 결정했다.\n\n“생산거점 먼저.”\n\n행정팀 담당자가 불편한 목소리로 말했다.\n\n“공공급수보다 농장이 먼저라는 겁니까?”\n\n진우가 대답했다.\n\n“오늘은요.”\n\n“왜죠?”\n\n“당신들은 저녁까지 버틸 물이 있고\n우회수단도 있습니다.”\n\n그리고 덧붙였다.\n\n“저쪽은 지금 몇 시간 놓치면 피해가 확정돼요.”\n\n---\n\n# 결과\n\n태훈과 민규가 생산거점부터 들어갔다.\n\n문제는 베어링 쪽이었다.\n\n예비부품으로 오전 안에 복구했다.\n\n그 뒤 바로 공공 급수지점으로 넘어갔다.\n\n급수지점은 그동안 제한배급과 외부 물통 운반으로 버텼다.\n\n오후에는 펌프를 교체해 정상화했다.\n\n사람이 물을 못 받아 위험해지는 상황도 없었고,\n생산거점의 작물 손실도 크게 막았다.\n\n진우가 원했던 건 바로 이런 구조였다.\n\n**공공을 무시한 것도 아니다.  \n공공이라는 이름 때문에 다른 계약을 무조건 밀어낸 것도 아니다.**\n\n그날의 피해를 보고 순서를 정했다."
+            },
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 0,
+              "end": 357,
+              "quote": "# 2027년 11월 16일\n### 폐쇄 체육시설 — 길드 접수대\n\n진우는 바로 사람부터 쫓지 않았다.\n\n먼저 **진품 확인체계**를 만들었다.\n\n민규가 얇은 금속표를 잘랐고,\n은채가 번호체계를 정했다.\n\n> 제품군 코드  \n> 개별 연번  \n> 판매·수리 이력은 길드 장부와 연결\n\n겉표식은 참고일 뿐이었다.\n\n누가 비슷한 색을 칠하고,\n금속표를 흉내 내도\n**장부에 번호가 없으면 길드 표준품이 아니다.**\n\n세린이 접수대에 한 줄을 붙였다.\n\n> **길드 표준품은 번호만 보지 말고 길드 장부 확인 가능 여부를 확인하십시오.**\n\n구매자가 종이를 잃어도 상관없었다.\n\n번호만 가져오면\n길드에서 판매기록과 수리이력을 확인할 수 있었다."
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/nodes/4",
+        "operation": "UPDATE",
+        "fields": {
+          "type": [
+            {
+              "block_id": "005",
+              "block_sha256": "b78ffe1b4cadbdd8680113147791ccddcd8921c69dd23ded4468390aad188c1a",
+              "start": 357,
+              "end": 379,
+              "quote": "서진우.\n\n윤서진.\n\n최은채.\n\n장태훈."
+            }
+          ],
+          "label": [
+            {
+              "block_id": "005",
+              "block_sha256": "b78ffe1b4cadbdd8680113147791ccddcd8921c69dd23ded4468390aad188c1a",
+              "start": 357,
+              "end": 379,
+              "quote": "서진우.\n\n윤서진.\n\n최은채.\n\n장태훈."
+            }
+          ],
+          "summary": [
+            {
+              "block_id": "001",
+              "block_sha256": "ba386edf6053df69dd92debbe5b86778a68d9f044abc0b9db6f17a6ce6b51323",
+              "start": 0,
+              "end": 209,
+              "quote": "# 2027년 10월 31일 ~ 11월 4일\n### 공공 급수지점 2곳 — 실태조사\n\n진우는 ‘공공’이라는 말부터 믿고 계약하지 않았다.\n\n문하진과 행정 잔존팀 사람들에게 먼저 물었다.\n\n“몇 명이 쓰고 있습니까?”\n\n“펌프 멈추면 몇 시간 버팁니까?”\n\n“대체 수원은요?”\n\n“밤에 고장 나면 누가 현장에 남습니까?”\n\n태훈과 민규는 설비를 봤고,\n은채는 운영기록을 봤다."
+            },
+            {
+              "block_id": "001",
+              "block_sha256": "ba386edf6053df69dd92debbe5b86778a68d9f044abc0b9db6f17a6ce6b51323",
+              "start": 409,
+              "end": 474,
+              "quote": "문제는 펌프였다.\n\n오래된 규격이었고\n임시수리를 반복한 흔적이 많았다.\n\n태훈이 말했다.\n\n“이건 바꾸는 게 맞아.”"
+            },
+            {
+              "block_id": "001",
+              "block_sha256": "ba386edf6053df69dd92debbe5b86778a68d9f044abc0b9db6f17a6ce6b51323",
+              "start": 1473,
+              "end": 2477,
+              "quote": "# 2027년 11월 9일 07:50\n### 원칙이 바로 시험대에 올랐다\n\n아침에 거의 동시에 두 건이 들어왔다.\n\n공공 급수지점 한 곳의 펌프가 멈췄다.\n\n그리고 동쪽 생산거점에서도\n운영펌프 하나가 심한 소음을 내며 정지했다.\n\n행정팀 쪽에서 먼저 연락이 왔다.\n\n“공공급수입니다. 빨리 사람 보내주세요.”\n\n동쪽에서는 정병호가 말했다.\n\n“오늘 오전에 물 못 넣으면\n지금 옮겨놓은 모종 일부가 위험합니다.”\n\n둘 다 급했다.\n\n진우는 ‘공공’이라는 단어부터 보지 않았다.\n\n현황부터 물었다.\n\n---\n\n## 공공 급수지점\n\n저장탱크 잔량은\n배급을 줄이면 저녁까지 버틸 정도였다.\n\n행정팀이 이미 제한배급을 시작했다.\n\n다른 수원에서 물통을 옮길 준비도 됐다.\n\n당장 편하지는 않지만\n**몇 시간 안에 사람이 물을 완전히 잃는 상황은 아니었다.**\n\n---\n\n## 생산거점\n\n반대로 이쪽은\n예비펌프가 이미 다른 곳에서 사용 중이었다.\n\n수동으로 옮길 수 있는 물량에도 한계가 있었다.\n\n태훈이 말했다.\n\n“여긴 오전 넘기면 작물 쪽 피해가 바로 나와.”\n\n진우가 결정했다.\n\n“생산거점 먼저.”\n\n행정팀 담당자가 불편한 목소리로 말했다.\n\n“공공급수보다 농장이 먼저라는 겁니까?”\n\n진우가 대답했다.\n\n“오늘은요.”\n\n“왜죠?”\n\n“당신들은 저녁까지 버틸 물이 있고\n우회수단도 있습니다.”\n\n그리고 덧붙였다.\n\n“저쪽은 지금 몇 시간 놓치면 피해가 확정돼요.”\n\n---\n\n# 결과\n\n태훈과 민규가 생산거점부터 들어갔다.\n\n문제는 베어링 쪽이었다.\n\n예비부품으로 오전 안에 복구했다.\n\n그 뒤 바로 공공 급수지점으로 넘어갔다.\n\n급수지점은 그동안 제한배급과 외부 물통 운반으로 버텼다.\n\n오후에는 펌프를 교체해 정상화했다.\n\n사람이 물을 못 받아 위험해지는 상황도 없었고,\n생산거점의 작물 손실도 크게 막았다.\n\n진우가 원했던 건 바로 이런 구조였다.\n\n**공공을 무시한 것도 아니다.  \n공공이라는 이름 때문에 다른 계약을 무조건 밀어낸 것도 아니다.**\n\n그날의 피해를 보고 순서를 정했다."
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/relations/0",
+        "fields": {
+          "relation": [
+            {
+              "block_id": "001",
+              "block_sha256": "ba386edf6053df69dd92debbe5b86778a68d9f044abc0b9db6f17a6ce6b51323",
+              "start": 735,
+              "end": 1466,
+              "quote": "# 11월 5일 — 계약 정리\n\n진우는 세 가지를 분명히 했다.\n\n“펌프와 부품은 팔 수 있습니다.”\n\n“일반 유지보수 계약도 받을 수 있고요.”\n\n그리고 마지막 말을 붙였다.\n\n“하지만 공공급수라고 해서\n길드가 무조건 먼저 뛰어오는 계약은 안 합니다.”\n\n행정팀 쪽에서 바로 물었다.\n\n“사람들 물이 끊겨도요?”\n\n진우가 대답했다.\n\n“그 상황을 보고 움직이죠.”\n\n“그게 무슨 차이입니까?”\n\n“급수지점에 하루치 물이 남아 있고,\n다른 데는 지금 안 가면 오늘 설비가 완전히 죽는 상황일 수도 있습니다.”\n\n진우가 말했다.\n\n“반대로 여기가 물 한 방울 안 나오고\n대체수단도 없고\n사람 수십 명이 바로 위험해지면\n당연히 여기부터 보겠죠.”\n\n잠시 조용해졌다.\n\n“**공공이라서 우선이 아니라,\n실제 피해가 큰 일이 우선입니다.**”\n\n문하진이 먼저 고개를 끄덕였다.\n\n“그게 맞아.”\n\n---\n\n## 최종 구조\n\n**행정 잔존팀**\n- 급수지점 운영책임\n- 배급기준\n- 일상점검\n- 대체수원 확보\n- 현장 인력\n- 비상시 1차 대응\n\n**길드**\n- 표준펌프·부품 판매\n- 일반 유지보수 계약\n- 수리 요청 접수\n- 상황에 따른 기술지원\n\n그리고 한 줄이 계약에서 빠졌다.\n\n> 급수 중단 시 길드 최우선 복구\n\n대신 이렇게 바뀌었다.\n\n> **긴급 고장은 당시 인명·대체수단·저장량·다른 현장 상황을 함께 판단해 대응한다.**\n\n공공기관도 일반 고객과 다른 특권은 없었다.\n\n책임도 떠넘길 수 없었다."
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/relations/1",
+        "fields": {
+          "relation": [
+            {
+              "block_id": "001",
+              "block_sha256": "ba386edf6053df69dd92debbe5b86778a68d9f044abc0b9db6f17a6ce6b51323",
+              "start": 735,
+              "end": 1466,
+              "quote": "# 11월 5일 — 계약 정리\n\n진우는 세 가지를 분명히 했다.\n\n“펌프와 부품은 팔 수 있습니다.”\n\n“일반 유지보수 계약도 받을 수 있고요.”\n\n그리고 마지막 말을 붙였다.\n\n“하지만 공공급수라고 해서\n길드가 무조건 먼저 뛰어오는 계약은 안 합니다.”\n\n행정팀 쪽에서 바로 물었다.\n\n“사람들 물이 끊겨도요?”\n\n진우가 대답했다.\n\n“그 상황을 보고 움직이죠.”\n\n“그게 무슨 차이입니까?”\n\n“급수지점에 하루치 물이 남아 있고,\n다른 데는 지금 안 가면 오늘 설비가 완전히 죽는 상황일 수도 있습니다.”\n\n진우가 말했다.\n\n“반대로 여기가 물 한 방울 안 나오고\n대체수단도 없고\n사람 수십 명이 바로 위험해지면\n당연히 여기부터 보겠죠.”\n\n잠시 조용해졌다.\n\n“**공공이라서 우선이 아니라,\n실제 피해가 큰 일이 우선입니다.**”\n\n문하진이 먼저 고개를 끄덕였다.\n\n“그게 맞아.”\n\n---\n\n## 최종 구조\n\n**행정 잔존팀**\n- 급수지점 운영책임\n- 배급기준\n- 일상점검\n- 대체수원 확보\n- 현장 인력\n- 비상시 1차 대응\n\n**길드**\n- 표준펌프·부품 판매\n- 일반 유지보수 계약\n- 수리 요청 접수\n- 상황에 따른 기술지원\n\n그리고 한 줄이 계약에서 빠졌다.\n\n> 급수 중단 시 길드 최우선 복구\n\n대신 이렇게 바뀌었다.\n\n> **긴급 고장은 당시 인명·대체수단·저장량·다른 현장 상황을 함께 판단해 대응한다.**\n\n공공기관도 일반 고객과 다른 특권은 없었다.\n\n책임도 떠넘길 수 없었다."
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/relations/2",
+        "fields": {
+          "relation": [
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 0,
+              "end": 357,
+              "quote": "# 2027년 11월 16일\n### 폐쇄 체육시설 — 길드 접수대\n\n진우는 바로 사람부터 쫓지 않았다.\n\n먼저 **진품 확인체계**를 만들었다.\n\n민규가 얇은 금속표를 잘랐고,\n은채가 번호체계를 정했다.\n\n> 제품군 코드  \n> 개별 연번  \n> 판매·수리 이력은 길드 장부와 연결\n\n겉표식은 참고일 뿐이었다.\n\n누가 비슷한 색을 칠하고,\n금속표를 흉내 내도\n**장부에 번호가 없으면 길드 표준품이 아니다.**\n\n세린이 접수대에 한 줄을 붙였다.\n\n> **길드 표준품은 번호만 보지 말고 길드 장부 확인 가능 여부를 확인하십시오.**\n\n구매자가 종이를 잃어도 상관없었다.\n\n번호만 가져오면\n길드에서 판매기록과 수리이력을 확인할 수 있었다."
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/relations/3",
+        "fields": {
+          "relation": [
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 0,
+              "end": 357,
+              "quote": "# 2027년 11월 16일\n### 폐쇄 체육시설 — 길드 접수대\n\n진우는 바로 사람부터 쫓지 않았다.\n\n먼저 **진품 확인체계**를 만들었다.\n\n민규가 얇은 금속표를 잘랐고,\n은채가 번호체계를 정했다.\n\n> 제품군 코드  \n> 개별 연번  \n> 판매·수리 이력은 길드 장부와 연결\n\n겉표식은 참고일 뿐이었다.\n\n누가 비슷한 색을 칠하고,\n금속표를 흉내 내도\n**장부에 번호가 없으면 길드 표준품이 아니다.**\n\n세린이 접수대에 한 줄을 붙였다.\n\n> **길드 표준품은 번호만 보지 말고 길드 장부 확인 가능 여부를 확인하십시오.**\n\n구매자가 종이를 잃어도 상관없었다.\n\n번호만 가져오면\n길드에서 판매기록과 수리이력을 확인할 수 있었다."
+            },
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 412,
+              "end": 526,
+              "quote": "은채가 장부를 펼치자 바로 문제가 나왔다.\n\n진짜 A-07은 이미 동쪽 생산거점에 설치돼 있었다.\n\n같은 번호가 두 개일 수 없었다.\n\n민규가 말했다.\n\n“그냥 비슷하게 만든 게 아니라 번호까지 베꼈네.”"
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/relations/4",
+        "fields": {
+          "relation": [
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 0,
+              "end": 357,
+              "quote": "# 2027년 11월 16일\n### 폐쇄 체육시설 — 길드 접수대\n\n진우는 바로 사람부터 쫓지 않았다.\n\n먼저 **진품 확인체계**를 만들었다.\n\n민규가 얇은 금속표를 잘랐고,\n은채가 번호체계를 정했다.\n\n> 제품군 코드  \n> 개별 연번  \n> 판매·수리 이력은 길드 장부와 연결\n\n겉표식은 참고일 뿐이었다.\n\n누가 비슷한 색을 칠하고,\n금속표를 흉내 내도\n**장부에 번호가 없으면 길드 표준품이 아니다.**\n\n세린이 접수대에 한 줄을 붙였다.\n\n> **길드 표준품은 번호만 보지 말고 길드 장부 확인 가능 여부를 확인하십시오.**\n\n구매자가 종이를 잃어도 상관없었다.\n\n번호만 가져오면\n길드에서 판매기록과 수리이력을 확인할 수 있었다."
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/relations/5",
+        "fields": {
+          "relation": [
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 0,
+              "end": 357,
+              "quote": "# 2027년 11월 16일\n### 폐쇄 체육시설 — 길드 접수대\n\n진우는 바로 사람부터 쫓지 않았다.\n\n먼저 **진품 확인체계**를 만들었다.\n\n민규가 얇은 금속표를 잘랐고,\n은채가 번호체계를 정했다.\n\n> 제품군 코드  \n> 개별 연번  \n> 판매·수리 이력은 길드 장부와 연결\n\n겉표식은 참고일 뿐이었다.\n\n누가 비슷한 색을 칠하고,\n금속표를 흉내 내도\n**장부에 번호가 없으면 길드 표준품이 아니다.**\n\n세린이 접수대에 한 줄을 붙였다.\n\n> **길드 표준품은 번호만 보지 말고 길드 장부 확인 가능 여부를 확인하십시오.**\n\n구매자가 종이를 잃어도 상관없었다.\n\n번호만 가져오면\n길드에서 판매기록과 수리이력을 확인할 수 있었다."
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/relations/6",
+        "fields": {
+          "relation": [
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 0,
+              "end": 357,
+              "quote": "# 2027년 11월 16일\n### 폐쇄 체육시설 — 길드 접수대\n\n진우는 바로 사람부터 쫓지 않았다.\n\n먼저 **진품 확인체계**를 만들었다.\n\n민규가 얇은 금속표를 잘랐고,\n은채가 번호체계를 정했다.\n\n> 제품군 코드  \n> 개별 연번  \n> 판매·수리 이력은 길드 장부와 연결\n\n겉표식은 참고일 뿐이었다.\n\n누가 비슷한 색을 칠하고,\n금속표를 흉내 내도\n**장부에 번호가 없으면 길드 표준품이 아니다.**\n\n세린이 접수대에 한 줄을 붙였다.\n\n> **길드 표준품은 번호만 보지 말고 길드 장부 확인 가능 여부를 확인하십시오.**\n\n구매자가 종이를 잃어도 상관없었다.\n\n번호만 가져오면\n길드에서 판매기록과 수리이력을 확인할 수 있었다."
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/relations/7",
+        "fields": {
+          "relation": [
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 551,
+              "end": 821,
+              "quote": "# 11월 17일 ~ 18일\n### 조용한 확인\n\n하영이 시장 쪽에서 말을 돌렸다.\n\n“길드 표준펌프 산 사람 중에 장부 확인 안 한 사람 있어?”\n\n대놓고 범인을 찾지는 않았다.\n\n최광석도 자기 손님들 이야기를 몇 군데 확인했다.\n\n그가 도와준 이유도 착해서가 아니었다.\n\n“짝퉁이 돌아다니면 우리 장사까지 다 의심받습니다.”\n\n자기 이해관계였다.\n\n그게 더 현실적이었다.\n\n이틀 만에 비슷한 물건이 네 대까지 확인됐다.\n\n공통점이 있었다.\n\n모두 이동상인 **황대식**을 거쳤다."
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/relations/8",
+        "fields": {
+          "relation": [
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 551,
+              "end": 821,
+              "quote": "# 11월 17일 ~ 18일\n### 조용한 확인\n\n하영이 시장 쪽에서 말을 돌렸다.\n\n“길드 표준펌프 산 사람 중에 장부 확인 안 한 사람 있어?”\n\n대놓고 범인을 찾지는 않았다.\n\n최광석도 자기 손님들 이야기를 몇 군데 확인했다.\n\n그가 도와준 이유도 착해서가 아니었다.\n\n“짝퉁이 돌아다니면 우리 장사까지 다 의심받습니다.”\n\n자기 이해관계였다.\n\n그게 더 현실적이었다.\n\n이틀 만에 비슷한 물건이 네 대까지 확인됐다.\n\n공통점이 있었다.\n\n모두 이동상인 **황대식**을 거쳤다."
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/relations/9",
+        "fields": {
+          "relation": [
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 412,
+              "end": 526,
+              "quote": "은채가 장부를 펼치자 바로 문제가 나왔다.\n\n진짜 A-07은 이미 동쪽 생산거점에 설치돼 있었다.\n\n같은 번호가 두 개일 수 없었다.\n\n민규가 말했다.\n\n“그냥 비슷하게 만든 게 아니라 번호까지 베꼈네.”"
+            },
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 0,
+              "end": 357,
+              "quote": "# 2027년 11월 16일\n### 폐쇄 체육시설 — 길드 접수대\n\n진우는 바로 사람부터 쫓지 않았다.\n\n먼저 **진품 확인체계**를 만들었다.\n\n민규가 얇은 금속표를 잘랐고,\n은채가 번호체계를 정했다.\n\n> 제품군 코드  \n> 개별 연번  \n> 판매·수리 이력은 길드 장부와 연결\n\n겉표식은 참고일 뿐이었다.\n\n누가 비슷한 색을 칠하고,\n금속표를 흉내 내도\n**장부에 번호가 없으면 길드 표준품이 아니다.**\n\n세린이 접수대에 한 줄을 붙였다.\n\n> **길드 표준품은 번호만 보지 말고 길드 장부 확인 가능 여부를 확인하십시오.**\n\n구매자가 종이를 잃어도 상관없었다.\n\n번호만 가져오면\n길드에서 판매기록과 수리이력을 확인할 수 있었다."
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/relations/10",
+        "fields": {
+          "relation": [
+            {
+              "block_id": "003",
+              "block_sha256": "a93668b8e90cdf6d1acf0dbaf7efc8c92454c4cd80e9dcdda5f460d5b53c849b",
+              "start": 1265,
+              "end": 1738,
+              "quote": "## 진우가 내린 판단\n\n진우는 대식 물건을 빼앗지 않았다.\n\n길드가 경찰도 아니고,\n밖에서 장사하는 것까지 막을 권리도 없었다.\n\n대신 길드가 통제할 수 있는 것만 건드렸다.\n\n“밖에서 장사하는 건 마음대로 하세요.”\n\n대식이 쳐다봤다.\n\n“대신 길드 이름이랑 표식 비슷한 걸 써서 판 건 정리해야 합니다.”\n\n조건은 세 가지였다.\n\n**1. 확인된 네 건에 대해 구매자와 직접 정산한다.**  \n환불이든 가격조정이든 당사자끼리 합의한다.\n\n**2. 길드 표식을 흉내 낸 표시는 전부 제거한다.**\n\n**3. 정리될 때까지 길드 시장·중개·에스크로·수리서비스 이용을 제한한다.**\n\n대식이 목소리를 높였다.\n\n“길드가 무슨 자격으로 내 장사를 막습니까?”\n\n진우가 대답했다.\n\n“밖에서 하는 장사는 안 막습니다.”\n\n그리고 접수대를 가리켰다.\n\n“우리 서비스 이용을 안 받겠다는 겁니다.”\n\n그건 달랐다.\n\n길드가 가진 권한 안에서만 제재했다."
+            }
+          ]
+        }
+      }
+    ],
+    "deferred": [
+      {
+        "reason": "북쪽 초청은 참석 여부·조건·역할 모두 미정이다. 기존 초청 사건 record가 이미 save 285이므로 같은 revision 변경 guard를 유지하고 이 보완안에서는 수정하지 않는다.",
+        "evidence": [
+          {
+            "block_id": "005",
+            "block_sha256": "b78ffe1b4cadbdd8680113147791ccddcd8921c69dd23ded4468390aad188c1a",
+            "start": 2427,
+            "end": 2460,
+            "quote": "길드는 참석 여부도,\n조건도,\n역할도 아직 결정하지 않았다."
+          }
+        ]
+      },
+      {
+        "reason": "박동철이라는 이름과 뒤편 창고 문을 확인한 행동이 공개 GM 005에 나오지만 현재 기존 인물 목록에는 확인 가능한 연결이 없다. 한 장면만으로 새 인물의 장기 직위·고용관계를 정하지 않고 동일인 여부와 공개 가능한 역할 확인을 별도 검수로 유보한다.",
+        "evidence": [
+          {
+            "block_id": "005",
+            "block_sha256": "b78ffe1b4cadbdd8680113147791ccddcd8921c69dd23ded4468390aad188c1a",
+            "start": 147,
+            "end": 166,
+            "quote": "박동철은 뒤편 창고 문을 확인했다."
+          }
+        ]
+      },
+      {
+        "reason": "폐쇄 직업훈련원이 핵심 4인 생활거점으로 서술되지만 현재 Graph 장소 목록에 일치하는 정식 ID가 없고 기존 제한 공개·비공개 거점과의 관계도 확정되지 않았다. 장소 동일성과 공개 범위를 확인할 때까지 새 장소·거주관계 추가와 위치 정보 노출을 유보한다.",
+        "evidence": [
+          {
+            "block_id": "005",
+            "block_sha256": "b78ffe1b4cadbdd8680113147791ccddcd8921c69dd23ded4468390aad188c1a",
+            "start": 53,
+            "end": 78,
+            "quote": "### 폐쇄 직업훈련원 — 핵심 4인 생활거점"
+          }
+        ]
+      }
+    ],
+    "note": "기존 SESSION_008 APPLIED 사실·receipt를 보존한 별도 보완안이다. 공개 GM 001/003/005 전체를 검토하고, 기존에 반영된 사건과 새 인물·장소는 재생성하지 않는다. anchor 253인 기존 인물 5명의 확인된 최근 활동만 summary에 보강하고 누락된 명시 참여관계를 추가한다. 기존 이름·유형·직업·소속·거점출입 메타는 그대로 보존한다. 거점 접근권, 새 직위, 사적 관계, 미선택 초청 참석을 추론하지 않는다. COMPLETE는 전체 008 공개 블록 검토를 뜻하며 기존 receipt를 바꾸거나 새 source 처리 완료를 주장하지 않는다.",
+    "raw_changed": false,
+    "book_changed": false,
+    "graph_changed": false,
+    "source_marked_processed": false,
+    "proposal_sha256": "0ea966a442b22bbc30e46377373d546b8c5d2af0009808b656a8d7c09a4f9f24"
+  },
+  "review_job_id": "wiki-review-job-5e707244a3b1ed0d307a74d34c033f657629327a7539ab7e5b75b627616af250",
+  "quote_refs": [
+    {
+      "citation_id": "survey-roles",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "block_id": "001",
+      "raw_line_start": 18,
+      "raw_line_end": 34,
+      "quote_byte_sha256": "954cd5f2d2da52837ce4dc49ed8c1d983838c75591ceee3aaa865bae6802cec6"
+    },
+    {
+      "citation_id": "pump-replacement",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "block_id": "001",
+      "raw_line_start": 55,
+      "raw_line_end": 62,
+      "quote_byte_sha256": "6ae024a08e92ba0d8781c62ebee4316694e858b2455b40387e72c65a907d7abb"
+    },
+    {
+      "citation_id": "public-contract",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "block_id": "001",
+      "raw_line_start": 89,
+      "raw_line_end": 159,
+      "quote_byte_sha256": "dca4911b77ee54646788b1e44a2aca11471c24ce8ffad4392b191a43cddc906c"
+    },
+    {
+      "citation_id": "repair-priority",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "block_id": "001",
+      "raw_line_start": 163,
+      "raw_line_end": 260,
+      "quote_byte_sha256": "ea9e8dec2b3fed489c93d6082598e3528b8e2b675f725d587ab181477a02e20a"
+    },
+    {
+      "citation_id": "counterfeit-check",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "block_id": "001",
+      "raw_line_start": 309,
+      "raw_line_end": 314,
+      "quote_byte_sha256": "61d606618d8fc214d8e17c349a322142e236222073e8d989dfed19c93f9f225f"
+    },
+    {
+      "citation_id": "authenticity-setup",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "block_id": "003",
+      "raw_line_start": 361,
+      "raw_line_end": 388,
+      "quote_byte_sha256": "97a87b3d537a3ee99a6a89a7a25d139222b8722b3ac5dadb5ade1d0c31d93f36"
+    },
+    {
+      "citation_id": "copied-number",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "block_id": "003",
+      "raw_line_start": 400,
+      "raw_line_end": 408,
+      "quote_byte_sha256": "092a9fd9b193531557c572f7a561174b8c7895e2e8a1ecb81103b526b020be12"
+    },
+    {
+      "citation_id": "market-investigation",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "block_id": "003",
+      "raw_line_start": 414,
+      "raw_line_end": 437,
+      "quote_byte_sha256": "e9506b1eea943bdc7f694b84e49c481de26fde2b44a54d73616fda4ec7125b88"
+    },
+    {
+      "citation_id": "sanction-boundary",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "block_id": "003",
+      "raw_line_start": 490,
+      "raw_line_end": 528,
+      "quote_byte_sha256": "28f4997a1b804b160abf0c581eaf9e0b52a151864600316150f00941164ef996"
+    },
+    {
+      "citation_id": "northern-invitation",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "block_id": "003",
+      "raw_line_start": 592,
+      "raw_line_end": 614,
+      "quote_byte_sha256": "87dc61766339193fd5829a9c3b08ff1e599445597f2b9b9237231382b14eed7a"
+    },
+    {
+      "citation_id": "core-four-names",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "block_id": "005",
+      "raw_line_start": 713,
+      "raw_line_end": 719,
+      "quote_byte_sha256": "74a5dde361cb9172d50cff070cba60b04a2fa8d094bf230dc36da455e4155a32"
+    },
+    {
+      "citation_id": "eunchae-settlement",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "block_id": "005",
+      "raw_line_start": 731,
+      "raw_line_end": 733,
+      "quote_byte_sha256": "87b91cb207a17983d74b04ff7851d92afb05b745170a057ea4dc16be500fc62c"
+    },
+    {
+      "citation_id": "northern-pending",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "block_id": "005",
+      "raw_line_start": 966,
+      "raw_line_end": 968,
+      "quote_byte_sha256": "a854c7c816be082e26aa01ac3fbb525a4f2ec73b83855dd5393c2b5a955cd27c"
+    },
+    {
+      "citation_id": "dongcheol-warehouse-check",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "block_id": "005",
+      "raw_line_start": 694,
+      "raw_line_end": 694,
+      "quote_byte_sha256": "21daa3e312386bae8d4300d99db0227c03b7096b467aadafb4e27b0ab5fcd532"
+    },
+    {
+      "citation_id": "vocational-living-base",
+      "raw_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/PART_001.md",
+      "block_id": "005",
+      "raw_line_start": 686,
+      "raw_line_end": 686,
+      "quote_byte_sha256": "accff5bce005d21b48df5ac5224c642d770596ea7a8f41e9b818f61d86829992"
+    }
+  ],
+  "reconciliation_preview": {
+    "nodes_added": 0,
+    "nodes_updated": 5,
+    "relations_added": 11,
+    "relations_updated": 0,
+    "unchanged_records": 0,
+    "database_writes": 0,
+    "external_calls": 0,
+    "site_publications": 0,
+    "status": "GRAPH_BACKFILL_COMPILED",
+    "node_count": 72,
+    "relation_count": 127,
+    "story_links": 376,
+    "ambiguous_aliases": 0,
+    "inferred_relationships": 0,
+    "global_anchor_preserved": false,
+    "graph_anchor": {
+      "game_time": "2027-11-22 22:40",
+      "save_version": 285
+    },
+    "global_anchor_unchanged": true,
+    "candidate_graph_sha256": "f63dd099a5457b3a2f60190e0fa22084ac3a96acd4016912a1d39fed14ac3ed3",
+    "history_before": 0,
+    "history_after": 5,
+    "graph_writes": 0,
+    "receipt_writes": 0,
+    "source_marked_processed": false
+  },
+  "receipt_contract": {
+    "ref": "archive/content/public-facts/C03-AFTERFALL/S03/receipts/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+    "version": "a-wiki-amendment-receipt-v1",
+    "session_id": "SESSION_008",
+    "source_sha256": "3d15073c796967f27b1dd094ceecd948ab28b93aed7971818de48cb0e6cd4dc0",
+    "fact_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187",
+    "proposal_sha256": "0ea966a442b22bbc30e46377373d546b8c5d2af0009808b656a8d7c09a4f9f24",
+    "graph_before_sha256": "4eae33f49195300c4b538c05eb02c3a91638b2f648af1d4e4d0e84fb0f87303e",
+    "required_before_write": [
+      "independent_review_approved_exact_proposal",
+      "protected_source_hashes_unchanged",
+      "graph_persisted_and_read_back"
+    ],
+    "outcome": null,
+    "review_sha256": null,
+    "graph_after_sha256": null
+  },
+  "bundle_sha256": "a3f61d38e42eaf93eafc27e908eea15809ee7ad35c8087921782cb07f3792d69"
+}

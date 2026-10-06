@@ -16,6 +16,7 @@
 .operator-tech-details[open] > summary { margin-bottom: 8px; }
 .operator-tech-details dl { margin-top: 6px; }
 .operator-tech-details code { font-size: 10px; }
+.operator-status-help { margin: 10px 0 0; color: #6b6b73; font-size: 12px; line-height: 1.5; }
 .operator-release-tech { flex-basis: 100%; margin-top: 0; padding-top: 8px; }
 .operator-release-tech > span { display: inline-block; margin: 5px 14px 0 0; }
 .operator-release-strip { display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; margin-top:10px; padding:11px 13px; border:1px solid #e5e5e8; border-radius:8px; background:#fff; color:#55555d; font-size:12px; }.operator-release-strip > strong { margin-right:auto; color:#2d2d33; font-size:13px; }.operator-release-strip > strong small { margin-left:4px; color:#83838a; font-size:10px; font-weight:600; }.operator-release-strip code { color:#33333a; font-size:11px; }

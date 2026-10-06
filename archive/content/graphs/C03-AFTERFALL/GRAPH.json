@@ -94,7 +94,7 @@
       },
       "id": "char-eunchae",
       "label": "최은채",
-      "overview": "핵심 4인의 물류·기록·접근권·관계 경계 담당. 위치 비밀 유지와 재고·규칙의 구분을 중요하게 다룬다.",
+      "overview": "공공 급수지점 실태조사에서 운영기록을 확인했다. 길드 표준품의 번호체계를 정하고 판매·수리 장부와 대조해 사칭품을 확인했으며, 하루 거래 정산을 마감했다.",
       "relations": [
         {
           "direction": "outgoing",
@@ -106,9 +106,23 @@
         {
           "direction": "outgoing",
           "kind": "participated_in",
+          "label": "판매·수리 장부 대조",
+          "other_id": "event-wiki-281823f8f1b6fb2c770b1925",
+          "relation_id": "rel-359c149eb2904687ff1e134ae9ec1615b8f4693e16f19eaa77c6055e44152b9e"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
           "label": "권리 확인과 협상 준비에 참여",
           "other_id": "event-wiki-bf4768814dd7f1559d9f7496",
           "relation_id": "rel-379921507d951549980d75a5036d96ce51a37ba682e79a003f7dc807ab14e1eb"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "표준품 번호체계·장부 확인",
+          "other_id": "event-wiki-d12d5299a253870e3748a92e",
+          "relation_id": "rel-98634a09ae332af656046bcdcaa4c1dfb5d3e58328602cada40ad9666bb6cfda"
         },
         {
           "direction": "incoming",
@@ -175,6 +189,13 @@
       "label": "문하진",
       "overview": "북서권 지방행정 잔존 대응팀의 시설·급수 실무자. 공공수원 복구와 제한적 연락망을 유지한다.",
       "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "상황별 대응 원칙 확인·동의",
+          "other_id": "event-wiki-a0da729cf563fe4b71f80b21",
+          "relation_id": "rel-4db0209a3c3e97ba7b8eb6d1b24d9d73f587c113b4639f4699e1b624656fee0d"
+        },
         {
           "direction": "incoming",
           "kind": "published_relation",
@@ -244,7 +265,7 @@
       },
       "id": "char-hayoung",
       "label": "신하영",
-      "overview": "백운생활관을 자발적으로 이탈해 공개 생활망에서 자립 중. 현재 겨울편에서 음식·조리·위생·생활연료 절약을 주도한다. 과거 기록의 이소라는 동일 인물 alias다.",
+      "overview": "길드 표준펌프 사칭 문제가 생기자 시장에서 구매 사례와 장부 확인 여부를 알아봤다. 2027년 11월 22일에는 북쪽 연료장 생활권에서 보낸 겨울 전 연료·운송 회의 초청장을 길드에 전달했다.",
       "relations": [
         {
           "direction": "incoming",
@@ -259,6 +280,13 @@
           "label": "생활 동료",
           "other_id": "char-yujin",
           "relation_id": "rel-39648dbe9f57d2df86f65fe11c6199f907b93dcc639973bff1cb66f2b0f4d205"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "시장 구매 사례 확인",
+          "other_id": "event-wiki-281823f8f1b6fb2c770b1925",
+          "relation_id": "rel-62f6a47262cb253fee0122b9c1c8b144a6055fc556e9ac3d3abfb3aa4b0249de"
         },
         {
           "direction": "outgoing",
@@ -418,7 +446,7 @@
       },
       "id": "char-jinwoo",
       "label": "서진우",
-      "overview": "핵심 4인의 한 축. 외부정찰·응급의료·정보·거점 연결을 담당하며 자동 지휘관이나 지역대표로 취급하지 않는다.",
+      "overview": "공공 급수지점에는 일반 유지보수와 기술지원을 제공하고 일상 운영은 행정 잔존팀이 맡도록 책임을 나눴다. 2027년 11월 9일에는 저장량과 대체수단을 비교해 생산거점을 먼저 복구하도록 결정했다. 길드 표식 사칭 문제에서는 상인의 물건을 빼앗거나 외부 장사를 금지하지 않고 피해거래 정산과 길드 서비스 이용 제한으로 대응했다.",
       "relations": [
         {
           "direction": "outgoing",
@@ -426,6 +454,13 @@
           "label": "보증거래 폐기·직매입 재판매 방향 결정",
           "other_id": "event-wiki-111fe570a078504a9c47714f",
           "relation_id": "rel-05d1eb1eace7023308e2f773415c17ed4a5c593eef0d1e1a97cd8ab272f7132f"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "진품 확인체계 구축 착수",
+          "other_id": "event-wiki-d12d5299a253870e3748a92e",
+          "relation_id": "rel-1a786e83fe0329ead142befa822647bc5d5789db7806c715a4fd45fd2e2cb6d3"
         },
         {
           "direction": "outgoing",
@@ -555,10 +590,24 @@
         },
         {
           "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "피해거래 정산·서비스 이용 제한 판단",
+          "other_id": "event-wiki-281823f8f1b6fb2c770b1925",
+          "relation_id": "rel-f421fceb0995ec1f612b19c732bce63b7cfd6523fac664368d721202bb2c7ab5"
+        },
+        {
+          "direction": "outgoing",
           "kind": "published_relation",
           "label": "외부 연락축",
           "other_id": "char-minho",
           "relation_id": "rel-fa21e314d2a5084f9e5a57e221d82feaced367ed9a85e1b681fdc10e6d17f089"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "일반 유지보수·상황별 대응 원칙 확정",
+          "other_id": "event-wiki-a0da729cf563fe4b71f80b21",
+          "relation_id": "rel-ff5b2280717b2961c2da666b4f24c56cd96e1c47e2581e010353fd4733cc03d7"
         }
       ],
       "story_link_ids": [
@@ -730,7 +779,7 @@
       },
       "id": "char-mingyu",
       "label": "정민규",
-      "overview": "백운생활관 이탈 후 검증을 거쳐 외부 시설·전기 협력자로 승인됐다. 거점 출입권은 없고 작업 전 대가·회수품·위험범위를 합의한다.",
+      "overview": "공공 급수지점 실태조사에서 설비를 살폈다. 2027년 11월 9일 장태훈과 생산거점 펌프를 먼저 복구한 뒤 공공 급수지점 복구에 참여했고, 표준품 진품 확인용 금속표를 만들었다.",
       "relations": [
         {
           "direction": "outgoing",
@@ -745,6 +794,13 @@
           "label": "현장조사·전원 및 수리 판단",
           "other_id": "event-wiki-b7ffeffefd90e9765d184979",
           "relation_id": "rel-1dbf601f473b03b6a3ed9b27fc366ab28ec12c60ba9a88776913f3eaa959b7cd"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "진품 확인용 금속표 제작",
+          "other_id": "event-wiki-d12d5299a253870e3748a92e",
+          "relation_id": "rel-2262bb5680e30c2a58c36aad536faa852113f9780bf2f34ae91ccd82c6db2188"
         },
         {
           "direction": "incoming",
@@ -1095,7 +1151,7 @@
       },
       "id": "char-taehoon",
       "label": "장태훈",
-      "overview": "핵심 4인의 발전기·급수·난방·설비·부품·수리 담당. 실증단지 관정 계통에도 실제 기술지원을 제공했다.",
+      "overview": "공공 급수지점 두 곳의 설비를 조사하고 오래된 펌프 교체가 필요하다고 판단했다. 2027년 11월 9일에는 정민규와 생산거점 펌프를 오전 안에 복구하고, 이어 공공 급수지점 펌프를 교체해 오후에 정상화했다.",
       "relations": [
         {
           "direction": "incoming",
@@ -1248,6 +1304,13 @@
       "label": "오세린",
       "overview": "길드 접수와 관리동 논의에 참여하며 거래 책임범위를 안내하고 등록상인·에스크로·보증거래의 차이를 정리하는 실무 접점이다.",
       "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "접수대 장부 확인 안내",
+          "other_id": "event-wiki-d12d5299a253870e3748a92e",
+          "relation_id": "rel-0f9310e0cef73c26e49dd28c8525691b7910d9207749a69c5a663ea7f80d8c3b"
+        },
         {
           "direction": "outgoing",
           "kind": "participated_in",
@@ -1419,6 +1482,13 @@
           "label": "등록상인 필요를 제기한 기존 상인",
           "other_id": "event-wiki-6fa152109f3897e4ad04b372",
           "relation_id": "rel-a23f755f04040c753fa814de697f6e3d8742a57ca08644d63a6633135bcfda8d"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "고객 거래사례 확인",
+          "other_id": "event-wiki-281823f8f1b6fb2c770b1925",
+          "relation_id": "rel-cb388c79daaf61712d0c4d9001278ce11f854d7219ce9b08fbddd5fe4ccce973"
         },
         {
           "direction": "outgoing",
@@ -1901,6 +1971,20 @@
       "overview": "길드 표식을 흉내 낸 비정품 펌프 네 대가 황대식 판매망에서 확인됐다. 길드는 외부 장사를 몰수하거나 금지하지 않고 피해거래 정산, 가짜 표식 제거, 길드 서비스 이용 제한으로 대응했고 확인된 네 건은 환불 2건, 가격조정 1건, 회수 1건으로 정리됐다.",
       "relations": [
         {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "판매·수리 장부 대조",
+          "other_id": "char-eunchae",
+          "relation_id": "rel-359c149eb2904687ff1e134ae9ec1615b8f4693e16f19eaa77c6055e44152b9e"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "시장 구매 사례 확인",
+          "other_id": "char-hayoung",
+          "relation_id": "rel-62f6a47262cb253fee0122b9c1c8b144a6055fc556e9ac3d3abfb3aa4b0249de"
+        },
+        {
           "direction": "outgoing",
           "kind": "occurred_at",
           "label": "길드 접수·정산에서 사건 확인 및 처리",
@@ -1910,9 +1994,23 @@
         {
           "direction": "incoming",
           "kind": "participated_in",
+          "label": "고객 거래사례 확인",
+          "other_id": "char-wiki-cc15e0b3875ce0e734646be4",
+          "relation_id": "rel-cb388c79daaf61712d0c4d9001278ce11f854d7219ce9b08fbddd5fe4ccce973"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
           "label": "사칭 판매망 당사자",
           "other_id": "char-wiki-b862f3d27582267fb5da3320",
           "relation_id": "rel-e460fe3bdd950983f6a38df4e66916083fa31e5bbea69bd5651d107d4e18abd5"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "피해거래 정산·서비스 이용 제한 판단",
+          "other_id": "char-jinwoo",
+          "relation_id": "rel-f421fceb0995ec1f612b19c732bce63b7cfd6523fac664368d721202bb2c7ab5"
         }
       ],
       "story_link_ids": [],
@@ -2063,11 +2161,25 @@
       "overview": "공공 급수지점의 일상 운영·배급·대체수원·1차 대응은 행정 잔존팀이 맡고, 길드는 표준펌프·부품 판매와 일반 유지보수·기술지원을 제공하기로 했다. 공공이라는 이유의 자동 최우선 복구는 두지 않고 실제 인명위험·대체수단·저장량·동시 긴급상황을 비교해 대응한다.",
       "relations": [
         {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "상황별 대응 원칙 확인·동의",
+          "other_id": "char-hajin",
+          "relation_id": "rel-4db0209a3c3e97ba7b8eb6d1b24d9d73f587c113b4639f4699e1b624656fee0d"
+        },
+        {
           "direction": "outgoing",
           "kind": "related_to",
           "label": "공공 급수지점 요청에 대한 최종 운영원칙",
           "other_id": "event-wiki-3fd45d2cb293984e10fb4440",
           "relation_id": "rel-831cc82831bb2546e0e70eb3b2d54e84c67a8bffefef19381f87ebb4ca61272a"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "일반 유지보수·상황별 대응 원칙 확정",
+          "other_id": "char-jinwoo",
+          "relation_id": "rel-ff5b2280717b2961c2da666b4f24c56cd96e1c47e2581e010353fd4733cc03d7"
         }
       ],
       "story_link_ids": [],
@@ -2358,11 +2470,46 @@
       "overview": "길드 표준품은 제품 번호, 길드 판매·수리 장부 기록, 현재 보증·수리 상태를 함께 확인하는 체계로 정리됐다. 겉표식 하나만으로는 진품을 증명하지 않는다.",
       "relations": [
         {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "접수대 장부 확인 안내",
+          "other_id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+          "relation_id": "rel-0f9310e0cef73c26e49dd28c8525691b7910d9207749a69c5a663ea7f80d8c3b"
+        },
+        {
           "direction": "outgoing",
           "kind": "related_to",
           "label": "표준펌프 보증·사후서비스의 진품 확인 기반",
           "other_id": "event-wiki-df3c90d6f885fdb269cd38d3",
           "relation_id": "rel-127d3bff010ec75747a844e93dbdaf8d72f625a11f364bad61239cb5cc0e86db"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "진품 확인체계 구축 착수",
+          "other_id": "char-jinwoo",
+          "relation_id": "rel-1a786e83fe0329ead142befa822647bc5d5789db7806c715a4fd45fd2e2cb6d3"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "진품 확인용 금속표 제작",
+          "other_id": "char-mingyu",
+          "relation_id": "rel-2262bb5680e30c2a58c36aad536faa852113f9780bf2f34ae91ccd82c6db2188"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "표준품 번호체계·장부 확인",
+          "other_id": "char-eunchae",
+          "relation_id": "rel-98634a09ae332af656046bcdcaa4c1dfb5d3e58328602cada40ad9666bb6cfda"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "길드 접수대 진품 확인체계 운영",
+          "other_id": "loc-sports-complex",
+          "relation_id": "rel-f63eca3e3221c899c44721adff2abf57ea29550564336dd86923721abc429e2d"
         }
       ],
       "story_link_ids": [],
@@ -2928,6 +3075,13 @@
           "label": "폐쇄 체육시설 관리동에서 사업구조 재정의",
           "other_id": "event-wiki-111fe570a078504a9c47714f",
           "relation_id": "rel-d7073f1a5e301740c448f42b9fbe46721779c039c1d63d10a406968a9ef016d5"
+        },
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "길드 접수대 진품 확인체계 운영",
+          "other_id": "event-wiki-d12d5299a253870e3748a92e",
+          "relation_id": "rel-f63eca3e3221c899c44721adff2abf57ea29550564336dd86923721abc429e2d"
         }
       ],
       "story_link_ids": [
@@ -3309,7 +3463,7 @@
     }
   ],
   "chronicle_id": "C03-AFTERFALL",
-  "content_sha256": "4eae33f49195300c4b538c05eb02c3a91638b2f648af1d4e4d0e84fb0f87303e",
+  "content_sha256": "f63dd099a5457b3a2f60190e0fa22084ac3a96acd4016912a1d39fed14ac3ed3",
   "nodes": [
     {
       "anchor": {
@@ -3372,8 +3526,8 @@
     },
     {
       "anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
       },
       "data": {
         "id": "char-eunchae",
@@ -3382,9 +3536,9 @@
           "겨울역할": "물류·기록 지원",
           "상태": "ACTIVE"
         },
-        "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+        "source": "S03 SESSION_008 GM 공개 블록 001, 003, 005",
         "subtitle": "병원 행정직 출신 · 물류·기록",
-        "summary": "핵심 4인의 물류·기록·접근권·관계 경계 담당. 위치 비밀 유지와 재고·규칙의 구분을 중요하게 다룬다.",
+        "summary": "공공 급수지점 실태조사에서 운영기록을 확인했다. 길드 표준품의 번호체계를 정하고 판매·수리 장부와 대조해 사칭품을 확인했으며, 하루 거래 정산을 마감했다.",
         "tags": [
           "CORE",
           "핵심 4인",
@@ -3394,11 +3548,42 @@
         "type": "character"
       },
       "evidence": {
-        "pointer": "/nodes/2",
-        "source_ref": "archive/web/src/archive/archiveData.ts",
-        "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+        "pointer": "/nodes/1",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
       },
-      "history": [],
+      "history": [
+        {
+          "anchor": {
+            "game_time": "2027-03-23 17:50",
+            "save_version": 253
+          },
+          "data": {
+            "id": "char-eunchae",
+            "label": "최은채",
+            "meta": {
+              "겨울역할": "물류·기록 지원",
+              "상태": "ACTIVE"
+            },
+            "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+            "subtitle": "병원 행정직 출신 · 물류·기록",
+            "summary": "핵심 4인의 물류·기록·접근권·관계 경계 담당. 위치 비밀 유지와 재고·규칙의 구분을 중요하게 다룬다.",
+            "tags": [
+              "CORE",
+              "핵심 4인",
+              "물류",
+              "기록"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "44f6bb665d100229c06173833e8e313f553b8acd4dff74fc67c00aa7853fcd9d",
+          "evidence": {
+            "pointer": "/nodes/2",
+            "source_ref": "archive/web/src/archive/archiveData.ts",
+            "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          }
+        }
+      ],
       "id": "char-eunchae"
     },
     {
@@ -3433,8 +3618,8 @@
     },
     {
       "anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
       },
       "data": {
         "id": "char-hayoung",
@@ -3444,9 +3629,9 @@
           "상태": "ACTIVE",
           "연합원": "아님"
         },
-        "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+        "source": "S03 SESSION_008 GM 공개 블록 003",
         "subtitle": "조리·위생·단체생활 전문가",
-        "summary": "백운생활관을 자발적으로 이탈해 공개 생활망에서 자립 중. 현재 겨울편에서 음식·조리·위생·생활연료 절약을 주도한다. 과거 기록의 이소라는 동일 인물 alias다.",
+        "summary": "길드 표준펌프 사칭 문제가 생기자 시장에서 구매 사례와 장부 확인 여부를 알아봤다. 2027년 11월 22일에는 북쪽 연료장 생활권에서 보낸 겨울 전 연료·운송 회의 초청장을 길드에 전달했다.",
         "tags": [
           "MAJOR",
           "겨울편 주도",
@@ -3457,11 +3642,44 @@
         "type": "character"
       },
       "evidence": {
-        "pointer": "/nodes/4",
-        "source_ref": "archive/web/src/archive/archiveData.ts",
-        "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+        "pointer": "/nodes/2",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
       },
-      "history": [],
+      "history": [
+        {
+          "anchor": {
+            "game_time": "2027-03-23 17:50",
+            "save_version": 253
+          },
+          "data": {
+            "id": "char-hayoung",
+            "label": "신하영",
+            "meta": {
+              "별칭": "이소라",
+              "상태": "ACTIVE",
+              "연합원": "아님"
+            },
+            "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+            "subtitle": "조리·위생·단체생활 전문가",
+            "summary": "백운생활관을 자발적으로 이탈해 공개 생활망에서 자립 중. 현재 겨울편에서 음식·조리·위생·생활연료 절약을 주도한다. 과거 기록의 이소라는 동일 인물 alias다.",
+            "tags": [
+              "MAJOR",
+              "겨울편 주도",
+              "조리",
+              "위생",
+              "TRUSTED_EXTERNAL"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "ae2b54a8d610d9a9261e415eb540810e44cbc96bfa9d471d4e7b83e018bd49e1",
+          "evidence": {
+            "pointer": "/nodes/4",
+            "source_ref": "archive/web/src/archive/archiveData.ts",
+            "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          }
+        }
+      ],
       "id": "char-hayoung"
     },
     {
@@ -3525,8 +3743,8 @@
     },
     {
       "anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
       },
       "data": {
         "id": "char-jinwoo",
@@ -3535,9 +3753,9 @@
           "상태": "ACTIVE",
           "소속": "CORE_FOUR"
         },
-        "source": "Supabase survival_rpg.characters / CURRENT_STATE.json",
+        "source": "S03 SESSION_008 GM 공개 블록 001, 003, 005",
         "subtitle": "응급실 간호사 · 플레이어",
-        "summary": "핵심 4인의 한 축. 외부정찰·응급의료·정보·거점 연결을 담당하며 자동 지휘관이나 지역대표로 취급하지 않는다.",
+        "summary": "공공 급수지점에는 일반 유지보수와 기술지원을 제공하고 일상 운영은 행정 잔존팀이 맡도록 책임을 나눴다. 2027년 11월 9일에는 저장량과 대체수단을 비교해 생산거점을 먼저 복구하도록 결정했다. 길드 표식 사칭 문제에서는 상인의 물건을 빼앗거나 외부 장사를 금지하지 않고 피해거래 정산과 길드 서비스 이용 제한으로 대응했다.",
         "tags": [
           "PLAYER",
           "핵심 4인",
@@ -3548,10 +3766,41 @@
       },
       "evidence": {
         "pointer": "/nodes/0",
-        "source_ref": "archive/web/src/archive/archiveData.ts",
-        "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
       },
-      "history": [],
+      "history": [
+        {
+          "anchor": {
+            "game_time": "2027-03-23 17:50",
+            "save_version": 253
+          },
+          "data": {
+            "id": "char-jinwoo",
+            "label": "서진우",
+            "meta": {
+              "상태": "ACTIVE",
+              "소속": "CORE_FOUR"
+            },
+            "source": "Supabase survival_rpg.characters / CURRENT_STATE.json",
+            "subtitle": "응급실 간호사 · 플레이어",
+            "summary": "핵심 4인의 한 축. 외부정찰·응급의료·정보·거점 연결을 담당하며 자동 지휘관이나 지역대표로 취급하지 않는다.",
+            "tags": [
+              "PLAYER",
+              "핵심 4인",
+              "응급의료",
+              "외부정찰"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "43a51a8ae989e88c18ce3eebda3139beac5ad9ca038d754646a7d0c42882c271",
+          "evidence": {
+            "pointer": "/nodes/0",
+            "source_ref": "archive/web/src/archive/archiveData.ts",
+            "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          }
+        }
+      ],
       "id": "char-jinwoo"
     },
     {
@@ -3646,8 +3895,8 @@
     },
     {
       "anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
       },
       "data": {
         "id": "char-mingyu",
@@ -3656,9 +3905,9 @@
           "거점출입": "없음",
           "상태": "ACTIVE"
         },
-        "source": "Supabase survival_rpg.characters / PERSISTENT_CANON.md",
+        "source": "S03 SESSION_008 GM 공개 블록 001, 003",
         "subtitle": "외부 전기·시설 기술자",
-        "summary": "백운생활관 이탈 후 검증을 거쳐 외부 시설·전기 협력자로 승인됐다. 거점 출입권은 없고 작업 전 대가·회수품·위험범위를 합의한다.",
+        "summary": "공공 급수지점 실태조사에서 설비를 살폈다. 2027년 11월 9일 장태훈과 생산거점 펌프를 먼저 복구한 뒤 공공 급수지점 복구에 참여했고, 표준품 진품 확인용 금속표를 만들었다.",
         "tags": [
           "MAJOR",
           "전기",
@@ -3668,11 +3917,42 @@
         "type": "character"
       },
       "evidence": {
-        "pointer": "/nodes/10",
-        "source_ref": "archive/web/src/archive/archiveData.ts",
-        "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+        "pointer": "/nodes/3",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
       },
-      "history": [],
+      "history": [
+        {
+          "anchor": {
+            "game_time": "2027-03-23 17:50",
+            "save_version": 253
+          },
+          "data": {
+            "id": "char-mingyu",
+            "label": "정민규",
+            "meta": {
+              "거점출입": "없음",
+              "상태": "ACTIVE"
+            },
+            "source": "Supabase survival_rpg.characters / PERSISTENT_CANON.md",
+            "subtitle": "외부 전기·시설 기술자",
+            "summary": "백운생활관 이탈 후 검증을 거쳐 외부 시설·전기 협력자로 승인됐다. 거점 출입권은 없고 작업 전 대가·회수품·위험범위를 합의한다.",
+            "tags": [
+              "MAJOR",
+              "전기",
+              "시설",
+              "외부협력"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "9902d3c51934a996f71c8d2e335081d2b8ff44ebe5f1e2744fde6dfdc12e9bbe",
+          "evidence": {
+            "pointer": "/nodes/10",
+            "source_ref": "archive/web/src/archive/archiveData.ts",
+            "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          }
+        }
+      ],
       "id": "char-mingyu"
     },
     {
@@ -3828,8 +4108,8 @@
     },
     {
       "anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
       },
       "data": {
         "id": "char-taehoon",
@@ -3838,9 +4118,9 @@
           "겨울역할": "설비·난방·급수 지원",
           "상태": "ACTIVE"
         },
-        "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+        "source": "S03 SESSION_008 GM 공개 블록 001, 005",
         "subtitle": "시설운영 기술자",
-        "summary": "핵심 4인의 발전기·급수·난방·설비·부품·수리 담당. 실증단지 관정 계통에도 실제 기술지원을 제공했다.",
+        "summary": "공공 급수지점 두 곳의 설비를 조사하고 오래된 펌프 교체가 필요하다고 판단했다. 2027년 11월 9일에는 정민규와 생산거점 펌프를 오전 안에 복구하고, 이어 공공 급수지점 펌프를 교체해 오후에 정상화했다.",
         "tags": [
           "CORE",
           "핵심 4인",
@@ -3851,11 +4131,43 @@
         "type": "character"
       },
       "evidence": {
-        "pointer": "/nodes/3",
-        "source_ref": "archive/web/src/archive/archiveData.ts",
-        "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+        "pointer": "/nodes/4",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
       },
-      "history": [],
+      "history": [
+        {
+          "anchor": {
+            "game_time": "2027-03-23 17:50",
+            "save_version": 253
+          },
+          "data": {
+            "id": "char-taehoon",
+            "label": "장태훈",
+            "meta": {
+              "겨울역할": "설비·난방·급수 지원",
+              "상태": "ACTIVE"
+            },
+            "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+            "subtitle": "시설운영 기술자",
+            "summary": "핵심 4인의 발전기·급수·난방·설비·부품·수리 담당. 실증단지 관정 계통에도 실제 기술지원을 제공했다.",
+            "tags": [
+              "CORE",
+              "핵심 4인",
+              "시설",
+              "난방",
+              "급수"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "14f1cbc3d5434d455223896f71868f2298a06208bc3b7330d55dd64fa0bb5df1",
+          "evidence": {
+            "pointer": "/nodes/3",
+            "source_ref": "archive/web/src/archive/archiveData.ts",
+            "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          }
+        }
+      ],
       "id": "char-taehoon"
     },
     {
@@ -5389,6 +5701,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
+      },
+      "data": {
+        "from": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+        "kind": "participated_in",
+        "label": "접수대 장부 확인 안내",
+        "to": "event-wiki-d12d5299a253870e3748a92e"
+      },
+      "evidence": {
+        "pointer": "/relations/5",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+      },
+      "history": [],
+      "id": "rel-0f9310e0cef73c26e49dd28c8525691b7910d9207749a69c5a663ea7f80d8c3b"
+    },
+    {
+      "anchor": {
         "game_time": "2027-09-22 16:10",
         "save_version": 280
       },
@@ -5503,6 +5834,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
+      },
+      "data": {
+        "from": "char-jinwoo",
+        "kind": "participated_in",
+        "label": "진품 확인체계 구축 착수",
+        "to": "event-wiki-d12d5299a253870e3748a92e"
+      },
+      "evidence": {
+        "pointer": "/relations/2",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+      },
+      "history": [],
+      "id": "rel-1a786e83fe0329ead142befa822647bc5d5789db7806c715a4fd45fd2e2cb6d3"
+    },
+    {
+      "anchor": {
         "game_time": "2027-10-30 13:20",
         "save_version": 282
       },
@@ -5576,6 +5926,25 @@
       },
       "history": [],
       "id": "rel-2247b1dcf861bbfbb9b39afec127f39fb89cbb218e99361aac3eed8eae65383f"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
+      },
+      "data": {
+        "from": "char-mingyu",
+        "kind": "participated_in",
+        "label": "진품 확인용 금속표 제작",
+        "to": "event-wiki-d12d5299a253870e3748a92e"
+      },
+      "evidence": {
+        "pointer": "/relations/4",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+      },
+      "history": [],
+      "id": "rel-2262bb5680e30c2a58c36aad536faa852113f9780bf2f34ae91ccd82c6db2188"
     },
     {
       "anchor": {
@@ -5690,6 +6059,25 @@
       },
       "history": [],
       "id": "rel-3510e6869b355e11b8a75b25c1074e5c881d34714d55c67e50a345b16725cf8b"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
+      },
+      "data": {
+        "from": "char-eunchae",
+        "kind": "participated_in",
+        "label": "판매·수리 장부 대조",
+        "to": "event-wiki-281823f8f1b6fb2c770b1925"
+      },
+      "evidence": {
+        "pointer": "/relations/9",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+      },
+      "history": [],
+      "id": "rel-359c149eb2904687ff1e134ae9ec1615b8f4693e16f19eaa77c6055e44152b9e"
     },
     {
       "anchor": {
@@ -5883,6 +6271,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
+      },
+      "data": {
+        "from": "char-hajin",
+        "kind": "participated_in",
+        "label": "상황별 대응 원칙 확인·동의",
+        "to": "event-wiki-a0da729cf563fe4b71f80b21"
+      },
+      "evidence": {
+        "pointer": "/relations/1",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+      },
+      "history": [],
+      "id": "rel-4db0209a3c3e97ba7b8eb6d1b24d9d73f587c113b4639f4699e1b624656fee0d"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -6032,6 +6439,25 @@
       },
       "history": [],
       "id": "rel-62dc4ec0646187eb934cb6f6469d25b6f6b2352c416fd88b65dfb27fdf72b1cc"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
+      },
+      "data": {
+        "from": "char-hayoung",
+        "kind": "participated_in",
+        "label": "시장 구매 사례 확인",
+        "to": "event-wiki-281823f8f1b6fb2c770b1925"
+      },
+      "evidence": {
+        "pointer": "/relations/7",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+      },
+      "history": [],
+      "id": "rel-62f6a47262cb253fee0122b9c1c8b144a6055fc556e9ac3d3abfb3aa4b0249de"
     },
     {
       "anchor": {
@@ -6495,6 +6921,25 @@
         "save_version": 285
       },
       "data": {
+        "from": "char-eunchae",
+        "kind": "participated_in",
+        "label": "표준품 번호체계·장부 확인",
+        "to": "event-wiki-d12d5299a253870e3748a92e"
+      },
+      "evidence": {
+        "pointer": "/relations/3",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+      },
+      "history": [],
+      "id": "rel-98634a09ae332af656046bcdcaa4c1dfb5d3e58328602cada40ad9666bb6cfda"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
+      },
+      "data": {
         "from": "event-wiki-934cea538155fc7bc102a21c",
         "kind": "related_to",
         "label": "초청 발신 생활권",
@@ -6928,6 +7373,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
+      },
+      "data": {
+        "from": "char-wiki-cc15e0b3875ce0e734646be4",
+        "kind": "participated_in",
+        "label": "고객 거래사례 확인",
+        "to": "event-wiki-281823f8f1b6fb2c770b1925"
+      },
+      "evidence": {
+        "pointer": "/relations/8",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+      },
+      "history": [],
+      "id": "rel-cb388c79daaf61712d0c4d9001278ce11f854d7219ce9b08fbddd5fe4ccce973"
+    },
+    {
+      "anchor": {
         "game_time": "2027-09-22 16:10",
         "save_version": 280
       },
@@ -7331,6 +7795,25 @@
         "save_version": 285
       },
       "data": {
+        "from": "char-jinwoo",
+        "kind": "participated_in",
+        "label": "피해거래 정산·서비스 이용 제한 판단",
+        "to": "event-wiki-281823f8f1b6fb2c770b1925"
+      },
+      "evidence": {
+        "pointer": "/relations/10",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+      },
+      "history": [],
+      "id": "rel-f421fceb0995ec1f612b19c732bce63b7cfd6523fac664368d721202bb2c7ab5"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
+      },
+      "data": {
         "from": "char-taehoon",
         "kind": "participated_in",
         "label": "생산거점 복구",
@@ -7343,6 +7826,25 @@
       },
       "history": [],
       "id": "rel-f59f48aac4f15e3aee0221ec2fe8a51f86c23b6e7043e79d7278100fe101ea85"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
+      },
+      "data": {
+        "from": "event-wiki-d12d5299a253870e3748a92e",
+        "kind": "occurred_at",
+        "label": "길드 접수대 진품 확인체계 운영",
+        "to": "loc-sports-complex"
+      },
+      "evidence": {
+        "pointer": "/relations/6",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+      },
+      "history": [],
+      "id": "rel-f63eca3e3221c899c44721adff2abf57ea29550564336dd86923721abc429e2d"
     },
     {
       "anchor": {
@@ -7514,6 +8016,25 @@
       },
       "history": [],
       "id": "rel-ff07e0d1046ddba54ca825c7edd99e612ef5d042e0ff8e6f71c111c7e4b98329"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-22 22:40",
+        "save_version": 285
+      },
+      "data": {
+        "from": "char-jinwoo",
+        "kind": "participated_in",
+        "label": "일반 유지보수·상황별 대응 원칙 확정",
+        "to": "event-wiki-a0da729cf563fe4b71f80b21"
+      },
+      "evidence": {
+        "pointer": "/relations/0",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+      },
+      "history": [],
+      "id": "rel-ff5b2280717b2961c2da666b4f24c56cd96e1c47e2581e010353fd4733cc03d7"
     }
   ],
   "story_links": [

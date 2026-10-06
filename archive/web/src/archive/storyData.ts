@@ -3,10 +3,15 @@ import { assertReaderManifest } from './readerManifestContract'
 import publicGraph from '../../../content/graphs/C03-AFTERFALL/GRAPH.json'
 
 export type ReaderSourceKind = 'VERIFIED_GM_NARRATIVE' | 'EDITORIAL_CANON_BRIDGE'
+export type ReaderPublicationProvenance = {
+  visibility: string; sessionId: string; part: string
+  sourceManifestRef: string; sourceManifestSha256: string; rawSha256: string
+}
 export type ReaderChapter = {
   id: string; chronicleId: ChronicleId; seasonId?: string; partId?: string; arcLabel?: string
   chapterNumber: number; title: string; subtitle?: string; dateLabel?: string; body: string
   relatedNodeIds: string[]; sourceKind: ReaderSourceKind; sourceRefs: string[]; archiveSourceRefs: string[]; sourceHashes: string[]; supportingRefs: string[]; transformVersion: string
+  publicationProvenance?: ReaderPublicationProvenance
 }
 export type ReaderCoverage = { verifiedRawParts: number; scanned: number; eligibleGmProse: number; included: number; omitted: { sourceRef: string; archiveSourceRef: string; reason: string }[] }
 export type ChronicleBook = {

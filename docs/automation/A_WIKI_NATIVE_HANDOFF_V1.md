@@ -71,7 +71,8 @@ The old `automation/a-wiki-native` branch is legacy evidence only and is not an 
 
 Table: `survival_ops.a_wiki_native_jobs`
 
-Only one non-PUBLISHED job may exist.
+Only one active job may exist. `PUBLISHED` and `SUPERSEDED` rows are retained as
+immutable history and are excluded from active-job selection.
 
 Native-readable phases:
 
@@ -89,6 +90,45 @@ Program phases:
 - `PUBLISHED`
 
 The immutable prepared job is bound to source SHA, Graph SHA and main SHA.
+
+Approved AFTERFALL sources are discovered by season through the existing public
+Reader source catalog, starting at S03. S03's historical SESSION_005 baseline is
+preserved; later seasons begin with their first approved source. A session is
+identified by its full season-qualified source path and source hash. Entity IDs
+continue across seasons. A live/open S04 session is not a public source.
+
+## Publication reconciliation and graph drift
+
+`prepare` checks the durable job ledger **before** returning `NO_JOB`. A source
+may have been independently reviewed and merged outside the Native handoff.
+In that case the program verifies the exact source/PART, fact and receipt bytes
+at the merged PR head, merge commit and current main, checks main ancestry, and
+checks receipt-bound Graph revisions (including preserved history). Identical
+facts whose older evidence was retained must also exist unchanged in the exact
+receipt-bound pre-publication Graph. A malformed receipt is a blocker, not an
+empty queue.
+
+Only after those checks does the service-only
+`archive_a_wiki_native_job_reconcile_publication` RPC close the stale row. It
+records `completion_origin=EXTERNAL_REVIEWED_MERGE` and the verification evidence.
+The original prepared package, Extractor/Reviewer fields and submission times
+remain unchanged; the external work is never represented as a Native run.
+Repeating the same reconciliation is a no-op. A source with no Native row is not
+given a fabricated run history.
+
+For unfinished work blocked by `A_WIKI_GRAPH_CHANGED_REPREPARE_REQUIRED`, the
+program reads a fresh main worktree and calls the narrow
+`archive_a_wiki_native_job_supersede_reprepare` RPC. The old row becomes
+`SUPERSEDED`; a new row binds the same public source to the newer Graph and
+starts at `EXTRACTOR_READY`. Both extraction and independent review run again.
+Its publication branch includes the new graph revision to avoid adopting an old
+proposal branch. Retrying the old approved proposal is explicitly rejected.
+
+The operator readback composes A-Wiki with the existing A/B/C payload. The UI
+distinguishes content review, repository merge, and confirmed Production
+deployment. `PUBLISHED` means repository reflection; Production continues on the
+existing batched release policy. Zero active jobs alone does not prove that a
+fresh public-source scan ran.
 
 ## Native RPC contract
 
@@ -197,6 +237,8 @@ Native AI owns none of those mutations.
 | Extractor semantic uncertainty | HUMAN_REVIEW |
 | Reviewer omission/ambiguity | HUMAN_REVIEW |
 | current Graph differs from prepared Graph | BLOCKED, no Graph write |
+| verified graph drift with unchanged public source | old job retained; fresh Extractor/Reviewer package |
+| merged external receipt with stale Native job | exact publication evidence checked, original Native history preserved |
 | Finalizer validation fails | BLOCKED |
 | Fact/Graph persistence fails | no Receipt |
 | PR CI fails | main unchanged |

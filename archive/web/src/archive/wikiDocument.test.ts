@@ -7,8 +7,11 @@ import {
   wikiEventIndex,
   wikiLocationIndex,
   wikiSupportedNodeIds,
+  wikiHistoryForRecord,
+  type WikiGraphRecord,
 } from './wikiDocument'
 import { wikiSectionPlan } from './WikiDocumentPage'
+import publicGraph from '../../../content/graphs/C03-AFTERFALL/GRAPH.json'
 
 describe('WikiDocument compiler', () => {
   it('builds the approved 서진우 document from existing sources', () => {
@@ -71,5 +74,39 @@ describe('WikiDocument compiler', () => {
 
   it('fails closed for an unknown node rather than inventing a Wiki document', () => {
     expect(() => buildWikiDocument('missing-node')).toThrow(/Wiki source record missing/)
+  })
+
+  it('shows a character’s confirmed recent activities before earlier events and preserves their older article', () => {
+    const document = buildWikiDocument('char-taehoon')
+    const pumpIndex = document.activities.findIndex((item) => item.nodeId === 'event-wiki-aca3696fd78c3c8a9332aeb6')
+    const fireIndex = document.activities.findIndex((item) => item.nodeId === 'event-fireline')
+    expect(pumpIndex).toBeGreaterThanOrEqual(0)
+    expect(fireIndex).toBeGreaterThan(pumpIndex)
+    expect(document.activities[pumpIndex].relationship).toContain('생산거점 복구')
+    expect(document.activities[pumpIndex].sources[0]?.partId).toBe('c03-s03-session-008-001')
+    expect(document.sections.some((section) => section.id === 'taehoon-infra')).toBe(true)
+    expect(document.timeline.some((item) => item.title === '핵심 시설 담당')).toBe(true)
+    expect(document.transcriptPartIds).toContain('c03-s01-001')
+  })
+
+  it('renders the current state and complete older snapshots newest first without inventing missing history text', () => {
+    const original = publicGraph.nodes.find((record) => record.id === 'char-eunchae')! as WikiGraphRecord
+    const record: WikiGraphRecord = {
+      ...original,
+      data: { ...original.data, meta: {}, summary: '새로 확인된 역할' },
+      anchor: { game_time: '2027-11-22 22:40', save_version: 285 },
+      history: [
+        { anchor: { game_time: '2027-03-23 17:50', save_version: 253 }, data: { ...original.data, meta: {}, summary: '봄 기록' }, evidence: original.evidence },
+        { anchor: { game_time: '2027-09-22 16:10', save_version: 280 }, data: { ...original.data, label: '과거 표기', meta: { 역할: '당시 역할' }, summary: '가을 기록' }, evidence: original.evidence },
+        { anchor: { game_time: '2027-07-12 17:30', save_version: 275 }, evidence: original.evidence },
+      ],
+    }
+    const history = wikiHistoryForRecord(record)
+    expect(history.map((item) => item.date)).toEqual(['2027-11-22 22:40', '2027-09-22 16:10', '2027-07-12 17:30', '2027-03-23 17:50'])
+    expect(history.map((item) => item.summary)).toEqual(['새로 확인된 역할', '가을 기록', undefined, '봄 기록'])
+    expect(history.filter((item) => item.current)).toHaveLength(1)
+    expect(history[1].title).toBe('과거 표기')
+    expect(history[1].metaRows).toEqual([{ label: '역할', value: '당시 역할' }])
+    expect(record.history[0].data?.summary).toBe('봄 기록')
   })
 })

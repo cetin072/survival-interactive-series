@@ -11,6 +11,7 @@ import {
   discoverWikiSource,
   discoverWikiSources,
   expectedWikiFactPath,
+  expectedWikiReceiptPath,
   prepareWikiFacts,
   validateWikiFacts,
 } from './wiki-semantic-jobs.mjs'
@@ -156,4 +157,101 @@ test('rejects a new entity whose name does not occur in the GM source', async ()
   candidate.facts.nodes[0] = { ...candidate.facts.nodes[0], label: '가공 인물' }
   const beforeApply = { ...publicGraph, nodes: publicGraph.nodes.filter((record) => !candidate.facts.nodes.some((node) => node.id === record.id)) }
   assert.throws(() => validateWikiFacts(candidate.facts, source, beforeApply), /WIKI_NEW_CHARACTER_EVIDENCE_INVALID/)
+})
+
+// Synthetic public-archive fixtures only. These are never written to the real
+// AFTERFALL archive and do not represent played S04 events.
+async function writeSyntheticSeason(targetRoot, seasonId, sessionId = 'SESSION_005', partCount = 1) {
+  const seasonRef = `archive/content/transcripts/C03-AFTERFALL/${seasonId}`
+  const prefix = `${seasonRef}/${sessionId}`
+  const range = { start: '2099-01-01 10:00', end: '2099-01-01 10:00' }
+  const session = { session_id: sessionId, visibility: 'PUBLIC_ARCHIVE', capture_quality: 'VERIFIED_CONTIGUOUS_TURN_PAIRS', atomic_pairing_complete: true,
+    source_manifest: `${sessionId}/SOURCE_MANIFEST.json`, coverage_basis: 'captured_message_range', captured_message_range: range,
+    user_messages: partCount, gm_public_blocks: partCount }
+  const manifest = { chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', season_id: seasonId,
+    archive_class: 'COLD_RAW', visibility: 'PUBLIC_ARCHIVE', sessions: [session] }
+  const parts = {}, messages = []
+  await mkdir(resolve(targetRoot, prefix), { recursive: true })
+  for (let index = 0; index < partCount; index++) {
+    const user = `SYNTHETIC_INPUT_${index}`, gm = `SYNTHETIC_PUBLIC_${seasonId}_${index}`
+    const name = `PART_${String(index + 1).padStart(3, '0')}.md`
+    const raw = Buffer.from(`## USER ${String(index * 2).padStart(3, '0')}\n\n${user}\n\n## GM ${String(index * 2 + 1).padStart(3, '0')}\n\n${gm}\n`)
+    parts[name] = byteHash(raw)
+    messages.push({ message_order: index * 2, role: 'USER', sha256: byteHash(user) },
+      { message_order: index * 2 + 1, role: 'GM', sha256: byteHash(gm), state_link: { outcome: 'APPLIED', linked_save_version: 400 } })
+    await writeFile(resolve(targetRoot, prefix, name), raw)
+  }
+  const source = { ...manifest, sessions: undefined, ...session, public_safe_only: true, closed_at: '2099-01-01T10:00:00Z',
+    counts: { user: partCount, gm: partCount, total: partCount * 2 },
+    message_order: { min: 0, max: partCount * 2 - 1, contiguous: true }, content_sha256: messages,
+    parts: Object.keys(parts), parts_sha256: parts }
+  await writeFile(resolve(targetRoot, prefix, 'SOURCE_MANIFEST.json'), JSON.stringify(source))
+  await writeFile(resolve(targetRoot, seasonRef, 'MANIFEST.json'), JSON.stringify(manifest))
+  return { seasonRef, manifest }
+}
+
+test('S03 and S04 with the same session number have separate completion identities', async () => {
+  const testRoot = await mkdtemp(resolve(tmpdir(), 'wiki-seasons-'))
+  try {
+    await writeSyntheticSeason(testRoot, 'S03')
+    await writeSyntheticSeason(testRoot, 'S04')
+    const sources = await discoverWikiSources(testRoot)
+    assert.deepEqual(sources.map((source) => `${source.seasonId}/${source.sourceSession.session_id}`), ['S03/SESSION_005', 'S04/SESSION_005'])
+    assert.notEqual(expectedWikiFactPath(sources[0]), expectedWikiFactPath(sources[1]))
+    assert.notEqual(expectedWikiReceiptPath(sources[0]), expectedWikiReceiptPath(sources[1]))
+    const receiptRef = expectedWikiReceiptPath(sources[0])
+    await mkdir(resolve(testRoot, receiptRef, '..'), { recursive: true })
+    await writeFile(resolve(testRoot, receiptRef), '{}\n')
+    assert.equal((await discoverWikiSource(testRoot)).seasonId, 'S04')
+    // The old SESSION_005 special case must never classify S04 as a legacy apply.
+    const factRef = expectedWikiFactPath(sources[1])
+    await mkdir(resolve(testRoot, factRef, '..'), { recursive: true })
+    await writeFile(resolve(testRoot, factRef), '{}\n')
+    assert.equal((await discoverWikiSource(testRoot)).seasonId, 'S04')
+    assert.throws(() => prepareWikiFacts(sources[1], publicGraph), /WIKI_SEMANTIC_EXTRACTOR_REQUIRED/)
+  } finally { await rm(testRoot, { recursive: true, force: true }) }
+})
+
+test('all approved parts reach the S04 job without dropping later GM blocks', async () => {
+  const testRoot = await mkdtemp(resolve(tmpdir(), 'wiki-multipart-'))
+  try {
+    await writeSyntheticSeason(testRoot, 'S04', 'SESSION_001', 2)
+    const source = await discoverWikiSource(testRoot)
+    const { buildWikiFactJob } = await import('./wiki-fact-extractor.mjs')
+    const job = buildWikiFactJob(source, publicGraph)
+    assert.equal(job.season_id, 'S04')
+    assert.deepEqual(job.source.gm_blocks.map((block) => block.block_id), ['001', '003'])
+    assert.match(job.source.gm_blocks[1].text, /SYNTHETIC_PUBLIC_S04_1/)
+    assert.equal(job.source.raw_parts.length, 2)
+    assert.equal(job.source.raw_parts[1].ref, 'archive/content/transcripts/C03-AFTERFALL/S04/SESSION_001/PART_002.md')
+  } finally { await rm(testRoot, { recursive: true, force: true }) }
+})
+
+test('private or incomplete S04 capture never becomes a pending semantic source', async () => {
+  const testRoot = await mkdtemp(resolve(tmpdir(), 'wiki-private-season-'))
+  try {
+    const { seasonRef, manifest } = await writeSyntheticSeason(testRoot, 'S04')
+    await rm(resolve(testRoot, seasonRef, 'SESSION_005'), { recursive: true, force: true })
+    for (const visibility of ['PLAYER_ARCHIVE', 'CORE_PRIVATE']) {
+      await writeFile(resolve(testRoot, seasonRef, 'MANIFEST.json'), JSON.stringify({ ...manifest, visibility }))
+      assert.deepEqual(await discoverWikiSources(testRoot), [])
+    }
+    manifest.sessions[0].capture_quality = 'PARTIAL_CAPTURE_INCOMPLETE_PAIRING'
+    manifest.sessions[0].atomic_pairing_complete = false
+    await writeFile(resolve(testRoot, seasonRef, 'MANIFEST.json'), JSON.stringify(manifest))
+    assert.deepEqual(await discoverWikiSources(testRoot), [])
+    await assert.rejects(discoverWikiSource(testRoot), /WIKI_NO_PENDING_SOURCE/)
+  } finally { await rm(testRoot, { recursive: true, force: true }) }
+})
+
+test('approved S04 source with a mismatched season fails closed', async () => {
+  const testRoot = await mkdtemp(resolve(tmpdir(), 'wiki-season-mismatch-'))
+  try {
+    const { seasonRef } = await writeSyntheticSeason(testRoot, 'S04')
+    const ref = resolve(testRoot, seasonRef, 'SESSION_005/SOURCE_MANIFEST.json')
+    const source = JSON.parse(await readFile(ref, 'utf8'))
+    source.season_id = 'S03'
+    await writeFile(ref, JSON.stringify(source))
+    await assert.rejects(discoverWikiSources(testRoot), /INVALID_APPROVED_READER_SOURCE/)
+  } finally { await rm(testRoot, { recursive: true, force: true }) }
 })

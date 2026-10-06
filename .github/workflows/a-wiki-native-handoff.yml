@@ -7,19 +7,21 @@ on:
       - 'archive/scripts/a-wiki-native-control*'
       - 'archive/scripts/lib/wiki-fact-*'
       - 'archive/scripts/lib/wiki-semantic-jobs*'
+      - 'archive/scripts/lib/a-wiki-publication-evidence*'
       - 'archive/scripts/lib/publication-graph.mjs'
       - 'supabase/migrations/*a_wiki_native_jobs*'
       - 'docs/automation/A_WIKI_NATIVE_HANDOFF_V1.md'
   push:
     branches: [main]
     paths:
-      - 'archive/content/transcripts/C03-AFTERFALL/S03/**'
-      - 'archive/content/public-facts/C03-AFTERFALL/S03/**'
+      - 'archive/content/transcripts/C03-AFTERFALL/S*/**'
+      - 'archive/content/public-facts/C03-AFTERFALL/S*/**'
       - 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'
       - '.github/workflows/a-wiki-native-handoff.yml'
       - 'archive/scripts/a-wiki-native-control*'
       - 'archive/scripts/lib/wiki-fact-*'
       - 'archive/scripts/lib/wiki-semantic-jobs*'
+      - 'archive/scripts/lib/a-wiki-publication-evidence*'
       - 'archive/scripts/lib/publication-graph.mjs'
       - 'supabase/migrations/*a_wiki_native_jobs*'
       - 'docs/automation/A_WIKI_NATIVE_HANDOFF_V1.md'
@@ -65,6 +67,7 @@ jobs:
             archive/scripts/lib/wiki-semantic-jobs.test.mjs \
             archive/scripts/lib/wiki-fact-extractor.test.mjs \
             archive/scripts/lib/wiki-fact-finalizer.test.mjs \
+            archive/scripts/lib/a-wiki-publication-evidence.test.mjs \
             archive/scripts/a-wiki-native-control.test.mjs
 
   prepare:
@@ -88,6 +91,7 @@ jobs:
           node-version: '22'
       - name: Prepare one durable native semantic job
         env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
           ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
           ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
         run: node archive/scripts/a-wiki-native-control.mjs prepare

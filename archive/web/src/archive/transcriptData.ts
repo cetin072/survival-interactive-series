@@ -44,14 +44,7 @@ const c03S02Manifests = import.meta.glob(
   { eager: true, import: 'default' },
 ) as Record<string, unknown>
 import c03S02SharedRecovery from '../../../content/transcripts/C03-AFTERFALL/S02/SHARED_CHAT_RECOVERY/PART_RECOVERY_001.md?raw'
-const c03S03Raw = import.meta.glob(
-  '../../../content/transcripts/C03-AFTERFALL/S03/SESSION_*/PART_*.md',
-  { eager: true, query: '?raw', import: 'default' },
-) as Record<string, string>
-const c03S03Manifests = import.meta.glob(
-  '../../../content/transcripts/C03-AFTERFALL/S03/SESSION_*/SOURCE_MANIFEST.json',
-  { eager: true, import: 'default' },
-) as Record<string, unknown>
+import publishedRollingTranscripts from 'virtual:archive-public-transcripts'
 
 import { activeChronicle, chronicleRegistry, getChronicle, partitionChronicles, type Chronicle, type ChronicleId, type ChronicleTranscriptStatus } from './chronicleRegistry'
 export { activeChronicle, getChronicle, partitionChronicles, type Chronicle, type ChronicleId, type ChronicleTranscriptStatus }
@@ -169,71 +162,7 @@ const c03S02TranscriptPartsWithRecovery = c03S02TranscriptParts.flatMap((part) =
   part.sessionId === 'SESSION_004' ? [part, c03S02SharedRecoveryPart] : [part],
 )
 
-type C03S03Session = {
-  session_id: string
-  capture_quality?: string
-  captured_message_range?: {
-    start?: string
-    end?: string
-  }
-  source_message_order?: {
-    min?: number
-    max?: number
-    contiguous?: boolean
-  }
-  parts?: string[]
-}
-
-const c03S03SessionEntries = Object.entries(c03S03Manifests).map(([path, value]) => {
-  const match = path.match(/S03\/(SESSION_\d{3})\/SOURCE_MANIFEST\.json$/)
-  if (!match) throw new Error('Unexpected C03 S03 SOURCE_MANIFEST path: ' + path)
-  const session = value as C03S03Session
-  if (session.session_id !== match[1]) throw new Error('C03 S03 SOURCE_MANIFEST session mismatch: ' + path)
-  if (session.capture_quality !== 'VERIFIED_CONTIGUOUS_TURN_PAIRS'
-    || session.source_message_order?.contiguous !== true) {
-    throw new Error('C03 S03 Archive session is not verified contiguous RAW: ' + path)
-  }
-  return [session.session_id, session] as const
-})
-const c03S03Sessions = new Map(c03S03SessionEntries)
-if (c03S03Sessions.size !== c03S03SessionEntries.length) {
-  throw new Error('Duplicate C03 S03 Archive session manifest')
-}
-
-function c03S03DisplayRange(session: C03S03Session) {
-  const captured = session.captured_message_range
-  const minOrder = session.source_message_order?.min
-  const maxOrder = session.source_message_order?.max
-  if (!captured?.start || !captured.end
-    || typeof minOrder !== 'number' || !Number.isSafeInteger(minOrder)
-    || typeof maxOrder !== 'number' || !Number.isSafeInteger(maxOrder)) {
-    throw new Error('C03 S03 Archive session has incomplete range metadata: ' + session.session_id)
-  }
-  return `${captured.start} → ${captured.end} · 원본 순서 ${minOrder}–${maxOrder}`
-}
-
-const c03S03TranscriptParts: TranscriptPart[] = Object.entries(c03S03Raw)
-  .sort(([left], [right]) => left.localeCompare(right))
-  .map(([path, content]) => {
-    const match = path.match(/S03\/(SESSION_\d{3})\/(PART_(\d{3})\.md)$/)
-    if (!match) throw new Error('Unexpected C03 S03 Archive transcript path: ' + path)
-    const [, sessionId, partFile, partNumber] = match
-    const session = c03S03Sessions.get(sessionId)
-    if (!session) throw new Error('C03 S03 Archive part has no SOURCE_MANIFEST: ' + path)
-    if (!session.parts?.includes(partFile)) {
-      throw new Error('C03 S03 Archive part is not sealed by SOURCE_MANIFEST: ' + path)
-    }
-    return c03({
-      id: `c03-s03-${sessionId.toLowerCase().replace(/_/g, '-')}-${partNumber}`,
-      seasonId: 'S03', sessionId, number: Number(partNumber),
-      title: `2027년 4월 보관업 · ${sessionId} · PART ${partNumber}`,
-      range: c03S03DisplayRange(session),
-      status: 'verified_transcript',
-      source: `archive/content/transcripts/C03-AFTERFALL/S03/${sessionId}/${partFile}`,
-      sourceVerified: true, content,
-    })
-  })
-
+const c03RollingTranscriptParts = (publishedRollingTranscripts as Omit<TranscriptPart, 'ipId' | 'chronicleId' | 'worldlineId' | 'relatedNodeIds'>[]).map(c03)
 
 type C02SessionCatalog = {
   sessionId: string
@@ -366,7 +295,7 @@ export const transcriptParts: TranscriptPart[] = [
   c03({ id: 'c03-s02-session-002-gap', seasonId: 'S02', sessionId: 'SESSION_002', number: 0, title: '세션 002 직접 확인 전 구간', range: '2027-01-04 first-winter discussion 이전', status: 'missing_transcript', source: 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/SOURCE_INDEX.md', sourceVerified: true }),
   ...c03S02TranscriptPartsWithRecovery.filter((part) => part.sessionId !== 'SESSION_001'),
   c03({ id: 'c03-s03-session-001-gap', seasonId: 'S03', sessionId: 'SESSION_001', number: 0, title: 'S03 원본 순서 0–41', range: '첫 게시 배치 이전 · 아직 Archive에 보존되지 않은 구간', status: 'missing_transcript', source: 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_001/SOURCE_INDEX.md', sourceVerified: true }),
-  ...c03S03TranscriptParts,
+  ...c03RollingTranscriptParts,
 ]
 
 export function transcriptPartsFor(chronicleId: ChronicleId) { return transcriptParts.filter((part) => part.chronicleId === chronicleId) }

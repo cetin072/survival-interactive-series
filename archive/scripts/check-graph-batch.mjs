@@ -4,9 +4,11 @@ import { execFileSync } from 'node:child_process'
 import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
 import { tmpdir } from 'node:os'
+import { isDeepStrictEqual } from 'node:util'
 import { prepareGraphPublication } from './run-graph-publication.mjs'
 import { fingerprint } from './lib/publication-plan.mjs'
-import { byteHash } from './lib/publication-graph.mjs'
+import { byteHash, graphHash } from './lib/publication-graph.mjs'
+import { loadPublicWikiData } from './lib/wiki-public-sources.mjs'
 import { archiveNodes, archiveEdges } from '../web/src/archive/archiveData.ts'
 
 const root = resolve(import.meta.dirname, '..', '..')
@@ -24,7 +26,23 @@ const minimumExpectedRelations = archiveEdges.length + 2 + aWikiFacts.relations.
 assert.ok(initial.graph.nodes.length >= minimumExpectedNodes)
 assert.ok(initial.graph.relations.length >= minimumExpectedRelations)
 assert.ok(initial.graph.nodes.some((n) => n.id === 'loc-guild-rear-warehouse'))
-for (const source of archiveNodes) assert.deepEqual(initial.graph.nodes.find((n) => n.id === source.id).data, source)
+// The graph reconciler already validates current/history shape, anchor order,
+// and hashes. A reviewed update may move the complete legacy data into history;
+// its replacement must also resolve through the existing byte-verified loader.
+const verifiedPublicSources = (await loadPublicWikiData(root)).sources
+for (const source of archiveNodes) {
+  const record = initial.graph.nodes.find((n) => n.id === source.id)
+  assert.ok(record, `missing legacy node: ${source.id}`)
+  const baseline = [record, ...record.history].find((revision) => isDeepStrictEqual(revision.data, source))
+  assert.ok(baseline, `complete legacy data was not preserved: ${source.id}`)
+  if (baseline !== record) {
+    assert.equal(baseline.data_sha256, graphHash(source), `legacy history hash mismatch: ${source.id}`)
+    assert.equal(record.data.type, source.type, `legacy entity type changed: ${source.id}`)
+    assert.ok(verifiedPublicSources.some((entry) => entry.nodeId === record.id
+      && isDeepStrictEqual(entry.evidence, record.evidence)),
+    `updated legacy node lacks verified public fact evidence: ${source.id}`)
+  }
+}
 for (const source of archiveEdges) assert.ok(initial.graph.relations.some((r) => r.data.from === source.from && r.data.to === source.to && r.data.label === source.label && r.data.kind === 'published_relation'))
 for (const source of aWikiFacts.nodes) assert.ok(initial.graph.nodes.some((n) =>
   n.id === source.id && n.data.type === source.type && n.data.label === source.label))

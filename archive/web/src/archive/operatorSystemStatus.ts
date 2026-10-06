@@ -78,6 +78,64 @@ export function productionStatusTone(context?: string | null) {
   return context === 'production' ? 'ok' : 'neutral'
 }
 
+type AWikiPublicationJob = {
+  status?: string
+  merge_sha?: string | null
+  review_submitted_at?: string | null
+}
+
+type ProductionEvidence = {
+  release: { source_main_sha?: string } | null
+  deploy: { context?: string; commit_ref?: string } | null
+}
+
+export function aWikiPublicationStatus(job: AWikiPublicationJob | null, production: ProductionEvidence) {
+  const status = job?.status?.toUpperCase()
+  const shaPattern = /^[a-f0-9]{40}$/
+  const merged = status === 'PUBLISHED' && shaPattern.test(job?.merge_sha ?? '')
+  const review = status === 'PUBLISHED' || status === 'FINALIZING' ? '검수 통과'
+    : status === 'REJECT' ? '반려'
+    : status === 'HUMAN_REVIEW' ? '사람 검토 필요'
+    : status === 'REVIEW_SUBMITTED' || job?.review_submitted_at ? '검수 결과 제출'
+    : status === 'REVIEW_READY' ? '검수 대기'
+    : status ? '추출 후 검수 예정' : '기록 없음'
+  const repository = merged ? '반영 완료'
+    : status === 'PUBLISHED' ? '반영 근거 확인 필요'
+    : status === 'FINALIZING' ? '반영 중' : '반영 전'
+
+  if (!merged) return {
+    review,
+    repository,
+    deployment: '저장소 반영 후 확인',
+    deploymentDetail: '검수와 저장소 반영을 마친 뒤 실제 사이트 배포를 확인합니다.',
+    deploymentVerified: false,
+  }
+
+  // PUBLISHED proves the repository merge only. A different release SHA may be
+  // an ancestor or a descendant; metadata alone cannot determine either.
+  const deploymentVerified = production.deploy?.context === 'production'
+    && shaPattern.test(production.deploy.commit_ref ?? '')
+    && production.release?.source_main_sha === job?.merge_sha
+  return {
+    review,
+    repository,
+    deployment: deploymentVerified ? '공개 반영 확인' : '배포 미확인',
+    deploymentDetail: deploymentVerified
+      ? '현재 사이트의 배포 원본이 이 위키의 저장소 반영 버전과 일치합니다.'
+      : production.deploy?.context !== 'production' || !production.release?.source_main_sha
+        ? '현재 화면에서 실제 사이트 배포 정보를 확인하지 못했습니다.'
+        : '저장소 반영은 끝났습니다. 현재 배포에 이 위키가 포함됐는지는 아직 확인되지 않았습니다.',
+    deploymentVerified,
+  }
+}
+
+export function aWikiStatusLabel(value?: string | null) {
+  if (value?.toUpperCase() === 'PUBLISHED') return '저장소 반영 완료'
+  if (value?.toUpperCase() === 'FINALIZING') return '저장소 반영 중'
+  if (value?.toUpperCase() === 'SUPERSEDED') return '새 작업으로 대체 · 기록 보존'
+  return statusLabel(value)
+}
+
 
 const statusKorean: Record<string, string> = {
   AUTO: '자동 운영',
