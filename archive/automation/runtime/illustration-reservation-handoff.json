@@ -167,5 +167,28 @@
     "source_library_file_id": "libfile_1532be3d794c8191b91906fa5d006014",
     "source_sha256": "88712f315cc9ef38ece598d9b828143d2bd564604819a5b29deaa6c28adbc2ec"
   },
-  "transfer": null
+  "transfer": {
+    "status": "FINALIZE_QUEUED",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_00000000cdfc81f582fa8c0671ca4b20",
+    "source_library_file_id": "libfile_1532be3d794c8191b91906fa5d006014",
+    "source_version_id": null,
+    "source_sha256": "88712f315cc9ef38ece598d9b828143d2bd564604819a5b29deaa6c28adbc2ec",
+    "staging_id": "site-event-network-decay-da22faf4814c",
+    "derivative_sha256": "da22faf4814cd8a4537c7961dff0825c1984db66d9e88cbf8329ef81aa1d0010",
+    "derivative_size_bytes": 165909,
+    "derivative_width": 512,
+    "derivative_height": 512,
+    "derivative_mime_type": "image/png",
+    "derivative_palette_colors": 128,
+    "chunk_count": 2,
+    "stored_chunk_indexes": [
+      0,
+      1
+    ],
+    "finalizer_dispatch_request_id": 348,
+    "finalizer_dispatch_at": "2026-10-06T14:35:02.144836+00:00",
+    "job_status_readback": "FINALIZING",
+    "completed_at": "2026-10-06T14:35:32.154Z"
+  }
 }
