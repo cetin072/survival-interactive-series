@@ -183,6 +183,76 @@ class FinalizerIdentityTests(unittest.TestCase):
             "p_lease_seconds": 7200,
         })
 
+    def test_pr_check_propagation_budget_is_at_least_ten_minutes(self):
+        self.assertGreaterEqual(
+            MODULE.PR_CHECK_PROPAGATION_ATTEMPTS * MODULE.PR_CHECK_PROPAGATION_POLL_SECONDS,
+            600,
+        )
+
+    def test_check_timeout_recovery_requires_exact_clean_passed_identity_pr(self):
+        job = self.fixture()
+        job.update({
+            "status": "BLOCKED",
+            "blocker_code": MODULE.RECOVERABLE_CHECK_TIMEOUT,
+            "blocker_stage": "PROGRAM_FINALIZER",
+            "review_staging_id": "site-event-network-decay-da22faf4814c",
+        })
+        branch = f"automation/finalize-identity-{job['job_id']}"
+        identity_path = MODULE.identity_path_for_subject(job["subject_id"])
+        head = "a" * 40
+        existing = {"number": 436, "headRefOid": head}
+        view = {
+            "state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "headRefName": branch,
+            "headRefOid": head,
+            "baseRefName": "main",
+            "statusCheckRollup": [{"name": "Validate archive", "conclusion": "SUCCESS"}],
+            "files": [{"path": identity_path}],
+        }
+        checked = mock.Mock(returncode=0)
+        with mock.patch.object(MODULE, "find_open_pr", return_value=existing), \
+             mock.patch.object(MODULE, "gh_json", return_value=view), \
+             mock.patch.object(MODULE.subprocess, "run", return_value=checked), \
+             mock.patch.object(
+                 MODULE, "run",
+                 side_effect=["", json.dumps(MODULE.identity_payload(job))],
+             ):
+            self.assertEqual(MODULE.validate_check_timeout_recovery_pr(job), 436)
+
+    def test_check_timeout_recovery_rejects_non_matching_blocker(self):
+        job = self.fixture()
+        job.update({
+            "status": "BLOCKED",
+            "blocker_code": "SOME_OTHER_FINALIZER_ERROR",
+            "blocker_stage": "PROGRAM_FINALIZER",
+            "review_staging_id": "site-event-network-decay-da22faf4814c",
+        })
+        with self.assertRaisesRegex(ValueError, "FINALIZER_RECOVERY_NOT_ELIGIBLE"):
+            MODULE.validate_check_timeout_recovery_pr(job)
+
+    def test_recover_check_timeout_job_uses_binding_guard_rpc(self):
+        job = self.fixture()
+        job.update({
+            "status": "BLOCKED",
+            "blocker_code": MODULE.RECOVERABLE_CHECK_TIMEOUT,
+            "blocker_stage": "PROGRAM_FINALIZER",
+            "review_staging_id": "site-event-network-decay-da22faf4814c",
+        })
+        recovered = dict(job, status="FINALIZE_QUEUED", blocker_code=None, blocker_stage=None)
+        with mock.patch.object(MODULE, "validate_check_timeout_recovery_pr", return_value=436), \
+             mock.patch.object(MODULE, "rpc", side_effect=[{"status": "FINALIZE_QUEUED"}, recovered]) as rpc:
+            self.assertEqual(MODULE.recover_check_timeout_job(job)["status"], "FINALIZE_QUEUED")
+        self.assertEqual(rpc.call_args_list[0], mock.call(
+            "archive_illustration_finalizer_recover_check_timeout",
+            {
+                "p_job_id": job["job_id"],
+                "p_expected_output_sha256": job["output_sha256"],
+                "p_expected_provider_asset_id": job["provider_asset_id"],
+                "p_expected_review_staging_id": job["review_staging_id"],
+            },
+        ))
+
     def test_wait_pr_and_merge_waits_for_checks_to_appear(self):
         head = "a" * 40
         merged = "d" * 40
@@ -221,6 +291,7 @@ class FinalizerIdentityTests(unittest.TestCase):
         }
         with mock.patch.object(MODULE, "heartbeat"), \
              mock.patch.object(MODULE.time, "sleep"), \
+             mock.patch.object(MODULE, "PR_CHECK_PROPAGATION_ATTEMPTS", 3), \
              mock.patch.object(MODULE, "gh_json", return_value=no_checks), \
              mock.patch.object(MODULE, "run_with_heartbeat") as watch:
             with self.assertRaisesRegex(
