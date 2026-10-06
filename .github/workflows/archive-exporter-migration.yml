@@ -304,6 +304,7 @@ jobs:
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261003224700_illustration_renderer_state_handoff_v1.sql
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261003231500_illustration_daily_retry_index_fix_v1.sql
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261007002000_illustration_finalizer_check_timeout_recovery_v1.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261007004500_illustration_finalizer_recovery_role_v2.sql
       - name: Verify shared review context and legacy compatibility
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_shared_review_context_v1_verification.sql
       - name: Verify Registry duplicate gate
@@ -312,3 +313,5 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_renderer_state_handoff_v1_verification.sql
       - name: Verify same-day retry index policy
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_daily_retry_index_fix_v1_verification.sql
+      - name: Verify finalizer recovery role boundary
+        run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_finalizer_recovery_role_v2_verification.sql
