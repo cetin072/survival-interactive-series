@@ -3,6 +3,7 @@ import { ExplorerView, buildPositions, buildVisibleGraph } from './ExplorerView'
 import { ChronicleRoom, chronicleFilterFor, type ChronicleSection } from './ChronicleRoom'
 import { RawTranscriptReader } from './RawTranscriptReader'
 import { StoryBookReader } from './StoryBookReader'
+import { isWikiSupportedNodeId } from './wikiDocument'
 import { WikiStoryLibrary } from './WikiStoryLibrary'
 import { WikiToolsPage } from './WikiToolsPage'
 import { WikiMediaPage } from './WikiMediaPage'
@@ -51,11 +52,13 @@ export function ArchiveApp() {
   if (route.view === 'tools') return <WikiToolsPage />
   if (route.view === 'media') return <WikiMediaPage />
 
+  if (route.view === 'book') return <StoryBookReader key={route.chronicleId} chronicleId={route.chronicleId} initialChapterId={route.chapterId} onChapterChange={(chapterId) => open({ ...route, chapterId })} onOpenNode={(nodeId) => open(isWikiSupportedNodeId(nodeId) ? { view: 'wiki-preview', chronicleId: route.chronicleId, nodeId } : { view: 'archive', chronicleId: route.chronicleId, nodeId })} onBack={() => open({ view: 'story', chronicleId: route.chronicleId })} onOpenChronicle={() => open({ view: 'wiki-preview', chronicleId: route.chronicleId, page: 'chronicle' })} />
+
   return <main className="archive-shell">
     <header className="archive-header">
       <button className="archive-brand" onClick={() => open({ view: 'wiki-preview', chronicleId: activeChronicle.id, page: 'home' })}><p className="archive-kicker">SURVIVAL DIARY</p><h1>생존일기 <span>ARCHIVE</span></h1></button>
       <nav className="archive-primary-nav" aria-label="주요 탐색">
-        <button className={route.view === 'chronicle' || route.view === 'book' ? 'active' : ''} onClick={() => open({ view: 'story', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[0]}</button>
+        <button className={route.view === 'chronicle' ? 'active' : ''} onClick={() => open({ view: 'story', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[0]}</button>
         <a href="/knowledge/">{primaryNavigationLabels[1]}</a>
         <button onClick={() => open({ view: 'tools', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[2]}</button>
         <button onClick={() => open({ view: 'media', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[3]}</button>
@@ -64,7 +67,6 @@ export function ArchiveApp() {
     {route.view === 'chronicle' && <ChronicleRoom key={route.chronicleId} chronicleId={route.chronicleId} section={roomSection} onSection={(section) => open({ ...route, section })} onRead={() => openBook(route.chronicleId)} onExplore={() => openRoom(route.chronicleId, 'graph')} onRaw={() => open({ view: 'raw', chronicleId: route.chronicleId })} onOpenHub={() => open({ view: 'story', chronicleId: activeChronicle.id })} />}
     {roomHasGraph && <ExplorerView key={route.chronicleId + ':' + roomSection} initialFilter={chronicleFilterFor(roomSection)} onOpenStory={(chapterId) => openBook(route.chronicleId, chapterId)} />}
     {route.view === 'archive' && <ExplorerView key={route.nodeId ?? 'default'} initialNodeId={route.nodeId} onOpenStory={(chapterId) => openBook('C03-AFTERFALL', chapterId)} />}
-    {route.view === 'book' && <StoryBookReader key={route.chronicleId} chronicleId={route.chronicleId} initialChapterId={route.chapterId} onChapterChange={(chapterId) => open({ ...route, chapterId })} onOpenNode={(nodeId) => open({ view: 'archive', chronicleId: activeChronicle.id, nodeId })} onBack={() => open({ view: 'chronicle', chronicleId: route.chronicleId, section: 'overview' })} />}
     {route.view === 'raw' && <RawTranscriptReader key={rawChronicle.id} chronicleId={rawChronicle.id} initialPartId={route.partId} onPartChange={(partId) => open({ ...route, partId })} onOpenNode={(nodeId) => open({ view: 'archive', chronicleId: activeChronicle.id, nodeId })} onOpenExplorer={() => open({ view: 'archive', chronicleId: activeChronicle.id })} />}
     {(route.view === 'operator' || route.view === 'operator-visuals' || route.view === 'operator-knowledge' || route.view === 'operator-knowledge-detail' || route.view === 'operator-vault') && <Suspense fallback={<section className="operator-page" aria-live="polite">운영자 화면을 불러오는 중…</section>}><OperatorConsole
       view={route.view === 'operator-visuals' ? 'visuals' : route.view === 'operator-knowledge' ? 'knowledge' : route.view === 'operator-knowledge-detail' ? 'knowledge-detail' : route.view === 'operator-vault' ? 'vault' : 'dashboard'}

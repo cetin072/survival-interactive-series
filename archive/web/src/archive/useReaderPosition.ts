@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 /** One post-commit content scroll, not competing parent/child smooth scrolls. */
-export function useReaderPosition(itemId: string | undefined) {
+export function useReaderPosition(itemId: string | undefined, stickyHeaderSelector?: string) {
   const articleRef = useRef<HTMLElement>(null)
   const lastPositionedId = useRef<string | undefined>(undefined)
   const [progress, setProgress] = useState(0)
   const scrollToStart = useCallback(() => {
     const article = articleRef.current
-    if (article) window.scrollTo({ top: Math.max(0, window.scrollY + article.getBoundingClientRect().top - 16), behavior: 'instant' })
-  }, [])
+    const inset = stickyHeaderSelector ? document.querySelector(stickyHeaderSelector)?.getBoundingClientRect().height ?? 0 : 0
+    if (article) window.scrollTo({ top: Math.max(0, window.scrollY + article.getBoundingClientRect().top - inset - 16), behavior: 'instant' })
+  }, [stickyHeaderSelector])
 
   useLayoutEffect(() => {
     if (!itemId || lastPositionedId.current === itemId) return

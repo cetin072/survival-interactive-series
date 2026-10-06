@@ -1,5 +1,6 @@
 import { chronicleRegistry, type ChronicleId } from './chronicleRegistry'
 import { assertReaderManifest } from './readerManifestContract'
+import { buildReaderContents } from './readerContents'
 import publicGraph from '../../../content/graphs/C03-AFTERFALL/GRAPH.json'
 
 export type ReaderSourceKind = 'VERIFIED_GM_NARRATIVE' | 'EDITORIAL_CANON_BRIDGE'
@@ -28,7 +29,9 @@ export const chronicleBooks: ChronicleBook[] = chronicleRegistry.filter((item) =
   return { chronicleId: registry.id, title: registry.title, protagonist: registry.protagonist, worldlineId: registry.worldlineId, subtitle: book.subtitle, description: book.description, sourceRoot: registry.sourceRoot, transformVersion: book.transformVersion, beginningStatus: book.beginningStatus, beginningGap: book.beginningGap, coverage: book.coverage }
 })
 export const readerChapters: ReaderChapter[] = files.flatMap((book) => book.chapters.map((chapter) => ({ ...chapter, chronicleId: book.chronicleId })))
-export const chaptersForChronicle = (chronicleId: ChronicleId) => readerChapters.filter((chapter) => chapter.chronicleId === chronicleId)
+const contentsByChronicle = new Map(chronicleRegistry.map((chronicle) => [chronicle.id, buildReaderContents(readerChapters.filter((chapter) => chapter.chronicleId === chronicle.id))]))
+export const readerContentsForChronicle = (chronicleId: ChronicleId) => contentsByChronicle.get(chronicleId) ?? buildReaderContents([])
+export const chaptersForChronicle = (chronicleId: ChronicleId) => readerContentsForChronicle(chronicleId).entries.map((entry) => entry.chapter)
 export const chapterForNode = (nodeId: string) => {
   const linked = publicGraph.story_links.find((link) => link.node_id === nodeId)
   return readerChapters.find((chapter) => chapter.id === linked?.chapter_id) ?? readerChapters.find((chapter) => chapter.relatedNodeIds.includes(nodeId))
