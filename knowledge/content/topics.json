@@ -94,5 +94,15 @@
     "guide_id": null,
     "tools": [],
     "story_refs": []
+  },
+  {
+    "id": "emergency-restoration-prioritization",
+    "title": "긴급 복구 요청의 우선순위",
+    "brief_ids": [
+      "K-015"
+    ],
+    "guide_id": null,
+    "tools": [],
+    "story_refs": []
   }
 ]
