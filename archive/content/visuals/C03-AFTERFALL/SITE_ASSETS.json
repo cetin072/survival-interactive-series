@@ -133,7 +133,23 @@
       "width": 512,
       "height": 512,
       "mime_type": "image/png"
+    },
+    {
+      "point_id": "point-53a062c44d358ff024594b6789f682d56820c14e9fe14f6b2817fea03bc4e157",
+      "generation_key": "generation-b709bedf4fae9f0bff641c43a8a2a7862266e605f03081e4a845934ddde353db",
+      "subject_id": "event-network-decay",
+      "source_sha256": "da22faf4814cd8a4537c7961dff0825c1984db66d9e88cbf8329ef81aa1d0010",
+      "storage_bucket": "survival-archive-originals",
+      "storage_object_path": "AFTERFALL/point-53a062c44d358ff024594b6789f682d56820c14e9fe14f6b2817fea03bc4e157/generation-b709bedf4fae9f0bff641c43a8a2a7862266e605f03081e4a845934ddde353db/da22faf4814cd8a4537c7961dff0825c1984db66d9e88cbf8329ef81aa1d0010.png",
+      "registry_asset_id": "AF-EVENT-53A062C44D358FF024594B67",
+      "derivative_version": "site-png-512-v1",
+      "public_path": "/visual-assets/45fab80e742074589ad442ad404fae0f49c647783a1e677e38c0a9542b861eb2.png",
+      "sha256": "45fab80e742074589ad442ad404fae0f49c647783a1e677e38c0a9542b861eb2",
+      "bytes": 165909,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png"
     }
   ],
-  "content_sha256": "8596f6c70d9a5f3f21423e92c52536f1acc39394f0db39052b5d7840566b7e3c"
+  "content_sha256": "38b5a4db54f35af3cf092c5d34184bf36e5592ba7ec93c55b29645a6d48e557c"
 }
