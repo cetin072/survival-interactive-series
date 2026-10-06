@@ -47,7 +47,88 @@
     "job_status_after_provider_complete": "INGESTING",
     "readback_at": "2026-10-06T13:45:43.83643Z"
   },
-  "result": null,
+  "result": {
+    "status": "REGULAR_E2E_PASS",
+    "main_sha": "9d35970461af0a1d92b0f7b4021a627266d18fad",
+    "job_id": "illustration-event-network-decay-b709bedf4fae-20261006-37392537655",
+    "job_status": "SUCCEEDED",
+    "subject_id": "event-network-decay",
+    "point_id": "point-53a062c44d358ff024594b6789f682d56820c14e9fe14f6b2817fea03bc4e157",
+    "generation_key": "generation-b709bedf4fae9f0bff641c43a8a2a7862266e605f03081e4a845934ddde353db",
+    "prompt_sha256": "e0b3ceb020926c89acbd2a596ba238f7578e62fa0080394ceac04bffc85cbe6c",
+    "library": {
+      "source_path": "/IMAGE-RENDER/output/current.png",
+      "file_id": "file_00000000cdfc81f582fa8c0671ca4b20",
+      "library_file_id": "libfile_1532be3d794c8191b91906fa5d006014",
+      "sha256": "88712f315cc9ef38ece598d9b828143d2bd564604819a5b29deaa6c28adbc2ec",
+      "width": 1774,
+      "height": 887,
+      "size_bytes": 2573930
+    },
+    "review": {
+      "decision": "PASS",
+      "provider": "native_chatgpt_vision",
+      "handoff_commit": "48ff149cc44e12d7dd516251e66371080395e905",
+      "workflow_run_id": 37473841953,
+      "reviewed_at": "2026-10-06T13:49:33.394855+00:00"
+    },
+    "transfer": {
+      "status": "FINALIZE_QUEUED",
+      "staging_id": "site-event-network-decay-da22faf4814c",
+      "derivative_sha256": "da22faf4814cd8a4537c7961dff0825c1984db66d9e88cbf8329ef81aa1d0010",
+      "derivative_size_bytes": 165909,
+      "derivative_width": 512,
+      "derivative_height": 512,
+      "palette_colors": 128,
+      "chunk_count": 2,
+      "finalizer_dispatch_request_id": 348
+    },
+    "finalizer": {
+      "workflow_run_id": 37490424278,
+      "status": "SUCCEEDED",
+      "finalized_at": "2026-10-06T15:55:18.586868+00:00",
+      "identity_path": "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_NETWORK_DECAY.json",
+      "identity_source_commit": "26a452d6e91d18bf0318be3ffde4dd27c0a3d85c",
+      "identity_pr": 436,
+      "handoff_pr": 440,
+      "derivative_request_pr": 441,
+      "derivative_publish_pr": 442,
+      "recovery": {
+        "initial_blocker": "FINALIZER_PR_CHECKS_NOT_REPORTED_TIMEOUT",
+        "propagation_budget_seconds": 600,
+        "recovery_code_pr": 438,
+        "recovery_auth_pr": 439,
+        "recovery_main_sha": "0772e3f05c8898e9b1982e5407139b7de64aa877",
+        "recovered_without_regeneration": true,
+        "recovered_without_rereview": true
+      }
+    },
+    "storage": {
+      "provider": "supabase",
+      "bucket": "survival-archive-originals",
+      "object_path": "AFTERFALL/point-53a062c44d358ff024594b6789f682d56820c14e9fe14f6b2817fea03bc4e157/generation-b709bedf4fae9f0bff641c43a8a2a7862266e605f03081e4a845934ddde353db/da22faf4814cd8a4537c7961dff0825c1984db66d9e88cbf8329ef81aa1d0010.png",
+      "storage_verified": true
+    },
+    "registry": {
+      "status": "READY",
+      "asset_id": "AF-EVENT-53A062C44D358FF024594B67",
+      "exact_match_count": 1,
+      "source_sha256": "da22faf4814cd8a4537c7961dff0825c1984db66d9e88cbf8329ef81aa1d0010"
+    },
+    "site_assets": {
+      "exact_subject_count": 1,
+      "subject_id": "event-network-decay",
+      "public_path": "/visual-assets/45fab80e742074589ad442ad404fae0f49c647783a1e677e38c0a9542b861eb2.png",
+      "derivative_sha256": "45fab80e742074589ad442ad404fae0f49c647783a1e677e38c0a9542b861eb2",
+      "bytes": 165909,
+      "width": 512,
+      "height": 512,
+      "published_main_sha": "9d35970461af0a1d92b0f7b4021a627266d18fad"
+    },
+    "binding_mismatch": false,
+    "paid_api_calls": 0,
+    "completed_at": "2026-10-06T15:55:18.586868Z"
+  },
   "trial": {
     "version": "illustration-reservation-live-trial-v2",
     "source_commit": "22e080d6f77fc0a2d963ad428e18b73e424db4ed",
