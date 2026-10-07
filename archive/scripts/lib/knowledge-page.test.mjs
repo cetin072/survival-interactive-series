@@ -1,10 +1,17 @@
-import test from 'node:test'
+import test, { before, after } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { loadKnowledge, root } from './knowledge-content.mjs'
 import { publicBriefs, publicBriefData } from './knowledge-public.mjs'
-import { escapeKnowledgeHtml as esc, knowledgeHref, knowledgeReviewState, renderKnowledgeDetail } from './knowledge-detail.mjs'
+import { createKnowledgePageRenderer } from '../../web/render-knowledge.mjs'
+const esc = (value) => String(value).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch])
+const knowledgeHref = (brief) => '/knowledge/' + brief.slug + '/'
+let renderer
+before(async () => { renderer = await createKnowledgePageRenderer() })
+after(async () => { await renderer?.close() })
+const renderKnowledgeDetail = (brief) => renderer.render(brief)
+const knowledgeReviewState = (brief) => renderer.reviewState(brief)
 
 test('all ten existing canonical routes retain original content, SEO, sitemap, downloads and relations', async () => {
   const data = await loadKnowledge()
@@ -14,6 +21,7 @@ test('all ten existing canonical routes retain original content, SEO, sitemap, d
   const sitemap = await readFile(join(root, 'archive/web/public/sitemap.xml'), 'utf8')
   for (const brief of published) {
     const page = await readFile(join(root, 'archive/web/public/knowledge', brief.slug, 'index.html'), 'utf8')
+    const normalizedPage = page.replaceAll('&#x27;', '&#39;')
     const projection = publicBriefData(brief, data)
     assert.ok(page.includes(renderKnowledgeDetail(projection)), brief.id + ': shared renderer')
     assert.ok(page.includes(`<title>${esc(brief.title)} | 생존일기</title>`))
@@ -31,9 +39,9 @@ test('all ten existing canonical routes retain original content, SEO, sitemap, d
     assert.equal(schemas[0].itemListElement[1].item, url)
     assert.deepEqual(projection.sections, brief.sections)
     for (const section of brief.sections) {
-      assert.ok(page.includes(esc(section.heading)))
+      assert.ok(normalizedPage.includes(esc(section.heading)))
       for (const block of section.blocks) {
-        for (const value of [block.text, ...(block.items ?? []), ...(block.headers ?? []), ...(block.rows ?? []).flat()].filter(Boolean)) assert.ok(page.includes(esc(value)), brief.id + ': original body')
+        for (const value of [block.text, ...(block.items ?? []), ...(block.headers ?? []), ...(block.rows ?? []).flat()].filter(Boolean)) assert.ok(page.replaceAll('&#x27;', '&#39;').includes(esc(value)), brief.id + ': original body')
         if (block.type === 'image') assert.ok(page.includes(`src="${esc(block.src)}"`))
         if (block.type === 'youtube') assert.ok(page.includes('youtube-nocookie.com/embed/'))
       }
@@ -42,7 +50,7 @@ test('all ten existing canonical routes retain original content, SEO, sitemap, d
       assert.ok(page.includes(`href="${tool.path}" download`))
       assert.ok((await readFile(join(root, 'archive/web/public', tool.path))).length > 0)
     }
-    for (const source of brief.sources) assert.ok(page.includes(esc(source.url)))
+    for (const source of brief.sources) assert.ok(normalizedPage.includes(esc(source.url)))
     for (const related of projection.related_briefs) assert.ok(page.includes(`href="${knowledgeHref(related)}"`))
     for (const story of projection.related_stories) assert.ok(page.includes(`href="${esc(story.path)}"`))
     assert.doesNotMatch(page, /knowledge-preview|<script(?! type="application\/ld\+json")/)
@@ -67,7 +75,7 @@ test('media and all relation types render together without data loss or unsafe H
   assert.ok(html.includes('alt="이미지 &quot;설명&quot;"'))
   assert.ok(html.includes('&lt;script&gt;alert(1)&lt;/script&gt;'))
   assert.ok(html.includes('https://www.youtube-nocookie.com/embed/AbCdEf12345'))
-  assert.ok(html.includes('allowfullscreen'))
+  assert.ok(html.includes('allowFullScreen'))
   assert.ok(html.includes(`href="${brief.tools[0].path}" download`))
   assert.ok(html.includes('/knowledge/family-emergency-contact-plan/'))
   assert.ok(html.includes('/knowledge/guides/fixture-guide/'))

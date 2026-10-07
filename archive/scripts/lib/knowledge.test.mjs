@@ -436,7 +436,7 @@ test('generated golden pages remain static, searchable, linked and downloadable'
     assert.match(index, new RegExp(`/knowledge/${brief.slug}/`))
     assert.match(sitemap, new RegExp(`/knowledge/${brief.slug}/`))
     assert.ok(page.includes('<h1>' + htmlEsc(brief.label) + '</h1>'))
-    assert.ok(page.includes('class="knowledge-guide-question article-question">' + htmlEsc(brief.title) + '</p>'))
+    assert.ok(page.includes('class="knowledge-guide-question">' + htmlEsc(brief.title) + '</p>'))
     assert.ok(page.includes(`<title>${htmlEsc(`${brief.title} | 생존일기`)}</title>`))
     assert.ok(page.includes(htmlEsc(brief.meta_description)))
     assert.ok(page.includes('https://schema.org'))

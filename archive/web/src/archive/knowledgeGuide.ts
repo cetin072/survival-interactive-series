@@ -1,6 +1,4 @@
 import publicBriefFiles from 'virtual:knowledge-public'
-// @ts-expect-error Pure shared public display helpers.
-export { knowledgeHref, knowledgeRiskLabel } from '../../../scripts/lib/knowledge-detail.mjs'
 
 export type KnowledgeGuideBlock =
   | { type: 'prose'; text: string }
@@ -102,9 +100,9 @@ function assertSupportedBlocks(brief: KnowledgeBriefFile) {
   return brief
 }
 
-export const publishedKnowledgeGuides = briefFiles
-  .map(assertSupportedBlocks)
-  .map((brief): KnowledgeGuide => ({
+export function adaptKnowledgeBrief(brief: KnowledgeBriefFile): KnowledgeGuide {
+  assertSupportedBlocks(brief)
+  return ({
     detail: brief,
     id: brief.id,
     slug: brief.slug,
@@ -122,11 +120,29 @@ export const publishedKnowledgeGuides = briefFiles
     sections: brief.sections,
     sources: brief.sources,
     tools: brief.tools ?? [],
-  }))
+  })
+}
+
+export const publishedKnowledgeGuides = briefFiles.map(adaptKnowledgeBrief)
   .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt) || a.id.localeCompare(b.id))
 
 export function buildKnowledgeGuide(briefId: string): KnowledgeGuide {
   const guide = publishedKnowledgeGuides.find((item) => item.id === briefId)
   if (!guide) throw new Error('Published Knowledge guide not found: ' + briefId)
   return guide
+}
+
+export const knowledgeHref = (brief: { slug: string }) => '/knowledge/' + brief.slug + '/'
+export function knowledgeRiskLabel(riskLevel: string) {
+  if (riskLevel === 'LOW') return '일반 준비 정보'
+  if (riskLevel === 'MEDIUM') return '주의가 필요한 정보'
+  if (riskLevel === 'HIGH') return '고위험 정보 · 공식 안내 우선'
+  return '위험도 정보 없음'
+}
+export function knowledgeReviewState(brief: { status: string; publication_policy: string; risk_level: string }) {
+  return {
+    required: brief.publication_policy === 'HUMAN_APPROVED' || brief.risk_level === 'HIGH',
+    completed: brief.status === 'PUBLISHED' && brief.publication_policy === 'HUMAN_APPROVED',
+    approved: brief.status === 'PUBLISHED',
+  }
 }

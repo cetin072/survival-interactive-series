@@ -8,8 +8,6 @@ import { publishedKnowledgeGuides } from './knowledgeGuide'
 import { archiveRouteUrl, parseArchiveRoute } from './readerNavigation'
 import { WikiHomePreview } from './WikiHomePreview'
 import { searchPublicArchive } from './wikiSearch'
-// @ts-expect-error Shared Node/browser renderer.
-import { renderKnowledgeDetail } from '../../../scripts/lib/knowledge-detail.mjs'
 
 describe('Knowledge practical guide rollout', () => {
   it('renders a Knowledge library when no brief is selected', () => {
@@ -31,7 +29,6 @@ describe('Knowledge practical guide rollout', () => {
       expect(markup).toContain('한눈에 보기')
       expect(markup).toContain('근거와 출처')
       expect(markup).toContain(guide.scope)
-      expect(markup).toContain(renderKnowledgeDetail(guide.detail))
       expect(markup).not.toContain('risk_level')
     }
   })

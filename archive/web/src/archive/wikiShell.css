@@ -9,7 +9,6 @@
 .wiki-shell a:hover { text-decoration: underline; }
 
 /* Detail media and static shell use the same styles as the public Guide UI. */
-.knowledge-detail-header { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
 .knowledge-guide-media { margin: 20px 0; }
 .knowledge-guide-media img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: contain; border-radius: 7px; }
 .knowledge-guide-media figcaption { margin-top: 8px; color: #73786f; font-size: 13px; }
