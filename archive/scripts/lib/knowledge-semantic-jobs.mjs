@@ -178,7 +178,8 @@ export function validateSemanticResult(job, result) {
     if (job.source_ref.endsWith('/EX-001-apartment-power-outage.json'))
       fail(brief.risk_level === 'HIGH' && brief.risk_domains?.includes('ELECTRICAL'), 'SEMANTIC_EX001_RISK_DOWNGRADE_FORBIDDEN')
   } else {
-    fail(candidate.reader_book_ref === source.reader_book_ref
+    const readerBookRef = source.reader_book_ref ?? READER_BOOK_REF
+    fail(candidate.reader_book_ref === readerBookRef
       && candidate.reader_book_sha256 === source.reader_book_sha256
       && candidate.reader_chapter_id === source.chapter_id
       && candidate.reader_chapter_sha256 === source.chapter_sha256
