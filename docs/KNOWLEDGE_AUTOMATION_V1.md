@@ -43,3 +43,24 @@ V1 최초 활성화 때 **기존에 공개 승인을 받은 입력만** `node ar
 ## 현재 범위
 
 이 PR에는 예약 Worker, 게임 직후 후보 추출, 실제 웹 조사, Notion API, GUIDE 자동생성, 자동 merge, Production 배포가 없습니다. Archive Reader/RAW/Canon/게임 Runtime/Supabase 코드는 수정하지 않습니다.
+
+
+## 검색 환경 STEP 2A / STEP 2B 인계 (2026-10-07 KST)
+
+STEP 1 구현·병합은 PASS (PR #456 / 7641c1953998e6c10ce4010a886f8ea6ddecfc36). 현재 Production은 이전 상세 화면이며 STEP 1 실물 검수는 정상 배포 후 수행합니다. Production이 오래됐다는 이유로 main의 KnowledgeGuide를 다시 구현하지 않습니다.
+
+STEP 2A는 기존 생성기의 최초 HTML head에 기존 label 기반 검색 제목, 기존 meta_description, Open Graph 6개 필드를 출력하고 같은 승인 필터로 sitemap과 robots.txt를 생성합니다. 기존 title 질문·본문·출처·다운로드·JSON-LD 날짜와 정책/pin은 유지합니다. 연결된 승인 대표 이미지가 없으므로 og:image는 보류합니다. label만으로 재난·통신 문맥이 불명확한 K-007 ‘정보 상태 인계’와 K-009 ‘역할·권한 분담’은 향후 편집 후보이며 이번 단계에서 원문을 수정하지 않습니다.
+
+- Production: https://survival-diary-archive.netlify.app
+- 제출 대상: https://survival-diary-archive.netlify.app/sitemap.xml
+- 대표 글: https://survival-diary-archive.netlify.app/knowledge/emergency-supplies-inventory/
+- 대표 글: https://survival-diary-archive.netlify.app/knowledge/family-emergency-contact-plan/
+- 대표 글: https://survival-diary-archive.netlify.app/knowledge/apartment-power-outage-scope-check/
+- 기존 인증 흔적: main의 HTML/공개 파일에서 Google·네이버 소유확인 태그·파일을 발견하지 못함. 계정 등록/소유권은 미확인(미등록이라고 단정하지 않음). 실제 인증값이나 placeholder는 추가하지 않음.
+- 상태를 각각 기록: 코드 구현 / main 병합 / 공개 배포 / 소유권 인증 / sitemap 제출 / 실제 색인. 구현·검사 성공은 색인·순위·리치 결과 보장이 아님.
+
+배포 환경: Production에는 전역 noindex를 추가하지 않습니다. Deploy Preview는 Netlify의 기존 X-Robots-Tag: noindex를 재사용합니다. main--survival-diary-archive는 deploy-meta에서 현재 Production과 동일한 context/commit/build_id인 Production alias로 확인됐습니다. 별도 branch-deploy로 오인해 noindex를 추가하지 않습니다. 설정된 테스트 branch codex/archive-image-attempt-ref는 Netlify 목록에 배포 기록이 없어 실제 응답은 NOT_VERIFIED이며, 확인되지 않은 누락을 추정해 공통 헤더를 추가하지 않습니다. 기존 /operator* noindex·인증·CSP는 유지합니다. 현재 /?view=operator는 운영자 진입이 아니라 공개 홈으로 정규화되고, 실제 운영자 진입은 /operator/ 및 하위 경로입니다. Wiki/Reader/RAW 쿼리의 공개 정책을 바꾸지 않습니다.
+
+정상 Production 배포 후: robots 200/text/plain와 Production origin Sitemap 줄, sitemap 200/XML·URL 집합, 목록/대표 상세 200, 없는 slug 404, 유일한 title/description/canonical·OG·JSON-LD, 공개 noindex 부재, Operator 로그인/noindex, 기존 preview 호환 이동과 다운로드·media CSP를 실제 응답으로 확인합니다. 실제 공개 영상 재생은 합성 미디어 렌더링 검사와 별도입니다. 향후 별도 테스트 branch가 실제 사용되면 정확한 context와 alias 응답의 noindex를 확인하고 누락된 경우에만 별도 보완합니다. Production 강제 배포와 release marker 변경은 하지 않습니다.
+
+STEP 2B에서 계정 담당자가 확인할 사항: 기존 Google Search Console/네이버 서치어드바이저 속성·소유권·기존 인증 방식, Production 배포 반영, sitemap 처리 상태·제출 이력, 대표 URL canonical/수집/색인 상태. 계정 로그인·속성 생성·소유권 변경·제출·색인 요청·DNS 작업은 이번 STEP 2A에서 수행하지 않습니다.

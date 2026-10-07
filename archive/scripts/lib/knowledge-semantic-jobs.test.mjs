@@ -623,6 +623,25 @@ test('C-FINALIZER drives an exact-target package through a Git worker branch to 
     assert.ok(!committedPaths.includes('archive/web/public/knowledge/semantic-finalizer-git-fixture/index.html'))
     const sitemap = git(['show', `${headRef}:archive/web/public/sitemap.xml`])
     assert.ok(!sitemap.includes('/knowledge/semantic-finalizer-git-fixture/'))
+
+    // Use this independent repository to exercise real metadata escaping and automatic sitemap growth.
+    const legacyFile = join(root, 'knowledge/content/briefs/K-002.json')
+    const legacy = JSON.parse(await readFile(legacyFile, 'utf8'))
+    legacy.label = '비상용품 "기록" & 점검 <확인>'
+    legacy.meta_description = '물품 "확인" & 점검 <기록>을 정리합니다.'
+    await writeFile(legacyFile, JSON.stringify(legacy))
+    const nextFile = join(root, 'knowledge/content/briefs/K-004.json')
+    const next = JSON.parse(await readFile(nextFile, 'utf8'))
+    next.status = 'PUBLISHED'
+    await writeFile(nextFile, JSON.stringify(next))
+    execFileSync(process.execPath, ['archive/scripts/build-knowledge.mjs'], { cwd: root, stdio: 'pipe' })
+    const page = await readFile(join(root, 'archive/web/public/knowledge', legacy.slug, 'index.html'), 'utf8')
+    assert.ok(page.includes('<title>비상용품 &quot;기록&quot; &amp; 점검 &lt;확인&gt; | 생존일기</title>'))
+    assert.ok(page.includes('<meta property="og:description" content="물품 &quot;확인&quot; &amp; 점검 &lt;기록&gt;을 정리합니다." />'))
+    assert.ok(page.includes('<meta name="description" content="물품 &quot;확인&quot; &amp; 점검 &lt;기록&gt;을 정리합니다." />'))
+    const generatedSitemap = await readFile(join(root, 'archive/web/public/sitemap.xml'), 'utf8')
+    assert.ok(generatedSitemap.includes('/knowledge/' + next.slug + '/'))
+    assert.ok(!(await readFile(join(root, 'archive/web/public/knowledge', next.slug, 'index.html'), 'utf8')).includes('noindex'))
   } finally {
     await rm(root, { recursive: true, force: true })
     await rm(remote, { recursive: true, force: true })

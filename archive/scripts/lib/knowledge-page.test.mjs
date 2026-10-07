@@ -13,7 +13,7 @@ after(async () => { await renderer?.close() })
 const renderKnowledgeDetail = (brief) => renderer.render(brief)
 const knowledgeReviewState = (brief) => renderer.reviewState(brief)
 
-test('all ten existing canonical routes retain original content, SEO, sitemap, downloads and relations', async () => {
+test('all existing canonical routes retain original content, SEO, sitemap, downloads and relations', async () => {
   const data = await loadKnowledge()
   const published = await publicBriefs(data)
   const existingSlugs = ['emergency-supplies-inventory', 'family-emergency-contact-plan', 'information-status-handoff', 'community-role-delegation', 'evacuation-decision-planning', 'community-mutual-aid-agreement', 'emergency-route-redundancy', 'emergency-map-information-access', 'emergency-external-personnel-credentialing', 'apartment-power-outage-scope-check']
@@ -24,11 +24,23 @@ test('all ten existing canonical routes retain original content, SEO, sitemap, d
     const normalizedPage = page.replaceAll('&#x27;', '&#39;')
     const projection = publicBriefData(brief, data)
     assert.ok(page.includes(renderKnowledgeDetail(projection)), brief.id + ': shared renderer')
-    assert.ok(page.includes(`<title>${esc(brief.title)} | 생존일기</title>`))
+    assert.ok(page.includes(`<title>${esc(brief.label?.trim() || brief.title)} | 생존일기</title>`))
     assert.ok(page.includes(`<meta name="description" content="${esc(brief.meta_description)}" />`))
     const url = data.config.site_origin + knowledgeHref(brief)
     assert.ok(page.includes(`<link rel="canonical" href="${url}" />`))
     assert.ok(sitemap.includes(`<loc>${url}</loc>`))
+    assert.equal([...page.matchAll(/<title>/g)].length, 1)
+    assert.equal([...page.matchAll(/<meta name="description"/g)].length, 1)
+    assert.equal([...page.matchAll(/<link rel="canonical"/g)].length, 1)
+    const og = [...page.matchAll(/<meta property="(og:[^"]+)" content="([^"]*)" \/>/g)]
+    assert.equal(og.length, 6)
+    assert.equal(new Set(og.map((tag) => tag[1])).size, 6)
+    assert.deepEqual(Object.fromEntries(og.map((tag) => [tag[1], tag[2]])), {
+      'og:title': esc((brief.label?.trim() || brief.title) + ' | 생존일기'),
+      'og:description': esc(brief.meta_description), 'og:type': 'article',
+      'og:url': esc(url), 'og:site_name': '생존일기', 'og:locale': 'ko_KR',
+    })
+    assert.doesNotMatch(page, /noindex|site-verification|property="og:image"/)
     const schemas = [...page.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map((match) => JSON.parse(match[1]))
     assert.deepEqual(schemas.map((schema) => schema['@type']), ['BreadcrumbList', 'Article'])
     assert.equal(schemas[1].headline, brief.title)
@@ -105,4 +117,30 @@ test('media permission is scoped to knowledge while executable code and Operator
   assert.ok(policies[1].includes("img-src 'self' data: https:;"))
   assert.ok(policies[1].includes('frame-src https://www.youtube-nocookie.com;'))
   for (const policy of policies) assert.ok(policy.includes("script-src 'self';"))
+})
+
+
+test('robots and sitemap discover exactly the approved public pages without blocking assets or Operator noindex', async () => {
+  const data = await loadKnowledge()
+  const published = await publicBriefs(data)
+  const origin = data.config.site_origin
+  const robots = await readFile(join(root, 'archive/web/public/robots.txt'), 'utf8')
+  assert.equal(robots.replaceAll('\r\n', '\n'), 'User-agent: *\nAllow: /\n\nSitemap: ' + origin + '/sitemap.xml\n')
+  assert.doesNotMatch(robots, /noindex|Disallow:/i)
+  const sitemap = await readFile(join(root, 'archive/web/public/sitemap.xml'), 'utf8')
+  const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((item) => item[1])
+  assert.deepEqual(urls, ['/', '/knowledge/', ...published.map(knowledgeHref)].map((path) => origin + path))
+  assert.equal(new Set(urls).size, urls.length)
+  assert.doesNotMatch(sitemap, /operator|knowledge-preview|deploy-preview|lastmod|priority|changefreq/)
+  const index = await readFile(join(root, 'archive/web/public/knowledge/index.html'), 'utf8')
+  for (const brief of published) assert.ok(index.includes('href="' + knowledgeHref(brief) + '"'))
+  for (const brief of data.briefs.filter((item) => item.status !== 'PUBLISHED')) {
+    assert.ok(!urls.includes(origin + knowledgeHref(brief)))
+    assert.ok(!index.includes('href="' + knowledgeHref(brief) + '"'))
+  }
+  assert.ok(index.includes('<meta property="og:type" content="website" />'))
+  assert.doesNotMatch(index, /noindex|site-verification/)
+  const config = await readFile(join(root, 'archive/web/netlify.toml'), 'utf8')
+  assert.ok(config.includes('for = "/operator*"'))
+  assert.ok(config.includes('X-Robots-Tag = "noindex, nofollow, noarchive"'))
 })
