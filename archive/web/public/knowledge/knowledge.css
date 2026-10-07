@@ -70,3 +70,6 @@ a { color: inherit; }
 .knowledge-card .card-question { margin: 0 0 10px; }
 .related-question { margin-top: 3px; }
 .article-question { margin: 0 0 16px; color: #5e5e66; font-size: clamp(16px, 2.3vw, 20px); line-height: 1.55; }
+
+.knowledge-brand span { display: block; margin-top: 4px; color: #626269; font-size: 12px; }
+.knowledge-nav a:focus-visible { outline: 2px solid #52575b; outline-offset: 2px; }

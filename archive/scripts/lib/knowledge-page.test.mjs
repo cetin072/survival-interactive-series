@@ -144,3 +144,20 @@ test('robots and sitemap discover exactly the approved public pages without bloc
   assert.ok(config.includes('for = "/operator*"'))
   assert.ok(config.includes('X-Robots-Tag = "noindex, nofollow, noarchive"'))
 })
+
+test('static Knowledge menu matches the existing public navigation and exposes a working home search link', async () => {
+  const data = await loadKnowledge()
+  const published = await publicBriefs(data)
+  const labels = ['생존 지식', '자료실', '생존 이야기', '세계관 위키']
+  assert.deepEqual(renderer.navigation.map((item) => item.label), labels)
+  for (const path of ['index.html', ...published.map((brief) => brief.slug + '/index.html')]) {
+    const page = await readFile(join(root, 'archive/web/public/knowledge', path), 'utf8')
+    const menu = page.match(/<nav class="knowledge-nav"[^>]*>(.*?)<\/nav>/s)[1]
+    const links = [...menu.matchAll(/<a href="([^"]+)"[^>]*>([^<]+)<\/a>/g)]
+    assert.deepEqual(links.slice(0, 4).map((item) => ({ href: item[1], label: item[2] })), renderer.navigation.map((item) => ({ href: esc(item.href), label: item.label })))
+    assert.ok(menu.includes('href="/knowledge/" aria-current="page"'))
+    assert.ok(menu.includes('href="/#site-search">검색</a>'))
+    assert.ok(page.includes('<span>생존 지식과 이야기</span>'))
+    assert.doesNotMatch(menu, /<input|<form/)
+  }
+})

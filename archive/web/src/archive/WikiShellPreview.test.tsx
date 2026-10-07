@@ -8,12 +8,12 @@ import { archiveRouteUrl, parseArchiveRoute } from './readerNavigation'
 describe('Wiki staged public structure', () => {
   it('uses the Wiki home as the default preview entrance', () => {
     const markup = renderToStaticMarkup(createElement(WikiShellPreview))
-    expect(markup).toContain('생존 이야기를 읽고')
-    expect(markup).toContain('현재 진행 중')
+    expect(markup).toContain('일상과 비상상황에 필요한 생존 지식')
+    expect(markup).toContain('진행 중')
     expect(markup).toContain('서진우의 생존기')
-    expect(markup).toContain('최근 세계관 기록')
-    expect(markup).toContain('세계관 분류')
-    expect(markup).toContain('최근 생존 지식')
+    expect(markup).not.toContain('최근 세계관 기록')
+    expect(markup).toContain('세계관 위키 탐색')
+    expect(markup).toContain('최근 공개한 지식')
     expect(markup).toContain('생존기')
   })
 

@@ -1,16 +1,16 @@
 import { WikiSearchBox } from './WikiSearchBox'
+import { currentPublicMenu, publicNavigation } from './publicNavigation'
 
 export function WikiTopbar() {
+  const current = typeof window === 'undefined' ? undefined : currentPublicMenu(window.location.pathname, window.location.search)
   return <header className="wiki-topbar">
-    <a className="wiki-brand" href="/" aria-label="생존일기 Wiki 홈">
+    <a className="wiki-brand" href="/" aria-label="생존일기 홈">
       <strong>생존일기</strong>
-      <span>생존 기록 보관소</span>
+      <span>생존 지식과 이야기</span>
     </a>
     <WikiSearchBox />
     <nav aria-label="공용 메뉴">
-      <a href="/?view=story">이야기</a>
-      <a href="/knowledge/">생존 지식</a>
-      <a href="/?view=tools">자료실</a>
+      {publicNavigation.map((item) => <a key={item.id} href={item.href} aria-current={current === item.id ? 'page' : undefined}>{item.label}</a>)}
     </nav>
   </header>
 }

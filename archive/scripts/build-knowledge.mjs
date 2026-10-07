@@ -32,8 +32,8 @@ ${schema}
 <body>
   <div class="knowledge-shell">
     <header class="knowledge-header">
-      <a class="knowledge-brand" href="/"><p class="knowledge-kicker">SURVIVAL DIARY</p><strong>생존일기 · 생존 지식</strong></a>
-      <nav class="knowledge-nav" aria-label="주요 탐색"><a href="/?view=archive">세계 탐색</a><a href="/?view=story">이야기 읽기</a><a href="/knowledge/" aria-current="page">생존 지식</a></nav>
+      <a class="knowledge-brand" href="/"><p class="knowledge-kicker">SURVIVAL DIARY</p><strong>생존일기</strong><span>생존 지식과 이야기</span></a>
+      <nav class="knowledge-nav" aria-label="주요 탐색">${renderer.navigation.map((item) => `<a href="${esc(item.href)}"${item.id === 'knowledge' ? ' aria-current="page"' : ''}>${esc(item.label)}</a>`).join('')}<a href="/#site-search">검색</a></nav>
     </header>
     ${body}
   </div>

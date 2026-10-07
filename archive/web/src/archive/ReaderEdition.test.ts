@@ -12,7 +12,7 @@ import { archiveNodes } from './archiveData'
 
 describe('Reader Edition V1.1', () => {
   it('keeps RAW outside the primary navigation while exposing Survival Knowledge', () => {
-    expect(primaryNavigationLabels).toEqual(['이야기', '생존 지식', 'Tools', 'Media'])
+    expect(primaryNavigationLabels).toEqual(['생존 지식', '자료실', '생존 이야기', '세계관 위키'])
   })
   it('has one registry and switches current shelf without Story code changes', () => {
     expect(partitionChronicles().active.id).toBe('C03-AFTERFALL')
