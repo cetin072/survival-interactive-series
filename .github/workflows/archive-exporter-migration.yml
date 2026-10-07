@@ -315,3 +315,7 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_daily_retry_index_fix_v1_verification.sql
       - name: Verify finalizer recovery role boundary
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_finalizer_recovery_role_v2_verification.sql
+      - name: Verify preserved PASS recovery in isolated database
+        run: |
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261007062615_illustration_preserved_pass_recovery.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_preserved_pass_recovery.sql
