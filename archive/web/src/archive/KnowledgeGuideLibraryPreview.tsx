@@ -1,9 +1,11 @@
+import { groupKnowledge } from './knowledgeCategories'
 import { knowledgeHref, knowledgeRiskLabel, publishedKnowledgeGuides, type KnowledgeGuide } from './knowledgeGuide'
 import { WikiTopbar } from './WikiTopbar'
 import './wikiShell.css'
 import './survivalDesignLanguage.css'
 
 export function KnowledgeGuideLibraryPreview({ notice, showTopbar = true, guides = publishedKnowledgeGuides }: { notice?: string; showTopbar?: boolean; guides?: readonly KnowledgeGuide[] }) {
+  const groups = groupKnowledge(guides)
   return <main className="wiki-shell knowledge-library-shell">
     {showTopbar && <WikiTopbar />}
 
@@ -18,15 +20,19 @@ export function KnowledgeGuideLibraryPreview({ notice, showTopbar = true, guides
         <p>현실에서 참고할 수 있도록 행동 방법, 주의사항, 도구와 근거를 함께 정리한 실전 가이드입니다.</p>
       </header>
 
+      <nav className="wiki-home-actions" aria-label="생존 지식 주제">
+        {groups.map((group) => <a key={group.id} href={'#knowledge-' + group.id}>{group.label} {group.guides.length}</a>)}
+      </nav>
+
       {notice && <p className="knowledge-library-notice" role="status">{notice}</p>}
 
-      <section className="knowledge-library-list" aria-label="공개 생존 지식">
+      {groups.map((group) => <section key={group.id} id={"knowledge-" + group.id} className="knowledge-library-list" aria-label={group.label}>
         <div className="wiki-section-heading">
-          <h2>공개 가이드</h2>
-          <span>{guides.length}개</span>
+          <h2>{group.label}</h2>
+          <span>{group.guides.length}개</span>
         </div>
         <div>
-          {guides.map((guide) => <article key={guide.id}>
+          {group.guides.map((guide) => <article key={guide.id}>
             <div className="knowledge-library-meta">
               <span>생존 지식</span>
               <small>{knowledgeRiskLabel(guide.riskLevel)} · {guide.publishedAt}</small>
@@ -40,7 +46,7 @@ export function KnowledgeGuideLibraryPreview({ notice, showTopbar = true, guides
             </div>
           </article>)}
         </div>
-      </section>
+      </section>)}
     </div>
   </main>
 }
