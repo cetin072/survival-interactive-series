@@ -144,3 +144,43 @@ test('robots and sitemap discover exactly the approved public pages without bloc
   assert.ok(config.includes('for = "/operator*"'))
   assert.ok(config.includes('X-Robots-Tag = "noindex, nofollow, noarchive"'))
 })
+
+test('static Knowledge menu matches the existing public navigation and exposes a working home search link', async () => {
+  const data = await loadKnowledge()
+  const published = await publicBriefs(data)
+  const labels = ['생존 지식', '자료실', '생존 이야기', '세계관 위키']
+  assert.deepEqual(renderer.navigation.map((item) => item.label), labels)
+  for (const path of ['index.html', ...published.map((brief) => brief.slug + '/index.html')]) {
+    const page = await readFile(join(root, 'archive/web/public/knowledge', path), 'utf8')
+    const menu = page.match(/<nav class="knowledge-nav"[^>]*>(.*?)<\/nav>/s)[1]
+    const links = [...menu.matchAll(/<a href="([^"]+)"[^>]*>([^<]+)<\/a>/g)]
+    assert.deepEqual(links.slice(0, 4).map((item) => ({ href: item[1], label: item[2] })), renderer.navigation.map((item) => ({ href: esc(item.href), label: item.label })))
+    assert.ok(menu.includes('href="/knowledge/" aria-current="page"'))
+    assert.ok(menu.includes('href="/#site-search">검색</a>'))
+    assert.ok(page.includes('<span>생존 지식과 이야기</span>'))
+    assert.doesNotMatch(menu, /<input|<form/)
+  }
+})
+
+test('canonical index reuses the existing Library UI as static HTML with original SEO and every public guide', async () => {
+  const data = await loadKnowledge()
+  const published = await publicBriefs(data)
+  const projections = published.map((brief) => publicBriefData(brief, data))
+  const page = await readFile(join(root, 'archive/web/public/knowledge/index.html'), 'utf8')
+  assert.ok(page.includes(renderer.renderLibrary(projections)))
+  assert.equal([...page.matchAll(/class="wiki-topbar"/g)].length, 0)
+  assert.ok(page.includes('class="knowledge-library-list"'))
+  assert.ok(page.includes('href="/knowledge/wikiShell.css"'))
+  assert.ok(page.includes('href="/knowledge/survivalDesignLanguage.css"'))
+  assert.ok(page.includes('<title>생존 지식 | 생존일기</title>'))
+  assert.ok(page.includes('<meta name="description" content="게임과 이야기에서 시작한 질문을 현실의 공식 자료와 검토 가능한 근거로 정리하는 생존 지식 아카이브." />'))
+  assert.ok(page.includes('<link rel="canonical" href="' + data.config.site_origin + '/knowledge/" />'))
+  assert.equal([...page.matchAll(/<meta property="og:/g)].length, 6)
+  assert.ok(page.includes('<meta property="og:type" content="website" />'))
+  for (const brief of published) assert.ok(page.includes('href="' + knowledgeHref(brief) + '"'))
+  assert.doesNotMatch(page, /<script|knowledge-card|knowledge-hero|noindex/)
+  const added = { ...projections[0], id: 'K-fixture', slug: 'fixture-new-guide', label: '새 공개 가이드' }
+  const html = renderer.renderLibrary([...projections, added])
+  assert.ok(html.includes('/knowledge/fixture-new-guide/'))
+  assert.ok(html.includes('<span>' + (published.length + 1) + '개</span>'))
+})

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { searchPublicArchive, searchResultGroups, type PublicSearchEntry } from './wikiSearch'
 
 const groupMeta = {
@@ -24,6 +24,10 @@ function SearchGroup({ title, entries }: { title: string; entries: PublicSearchE
 
 export function WikiSearchBox() {
   const [query, setQuery] = useState('')
+  const searchInput = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    if (window.location.hash === '#site-search') searchInput.current?.focus()
+  }, [])
   const results = useMemo(() => searchPublicArchive(query), [query])
   const groups = useMemo(() => searchResultGroups(results), [results])
   const hasQuery = query.trim().length > 0
@@ -34,13 +38,14 @@ export function WikiSearchBox() {
   }
 
   return <div className="wiki-search-area">
-    <form className="wiki-search" onSubmit={submit} role="search">
+    <form id="site-search" className="wiki-search" onSubmit={submit} role="search">
       <input
+        ref={searchInput}
         aria-label="통합 검색"
         autoComplete="off"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        placeholder="인물, 장소, 사건, 생존 지식 검색"
+        placeholder="생존 지식·자료·작품 검색"
       />
       <button type="submit">검색</button>
     </form>

@@ -12,12 +12,13 @@ import { KnowledgeGuidePreview } from './KnowledgeGuidePreview'
 import { activeChronicle, getChronicle } from './transcriptData'
 import type { ReaderChapter } from './storyData'
 import { archiveRouteUrl, browserReaderStorage, parseArchiveRoute, resolveReaderRoute, type ArchiveRoute } from './readerNavigation'
+import { publicNavigation, currentPublicMenu } from './publicNavigation'
 import './archive.css'
 
 const OperatorConsole = lazy(() => import('./OperatorConsole'))
 
 export { buildPositions, buildVisibleGraph }
-export const primaryNavigationLabels = ['이야기', '생존 지식', 'Tools', 'Media'] as const
+export const primaryNavigationLabels = publicNavigation.map((item) => item.label)
 const readRoute = () => parseArchiveRoute(window.location.search, browserReaderStorage(), window.location.pathname)
 
 function writeRoute(route: ArchiveRoute, replace = false) {
@@ -58,10 +59,12 @@ export function ArchiveApp() {
     <header className="archive-header">
       <button className="archive-brand" onClick={() => open({ view: 'wiki-preview', chronicleId: activeChronicle.id, page: 'home' })}><p className="archive-kicker">SURVIVAL DIARY</p><h1>생존일기 <span>ARCHIVE</span></h1></button>
       <nav className="archive-primary-nav" aria-label="주요 탐색">
-        <button className={route.view === 'chronicle' ? 'active' : ''} onClick={() => open({ view: 'story', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[0]}</button>
-        <a href="/knowledge/">{primaryNavigationLabels[1]}</a>
-        <button onClick={() => open({ view: 'tools', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[2]}</button>
-        <button onClick={() => open({ view: 'media', chronicleId: activeChronicle.id })}>{primaryNavigationLabels[3]}</button>
+        {route.view.startsWith('operator') ? <>
+        <button className={route.view === 'chronicle' ? 'active' : ''} onClick={() => open({ view: 'story', chronicleId: activeChronicle.id })}>이야기</button>
+        <a href="/knowledge/">생존 지식</a>
+        <button onClick={() => open({ view: 'tools', chronicleId: activeChronicle.id })}>Tools</button>
+        <button onClick={() => open({ view: 'media', chronicleId: activeChronicle.id })}>Media</button>
+        </> : publicNavigation.map((item) => <a key={item.id} href={item.href} aria-current={currentPublicMenu(window.location.pathname, window.location.search) === item.id ? 'page' : undefined}>{item.label}</a>)}
       </nav>
     </header>
     {route.view === 'chronicle' && <ChronicleRoom key={route.chronicleId} chronicleId={route.chronicleId} section={roomSection} onSection={(section) => open({ ...route, section })} onRead={() => openBook(route.chronicleId)} onExplore={() => openRoom(route.chronicleId, 'graph')} onRaw={() => open({ view: 'raw', chronicleId: route.chronicleId })} onOpenHub={() => open({ view: 'story', chronicleId: activeChronicle.id })} />}

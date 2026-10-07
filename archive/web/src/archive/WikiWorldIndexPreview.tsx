@@ -49,7 +49,7 @@ export function WikiWorldIndexPreview({ chronicleId = 'C03-AFTERFALL' }: { chron
 
       <header className="wiki-chronicle-header">
         <p className="wiki-document-kicker">인물 · 장소 · 사건</p>
-        <h1>세계관 전체보기</h1>
+        <h1>{chronicle.title} · 세계관 전체보기</h1>
         <p>현재 공개된 세계관 문서를 한곳에서 찾아보고 바로 열 수 있습니다.</p>
         <nav className="wiki-world-index-jump" aria-label="세계관 분류 바로가기">
           <a href="#characters">인물 {wikiCharacterIndex.length}</a>
