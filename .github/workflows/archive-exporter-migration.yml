@@ -317,5 +317,7 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_finalizer_recovery_role_v2_verification.sql
       - name: Verify preserved PASS recovery in isolated database
         run: |
+          # The focused fixture predates the live observability migration.
+          psql -v ON_ERROR_STOP=1 -c 'ALTER TABLE survival_ops.illustration_render_jobs ADD COLUMN provider_completed_at timestamptz;'
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261007062615_illustration_preserved_pass_recovery.sql
           psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_preserved_pass_recovery.sql
