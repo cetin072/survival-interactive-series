@@ -49,7 +49,7 @@ export function decideRelease({ headSha, lastReleaseCommit = null, marker = null
   if (lastReleaseCommit !== null && !SHA.test(lastReleaseCommit)) throw new Error('INVALID_LAST_RELEASE_COMMIT')
   if (marker !== null) validateReleaseMarker(marker)
 
-  if (!force && ((!hasSiteChanges && marker) || (lastReleaseCommit && headSha === lastReleaseCommit))) {
+  if ((!hasSiteChanges && marker) || (lastReleaseCommit && headSha === lastReleaseCommit)) {
     return { status: 'NO_CHANGES', due: false }
   }
 
