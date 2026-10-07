@@ -6,7 +6,7 @@ Archive and Knowledge state → C-PREP → durable `PREPARED` job → Semantic W
 
 ## Ownership
 
-- **C-PREP** scans the current source inventory, selects one oldest eligible FRESH source, otherwise one unhandled EXPERIENCE_SEED, otherwise one due BACKFILL, excludes handled identities, applies the existing backfill cadence, checks legacy worker PR/branch blockers, pins source/policy/main, and writes a compact durable job.
+- **C-PREP** scans the current source inventory, selects one oldest eligible FRESH source, otherwise one unhandled EXPERIENCE_SEED, otherwise one due BACKFILL, excludes handled identities, applies the existing backfill cadence, checks legacy worker PR/branch blockers, pins source/policy/main, and writes a compact durable job. Reader BACKFILL is configured as one ordered pool across `C03-AFTERFALL` (서진우), `C02-STRONGHOLD` (박도현), and `C01-HAN-JUNHO` (한준호). It takes at most one unreviewed verified Reader chapter per run; adding chronicles does not add schedules or workers.
 - **ChatGPT Semantic Worker** reads one prepared job, researches and semantically evaluates one candidate, submits one versioned result, then stops. It owns no GitHub, CI, repository state, publication, or Production work.
 - **C-FINALIZER** claims submitted work, revalidates source/policy/package and duplicate state, writes one atomic package commit on a deterministic worker branch, opens one Draft PR with `PACKAGE_READY`, and records lifecycle state. Existing Worker Gate and publication workflows own the publication decision and exact-head merge. HOLD is terminal and creates no content PR. HUMAN_REVIEW uses the existing Operator Inbox.
 
@@ -15,6 +15,16 @@ The current C1 runtime remains available as legacy/fallback during migration. C2
 ## Durable boundary and recovery
 
 Supabase `survival_ops.knowledge_semantic_jobs` persists source identity, policy and main pins, compact context, immutable submitted result and digest, lifecycle references, blockers and attempts. A unique active-job index serializes semantic work. `PREPARED` is not expired, so the other scheduled worker can safely continue after a run interruption. Submit uses a database row lock and digest equality: the first valid result is accepted, identical resubmission returns `ALREADY_SUBMITTED`, and a different resubmission is rejected. A scheduled program-owned dispatcher triggers the finalizer; finalizer claims can be recovered after a stale attempt.
+
+## Source priority and multi-chronicle backfill
+
+The source order remains deliberately simple:
+
+1. fresh verified public Archive source;
+2. unhandled Experience Seed;
+3. due verified Reader BACKFILL.
+
+The Reader pool is an approved code catalog and currently checks 서진우 → 박도현 → 한준호. It is intentionally kept outside `worker-policy.json` so adding Reader sources does not invalidate an already prepared semantic job's policy pin. A reviewed/HOLD/HUMAN_REVIEW/PUBLISHED Reader work key is skipped, so the selector eventually moves across all configured chronicles without requiring new gameplay. Chronicle identity is part of the source reference (`BOOK.json#chapter-id`), preventing same chapter IDs in different books from colliding. Story text only supplies the question/provenance; reality claims still require independent authoritative external sources.
 
 ## Schedules and release boundary
 

@@ -8,7 +8,7 @@ import { publicKnowledgeInventory, scanKnowledge } from './lib/knowledge-scan.mj
 import { backfillDue, validateRuntimeState } from './lib/knowledge-worker-runtime.mjs'
 import {
   buildSemanticContext, chapterHash, hashPolicyBytes, makeWorkKey, nextBriefId,
-  postSupabaseRpc, reservedCandidateId, selectBackfillChapter,
+  postSupabaseRpc, READER_BOOK_REFS, reservedCandidateId, selectBackfillChapter,
 } from './lib/knowledge-semantic-jobs.mjs'
 
 export const repository = 'cetin072/survival-interactive-series'
@@ -112,27 +112,37 @@ export function policyPin(policyBytes, configBytes, editorialBytes, policy, conf
   }
 }
 
-async function publicReaderBackfillChoice(data, runtimeState) {
-  const bookPath = join(root, 'archive/content/stories/C03-AFTERFALL/BOOK.json')
-  const bookBytes = await readFile(bookPath)
-  const book = JSON.parse(bookBytes.toString('utf8'))
-  const choice = selectBackfillChapter({ book, candidates: data.candidates, reviewedWorkKeys: runtimeState.backfill.reviewed_items.map((item) => item.work_key) })
-  if (!choice) return null
-  const chapter = choice.chapter
-  return {
-    jobType: 'BACKFILL_BRIEF',
-    sourceKind: 'PUBLIC_READER',
-    sourceRef: choice.sourceRef,
-    sourceSha256: choice.chapterSha,
-    workKey: choice.workKey,
-    chapterId: chapter.id,
-    chapterSha256: choice.chapterSha,
-    readerBookSha256: sha(bookBytes),
-    refs: chapter.sourceRefs,
-    hashes: chapter.sourceHashes,
-    excerpt: chapter.body,
-    existingCandidate: choice.existingCandidate,
+async function publicReaderBackfillChoice(data, runtimeState, bookRefs = READER_BOOK_REFS) {
+  const reviewedWorkKeys = runtimeState.backfill.reviewed_items.map((item) => item.work_key)
+  for (const readerBookRef of bookRefs) {
+    if (!/^archive\/content\/stories\/C\d{2}-[A-Z0-9-]+\/BOOK\.json$/.test(readerBookRef)) throw new Error('PREP_READER_BOOK_REF_INVALID')
+    const bookBytes = await readFile(join(root, readerBookRef))
+    const book = JSON.parse(bookBytes.toString('utf8'))
+    const choice = selectBackfillChapter({
+      book,
+      readerBookRef,
+      candidates: data.candidates,
+      reviewedWorkKeys,
+    })
+    if (!choice) continue
+    const chapter = choice.chapter
+    return {
+      jobType: 'BACKFILL_BRIEF',
+      sourceKind: 'PUBLIC_READER',
+      sourceRef: choice.sourceRef,
+      sourceSha256: choice.chapterSha,
+      workKey: choice.workKey,
+      chapterId: chapter.id,
+      chapterSha256: choice.chapterSha,
+      readerBookRef,
+      readerBookSha256: sha(bookBytes),
+      refs: chapter.sourceRefs,
+      hashes: chapter.sourceHashes,
+      excerpt: chapter.body,
+      existingCandidate: choice.existingCandidate,
+    }
   }
+  return null
 }
 
 export async function selectExperienceSeed({ base = root, handledJobs = [] } = {}) {
@@ -190,7 +200,12 @@ export async function createJob({ choice, policy, policyPin, mainSha, data, hand
   const target = { brief_id: briefId, candidate_id: candidateId }
   const source = {
     kind: choice.sourceKind, ref: choice.sourceRef, sha256: choice.sourceSha256,
-    ...(choice.chapterId ? { chapter_id: choice.chapterId, chapter_sha256: choice.chapterSha256, reader_book_sha256: choice.readerBookSha256 } : {}),
+    ...(choice.chapterId ? {
+      chapter_id: choice.chapterId,
+      chapter_sha256: choice.chapterSha256,
+      reader_book_ref: choice.readerBookRef,
+      reader_book_sha256: choice.readerBookSha256,
+    } : {}),
     refs: choice.refs ?? [], hashes: choice.hashes ?? [],
   }
   const context = buildSemanticContext({
@@ -261,7 +276,7 @@ export async function runSemanticPrepare({ now = new Date() } = {}) {
     ? await publicReaderBackfillChoice(data, {
       ...runtimeState,
       backfill: { ...runtimeState.backfill, reviewed_items: [...runtimeState.backfill.reviewed_items, ...handledBackfillWorkKeys.map((work_key) => ({ work_key }))] },
-    }) : null
+    }, READER_BOOK_REFS) : null
   const plan = planSemanticPreparation({ activeJobs, handledJobs, scanner, experienceChoice, backfillIsDue, backfillChoice, legacyBlocker: blocker })
 
   if (plan.decision === 'NOOP') {

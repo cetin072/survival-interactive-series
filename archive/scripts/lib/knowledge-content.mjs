@@ -29,10 +29,10 @@ const lowRiskDomains = new Set(['GENERAL_PREPAREDNESS', 'FOOD_STORAGE', 'COMMUNI
 const highRiskDomains = new Set(['MEDICAL', 'MEDICATION', 'FIRST_AID_PROCEDURE', 'WATER_PURIFICATION', 'GENERATOR', 'COMBUSTION_CO', 'ELECTRICAL', 'RESCUE', 'SHELTER_STRUCTURAL', 'OTHER_SEVERE_HARM'])
 const allowedRiskDomains = new Set([...lowRiskDomains, ...highRiskDomains])
 const publicationModes = new Set(['PR_ONLY', 'AUTO_LOW_RISK_SHADOW', 'AUTO_LOW_RISK'])
-const readerBookRef = 'archive/content/stories/C03-AFTERFALL/BOOK.json'
+const readerBookRefPattern = /^archive\/content\/stories\/C\d{2}-[A-Z0-9-]+\/BOOK\.json$/
 
 async function verifiedReaderReference(item, base, label) {
-  fail(item.source_kind === 'PUBLIC_READER' && item.reader_book_ref === readerBookRef && /^[a-f0-9]{64}$/.test(item.reader_book_sha256), `${label} Reader identity`)
+  fail(item.source_kind === 'PUBLIC_READER' && readerBookRefPattern.test(item.reader_book_ref ?? '') && /^[a-f0-9]{64}$/.test(item.reader_book_sha256), `${label} Reader identity`)
   fail(nonempty(item.reader_chapter_id) && /^[a-f0-9]{64}$/.test(item.reader_chapter_sha256) && Array.isArray(item.source_refs) && item.source_refs.length > 0 && Array.isArray(item.source_hashes) && item.source_hashes.length === item.source_refs.length && item.source_hashes.every((hash) => /^[a-f0-9]{64}$/.test(hash)), `${label} Reader fields`)
   const bytes = await readFile(join(base, item.reader_book_ref))
   // The BOOK hash records discovery-time context; new chapters may grow BOOK.json.

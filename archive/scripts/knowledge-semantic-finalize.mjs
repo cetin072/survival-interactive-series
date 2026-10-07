@@ -111,11 +111,13 @@ export async function verifyPins(job, base) {
     for (let index = 0; index < context.source.refs.length; index += 1) await verifyFile(context.source.refs[index], context.source.hashes[index])
   } else if (job.source_kind === 'PUBLIC_READER') {
     const chapterId = context.source.chapter_id
+    const readerBookRef = context.source.reader_book_ref ?? 'archive/content/stories/C03-AFTERFALL/BOOK.json'
     if (!chapterId || context.source.chapter_sha256 !== job.source_sha256) throw new Error('SEMANTIC_READER_PIN_INVALID')
-    const book = JSON.parse(await readFile(join(base, 'archive/content/stories/C03-AFTERFALL/BOOK.json'), 'utf8'))
+    if (!/^archive\/content\/stories\/C\d{2}-[A-Z0-9-]+\/BOOK\.json$/.test(readerBookRef)) throw new Error('SEMANTIC_READER_BOOK_REF_INVALID')
+    const book = JSON.parse(await readFile(join(base, readerBookRef), 'utf8'))
     const chapter = book.chapters?.find((item) => item.id === chapterId)
     if (!chapter || chapter.sourceKind !== 'VERIFIED_GM_NARRATIVE' || chapterHash(chapter) !== job.source_sha256) throw new Error('SEMANTIC_SOURCE_SHA_CHANGED')
-    if (job.source_ref !== `archive/content/stories/C03-AFTERFALL/BOOK.json#${chapterId}`
+    if (job.source_ref !== `${readerBookRef}#${chapterId}`
       || json(chapter.sourceRefs) !== json(context.source.refs) || json(chapter.sourceHashes) !== json(context.source.hashes)) throw new Error('SEMANTIC_READER_PROVENANCE_CHANGED')
     for (let index = 0; index < context.source.refs.length; index += 1) await verifyFile(context.source.refs[index], context.source.hashes[index])
   } else if (job.source_kind === 'USER_REPORTED_EXPERIENCE') {

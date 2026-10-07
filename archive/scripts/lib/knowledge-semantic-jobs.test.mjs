@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
-import { applySemanticPackage, buildSemanticContext, chapterHash, hashPolicyBytes, knowledgeOperationalDate, makeWorkKey, nextBriefId, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
+import { applySemanticPackage, buildSemanticContext, chapterHash, hashPolicyBytes, knowledgeOperationalDate, makeWorkKey, nextBriefId, READER_BOOK_REFS, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
 import { finalizerAction, semanticBranchRef, reconcilePullRequest, runSemanticFinalizer, verifyPins } from '../knowledge-semantic-finalize.mjs'
 import { runPackage } from '../knowledge-semantic-finalize.mjs'
 import { detectLegacyWorkerBlocker, planSemanticPreparation, selectExperienceSeed } from '../knowledge-semantic-prepare.mjs'
@@ -140,6 +140,46 @@ test('reserved identities and verified Reader selection are stable and exclude r
   assert.equal(selectBackfillChapter({ book, candidates: [], reviewedWorkKeys: [choice.workKey] }), null)
 })
 
+test('configured Reader backfill catalog resolves all three verified chronicles in priority order', async () => {
+  assert.deepEqual(READER_BOOK_REFS, [
+    'archive/content/stories/C03-AFTERFALL/BOOK.json',
+    'archive/content/stories/C02-STRONGHOLD/BOOK.json',
+    'archive/content/stories/C01-HAN-JUNHO/BOOK.json',
+  ])
+  const base = resolve(import.meta.dirname, '../../..')
+  for (const readerBookRef of READER_BOOK_REFS) {
+    const book = JSON.parse(await readFile(join(base, readerBookRef), 'utf8'))
+    const choice = selectBackfillChapter({ book, readerBookRef, candidates: [] })
+    assert.ok(choice, `no verified Reader chapter in ${readerBookRef}`)
+    assert.equal(choice.readerBookRef, readerBookRef)
+    assert.equal(choice.sourceRef.startsWith(`${readerBookRef}#`), true)
+  }
+})
+test('Reader backfill keeps chronicle identity and does not collide across books', () => {
+  const sharedChapter = { id: 'shared-chapter', chapterNumber: 1, sourceKind: 'VERIFIED_GM_NARRATIVE', body: 'story', sourceRefs: ['public/ref'], sourceHashes: ['2'.repeat(64)] }
+  const existing = [{
+    id: 'KC-existing',
+    source_kind: 'PUBLIC_READER',
+    reader_book_ref: 'archive/content/stories/C03-AFTERFALL/BOOK.json',
+    reader_chapter_id: 'shared-chapter',
+    brief_id: 'K-010',
+    status: 'BRIEF_PROPOSED',
+  }]
+  const c01 = selectBackfillChapter({
+    book: { chapters: [sharedChapter] },
+    readerBookRef: 'archive/content/stories/C01-HAN-JUNHO/BOOK.json',
+    candidates: existing,
+  })
+  assert.equal(c01.sourceRef, 'archive/content/stories/C01-HAN-JUNHO/BOOK.json#shared-chapter')
+  assert.equal(c01.readerBookRef, 'archive/content/stories/C01-HAN-JUNHO/BOOK.json')
+  assert.equal(c01.existingCandidate, null)
+  assert.equal(selectBackfillChapter({
+    book: { chapters: [sharedChapter] },
+    readerBookRef: 'archive/content/stories/C03-AFTERFALL/BOOK.json',
+    candidates: existing,
+  }), null)
+})
+
 test('semantic context is compact and bounded', () => {
   const data = { candidates: [], briefs: [], topics: [], config: { publication_mode: 'AUTO_LOW_RISK_SHADOW', auto_publish_enabled: false } }
   const context = buildSemanticContext({ jobType: 'FRESH_BRIEF', source: { kind: 'PUBLIC_ARCHIVE', ref: sourceRef, sha256: sourceSha }, target: { brief_id: 'K-011', candidate_id: 'KC-test' }, existingKnowledge: data, policy: { version: 2, editorial_spec_ref: 'docs/spec.md', research_policy: { minimum_authoritative_sources_per_brief: 2 }, candidate_policy: { allowed_auto_risk_domains: [], high_risk_domains: [] } }, excerpt: 'x'.repeat(8000) })
@@ -154,6 +194,7 @@ test('semantic context is compact and bounded', () => {
       sha256: '1'.repeat(64),
       chapter_id: 'ch-1',
       chapter_sha256: '1'.repeat(64),
+      reader_book_ref: 'archive/content/stories/C03-AFTERFALL/BOOK.json',
       reader_book_sha256: '3'.repeat(64),
       refs: ['public/ref'],
       hashes: ['2'.repeat(64)],
@@ -166,7 +207,7 @@ test('semantic context is compact and bounded', () => {
   assert.equal(readerContext.source.reader_book_sha256, '3'.repeat(64))
   assert.throws(() => buildSemanticContext({
     jobType: 'BACKFILL_BRIEF',
-    source: { kind: 'PUBLIC_READER', ref: 'archive/content/stories/C03-AFTERFALL/BOOK.json#ch-1', sha256: '1'.repeat(64), chapter_id: 'ch-1', chapter_sha256: '1'.repeat(64), refs: ['public/ref'], hashes: ['2'.repeat(64)] },
+    source: { kind: 'PUBLIC_READER', ref: 'archive/content/stories/C03-AFTERFALL/BOOK.json#ch-1', sha256: '1'.repeat(64), chapter_id: 'ch-1', chapter_sha256: '1'.repeat(64), reader_book_ref: 'archive/content/stories/C03-AFTERFALL/BOOK.json', refs: ['public/ref'], hashes: ['2'.repeat(64)] },
     target: { brief_id: 'K-011', candidate_id: 'KC-reader-test' },
     existingKnowledge: data,
     policy: { version: 2, editorial_spec_ref: 'docs/spec.md', research_policy: { minimum_authoritative_sources_per_brief: 2 }, candidate_policy: { allowed_auto_risk_domains: [], high_risk_domains: [] } },

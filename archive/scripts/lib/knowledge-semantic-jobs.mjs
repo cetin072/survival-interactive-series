@@ -7,7 +7,12 @@ import { recordKnowledgeDisposition, validateKnowledgeState } from './knowledge-
 
 export const SEMANTIC_RESULT_VERSION = 'knowledge-semantic-result-v1'
 export const SEMANTIC_DECISIONS = Object.freeze(['BRIEF_READY', 'HOLD', 'HUMAN_REVIEW'])
-export const READER_BOOK_REF = 'archive/content/stories/C03-AFTERFALL/BOOK.json'
+export const READER_BOOK_REFS = Object.freeze([
+  'archive/content/stories/C03-AFTERFALL/BOOK.json',
+  'archive/content/stories/C02-STRONGHOLD/BOOK.json',
+  'archive/content/stories/C01-HAN-JUNHO/BOOK.json',
+])
+export const READER_BOOK_REF = READER_BOOK_REFS[0]
 
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex')
 const canonicalChapterSha = (chapter) => sha(Buffer.from(JSON.stringify(chapter), 'utf8'))
@@ -48,21 +53,22 @@ export function reservedCandidateId(workKey) {
   return `KC-${slug}-${sha(Buffer.from(workKey)).slice(0, 10)}`
 }
 
-export function selectBackfillChapter({ book, candidates, reviewedWorkKeys = [] }) {
+export function selectBackfillChapter({ book, readerBookRef = READER_BOOK_REF, candidates, reviewedWorkKeys = [] }) {
   const reviewed = new Set(reviewedWorkKeys)
-  const existingByChapter = new Map(candidates
+  fail(/^archive\/content\/stories\/C\d{2}-[A-Z0-9-]+\/BOOK\.json$/.test(readerBookRef), 'SEMANTIC_READER_BOOK_REF_INVALID')
+  const existingBySource = new Map(candidates
     .filter((candidate) => candidate.source_kind === 'PUBLIC_READER' && candidate.reader_chapter_id)
-    .map((candidate) => [candidate.reader_chapter_id, candidate]))
+    .map((candidate) => [`${candidate.reader_book_ref ?? READER_BOOK_REF}#${candidate.reader_chapter_id}`, candidate]))
   const chapters = [...(book.chapters ?? [])]
     .filter((chapter) => chapter.sourceKind === 'VERIFIED_GM_NARRATIVE' && chapter.body?.trim())
     .sort((a, b) => (a.chapterNumber ?? 0) - (b.chapterNumber ?? 0) || a.id.localeCompare(b.id))
   for (const chapter of chapters) {
     const chapterSha = canonicalChapterSha(chapter)
-    const sourceRef = `${READER_BOOK_REF}#${chapter.id}`
+    const sourceRef = `${readerBookRef}#${chapter.id}`
     const workKey = makeWorkKey({ sourceKind: 'PUBLIC_READER', sourceRef, sourceSha256: chapterSha })
-    const existing = existingByChapter.get(chapter.id)
+    const existing = existingBySource.get(sourceRef)
     if (reviewed.has(workKey) || (existing && (existing.brief_id || existing.status !== 'DISCOVERED'))) continue
-    return { chapter, chapterSha, sourceRef, workKey, existingCandidate: existing ?? null }
+    return { chapter, chapterSha, readerBookRef, sourceRef, workKey, existingCandidate: existing ?? null }
   }
   return null
 }
@@ -81,6 +87,8 @@ export function buildSemanticContext({ jobType, source, target, existingKnowledg
   fail(['FRESH_BRIEF', 'BACKFILL_BRIEF'].includes(jobType), 'SEMANTIC_JOB_TYPE_INVALID')
   if (source.kind === 'PUBLIC_READER') {
     fail(/^[a-f0-9]{64}$/.test(source.reader_book_sha256 ?? ''), 'SEMANTIC_READER_BOOK_SHA_REQUIRED')
+    fail(/^archive\/content\/stories\/C\d{2}-[A-Z0-9-]+\/BOOK\.json$/.test(source.reader_book_ref ?? ''), 'SEMANTIC_READER_BOOK_REF_INVALID')
+    fail(source.ref === `${source.reader_book_ref}#${source.chapter_id}`, 'SEMANTIC_READER_SOURCE_REF_INVALID')
   }
   const questions = existingKnowledge.candidates.map((item) => ({
     id: item.id, question: item.question, topic_id: item.topic_id, brief_id: item.brief_id ?? null,
@@ -97,6 +105,7 @@ export function buildSemanticContext({ jobType, source, target, existingKnowledg
       ...(source.chapter_id ? {
         chapter_id: source.chapter_id,
         chapter_sha256: source.chapter_sha256,
+        reader_book_ref: source.reader_book_ref,
         reader_book_sha256: source.reader_book_sha256,
       } : {}),
       refs: source.refs ?? [],
@@ -174,7 +183,8 @@ export function validateSemanticResult(job, result) {
     if (job.source_ref.endsWith('/EX-001-apartment-power-outage.json'))
       fail(brief.risk_level === 'HIGH' && brief.risk_domains?.includes('ELECTRICAL'), 'SEMANTIC_EX001_RISK_DOWNGRADE_FORBIDDEN')
   } else {
-    fail(candidate.reader_book_ref === READER_BOOK_REF
+    const readerBookRef = source.reader_book_ref ?? READER_BOOK_REF
+    fail(candidate.reader_book_ref === readerBookRef
       && candidate.reader_book_sha256 === source.reader_book_sha256
       && candidate.reader_chapter_id === source.chapter_id
       && candidate.reader_chapter_sha256 === source.chapter_sha256
