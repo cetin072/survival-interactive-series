@@ -28,6 +28,7 @@ Status: **AUTHORITATIVE**
 15. Supabase `check_runtime_consistency('AFTERFALL')`
 16. `PLAY_SESSION_PROTOCOL_V3.md`에 따라 Live RAW capture session을 확인/개설
 17. 장면 관련 인물만 지정해 `get_scene_context('AFTERFALL', ...)`
+18. S04 연출 파일럿을 적용하는 경우 이 문서 §18을 따른다.
 
 새 채팅에서 worldline identity가 애매하면 repository root의 `SURVIVAL_DIARY_IP_BIBLE.md`와 `WORLDLINE_ROUTER.md`를 먼저 확인한다.
 
@@ -225,3 +226,14 @@ S03 시작·계속 플레이 및 이후 시즌 재개 시, 첫 장면 전에 한
 길드는 생존을 대신하는 경영 메뉴가 아니라 모험을 가능하게 하는 기반이다. 진우 측의 실제 성장·자산·시간 보상을 유지하고, 길드 이용자의 독립적인 삶을 통해 바깥의 지속 Pressure를 보여준다. 현재 정책을 매 턴 다시 읽거나 장면 대사로 낭독하지 않는다.
 
 이 추가 로드는 운영 지침 승계이지 미래 대본 로드가 아니다. GM-only 문서 전문·Hidden World Seed·미래 사건을 플레이어에게 노출하지 않는다. 정책 파일을 수정했다고 실제 시설·수익·영입·Supabase Save가 갱신된 것으로 간주하지 않는다. 기존 최신 공개 플레이를 과거 체크포인트로 되감지 않으며, 미동기화가 있으면 그 범위를 구분하고 임의로 상태를 덮어쓰지 않는다.
+
+
+## 18. Narrative System V1 — S04 연출 파일럿
+
+이 절과 연결 문서는 사용자 검토 후 `worldline/afterfall-rpg`에 승인·병합된 버전만 적용한다. Draft branch가 있다는 이유로 라이브 규칙이 바뀐 것으로 간주하지 않는다.
+
+S04 첫 부팅 또는 계속 플레이의 새 방에서는 기존 연속성·현재 상태·장면 컨텍스트 확인을 마친 뒤 `narrative/NARRATIVE_SYSTEM_V1.md`를 한 번 읽는다. 이미 진행한 S04를 START_HANDOFF 시점으로 재시작하지 않는다. GitHub snapshot과 실제 runtime이 다르면 기존 연속성 프로토콜로 먼저 확인하고 이 파일럿을 이유로 Save를 덮어쓰지 않는다.
+
+현재 장면에 필요한 인물만 `narrative/CHARACTER_PERFORMANCE_V1.md`의 해당 부분을 참고한다. 이 파일은 연출 예시이지 새 Character Bible이 아니다. 실제 인물 카드·확정 사실·플레이어 선택이 우선한다. 예시 대사·행동을 과거 기록이나 미래 사건으로 저장하지 않는다.
+
+`narrative/REUSE_REVIEW_V1.md`와 `narrative/TRIAL_AND_ACCEPTANCE_V1.md`는 기획·검수용이다. 일반 장면 컨텍스트에 자동 포함하지 않는다. 같은 장면에서 문서를 반복 로드하거나 연출을 위해 별도 LLM·DB·원격 호출을 추가하지 않는다. 기존 `LIVE_TURN_FAST_PATH_V1.md`, Choice Gate, 전지적 카메라의 정보 경계와 RAW 보존 규칙을 유지한다.
