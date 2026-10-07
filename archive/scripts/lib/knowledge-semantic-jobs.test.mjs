@@ -5,10 +5,10 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
-import { applySemanticPackage, buildSemanticContext, chapterHash, hashPolicyBytes, knowledgeOperationalDate, makeWorkKey, nextBriefId, READER_BOOK_REFS, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
+import { applySemanticPackage, buildSemanticContext, chapterHash, hashPolicyBytes, knowledgeOperationalDate, makeWorkKey, nextBriefId, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
 import { finalizerAction, semanticBranchRef, reconcilePullRequest, runSemanticFinalizer, verifyPins } from '../knowledge-semantic-finalize.mjs'
 import { runPackage } from '../knowledge-semantic-finalize.mjs'
-import { detectLegacyWorkerBlocker, planSemanticPreparation, selectExperienceSeed } from '../knowledge-semantic-prepare.mjs'
+import { detectLegacyWorkerBlocker, discoverReaderBookRefs, planSemanticPreparation, selectExperienceSeed } from '../knowledge-semantic-prepare.mjs'
 
 const digest = (value) => createHash('sha256').update(value).digest('hex')
 const sourceRef = 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_001/SOURCE_MANIFEST.json'
@@ -140,20 +140,52 @@ test('reserved identities and verified Reader selection are stable and exclude r
   assert.equal(selectBackfillChapter({ book, candidates: [], reviewedWorkKeys: [choice.workKey] }), null)
 })
 
-test('configured Reader backfill catalog resolves all three verified chronicles in priority order', async () => {
-  assert.deepEqual(READER_BOOK_REFS, [
+test('Reader backfill auto-discovers current verified chronicles without a fixed catalog', async () => {
+  const base = resolve(import.meta.dirname, '../../..')
+  const refs = await discoverReaderBookRefs({ base })
+  for (const expected of [
     'archive/content/stories/C03-AFTERFALL/BOOK.json',
     'archive/content/stories/C02-STRONGHOLD/BOOK.json',
     'archive/content/stories/C01-HAN-JUNHO/BOOK.json',
-  ])
-  const base = resolve(import.meta.dirname, '../../..')
-  for (const readerBookRef of READER_BOOK_REFS) {
+  ]) assert.equal(refs.includes(expected), true)
+  for (const readerBookRef of refs) {
     const book = JSON.parse(await readFile(join(base, readerBookRef), 'utf8'))
     const choice = selectBackfillChapter({ book, readerBookRef, candidates: [] })
     assert.ok(choice, `no verified Reader chapter in ${readerBookRef}`)
     assert.equal(choice.readerBookRef, readerBookRef)
     assert.equal(choice.sourceRef.startsWith(`${readerBookRef}#`), true)
   }
+})
+
+test('Reader discovery automatically admits a future Chronicle and ignores empty Reader shells', async () => {
+  const base = await mkdtemp(join(tmpdir(), 'knowledge-reader-discovery-'))
+  try {
+    const makeBook = async (chronicleId, verified = true) => {
+      const dir = join(base, 'archive/content/stories', chronicleId)
+      await mkdir(dir, { recursive: true })
+      await writeFile(join(dir, 'BOOK.json'), JSON.stringify({
+        chronicleId,
+        chapters: verified ? [{
+          id: chronicleId.toLowerCase() + '-chapter-01',
+          chapterNumber: 1,
+          sourceKind: 'VERIFIED_GM_NARRATIVE',
+          body: 'verified story',
+          sourceRefs: ['public/ref'],
+          sourceHashes: ['2'.repeat(64)],
+        }] : [],
+      }))
+    }
+    await makeBook('C01-HAN-JUNHO')
+    await makeBook('C02-STRONGHOLD')
+    await makeBook('C03-EMPTY', false)
+    await makeBook('C04-NEW-STORY')
+    const refs = await discoverReaderBookRefs({ base })
+    assert.deepEqual(refs, [
+      'archive/content/stories/C04-NEW-STORY/BOOK.json',
+      'archive/content/stories/C02-STRONGHOLD/BOOK.json',
+      'archive/content/stories/C01-HAN-JUNHO/BOOK.json',
+    ])
+  } finally { await rm(base, { recursive: true, force: true }) }
 })
 test('Reader backfill keeps chronicle identity and does not collide across books', () => {
   const sharedChapter = { id: 'shared-chapter', chapterNumber: 1, sourceKind: 'VERIFIED_GM_NARRATIVE', body: 'story', sourceRefs: ['public/ref'], sourceHashes: ['2'.repeat(64)] }
