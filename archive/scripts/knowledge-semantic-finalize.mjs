@@ -200,6 +200,7 @@ async function reconcileOpenJobs({ requestRpc = rpc, shell = run, currentRoot = 
   const jobs = await requestRpc('archive_knowledge_semantic_job_list_reconcile_v2', {})
   const outcomes = []
   for (const job of jobs ?? []) {
+    if (job.status === 'HUMAN_REVIEW') continue
     if (!Number.isInteger(job.final_pr_number)) {
       const outcome = { status: 'BLOCKED', code: 'PR_REFERENCE_MISSING' }
       const update = await updateJob(requestRpc, job.job_id, job.status, outcome.status, { blockerCode: outcome.code, blockerStage: 'PR_RECONCILE' })

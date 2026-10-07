@@ -1,9 +1,6 @@
 name: Finalize Knowledge semantic job
 
 on:
-  schedule:
-    # Fallback for the primary Supabase external dispatcher.
-    - cron: '*/5 * * * *'
   workflow_dispatch:
     inputs:
       dispatch_origin:

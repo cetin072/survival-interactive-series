@@ -61,7 +61,23 @@ test('C-PREP chooses FRESH then EXPERIENCE_SEED then due BACKFILL, once per run'
   assert.equal(planSemanticPreparation({ activeJobs: [], scanner: { sources: [fresh] }, experienceChoice: seed, backfillIsDue: true, backfillChoice: reader }).decision, 'FRESH')
   assert.equal(planSemanticPreparation({ activeJobs: [], scanner: { sources: [] }, experienceChoice: seed, backfillIsDue: true, backfillChoice: reader }).decision, 'EXPERIENCE_SEED')
   assert.equal(planSemanticPreparation({ activeJobs: [], scanner: { sources: [] }, backfillIsDue: true, backfillChoice: reader }).decision, 'BACKFILL')
-  assert.equal(planSemanticPreparation({ activeJobs: [{ status: 'HUMAN_REVIEW' }], scanner: { sources: [] }, experienceChoice: seed, backfillIsDue: true, backfillChoice: reader }).decision, 'NOOP')
+  assert.equal(planSemanticPreparation({ activeJobs: [{ status: 'HUMAN_REVIEW' }], scanner: { sources: [] }, experienceChoice: seed, backfillIsDue: true, backfillChoice: reader }).decision, 'EXPERIENCE_SEED')
+})
+
+test('human waiting releases the machine slot while its source and brief remain reserved', () => {
+  const human = { status: 'HUMAN_REVIEW', job_type: 'FRESH_BRIEF', source_kind: 'PUBLIC_ARCHIVE', source_ref: 'a', source_sha256: 'a'.repeat(64), brief_id: 'K-015' }
+  const same = { status: 'PENDING', source_manifest_ref: 'a', source_manifest_sha256: 'a'.repeat(64) }
+  const other = { status: 'PENDING', source_manifest_ref: 'b', source_manifest_sha256: 'b'.repeat(64) }
+  const plan = (sources, extra = {}) => planSemanticPreparation({ activeJobs: [human], handledJobs: [human], scanner: { sources }, backfillIsDue: false, ...extra })
+  assert.equal(plan([same, other]).decision, 'FRESH')
+  assert.equal(plan([same, other]).source.source_manifest_ref, 'b')
+  assert.equal(plan([same]).decision, 'NOOP')
+  assert.equal(plan([], { backfillIsDue: true, backfillChoice: { sourceRef: 'reader' } }).decision, 'BACKFILL')
+  assert.equal(plan([other], { activeJobs: [{ status: 'PREPARED' }] }).code, 'ACTIVE_SEMANTIC_JOB_EXISTS')
+  assert.equal(nextBriefId([{ id: 'K-014' }], [human.brief_id]), 'K-016')
+  for (const status of ['HOLD', 'PUBLISHED']) {
+    assert.equal(plan([same], { activeJobs: [], handledJobs: [{ ...human, status }] }).decision, 'NOOP')
+  }
 })
 
 test('EX-001 is a deterministic Seed candidate and a handled identity is not selected again', async () => {
