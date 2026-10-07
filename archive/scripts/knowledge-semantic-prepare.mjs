@@ -8,7 +8,7 @@ import { publicKnowledgeInventory, scanKnowledge } from './lib/knowledge-scan.mj
 import { backfillDue, validateRuntimeState } from './lib/knowledge-worker-runtime.mjs'
 import {
   buildSemanticContext, chapterHash, hashPolicyBytes, makeWorkKey, nextBriefId,
-  postSupabaseRpc, READER_BOOK_REFS, reservedCandidateId, selectBackfillChapter,
+  postSupabaseRpc, reservedCandidateId, selectBackfillChapter,
 } from './lib/knowledge-semantic-jobs.mjs'
 
 export const repository = 'cetin072/survival-interactive-series'
@@ -112,7 +112,35 @@ export function policyPin(policyBytes, configBytes, editorialBytes, policy, conf
   }
 }
 
-async function publicReaderBackfillChoice(data, runtimeState, bookRefs = READER_BOOK_REFS) {
+const readerChronicleDirectory = /^C(\d{2,})-[A-Z0-9-]+$/
+
+export async function discoverReaderBookRefs({ base = root } = {}) {
+  const storiesRoot = join(base, 'archive/content/stories')
+  const entries = (await readdir(storiesRoot, { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory() && readerChronicleDirectory.test(entry.name))
+    .sort((a, b) => {
+      const aNumber = Number(readerChronicleDirectory.exec(a.name)?.[1] ?? 0)
+      const bNumber = Number(readerChronicleDirectory.exec(b.name)?.[1] ?? 0)
+      return bNumber - aNumber || b.name.localeCompare(a.name)
+    })
+  const refs = []
+  for (const entry of entries) {
+    const readerBookRef = `archive/content/stories/${entry.name}/BOOK.json`
+    const bytes = await readFile(join(base, readerBookRef)).catch((error) => {
+      if (error.code === 'ENOENT') return null
+      throw error
+    })
+    if (!bytes) continue
+    let book
+    try { book = JSON.parse(bytes.toString('utf8')) } catch { throw new Error('PREP_READER_BOOK_INVALID') }
+    if (book?.chronicleId !== entry.name || !Array.isArray(book.chapters)) throw new Error('PREP_READER_BOOK_INVALID')
+    if (!book.chapters.some((chapter) => chapter?.sourceKind === 'VERIFIED_GM_NARRATIVE' && chapter.body?.trim())) continue
+    refs.push(readerBookRef)
+  }
+  return refs
+}
+
+async function publicReaderBackfillChoice(data, runtimeState, bookRefs) {
   const reviewedWorkKeys = runtimeState.backfill.reviewed_items.map((item) => item.work_key)
   for (const readerBookRef of bookRefs) {
     if (!/^archive\/content\/stories\/C\d{2}-[A-Z0-9-]+\/BOOK\.json$/.test(readerBookRef)) throw new Error('PREP_READER_BOOK_REF_INVALID')
@@ -272,11 +300,21 @@ export async function runSemanticPrepare({ now = new Date() } = {}) {
   const initialPlan = planSemanticPreparation({ activeJobs, handledJobs, scanner, backfillIsDue: false, legacyBlocker: blocker })
   const experienceChoice = initialPlan.decision === 'NOOP' ? await selectExperienceSeed({ handledJobs }) : null
   const handledBackfillWorkKeys = (handledJobs ?? []).filter((job) => job.job_type === 'BACKFILL_BRIEF' && job.source_kind === 'PUBLIC_READER').map((job) => job.work_key)
+  let readerBookRefs = []
+  if (initialPlan.decision === 'NOOP' && !experienceChoice && backfillIsDue) {
+    try {
+      readerBookRefs = await discoverReaderBookRefs()
+    } catch {
+      const blockerCode = 'READER_CATALOG_INVALID'
+      await recordPrep('BLOCKED', 'READER_CATALOG', { blockerCode, mainSha })
+      return { status: 'BLOCKED', reason: blockerCode, main_sha: mainSha }
+    }
+  }
   const backfillChoice = initialPlan.decision === 'NOOP' && !experienceChoice && backfillIsDue
     ? await publicReaderBackfillChoice(data, {
       ...runtimeState,
       backfill: { ...runtimeState.backfill, reviewed_items: [...runtimeState.backfill.reviewed_items, ...handledBackfillWorkKeys.map((work_key) => ({ work_key }))] },
-    }, READER_BOOK_REFS) : null
+    }, readerBookRefs) : null
   const plan = planSemanticPreparation({ activeJobs, handledJobs, scanner, experienceChoice, backfillIsDue, backfillChoice, legacyBlocker: blocker })
 
   if (plan.decision === 'NOOP') {
