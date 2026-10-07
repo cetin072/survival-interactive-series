@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
-import { applySemanticPackage, buildSemanticContext, chapterHash, hashPolicyBytes, knowledgeOperationalDate, makeWorkKey, nextBriefId, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
+import { applySemanticPackage, buildSemanticContext, chapterHash, hashPolicyBytes, knowledgeOperationalDate, makeWorkKey, nextBriefId, READER_BOOK_REFS, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
 import { finalizerAction, semanticBranchRef, reconcilePullRequest, runSemanticFinalizer, verifyPins } from '../knowledge-semantic-finalize.mjs'
 import { runPackage } from '../knowledge-semantic-finalize.mjs'
 import { detectLegacyWorkerBlocker, planSemanticPreparation, selectExperienceSeed } from '../knowledge-semantic-prepare.mjs'
@@ -138,6 +138,22 @@ test('reserved identities and verified Reader selection are stable and exclude r
   assert.equal(choice.chapter.id, 'ch-1')
   assert.equal(choice.chapterSha, chapterHash(chapter))
   assert.equal(selectBackfillChapter({ book, candidates: [], reviewedWorkKeys: [choice.workKey] }), null)
+})
+
+test('configured Reader backfill catalog resolves all three verified chronicles in priority order', async () => {
+  assert.deepEqual(READER_BOOK_REFS, [
+    'archive/content/stories/C03-AFTERFALL/BOOK.json',
+    'archive/content/stories/C02-STRONGHOLD/BOOK.json',
+    'archive/content/stories/C01-HAN-JUNHO/BOOK.json',
+  ])
+  const base = resolve(import.meta.dirname, '../../..')
+  for (const readerBookRef of READER_BOOK_REFS) {
+    const book = JSON.parse(await readFile(join(base, readerBookRef), 'utf8'))
+    const choice = selectBackfillChapter({ book, readerBookRef, candidates: [] })
+    assert.ok(choice, `no verified Reader chapter in ${readerBookRef}`)
+    assert.equal(choice.readerBookRef, readerBookRef)
+    assert.match(choice.sourceRef, new RegExp(`^${readerBookRef.replace(/[.*+?^${}()|[\\]\\]/g, '\\test('Reader backfill keeps chronicle identity and does not collide across books', () => {')}#`))
+  }
 })
 
 test('Reader backfill keeps chronicle identity and does not collide across books', () => {
