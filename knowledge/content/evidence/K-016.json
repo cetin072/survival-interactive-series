@@ -1,0 +1,71 @@
+{
+  "claims": [
+    {
+      "claim": "FEMA의 NIMS 교육자료는 사고 자원을 동원부터 철수까지 추적하며, 철수의 목표를 자원을 원래 위치와 상태로 질서 있고 안전하며 효율적으로 돌려보내는 것으로 설명한다.",
+      "context": "공용 장비와 담당 인력이 운영에서 빠질 때 반납·인계 절차를 두어야 한다는 현실 원칙의 근거다.",
+      "limitation": "미국의 사고관리 체계를 설명한 자료이므로 한국의 소규모 공동체에 법적 의무나 특정 서식을 부과하지 않는다.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "claim": "FEMA의 NIMS 교육자료는 자원이 더 필요하지 않게 되면 재배치하거나 철수시키고, 철수 전에 자원의 재정비·재보충·폐기·반환 또는 운용상태 복원을 계획하도록 안내한다.",
+      "context": "반납 여부만 표시하지 않고 수량·상태·보충·수리·예외를 함께 기록하는 체크리스트를 구성하는 근거다.",
+      "limitation": "모든 항목이 모든 장비에 필요한 것은 아니며 조직 규모와 자원 특성에 맞게 줄여야 한다.",
+      "source_ids": [
+        "S1"
+      ]
+    },
+    {
+      "claim": "FEMA의 ICS 221 철수 체크아웃 양식은 자원이나 인력이 현장을 떠나기 전에 필요한 담당자의 확인을 받도록 하며, 보급·통신·시설·차량지원·보안·시간·문서화 등 관련 부서의 확인란과 실제 출발 정보를 둔다.",
+      "context": "누가 무엇을 확인했고 언제 인계가 끝났는지 남기는 간단한 체크아웃 기록의 공식 사례다.",
+      "limitation": "ICS 221 전체를 그대로 써야 한다는 뜻이 아니며, 소규모 조직은 해당되는 담당자와 항목만 선택할 수 있다.",
+      "source_ids": [
+        "S2"
+      ]
+    },
+    {
+      "claim": "소규모 비상 운영 조직은 공식 자료의 철수·체크아웃 원칙을 적용해 물품별 소유 구분, 현재 보관자, 수량·상태, 반환 또는 보충 조치, 확인자와 완료 시각을 한 기록에 모을 수 있다.",
+      "context": "공식 자료의 자원 추적·복원·담당자 확인 요소를 소규모 조직에 맞게 단순화한 편집상 적용이다.",
+      "limitation": "이 기록은 법적 소유권을 판정하거나 사람의 퇴거를 강제하거나 개인 물품을 압류할 권한을 만들지 않는다. 소유 분쟁은 당사자 합의와 관할 법률·공식 절차를 따른다.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "claim": "허구 Reader에서는 운영 거점을 떠나려는 인물과 남은 집단 사이에 차량과 물자의 소유·반출 범위를 둘러싼 갈등이 나타난다.",
+      "context": "C03-AFTERFALL의 허구 서사에서 현실의 인수인계 질문을 도출한 narrative provenance다.",
+      "limitation": "허구 서사이며 현실의 소유권, 강제력, 자원관리 절차를 입증하는 근거가 아니다.",
+      "source_ids": [
+        "S3"
+      ]
+    }
+  ],
+  "brief_id": "K-016",
+  "question": "비상 운영 조직에서 사람이 떠날 때 공용 장비와 개인 물품을 어떻게 인수인계해야 할까",
+  "unknowns": [],
+  "conflicts": [],
+  "risk_notes": [
+    "저위험 GENERAL_PREPAREDNESS·COMMUNICATION 범위의 기록·인계 원칙이며 법률상 소유권 판단이나 강제 퇴거 절차를 다루지 않는다.",
+    "개인 물품은 본인 동의나 명확한 기존 약정 없이 공용 자산으로 분류하지 않는다.",
+    "물리적 충돌·위협·불법 점유가 발생하면 이 체크리스트로 해결하려 하지 말고 관할 기관과 공식 분쟁절차를 따른다."
+  ],
+  "copyright_status": "CLEAR",
+  "reader_provenance": {
+    "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-chapter-07",
+    "source_kind": "PUBLIC_READER",
+    "source_refs": [
+      "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_004.md"
+    ],
+    "source_hashes": [
+      "8b47ab7b7efeff90cc791866b3b2bfcc0b185348d7dd3c15a29cb4a217104c5d"
+    ],
+    "source_sha256": "e7e4e5ea77e533b36b4e695a8b93c386615afe1450732707bfcf3724d6e18c75",
+    "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+    "reader_chapter_id": "c03-afterfall-chapter-07",
+    "reader_book_sha256": "53af20b4f4c499838399eb60b6b3046dae4e2a60c066fcaf7bad095e9154db64",
+    "reader_chapter_sha256": "e7e4e5ea77e533b36b4e695a8b93c386615afe1450732707bfcf3724d6e18c75"
+  },
+  "story_source_status": "VERIFIED_PUBLIC_READER_BACKFILL"
+}

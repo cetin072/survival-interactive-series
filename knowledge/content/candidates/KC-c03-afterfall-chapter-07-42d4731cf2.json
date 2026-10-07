@@ -1,0 +1,21 @@
+{
+  "id": "KC-c03-afterfall-chapter-07-42d4731cf2",
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-016",
+  "question": "비상 운영 조직에서 사람이 떠날 때 공용 장비와 개인 물품을 어떻게 인수인계해야 할까",
+  "topic_id": "community-emergency-resource-management",
+  "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-chapter-07",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_004.md"
+  ],
+  "source_hashes": [
+    "8b47ab7b7efeff90cc791866b3b2bfcc0b185348d7dd3c15a29cb4a217104c5d"
+  ],
+  "source_sha256": "e7e4e5ea77e533b36b4e695a8b93c386615afe1450732707bfcf3724d6e18c75",
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "disposition_note": "기존 재고 분산·배분·계약·외부인력 체크인 글과 달리, 인력 이탈 시점의 자원 철수와 반납·소유 구분·인계 기록에 초점을 둔 독립 질문이다. 현실 설명은 FEMA 공식 자원관리·체크아웃 자료로 검증하고 Reader는 허구 서사의 질문 출처로만 사용했다.",
+  "reader_chapter_id": "c03-afterfall-chapter-07",
+  "reader_book_sha256": "53af20b4f4c499838399eb60b6b3046dae4e2a60c066fcaf7bad095e9154db64",
+  "reader_chapter_sha256": "e7e4e5ea77e533b36b4e695a8b93c386615afe1450732707bfcf3724d6e18c75"
+}
