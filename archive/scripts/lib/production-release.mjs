@@ -43,13 +43,13 @@ export function validateReleaseMarker(marker) {
   return marker
 }
 
-export function decideRelease({ headSha, lastReleaseCommit = null, marker = null, policy, now = new Date(), force = false }) {
+export function decideRelease({ headSha, lastReleaseCommit = null, marker = null, policy, now = new Date(), force = false, hasSiteChanges = true }) {
   validateReleasePolicy(policy)
   if (!SHA.test(headSha)) throw new Error('INVALID_RELEASE_HEAD')
   if (lastReleaseCommit !== null && !SHA.test(lastReleaseCommit)) throw new Error('INVALID_LAST_RELEASE_COMMIT')
   if (marker !== null) validateReleaseMarker(marker)
 
-  if (!force && lastReleaseCommit && headSha === lastReleaseCommit) {
+  if (!force && ((!hasSiteChanges && marker) || (lastReleaseCommit && headSha === lastReleaseCommit))) {
     return { status: 'NO_CHANGES', due: false }
   }
 
@@ -59,6 +59,7 @@ export function decideRelease({ headSha, lastReleaseCommit = null, marker = null
 
   const today = kstDate(now)
   const elapsed = dayNumber(today) - dayNumber(marker.released_on_kst)
+  if (elapsed < 1) return { status: 'DAILY_LIMIT_REACHED', due: false }
   if (!force && elapsed < policy.production_interval_days) {
     return {
       status: 'WAITING_WINDOW',
