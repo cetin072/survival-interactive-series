@@ -155,10 +155,6 @@ test('configured Reader backfill catalog resolves all three verified chronicles 
     assert.equal(choice.sourceRef.startsWith(`${readerBookRef}#`), true)
   }
 })
-test('Reader backfill keeps chronicle identity and does not collide across books', () => {')}#`))
-  }
-})
-
 test('Reader backfill keeps chronicle identity and does not collide across books', () => {
   const sharedChapter = { id: 'shared-chapter', chapterNumber: 1, sourceKind: 'VERIFIED_GM_NARRATIVE', body: 'story', sourceRefs: ['public/ref'], sourceHashes: ['2'.repeat(64)] }
   const existing = [{
