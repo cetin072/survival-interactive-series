@@ -152,7 +152,10 @@ test('configured Reader backfill catalog resolves all three verified chronicles 
     const choice = selectBackfillChapter({ book, readerBookRef, candidates: [] })
     assert.ok(choice, `no verified Reader chapter in ${readerBookRef}`)
     assert.equal(choice.readerBookRef, readerBookRef)
-    assert.match(choice.sourceRef, new RegExp(`^${readerBookRef.replace(/[.*+?^${}()|[\\]\\]/g, '\\test('Reader backfill keeps chronicle identity and does not collide across books', () => {')}#`))
+    assert.equal(choice.sourceRef.startsWith(`${readerBookRef}#`), true)
+  }
+})
+test('Reader backfill keeps chronicle identity and does not collide across books', () => {')}#`))
   }
 })
 
