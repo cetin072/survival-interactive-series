@@ -2,9 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { searchPublicArchive, searchResultGroups, type PublicSearchEntry } from './wikiSearch'
 
 const groupMeta = {
-  wiki: { title: '이야기 Wiki', empty: '일치하는 세계관 문서가 없습니다.' },
+  wiki: { title: '작품 속 정보', empty: '일치하는 세계관 문서가 없습니다.' },
   knowledge: { title: '생존 지식', empty: '일치하는 공개 생존 지식이 없습니다.' },
-  resource: { title: '자료실', empty: '일치하는 공개 자료가 없습니다.' },
+  resource: { title: '실용 자료', empty: '일치하는 공개 자료가 없습니다.' },
 } as const
 
 function SearchGroup({ title, entries }: { title: string; entries: PublicSearchEntry[] }) {
@@ -34,7 +34,7 @@ export function WikiSearchBox() {
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (results[0]) window.location.assign(results[0].href)
+    if (hasQuery) document.getElementById('site-search-results')?.focus()
   }
 
   return <div className="wiki-search-area">
@@ -50,16 +50,16 @@ export function WikiSearchBox() {
       <button type="submit">검색</button>
     </form>
 
-    {hasQuery && <div className="wiki-search-results" aria-live="polite">
+    {hasQuery && <div id="site-search-results" className="wiki-search-results" aria-live="polite" tabIndex={-1}>
       <div className="wiki-search-result-head">
         <strong>통합 검색</strong>
         <span>{results.length}건</span>
       </div>
       {results.length
         ? <>
-            <SearchGroup title={groupMeta.wiki.title} entries={groups.wiki} />
             <SearchGroup title={groupMeta.knowledge.title} entries={groups.knowledge} />
             <SearchGroup title={groupMeta.resource.title} entries={groups.resource} />
+            <SearchGroup title={groupMeta.wiki.title} entries={groups.wiki} />
           </>
         : <p className="wiki-search-empty">일치하는 공개 문서나 자료가 없습니다.</p>}
     </div>}
