@@ -28,8 +28,9 @@ export function knowledgeOperationalDate(value, timeZone = 'Asia/Seoul') {
   return `${values.year}-${values.month}-${values.day}`
 }
 
-export function nextBriefId(briefs) {
-  const max = briefs.reduce((current, brief) => Math.max(current, Number(/^K-(\d+)$/.exec(brief.id)?.[1] ?? 0)), 0)
+export function nextBriefId(briefs, reservedBriefIds = []) {
+  const ids = [...briefs.map((brief) => brief.id), ...reservedBriefIds]
+  const max = ids.reduce((current, id) => Math.max(current, Number(/^K-(\d+)$/.exec(id)?.[1] ?? 0)), 0)
   return `K-${String(max + 1).padStart(3, '0')}`
 }
 

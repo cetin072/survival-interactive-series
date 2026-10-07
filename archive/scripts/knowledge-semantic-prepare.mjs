@@ -17,11 +17,13 @@ const json = (value) => JSON.stringify(value)
 const sha = (value) => createHash('sha256').update(value).digest('hex')
 
 export function planSemanticPreparation({ activeJobs, handledJobs = [], scanner, experienceChoice, backfillIsDue, backfillChoice, legacyBlocker }) {
+  handledJobs = [...handledJobs, ...(activeJobs ?? []).filter((job) => job.status === 'HUMAN_REVIEW')]
   if (handledJobs.some((job) => job.recovery_available !== false && job.status === 'BLOCKED' && job.blocker_code === 'MAIN_MOVED_REVALIDATION_REQUIRED'
     && job.blocker_stage === 'PR_RECONCILE' && ['HUMAN_REVIEW', 'BRIEF_READY'].includes(job.result_decision))) {
     return { decision: 'NOOP', code: 'ACTIVE_RECOVERABLE_JOB_EXISTS' }
   }
-  if (Array.isArray(activeJobs) && activeJobs.length) return { decision: 'NOOP', code: 'ACTIVE_SEMANTIC_JOB_EXISTS' }
+  if (Array.isArray(activeJobs) && activeJobs.some((job) => !['HUMAN_REVIEW', 'HOLD', 'PUBLISHED'].includes(job.status)
+    && !(job.status === 'BLOCKED' && job.recovery_available === false))) return { decision: 'NOOP', code: 'ACTIVE_SEMANTIC_JOB_EXISTS' }
   if (legacyBlocker) return { decision: 'BLOCKED', code: legacyBlocker }
   const changed = (scanner?.sources ?? []).find((source) => source.status === 'SOURCE_CHANGED_RESCAN_REQUIRED')
   if (changed) return { decision: 'BLOCKED', code: 'SOURCE_CHANGED_RESCAN_REQUIRED', source: changed }
@@ -182,8 +184,8 @@ async function freshChoice(source) {
   }
 }
 
-export async function createJob({ choice, policy, policyPin, mainSha, data, initialStatus = 'PREPARED', blockerCode = null }) {
-  const briefId = nextBriefId(data.briefs)
+export async function createJob({ choice, policy, policyPin, mainSha, data, handledJobs = [], initialStatus = 'PREPARED', blockerCode = null }) {
+  const briefId = nextBriefId(data.briefs, handledJobs.map((job) => job.brief_id))
   const candidateId = choice.existingCandidate?.id ?? reservedCandidateId(choice.workKey)
   const target = { brief_id: briefId, candidate_id: candidateId }
   const source = {
@@ -277,7 +279,7 @@ export async function runSemanticPrepare({ now = new Date() } = {}) {
         excerpt: '', sourceError: error.message,
       }))
       const blockerCode = choice.sourceError ? 'SOURCE_HASH_VALIDATION_FAILED' : plan.code
-      const blocked = await createJob({ choice, policy, policyPin: pin, mainSha, data, initialStatus: 'BLOCKED', blockerCode })
+      const blocked = await createJob({ choice, policy, policyPin: pin, mainSha, data, handledJobs, initialStatus: 'BLOCKED', blockerCode })
       await recordPrep('BLOCKED', 'SOURCE_VALIDATION', { blockerCode, sourceRef: choice.sourceRef, sourceSha256: choice.sourceSha256, mainSha })
       return { status: 'BLOCKED', reason: blockerCode, job: blocked.result }
     }
@@ -297,11 +299,11 @@ export async function runSemanticPrepare({ now = new Date() } = {}) {
       refs: (plan.source.parts ?? []).map((part) => part.ref), hashes: (plan.source.parts ?? []).map((part) => part.sha256), excerpt: '',
     }
     const blockerCode = 'SOURCE_HASH_VALIDATION_FAILED'
-    const blocked = await createJob({ choice: blockedChoice, policy, policyPin: pin, mainSha, data, initialStatus: 'BLOCKED', blockerCode })
+    const blocked = await createJob({ choice: blockedChoice, policy, policyPin: pin, mainSha, data, handledJobs, initialStatus: 'BLOCKED', blockerCode })
     await recordPrep('BLOCKED', 'SOURCE_VALIDATION', { blockerCode, sourceRef: blockedChoice.sourceRef, sourceSha256: blockedChoice.sourceSha256, mainSha })
     return { status: 'BLOCKED', reason: blockerCode, job: blocked.result }
   }
-  const prepared = await createJob({ choice, policy, config, policyPin: pin, mainSha, data })
+  const prepared = await createJob({ choice, policy, config, policyPin: pin, mainSha, data, handledJobs })
   if (prepared.result.status === 'PREPARED' && prepared.result.created === true) {
     await recordPrep('PREPARED', choice.jobType, {
       sourceRef: choice.sourceRef, sourceSha256: choice.sourceSha256, mainSha,

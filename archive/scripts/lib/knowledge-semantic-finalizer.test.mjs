@@ -1,8 +1,20 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
 import { finalizerAction, reconcilePullRequest, runSemanticFinalizer, semanticBranchRef } from '../knowledge-semantic-finalize.mjs'
 
 const job = { job_id: '287c20fb-7ad2-41e4-b9be-12426675d234', source_kind: 'PUBLIC_ARCHIVE', source_ref: 'manifest', source_sha256: 'a'.repeat(64), semantic_context: { target: { brief_id: 'K-011', candidate_id: 'KC-test' }, source: { kind: 'PUBLIC_ARCHIVE' } } }
+
+test('human waiting is neither polled nor reconciled by the machine finalizer', async () => {
+  const { calls, requestRpc, shell } = finalizerHarness({ claimedJob: { status: 'NO_SUBMITTED_JOB' }, openJobs: [{ ...job, status: 'HUMAN_REVIEW' }] })
+  const result = await runSemanticFinalizer({ requestRpc, shell, mainSha: 'b'.repeat(40) })
+  assert.deepEqual(result.jobs, [])
+  assert.equal(calls.filter((call) => call[0] === 'shell').length, 0)
+  assert.equal(calls.filter((call) => call[1] === 'archive_knowledge_semantic_job_update').length, 0)
+  const workflow = await readFile(new URL('../../../.github/workflows/knowledge-semantic-finalizer.yml', import.meta.url), 'utf8')
+  assert.doesNotMatch(workflow, /\bschedule:|cron:/)
+  assert.match(workflow, /workflow_dispatch:/)
+})
 
 test('worker interruption before submit leaves C-PREPARED job reusable', () => {
   const prepared = { ...job, status: 'PREPARED', semantic_result: null }
@@ -121,6 +133,11 @@ test('main drift leaves HUMAN_REVIEW and BRIEF_READY open; semantic, source and 
     const pr={state:'open',merged:false,head:{sha:submitted.final_head_sha,ref:submitted.final_head_ref,repo:{full_name:'cetin072/survival-interactive-series'}},base:{ref:'main',sha:'f'.repeat(40)}}
     const harness=finalizerHarness({claimedJob:{status:'NO_SUBMITTED_JOB'},openJobs:[submitted],pullRequest:pr})
     const outcome=await runSemanticFinalizer({...harness,mainSha:'0'.repeat(40),verifyPinsFn:async()=>({context:job.semantic_context})})
+    if (decision === 'HUMAN_REVIEW') {
+      assert.deepEqual(outcome.jobs, [])
+      assert.equal(harness.calls.filter(c=>c[0]==='shell').length, 0)
+      continue // Approval consumer validates human packages; the polling finalizer leaves them untouched.
+    }
     assert.equal(outcome.jobs[0].status,submitted.status)
     assert.equal(outcome.jobs[0].revalidation_required,true)
     assert.ok(!harness.calls.some(c=>c[0]==='shell'&&c[2][1]==='close'))
