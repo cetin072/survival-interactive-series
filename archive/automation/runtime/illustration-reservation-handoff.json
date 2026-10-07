@@ -2,161 +2,22 @@
   "receipt": {
     "version": "illustration-reservation-handoff-v1",
     "mode": "LIVE",
-    "job_id": "illustration-event-shelter-22e758f3837c-20261007-37526903478",
-    "main_sha": "55c935cfc1e895091d4c83754229f3af6c1febec",
-    "point_id": "point-678e9d03df307380c620f2c88986b88cf0a22b28e1e986174a0578b81dbb6b3b",
-    "generation_key": "generation-22e758f3837ca6257f34706b00f77087498858d9005b8c1cf69619801c1736f7",
-    "subject_id": "event-shelter",
-    "prompt_sha256": "79ea3f12fc72f4a8278b1b275c9df12f15e25f692af5dc886011195023b1bd4b",
-    "review_context_sha256": "e79b9db79e71af031ae8643fc84ce500d8cc7753758e4050a2dc750ba0b921ab",
+    "job_id": "illustration-event-winter-council-c0048fceecc3-20261008-37682453254",
+    "main_sha": "400536cacf5f8fb3d9d8a15ab3f601c74fbe571c",
+    "point_id": "point-e5c2e0b5f6a8074663afdc72b11fe87f9b5fac618fd5b5ee551eca7e359a10e7",
+    "generation_key": "generation-c0048fceecc3e197534a67c851bbddb79673430f781a9b35d01197b68f11dac6",
+    "subject_id": "event-winter-council",
+    "prompt_sha256": "80669c440415d19307e21649687a1da55b93b8306d2bf343a79d3aa112255491",
+    "review_context_sha256": "e685c5074c6d23c6cb580ba1c3c6ba912570fae21358cef4cd75b49c0c3f6b98",
     "renderer_id": "6ac2e58fc3848191aba731468f6c3e18",
-    "requested_at": "2026-10-06T21:35:25.494Z",
-    "job_created_at": "2026-10-06T20:30:14.498765+00:00",
-    "renderer_prompt_sha256": "0dc51dfd6847467d7092395d325f0dc8bf90b657ec24c13c596edd91fa8ec05c",
-    "baseline": {
-      "library_file_id": "libfile_1532be3d794c8191b91906fa5d006014",
-      "file_id": "file_00000000cdfc81f582fa8c0671ca4b20",
-      "version_id": null,
-      "modified_at": "2026-10-06T13:35:13.490476Z",
-      "sha256": "88712f315cc9ef38ece598d9b828143d2bd564604819a5b29deaa6c28adbc2ec"
-    }
+    "requested_at": "2026-10-07T21:34:47.789690+00:00",
+    "job_created_at": "2026-10-07T20:30:13.940439+00:00",
+    "renderer_prompt_sha256": "ffc0c60d3a628e08a073a3bd86214e9d47841715e724279d15315890fbd434c3",
+    "baseline": null
   },
-  "dispatch": {
-    "status": "DISPATCHED",
-    "renderer_id": "6ac2e58fc3848191aba731468f6c3e18",
-    "renderer_prompt_sha256": "0dc51dfd6847467d7092395d325f0dc8bf90b657ec24c13c596edd91fa8ec05c",
-    "task_updated_at": "2026-10-06T21:35:42.863460+00:00",
-    "schedule": "BEGIN:VEVENT\nDTSTART:20261006T213742Z\nEND:VEVENT",
-    "scheduled_for": "2026-10-07T06:37:42+09:00",
-    "next_run_time": null,
-    "prompt_exact_readback": true
-  },
-  "collection": {
-    "status": "READY_FOR_PROVIDER_COMPLETE",
-    "source_library_path": "/IMAGE-RENDER/output/current.png",
-    "source_file_id": "file_0000000092a0822f8a823e5a333f35c5",
-    "source_library_file_id": "libfile_1532be3d794c8191b91906fa5d006014",
-    "source_version_id": "1",
-    "source_sha256": "169962dd615551ccaa6db842f44fc79874f146aae27fb62a98bd01d6e4d3e2a6",
-    "source_width": 1774,
-    "source_height": 887,
-    "source_size_bytes": 2476102,
-    "source_modified_at": "2026-10-06T21:44:13.373766Z",
-    "observed_at": "2026-10-06T22:27:49.549Z",
-    "png_verify": true,
-    "png_full_decode": true,
-    "provider_complete": {
-      "p_job_id": "illustration-event-shelter-22e758f3837c-20261007-37526903478",
-      "p_prompt_sha256": "79ea3f12fc72f4a8278b1b275c9df12f15e25f692af5dc886011195023b1bd4b"
-    },
-    "provider_completed_at": "2026-10-06T22:28:20.924665+00:00",
-    "job_status_after_provider_complete": "INGESTING",
-    "readback_at": "2026-10-06T22:28:26.059551+00:00"
-  },
-  "review": {
-    "status": "PROGRAM_DECISION_APPLIED",
-    "review_handoff_commit": "d30324c8e646750f1ed1230371d6e3b524690fb4",
-    "decision": "PASS",
-    "review_provider": "native_chatgpt_vision",
-    "reviewed_at": "2026-10-06T23:30:19.550299+00:00",
-    "source_library_path": "/IMAGE-RENDER/output/current.png",
-    "source_file_id": "file_0000000092a0822f8a823e5a333f35c5",
-    "source_library_file_id": "libfile_1532be3d794c8191b91906fa5d006014",
-    "source_version_id": "1",
-    "source_sha256": "169962dd615551ccaa6db842f44fc79874f146aae27fb62a98bd01d6e4d3e2a6"
-  },
-  "transfer": {
-    "status": "FINALIZE_QUEUED",
-    "source_library_path": "/IMAGE-RENDER/output/current.png",
-    "source_file_id": "file_0000000092a0822f8a823e5a333f35c5",
-    "source_library_file_id": "libfile_1532be3d794c8191b91906fa5d006014",
-    "source_version_id": "1",
-    "source_sha256": "169962dd615551ccaa6db842f44fc79874f146aae27fb62a98bd01d6e4d3e2a6",
-    "staging_id": "site-illustration-event-shelter-22e758f3837c-20261007-37526903478",
-    "derivative_sha256": "edc73d65f08449c1a2f59ffd0c9e7778b06e4a50b9cc23a06a079b42abbd6604",
-    "derivative_size_bytes": 186780,
-    "derivative_width": 512,
-    "derivative_height": 512,
-    "derivative_mime_type": "image/png",
-    "derivative_palette_colors": 256,
-    "chunk_count": 2,
-    "stored_chunk_indexes": [
-      0,
-      1
-    ],
-    "finalizer_dispatch_request_id": 63,
-    "finalizer_dispatch_at": "2026-10-07T00:36:58.014574+00:00",
-    "job_status_readback": "FINALIZE_QUEUED",
-    "completed_at": "2026-10-07T00:37:35.537Z"
-  },
-  "result": {
-    "status": "REGULAR_E2E_PASS",
-    "audited_main_sha": "e9a8c956f54283de34f7b08a59d2256a69582ec9",
-    "job_id": "illustration-event-shelter-22e758f3837c-20261007-37526903478",
-    "job_status": "SUCCEEDED",
-    "point_id": "point-678e9d03df307380c620f2c88986b88cf0a22b28e1e986174a0578b81dbb6b3b",
-    "generation_key": "generation-22e758f3837ca6257f34706b00f77087498858d9005b8c1cf69619801c1736f7",
-    "subject_id": "event-shelter",
-    "prompt_sha256": "79ea3f12fc72f4a8278b1b275c9df12f15e25f692af5dc886011195023b1bd4b",
-    "library_source": {
-      "path": "/IMAGE-RENDER/output/current.png",
-      "file_id": "file_0000000092a0822f8a823e5a333f35c5",
-      "library_file_id": "libfile_1532be3d794c8191b91906fa5d006014",
-      "version_id": "1",
-      "sha256": "169962dd615551ccaa6db842f44fc79874f146aae27fb62a98bd01d6e4d3e2a6"
-    },
-    "review": {
-      "decision": "PASS",
-      "provider": "native_chatgpt_vision",
-      "reviewed_at": "2026-10-06T23:30:19.550299+00:00",
-      "handoff_commit": "d30324c8e646750f1ed1230371d6e3b524690fb4"
-    },
-    "transfer": {
-      "staging_id": "site-illustration-event-shelter-22e758f3837c-20261007-37526903478",
-      "source_sha256": "169962dd615551ccaa6db842f44fc79874f146aae27fb62a98bd01d6e4d3e2a6",
-      "derivative_sha256": "edc73d65f08449c1a2f59ffd0c9e7778b06e4a50b9cc23a06a079b42abbd6604",
-      "derivative_size_bytes": 186780,
-      "derivative_width": 512,
-      "derivative_height": 512,
-      "derivative_mime_type": "image/png"
-    },
-    "finalizer": {
-      "status": "SUCCEEDED",
-      "dispatch_request_id": 90,
-      "finalized_at": "2026-10-07T06:50:36.991281+00:00",
-      "identity_path": "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_EVENT_SHELTER.json",
-      "source_commit": "415f786f54b9dde9c8503b86d2eaca72a30b6e68"
-    },
-    "storage": {
-      "provider": "supabase",
-      "bucket": "survival-archive-originals",
-      "object_path": "AFTERFALL/point-678e9d03df307380c620f2c88986b88cf0a22b28e1e986174a0578b81dbb6b3b/generation-22e758f3837ca6257f34706b00f77087498858d9005b8c1cf69619801c1736f7/edc73d65f08449c1a2f59ffd0c9e7778b06e4a50b9cc23a06a079b42abbd6604.png",
-      "sha256": "edc73d65f08449c1a2f59ffd0c9e7778b06e4a50b9cc23a06a079b42abbd6604",
-      "storage_verified": true
-    },
-    "registry": {
-      "status": "READY",
-      "asset_id": "AF-EVENT-678E9D03DF307380C620F2C8",
-      "exact_match_count": 1,
-      "point_id": "point-678e9d03df307380c620f2c88986b88cf0a22b28e1e986174a0578b81dbb6b3b",
-      "generation_key": "generation-22e758f3837ca6257f34706b00f77087498858d9005b8c1cf69619801c1736f7",
-      "subject_id": "event-shelter",
-      "source_sha256": "edc73d65f08449c1a2f59ffd0c9e7778b06e4a50b9cc23a06a079b42abbd6604"
-    },
-    "site_assets": {
-      "path": "archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json",
-      "exact_subject_count": 1,
-      "subject_id": "event-shelter",
-      "public_path": "/visual-assets/36c8ebfce50e318952dd5997d5b6440558948f21ee298c91ee12dcec11246dba.png",
-      "public_sha256": "36c8ebfce50e318952dd5997d5b6440558948f21ee298c91ee12dcec11246dba",
-      "source_sha256": "edc73d65f08449c1a2f59ffd0c9e7778b06e4a50b9cc23a06a079b42abbd6604",
-      "bytes": 186781,
-      "width": 512,
-      "height": 512,
-      "mime_type": "image/png",
-      "published_main_sha": "e9a8c956f54283de34f7b08a59d2256a69582ec9"
-    },
-    "completed_at": "2026-10-07T06:50:36.991281+00:00",
-    "audited_at": "2026-10-07T07:36:32.716Z"
-  }
+  "dispatch": null,
+  "collection": null,
+  "review": null,
+  "transfer": null,
+  "result": null
 }
