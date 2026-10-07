@@ -41,10 +41,11 @@ describe('public Wiki navigation', () => {
   it('shows the tools page in the Wiki shell', () => {
     const markup = renderRoute('/?view=tools')
     expect(markup).toContain('wiki-topbar')
-    expect(markup).toContain('생존 도구')
-    expect(markup).toContain('PDF 자료')
-    expect(markup).toContain('XLSX 관리표')
-    expect(markup).toContain('체크리스트')
+    expect(markup).toContain('공개 실용 자료')
+    expect(markup).toContain('비상용품·재고 관리표 v1')
+    expect(markup).toContain('XLSX')
+    expect(markup).toContain('사용 설명 보기')
+    expect(markup).not.toContain('준비 중')
     expect(markup).not.toContain('archive-header')
   })
 

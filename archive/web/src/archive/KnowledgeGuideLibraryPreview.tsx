@@ -1,15 +1,15 @@
-import { knowledgeHref, knowledgeRiskLabel, publishedKnowledgeGuides } from './knowledgeGuide'
+import { knowledgeHref, knowledgeRiskLabel, publishedKnowledgeGuides, type KnowledgeGuide } from './knowledgeGuide'
 import { WikiTopbar } from './WikiTopbar'
 import './wikiShell.css'
 import './survivalDesignLanguage.css'
 
-export function KnowledgeGuideLibraryPreview({ notice }: { notice?: string }) {
+export function KnowledgeGuideLibraryPreview({ notice, showTopbar = true, guides = publishedKnowledgeGuides }: { notice?: string; showTopbar?: boolean; guides?: readonly KnowledgeGuide[] }) {
   return <main className="wiki-shell knowledge-library-shell">
-    <WikiTopbar />
+    {showTopbar && <WikiTopbar />}
 
     <div className="knowledge-guide-frame">
       <nav className="wiki-breadcrumb" aria-label="현재 위치">
-        <a href="/?view=wiki-preview">생존일기</a><span>›</span><strong>생존 지식</strong>
+        <a href="/">생존일기</a><span>›</span><strong>생존 지식</strong>
       </nav>
 
       <header className="knowledge-library-header">
@@ -23,10 +23,10 @@ export function KnowledgeGuideLibraryPreview({ notice }: { notice?: string }) {
       <section className="knowledge-library-list" aria-label="공개 생존 지식">
         <div className="wiki-section-heading">
           <h2>공개 가이드</h2>
-          <span>{publishedKnowledgeGuides.length}개</span>
+          <span>{guides.length}개</span>
         </div>
         <div>
-          {publishedKnowledgeGuides.map((guide) => <article key={guide.id}>
+          {guides.map((guide) => <article key={guide.id}>
             <div className="knowledge-library-meta">
               <span>생존 지식</span>
               <small>{knowledgeRiskLabel(guide.riskLevel)} · {guide.publishedAt}</small>

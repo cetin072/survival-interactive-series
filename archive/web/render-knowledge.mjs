@@ -9,10 +9,12 @@ export async function createKnowledgePageRenderer() {
   try {
     const { KnowledgeGuidePage } = await server.ssrLoadModule('/src/archive/KnowledgeGuidePage.tsx')
     const { adaptKnowledgeBrief, knowledgeReviewState } = await server.ssrLoadModule('/src/archive/knowledgeGuide.ts')
+    const { KnowledgeGuideLibraryPreview } = await server.ssrLoadModule('/src/archive/KnowledgeGuideLibraryPreview.tsx')
     const { publicNavigation } = await server.ssrLoadModule('/src/archive/publicNavigation.ts')
     return {
       navigation: publicNavigation,
       render: (brief) => renderToStaticMarkup(createElement(KnowledgeGuidePage, { guide: adaptKnowledgeBrief(brief), showTopbar: false })),
+      renderLibrary: (briefs) => renderToStaticMarkup(createElement(KnowledgeGuideLibraryPreview, { guides: briefs.map(adaptKnowledgeBrief), showTopbar: false })),
       reviewState: knowledgeReviewState,
       close: () => server.close(),
     }

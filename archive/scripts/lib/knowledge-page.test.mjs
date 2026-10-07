@@ -161,3 +161,26 @@ test('static Knowledge menu matches the existing public navigation and exposes a
     assert.doesNotMatch(menu, /<input|<form/)
   }
 })
+
+test('canonical index reuses the existing Library UI as static HTML with original SEO and every public guide', async () => {
+  const data = await loadKnowledge()
+  const published = await publicBriefs(data)
+  const projections = published.map((brief) => publicBriefData(brief, data))
+  const page = await readFile(join(root, 'archive/web/public/knowledge/index.html'), 'utf8')
+  assert.ok(page.includes(renderer.renderLibrary(projections)))
+  assert.equal([...page.matchAll(/class="wiki-topbar"/g)].length, 0)
+  assert.ok(page.includes('class="knowledge-library-list"'))
+  assert.ok(page.includes('href="/knowledge/wikiShell.css"'))
+  assert.ok(page.includes('href="/knowledge/survivalDesignLanguage.css"'))
+  assert.ok(page.includes('<title>생존 지식 | 생존일기</title>'))
+  assert.ok(page.includes('<meta name="description" content="게임과 이야기에서 시작한 질문을 현실의 공식 자료와 검토 가능한 근거로 정리하는 생존 지식 아카이브." />'))
+  assert.ok(page.includes('<link rel="canonical" href="' + data.config.site_origin + '/knowledge/" />'))
+  assert.equal([...page.matchAll(/<meta property="og:/g)].length, 6)
+  assert.ok(page.includes('<meta property="og:type" content="website" />'))
+  for (const brief of published) assert.ok(page.includes('href="' + knowledgeHref(brief) + '"'))
+  assert.doesNotMatch(page, /<script|knowledge-card|knowledge-hero|noindex/)
+  const added = { ...projections[0], id: 'K-fixture', slug: 'fixture-new-guide', label: '새 공개 가이드' }
+  const html = renderer.renderLibrary([...projections, added])
+  assert.ok(html.includes('/knowledge/fixture-new-guide/'))
+  assert.ok(html.includes('<span>' + (published.length + 1) + '개</span>'))
+})

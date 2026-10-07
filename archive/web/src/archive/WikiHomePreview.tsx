@@ -1,7 +1,8 @@
 import { chronicleRegistry, type Chronicle } from './chronicleRegistry'
 import { chaptersForChronicle } from './storyData'
 import { knowledgeHref, type KnowledgeGuide } from './knowledgeGuide'
-import { availableKnowledgeTools, selectHomeKnowledge } from './knowledgeHome'
+import { selectHomeKnowledge } from './knowledgeHome'
+import { availableKnowledgeTools } from './knowledgeResources'
 import { archiveRouteUrl } from './readerNavigation'
 import { publicNavigation } from './publicNavigation'
 import { WikiTopbar } from './WikiTopbar'
@@ -51,7 +52,7 @@ export function WikiHomePreview({ knowledge = selectHomeKnowledge(), chronicles 
       </section>
 
       {knowledge.resource && <section className="wiki-home-section" aria-labelledby="wiki-resource-title">
-        <div className="wiki-section-heading"><h2 id="wiki-resource-title">바로 쓰는 자료</h2></div>
+        <div className="wiki-section-heading"><h2 id="wiki-resource-title">바로 쓰는 자료</h2><a href="/?view=tools">자료실 전체 보기 →</a></div>
         <h3>{knowledge.resource.tool.title}</h3>
         <p>{knowledge.resource.tool.description}</p>
         <div className="wiki-home-actions">

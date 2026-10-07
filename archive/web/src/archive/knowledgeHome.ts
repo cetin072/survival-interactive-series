@@ -1,10 +1,8 @@
 import { type KnowledgeGuide, publishedKnowledgeGuides } from './knowledgeGuide'
+import { selectKnowledgeResources } from './knowledgeResources'
 
 // Editorial choice stores IDs and order only.
 export const featuredKnowledgeIds = ['K-014', 'K-002', 'K-003'] as const
-
-export const availableKnowledgeTools = (guide: KnowledgeGuide) =>
-  guide.tools.filter((tool) => tool.availability === 'AVAILABLE')
 
 export function selectHomeKnowledge(guides: readonly KnowledgeGuide[] = publishedKnowledgeGuides) {
   // The build-owned public projection has already rechecked approval and files.
@@ -13,11 +11,9 @@ export function selectHomeKnowledge(guides: readonly KnowledgeGuide[] = publishe
   const featuredIds = new Set(featured.map((guide) => guide.id))
   const recent = published.filter((guide) => !featuredIds.has(guide.id))
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt) || a.id.localeCompare(b.id)).slice(0, 4)
-  const toolGuide = [published.find((guide) => guide.id === 'K-002'), ...published]
-    .find((guide) => guide && availableKnowledgeTools(guide).length)
   return {
     featured, recent,
     missingFeaturedIds: featuredKnowledgeIds.filter((id) => !featuredIds.has(id)),
-    resource: toolGuide ? { guide: toolGuide, tool: availableKnowledgeTools(toolGuide)[0] } : undefined,
+    resource: selectKnowledgeResources(published)[0],
   }
 }
