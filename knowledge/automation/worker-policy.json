@@ -63,7 +63,12 @@
     "require_verified_public_archive": true,
     "pin_source_manifest_sha256": true,
     "leave_other_pending_sources_unprocessed": true,
-    "operator_inbox_is_default_staging": true
+    "operator_inbox_is_default_staging": true,
+    "reader_backfill_book_refs": [
+      "archive/content/stories/C03-AFTERFALL/BOOK.json",
+      "archive/content/stories/C02-STRONGHOLD/BOOK.json",
+      "archive/content/stories/C01-HAN-JUNHO/BOOK.json"
+    ]
   },
   "notification_policy": {
     "notify_on": [
