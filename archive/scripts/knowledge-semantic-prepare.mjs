@@ -8,7 +8,7 @@ import { publicKnowledgeInventory, scanKnowledge } from './lib/knowledge-scan.mj
 import { backfillDue, validateRuntimeState } from './lib/knowledge-worker-runtime.mjs'
 import {
   buildSemanticContext, chapterHash, hashPolicyBytes, makeWorkKey, nextBriefId,
-  postSupabaseRpc, READER_BOOK_REF, reservedCandidateId, selectBackfillChapter,
+  postSupabaseRpc, READER_BOOK_REFS, reservedCandidateId, selectBackfillChapter,
 } from './lib/knowledge-semantic-jobs.mjs'
 
 export const repository = 'cetin072/survival-interactive-series'
@@ -112,7 +112,7 @@ export function policyPin(policyBytes, configBytes, editorialBytes, policy, conf
   }
 }
 
-async function publicReaderBackfillChoice(data, runtimeState, bookRefs = [READER_BOOK_REF]) {
+async function publicReaderBackfillChoice(data, runtimeState, bookRefs = READER_BOOK_REFS) {
   const reviewedWorkKeys = runtimeState.backfill.reviewed_items.map((item) => item.work_key)
   for (const readerBookRef of bookRefs) {
     if (!/^archive\/content\/stories\/C\d{2}-[A-Z0-9-]+\/BOOK\.json$/.test(readerBookRef)) throw new Error('PREP_READER_BOOK_REF_INVALID')
@@ -276,7 +276,7 @@ export async function runSemanticPrepare({ now = new Date() } = {}) {
     ? await publicReaderBackfillChoice(data, {
       ...runtimeState,
       backfill: { ...runtimeState.backfill, reviewed_items: [...runtimeState.backfill.reviewed_items, ...handledBackfillWorkKeys.map((work_key) => ({ work_key }))] },
-    }, policy.source_policy.reader_backfill_book_refs ?? [READER_BOOK_REF]) : null
+    }, READER_BOOK_REFS) : null
   const plan = planSemanticPreparation({ activeJobs, handledJobs, scanner, experienceChoice, backfillIsDue, backfillChoice, legacyBlocker: blocker })
 
   if (plan.decision === 'NOOP') {
