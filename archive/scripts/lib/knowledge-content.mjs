@@ -29,7 +29,7 @@ const lowRiskDomains = new Set(['GENERAL_PREPAREDNESS', 'FOOD_STORAGE', 'COMMUNI
 const highRiskDomains = new Set(['MEDICAL', 'MEDICATION', 'FIRST_AID_PROCEDURE', 'WATER_PURIFICATION', 'GENERATOR', 'COMBUSTION_CO', 'ELECTRICAL', 'RESCUE', 'SHELTER_STRUCTURAL', 'OTHER_SEVERE_HARM'])
 const allowedRiskDomains = new Set([...lowRiskDomains, ...highRiskDomains])
 const publicationModes = new Set(['PR_ONLY', 'AUTO_LOW_RISK_SHADOW', 'AUTO_LOW_RISK'])
-const readerBookRefPattern = /^archive\/content\/stories\/C\d{2}-[A-Z0-9-]+\/BOOK\.json$/
+const readerBookRefPattern = /^archive\/content\/stories\/C\d{2,}-[A-Z0-9-]+\/BOOK\.json$/
 
 async function verifiedReaderReference(item, base, label) {
   fail(item.source_kind === 'PUBLIC_READER' && readerBookRefPattern.test(item.reader_book_ref ?? '') && /^[a-f0-9]{64}$/.test(item.reader_book_sha256), `${label} Reader identity`)
