@@ -66,6 +66,18 @@ begin
   update survival_ops.illustration_review_staging_chunks set chunk_b64='YmFk' where staging_id=tid and chunk_index=1;
   perform pg_temp.expect_denied(s,w,true);
   update survival_ops.illustration_review_staging_chunks set chunk_b64=encode(convert_to(repeat('a',36),'UTF8'),'base64') where staging_id=tid and chunk_index=1;
+  -- Existing retry/daily policy rejection must roll back candidate deferral.
+  update survival_ops.illustration_render_jobs set finalizer_failure_count=5 where job_id=sid;
+  perform pg_temp.expect_denied((select to_jsonb(j) from survival_ops.illustration_render_jobs j where job_id=sid),w,true);
+  update survival_ops.illustration_render_jobs set finalizer_failure_count=1 where job_id=sid;
+  insert into survival_ops.illustration_render_jobs
+    select (jsonb_populate_record(null::survival_ops.illustration_render_jobs,
+      s||jsonb_build_object('job_id','test-preserved-daily-success','status','SUCCEEDED'))).*;
+  perform pg_temp.expect_denied(s,w,true);
+  delete from survival_ops.illustration_render_jobs where job_id='test-preserved-daily-success';
+  if (select status from survival_ops.illustration_render_jobs where job_id=wid)<>'PREPARED' then
+    raise exception 'POLICY_DENIAL_DID_NOT_ROLL_BACK';
+  end if;
   perform set_config('role','anon',true);
   begin
     perform public.archive_illustration_recover_preserved_shelter(s,w,true);
