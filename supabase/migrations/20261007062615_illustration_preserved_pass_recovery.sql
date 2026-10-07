@@ -9,7 +9,7 @@ declare
   s survival_ops.illustration_render_jobs%rowtype;
   w survival_ops.illustration_render_jobs%rowtype;
   t survival_ops.illustration_review_staging%rowtype;
-  binary bytea;
+  v_binary bytea;
   count_chunks integer;
   result jsonb;
 begin
@@ -69,10 +69,10 @@ begin
   perform 1 from survival_ops.illustration_review_staging_chunks
     where staging_id=t.staging_id order by chunk_index for update;
   select count(*),decode(string_agg(chunk_b64,'' order by chunk_index),'base64')
-    into count_chunks,binary from survival_ops.illustration_review_staging_chunks where staging_id=t.staging_id;
+    into count_chunks,v_binary from survival_ops.illustration_review_staging_chunks where staging_id=t.staging_id;
   if count_chunks<>2 or not exists(select 1 from survival_ops.illustration_review_staging_chunks where staging_id=t.staging_id and chunk_index=0)
     or not exists(select 1 from survival_ops.illustration_review_staging_chunks where staging_id=t.staging_id and chunk_index=1)
-    or octet_length(binary) is distinct from s.output_bytes or encode(extensions.digest(binary,'sha256'),'hex') is distinct from s.output_sha256 then
+    or octet_length(v_binary) is distinct from s.output_bytes or encode(extensions.digest(v_binary,'sha256'),'hex') is distinct from s.output_sha256 then
     raise exception 'PRESERVED_PASS_BINARY_CHANGED' using errcode='22023';
   end if;
   update survival_ops.illustration_render_jobs set status='BLOCKED',
