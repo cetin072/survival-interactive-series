@@ -313,10 +313,9 @@ def ensure_json_request(path, payload, branch, title, body):
 
 
 def identity_path_for_subject(subject_id):
-    suffix = re.sub(r"^(char|loc|event)-", "", subject_id)
-    suffix = re.sub(r"[^a-z0-9]+", "_", suffix).strip("_").upper()
-    if not suffix:
+    if not isinstance(subject_id, str) or not re.fullmatch(r"(char|loc|event)-[a-z0-9]+(?:-[a-z0-9]+)*", subject_id):
         fail("FINALIZER_IDENTITY_SUBJECT_INVALID")
+    suffix = subject_id.replace('-', '_').upper()
     return f"archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_{suffix}.json"
 
 
@@ -361,11 +360,17 @@ def ensure_identity(job):
     payload = identity_payload(job)
     checkout_main()
 
-    if main_has(path):
-        observed = json.loads(run("git", "show", f"origin/main:{path}"))
-        if observed != payload:
-            fail("FINALIZER_IDENTITY_EXISTING_CONFLICT")
-        return path, commit_for_path(path)
+    # Reuse published legacy identities without renaming. A legacy identity
+    # for another subject cannot claim this subject's new canonical path.
+    legacy = path.replace(f"ILLUSTRATION_E2E_{job['subject_id'].split('-')[0].upper()}_", "ILLUSTRATION_E2E_")
+    for candidate in (path, legacy):
+        if main_has(candidate):
+            observed = json.loads(run("git", "show", f"origin/main:{candidate}"))
+            if candidate == legacy and observed.get('subject_id') != job['subject_id']:
+                continue
+            if observed != payload:
+                fail("FINALIZER_IDENTITY_EXISTING_CONFLICT")
+            return candidate, commit_for_path(candidate)
 
     branch = f"automation/finalize-identity-{job['job_id']}"
     merge_sha = ensure_json_request(

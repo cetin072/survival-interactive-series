@@ -35,12 +35,79 @@ class FinalizerIdentityTests(unittest.TestCase):
     def test_identity_path_is_stable_and_subject_scoped(self):
         self.assertEqual(
             MODULE.identity_path_for_subject("loc-west-road"),
-            "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_WEST_ROAD.json",
+            "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_LOC_WEST_ROAD.json",
         )
         self.assertEqual(
             MODULE.identity_path_for_subject("char-taehoon"),
-            "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_TAEHOON.json",
+            "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_CHAR_TAEHOON.json",
         )
+
+    def test_identity_type_prefix_prevents_same_suffix_collision(self):
+        for suffix in ['shelter', 'foo', 'foo-bar']:
+            paths = {MODULE.identity_path_for_subject(f'{kind}-{suffix}')
+                     for kind in ['char', 'loc', 'event']}
+            self.assertEqual(len(paths), 3)
+        for invalid in ['shelter', 'char/foo', '../event-foo', 'event-', 'event_FOO']:
+            with self.assertRaisesRegex(ValueError, 'FINALIZER_IDENTITY_SUBJECT_INVALID'):
+                MODULE.identity_path_for_subject(invalid)
+
+    def test_existing_legacy_loc_shelter_is_reused_without_rename(self):
+        legacy = 'archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_SHELTER.json'
+        payload = json.loads((ROOT / legacy).read_text(encoding='utf-8'))
+        job = self.fixture() | {'subject_id': 'loc-shelter'}
+        with mock.patch.object(MODULE, 'checkout_main'), \
+             mock.patch.object(MODULE, 'identity_payload', return_value=payload), \
+             mock.patch.object(MODULE, 'main_has', side_effect=lambda path: path == legacy), \
+             mock.patch.object(MODULE, 'run', return_value=json.dumps(payload)), \
+             mock.patch.object(MODULE, 'commit_for_path', return_value='a'*40), \
+             mock.patch.object(MODULE, 'ensure_json_request') as create:
+            self.assertEqual(MODULE.ensure_identity(job), (legacy, 'a'*40))
+            create.assert_not_called()
+
+    def test_published_legacy_shelter_still_passes_storage_identity_contract(self):
+        import illustration_storage_handoff as handoff
+        path = ROOT / 'archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_SHELTER.json'
+        record, _, point, object_path = handoff.identity(path, allow_published=True)
+        self.assertEqual(record['subject_id'], 'loc-shelter')
+        self.assertEqual(point['subject_id'], record['subject_id'])
+        manifest = json.loads(MODULE.SITE_ASSETS.read_text(encoding='utf-8'))
+        assets = [a for a in manifest['assets'] if a['subject_id']=='loc-shelter']
+        self.assertEqual(len(assets), 1)
+        self.assertEqual(assets[0]['source_sha256'], record['source_sha256'])
+        self.assertEqual(assets[0]['storage_object_path'], object_path)
+
+    def test_event_shelter_ignores_other_subject_legacy_and_creates_typed_identity(self):
+        legacy = 'archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_SHELTER.json'
+        job = self.fixture() | {'subject_id': 'event-shelter'}
+        canonical = MODULE.identity_path_for_subject(job['subject_id'])
+        with mock.patch.object(MODULE, 'checkout_main'), \
+             mock.patch.object(MODULE, 'main_has', side_effect=lambda path: path == legacy), \
+             mock.patch.object(MODULE, 'run', return_value=(ROOT/legacy).read_text(encoding='utf-8')), \
+             mock.patch.object(MODULE, 'ensure_json_request', return_value='b'*40) as create:
+            self.assertEqual(MODULE.ensure_identity(job), (canonical, 'b'*40))
+            self.assertTrue(canonical.endswith('ILLUSTRATION_E2E_EVENT_SHELTER.json'))
+            self.assertEqual(create.call_args.args[:2], (canonical, MODULE.identity_payload(job)))
+
+    def test_same_subject_identity_is_idempotent_and_conflicting_payload_fails_closed(self):
+        job = self.fixture()
+        payload = MODULE.identity_payload(job)
+        for legacy in [False, True]:
+            canonical = MODULE.identity_path_for_subject(job['subject_id'])
+            path = canonical.replace('LOC_', '') if legacy else canonical
+            with mock.patch.object(MODULE, 'checkout_main'), \
+                 mock.patch.object(MODULE, 'main_has', side_effect=lambda p: p == path), \
+                 mock.patch.object(MODULE, 'commit_for_path', return_value='a'*40), \
+                 mock.patch.object(MODULE, 'run', return_value=json.dumps(payload)), \
+                 mock.patch.object(MODULE, 'ensure_json_request') as create:
+                self.assertEqual(MODULE.ensure_identity(job), (path, 'a'*40))
+                create.assert_not_called()
+            with mock.patch.object(MODULE, 'checkout_main'), \
+                 mock.patch.object(MODULE, 'main_has', side_effect=lambda p: p == path), \
+                 mock.patch.object(MODULE, 'run', return_value=json.dumps(payload | {'source_sha256':'f'*64})), \
+                 mock.patch.object(MODULE, 'ensure_json_request') as create:
+                with self.assertRaisesRegex(ValueError, 'FINALIZER_IDENTITY_EXISTING_CONFLICT'):
+                    MODULE.ensure_identity(job)
+                create.assert_not_called()
 
     def test_identity_payload_is_programmatic_and_review_bound(self):
         payload = MODULE.identity_payload(self.fixture())
