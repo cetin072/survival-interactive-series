@@ -10,21 +10,8 @@ const nonempty = (value) => typeof value === 'string' && value.trim().length > 0
 const date = (value) => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value))
 const localPath = (value) => typeof value === 'string' && /^\/knowledge\/[a-z0-9/-]+\.(xlsx|pdf|csv)$/.test(value) && !value.includes('..')
 const httpsUrl = (value) => typeof value === 'string' && /^https:\/\//i.test(value)
-export function youtubeVideoId(value) {
-  if (!httpsUrl(value)) return null
-  try {
-    const url = new URL(value)
-    const host = url.hostname.toLowerCase().replace(/^www\./, '')
-    if (host === 'youtu.be') return /^[A-Za-z0-9_-]{6,20}$/.test(url.pathname.slice(1)) ? url.pathname.slice(1) : null
-    if (host === 'youtube.com' || host === 'm.youtube.com') {
-      const direct = url.searchParams.get('v')
-      if (direct && /^[A-Za-z0-9_-]{6,20}$/.test(direct)) return direct
-      const parts = url.pathname.split('/').filter(Boolean)
-      if (['shorts','embed','live'].includes(parts[0]) && /^[A-Za-z0-9_-]{6,20}$/.test(parts[1] ?? '')) return parts[1]
-    }
-  } catch {}
-  return null
-}
+import { youtubeVideoId } from './knowledge-detail.mjs'
+export { youtubeVideoId } from './knowledge-detail.mjs'
 const lowRiskDomains = new Set(['GENERAL_PREPAREDNESS', 'FOOD_STORAGE', 'COMMUNICATION', 'EVACUATION'])
 const highRiskDomains = new Set(['MEDICAL', 'MEDICATION', 'FIRST_AID_PROCEDURE', 'WATER_PURIFICATION', 'GENERATOR', 'COMBUSTION_CO', 'ELECTRICAL', 'RESCUE', 'SHELTER_STRUCTURAL', 'OTHER_SEVERE_HARM'])
 const allowedRiskDomains = new Set([...lowRiskDomains, ...highRiskDomains])

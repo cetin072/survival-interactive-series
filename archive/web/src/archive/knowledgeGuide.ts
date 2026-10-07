@@ -1,4 +1,6 @@
 import publicBriefFiles from 'virtual:knowledge-public'
+// @ts-expect-error Pure shared public display helpers.
+export { knowledgeHref, knowledgeRiskLabel } from '../../../scripts/lib/knowledge-detail.mjs'
 
 export type KnowledgeGuideBlock =
   | { type: 'prose'; text: string }
@@ -7,6 +9,8 @@ export type KnowledgeGuideBlock =
   | { type: 'unordered_list'; items: string[] }
   | { type: 'table'; headers: string[]; rows: string[][] }
   | { type: 'download/tool'; tool_path: string }
+  | { type: 'image'; src: string; alt: string; caption?: string }
+  | { type: 'youtube'; url: string; title: string }
 
 export type KnowledgeGuideSection = {
   heading: string
@@ -31,6 +35,7 @@ export type KnowledgeGuideTool = {
 }
 
 export type KnowledgeGuide = {
+  detail: KnowledgeBriefFile
   id: string
   slug: string
   status: string
@@ -63,6 +68,11 @@ type KnowledgeBriefFile = {
   risk_level: string
   source_checked_at: string
   published_at: string
+  updated_at: string
+  publication_policy: string
+  related_briefs: { id: string; slug: string; label: string; title: string }[]
+  related_stories: { id: string; title: string; path: string }[]
+  related_guide: { id: string; slug: string; title: string } | null
   sections: KnowledgeGuideSection[]
   sources: KnowledgeGuideSource[]
   tools?: KnowledgeGuideTool[]
@@ -77,6 +87,8 @@ export const supportedKnowledgeBlockTypes = new Set([
   'unordered_list',
   'table',
   'download/tool',
+  'image',
+  'youtube',
 ])
 
 function assertSupportedBlocks(brief: KnowledgeBriefFile) {
@@ -93,6 +105,7 @@ function assertSupportedBlocks(brief: KnowledgeBriefFile) {
 export const publishedKnowledgeGuides = briefFiles
   .map(assertSupportedBlocks)
   .map((brief): KnowledgeGuide => ({
+    detail: brief,
     id: brief.id,
     slug: brief.slug,
     status: brief.status,
@@ -116,11 +129,4 @@ export function buildKnowledgeGuide(briefId: string): KnowledgeGuide {
   const guide = publishedKnowledgeGuides.find((item) => item.id === briefId)
   if (!guide) throw new Error('Published Knowledge guide not found: ' + briefId)
   return guide
-}
-
-export function knowledgeRiskLabel(riskLevel: string) {
-  if (riskLevel === 'LOW') return '일반 준비 정보'
-  if (riskLevel === 'MEDIUM') return '주의가 필요한 정보'
-  if (riskLevel === 'HIGH') return '사람 검토가 필요한 고위험 정보'
-  return '위험도 정보 없음'
 }

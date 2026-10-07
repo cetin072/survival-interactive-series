@@ -28,9 +28,12 @@ const blockFields = {
   image: ['src', 'alt', 'caption'], youtube: ['url', 'title'],
 }
 
-export function publicBriefData(brief) {
+export function publicBriefData(brief, data) {
   return {
-    ...pick(brief, ['id', 'slug', 'status', 'label', 'title', 'summary', 'lead', 'scope', 'basis', 'footer', 'risk_level', 'source_checked_at', 'published_at']),
+    ...pick(brief, ['id', 'slug', 'status', 'label', 'title', 'summary', 'lead', 'scope', 'basis', 'footer', 'risk_level', 'source_checked_at', 'published_at', 'updated_at', 'publication_policy']),
+    related_briefs: (brief.related_brief_ids ?? []).map((id) => data?.briefs.find((item) => item.id === id && item.status === 'PUBLISHED')).filter(Boolean).map((item) => pick(item, ['id', 'slug', 'label', 'title'])),
+    related_stories: (brief.story_refs ?? []).map((id) => data?.stories.find((item) => item.id === id && item.verified === true)).filter(Boolean).map((item) => pick(item, ['id', 'title', 'path'])),
+    related_guide: (() => { const guide = data?.guides.find((item) => item.id === brief.guide_id && item.status === 'PUBLISHED'); return guide ? pick(guide, ['id', 'slug', 'title']) : null })(),
     sections: brief.sections.map((section) => ({ heading: section.heading,
       blocks: section.blocks.map((block) => {
         if (!blockFields[block.type]) throw new Error(`KNOWLEDGE_PUBLIC_BLOCK:${block.type}`)
@@ -46,5 +49,5 @@ export async function publicKnowledgeModule() {
   const { loadKnowledge, validateKnowledge } = await import('./knowledge-content.mjs')
   const data = await loadKnowledge()
   await validateKnowledge(data)
-  return JSON.stringify((await publicBriefs(data)).map(publicBriefData))
+  return JSON.stringify((await publicBriefs(data)).map((brief) => publicBriefData(brief, data)))
 }

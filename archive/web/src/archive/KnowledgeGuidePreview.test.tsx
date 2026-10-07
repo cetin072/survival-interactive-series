@@ -1,18 +1,24 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
+import { KnowledgeGuideLibraryPreview } from './KnowledgeGuideLibraryPreview'
+import { KnowledgeGuidePage } from './KnowledgeGuidePage'
 import { KnowledgeGuidePreview } from './KnowledgeGuidePreview'
 import { publishedKnowledgeGuides } from './knowledgeGuide'
 import { archiveRouteUrl, parseArchiveRoute } from './readerNavigation'
+import { WikiHomePreview } from './WikiHomePreview'
+import { searchPublicArchive } from './wikiSearch'
+// @ts-expect-error Shared Node/browser renderer.
+import { renderKnowledgeDetail } from '../../../scripts/lib/knowledge-detail.mjs'
 
 describe('Knowledge practical guide rollout', () => {
   it('renders a Knowledge library when no brief is selected', () => {
-    const markup = renderToStaticMarkup(createElement(KnowledgeGuidePreview))
+    const markup = renderToStaticMarkup(createElement(KnowledgeGuideLibraryPreview))
     expect(markup).toContain('생존 지식')
     expect(markup).toContain('공개 가이드')
     for (const guide of publishedKnowledgeGuides) {
       expect(markup).toContain(guide.title)
-      expect(markup).toContain('brief=' + guide.id)
+      expect(markup).toContain('/knowledge/' + guide.slug + '/')
     }
     expect(markup).not.toContain('K-004')
     expect(markup).not.toContain('K-005')
@@ -20,17 +26,40 @@ describe('Knowledge practical guide rollout', () => {
 
   it('renders every PUBLISHED brief through the same practical Guide page', () => {
     for (const guide of publishedKnowledgeGuides) {
-      const markup = renderToStaticMarkup(createElement(KnowledgeGuidePreview, { briefId: guide.id }))
+      const markup = renderToStaticMarkup(createElement(KnowledgeGuidePage, { guide }))
       expect(markup).toContain(guide.title)
       expect(markup).toContain('한눈에 보기')
       expect(markup).toContain('근거와 출처')
       expect(markup).toContain(guide.scope)
+      expect(markup).toContain(renderKnowledgeDetail(guide.detail))
       expect(markup).not.toContain('risk_level')
     }
   })
 
-  it('renders K-002 with action blocks, caution and the downloadable XLSX', () => {
+  it('links home cards, search results, library and related knowledge to canonical paths', () => {
+    const home = renderToStaticMarkup(createElement(WikiHomePreview))
+    const library = renderToStaticMarkup(createElement(KnowledgeGuideLibraryPreview))
+    for (const guide of publishedKnowledgeGuides) {
+      const href = '/knowledge/' + guide.slug + '/'
+      expect(library).toContain('href="' + href + '"')
+      expect(searchPublicArchive(guide.id).find((item) => item.id === 'knowledge:' + guide.id)?.href).toBe(href)
+      const page = renderToStaticMarkup(createElement(KnowledgeGuidePage, { guide }))
+      for (const related of guide.detail.related_briefs) expect(page).toContain('href="/knowledge/' + related.slug + '/"')
+      expect(page).not.toContain('knowledge-preview')
+    }
+    for (const guide of publishedKnowledgeGuides.slice(0, 5)) expect(home).toContain('href="/knowledge/' + guide.slug + '/"')
+    expect(home).not.toContain('knowledge-preview')
+    expect(library).not.toContain('knowledge-preview')
+  })
+
+  it('legacy detail links expose a canonical destination without a duplicate article', () => {
     const markup = renderToStaticMarkup(createElement(KnowledgeGuidePreview, { briefId: 'K-002' }))
+    expect(markup).toContain('href="/knowledge/emergency-supplies-inventory/"')
+    expect(markup).not.toContain('<article')
+  })
+
+  it('renders K-002 with action blocks, caution and the downloadable XLSX', () => {
+    const markup = renderToStaticMarkup(createElement(KnowledgeGuidePage, { guide: publishedKnowledgeGuides.find((item) => item.id === 'K-002')! }))
     expect(markup).toContain('비상용품은 어떻게 목록화하고 점검하면 좋은가')
     expect(markup).toContain('핵심 요약')
     expect(markup).toContain('일반 준비 정보')
@@ -43,7 +72,7 @@ describe('Knowledge practical guide rollout', () => {
   })
 
   it('renders unordered lists used by other published Guides', () => {
-    const markup = renderToStaticMarkup(createElement(KnowledgeGuidePreview, { briefId: 'K-007' }))
+    const markup = renderToStaticMarkup(createElement(KnowledgeGuidePage, { guide: publishedKnowledgeGuides.find((item) => item.id === 'K-007')! }))
     expect(markup).toContain('knowledge-guide-list')
     expect(markup).toContain('정보 상태 인계')
   })

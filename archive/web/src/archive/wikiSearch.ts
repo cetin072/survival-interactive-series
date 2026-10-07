@@ -60,7 +60,7 @@ export const publishedKnowledgeEntries: (PublicSearchEntry & { publishedAt?: str
     title: brief.label ?? brief.title,
     subtitle: brief.title,
     summary: brief.summary ?? brief.lead ?? '',
-    href: '/?view=knowledge-preview&brief=' + encodeURIComponent(brief.id),
+    href: '/knowledge/' + brief.slug + '/',
     terms: [brief.id, brief.title, brief.label ?? '', brief.summary ?? '', brief.lead ?? '', brief.scope ?? ''],
     publishedAt: brief.published_at,
   }))

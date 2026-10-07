@@ -475,11 +475,13 @@ test('C-FINALIZER drives an exact-target package through a Git worker branch to 
   const repositoryRoot = resolve(import.meta.dirname, '../../..')
   const git = (args, cwd = root) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
   try {
+    await mkdir(join(root, 'archive/web/src/archive'), { recursive: true })
     await Promise.all([
       cp(join(repositoryRoot, 'knowledge'), join(root, 'knowledge'), { recursive: true }),
       cp(join(repositoryRoot, 'archive/content'), join(root, 'archive/content'), { recursive: true }),
       cp(join(repositoryRoot, 'archive/web/public'), join(root, 'archive/web/public'), { recursive: true }),
       cp(join(repositoryRoot, 'archive/scripts'), join(root, 'archive/scripts'), { recursive: true }),
+      ...['wikiShell.css', 'survivalDesignLanguage.css'].map((name) => cp(join(repositoryRoot, 'archive/web/src/archive', name), join(root, 'archive/web/src/archive', name))),
       cp(join(repositoryRoot, 'docs'), join(root, 'docs'), { recursive: true }),
     ])
     await mkdir(join(root, 'archive/web'), { recursive: true })
@@ -638,4 +640,3 @@ test('Knowledge publication binds a C3 durable job to the prepared exact head be
   assert.match(workflow, /p_head_sha: process\.env\.PREPARED_SHA/)
   assert.ok(workflow.indexOf('Bind C3 durable job to prepared head') < workflow.indexOf('Dispatch exact-head validation for prepared commit'))
 })
-
