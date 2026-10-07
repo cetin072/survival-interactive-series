@@ -24,7 +24,7 @@ The source order remains deliberately simple:
 2. unhandled Experience Seed;
 3. due verified Reader BACKFILL.
 
-The Reader pool order is controlled by `knowledge/automation/worker-policy.json` and currently checks 서진우 → 박도현 → 한준호. A reviewed/HOLD/HUMAN_REVIEW/PUBLISHED Reader work key is skipped, so the selector eventually moves across all configured chronicles without requiring new gameplay. Chronicle identity is part of the source reference (`BOOK.json#chapter-id`), preventing same chapter IDs in different books from colliding. Story text only supplies the question/provenance; reality claims still require independent authoritative external sources.
+The Reader pool is an approved code catalog and currently checks 서진우 → 박도현 → 한준호. It is intentionally kept outside `worker-policy.json` so adding Reader sources does not invalidate an already prepared semantic job's policy pin. A reviewed/HOLD/HUMAN_REVIEW/PUBLISHED Reader work key is skipped, so the selector eventually moves across all configured chronicles without requiring new gameplay. Chronicle identity is part of the source reference (`BOOK.json#chapter-id`), preventing same chapter IDs in different books from colliding. Story text only supplies the question/provenance; reality claims still require independent authoritative external sources.
 
 ## Schedules and release boundary
 
