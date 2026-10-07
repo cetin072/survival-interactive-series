@@ -7,12 +7,7 @@ import { recordKnowledgeDisposition, validateKnowledgeState } from './knowledge-
 
 export const SEMANTIC_RESULT_VERSION = 'knowledge-semantic-result-v1'
 export const SEMANTIC_DECISIONS = Object.freeze(['BRIEF_READY', 'HOLD', 'HUMAN_REVIEW'])
-export const READER_BOOK_REFS = Object.freeze([
-  'archive/content/stories/C03-AFTERFALL/BOOK.json',
-  'archive/content/stories/C02-STRONGHOLD/BOOK.json',
-  'archive/content/stories/C01-HAN-JUNHO/BOOK.json',
-])
-export const READER_BOOK_REF = READER_BOOK_REFS[0]
+export const READER_BOOK_REF = 'archive/content/stories/C03-AFTERFALL/BOOK.json'
 
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex')
 const canonicalChapterSha = (chapter) => sha(Buffer.from(JSON.stringify(chapter), 'utf8'))
