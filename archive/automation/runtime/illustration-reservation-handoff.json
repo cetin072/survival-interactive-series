@@ -25,7 +25,25 @@
     "next_run_time": null,
     "prompt_exact_readback": true
   },
-  "collection": null,
+  "collection": {
+    "status": "READY_FOR_PROVIDER_COMPLETE",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_00000000f780823081265718c1d2b401",
+    "source_library_file_id": "libfile_60b7ca3cf93c819198c5fa8abdfea152",
+    "source_version_id": null,
+    "source_sha256": "78c9db6360e3104ff14e46a26240344aa439c468ae2a47350160ba0f204b4f28",
+    "source_width": 1672,
+    "source_height": 941,
+    "source_size_bytes": 2481387,
+    "source_modified_at": "2026-10-07T21:43:39.607484Z",
+    "observed_at": "2026-10-07T22:28:05.972Z",
+    "png_verify": true,
+    "png_full_decode": true,
+    "provider_complete": {
+      "p_job_id": "illustration-event-winter-council-c0048fceecc3-20261008-37682453254",
+      "p_prompt_sha256": "80669c440415d19307e21649687a1da55b93b8306d2bf343a79d3aa112255491"
+    }
+  },
   "review": null,
   "transfer": null,
   "result": null
