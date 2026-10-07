@@ -89,9 +89,9 @@ export const publicSearchIndex: PublicSearchEntry[] = [
 ]
 
 const kindPriority: Record<PublicSearchKind, number> = {
-  wiki: 0,
-  knowledge: 1,
-  resource: 2,
+  wiki: 2,
+  knowledge: 0,
+  resource: 1,
 }
 
 function scoreEntry(entry: PublicSearchEntry, normalizedQuery: string, queryTokens: string[]) {
