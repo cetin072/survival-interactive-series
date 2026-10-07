@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { decideRelease, nextReleaseMarker, validateReleasePolicy } from './lib/production-release.mjs'
+import { decideRelease, nextReleaseMarker, validateReleaseMarker, validateReleasePolicy } from './lib/production-release.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 const markerRef = 'archive/web/public/release/production.json'
@@ -12,10 +12,17 @@ const policyRef = 'archive/automation/release-policy.json'
 // release bookkeeping do not change the public site by themselves.
 const siteInputs = [
   'archive/web', 'archive/content', 'knowledge/content', 'knowledge/automation/config.json',
+  'archive/automation/config.json', 'archive/automation/release-policy.json',
+  'knowledge/automation/worker-policy.json', 'knowledge/automation/state.json',
+  'knowledge/automation/runtime-state.json',
   'archive/scripts/build-knowledge.mjs',
   'archive/scripts/lib/knowledge-content.mjs', 'archive/scripts/lib/knowledge-public.mjs',
   'archive/scripts/lib/knowledge-release.mjs', 'archive/scripts/lib/wiki-public-sources.mjs',
   'archive/scripts/lib/approved-reader-sources.mjs', 'archive/scripts/lib/reader-transform.mjs',
+  'archive/scripts/lib/publication-graph.mjs',
+  ':(exclude,glob)archive/web/**/*.test.*',
+  ':(exclude,glob)archive/web/**/*.spec.*',
+  ':(exclude,glob)archive/web/**/README*',
   ':(exclude)archive/web/public/release/production.json',
   ':(exclude)archive/web/public/deploy-meta.json',
 ]
@@ -32,7 +39,7 @@ export async function prepare(args, { cwd = root, now = new Date() } = {}) {
   let marker = null
   let lastReleaseCommit = null
   if (existsSync(resolve(cwd, markerRef))) {
-    marker = JSON.parse(await readFile(resolve(cwd, markerRef), 'utf8'))
+    marker = validateReleaseMarker(JSON.parse(await readFile(resolve(cwd, markerRef), 'utf8')))
     lastReleaseCommit = git('log', '-1', '--format=%H', '--', markerRef) || null
   }
   const hasSiteChanges = !marker || Boolean(git('diff', '--name-only', marker.source_main_sha, headSha, '--', ...siteInputs))

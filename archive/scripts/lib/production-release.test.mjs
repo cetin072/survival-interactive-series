@@ -83,6 +83,65 @@ test('does not redeploy the exact release commit', () => {
   }), { status: 'NO_CHANGES', due: false })
 })
 
+test('real Git input matrix and force preserve release safety', async () => {
+  const cwd = await mkdtemp(join(tmpdir(), 'production-inputs-'))
+  const git = (...args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore','pipe','pipe'] }).trim()
+  const put = async (ref, bytes) => { await mkdir(join(cwd, ref, '..'), { recursive: true }); await writeFile(join(cwd, ref), bytes) }
+  const markerRef = 'archive/web/public/release/production.json'
+  const now = new Date('2026-10-03T14:00:00Z')
+  try {
+    git('init','-b','main'); git('config','user.name','Release fixture'); git('config','user.email','fixture@example.invalid')
+    await put('archive/automation/release-policy.json', JSON.stringify(policy))
+    await put('archive/web/index.html', 'site\n')
+    git('add','.'); git('commit','-m','source')
+    const source = git('rev-parse','HEAD')
+    const marker = nextReleaseMarker({ sourceMainSha: source, policy, now: new Date('2026-10-01T14:00:00Z') })
+    await put(markerRef, JSON.stringify(marker)); git('add','.'); git('commit','-m','marker')
+    const baseline = git('rev-parse','HEAD')
+    for (const force of [false, true]) {
+      const markerBefore = await readFile(join(cwd,markerRef),'utf8')
+      assert.equal((await prepare(['--apply', ...(force ? ['--force'] : [])], { cwd, now })).status, 'NO_CHANGES')
+      assert.equal(await readFile(join(cwd,markerRef),'utf8'), markerBefore)
+      assert.equal(git('rev-parse','HEAD'), baseline)
+      assert.equal(git('status','--porcelain'), '')
+    }
+    const inputs = ['archive/web/src/main.tsx', 'archive/automation/config.json',
+      'archive/automation/release-policy.json', 'knowledge/automation/worker-policy.json',
+      'knowledge/automation/state.json', 'knowledge/automation/runtime-state.json',
+      'knowledge/automation/config.json', 'archive/scripts/lib/publication-graph.mjs',
+      'archive/web/package-lock.json', 'archive/web/vite.config.ts',
+      'archive/content/stories/BOOK.json', 'archive/content/visuals/SITE_ASSETS.json',
+      'knowledge/content/guides.json']
+    const ignored = ['docs/operations.md', 'archive/web/README.md', 'archive/web/src/example.test.ts',
+      'archive/scripts/finalize-illustration-job.py', 'archive/scripts/knowledge-semantic-prepare.mjs',
+      'archive/web/public/deploy-meta.json', markerRef]
+    for (const ref of [...inputs, ...ignored]) {
+      git('reset','--hard',baseline); git('clean','-fd')
+      const bytes = ref === markerRef ? JSON.stringify({ ...marker, release_attempt: 2 })
+        : ref === 'archive/automation/release-policy.json' ? JSON.stringify({ ...policy, release_hour_kst: 22 }) : 'changed\n'
+      await put(ref, bytes); git('add','.'); git('commit','-m',ref)
+      const head = git('rev-parse','HEAD'), markerBefore = await readFile(join(cwd,markerRef),'utf8')
+      const changed = inputs.includes(ref)
+      for (const force of [false, true]) {
+        const outcome = await prepare(['--apply', ...(force ? ['--force'] : [])], { cwd, now })
+        assert.equal(outcome.status, changed ? 'RELEASE_PREPARED' : 'NO_CHANGES', `${ref} force=${force}`)
+        // Restore only fixture marker writes before checking the other mode.
+        await put(markerRef, markerBefore)
+        assert.equal(git('rev-parse','HEAD'),head)
+        assert.equal(git('status','--porcelain'),'')
+      }
+      if (changed) {
+        assert.equal((await prepare(['--check'], { cwd, now: new Date('2026-10-02T14:00:00Z') })).status,'WAITING_WINDOW')
+        assert.equal((await prepare(['--check','--force'], { cwd, now: new Date('2026-10-02T14:00:00Z') })).status,'WOULD_RELEASE')
+        assert.equal((await prepare(['--check','--force'], { cwd, now: new Date('2026-10-01T14:30:00Z') })).status,'DAILY_LIMIT_REACHED')
+      }
+    }
+    git('reset','--hard',baseline); git('clean','-fd')
+    await put(markerRef, JSON.stringify({ ...marker, source_main_sha: 'invalid-ref' }))
+    await assert.rejects(prepare(['--check','--force'], { cwd, now }), /INVALID_RELEASE_MARKER/)
+  } finally { await rm(cwd,{recursive:true,force:true}) }
+})
+
 test('waits for the two-day batching window', () => {
   const marker = nextReleaseMarker({ sourceMainSha: sha('a'), policy, now: new Date('2026-09-28T14:00:00Z') })
   const decision = decideRelease({
@@ -100,7 +159,7 @@ test('releases after the batching window and supports force', () => {
     now: new Date('2026-09-30T14:00:00Z'),
   }).due, true)
   assert.equal(decideRelease({
-    headSha: sha('b'), lastReleaseCommit: sha('b'), marker, policy,
+    headSha: sha('c'), lastReleaseCommit: sha('b'), marker, policy,
     now: new Date('2026-09-28T15:00:00Z'), force: true,
   }).reason, 'FORCED')
   assert.doesNotThrow(() => validateReleaseMarker(marker))
