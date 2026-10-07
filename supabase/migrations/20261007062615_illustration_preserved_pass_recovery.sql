@@ -44,7 +44,9 @@ begin
   if to_jsonb(s) is distinct from p_expected_shelter
     or to_jsonb(w) is distinct from p_expected_wide_area
     or s.status<>'BLOCKED' or s.blocker_code<>'FINALIZER_IDENTITY_EXISTING_CONFLICT'
-    or s.blocker_stage<>'PROGRAM_FINALIZER' or s.review_decision<>'PASS'
+    or s.blocker_stage is distinct from 'PROGRAM_FINALIZER' or s.review_decision is distinct from 'PASS'
+    or coalesce(s.output_sha256,'') !~ '^[a-f0-9]{64}$'
+    or coalesce(s.provider_asset_id,'')='' or coalesce(s.review_staging_id,'')=''
     or s.active_provider<>'native_chatgpt' or w.active_provider<>'native_chatgpt'
     or w.status<>'PREPARED' or w.provider_completed_at is not null
     or w.provider_asset_id is not null or w.review_decision is not null
@@ -59,9 +61,9 @@ begin
     where staging_id=s.review_staging_id for update;
   if t.staging_id is null or t.status<>'READY' or t.job_id<>s.job_id
     or t.point_id<>s.point_id or t.generation_key<>s.generation_key or t.subject_id<>s.subject_id
-    or t.source_sha256<>s.output_sha256 or t.provider_asset_id<>s.provider_asset_id
-    or t.byte_count<>s.output_bytes or t.width<>512 or t.height<>512
-    or s.output_width<>512 or s.output_height<>512 or t.chunk_count<>2 then
+    or t.source_sha256 is distinct from s.output_sha256 or t.provider_asset_id is distinct from s.provider_asset_id
+    or t.byte_count is distinct from s.output_bytes or t.width is distinct from 512 or t.height is distinct from 512
+    or s.output_width is distinct from 512 or s.output_height is distinct from 512 or t.chunk_count is distinct from 2 then
     raise exception 'PRESERVED_PASS_STAGING_CHANGED' using errcode='22023';
   end if;
   perform 1 from survival_ops.illustration_review_staging_chunks
@@ -70,7 +72,7 @@ begin
     into count_chunks,binary from survival_ops.illustration_review_staging_chunks where staging_id=t.staging_id;
   if count_chunks<>2 or not exists(select 1 from survival_ops.illustration_review_staging_chunks where staging_id=t.staging_id and chunk_index=0)
     or not exists(select 1 from survival_ops.illustration_review_staging_chunks where staging_id=t.staging_id and chunk_index=1)
-    or octet_length(binary)<>s.output_bytes or encode(extensions.digest(binary,'sha256'),'hex')<>s.output_sha256 then
+    or octet_length(binary) is distinct from s.output_bytes or encode(extensions.digest(binary,'sha256'),'hex') is distinct from s.output_sha256 then
     raise exception 'PRESERVED_PASS_BINARY_CHANGED' using errcode='22023';
   end if;
   update survival_ops.illustration_render_jobs set status='BLOCKED',
@@ -80,7 +82,7 @@ begin
     where job_id=w.job_id;
   -- Reuse existing admission, retry caps, daily-success gate and Finalizer dispatch.
   result:=public.archive_illustration_render_job_enqueue(to_jsonb(s));
-  if result->>'status'<>'FINALIZE_QUEUED' or result->>'job_id'<>s.job_id then
+  if result->>'status' is distinct from 'FINALIZE_QUEUED' or result->>'job_id' is distinct from s.job_id then
     raise exception 'PRESERVED_PASS_REQUEUE_DENIED: %',result->>'status' using errcode='22023';
   end if;
   return result || jsonb_build_object('preserved_job_id',w.job_id,'preserved_status','BLOCKED');
