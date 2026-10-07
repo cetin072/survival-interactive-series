@@ -42,7 +42,10 @@
     "provider_complete": {
       "p_job_id": "illustration-event-winter-council-c0048fceecc3-20261008-37682453254",
       "p_prompt_sha256": "80669c440415d19307e21649687a1da55b93b8306d2bf343a79d3aa112255491"
-    }
+    },
+    "provider_completed_at": "2026-10-07T22:28:37.62367+00:00",
+    "job_status_after_provider_complete": "INGESTING",
+    "readback_at": "2026-10-07T22:28:52.884Z"
   },
   "review": null,
   "transfer": null,
