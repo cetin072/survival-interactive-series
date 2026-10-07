@@ -1,6 +1,6 @@
 -- Isolated CI database only. Never run fixtures/dispatcher replacement on live DB.
 begin;
-create or replace function archive_ops.dispatch_afterfall_illustration_finalize(text)
+create or replace function archive_ops.dispatch_afterfall_illustration_finalize(p_job_id text)
 returns bigint language sql as $$ select -999::bigint $$;
 create function pg_temp.expect_denied(s jsonb,w jsonb,idle boolean) returns void language plpgsql as $$
 begin
