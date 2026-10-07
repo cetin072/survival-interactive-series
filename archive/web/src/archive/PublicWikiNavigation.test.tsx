@@ -19,9 +19,9 @@ describe('public Wiki navigation', () => {
     expect(markup).toContain('생존 이야기를 읽고')
     expect(markup).toContain('href="/" aria-label="생존일기 Wiki 홈"')
     expect(markup).toContain('href="/?view=story">이야기</a>')
-    expect(markup).toContain('href="/?view=knowledge-preview">생존 지식</a>')
+    expect(markup).toContain('href="/knowledge/">생존 지식</a>')
     expect(markup).toContain('href="/?view=tools">자료실</a>')
-    expect(markup).toContain('id="wiki-knowledge-title">최근 생존 지식</h2><a href="/?view=knowledge-preview">전체 보기</a>')
+    expect(markup).toContain('id="wiki-knowledge-title">최근 생존 지식</h2><a href="/knowledge/">전체 보기</a>')
     expect(markup).not.toContain('archive-header')
   })
 
@@ -57,10 +57,10 @@ describe('public Wiki navigation', () => {
     expect(markup).not.toContain('archive-header')
   })
 
-  it('keeps the Knowledge preview in the Wiki shell', () => {
+  it('keeps the legacy Knowledge entry as a link to its canonical destination', () => {
     const markup = renderRoute('/?view=knowledge-preview')
-    expect(markup).toContain('wiki-topbar')
-    expect(markup).toContain('공개 생존 지식')
+    expect(markup).toContain('정식 페이지로 이동')
+    expect(markup).toContain('href="/knowledge/"')
     expect(markup).not.toContain('archive-header')
   })
 })

@@ -34,6 +34,14 @@ command = "npm run build:verified"
   status = 200
   force = true
 
+# Knowledge's validated content contract supports HTTPS images and YouTube.
+# Keep executable code, connections and Operator's policy restricted as before.
+[[headers]]
+  for = "/knowledge/*"
+
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; connect-src 'self' https://jgsxpdflgkqroecfjzxq.supabase.co; img-src 'self' data: https:; frame-src https://www.youtube-nocookie.com; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
+
 [[redirects]]
   from = "/operator/*"
   to = "/index.html"

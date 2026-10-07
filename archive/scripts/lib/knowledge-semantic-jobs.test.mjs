@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
+import { existsSync, cpSync } from 'node:fs'
 import { applySemanticPackage, buildSemanticContext, chapterHash, hashPolicyBytes, knowledgeOperationalDate, makeWorkKey, nextBriefId, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
 import { finalizerAction, semanticBranchRef, reconcilePullRequest, runSemanticFinalizer, verifyPins } from '../knowledge-semantic-finalize.mjs'
 import { runPackage } from '../knowledge-semantic-finalize.mjs'
@@ -475,14 +476,20 @@ test('C-FINALIZER drives an exact-target package through a Git worker branch to 
   const repositoryRoot = resolve(import.meta.dirname, '../../..')
   const git = (args, cwd = root) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
   try {
+    await mkdir(join(root, 'archive/web/src/archive'), { recursive: true })
     await Promise.all([
       cp(join(repositoryRoot, 'knowledge'), join(root, 'knowledge'), { recursive: true }),
       cp(join(repositoryRoot, 'archive/content'), join(root, 'archive/content'), { recursive: true }),
       cp(join(repositoryRoot, 'archive/web/public'), join(root, 'archive/web/public'), { recursive: true }),
       cp(join(repositoryRoot, 'archive/scripts'), join(root, 'archive/scripts'), { recursive: true }),
+      cp(join(repositoryRoot, 'archive/web/src'), join(root, 'archive/web/src'), { recursive: true }),
+      cp(join(repositoryRoot, 'archive/web/vite.config.ts'), join(root, 'archive/web/vite.config.ts')),
+      cp(join(repositoryRoot, 'archive/web/render-knowledge.mjs'), join(root, 'archive/web/render-knowledge.mjs')),
+      cp(join(repositoryRoot, 'archive/web/.gitignore'), join(root, 'archive/web/.gitignore')),
       cp(join(repositoryRoot, 'docs'), join(root, 'docs'), { recursive: true }),
     ])
     await mkdir(join(root, 'archive/web'), { recursive: true })
+    await cp(join(repositoryRoot, 'archive/web/node_modules'), join(root, 'archive/web/node_modules'), { recursive: true })
     await writeFile(join(root, 'archive/web/package.json'), '{"private":true,"type":"module"}\n')
 
     const { loadKnowledge } = await import('./knowledge-content.mjs')
@@ -562,7 +569,11 @@ test('C-FINALIZER drives an exact-target package through a Git worker branch to 
 
     const runCommand = (command, args, cwd, env = {}) => {
       if (command !== 'npm') return execFileSync(command, args, { cwd, env: { ...process.env, ...env }, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
-      if (args[0] === 'ci' || (args[0] === 'run' && args[1] === 'knowledge:test')) return ''
+      if (args[0] === 'ci') {
+        if (!existsSync(join(cwd, 'node_modules'))) cpSync(join(repositoryRoot, 'archive/web/node_modules'), join(cwd, 'node_modules'), { recursive: true })
+        return ''
+      }
+      if (args[0] === 'run' && args[1] === 'knowledge:test') return ''
       if (args[0] === 'run' && args[1] === 'knowledge:build') {
         return execFileSync(process.execPath, ['../scripts/build-knowledge.mjs'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
       }
@@ -638,4 +649,3 @@ test('Knowledge publication binds a C3 durable job to the prepared exact head be
   assert.match(workflow, /p_head_sha: process\.env\.PREPARED_SHA/)
   assert.ok(workflow.indexOf('Bind C3 durable job to prepared head') < workflow.indexOf('Dispatch exact-head validation for prepared commit'))
 })
-

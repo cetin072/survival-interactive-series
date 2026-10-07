@@ -1,9 +1,7 @@
-import { knowledgeRiskLabel, publishedKnowledgeGuides } from './knowledgeGuide'
+import { knowledgeHref, knowledgeRiskLabel, publishedKnowledgeGuides } from './knowledgeGuide'
 import { WikiTopbar } from './WikiTopbar'
 import './wikiShell.css'
 import './survivalDesignLanguage.css'
-
-const guideHref = (id: string) => '/?view=knowledge-preview&brief=' + encodeURIComponent(id)
 
 export function KnowledgeGuideLibraryPreview({ notice }: { notice?: string }) {
   return <main className="wiki-shell knowledge-library-shell">
@@ -33,12 +31,12 @@ export function KnowledgeGuideLibraryPreview({ notice }: { notice?: string }) {
               <span>생존 지식</span>
               <small>{knowledgeRiskLabel(guide.riskLevel)} · {guide.publishedAt}</small>
             </div>
-            <h3><a href={guideHref(guide.id)}>{guide.label}</a></h3>
+            <h3><a href={knowledgeHref(guide)}>{guide.label}</a></h3>
             <p className="knowledge-guide-question">{guide.title}</p>
             <p>{guide.summary}</p>
             <div className="knowledge-library-footer">
               <span>{guide.scope}</span>
-              <a href={guideHref(guide.id)}>가이드 보기 →</a>
+              <a href={knowledgeHref(guide)}>가이드 보기 →</a>
             </div>
           </article>)}
         </div>
