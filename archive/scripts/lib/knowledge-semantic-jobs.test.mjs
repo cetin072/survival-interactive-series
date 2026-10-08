@@ -488,6 +488,19 @@ test('C-FINALIZER drives an exact-target package through a Git worker branch to 
       cp(join(repositoryRoot, 'archive/web/.gitignore'), join(root, 'archive/web/.gitignore')),
       cp(join(repositoryRoot, 'docs'), join(root, 'docs'), { recursive: true }),
     ])
+    // SSR now validates source-bound Wiki candidates too. Copy only their
+    // already-approved RAW inputs into this isolated Git fixture.
+    const { loadReaderWikiSeeds } = await import('./reader-wiki-seed.mjs')
+    for (const seed of await loadReaderWikiSeeds(repositoryRoot, { allowPreview: true })) {
+      const readerBook = JSON.parse(await readFile(join(repositoryRoot, 'archive/content/stories', seed.chronicleId, 'BOOK.json'), 'utf8'))
+      const reviewedIds = new Set(seed.chapters.map((row) => row.chapterId))
+      for (const chapter of readerBook.chapters.filter((chapter) => reviewedIds.has(chapter.id))) {
+        for (const ref of chapter.archiveSourceRefs) {
+          await mkdir(resolve(root, ref, '..'), { recursive: true })
+          await cp(join(repositoryRoot, ref), join(root, ref))
+        }
+      }
+    }
     await mkdir(join(root, 'archive/web'), { recursive: true })
     await cp(join(repositoryRoot, 'archive/web/node_modules'), join(root, 'archive/web/node_modules'), { recursive: true })
     await writeFile(join(root, 'archive/web/package.json'), '{"private":true,"type":"module"}\n')

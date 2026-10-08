@@ -1,8 +1,10 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { readFile } from 'node:fs/promises'
-import { resolve } from 'node:path'
-import { discoverWikiSources } from './lib/wiki-semantic-jobs.mjs'
+import { readFile, cp, mkdtemp, mkdir, rm, unlink } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { execFileSync } from 'node:child_process'
+import { resolve, join } from 'node:path'
+import { expectedWikiReceiptPath, discoverWikiSources } from './lib/wiki-semantic-jobs.mjs'
 import { byteHash, reconcilePublicGraph } from './lib/publication-graph.mjs'
 import {
   buildWikiFactJob, buildWikiFactReviewJob, validateWikiFactReview, WIKI_REVIEW_VERSION,
@@ -201,8 +203,23 @@ async function currentSourceRow(status = 'EXTRACTOR_READY') {
     prepared_job: { season_id: source.seasonId }, graph_sha256: 'f'.repeat(64) } }
 }
 
-test('prepare reconciles a completed stale ledger before admitting the next pending source and does not reconcile twice', async () => {
+test('prepare reconciles a completed stale ledger before admitting the next pending source and does not reconcile twice', async (t) => {
   const { row } = await currentSourceRow()
+  // Main can publish S04 between test runs. Model a pending source only in
+  // a temporary copy, never by changing checked-in facts or live receipts.
+  const fixtureBase = await mkdtemp(join(tmpdir(), 'a-wiki-native-pending-'))
+  t.after(() => rm(fixtureBase, { recursive: true, force: true }))
+  for (const ref of ['archive/content/transcripts/C03-AFTERFALL', 'archive/content/public-facts/C03-AFTERFALL', 'archive/content/graphs/C03-AFTERFALL']) {
+    await mkdir(resolve(fixtureBase, ref, '..'), { recursive: true })
+    await cp(join(base, ref), join(fixtureBase, ref), { recursive: true })
+  }
+  const pending = (await discoverWikiSources(fixtureBase)).find((source) => source.seasonId === 'S04' && source.sourceSession.session_id === 'SESSION_001')
+  assert.ok(pending)
+  await unlink(join(fixtureBase, expectedWikiReceiptPath(pending))).catch((error) => {
+    if (error.code !== 'ENOENT') throw error
+  })
+  execFileSync('git', ['init', '-b', 'main'], { cwd: fixtureBase, stdio: 'pipe' })
+  execFileSync('git', ['-c', 'user.name=Wiki fixture', '-c', 'user.email=wiki-fixture@example.invalid', 'commit', '--allow-empty', '-m', 'isolated pending-source fixture'], { cwd: fixtureBase, stdio: 'pipe' })
   let completed = false
   let nextActive = null
   const calls = []
@@ -242,11 +259,11 @@ test('prepare reconciles a completed stale ledger before admitting the next pend
     }
     return null
   }
-  const first = await prepareNativeJob({ base, requestRpc, collectCompletion })
+  const first = await prepareNativeJob({ base: fixtureBase, requestRpc, collectCompletion })
   assert.equal(first.status, 'EXTRACTOR_READY')
   assert.equal(first.job_id, 'next-job')
   assert.equal(first.reconciled_job_id, row.job_id)
-  const second = await prepareNativeJob({ base, requestRpc, collectCompletion })
+  const second = await prepareNativeJob({ base: fixtureBase, requestRpc, collectCompletion })
   assert.equal(second.status, 'EXTRACTOR_READY')
   assert.equal(second.job_id, 'next-job')
   assert.equal(second.reconciled_job_id, undefined)

@@ -3,8 +3,8 @@
   "chronicleId": "C02-STRONGHOLD",
   "worldlineId": "STRONGHOLD",
   "publication": "PREVIEW_ONLY",
-  "coverage": "PARTIAL",
-  "notice": "공개 Reader 기록을 바탕으로 정리한 위키 검수 후보입니다. 현재 공개 장 중 11장을 다뤘으며, 작품 전체의 설정이나 독립적인 검증을 보장하지 않습니다.",
+  "coverage": "ALL_AVAILABLE_CHAPTERS",
+  "notice": "현재 확보된 공개 Reader 11장 전체를 바탕으로 정리한 위키 검수 후보입니다. 누락된 역사와 미실행 선택은 보충하지 않았으며, 독립 검증이나 인간 공개 승인을 의미하지 않습니다.",
   "bookSha256": "cc21254acc575113b00713bf92dc27d807a14ea6baee727e3acbe2ff85c64fba",
   "chapters": [
     {
@@ -1505,7 +1505,7 @@
           "evidence": {
             "chapterId": "c02-stronghold-chapter-10",
             "bodySha256": "34d675c6db74725522fb5befc5f913981432e170e3733f67a373b847a6219b82",
-            "quote": "동쪽 출구를 통해 17명이 순차적으로 빠져나왔다.\n\n한지연 회사 기사도 무사히 복귀했다."
+            "quote": "### 4월 10일, 월요일 — 오전 2시 16분\n\n대부분의 구간이 안정됐다.\n\n터널 관리소의 서쪽 거리도—\n\n4.9킬로미터에서\n\n3.1.\n\n1.8.\n\n마지막에는 다시 **1.31킬로미터**.\n\n누구도 그 사이를 통과하지 않았다.\n\n그래서 무엇이 있었는지는 모른다.\n\n그럴 필요도 없었다.\n\n동쪽 출구를 통해 17명이 순차적으로 빠져나왔다.\n\n한지연 회사 기사도 무사히 복귀했다."
           }
         }
       ]
@@ -1552,7 +1552,7 @@
           }
         },
         {
-          "text": "제2병원 국지 변화는 아래거점 지표에 잡히지 않아 이후 경보 문구를 정상 단계가 안전 확인은 아니라고 바꾼다.",
+          "text": "제10장에서 도현은 경보가 국지적인 변화를 잡지 못하는 체계임을 인정하고, 정상 단계는 안전 확인이 아니라는 문구로 바꾼다.",
           "kind": "RECORDED",
           "evidence": {
             "chapterId": "c02-stronghold-chapter-10",

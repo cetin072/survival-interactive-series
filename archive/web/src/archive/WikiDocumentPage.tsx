@@ -159,7 +159,7 @@ export function WikiDocumentPage({
           {!!document.relations.length && <section id="wiki-relations">
             <h2><span>{numberFor('relations')}.</span> 관계</h2>
             <div className="wiki-relation-list">
-              {document.relations.map((relation) => <a key={relation.nodeId + relation.label} href={hrefForRelation(relation)}>
+              {document.relations.map((relation, index) => <a key={relation.nodeId + relation.label + index} href={hrefForRelation(relation)}>
                 <strong>{relation.title}</strong>
                 <span>{relation.label}</span>
                 <small>{relation.type === 'character' ? '인물' : relation.type === 'location' ? '장소' : relation.type === 'event' ? '사건' : '자료'} · {relation.subtitle}</small>
@@ -203,7 +203,7 @@ export function WikiDocumentPage({
 
         <footer className="wiki-document-footer" id="wiki-bottom">
           <strong>관련 문서</strong>
-          <nav>{document.relations.slice(0, 8).map((relation) => <a key={relation.nodeId} href={hrefForRelation(relation)}>{relation.title}</a>)}</nav>
+          <nav>{document.relations.slice(0, 8).map((relation, index) => <a key={relation.nodeId + index} href={hrefForRelation(relation)}>{relation.title}</a>)}</nav>
         </footer>
       </article>
     </div>
