@@ -74,3 +74,11 @@ Last verified head before this checkpoint: ac13a85 (main sync). Current checkpoi
 - No source/Canon/RAW/Reader edits. C03 data and jobs untouched. Candidate stays PREVIEW_ONLY/PARTIAL.
 - Current prior headac22a11; next git log identifies completed unit. Next exact action: read chapter08 in two complete body chunks; curate real new characters and external-house facts.
 - Draft478 final CI/Preview and browser captures still pending; HUMAN_CHECK_READY not reached.
+
+## C01 all-public-chapters checkpoint
+- All 10 public C01 chapter bodies fully read; 58 documents/173 source-bound facts/111 relations. Coverage ALL_AVAILABLE_CHAPTERS describes currently available public Reader only; PREVIEW_ONLY persists.
+- Read-only review audited chapters08–10 (41,431 chars/69 new facts/42 new relations), exact quotes/body hashes PASS. Compound claims narrowed or strengthened with actual outcomes. No redacted names, missing S02 acquisition history or DAY731 choice outcome reconstructed.
+- Full C01 source text and original RAW/Reader/Canon/Graph remain unchanged. Candidate does not claim human/expert validation.
+- C02 first chapter read18868 chars; vertical slice17 documents/13 relations in working tree. Discovered original canonical paths differ from archive paths; validator now binds existing catalog pairs and adapter uses validated sourceRefs for real RAW links. No original Reader/transcript changes.
+- PASS: web30 files/176 tests; seed4 tests; build:verified. Preview bundle5,398.76kB/gzip1,655.75kB before final C01 quote corrections. Browser still NOT_VERIFIED (pre-launch Windows sandbox helper).
+- Prior committed head0e14f3c; this checkpoint follows in git log. Next: C02 chapters02–11 full read and curation, source review, scoped search, final CI/Preview/browser gates. HUMAN_CHECK_READY not reached.
