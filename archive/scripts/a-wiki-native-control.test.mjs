@@ -350,7 +350,7 @@ test('A-Wiki visual sync recompiles the derived B catalog from the current appro
   }
 })
 
-test('approved GitHub publication transport failure resumes FINALIZING without re-running semantics', async () => {
+test('approved GitHub publication transport/readback failures resume FINALIZING without re-running semantics', async () => {
   const [graph, sources] = await Promise.all([
     readFile(resolve(base, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'), 'utf8').then(JSON.parse),
     discoverWikiSources(base),
@@ -376,43 +376,46 @@ test('approved GitHub publication transport failure resumes FINALIZING without r
     decision: 'APPROVE',
     note: 'Test-only independent approval.',
   }
-  const row = {
-    status: 'BLOCKED',
-    blocker_code: 'A_WIKI_COMMAND_GH_1',
-    job_id: 'blocked-db-job',
-    session_id: source.sourceSession.session_id,
-    source_ref: source.sourceManifestRef,
-    source_sha256: source.sourceDigest,
-    graph_sha256: graph.content_sha256,
-    prepared_job: job,
-    proposal: compiled.proposal,
-    review_job: compiled.reviewJob,
-    review_result: reviewResult,
+
+  for (const blockerCode of ['A_WIKI_COMMAND_GH_1', 'A_WIKI_PR_BINDING_INVALID']) {
+    const row = {
+      status: 'BLOCKED',
+      blocker_code: blockerCode,
+      job_id: 'blocked-db-job',
+      session_id: source.sourceSession.session_id,
+      source_ref: source.sourceManifestRef,
+      source_sha256: source.sourceDigest,
+      graph_sha256: graph.content_sha256,
+      prepared_job: job,
+      proposal: compiled.proposal,
+      review_job: compiled.reviewJob,
+      review_result: reviewResult,
+    }
+    const calls = []
+    const recovered = await prepareNativeJob({
+      base,
+      collectCompletion: async () => null,
+      requestRpc: async (name, args) => {
+        calls.push(name)
+        if (name === 'archive_a_wiki_native_job_recovery_current') return row
+        if (name === 'archive_a_wiki_native_job_advance') {
+          assert.equal(args.p_expected_status, 'BLOCKED')
+          assert.equal(args.p_status, 'FINALIZING')
+          return { status: 'FINALIZING', job_id: row.job_id }
+        }
+        if (name === 'archive_a_wiki_native_dispatch') return { status: 'DISPATCHED', request_id: 123 }
+        assert.fail(`Unexpected RPC ${name}`)
+      },
+    })
+    assert.equal(recovered.status, 'FINALIZING')
+    assert.equal(recovered.recovery, 'GITHUB_PUBLICATION_RETRY')
+    assert.equal(recovered.dispatch_request_id, 123)
+    assert.deepEqual(calls, [
+      'archive_a_wiki_native_job_recovery_current',
+      'archive_a_wiki_native_job_advance',
+      'archive_a_wiki_native_dispatch',
+    ])
   }
-  const calls = []
-  const recovered = await prepareNativeJob({
-    base,
-    collectCompletion: async () => null,
-    requestRpc: async (name, args) => {
-      calls.push(name)
-      if (name === 'archive_a_wiki_native_job_recovery_current') return row
-      if (name === 'archive_a_wiki_native_job_advance') {
-        assert.equal(args.p_expected_status, 'BLOCKED')
-        assert.equal(args.p_status, 'FINALIZING')
-        return { status: 'FINALIZING', job_id: row.job_id }
-      }
-      if (name === 'archive_a_wiki_native_dispatch') return { status: 'DISPATCHED', request_id: 123 }
-      assert.fail(`Unexpected RPC ${name}`)
-    },
-  })
-  assert.equal(recovered.status, 'FINALIZING')
-  assert.equal(recovered.recovery, 'GITHUB_PUBLICATION_RETRY')
-  assert.equal(recovered.dispatch_request_id, 123)
-  assert.deepEqual(calls, [
-    'archive_a_wiki_native_job_recovery_current',
-    'archive_a_wiki_native_job_advance',
-    'archive_a_wiki_native_dispatch',
-  ])
 })
 
 test('merged native retry requires source, receipt, exact proposal and independent review evidence', () => {
