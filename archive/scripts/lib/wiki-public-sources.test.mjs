@@ -37,22 +37,26 @@ async function fixture(t) {
 
 test('real SESSION_007/008 facts and five amended profiles resolve to approved Reader and RAW sources', async () => {
   const [data, graph] = await Promise.all([loadPublicWikiData(repoRoot), jsonAt(repoRoot, graphRef)])
-  const recentFacts = graph.nodes.filter((node) => /AWIKI_SESSION_00[78]_/.test(node.evidence.source_ref))
+  const recentFacts = graph.nodes.flatMap((node) =>
+    [node, ...(node.history ?? [])]
+      .filter((revision) => /AWIKI_SESSION_00[78]_/.test(revision.evidence.source_ref))
+      .map((revision) => ({ nodeId: node.id, evidence: revision.evidence })))
   const amended = graph.nodes.filter((node) => node.evidence.source_ref === amendmentRef)
+  const amendedBindings = amended.map((node) => ({ nodeId: node.id, evidence: node.evidence }))
   assert.equal(recentFacts.length, 15)
   assert.equal(amended.length, 5)
   assert.ok(data.sources.every((source) => JSON.stringify(Object.keys(source).sort()) === JSON.stringify(['evidence', 'links', 'nodeId'])))
   assert.ok(data.sources.flatMap((source) => source.links).every((link) =>
     JSON.stringify(Object.keys(link).sort()) === JSON.stringify(['archiveSourceRef', 'chapterId', 'chapterTitle', 'partId', 'partTitle'])))
   assert.ok(amended.every((node) => node.history.length > 0), 'the five previous profiles remain in history')
-  for (const node of [...recentFacts, ...amended]) {
-    const source = data.sources.find((item) => item.nodeId === node.id
-      && item.evidence.source_ref === node.evidence.source_ref
-      && item.evidence.source_sha256 === node.evidence.source_sha256
-      && item.evidence.pointer === node.evidence.pointer)
-    assert.ok(source, `missing exact source binding: ${node.id}`)
-    assert.ok(source.links.length > 0, `missing source link: ${node.id}`)
-    const session = node.evidence.source_ref === amendmentRef || node.evidence.source_ref.includes('SESSION_008') ? '008' : '007'
+  for (const binding of [...recentFacts, ...amendedBindings]) {
+    const source = data.sources.find((item) => item.nodeId === binding.nodeId
+      && item.evidence.source_ref === binding.evidence.source_ref
+      && item.evidence.source_sha256 === binding.evidence.source_sha256
+      && item.evidence.pointer === binding.evidence.pointer)
+    assert.ok(source, `missing exact source binding: ${binding.nodeId}`)
+    assert.ok(source.links.length > 0, `missing source link: ${binding.nodeId}`)
+    const session = binding.evidence.source_ref === amendmentRef || binding.evidence.source_ref.includes('SESSION_008') ? '008' : '007'
     for (const link of source.links) {
       assert.equal(link.partId, `c03-s03-session-${session}-001`)
       assert.equal(link.archiveSourceRef, `${transcriptsRef}/S03/SESSION_${session}/PART_001.md`)

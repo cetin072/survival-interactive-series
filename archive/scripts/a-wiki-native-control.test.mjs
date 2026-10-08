@@ -8,7 +8,7 @@ import {
   buildWikiFactJob, buildWikiFactReviewJob, validateWikiFactReview, WIKI_REVIEW_VERSION,
 } from './lib/wiki-fact-extractor.mjs'
 import {
-  compileSubmittedExtractor, inspectSubmittedReview, mergedPublication, confirmMergedPublication,
+  compileAWikiVisualCatalog, compileSubmittedExtractor, inspectSubmittedReview, mergedPublication, confirmMergedPublication,
   prepareNativeJob, publicationBranch, consumeNativeJob,
 } from './a-wiki-native-control.mjs'
 
@@ -201,32 +201,62 @@ async function currentSourceRow(status = 'EXTRACTOR_READY') {
     prepared_job: { season_id: source.seasonId }, graph_sha256: 'f'.repeat(64) } }
 }
 
-test('prepare reconciles completed stale ledger BEFORE returning no pending source and is idempotent', async () => {
+test('prepare reconciles a completed stale ledger before admitting the next pending source and does not reconcile twice', async () => {
   const { row } = await currentSourceRow()
   let completed = false
+  let nextActive = null
   const calls = []
   const requestRpc = async (name, args) => {
     calls.push(name)
-    if (name === 'archive_a_wiki_native_job_recovery_current') return completed ? { status: 'NO_JOB' } : row
+    if (name === 'archive_a_wiki_native_job_recovery_current') {
+      if (!completed) return row
+      return nextActive ?? { status: 'NO_JOB' }
+    }
     if (name === 'archive_a_wiki_native_job_reconcile_publication') {
       assert.equal(args.p_expected_status, 'EXTRACTOR_READY')
       assert.deepEqual(args.p_evidence, { verified: true })
       completed = true
       return { status: 'PUBLISHED' }
     }
+    if (name === 'archive_a_wiki_native_job_prepare') {
+      assert.equal(args.p_job.season_id, 'S04')
+      assert.equal(args.p_job.source.session_id, 'SESSION_001')
+      nextActive = {
+        status: 'EXTRACTOR_READY',
+        job_id: 'next-job',
+        session_id: args.p_job.source.session_id,
+        source_ref: args.p_job.source.manifest_ref,
+        source_sha256: args.p_job.source.manifest_sha256,
+        prepared_job: args.p_job,
+        graph_sha256: args.p_job.graph_sha256,
+      }
+      return { status: 'EXTRACTOR_READY', job_id: 'next-job' }
+    }
     assert.fail(`Unexpected RPC ${name}`)
   }
-  let collections = 0
-  const collectCompletion = async () => { collections++; return { verified: true } }
+  let originalCollections = 0
+  const collectCompletion = async ({ row: candidate }) => {
+    if (candidate.job_id === row.job_id) {
+      originalCollections++
+      return { verified: true }
+    }
+    return null
+  }
   const first = await prepareNativeJob({ base, requestRpc, collectCompletion })
-  assert.equal(first.status, 'NO_JOB')
+  assert.equal(first.status, 'EXTRACTOR_READY')
+  assert.equal(first.job_id, 'next-job')
   assert.equal(first.reconciled_job_id, row.job_id)
   const second = await prepareNativeJob({ base, requestRpc, collectCompletion })
-  assert.equal(second.status, 'NO_JOB')
+  assert.equal(second.status, 'EXTRACTOR_READY')
+  assert.equal(second.job_id, 'next-job')
   assert.equal(second.reconciled_job_id, undefined)
-  assert.equal(collections, 1)
-  assert.deepEqual(calls, ['archive_a_wiki_native_job_recovery_current',
-    'archive_a_wiki_native_job_reconcile_publication', 'archive_a_wiki_native_job_recovery_current'])
+  assert.equal(originalCollections, 1)
+  assert.deepEqual(calls, [
+    'archive_a_wiki_native_job_recovery_current',
+    'archive_a_wiki_native_job_reconcile_publication',
+    'archive_a_wiki_native_job_prepare',
+    'archive_a_wiki_native_job_recovery_current',
+  ])
 })
 
 test('invalid receipt evidence blocks prepare without faking completion or hiding it as NO_JOB', async () => {
@@ -297,6 +327,92 @@ test('consumer reports PUBLISHED only after the matching DB transition is confir
       headSha: 'a'.repeat(40), mergeSha: 'b'.repeat(40) }),
   })
   assert.equal(result.status, 'PUBLISHED')
+})
+
+test('A-Wiki visual sync recompiles the derived B catalog from the current approved Graph', async () => {
+  const [graph, previousCatalog, appearanceBytes, sources] = await Promise.all([
+    readFile(resolve(base, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'), 'utf8').then(JSON.parse),
+    readFile(resolve(base, 'archive/content/visuals/C03-AFTERFALL/VISUALS.json'), 'utf8').then(JSON.parse),
+    readFile(resolve(base, 'archive/content/public-facts/C03-AFTERFALL/S02/APPEARANCES_APPROVED_20260926.json')),
+    discoverWikiSources(base),
+  ])
+  const source = sources.find((item) => item.seasonId === 'S03'
+    && item.sourceSession.session_id === 'SESSION_008')
+  assert.ok(source)
+  const job = buildWikiFactJob(source, graph)
+  const { catalog } = compileAWikiVisualCatalog({ job, graph, appearanceBytes, previousCatalog })
+  assert.deepEqual(catalog.anchor, graph.anchor)
+  assert.equal(catalog.graph_sha256, graph.content_sha256)
+  const nextBySubject = new Map(catalog.points.map((point) => [point.subject_id, point]))
+  for (const point of previousCatalog.points) {
+    if (point.point_type === 'MAP') continue
+    assert.equal(nextBySubject.get(point.subject_id)?.point_id, point.point_id)
+  }
+})
+
+test('approved GitHub publication transport failure resumes FINALIZING without re-running semantics', async () => {
+  const [graph, sources] = await Promise.all([
+    readFile(resolve(base, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'), 'utf8').then(JSON.parse),
+    discoverWikiSources(base),
+  ])
+  const source = sources.find((item) => item.seasonId === 'S03'
+    && item.sourceSession.session_id === 'SESSION_008')
+  assert.ok(source)
+  const job = buildWikiFactJob(source, graph)
+  const result = {
+    version: 'wiki-fact-result-v1',
+    job_id: job.job_id,
+    decision: 'NO_FACTS',
+    coverage: { status: 'COMPLETE', reviewed_blocks: job.source.gm_blocks.map((block) => block.block_id) },
+    nodes: [], relations: [], citations: [], deferred: [],
+    note: 'Test-only complete no-facts extraction.',
+  }
+  const compiled = compileSubmittedExtractor({
+    status: 'EXTRACTOR_SUBMITTED', prepared_job: job, extractor_result: result,
+  })
+  const reviewResult = {
+    version: WIKI_REVIEW_VERSION,
+    proposal_sha256: compiled.proposal.proposal_sha256,
+    decision: 'APPROVE',
+    note: 'Test-only independent approval.',
+  }
+  const row = {
+    status: 'BLOCKED',
+    blocker_code: 'A_WIKI_COMMAND_GH_1',
+    job_id: 'blocked-db-job',
+    session_id: source.sourceSession.session_id,
+    source_ref: source.sourceManifestRef,
+    source_sha256: source.sourceDigest,
+    graph_sha256: graph.content_sha256,
+    prepared_job: job,
+    proposal: compiled.proposal,
+    review_job: compiled.reviewJob,
+    review_result: reviewResult,
+  }
+  const calls = []
+  const recovered = await prepareNativeJob({
+    base,
+    collectCompletion: async () => null,
+    requestRpc: async (name, args) => {
+      calls.push(name)
+      if (name === 'archive_a_wiki_native_job_recovery_current') return row
+      if (name === 'archive_a_wiki_native_job_advance') {
+        assert.equal(args.p_expected_status, 'BLOCKED')
+        assert.equal(args.p_status, 'FINALIZING')
+        return { status: 'FINALIZING', job_id: row.job_id }
+      }
+      if (name === 'archive_a_wiki_native_dispatch') return { status: 'DISPATCHED', request_id: 123 }
+      assert.fail(`Unexpected RPC ${name}`)
+    },
+  })
+  assert.equal(recovered.status, 'FINALIZING')
+  assert.equal(recovered.recovery, 'GITHUB_PUBLICATION_RETRY')
+  assert.equal(recovered.dispatch_request_id, 123)
+  assert.deepEqual(calls, [
+    'archive_a_wiki_native_job_recovery_current',
+    'archive_a_wiki_native_job_advance',
+    'archive_a_wiki_native_dispatch',
+  ])
 })
 
 test('merged native retry requires source, receipt, exact proposal and independent review evidence', () => {
