@@ -52,3 +52,10 @@ Last verified head before this checkpoint: ac13a85 (main sync). Current checkpoi
 - Browser retry after kernel reset still fails before opening a tab: Windows sandbox helper setup refresh error. Interactive local gate NOT_VERIFIED. Continue independent source processing; preserve final exact-head Preview gate.
 - Next: read C01 chapter02 in full, extend same snapshot with exact quoted evidence; progress chronologically through chapter10. Then C02, scoped search, source review and CI/Preview.
 - No main merge or Production operation.
+
+## C01 chapters02–03 checkpoint
+- Full bodies read: chapters01–03, including separately retrieved truncated chapter03 night segment. 21 documents,29 relations. RAW/body validation PASS3 tests.
+- Actual family reunion, south shelter move, medical-center arrival and car recovery distinguished from plans and reports. No vehicle return to shelter inferred at chapter03 end.
+- Read-only source re-review agent c01_source_review audits chapters01–03; this is not human approval.
+- Draft PR478 created/attached at head62320ad2c71311b4aaa6b27122e9e9d3e02a38ac. Remains Draft/incomplete. No merge or Production.
+- Next: chapter04 full read and same snapshot extension; remaining C01 chapters04–10, C02all, scoped search/final browser gate pending.

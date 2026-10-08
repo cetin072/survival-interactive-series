@@ -4,7 +4,7 @@
   "worldlineId": "CANON-V2",
   "publication": "PREVIEW_ONLY",
   "coverage": "PARTIAL",
-  "notice": "공개 Reader 기록을 바탕으로 정리한 위키 검수 후보입니다. 현재 첫 장을 다뤘으며, 작품 전체의 설정이나 독립적인 검증을 보장하지 않습니다.",
+  "notice": "공개 Reader 기록을 바탕으로 정리한 위키 검수 후보입니다. 현재 공개 장 중 3장을 다뤘으며, 작품 전체의 설정이나 독립적인 검증을 보장하지 않습니다.",
   "bookSha256": "98235add2392dc66591e26772aa07fb2c45f60b2ecb609ff1a36be4837f290c3",
   "chapters": [
     {
@@ -12,6 +12,18 @@
       "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
       "status": "REVIEWED",
       "note": "첫 장 전체를 읽고 실제 행동·상태와 진술·계획을 구분했다. 시청역 합류와 농로 통과는 실행 확정 사실에서 제외했다."
+    },
+    {
+      "chapterId": "c01-han-junho-chapter-02",
+      "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+      "status": "REVIEWED",
+      "note": "제2장 전체를 읽었다. 실제 후퇴·가족 합류·임시 대피 등록·집 회수 포기를 기록하고, 종합운동장 방문과 남쪽 분산 이동은 실행된 것으로 기록하지 않았다. 전력 이상 원인은 미확정이며 병원 연료 이야기는 전언으로 구분했다."
+    },
+    {
+      "chapterId": "c01-han-junho-chapter-03",
+      "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+      "status": "REVIEWED",
+      "note": "제3장 전체를 읽고 도구 출력에서 잘린 23:46~05:50 구간도 별도로 읽었다. 실제 남쪽 체육관·서윤 의료원 도착·차량 회수는 기록했다. 새벽 직원 대화, 주유소 전면 공급중단, 회수 차량의 대피소 귀환, 소방차 이동 원인은 확정하지 않았다."
     }
   ],
   "nodes": [
@@ -28,6 +40,42 @@
             "chapterId": "c01-han-junho-chapter-01",
             "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
             "quote": "- **준호** — 민석 역까지 도보 약 15분\n- **민석** — 역 내부 대기\n- **서윤** — 병원 잔류\n- **정호** — 농로 장애물 앞, 연기 악화"
+          }
+        },
+        {
+          "text": "제2장에서 민석과 구청 광장에서 합류하고, 이후 학교 체육관에서 정호까지 만나 세 사람이 모인다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-02",
+            "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+            "quote": "정호가 북쪽을 한번 바라본다.\n\n“내 집은 오늘 다시 못 들어가겠구나.”\n\n그 말은 담담하지만 무겁다.\n\n세 사람은 처음으로 한곳에 모였다."
+          }
+        },
+        {
+          "text": "제2장에서 가족이 다시 흩어지는 위험을 피하려고 그날의 집 물자 회수를 포기한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-02",
+            "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+            "quote": "준호가 결정을 내린다.\n\n“오늘은 집 안 간다.”\n\n민석이 바로 묻는다.\n\n“진짜?”\n\n“응. 지금은 물건보다 우리가 안 흩어지는 게 더 중요해.”"
+          }
+        },
+        {
+          "text": "제3장에서 가족 셋과 남쪽 실내체육관으로 옮겨 쉬고, 다음 날 버스와 도보로 자기 차량을 찾아 회수한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "차량은 회수했다.\n\n이제 선택은 **차를 얻는 문제**가 아니라 **차를 어떻게 보존하고 가족에게 가져갈 것인가**다."
+          }
+        },
+        {
+          "text": "차량 발견 시 시동은 정상이고 연료는 약 58%였지만 대피소로 돌아가는 주요 경로들은 막혀 있었다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "**시동 정상.**\n\n연료계:\n\n### 약 58%"
           }
         }
       ]
@@ -55,6 +103,42 @@
             "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
             "quote": "- 서윤 — 병원 비상전원 가동\n- 정호 — 연기 낀 농로, 장애물 앞"
           }
+        },
+        {
+          "text": "제2장 끝에도 병원에 남아 있다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-02",
+            "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+            "quote": "- 준호·민석·정호: 학교 대피소\n- 서윤: 병원 잔류"
+          }
+        },
+        {
+          "text": "제2장에서 병원 비상전원 연료 상태를 확인하라는 말이 돌고 있다고 준호에게 전한다.",
+          "kind": "REPORTED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-02",
+            "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+            "quote": "“병원에서 **비상전원 연료 상태 확인하라는 말이 돌고 있어.**”"
+          }
+        },
+        {
+          "text": "제3장에서 환자 이동 차량으로 병원을 떠나 남동쪽 의료원에 도착한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "서윤의 위치가 처음으로 고정된다.\n\n가족 네 명 모두 당장 위험지역을 벗어난 상태다."
+          }
+        },
+        {
+          "text": "다음 날 아침에는 환자와 의료진 중심의 의료원이므로 가족이 자유롭게 들어올 수 있을지 모른다고 설명한다.",
+          "kind": "REPORTED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "“여기는 환자랑 의료진 중심으로 운영되고 있어. 보호자도 제한하는 분위기야. 당신들이 와도 안으로 들어올 수 있을지 모르겠어.”"
+          }
         }
       ]
     },
@@ -81,6 +165,33 @@
             "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
             "quote": "- 민석 — 지하철역 비상조명 아래 대기\n- 준호 — 신호등 꺼진 교차로 정체"
           }
+        },
+        {
+          "text": "제2장에서 구청 광장 앞에서 준호를 발견해 합류한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-02",
+            "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+            "quote": "그리고 맞은편 횡단보도 쪽에서 민석이 보인다.\n\n가방을 멘 채 휴대전화를 들고 서 있다.\n\n민석도 나를 발견한다.\n\n손을 든다.\n\n**처음으로 가족 한 명과 합류했다.**"
+          }
+        },
+        {
+          "text": "제3장에서 가족 상황 기록을 맡아 확인된 정보와 원인 미확인 정보를 구분한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "“확정된 의미는 없어. 그냥 본 사실만 적어.”\n\n민석이 고개를 끄덕이고 옆에 표시한다.\n\n> **원인 미확인**"
+          }
+        },
+        {
+          "text": "준호가 차량을 회수하는 동안 정호와 남쪽 대피소에 남는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "- 준호 — 차량 회수 성공\n- 연료 약 58%\n- 민석·정호 — 남쪽 대피소\n- 서윤 — 남동쪽 의료원"
+          }
         }
       ]
     },
@@ -106,6 +217,24 @@
             "chapterId": "c01-han-junho-chapter-01",
             "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
             "quote": "- **준호** — 민석 역까지 도보 약 15분\n- **민석** — 역 내부 대기\n- **서윤** — 병원 잔류\n- **정호** — 농로 장애물 앞, 연기 악화"
+          }
+        },
+        {
+          "text": "제2장에서 농로 끝의 위험을 벗어난 뒤 차량을 두고 이동하며, 학교 체육관에서 준호·민석과 합류한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-02",
+            "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+            "quote": "정호가 사람들 사이로 들어온다.\n\n얼굴과 옷에 연기 냄새가 배어 있다.\n\n하지만 걸음은 안정적이다."
+          }
+        },
+        {
+          "text": "제3장에서 산불 대피 중 본 연기·정전·소방차 이동을 회상한다. 소방차 이동의 의미는 확정되지 않았다.",
+          "kind": "REPORTED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "“소방차가 처음엔 산 쪽으로 계속 올라갔는데, 나중엔 몇 대가 반대로 내려오더라.”\n\n그게 철수였는지, 재배치였는지는 알 수 없다."
           }
         }
       ]
@@ -157,6 +286,15 @@
             "chapterId": "c01-han-junho-chapter-01",
             "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
             "quote": "정호(아버지)는 외곽 집에 혼자 있다.  \n그 집 뒤쪽은 낮은 산과 밭으로 이어진다."
+          }
+        },
+        {
+          "text": "제3장 아침에는 정호 집 주변이 주민 복귀 제한 대상 지역으로 남아 있다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "정호 집은 훨씬 명확하다.\n\n현재도 주민 복귀 제한 대상 지역이다."
           }
         }
       ]
@@ -217,6 +355,256 @@
             "chapterId": "c01-han-junho-chapter-01",
             "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
             "quote": "- **준호** — 민석 역까지 도보 약 15분\n- **민석** — 역 내부 대기\n- **서윤** — 병원 잔류\n- **정호** — 농로 장애물 앞, 연기 악화"
+          }
+        },
+        {
+          "text": "제2장에서 정호는 농로 끝에 갇히는 위험에서는 벗어나지만, 이 시점에는 아직 대피가 끝나지 않았다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-02",
+            "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+            "quote": "정호는 아직 탈출하지 못했다.\n\n하지만 적어도 농로 끝에 갇히는 위험에서는 벗어났다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-district-plaza",
+      "type": "location",
+      "title": "구청 앞 광장",
+      "subtitle": "준호와 민석의 첫 합류 지점",
+      "facts": [
+        {
+          "text": "제2장에서 공공 안내와 차량 통제가 이루어지는 광장으로, 준호와 민석이 처음 합류한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-02",
+            "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+            "quote": "구청 광장이 보인다.\n\n사람들이 삼삼오오 모여 있다.\n\n공무원으로 보이는 사람들이 확성기로 안내하고 있고,\n경찰은 차량을 광장 안쪽으로 못 들어오게 막고 있다.\n\n그리고 맞은편 횡단보도 쪽에서 민석이 보인다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-river-bridge",
+      "type": "location",
+      "title": "하천 체육공원 인근 다리",
+      "subtitle": "보행 통제로 가족의 합류가 막힌 곳",
+      "facts": [
+        {
+          "text": "제2장에서 준호·민석과 정호가 다리 양쪽에 있고 경찰의 보행 통제가 진행된다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-02",
+            "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+            "quote": "- 준호 + 민석 — 다리 남쪽\n- 정호 — 다리 북쪽\n- 거리상으로는 매우 가까움\n- 경찰이 보행 통제 중"
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-school-gym",
+      "type": "location",
+      "title": "고등학교 체육관 대피소",
+      "subtitle": "고유 학교명 미확인 · 세 가족의 임시 기준점",
+      "facts": [
+        {
+          "text": "제2장에서 준호와 민석이 등록하고 들어간 임시 대피시설이다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-02",
+            "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+            "quote": "준호와 민석은 체육관 입구에서 대피 등록을 한다.\n\n이름, 연락처, 가족 수를 적고 안으로 들어간다."
+          }
+        },
+        {
+          "text": "제2장 끝에는 준호·민석·정호가 이 학교 대피소에 머문다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-02",
+            "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+            "quote": "- 준호·민석·정호: 학교 대피소\n- 서윤: 병원 잔류"
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-family-apartment",
+      "type": "location",
+      "title": "가족의 도심 아파트",
+      "subtitle": "제2장에서 물자 회수를 포기한 집",
+      "facts": [
+        {
+          "text": "제2장에는 직접 대피구역에 포함되지 않았지만 가족의 생활물자가 있는 집으로 기록된다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-02",
+            "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+            "quote": "- 아파트는 아직 직접 대피구역 아님\n- 집에는 생활물자 존재"
+          }
+        },
+        {
+          "text": "그날 밤 집으로 돌아가는 물자 회수는 포기한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-02",
+            "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+            "quote": "준호가 결정을 내린다.\n\n“오늘은 집 안 간다.”"
+          }
+        },
+        {
+          "text": "제3장 아침에는 의무 대피지역에 포함되지 않았지만 전력과 건물 피해 상태는 확정되지 않았다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "현재 아파트가 있는 동은 여전히 **의무 대피지역에 포함되지 않았다.**\n\n전력 상태는 불명확하다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-school-reunion",
+      "type": "event",
+      "title": "학교 대피소에서 세 가족 합류",
+      "subtitle": "준호·민석·정호 합류 · 서윤은 병원 잔류",
+      "facts": [
+        {
+          "text": "제2장에서 정호가 체육관에 도착하며 준호·민석과 한곳에 모인다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-02",
+            "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+            "quote": "정호가 북쪽을 한번 바라본다.\n\n“내 집은 오늘 다시 못 들어가겠구나.”\n\n그 말은 담담하지만 무겁다.\n\n세 사람은 처음으로 한곳에 모였다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-home-recovery-abandoned",
+      "type": "event",
+      "title": "첫날 집 물자 회수 포기",
+      "subtitle": "가족이 흩어지지 않는 것을 우선한 결정",
+      "facts": [
+        {
+          "text": "제2장에서 준호는 집 물자보다 가족이 흩어지지 않는 것이 중요하다고 말하며 귀가를 포기한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-02",
+            "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+            "quote": "준호가 결정을 내린다.\n\n“오늘은 집 안 간다.”\n\n민석이 바로 묻는다.\n\n“진짜?”\n\n“응. 지금은 물건보다 우리가 안 흩어지는 게 더 중요해.”"
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-south-gym",
+      "type": "location",
+      "title": "남쪽 실내체육관 대피소",
+      "subtitle": "학교 대피소에서 분산 이동한 가족의 거점",
+      "facts": [
+        {
+          "text": "제3장에서 준호·민석·정호가 학교를 떠나 버스로 도착한 더 큰 대피시설이다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "새 대피소는 첫 학교보다 훨씬 크다.\n\n하지만 이곳도 이미 사람이 많다.\n\n입구에서 다시 등록하고 가족 셋이 자리를 배정받는다."
+          }
+        },
+        {
+          "text": "식수·식사·충전 구역과 기본 응급 지원이 있으나 장시간 비상전원 운영 가능 여부는 공개되지 않았다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "- 생수 배급 있음\n- 간단한 식사 준비 중\n- 기본 응급처치 인력 있음\n- 만성질환 약은 개인 지참분 우선\n- 휴대전화 충전 구역 운영\n- 추가 이동 여부는 아직 미정\n- 비상전원은 가동 가능하지만 장시간 운영 가능 여부는 공개되지 않음"
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-southeast-medical",
+      "type": "location",
+      "title": "남동쪽 의료원",
+      "subtitle": "서윤이 환자 전원 뒤 머무는 의료시설",
+      "facts": [
+        {
+          "text": "제3장 끝에서 서윤이 머무는 시설로 기록된다. 실제 고유 의료원명은 공개 장에 명시되지 않는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "- 준호 — 차량 회수 성공\n- 연료 약 58%\n- 민석·정호 — 남쪽 대피소\n- 서윤 — 남동쪽 의료원"
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-south-shelter-move",
+      "type": "event",
+      "title": "남쪽 실내체육관 분산 이동",
+      "subtitle": "준호·민석·정호의 버스 이동",
+      "facts": [
+        {
+          "text": "제3장에서 세 사람은 대피버스를 타고 학교 체육관을 떠난다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "준호, 민석, 정호가 버스에 오른다.\n\n좌석은 거의 다 찬다."
+          }
+        },
+        {
+          "text": "남쪽 대형 대피소에 도착해 다시 등록하고 자리를 배정받는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "입구에서 다시 등록하고 가족 셋이 자리를 배정받는다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-contact-rules",
+      "type": "event",
+      "title": "통신 두절 시 가족 규칙 합의",
+      "subtitle": "무리한 합류 대신 공식 지시와 위치 확인",
+      "facts": [
+        {
+          "text": "제3장에서 준호와 서윤은 통신이 끊겨도 공식 이동 지시를 따르고 무리하게 서로를 찾으러 가지 않기로 합의한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "최소한 이제 통신이 완전히 끊겨도  \n서로 상대가 무엇을 할지 기본 원칙은 알고 있다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-car-recovery",
+      "type": "event",
+      "title": "준호 차량 회수",
+      "subtitle": "제3장 말미 회수 성공 · 귀환은 아직 미완료",
+      "facts": [
+        {
+          "text": "준호는 제한 운행 버스를 이용한 뒤 걸어서 세워둔 차량을 찾고 시동과 외관을 확인한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "문 정상.\n\n타이어 정상.\n\n차량 내부도 그대로다.\n\n시동을 건다.\n\n**시동 정상.**"
+          }
+        },
+        {
+          "text": "차량 회수에는 성공했지만 제3장 끝에는 가족이 있는 대피소로 귀환하기 전이다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-03",
+            "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+            "quote": "- 준호 — 차량 회수 성공\n- 연료 약 58%\n- 민석·정호 — 남쪽 대피소\n- 서윤 — 남동쪽 의료원"
           }
         }
       ]
@@ -311,6 +699,206 @@
         "chapterId": "c01-han-junho-chapter-01",
         "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
         "quote": "- **준호** — 민석 역까지 도보 약 15분\n- **민석** — 역 내부 대기\n- **서윤** — 병원 잔류\n- **정호** — 농로 장애물 앞, 연기 악화"
+      }
+    },
+    {
+      "from": "char-junho",
+      "to": "loc-district-plaza",
+      "label": "제2장 · 민석과 첫 합류",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-02",
+        "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+        "quote": "그리고 맞은편 횡단보도 쪽에서 민석이 보인다.\n\n가방을 멘 채 휴대전화를 들고 서 있다.\n\n민석도 나를 발견한다.\n\n손을 든다.\n\n**처음으로 가족 한 명과 합류했다.**"
+      }
+    },
+    {
+      "from": "char-junho",
+      "to": "loc-school-gym",
+      "label": "제2장 · 대피소에서 합류",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-02",
+        "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+        "quote": "- 준호·민석·정호: 학교 대피소\n- 서윤: 병원 잔류"
+      }
+    },
+    {
+      "from": "char-minseok",
+      "to": "loc-school-gym",
+      "label": "제2장 · 대피소에서 합류",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-02",
+        "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+        "quote": "- 준호·민석·정호: 학교 대피소\n- 서윤: 병원 잔류"
+      }
+    },
+    {
+      "from": "char-jeongho",
+      "to": "loc-school-gym",
+      "label": "제2장 · 대피소에서 합류",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-02",
+        "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+        "quote": "- 준호·민석·정호: 학교 대피소\n- 서윤: 병원 잔류"
+      }
+    },
+    {
+      "from": "char-junho",
+      "to": "event-school-reunion",
+      "label": "제2장 · 가족 셋 합류",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-02",
+        "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+        "quote": "- **준호 + 민석 + 정호 합류 완료**\n- 서윤은 병원"
+      }
+    },
+    {
+      "from": "char-minseok",
+      "to": "event-school-reunion",
+      "label": "제2장 · 가족 셋 합류",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-02",
+        "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+        "quote": "- **준호 + 민석 + 정호 합류 완료**\n- 서윤은 병원"
+      }
+    },
+    {
+      "from": "char-jeongho",
+      "to": "event-school-reunion",
+      "label": "제2장 · 가족 셋 합류",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-02",
+        "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+        "quote": "- **준호 + 민석 + 정호 합류 완료**\n- 서윤은 병원"
+      }
+    },
+    {
+      "from": "event-school-reunion",
+      "to": "loc-school-gym",
+      "label": "학교 대피소의 가족 합류",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-02",
+        "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+        "quote": "- 준호·민석·정호: 학교 대피소\n- 서윤: 병원 잔류"
+      }
+    },
+    {
+      "from": "char-junho",
+      "to": "event-home-recovery-abandoned",
+      "label": "제2장 · 귀가 포기 결정",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-02",
+        "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+        "quote": "준호가 결정을 내린다.\n\n“오늘은 집 안 간다.”"
+      }
+    },
+    {
+      "from": "event-home-recovery-abandoned",
+      "to": "loc-family-apartment",
+      "label": "제2장 · 물자 회수 대상에서 제외",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-02",
+        "bodySha256": "0461ecc5d6169523f17e0cc1711f852143a1cbac0c05ae885423f2d8b45a66d3",
+        "quote": "아파트에 있는 물자, 옷, 약, 충전기, 생활용품.\n\n아깝다.\n\n하지만 지금 들어갔다가 대피구역이 더 넓어지면, 세 사람이 다시 갈라질 수 있다."
+      }
+    },
+    {
+      "from": "char-junho",
+      "to": "event-south-shelter-move",
+      "label": "제3장 · 대피버스 탑승",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-03",
+        "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+        "quote": "준호, 민석, 정호가 버스에 오른다.\n\n좌석은 거의 다 찬다."
+      }
+    },
+    {
+      "from": "char-minseok",
+      "to": "event-south-shelter-move",
+      "label": "제3장 · 대피버스 탑승",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-03",
+        "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+        "quote": "준호, 민석, 정호가 버스에 오른다.\n\n좌석은 거의 다 찬다."
+      }
+    },
+    {
+      "from": "char-jeongho",
+      "to": "event-south-shelter-move",
+      "label": "제3장 · 대피버스 탑승",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-03",
+        "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+        "quote": "준호, 민석, 정호가 버스에 오른다.\n\n좌석은 거의 다 찬다."
+      }
+    },
+    {
+      "from": "event-south-shelter-move",
+      "to": "loc-south-gym",
+      "label": "남쪽 대피소 도착",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-03",
+        "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+        "quote": "- **준호·민석·정호** — 남쪽 대형 대피소 도착\n- **서윤** — 병원, 이동 준비 시작"
+      }
+    },
+    {
+      "from": "char-minseok",
+      "to": "loc-south-gym",
+      "label": "제3장 끝 · 준호 회수 중 대기",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-03",
+        "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+        "quote": "- 준호 — 차량 회수 성공\n- 연료 약 58%\n- 민석·정호 — 남쪽 대피소\n- 서윤 — 남동쪽 의료원"
+      }
+    },
+    {
+      "from": "char-jeongho",
+      "to": "loc-south-gym",
+      "label": "제3장 끝 · 준호 회수 중 대기",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-03",
+        "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+        "quote": "- 준호 — 차량 회수 성공\n- 연료 약 58%\n- 민석·정호 — 남쪽 대피소\n- 서윤 — 남동쪽 의료원"
+      }
+    },
+    {
+      "from": "char-seoyun",
+      "to": "loc-southeast-medical",
+      "label": "제3장 · 의료원 도착·잔류",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-03",
+        "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+        "quote": "- 준호 — 차량 회수 성공\n- 연료 약 58%\n- 민석·정호 — 남쪽 대피소\n- 서윤 — 남동쪽 의료원"
+      }
+    },
+    {
+      "from": "char-junho",
+      "to": "event-contact-rules",
+      "label": "제3장 · 통신 두절 규칙 합의",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-03",
+        "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+        "quote": "서윤의 답이 온다.\n\n> **동의.**\n\n그리고 잠시 뒤.\n\n> **당신도 나 찾으러 오지 마.**\n\n준호가 짧게 답한다.\n\n> 알겠어."
+      }
+    },
+    {
+      "from": "char-seoyun",
+      "to": "event-contact-rules",
+      "label": "제3장 · 통신 두절 규칙 합의",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-03",
+        "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+        "quote": "서윤의 답이 온다.\n\n> **동의.**\n\n그리고 잠시 뒤.\n\n> **당신도 나 찾으러 오지 마.**\n\n준호가 짧게 답한다.\n\n> 알겠어."
+      }
+    },
+    {
+      "from": "char-junho",
+      "to": "event-car-recovery",
+      "label": "제3장 · 차량 회수 성공",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-03",
+        "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
+        "quote": "- 준호 — 차량 회수 성공\n- 연료 약 58%\n- 민석·정호 — 남쪽 대피소\n- 서윤 — 남동쪽 의료원"
       }
     }
   ]
