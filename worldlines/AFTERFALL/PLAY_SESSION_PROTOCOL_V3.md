@@ -4,7 +4,7 @@ Status: **AUTHORITATIVE OPERATING POLICY**
 Chronicle: **03 / AFTERFALL / 서진우**  
 Supersedes: `PLAY_SESSION_PROTOCOL_V2.md` for live transcript capture  
 Database API:
-- `survival_rpg.open_public_transcript_session`
+- `survival_rpg.open_public_transcript_session_with_archive_intent` — atomic room open + pending continuity intent; legacy open remains available to existing callers
 - `survival_rpg.append_public_transcript_turn` — default fast RAW pair writer for routine LIVE turns
 - `survival_rpg.append_public_transcript_turn_with_state_link` — use when the turn already has a meaningful durable state mutation/version outcome
 - `survival_rpg.append_public_transcript_message` — recovery/meta primitive only
@@ -81,12 +81,64 @@ no valid OPEN session exists:
 3. if a stale OPEN session belongs to an earlier room, close it without
    rewriting its rows;
 4. generate one fresh session UUID;
-5. call `open_public_transcript_session(...)`;
+5. call `open_public_transcript_session_with_archive_intent(...)` with the
+   pending intent described below;
 6. retain the session UUID and `last_message_order`.
 
 A session created under v2 with broken USER/GM ordering must not be repaired by
 inventing the missing USER message. Close it as incomplete and start a new
 session.
+
+### A-Core V2 room intent
+
+Use the existing trusted Supabase connector and the additive RPC:
+
+`survival_rpg.open_public_transcript_session_with_archive_intent`
+
+Its parameters are `p_session_id`, `p_worldline_id`, `p_chronicle_id`,
+`p_season_id`, `p_archive_intent`, then optional `p_starting_save_version`,
+`p_starting_game_time`, `p_starting_scene_id`. Resolve identity and starting
+values from the latest live Runtime, not the historical S03 save-285 boot anchor.
+Do not rewind already played S04 or generate a game turn for Archive setup.
+
+Supply only pending continuity metadata in `p_archive_intent`:
+
+| Field | Value / source |
+| --- | --- |
+| `version` | `1` |
+| `disposition`, `publication` | both `REVIEW_REQUIRED` |
+| `history` | `NEW_CAPTURE` for a newly opened room |
+| `initial_order` | `0` for its fresh UUID |
+| `kind` | `CONTINUE` for a normal room move in the same season; `NEW_SEASON` or `RESTART` only for the actual explicit transition |
+| `predecessor_id` | UUID of the actual previous capture session from the handoff and live DB; never inferred from UUID/date sorting |
+| `evidence_ref` | existing relevant repository Issue/PR URL documenting that continuity; a URL is evidence, never approval |
+
+For a normal room move, verify the predecessor's C03 / AFTERFALL / same-season
+identity and pair-valid tail, close that previous room using the existing close
+RPC, then open one fresh UUID with `CONTINUE`. If continuity is missing or
+ambiguous, stop this boot registration for review; do not guess a predecessor,
+declare a restart, or reopen the superseded S04 introduction.
+
+Room close is not season completion. The open wrapper registers no public
+approval and writes no gameplay, Save, Canon, Reader or GitHub content. Invalid
+intent rolls back the open in the same transaction. On an ambiguous response,
+inspect the exact UUID and intent before retrying the same payload; do not
+generate another UUID or overwrite an existing intent.
+
+The existing discovery policy can inherit an approved same-season continuation
+only after that CLOSED predecessor is fully published through its actual tail,
+with `allow_continuation=true` and valid protected approval/Reader continuity.
+Until then it waits for the predecessor backlog. `NEW_SEASON`, `RESTART`,
+legacy, missing or mismatched metadata still require operator review. Never
+write `ADOPTED` / `APPROVED` as Runtime intent or call the operator approval
+RPC with a service credential. Per-turn pair capture below is unchanged.
+
+The DB wrapper and approval boundary are defined on main by
+`supabase/migrations/20261008053006_archive_source_intent_v2.sql` and verified
+with synthetic rows in `supabase/tests/archive_source_intent_v2_verification.sql`.
+This connection does not switch the regular Archive schedule to V2; that remains
+a separate operator-approved step. A future real room boot is not yet proven by
+the synthetic wrapper and discovery tests.
 
 ## 6. Atomic normal-turn capture
 
