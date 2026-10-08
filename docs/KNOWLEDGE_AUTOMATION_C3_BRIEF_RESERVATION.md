@@ -33,3 +33,9 @@ Main: bf49a49e0966beef2d8442d33a4540945280491b.
 The candidate migration was exercised in a rolled-back transaction against existing job identities. Valid K-016/K-018 bindings passed; wrong target, wrong digest and new duplicate reservations were rejected. Existing retry rejected the occupied K-019 slot. No persistent Job or review mutation occurred.
 
 Worker ID: 6abe754980a88191986e041b52181e7d. This session could not read the ChatGPT task because browser initialization failed. Current enabled state, updated_at, prompt, schedule and last/next execution are UNVERIFIED. OFF cause is CAUSE_NOT_VERIFIED. No schedule or Worker was created/modified.
+
+## Applied DB guard and verified preview
+
+The forward reservation migration was applied to project jgsxpdflgkqroecfjzxq after the isolated DB CI passed. Live receipt: 20261008234315 (knowledge_brief_reservation_contract). The installed read-only verification RPC returned VALID for the original K-016 and K-018. This changes the reservation guard, not their Job status, submitted result, review history or policy.
+
+Draft PR #480 supplies the Finalizer code. At initial code HEAD 5c4e630f7fb7fab91df48ae75a50c7fa763fd49d, all applicable checks passed, including Knowledge and knowledge-db-contract. Deploy Preview metadata matched this commit; Knowledge index and sitemap returned 200 and omitted unpublished K-015/K-016/K-018/K-019. Code deployment still awaits approved main merge.
