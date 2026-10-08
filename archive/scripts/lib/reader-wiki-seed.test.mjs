@@ -73,5 +73,23 @@ test('build validates RAW scope and bytes; production excludes all candidates; c
 test('actual snapshots validate in Preview and never enter Production',async()=>{
   const seeds=await loadReaderWikiSeeds(undefined,{allowPreview:true})
   assert.ok(seeds.some(s=>s.chronicleId==='C01-HAN-JUNHO'))
+  assert.ok(seeds.some(s=>s.chronicleId==='C02-STRONGHOLD'))
   assert.deepEqual(await loadReaderWikiSeeds(undefined,{allowPreview:false}),[])
 })
+
+test('canonical source refs must match the allowed archive mapping, not an arbitrary path', async () => {
+  const base=await mkdtemp(resolve(tmpdir(),'reader-wiki-mapping-')); const f=fixture();
+  f.book.chapters[0].sourceRefs=['original/C04.md']; f.bytes=Buffer.from(JSON.stringify(f.book)); f.seed.bookSha256=byteHash(f.bytes);
+  try {
+    await mkdir(resolve(base,'archive/content/wiki',f.seed.chronicleId),{recursive:true});
+    await mkdir(resolve(base,'archive/content/stories',f.seed.chronicleId),{recursive:true});
+    await mkdir(resolve(base,'public'),{recursive:true});
+    await writeFile(resolve(base,'archive/content/wiki',f.seed.chronicleId,'SEED.json'),JSON.stringify(f.seed));
+    await writeFile(resolve(base,'archive/content/stories',f.seed.chronicleId,'BOOK.json'),f.bytes);
+    await writeFile(resolve(base,f.book.chapters[0].archiveSourceRefs[0]),body);
+    const catalog={ [f.seed.chronicleId]:[{archivePath:f.book.chapters[0].archiveSourceRefs[0],canonicalRef:'original/C04.md'}] };
+    assert.equal((await loadReaderWikiSeeds(base,{catalog})).length,1);
+    catalog[f.seed.chronicleId][0].canonicalRef='private/other-world.md';
+    await assert.rejects(loadReaderWikiSeeds(base,{catalog}),/RAW_REFS/);
+  } finally {await rm(base,{recursive:true,force:true})}
+});

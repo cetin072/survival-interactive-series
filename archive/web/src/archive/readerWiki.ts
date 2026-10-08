@@ -21,8 +21,8 @@ export function buildReaderWikiDocuments(seed: ReaderWikiSeed, chapters: ReaderC
     const cited = ownChapters.filter((chapter) => ids.has(chapter.id)).sort((a,b) => a.chapterNumber - b.chapterNumber)
     if (cited.length !== ids.size || !cited.length) throw new Error('Reader Wiki chapter scope mismatch')
     const latest = cited.at(-1)!
-    const sources = cited.flatMap((chapter) => chapter.archiveSourceRefs.map((ref) => {
-      const part = parts.find((item) => item.source === ref)
+    const sources = cited.flatMap((chapter) => chapter.archiveSourceRefs.map((ref, index) => {
+      const part = parts.find((item) => item.source === (chapter.sourceRefs[index] ?? ref))
       if (!part) throw new Error('Reader Wiki RAW link missing: ' + seed.chronicleId)
       return { chapterId: chapter.id, chapterTitle: chapter.title, partId: part.id, partTitle: part.title, archiveSourceRef: ref }
     }))

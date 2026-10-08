@@ -10,8 +10,8 @@ const fixture = (id: string) => {
     {id:'char-mira',type:'character',title:'Mira '+id,subtitle:'Fixture',facts:[{text:'Mira waits.',kind:'RECORDED',evidence}]},
     {id:'loc-gate',type:'location',title:'Gate '+id,subtitle:'Fixture',facts:[{text:'Northern gate.',kind:'RECORDED',evidence}]},
   ],relations:[{from:'char-mira',to:'loc-gate',label:'waits at',evidence}]}
-  const chapter = {id:'chapter-shared',chronicleId:id,chapterNumber:1,title:'Chapter '+id,archiveSourceRefs:['public/'+id+'.md','public/'+id+'-second.md']} as ReaderChapter
-  const parts = [{id:'part-one',title:'RAW '+id,source:'public/'+id+'.md'},{id:'part-two',title:'Second RAW '+id,source:'public/'+id+'-second.md'}]
+  const chapter = {id:'chapter-shared',chronicleId:id,chapterNumber:1,title:'Chapter '+id,sourceRefs:['original/'+id+'.md','original/'+id+'-second.md'],archiveSourceRefs:['public/'+id+'.md','public/'+id+'-second.md']} as ReaderChapter
+  const parts = [{id:'part-one',title:'RAW '+id,source:'original/'+id+'.md'},{id:'part-two',title:'Second RAW '+id,source:'original/'+id+'-second.md'}]
   return {seed,chapter,parts}
 }
 describe('Reader Wiki shared contract and source identity',()=>{
@@ -48,3 +48,13 @@ describe('Reader Wiki shared contract and source identity',()=>{
     expect(renderToStaticMarkup(createElement(WikiShellPreview,{chronicleId:'C02-STRONGHOLD',nodeId:'char-junho'}))).toContain('세계관 문서를 찾을 수 없습니다')
   })
 })
+
+ it('links both actual C02 chapter-one RAW parts using canonical source mapping',()=>{
+   const document=readerWikiDocuments('C02-STRONGHOLD').find(item=>item.id==='char-dohyun')!;
+   const sources=document.sources.filter(s=>s.chapterId==='c02-stronghold-chapter-01');
+   expect(sources).toHaveLength(2); expect(new Set(sources.map(s=>s.partId)).size).toBe(2);
+   const markup=renderToStaticMarkup(createElement(WikiShellPreview,{chronicleId:'C02-STRONGHOLD',nodeId:document.id}));
+   expect(markup).toContain('chronicle=C02-STRONGHOLD&amp;chapter=c02-stronghold-chapter-01');
+   expect(markup).toContain('chronicle=C02-STRONGHOLD&amp;part=');
+   expect(markup).not.toContain('node=char-jinwoo'); expect(markup).not.toContain('wiki-visuals');
+ });

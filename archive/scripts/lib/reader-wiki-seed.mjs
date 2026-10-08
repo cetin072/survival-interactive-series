@@ -74,13 +74,17 @@ export async function loadReaderWikiSeeds(base = root, { allowPreview = process.
     const book = JSON.parse(bookBytes)
     insist(seed.chronicleId === entry.name, 'FOLDER_SCOPE')
     validateReaderWikiSeed(seed, book, bookBytes)
-    const publicPaths = new Set((catalog[entry.name] ?? []).map((part) => part.archivePath))
+    const publicParts = catalog[entry.name] ?? []
+    const publicPaths = new Set(publicParts.map((part) => part.archivePath))
     for (const row of seed.chapters) {
       const chapter = book.chapters.find((item) => item.id === row.chapterId)
       insist(Array.isArray(chapter.archiveSourceRefs) && chapter.archiveSourceRefs.length === chapter.sourceHashes.length
-        && chapter.sourceHashes.length > 0 && chapter.sourceRefs.every((ref) => chapter.archiveSourceRefs.includes(ref)), 'RAW_REFS')
+        && chapter.sourceHashes.length > 0 && Array.isArray(chapter.sourceRefs)
+        && chapter.sourceRefs.length === chapter.archiveSourceRefs.length, 'RAW_REFS')
       for (const [index, ref] of chapter.archiveSourceRefs.entries()) {
         insist(publicPaths.has(ref), 'RAW_SCOPE')
+        insist(publicParts.some((part) => part.archivePath === ref
+          && (part.canonicalRef ?? part.archivePath) === chapter.sourceRefs[index]), 'RAW_REFS')
         insist(byteHash(await readFile(resolve(base, ref))) === chapter.sourceHashes[index], 'RAW_CHANGED')
       }
     }

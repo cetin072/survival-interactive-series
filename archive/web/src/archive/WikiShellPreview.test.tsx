@@ -100,7 +100,9 @@ describe('Wiki staged public structure', () => {
       expect(markup).toContain(hasPublishedWorldWiki(chronicleId) ? '최근 세계관 기록' : '세계관 문서 준비 중')
       expect(markup).toContain('생존기별 세계관')
       expect(markup).not.toContain('char-jinwoo')
-      expect(markup).not.toContain('node=char-seojin')
+      expect(markup).not.toContain('node=char-seojin&amp;chronicle=C03-AFTERFALL')
+      if (chronicleId === 'C01-HAN-JUNHO') expect(markup).not.toContain('node=char-seojin')
+      else expect(markup).toContain('node=char-seojin&amp;chronicle=C02-STRONGHOLD')
       expect(markup).not.toContain('node=loc-agri')
     }
   })

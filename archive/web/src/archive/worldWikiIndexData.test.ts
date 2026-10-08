@@ -14,7 +14,7 @@ describe('world Wiki Chronicle boundary', () => {
   })
 
   it('does not invent unbuilt or future world records', () => {
-    for (const id of ['C02-STRONGHOLD', 'C04-NEW-WORLD']) {
+    for (const id of ['C04-NEW-WORLD', 'C05-NEW-WORLD']) {
       expect(hasPublishedWorldWiki(id)).toBe(false)
       expect(publishedWorldWikiIndex(id)).toBeNull()
     }
@@ -26,5 +26,11 @@ describe('world Wiki Chronicle boundary', () => {
     expect(world.categories.flatMap((group) => group.items).map((item) => item.id)).not.toContain('char-jinwoo')
     expect(world.recent.every((document) => document.chronicleId === 'C01-HAN-JUNHO'
       && document.anchor.saveVersion === undefined && document.sources.length > 0)).toBe(true)
+  })
+  it('uses actual C02 candidates with their own chapters and no C01 or C03 nodes', () => {
+    const world = publishedWorldWikiIndex('C02-STRONGHOLD')!
+    expect(world.categories[0].items.map(item => item.id)).toContain('char-dohyun')
+    expect(world.categories.flatMap(group => group.items).map(item => item.id)).not.toContain('char-junho')
+    expect(world.recent.every(document => document.chronicleId === 'C02-STRONGHOLD' && document.sources.every(source => source.chapterId.startsWith('c02-')))).toBe(true)
   })
 })
