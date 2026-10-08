@@ -201,32 +201,62 @@ async function currentSourceRow(status = 'EXTRACTOR_READY') {
     prepared_job: { season_id: source.seasonId }, graph_sha256: 'f'.repeat(64) } }
 }
 
-test('prepare reconciles completed stale ledger BEFORE returning no pending source and is idempotent', async () => {
+test('prepare reconciles a completed stale ledger before admitting the next pending source and does not reconcile twice', async () => {
   const { row } = await currentSourceRow()
   let completed = false
+  let nextActive = null
   const calls = []
   const requestRpc = async (name, args) => {
     calls.push(name)
-    if (name === 'archive_a_wiki_native_job_recovery_current') return completed ? { status: 'NO_JOB' } : row
+    if (name === 'archive_a_wiki_native_job_recovery_current') {
+      if (!completed) return row
+      return nextActive ?? { status: 'NO_JOB' }
+    }
     if (name === 'archive_a_wiki_native_job_reconcile_publication') {
       assert.equal(args.p_expected_status, 'EXTRACTOR_READY')
       assert.deepEqual(args.p_evidence, { verified: true })
       completed = true
       return { status: 'PUBLISHED' }
     }
+    if (name === 'archive_a_wiki_native_job_prepare') {
+      assert.equal(args.p_job.season_id, 'S04')
+      assert.equal(args.p_job.source.session_id, 'SESSION_001')
+      nextActive = {
+        status: 'EXTRACTOR_READY',
+        job_id: 'next-job',
+        session_id: args.p_job.source.session_id,
+        source_ref: args.p_job.source.manifest_ref,
+        source_sha256: args.p_job.source.manifest_sha256,
+        prepared_job: args.p_job,
+        graph_sha256: args.p_job.graph_sha256,
+      }
+      return { status: 'EXTRACTOR_READY', job_id: 'next-job' }
+    }
     assert.fail(`Unexpected RPC ${name}`)
   }
-  let collections = 0
-  const collectCompletion = async () => { collections++; return { verified: true } }
+  let originalCollections = 0
+  const collectCompletion = async ({ row: candidate }) => {
+    if (candidate.job_id === row.job_id) {
+      originalCollections++
+      return { verified: true }
+    }
+    return null
+  }
   const first = await prepareNativeJob({ base, requestRpc, collectCompletion })
-  assert.equal(first.status, 'NO_JOB')
+  assert.equal(first.status, 'EXTRACTOR_READY')
+  assert.equal(first.job_id, 'next-job')
   assert.equal(first.reconciled_job_id, row.job_id)
   const second = await prepareNativeJob({ base, requestRpc, collectCompletion })
-  assert.equal(second.status, 'NO_JOB')
+  assert.equal(second.status, 'EXTRACTOR_READY')
+  assert.equal(second.job_id, 'next-job')
   assert.equal(second.reconciled_job_id, undefined)
-  assert.equal(collections, 1)
-  assert.deepEqual(calls, ['archive_a_wiki_native_job_recovery_current',
-    'archive_a_wiki_native_job_reconcile_publication', 'archive_a_wiki_native_job_recovery_current'])
+  assert.equal(originalCollections, 1)
+  assert.deepEqual(calls, [
+    'archive_a_wiki_native_job_recovery_current',
+    'archive_a_wiki_native_job_reconcile_publication',
+    'archive_a_wiki_native_job_prepare',
+    'archive_a_wiki_native_job_recovery_current',
+  ])
 })
 
 test('invalid receipt evidence blocks prepare without faking completion or hiding it as NO_JOB', async () => {
