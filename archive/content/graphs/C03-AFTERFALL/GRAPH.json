@@ -3636,7 +3636,7 @@
     }
   ],
   "chronicle_id": "C03-AFTERFALL",
-  "content_sha256": "0ca9ee2c9159ed37d174752c6249d82ce3523b05ea01518e6a504dd7ce88c523",
+  "content_sha256": "96e2c231689792df8249d6811d2620b12a6132508e4ada3bacbeac88628f4bc9",
   "nodes": [
     {
       "anchor": {
@@ -8469,7 +8469,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-002cb639a3d5b669cda480625bc73c330584311bb59bb51fde61d68b43ef666b",
       "node_id": "char-mira",
@@ -8489,7 +8489,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-00430b3be232d4c0f4a8b015cffe2cc2f2a90cac384371e3503c93ae76fb1fdf",
       "node_id": "loc-agri",
@@ -8510,7 +8510,7 @@
       "chapter_title": "북쪽 의원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-00478350ff96e9675946f19733906cf73803bfca339d9ac9a502250a0fee4c2e",
       "node_id": "char-hyerin",
@@ -8532,7 +8532,7 @@
       "chapter_title": "2027년 7월 13일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-011cd9732fe0783a3565e315ece5bc12471cefbf87d4d42524d9b3ca48181ed9",
       "node_id": "char-wiki-322a5a52d57198d4a6f25429",
@@ -8552,7 +8552,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-0158cd215060cd5c1b5a8e9efb0c1051d7e635dbeb650e2640a9c6eaa7365c7e",
       "node_id": "char-hajin",
@@ -8588,7 +8588,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-01a8f1330a31efe95f210d71712010163ed865facc03d25c6c2133b41594fe60",
       "node_id": "loc-bridge",
@@ -8614,7 +8614,7 @@
       "chapter_title": "다섯 거점의 선택",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-03322824387ef46b7ac2ed91848ddc837b0cf952d9005e734b15d3fb0a90ac7f",
       "node_id": "char-seojin",
@@ -8634,7 +8634,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-0370cd510c03e05635c975ec45e9b8acc055e119a61b8a9c19f5e53a0061008d",
       "node_id": "char-jisu",
@@ -8660,7 +8660,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-0496a998fca7bcb9596d150ad1dd4d68e22823a7ce7b60acc06d32b5e751b1d9",
       "node_id": "char-jinwoo",
@@ -8676,7 +8676,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-05b85af8730a27c4ad14628417c96b02ae249d61a8b2a85245ec5b9efea962e4",
       "node_id": "loc-west-road",
@@ -8696,7 +8696,7 @@
       "chapter_title": "열세 사람의 밤",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-066964b4dc0c9fadf6bd0c77e28e3d48184fbdd5cc43edec707675c439989e16",
       "node_id": "char-taehoon",
@@ -8729,7 +8729,7 @@
       "chapter_title": "열세 사람의 밤",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-08dd82570b129eb5d7063275328899771771517661105c9ed2417aab5038b9d7",
       "node_id": "char-seojin",
@@ -8756,7 +8756,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-090cee3ce5d17de513b36c6cf7c3da3f2ef66824b6166bbfc8a134d8415c6e97",
       "node_id": "char-yujin",
@@ -8783,7 +8783,7 @@
       "chapter_title": "서쪽 화재선",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-09c02eaee3b5384b396fb591dcf65ac826d78717b0526a7d91a8bd7e7d5f6ef3",
       "node_id": "char-seongho",
@@ -8812,7 +8812,7 @@
       "chapter_title": "서쪽 화재선",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-0a7a751abfd8e6f89d1d1572bf4186d29fa45f18129d2a5d4c4aa7d8c668c48b",
       "node_id": "char-hyerin",
@@ -8839,7 +8839,7 @@
       "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-0a854e5a5898db1e36357acf52da7f3f8498da339bb53e4e1614ae5e149b7b87",
       "node_id": "char-wiki-6e626c477ade25e68140f8ea",
@@ -8859,7 +8859,7 @@
       "chapter_title": "2027년 7월 13일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-0a8f1c543307d889300d2a969d3670a79ff40cb64c899efc527f55d966743605",
       "node_id": "loc-sports-complex",
@@ -8882,7 +8882,7 @@
       "chapter_title": "백운생활관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-0b457dc3bd3606ebe72bef363a521e1917cdbe75802df4863e94c38fa042a972",
       "node_id": "char-kyunghee",
@@ -8902,7 +8902,7 @@
       "chapter_title": "2027년 10월 31일 ~ 11월 4일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-0ba35d4c2287822507ca3ae4bc21b52b195368f498ed4afaeafccb51deeb1d24",
       "node_id": "char-wiki-6e626c477ade25e68140f8ea",
@@ -8922,7 +8922,7 @@
       "chapter_title": "불이 지나간 자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-0bb93765ac70af46beaecc00611551a4e6aaa47f0352394aeecbf5f66c00c2ab",
       "node_id": "char-yujin",
@@ -8952,7 +8952,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-0d45bfa4415b12d9e42d54568b0b5140ee9ce42223d466698a905ac915cd4cfa",
       "node_id": "char-hajin",
@@ -8980,7 +8980,7 @@
       "chapter_title": "실증단지의 불",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-0dd27c38994122dab1f0f6b48020a409f0a80916bfe8c615d8cb4ffa77bdf3c1",
       "node_id": "char-doyoon",
@@ -9017,7 +9017,7 @@
       "chapter_title": "동천교 바깥의 차량들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-0e8782744387e625dd87d5e4ccb1d8123818d4c8360f24b4ff84f8d6c4628d1d",
       "node_id": "char-mira",
@@ -9038,7 +9038,7 @@
       "chapter_title": "2027년 7월 13일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-0fda28f174db9871118dd72079040c4c2733ae6ee4822a37144c56dbf2af839c",
       "node_id": "char-wiki-cc15e0b3875ce0e734646be4",
@@ -9061,7 +9061,7 @@
       "chapter_title": "2027년 10월 31일 ~ 11월 4일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-0ff5fe6a6264d13de5a32738ae6c744bea2aaf4176ed65831630a9250ba0eb1e",
       "node_id": "char-seojin",
@@ -9081,7 +9081,7 @@
       "chapter_title": "두 번째 거점",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-10cb8151eaf2cfa34eb18df82c1f20a990bb5c1beb75a0dab012d10f22ae641e",
       "node_id": "loc-nw-center",
@@ -9097,7 +9097,7 @@
       "chapter_title": "열세 사람의 밤",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-11260b0ccdb82b45f278dc643b66a735e6f4565d61ceb17557c7b75c6bd3990f",
       "node_id": "char-doyoon",
@@ -9118,7 +9118,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-11d9b4710b08a9c2460d57047a49936e23864db869a6cff6ba6aebf980da4921",
       "node_id": "loc-bridge",
@@ -9141,7 +9141,7 @@
       "chapter_title": "외곽 주민복지관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-12bb1eb6e3fed1af9157a487e760e55864be7c9952ac86d133eae08f19ddf579",
       "node_id": "char-mingyu",
@@ -9164,7 +9164,7 @@
       "chapter_title": "복지관의 두 축",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-12bd4a574220ad74e7f1d756fa6785b70c1d5079ad4b0ad6fb2cf68670dc31da",
       "node_id": "loc-shelter",
@@ -9187,7 +9187,7 @@
       "chapter_title": "2027년 5월 4일 09:00",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-131677fd225978c91275851381cfcf412cea220ba2e7b2e96dae624829f3df7e",
       "node_id": "char-wiki-6e626c477ade25e68140f8ea",
@@ -9216,7 +9216,7 @@
       "chapter_title": "2027년 4월 11일 17:25",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1346ba0955626322d847da51ef44ccf602fe6c67f98a6a02041d0866f952e5a1",
       "node_id": "char-hajin",
@@ -9238,7 +9238,7 @@
       "chapter_title": "첫겨울의 아침",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-13a239dea6c010ec4fc7a992fc7fc395e22af6a6269b2b6946f6e15951538cf6",
       "node_id": "loc-shelter",
@@ -9261,7 +9261,7 @@
       "chapter_title": "첫겨울의 아침",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-14456518d21692a6ffb62ee4e9cd88b1d713f4e216a863b87bf49f9df4a0d597",
       "node_id": "char-jinwoo",
@@ -9277,7 +9277,7 @@
       "chapter_title": "정식 연합체",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-146af141b87af0848b4249db398dfb32d2efd7ebfd8dec40dea8b75646c8b90e",
       "node_id": "char-sehoon",
@@ -9297,7 +9297,7 @@
       "chapter_title": "동천교 바깥의 차량들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1562ec45be1c91ab2e0ed149360573dc543cee6c6838d188a20f8e0e7f4b263f",
       "node_id": "loc-nw-center",
@@ -9317,7 +9317,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-15f78d0e4b0331c8e7794ea64fe297ea8f359710ac41afe6133cdc77d085c520",
       "node_id": "char-mira",
@@ -9338,7 +9338,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-17349774d8b236134f0f5727dbe01ec8e58fe50fd8dc8abd47f05817d1cf040e",
       "node_id": "char-eunchae",
@@ -9359,7 +9359,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-17955dac4d5b35823331f37f2aa10f9e457cfc55f1adb277240b0d335a160f7c",
       "node_id": "char-seongho",
@@ -9382,7 +9382,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-17f09a3a1134f195eb57b0d9f7fa06f2e8d77851a147b2bb5600686566c74118",
       "node_id": "loc-shelter",
@@ -9402,7 +9402,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-188808f9834677f93452045482c1412ddb95e564b7a8ed29a615c3181deafd88",
       "node_id": "loc-baekun",
@@ -9432,7 +9432,7 @@
       "chapter_title": "북쪽 의원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-18bad42087261feb6730417b35448b6b281a99ae5562796bf824ad9ca217a626",
       "node_id": "char-cheolsu",
@@ -9452,7 +9452,7 @@
       "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-19844aa2e81ae82dc3cffb931459483e8a92fe8b4ac1b6589aeb850e298faf11",
       "node_id": "char-seongho",
@@ -9477,7 +9477,7 @@
       "chapter_title": "서쪽 화재선",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1af5474d357892db1f9fbfa23de4fc2aaa2f4c3ad2e558c6e0b3b35b64c9d3da",
       "node_id": "char-sehoon",
@@ -9497,7 +9497,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1b2931b2498a156c363c4333f80ced803905b24afcb40f1fa479cc1f0d7c31f1",
       "node_id": "char-kyunghee",
@@ -9517,7 +9517,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1bbc83bf476780013c8f090b5650c9010e73c29918ee63e5a784d284e5065d1f",
       "node_id": "loc-nw-center",
@@ -9537,7 +9537,7 @@
       "chapter_title": "서쪽 화재선",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1bbf8816c39531f95ffbb6c0f30938a1742cfcfb021757dbf4be5c4adb421191",
       "node_id": "char-mira",
@@ -9562,7 +9562,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1c6d73b415bc87504a6c2963736245cc95e7b2ecdd415204245b3ce5566a15dc",
       "node_id": "loc-bridge",
@@ -9584,7 +9584,7 @@
       "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1c9d5ed5837d673d0580f53a1b15976145946f77d0b59518809a96ea57b8b030",
       "node_id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
@@ -9604,7 +9604,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1ca65bd182d1c9a4139fb07ca55d8b6f6324bdbecac5ce6714473256efed4c99",
       "node_id": "char-taehoon",
@@ -9654,7 +9654,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1cfbef87b0f4aca15b3b2384715df5adfb99612db092cdd4291415beb9a745f8",
       "node_id": "loc-forest",
@@ -9674,7 +9674,7 @@
       "chapter_title": "다섯 거점의 선택",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1d024ae2f01d9f91bf4922f9898cd74e909006f05c5c0f3291f6692bdb97210f",
       "node_id": "char-jinwoo",
@@ -9690,7 +9690,7 @@
       "chapter_title": "동천교 바깥의 차량들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1d097780274c92d9fdba729f4b60ae7cfa32975eed7329a9b465745ccc205f9e",
       "node_id": "char-hajin",
@@ -9722,7 +9722,7 @@
       "chapter_title": "불이 지나간 자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1d9c5ecb37adc000c28d096f15d0a675bdcaa32fd5d2f7b9ac5a144d338e7387",
       "node_id": "char-hajin",
@@ -9742,7 +9742,7 @@
       "chapter_title": "얼어붙은 관정",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1f210738000aaa93b568af09efb4fc1bdffbf0afbd1fe2015bd2d448d24d72dc",
       "node_id": "char-taehoon",
@@ -9758,7 +9758,7 @@
       "chapter_title": "얼어붙은 관정",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1f2a3f657269a2e07ce15f28d9eb93bdfbfdc66edf2497a727e97a7f9cf74336",
       "node_id": "loc-agri",
@@ -9781,7 +9781,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-1fdeed6959e93fb7495e79ff5383755acfa5269efd8bb0acb08ec357b0be9380",
       "node_id": "loc-sports-complex",
@@ -9806,7 +9806,7 @@
       "chapter_title": "2027년 9월 23일 ~ 10월 14일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-217bac3e35ea823da135090aff8ec22064cee740cff8c263792b826471f6bad8",
       "node_id": "char-hajin",
@@ -9827,7 +9827,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-228dae82ca9a5b739c43ac1985a0793dbce34df609c021ed1421f82252bd7d2e",
       "node_id": "char-minho",
@@ -9849,7 +9849,7 @@
       "chapter_title": "서쪽 화재선",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-24111d41edd6ae7e650cf2c5d0d09f424ab52d5792a8679194b78283c2040fa2",
       "node_id": "loc-bridge",
@@ -9869,7 +9869,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2454533d504aba930f85f2515aca3b92b9ca79b5df43a3f46dccc3fc300ed409",
       "node_id": "char-hajin",
@@ -9889,7 +9889,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-245cc5176e1e840b443043f06f774addb0972d928409f56a952dbe560c0ef6b0",
       "node_id": "char-doyoon",
@@ -9909,7 +9909,7 @@
       "chapter_title": "2027년 5월 4일 09:00",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2469a450ca960222aabd5655f579aec0cb6661b212fc59ae8e4804eaa95f5eb5",
       "node_id": "loc-sports-complex",
@@ -9934,7 +9934,7 @@
       "chapter_title": "서쪽 화재선",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-249ee892f7b7e06b1d100d5ca005d26fa42509ac7a48655e31311f860d54486e",
       "node_id": "char-jinwoo",
@@ -9958,7 +9958,7 @@
       "chapter_title": "첫겨울의 아침",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-24f866972afb1248a8a22605879bd872f5beafcb70bc955558c9b480dc5b5cad",
       "node_id": "loc-nw-center",
@@ -9978,7 +9978,7 @@
       "chapter_title": "복지관의 두 축",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-253d3a6a796f67dd42d8aa83c46b697c2ae7a0febc388d0b15b71cf071f68fef",
       "node_id": "loc-west-road",
@@ -10004,7 +10004,7 @@
       "chapter_title": "백운생활관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-256c0a6c0149d1841ba77805804fa5355c9aa1928718f3ad8ef4b3be40aa10e5",
       "node_id": "char-mingyu",
@@ -10027,7 +10027,7 @@
       "chapter_title": "복지관의 두 축",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2597b99ac96a2551de280a0075076fb50afd529ce093fbc0df0e871d9918cb45",
       "node_id": "char-yujin",
@@ -10047,7 +10047,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-26926e000d54b623a82f2a40d49aeb122ef0268be3bc1e2a8f71c9c3507ee389",
       "node_id": "char-sehoon",
@@ -10067,7 +10067,7 @@
       "chapter_title": "복지관의 두 축",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-288958b4cb9eb9bc7b85adf88598da10cbc7bf0534988244092a009d8ba4c3bd",
       "node_id": "char-jinwoo",
@@ -10083,7 +10083,7 @@
       "chapter_title": "2027년 4월 11일 17:25",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-288ab4a5e3a1451071308c18cb5390a03fb55bad6ceb0d08383f32e7d0d796df",
       "node_id": "loc-west-road",
@@ -10103,7 +10103,7 @@
       "chapter_title": "2027년 4월 25일 10:30",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2a6570b62c53d90b912aca5f47e35facc6a451775557200cb01851f3eafa8d32",
       "node_id": "loc-sports-complex",
@@ -10127,7 +10127,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2ab4ea720721cb938186bcd2b18234c8cb8d4a741099daa74c004cf3ab6eb3eb",
       "node_id": "loc-bridge",
@@ -10153,7 +10153,7 @@
       "chapter_title": "정식 연합체",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2b69c5c175a3a8b0d73c2173e5a3bcdbf13c7259d9ebdec5ef109d6e8dff2a74",
       "node_id": "loc-agri",
@@ -10176,7 +10176,7 @@
       "chapter_title": "백운생활관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2b84e566d75bf70f9ad141259484b96f4a6cb4780bfc368941089c6f80ac3d67",
       "node_id": "char-eunchae",
@@ -10196,7 +10196,7 @@
       "chapter_title": "2027년 10월 31일 ~ 11월 4일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2cfaf55e7919bdf7e60647c0b075e01bc8ae6e0a4dbddda8a89ed58b58de5ec8",
       "node_id": "char-taehoon",
@@ -10216,7 +10216,7 @@
       "chapter_title": "폐쇄된 체육시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2e3e9efb0b1ef4eebb423d299deb126cb5d0ee76b95bbcde570d9ed0585a9304",
       "node_id": "loc-forest",
@@ -10236,7 +10236,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2e80a67ddd8105e29224c08e0c4f79bfc18367f40640097c78f3ece9e8962716",
       "node_id": "char-doyoon",
@@ -10256,7 +10256,7 @@
       "chapter_title": "실증단지의 불",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2e9ef4049fc6b33b898c6342854cdaba32e961db9e9f9dd6c9efa77f17979a3f",
       "node_id": "char-eunchae",
@@ -10286,7 +10286,7 @@
       "chapter_title": "외곽 주민복지관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2ee1976a77631df46fbdc70602f6345fa3effeaea6759f7fcaad3d8773227c5f",
       "node_id": "loc-nw-center",
@@ -10306,7 +10306,7 @@
       "chapter_title": "얼어붙은 관정",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2efb105aa4534af26d2a53a2271d9bc0f187127525c37eb71362da3d39723d90",
       "node_id": "char-jinwoo",
@@ -10322,7 +10322,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2f15e9d8bf6d6ff331296d0a5429976d78eb9299cd340df46880ff72eca1b1df",
       "node_id": "loc-forest",
@@ -10344,7 +10344,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2f3fe70f0115a2f98e16b93e96ab5e10c460858a0725187f1fc79a2842983485",
       "node_id": "char-jinwoo",
@@ -10360,7 +10360,7 @@
       "chapter_title": "실증단지의 불",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2f780afbee734096b79e8e9176e1ad0368a8e6326685733ed3ecbadd9b66e92d",
       "node_id": "loc-agri",
@@ -10386,7 +10386,7 @@
       "chapter_title": "2027년 7월 13일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2f82964ebd7ba69d4b8fc1cd9c02847ebc5ef9285791fb623c7d1df648de4ebe",
       "node_id": "loc-wiki-b1be03144484391b40b8ecc4",
@@ -10406,7 +10406,7 @@
       "chapter_title": "다섯 거점의 선택",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2fe0d9bae19a3dc01c0d7487a8b10261b287bc6f94695a13440e12df2d786913",
       "node_id": "loc-sports-complex",
@@ -10429,7 +10429,7 @@
       "chapter_title": "동천교 바깥의 차량들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-2ffb48c11d7ae5e8c6598b5db2aa44231bdf88789dc6dfb0dfa7b23f3cc78e2e",
       "node_id": "loc-sports-complex",
@@ -10456,7 +10456,7 @@
       "chapter_title": "불이 지나간 자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-30198bbd822d4f843c3275d2d0f9c194cf6d36a13f4892fda908c5df3dd90584",
       "node_id": "char-seojin",
@@ -10482,7 +10482,7 @@
       "chapter_title": "북쪽 의원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-30e232add8a3cb042fe3c69b505eedfa7813d9a082069bae49c7d686a8737cdf",
       "node_id": "loc-clinic",
@@ -10505,7 +10505,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-31f4e5588bc42a4e8151f64d5a77d7effca86602f04232931965006e7e650bb0",
       "node_id": "char-mira",
@@ -10525,7 +10525,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-32434eb4fbf622d2de7eb6ebd79db38d2f8c41273fee792f1437bb55a77516d2",
       "node_id": "loc-west-road",
@@ -10549,7 +10549,7 @@
       "chapter_title": "실증단지의 불",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-335172c6d8299b4a4b89f26aa8ac4e98854cb845174bf9f0da9c7bfb437cd72a",
       "node_id": "event-fireline",
@@ -10565,7 +10565,7 @@
       "chapter_title": "2027년 10월 31일 ~ 11월 4일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3444c966b1c641e3a7983018fad73b185f1b724501b3cb93eca2bb1ab4fb8d1f",
       "node_id": "loc-sports-complex",
@@ -10585,7 +10585,7 @@
       "chapter_title": "불이 지나간 자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-34cf60fab1ba36b2d4d9c9ba01e88ebaa2ba2bd8fd088bbc0657caa0d9adc666",
       "node_id": "char-jinwoo",
@@ -10614,7 +10614,7 @@
       "chapter_title": "열세 사람의 밤",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3650f0f5e648e25ebd21b96d560045ab9cba6308fa06335814f2c7a4ce0276b2",
       "node_id": "loc-west-road",
@@ -10661,7 +10661,7 @@
       "chapter_title": "북쪽 의원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-366820531c26eb5e7fcd9d5a9f12b0ac05ce528468cc556c6742da6369ae2843",
       "node_id": "loc-forest",
@@ -10712,7 +10712,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-36875c61a9de5a5bb7893f9cca5d2d7e922ac7c7f66b77488e242c2450c18a6a",
       "node_id": "loc-nw-center",
@@ -10732,7 +10732,7 @@
       "chapter_title": "북쪽 의원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-36bafd53f8e174a490bd0e6da3d00018dce6cdf2242f7be0196276c79f43a3e2",
       "node_id": "char-eunchae",
@@ -10754,7 +10754,7 @@
       "chapter_title": "동천교 바깥의 차량들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3707316dd45d4f694fe9395f88cd9387931379dead34564f7a0147504466dc96",
       "node_id": "char-hayoung",
@@ -10774,7 +10774,7 @@
       "chapter_title": "복지관의 두 축",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3984b7152dada9c777dec611dcc8be303b9fde61aa17eb88445884be07f751c0",
       "node_id": "loc-nw-center",
@@ -10794,7 +10794,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3a1d5754bf1f527aad598d2137f66884ea5be5f48e65bd2696243dacbd61ecee",
       "node_id": "loc-shelter",
@@ -10820,7 +10820,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3ab9c869708f7d9fa25005fa3af83c893c357106747295114bfd1ff47be56eaa",
       "node_id": "loc-west-road",
@@ -10841,7 +10841,7 @@
       "chapter_title": "서쪽 화재선",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3af0b5c26db2b780ae367a9dd7c677e995aa52472db1e3120fbfe1d553b2bcdd",
       "node_id": "char-taehoon",
@@ -10895,7 +10895,7 @@
       "chapter_title": "서쪽 화재선",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3ba2436b68fb5a3b97804d107d7697181f0e9e7d6a81f1030ecc40b86a55f17d",
       "node_id": "char-eunchae",
@@ -10933,7 +10933,7 @@
       "chapter_title": "서쪽 화재선",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3c4a10e9a68ecb3ad000be14ee29b37ef659c2fa46c290b0ebd773498b167e86",
       "node_id": "event-fireline",
@@ -10949,7 +10949,7 @@
       "chapter_title": "폐쇄된 체육시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3c65ef0f55cdaf89eeed4e895233d2cd947832380992a44ea7e6400b28b976c9",
       "node_id": "char-hajin",
@@ -10979,7 +10979,7 @@
       "chapter_title": "얼어붙은 관정",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3c6fab9fb39d344033ae32a9558d8210c107d68559cb3823b646ce9f80d71286",
       "node_id": "char-mira",
@@ -11005,7 +11005,7 @@
       "chapter_title": "2027년 9월 23일 ~ 10월 14일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3d23f5aed6fe4ef6aa3f3ce725f93e98ee27b9468ebfd84be8d892187f2fa50f",
       "node_id": "loc-wiki-04beb10f1f92ee26f3f09c2f",
@@ -11025,7 +11025,7 @@
       "chapter_title": "폐쇄된 체육시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3dd6f1d5903de5a148203dcd036e5dd9ad05237bcb903738c08b3a5c55b61622",
       "node_id": "loc-contact",
@@ -11049,7 +11049,7 @@
       "chapter_title": "다섯 거점의 선택",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3decb8287260469faa4771cba289f536c34b013ec0f30c83986064dc35aaa65d",
       "node_id": "char-taehoon",
@@ -11073,7 +11073,7 @@
       "chapter_title": "불이 지나간 자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3df90ff83540f90414fcc4296e007ab9678ad94a0389397482061aa7efbc75ae",
       "node_id": "char-eunchae",
@@ -11107,7 +11107,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3ea2fcfd0c8647e6e3378d746acba6a86608dbce60ad23b151dcd8d9131446dc",
       "node_id": "char-hyerin",
@@ -11127,7 +11127,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3f96e014b82a4b98d958f9ee6d5a3af2d41aa412d503de9d884da6e2705c63e4",
       "node_id": "char-eunchae",
@@ -11150,7 +11150,7 @@
       "chapter_title": "두 번째 거점",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-3f9c60971fc3c4040b85d7ae32504760c2a6741d0f8f629dc1ff9e0a19c47bf0",
       "node_id": "char-sehoon",
@@ -11177,7 +11177,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-40a840f2f6076898b8a61bc93fc6a5639870fcc64b12d010038c3222dd5ea6fc",
       "node_id": "char-hyerin",
@@ -11199,7 +11199,7 @@
       "chapter_title": "서쪽 화재선",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-4155b692c6d45d0aec54c1242183d951748e8b2b0e6458abfcce7aec5ea64741",
       "node_id": "char-hajin",
@@ -11226,7 +11226,7 @@
       "chapter_title": "2027년 4월 11일 17:25",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-4239f3d413c5196f6f0fb5f7a4428c5bbed2ec0da4bbc4d07d8546ecda414546",
       "node_id": "loc-sports-complex",
@@ -11256,7 +11256,7 @@
       "chapter_title": "폐쇄된 체육시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-42967d92c8366ad1b5d7d2e7c7fa8f41ef1d4229c22b55492af10774c1baea03",
       "node_id": "loc-sports-complex",
@@ -11280,7 +11280,7 @@
       "chapter_title": "동천교 바깥의 차량들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-43c33c472f3078225644e1699da024b941a37ed88c67a54a5543e6f1b7255094",
       "node_id": "char-jinwoo",
@@ -11303,7 +11303,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-44d40ea42a023d57b9b43dffe117e439945c09589273bfb8b84f5c94c5b43214",
       "node_id": "char-yujin",
@@ -11323,7 +11323,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-4747faa28a5568997334be7500dac21d04f7fc69516bc0055b03903c9a19ef90",
       "node_id": "char-cheolsu",
@@ -11362,7 +11362,7 @@
       "chapter_title": "정식 연합체",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-487f3e88f9141f5731d8aece0e363097399f63816898f05b457448244eff046e",
       "node_id": "char-seojin",
@@ -11384,7 +11384,7 @@
       "chapter_title": "산림교육원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-4914cc1a2c073f8783d75146b4c7799d9607e4d7215c7f1ff6d8279545191193",
       "node_id": "loc-forest",
@@ -11415,7 +11415,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-4a9dbacd87d5572dbf3b7c275edef26dfbf864a4aa51edeaa200dc41bb7c65f3",
       "node_id": "char-seojin",
@@ -11447,7 +11447,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-4b0373e3f4644f1c769adf9e151507ffb270d3d1cf658b2e47f5172194c87830",
       "node_id": "char-seongho",
@@ -11467,7 +11467,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-4b127488d4b6f514d81de2b730eccf7705a583230fa4335b6d4e5b4f95d11c94",
       "node_id": "char-cheolsu",
@@ -11493,7 +11493,7 @@
       "chapter_title": "정식 연합체",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-4b47000c9f867bb7cb6b13b066b54a051a761a0c2a182571a863433d04266c21",
       "node_id": "char-mira",
@@ -11516,7 +11516,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-4c5616f2ab3dfb20eade2cc109f01beb46fb2d81d6044cc119f07e28a121fa82",
       "node_id": "loc-shelter",
@@ -11544,7 +11544,7 @@
       "chapter_title": "2027년 10월 31일 ~ 11월 4일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-4d2559867513fb3719ca1196bd3750533d695d2fe9661a9a69f76215bd7ea41e",
       "node_id": "char-wiki-b862f3d27582267fb5da3320",
@@ -11565,7 +11565,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-4d2ecca632099e9d84c5e1e83262e5acd1a296a7a87c5676ac3bb2f752b0ddf5",
       "node_id": "char-taehoon",
@@ -11585,7 +11585,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-4dacc1176e8a7198e5281312874e5ca49b44fd9a4b73dac48aebaf1842633268",
       "node_id": "char-jaemin",
@@ -11605,7 +11605,7 @@
       "chapter_title": "첫겨울의 아침",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-4df1dbeeee93b314ef06740bf68ff6f003c84da294f1f5cfec658580df30d6b8",
       "node_id": "char-hayoung",
@@ -11626,7 +11626,7 @@
       "chapter_title": "2027년 4월 8일 11:36",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-4ed0782eb6d4567462737afafec7edff5d32e35ccc4ae1e68f57a67155973b2d",
       "node_id": "char-hajin",
@@ -11647,7 +11647,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-4f1abcf8d81c84238955b2ca06cb887948358c9810ac347c7fa3daac470fad96",
       "node_id": "char-mingyu",
@@ -11675,7 +11675,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-5018ced348b70e916aaf5d01d9c4309df8dc0be99a3f52bbf5679f370e1af242",
       "node_id": "char-cheolsu",
@@ -11698,7 +11698,7 @@
       "chapter_title": "2027년 5월 4일 09:00",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-5066ce48e7c1d0da5a41357ead1b6f094f5575bfffa3cb98141dc01000853bf9",
       "node_id": "loc-wiki-6d44db0505ec3dcf97e41a4a",
@@ -11718,7 +11718,7 @@
       "chapter_title": "폐쇄된 체육시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-50b265d1f42833320bc9d199512b2d370adf562f4454a8007860d3f114efe53e",
       "node_id": "char-cheolsu",
@@ -11760,7 +11760,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-50f3b6ee920b37bffff2a7100f7e777771f04ad54b8941331ce3a5554b934573",
       "node_id": "loc-clinic",
@@ -11783,7 +11783,7 @@
       "chapter_title": "산림교육원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-511bedb9dca8ca8123bf80ee76095a9149bbd5e5530f87b16500a90d5b68c5c9",
       "node_id": "loc-baekun",
@@ -11809,7 +11809,7 @@
       "chapter_title": "2027년 7월 13일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-5142a748a4c3ef3a98390aac6ee19293a2ca158f034f8a6798461b7e611a9f5e",
       "node_id": "char-wiki-14b41bbae77f8558c571d384",
@@ -11830,7 +11830,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-51556f2f8557ca5059b2b5eed049c463a3a816c66398376bf68c781112c0957e",
       "node_id": "char-doyoon",
@@ -11851,7 +11851,7 @@
       "chapter_title": "외곽 주민복지관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-51ac90438e5a9263f9be0a136ecb27357763939f5f5f8480a3e9311028d8433f",
       "node_id": "char-yujin",
@@ -11867,7 +11867,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-525267e1a4ec455bf05556c65d0433c4e9c49afa8f6a26101d14e6561ca9f8bc",
       "node_id": "char-cheolsu",
@@ -11888,7 +11888,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-52f919630e21b8c54a9f84706c20a12433fe70268a617ac4b69f751add0d96b3",
       "node_id": "loc-nw-center",
@@ -11904,7 +11904,7 @@
       "chapter_title": "불이 지나간 자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-532f799b3bf949c39059fee3d79bdb5cd9ccc8e1b2bba8a0241aac38eee68043",
       "node_id": "event-fireline",
@@ -11920,7 +11920,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-5402864f613a54b30982d43135d8120a6d8a4b3e154b8b20911dfb1ba77bd624",
       "node_id": "char-mingyu",
@@ -11944,7 +11944,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-542834db9c54b97d4a6652eede2ad45310ab7ffedb617d4739b4fdc04da56cd8",
       "node_id": "loc-nw-center",
@@ -11964,7 +11964,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-554dab0c447f72a7d01626bb6409c610e5063f6f1288936e0bba2e6d0c0892c8",
       "node_id": "char-seojin",
@@ -11989,7 +11989,7 @@
       "chapter_title": "2027년 4월 8일 11:36",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-55d3f4c92b26d8e1af5be814defed12155f3e0c278ef1690c3aeb6ea707020e0",
       "node_id": "loc-shelter",
@@ -12009,7 +12009,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-55dcec85a9766b765feaf685255c39c062098afa18f21fa076cd3694cb279653",
       "node_id": "char-mira",
@@ -12029,7 +12029,7 @@
       "chapter_title": "2027년 7월 13일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-562b88b62c8f8ac875e172dab68849005c7ace75628ee7a88063f219049a3080",
       "node_id": "event-wiki-a93db7854c7049a3b7c936b2",
@@ -12050,7 +12050,7 @@
       "chapter_title": "동천교 바깥의 차량들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-592c08944d30944fbad74f61034eafaa82a520447021912b06821514848393b2",
       "node_id": "char-yujin",
@@ -12072,7 +12072,7 @@
       "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-595a2cd24f4e9e78fc4041c8570a1577d9faed6d5486931f9967da57764906c0",
       "node_id": "loc-wiki-f73ae01ebcb8d89952911bbc",
@@ -12093,7 +12093,7 @@
       "chapter_title": "2027년 6월 19일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-5ae082c7495537b34ff3afcf52e73e7982737ae3558e34c1fd2544289acdf038",
       "node_id": "char-wiki-322a5a52d57198d4a6f25429",
@@ -12113,7 +12113,7 @@
       "chapter_title": "백운생활관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-5b3c844c5d3e206324dfbdb508c1505bc01779954cc7d920c8db069ef80ee2f7",
       "node_id": "loc-forest",
@@ -12136,7 +12136,7 @@
       "chapter_title": "열세 사람의 밤",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-5b77cdfa6b9bc6a8d14c461373e384087d9b0bf460bca9a93cfa54a9b6c856e5",
       "node_id": "loc-nw-center",
@@ -12157,7 +12157,7 @@
       "chapter_title": "외곽 주민복지관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-5c19bf5e6d91af96cb9d4bdee09f62c935b64ce1e952b3f644d753797679f9ad",
       "node_id": "char-minho",
@@ -12177,7 +12177,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-5c731255c5bc5359bb12e4ffb09096f482a28cdcda29ea89bcf2562608664c08",
       "node_id": "char-jaemin",
@@ -12200,7 +12200,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-63587bcaa0f3b838a436e5c2306bb39d369b1f11d3d5698b4f20c4f992eaee1b",
       "node_id": "char-kyunghee",
@@ -12221,7 +12221,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-6413c20e95365b37fe0a0aabc950454699083dad4e6a977ae664298d3647e7a9",
       "node_id": "char-yujin",
@@ -12237,7 +12237,7 @@
       "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-64d37a58d4d93aca98a0a78232d7b30a8304293f1d86435c99a5be13ce27e698",
       "node_id": "char-eunchae",
@@ -12258,7 +12258,7 @@
       "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-65a17bc3e8d7b8dae9b16c1969324be850612b92cdced5861dbc29bf67f411b3",
       "node_id": "loc-sports-complex",
@@ -12279,7 +12279,7 @@
       "chapter_title": "첫겨울의 아침",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-664074250a243f8e47001b6ff707a6b22b823b46125b13ba9d69aac4001defb8",
       "node_id": "char-hajin",
@@ -12330,7 +12330,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-6685a26b8e4c00c7587227ca0ce161fbf7dcf2a8fabf0a28322093b3a9f2544f",
       "node_id": "char-hayoung",
@@ -12355,7 +12355,7 @@
       "chapter_title": "북쪽 의원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-66ef8b301cc95018f455692a1d76a94a24cf445c1de2fd32047282b78b49b5d8",
       "node_id": "char-jaemin",
@@ -12375,7 +12375,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-672e4874dc50de63a94b517ba553fa57eb0b5f183e071ce50ffed712c183cada",
       "node_id": "loc-west-road",
@@ -12398,7 +12398,7 @@
       "chapter_title": "백운생활관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-675e77a734f301062292801f0dae43f08af5f394c77bb2c7ab8fa7aad0ef66b1",
       "node_id": "char-seojin",
@@ -12419,7 +12419,7 @@
       "chapter_title": "2027년 6월 19일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-676ee5d8cfc6ee5e4bd61d956a7af40e69dc51c1d0b4b90c73e8e2ff0976d05f",
       "node_id": "loc-sports-complex",
@@ -12440,7 +12440,7 @@
       "chapter_title": "불이 지나간 자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-68ccd8858e5cfca087f77ea9404779717630a8384ccaa44ef22efe360c87de02",
       "node_id": "loc-baekun",
@@ -12466,7 +12466,7 @@
       "chapter_title": "서쪽 화재선",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-69567a0335ecaf13ef900a0e6fb78f395cf404791ea084ae0d90de6ff784496b",
       "node_id": "loc-nw-center",
@@ -12486,7 +12486,7 @@
       "chapter_title": "외곽 주민복지관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-696b18d09cad5cf92284cf0f471e6a81bb2fef4cbc7c067c2f6c519833c0b669",
       "node_id": "loc-shelter",
@@ -12509,7 +12509,7 @@
       "chapter_title": "복지관의 두 축",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-6971315385fd09b7105ca87c84a9b94c92eb8d2ff1242ce3061c3d4b949ff182",
       "node_id": "char-jisu",
@@ -12533,7 +12533,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-69b62cf6eef30894bc7ce9feeab78031e423f97946b4831d365755153509a18a",
       "node_id": "char-seojin",
@@ -12554,7 +12554,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-69beed44818b9f45d0745924b382d412cf97ac19d16daf9d5688d87011b37e20",
       "node_id": "loc-forest",
@@ -12574,7 +12574,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-6ac0c44ea8ae7d066b7f10c860cf41e6fc3ea16e7dc28a524166f4041e7860f4",
       "node_id": "char-minho",
@@ -12598,7 +12598,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-6b3679dd19cc34b158fc8936c044bb009d11b411179877a0f046febbb0bd4fe8",
       "node_id": "char-hajin",
@@ -12623,7 +12623,7 @@
       "chapter_title": "복지관의 두 축",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-6b447c754bb090b21c7136ce35d0433574727e5fb3965bccbc15eed648757e6a",
       "node_id": "char-seongho",
@@ -12650,7 +12650,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-6bc8c122ed784b004cc16dbfd0e6df479cd8f7c7cb341e1f7efe67ee51b145c2",
       "node_id": "loc-nw-center",
@@ -12671,7 +12671,7 @@
       "chapter_title": "북쪽 의원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-6bdbd4e67da04b2ac5e9a417c07feb67684f7fa7f058a02f14e286ae868ce960",
       "node_id": "char-minho",
@@ -12691,7 +12691,7 @@
       "chapter_title": "두 번째 거점",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-6cb0d5b33fbab0a11571fb8aad4aae604daf6737ac56474301f769f89b2e1a26",
       "node_id": "loc-agri",
@@ -12716,7 +12716,7 @@
       "chapter_title": "외곽 주민복지관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-6d222e4df0e5cd4e95bb70d7c08248ad668801fed8898953e161c549baf61802",
       "node_id": "char-jinwoo",
@@ -12732,7 +12732,7 @@
       "chapter_title": "2027년 5월 4일 09:00",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-6d948d6105cf17ec9c7b2a43335bfee1e0d83b542b2763f4e5e4e7e055756ef8",
       "node_id": "loc-west-road",
@@ -12756,7 +12756,7 @@
       "chapter_title": "정식 연합체",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-6da5e9f6ac7be70fb1b40c4ccbb6243b0ba52e4b4bc3fd18ccbab934d7cf6c55",
       "node_id": "char-jinwoo",
@@ -12779,7 +12779,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-6e08afbf483bae03ad334f762ed4e68016a03ee9651857da19da6ed5c271cc7e",
       "node_id": "char-eunchae",
@@ -12806,7 +12806,7 @@
       "chapter_title": "열세 사람의 밤",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-6f40db43f988467987219d477a0cc0a3a03b05c6d0a0d08b5350ef88e9209ef8",
       "node_id": "loc-agri",
@@ -12827,7 +12827,7 @@
       "chapter_title": "2027년 5월 4일 09:00",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-6f9f6585afab3f52ac2a73e1e98aea12ccd1d2964b70eae2e68488290910d9dc",
       "node_id": "loc-shelter",
@@ -12847,7 +12847,7 @@
       "chapter_title": "첫겨울의 아침",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-7039258f57c4963dea9c88ed40dd10fba461af9f3ce092716a2bbd4ccdf0a4a4",
       "node_id": "char-yujin",
@@ -12867,7 +12867,7 @@
       "chapter_title": "폐쇄된 체육시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-707295576bae48ab6211328856f84ccd4ac9d23e27a3039f6c2ee0e03e3b46e3",
       "node_id": "char-minho",
@@ -12894,7 +12894,7 @@
       "chapter_title": "두 번째 거점",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-70e48b81d67e7fb6471a53067204ba85cf691fe66be4c477a2a08bc70badd7e4",
       "node_id": "loc-forest",
@@ -12915,7 +12915,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-71d571805f86ce71e66d2fffa5caa0c76e404490e9960d84c7e9edac0c40d2ce",
       "node_id": "loc-nw-center",
@@ -12937,7 +12937,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-729581092a5de633be65e2729675a0beae32c5ecc86074f733e98d07d4ce47ec",
       "node_id": "char-hayoung",
@@ -12967,7 +12967,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-72c34a1eb90e9bce05a506b23dd3f9d2bebc3a8f1089c1b6e3d5f4f42edfb457",
       "node_id": "char-jisu",
@@ -12989,7 +12989,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-749e33a00fcc1e6e8d96e906e73092037045965ccea318d9726878704c82761f",
       "node_id": "char-minho",
@@ -13013,7 +13013,7 @@
       "chapter_title": "실증단지의 불",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-74ac475a8e001f214db2e4fe621e6b4baf24742c0faae5777c2057ca78828174",
       "node_id": "char-mira",
@@ -13052,7 +13052,7 @@
       "chapter_title": "2027년 9월 23일 ~ 10월 14일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-75a6e450aaa139042615a1a8b0affb2eb71f2dbc5e355be44880f82ea25a9473",
       "node_id": "loc-wiki-5a5b0982ccdae5210d2a6275",
@@ -13072,7 +13072,7 @@
       "chapter_title": "첫겨울의 아침",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-76ca9ad934ba7733890d794ac836401b89366f66259b430c9d7df0f9e0093df4",
       "node_id": "event-winter-council",
@@ -13088,7 +13088,7 @@
       "chapter_title": "2027년 6월 19일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-770aed676f48de5c67e6f525c3bf5295a9bcd2654390fe3bbfcd5ece1982e902",
       "node_id": "char-jo-hansu",
@@ -13109,7 +13109,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-7737d4c5b069075b706ec93ded43d64c1c1e9d5139630a13153bb6f14696a5d9",
       "node_id": "char-doyoon",
@@ -13131,7 +13131,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-780ca1b3549c6c02650e764a2a3003a8519afba4c7f4d9b9ff2f1c610130c546",
       "node_id": "char-minho",
@@ -13154,7 +13154,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-7944cf37840ab79624ea60d364ad5fbbb2ab5a7d629ce2012b833efd0dbf083e",
       "node_id": "char-cheolsu",
@@ -13174,7 +13174,7 @@
       "chapter_title": "얼어붙은 관정",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-795d3b219b8c797cc2abe6b08981052932e960920928c267a690eccf5ed56d59",
       "node_id": "char-doyoon",
@@ -13197,7 +13197,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-7c22c4bf76f1a1943f13c2acc038de8250568e4eab8ecea11814c398d46481b6",
       "node_id": "char-jisu",
@@ -13217,7 +13217,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-7c5cbe2722d148c960798ff793d9c67bf4be37cf11a67e76fa499a6df1ea0f1a",
       "node_id": "char-mingyu",
@@ -13239,7 +13239,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-7d50b1e0f1795aa1937df87e8c60d85cc96eb36158b17b9c5228807459103809",
       "node_id": "loc-baekun",
@@ -13255,7 +13255,7 @@
       "chapter_title": "백운생활관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-7e57ac43bdcbb9f9a2a8981fa6ddedea5f64d4b5bf5cfc5e316429c5a2615d93",
       "node_id": "char-jinwoo",
@@ -13271,7 +13271,7 @@
       "chapter_title": "폐쇄된 체육시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-7e8dbb5d4c4b9e87f96ab3b464c6474e9109667d4dc79e0d9eca357fe873fc31",
       "node_id": "char-jinwoo",
@@ -13294,7 +13294,7 @@
       "chapter_title": "정식 연합체",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-7ea68004436f9861332a58038e9f77333ec591701070e40ff69bffad2c18320d",
       "node_id": "char-taehoon",
@@ -13316,7 +13316,7 @@
       "chapter_title": "산림교육원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-7f5609aa4449f18fdbf4b2e97b4e336e4674b5505209e9a74e366f9039baa2f8",
       "node_id": "char-kyunghee",
@@ -13342,7 +13342,7 @@
       "chapter_title": "서쪽 화재선",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-81809345b4a62d050733f5d2463ec38f5d7f656090b0cf507ed8d5cb8a716b48",
       "node_id": "loc-west-road",
@@ -13363,7 +13363,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-81b16ade7125a6ad836a082e8f1b8478537c658546702731ac289ef7ce32546c",
       "node_id": "char-eunchae",
@@ -13414,7 +13414,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-81d22760a03aef9ac48aa0bfeb241c022533bc3c4bea2aa11faf7a7cb27a8090",
       "node_id": "loc-west-road",
@@ -13445,7 +13445,7 @@
       "chapter_title": "동천교 바깥의 차량들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-81fe6573b20d187f868d2a909693ea7576ba88727deb04e2d230d0625624f707",
       "node_id": "char-seongho",
@@ -13465,7 +13465,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-82bec45e1b8e0588ee58b2d6e1ad8d156ae2b2ce2796e6a05ecd18a588f30ac5",
       "node_id": "char-jisu",
@@ -13489,7 +13489,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-82c7366ab879b08707be996f8f85012fb77f6cfc0cc7a25dbe301ca0a07506cf",
       "node_id": "loc-agri",
@@ -13512,7 +13512,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-8372de9fd095f46d66dba6f36bdea6ed4da93fbe5fe71d843cb1319d8c60b81a",
       "node_id": "char-mira",
@@ -13534,7 +13534,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-842319ca30ea438697007d852d73314459b2e40f346a3c54b57bc90b821312ac",
       "node_id": "char-jinwoo",
@@ -13557,7 +13557,7 @@
       "chapter_title": "복지관의 두 축",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-846b5b332f83039589843c867929161b7d1b5aa12eb938ce0ec6eba814aeac0d",
       "node_id": "char-cheolsu",
@@ -13588,7 +13588,7 @@
       "chapter_title": "실증단지의 불",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-850d890b70af90f2086fd99904d3c382862fd87600d2190f24f3fe2f2cbd851b",
       "node_id": "char-taehoon",
@@ -13635,7 +13635,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-857c76c02c6ffc059fcfd5e65037bb20fc78312dd2bcfe323066ec9d92bedf4d",
       "node_id": "char-taehoon",
@@ -13663,7 +13663,7 @@
       "chapter_title": "두 번째 거점",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-85d438149dceabfbd05e0bb2b67c4639dead5b99969a25dd8657e6ac628fae15",
       "node_id": "char-minho",
@@ -13683,7 +13683,7 @@
       "chapter_title": "다섯 거점의 선택",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-868141d2814751568ff3f4f74cd75958804848340001c67b839327bc8dbc8012",
       "node_id": "loc-nw-center",
@@ -13703,7 +13703,7 @@
       "chapter_title": "다섯 거점의 선택",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-8692a1e84dfdbebd7437b04f734e45a51093fb3cffa58799c65b6faac9feef0c",
       "node_id": "char-hayoung",
@@ -13724,7 +13724,7 @@
       "chapter_title": "열세 사람의 밤",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-87aa6180caa1d9851a29b0f2d504ea2bb82b95876c8b375e9f2aee7d7b2eed20",
       "node_id": "char-mira",
@@ -13752,7 +13752,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-87ab2a33881c7fb3b0a88f7ee03a73c0be8b571bbcfd6ff6fdcb6aee09fd7481",
       "node_id": "char-jinwoo",
@@ -13777,7 +13777,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-8907ebb38134e97eeff0a7ab5c78fe53a90f872306a1ff4188623e237806cdc6",
       "node_id": "loc-nw-center",
@@ -13802,7 +13802,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-891b903892ce4490b1f07befd7794aa2aa34995d502cd155eb93f41f3e63a474",
       "node_id": "char-sehoon",
@@ -13826,7 +13826,7 @@
       "chapter_title": "2027년 6월 19일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-892c90e77e884e7e37291c27b2609db3d58cf7b6589c0e49a23f8b1b1aba0678",
       "node_id": "loc-wiki-b1be03144484391b40b8ecc4",
@@ -13846,7 +13846,7 @@
       "chapter_title": "2027년 10월 31일 ~ 11월 4일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-8972a7e89fdbf894e797c8e3e126b54edcb2fbabd150f3800a820dae5517b6e7",
       "node_id": "char-hajin",
@@ -13867,7 +13867,7 @@
       "chapter_title": "외곽 주민복지관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-8975ed3807e12fcd7e24f0c8aa50f2f912d37875ac5b4232772162c48e9fce16",
       "node_id": "char-seongho",
@@ -13887,7 +13887,7 @@
       "chapter_title": "폐쇄된 체육시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-8a67b7b1083010f5834d5d9a89816ded008e2f3dadf89da572bbda0f0f1ce27d",
       "node_id": "char-jaemin",
@@ -13910,7 +13910,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-8a6d31ab75e102b028df3c30534fba3fb635e012f6ff729d8102fae650dcc05f",
       "node_id": "char-seongho",
@@ -13931,7 +13931,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-8bd829f2c12f10525ce6b35fdb86a6926fd0d72f308f46bc72bcfaf340aa54f2",
       "node_id": "loc-contact",
@@ -13947,7 +13947,7 @@
       "chapter_title": "첫겨울의 아침",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-8cbcf196ba6f2de2befaa63e54fc047699840b8ca340b2b8d0e21929bec2a252",
       "node_id": "char-sehoon",
@@ -13968,7 +13968,7 @@
       "chapter_title": "북쪽 의원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-8ccb96d784398f43cb87d6ab96ed4171503de441ee4e0924ca8ba56509960071",
       "node_id": "char-kyunghee",
@@ -13989,7 +13989,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-8e3b901333c9ee83d2655f36cdd699b9addb239c018a0c56fb16ad76d20712b8",
       "node_id": "char-hayoung",
@@ -14012,7 +14012,7 @@
       "chapter_title": "외곽 주민복지관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-8ec9738156132c647a91548f2e5354780994be64195a18a0d5dfff6e4d0981b8",
       "node_id": "char-hajin",
@@ -14044,7 +14044,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-9042985b63863cc42a1fd558c6064e09beeeb936e5914fdd3f5ccef75d45f754",
       "node_id": "char-yujin",
@@ -14064,7 +14064,7 @@
       "chapter_title": "2027년 5월 4일 09:00",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-918078b9e27a21a0f36aa29c88ce2d70b07c4156917c256c3a9c4058c438f341",
       "node_id": "char-yujin",
@@ -14084,7 +14084,7 @@
       "chapter_title": "동천교 바깥의 차량들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-91d745261d71ed7581f434cb21539c5a52825c2c10d2ef1811737d3051273c27",
       "node_id": "loc-bridge",
@@ -14114,7 +14114,7 @@
       "chapter_title": "2027년 4월 11일 17:25",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-933bf9c6de5285266a165888eea003b0237fb089eaa0db396c91e6a0289f072d",
       "node_id": "loc-bridge",
@@ -14135,7 +14135,7 @@
       "chapter_title": "열세 사람의 밤",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-938d89fd072a3719bdc45854d59887e3b955cd453a96de3c3d94098b26108649",
       "node_id": "char-seongho",
@@ -14167,7 +14167,7 @@
       "chapter_title": "산림교육원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-93a8a118cdb2dba02076229df4d3226ae50905ee441665441d77165ad44ef0fd",
       "node_id": "char-hyerin",
@@ -14190,7 +14190,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-941f5a4e8ac03a5e1b5c9d5b7aadc235b0335d0fcdef8e13cec7f0bec4c25515",
       "node_id": "char-eunchae",
@@ -14216,7 +14216,7 @@
       "chapter_title": "2027년 4월 11일 17:25",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-944e96fc16017e04dee63b9a98eed84061ec90dc2237914434b09d0b32c9d8bf",
       "node_id": "char-hyerin",
@@ -14238,7 +14238,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-945656358b2ff726a1403c9630066873ae19f3c2f66241ff1655e03a4f890506",
       "node_id": "char-jaemin",
@@ -14258,7 +14258,7 @@
       "chapter_title": "열세 사람의 밤",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-963f11cfcdac46ae18a49235d3b6b9615245d3982fa4836716d464f17af13ff5",
       "node_id": "char-jinwoo",
@@ -14274,7 +14274,7 @@
       "chapter_title": "2027년 4월 11일 17:25",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-988b00a7e2480343970cf1cbd8d4ce05c4da4e370ee4405449799380ca647bf7",
       "node_id": "loc-clinic",
@@ -14295,7 +14295,7 @@
       "chapter_title": "산림교육원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-99b655fb45cb8f11d847cc179f658cdb17101e9bae199421e72916900de84004",
       "node_id": "loc-west-road",
@@ -14319,7 +14319,7 @@
       "chapter_title": "2027년 4월 11일 17:25",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-9b02cbfb3b1e0919e979915c50435182dbb20398f7d52ff2b978c473c0d6e732",
       "node_id": "char-seojin",
@@ -14340,7 +14340,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-9b63fbe44f8ae3d3bae8faa08ebbe92ea69ad3f89de2b63b111fe98379a3a7f1",
       "node_id": "char-yujin",
@@ -14364,7 +14364,7 @@
       "chapter_title": "불이 지나간 자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-9c0e734c5a979cbf8d56bec86d44dfa5dce0b2ae6da3bd6fadfb238e14c43ca8",
       "node_id": "char-doyoon",
@@ -14384,7 +14384,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-9c1ae9a60f12277e2b53b012ed7057c2d038c4a8e580e52198f222b4aa8617ad",
       "node_id": "loc-bridge",
@@ -14414,7 +14414,7 @@
       "chapter_title": "두 번째 거점",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-9c40094347903d05eb89fb84d20cdc508cd5aa95e588d24c067982b96590a817",
       "node_id": "char-mira",
@@ -14444,7 +14444,7 @@
       "chapter_title": "첫겨울의 아침",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-9db2b72d1cabb349ecb6fc977f86fc848d267afc3af6d4e9291b1b31fb30bf3a",
       "node_id": "char-seojin",
@@ -14464,7 +14464,7 @@
       "chapter_title": "2027년 10월 31일 ~ 11월 4일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-9e1d3def9f4904ae85f4e29653baa1a7ff043513a3f0248d263791704412a462",
       "node_id": "loc-west-road",
@@ -14485,7 +14485,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-9f39dbb350f6ea8e8094f79b8bdf5f8e0d69ed67adf74e21d747499f72476edb",
       "node_id": "char-mira",
@@ -14505,7 +14505,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-a04d6c66bd0f8826e1f73401c4f33622d7869d7cc8c3f32bdaa8a3446a6eaed4",
       "node_id": "char-doyoon",
@@ -14526,7 +14526,7 @@
       "chapter_title": "백운생활관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-a15eb202dfe4b2d776325647c7e4630b340d4103772b5f255d1878ed5bb8915c",
       "node_id": "char-hyerin",
@@ -14547,7 +14547,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-a1b94a7eec5ae236093d1510f082c54ee51854d00d8a0af53ee4434de03570ba",
       "node_id": "loc-sports-complex",
@@ -14591,7 +14591,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-a21ab17993c2e80db54194e1239222a19d79a6e4e31bba50485da65161b83fcd",
       "node_id": "char-hajin",
@@ -14639,7 +14639,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-a2b66a1789d545afeea3ddae6b21ee0e03eb2e7cb7b85ec48bb3146d213450e3",
       "node_id": "loc-baekun",
@@ -14661,7 +14661,7 @@
       "chapter_title": "열세 사람의 밤",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-a4fbb1d1f074b85fa9c403435aa7173a6f438ebbb85f4ea6958559af778dce0a",
       "node_id": "char-sehoon",
@@ -14684,7 +14684,7 @@
       "chapter_title": "정식 연합체",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-a697e8129a22a20969721d5f15bbb598ae42877119b66979c24a1f2afa17216f",
       "node_id": "char-eunchae",
@@ -14705,7 +14705,7 @@
       "chapter_title": "불이 지나간 자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-a6e50944339e2e66de16e17820a510ca78129acbe6c488c31291fb5127ee0b37",
       "node_id": "char-mira",
@@ -14727,7 +14727,7 @@
       "chapter_title": "북쪽 의원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-a7b1c1ea8b6dfefab0d6d4a4069ac81cd51973de517ba70d99f1bac8066cbead",
       "node_id": "char-taehoon",
@@ -14749,7 +14749,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-a8b598c20a93d3c220a6c3dd7968b90156b1e431a691633cd41d7e11483c0cac",
       "node_id": "char-mingyu",
@@ -14773,7 +14773,7 @@
       "chapter_title": "실증단지의 불",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-a944a9b44ccef5c62841afa8b0becfe6d0a66c5cde63693c4b487f8b5a0114bc",
       "node_id": "char-sehoon",
@@ -14808,7 +14808,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-aac26bb5e848ef69389cab0f3931f66b543eb15ce63378c943d6491e0a91a07e",
       "node_id": "char-doyoon",
@@ -14828,7 +14828,7 @@
       "chapter_title": "복지관의 두 축",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-ab9a99277d69139806787e3107c51afc4c09f7a702bf365e3faba91069e08597",
       "node_id": "char-hayoung",
@@ -14857,7 +14857,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-ad1b829ee1d6456c0f6e573f591904aa51116e1dfe061a99a3d10222153e6bf7",
       "node_id": "char-hayoung",
@@ -14873,7 +14873,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-add63fedc51bad5059aec5243b53e6a1faed477dcda0c9f4505bd59d3d3cc8b1",
       "node_id": "char-jisu",
@@ -14894,7 +14894,7 @@
       "chapter_title": "정식 연합체",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-ae03c185251194776ff405b295e5109df082761791bc8b12dde511d989e26d42",
       "node_id": "char-doyoon",
@@ -14914,7 +14914,7 @@
       "chapter_title": "2027년 5월 4일 09:00",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-b026005591f0dba5d281c7e41d8f75d2b8ec4f29f7ea291b41b44c331283e6a8",
       "node_id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
@@ -14944,7 +14944,7 @@
       "chapter_title": "산림교육원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-b02c742f451f1436043870523d73c1ebabf2bc4434310d596f38a3ee4a50d6f0",
       "node_id": "char-jinwoo",
@@ -14969,7 +14969,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-b0d9b3e8fed8491a09091d5c936322c2099203cf327a182a34aa4cd5a998b2cd",
       "node_id": "loc-forest",
@@ -14991,7 +14991,7 @@
       "chapter_title": "두 번째 거점",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-b13791ca69926aecee8d9edcaa9e3f6c1e14a0fb01b6f017c6f0d47526b9211c",
       "node_id": "char-taehoon",
@@ -15033,7 +15033,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-b29c27a632ced6cc04eddc1d0db62151b5805ac29e827c151edf7c1e6364a624",
       "node_id": "char-eunchae",
@@ -15054,7 +15054,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-b3ad7f59388f9dc1638d6bbeefbf08dc3303b5314af3314ade40677e2e43b290",
       "node_id": "char-jinwoo",
@@ -15070,7 +15070,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-b3beed8bc9eea62d2f9a606557e3ac77c81a3936fad4b314d2863baae8615c50",
       "node_id": "char-hayoung",
@@ -15106,7 +15106,7 @@
       "chapter_title": "두 번째 거점",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-b41154d4f0fab51967a66dcaf5927bd3f2d22102a65f86fc9b9bfdc3929c78d3",
       "node_id": "char-eunchae",
@@ -15146,7 +15146,7 @@
       "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-b52fdab518d420aef1de51a6f85a28503f9a83a5941bb41245c08cf289c95437",
       "node_id": "char-taehoon",
@@ -15167,7 +15167,7 @@
       "chapter_title": "동천교 바깥의 차량들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-b6c02fcbc70826af17061de9a30062705bbe54d4875f05b532b354f7dfac921b",
       "node_id": "loc-west-road",
@@ -15190,7 +15190,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-b80b4f3576662991dcc1bd34a9136e37eaedeee4922afbe878174c3d6db1fb91",
       "node_id": "loc-agri",
@@ -15210,7 +15210,7 @@
       "chapter_title": "열세 사람의 밤",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-b8fbd77d00df4abc912dd360642dd1c540c3be9fb873e871c95c46f01a7581d4",
       "node_id": "char-eunchae",
@@ -15234,7 +15234,7 @@
       "chapter_title": "동천교 바깥의 차량들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-b90857b6b32a0263423c91d806141bfb97830053a590109af3759e92cb092111",
       "node_id": "char-jisu",
@@ -15254,7 +15254,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-b9a9437ccc89dd8379928206a3336ede3fcc39db729b0869618c6fd6af766972",
       "node_id": "char-jinwoo",
@@ -15277,7 +15277,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-bc0e6e03d8ae1d85cdb16c5016bfdfe9d60aafaf6686b1ee02780df5927aaa3f",
       "node_id": "char-mingyu",
@@ -15300,7 +15300,7 @@
       "chapter_title": "두 번째 거점",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-bccae78ddb4a5024a1e88950d99f82ae4ea1f76d14b12314befdea69b2b13183",
       "node_id": "char-jinwoo",
@@ -15324,7 +15324,7 @@
       "chapter_title": "불이 지나간 자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-be44eccd9389e0f70b68e5ddd10975fa61b9dbf9458ed9b19d170b1a47ccd679",
       "node_id": "char-taehoon",
@@ -15355,7 +15355,7 @@
       "chapter_title": "2027년 7월 13일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-beb4e8509801741b345602e5fe17464f1c323d0a49283d96261f2cf7574300a4",
       "node_id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
@@ -15375,7 +15375,7 @@
       "chapter_title": "2027년 10월 31일 ~ 11월 4일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-bedd3a2307f0f8946954eaf71eb14eca7f7bd89af50424c966ea24f95e7902f3",
       "node_id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
@@ -15395,7 +15395,7 @@
       "chapter_title": "북쪽 의원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c0c9eee3ee11f8bece66c4484696a414e33bf61e8e594d1d59df636e66e774ef",
       "node_id": "char-jinwoo",
@@ -15420,7 +15420,7 @@
       "chapter_title": "불이 지나간 자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c173898cc2e73efc69d228d8069db628213f016de187dd447339752b13ffff1d",
       "node_id": "char-hayoung",
@@ -15471,7 +15471,7 @@
       "chapter_title": "산림교육원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c246a0b268a032129a4c26a290336c7efb625f93c50fa90d61f9745e182fedf0",
       "node_id": "loc-clinic",
@@ -15491,7 +15491,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c2f0dc6beb420f12b42a4ecfb27ca0ed95d1a122cff135c47e10291a8f45b7d2",
       "node_id": "char-kyunghee",
@@ -15513,7 +15513,7 @@
       "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c4c28a40655bce1b2ce5c2986f41d0f95dba901768fdcb071bc6471341e1ebc3",
       "node_id": "loc-west-road",
@@ -15533,7 +15533,7 @@
       "chapter_title": "2027년 9월 23일 ~ 10월 14일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c610ce49aed073ac76c532fce214c796d482a5c34e4ecd4fb0277cfe4a69fc5e",
       "node_id": "char-wiki-9cb69d0dc08460c215904370",
@@ -15553,7 +15553,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c64b91108c0dc24215300b8bc0961b128472f2285962b61d3a4b5e4481e41565",
       "node_id": "char-hajin",
@@ -15575,7 +15575,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c64f21b18ece6a29f9d063b72d9accad024160851e9215186e4049930ad9578c",
       "node_id": "char-mira",
@@ -15609,7 +15609,7 @@
       "chapter_title": "다섯 거점의 선택",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c67e5faf464f6fa188207474667d38bdea80e9f44cb9501a695f84f993af2cde",
       "node_id": "char-yujin",
@@ -15629,7 +15629,7 @@
       "chapter_title": "다섯 거점의 선택",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c686f4b578903f7ebf52e5de4613347ba6652db40df75e4a99b36b9d0de61734",
       "node_id": "char-mira",
@@ -15649,7 +15649,7 @@
       "chapter_title": "첫겨울의 아침",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c689b894891f25d7ca9b0ca098434564375da5afb85f678c9e1e5e0c90e9a41e",
       "node_id": "char-mira",
@@ -15672,7 +15672,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c749719818634a65149ab37ba297fac8685db884e0615c412af1cf163be7a4c9",
       "node_id": "char-seojin",
@@ -15693,7 +15693,7 @@
       "chapter_title": "첫겨울의 아침",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c777140c9b9a9dc5b0559d66b38f8e159a49206cb8592fc3edb461a319173562",
       "node_id": "char-taehoon",
@@ -15713,7 +15713,7 @@
       "chapter_title": "복지관의 두 축",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c7cca36ed9ee0085f2169cd3ce5f1a9706ecdbcb861ba4af0d47226d134bc638",
       "node_id": "char-minho",
@@ -15734,7 +15734,7 @@
       "chapter_title": "동천교 바깥의 차량들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c8cc97e2642049609134882105c4f9b5b76345e7a76ab69d87424a4254415cc8",
       "node_id": "char-mingyu",
@@ -15754,7 +15754,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c8e73941f5866cb0f5e00f419f8b3c5bd09d3cf1966a26319da4a44613b87c6a",
       "node_id": "char-hyerin",
@@ -15777,7 +15777,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-c9700d6969e1d2ebf6085348370abe401e8b4246f43d768c8f5cafb0f5b8d8fd",
       "node_id": "char-jaemin",
@@ -15798,7 +15798,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-caa246e338f6043bef7bcf9fa9cc6c2f26db01038bfaeb3f3f490b3a6b1490bb",
       "node_id": "loc-west-road",
@@ -15823,7 +15823,7 @@
       "chapter_title": "2027년 6월 19일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-cb0c546e08187bd185644faee49039e53d361c82b9dc3632ecca797273a5c042",
       "node_id": "loc-west-road",
@@ -15851,7 +15851,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-cb2c6575ade330d4d6313b83535063a5dee15cc07094dfb69308a716753d5ce5",
       "node_id": "loc-forest",
@@ -15878,7 +15878,7 @@
       "chapter_title": "서쪽 화재선",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-cb3c48d07b21b38dea19c8ab9b2a47bbb02c4a4408e4e4c3ac9ce838fcd6b40e",
       "node_id": "char-doyoon",
@@ -15898,7 +15898,7 @@
       "chapter_title": "2027년 7월 13일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-cba356c94db8a78dac512a39f5ec67cbe4626354dbbffe674e58580d0fdfcef6",
       "node_id": "char-wiki-97e31f6fd22a6841eb7def52",
@@ -15919,7 +15919,7 @@
       "chapter_title": "2027년 10월 31일 ~ 11월 4일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-cc07928f7d67f0dc0b962db4b830c3507654b3312a30a4c21340a50434a9779d",
       "node_id": "char-eunchae",
@@ -15939,7 +15939,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-cdb48fd2e2695e5eb3e82f68224d3a8f2c0e35da92e8262153c90e9ded450021",
       "node_id": "char-taehoon",
@@ -15964,7 +15964,7 @@
       "chapter_title": "북쪽 의원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-cefbf8a6707c77f5e2553692e8e4a51052181b9e22adff56bf5fe130b3c67002",
       "node_id": "char-hajin",
@@ -15984,7 +15984,7 @@
       "chapter_title": "불이 지나간 자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-cffb0306d40886f86ad99460025a8d8f7926072b10f308532b78bef5d66981c2",
       "node_id": "char-sehoon",
@@ -16004,7 +16004,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-d01c23b8a2c8a8ad9c3c4fae2fdf8ca204808a30137179c08d8616efc78b375c",
       "node_id": "loc-west-road",
@@ -16026,7 +16026,7 @@
       "chapter_title": "첫겨울의 아침",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-d083bb2fe75b4209a1db533c90014b18eb9123ae1e39de4c5bcd46c9797544c3",
       "node_id": "char-doyoon",
@@ -16047,7 +16047,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-d2142a7a202438fc506c529df8136c79f0ca1d4a5778f7ac4c2dac17bb6f1b82",
       "node_id": "char-sehoon",
@@ -16068,7 +16068,7 @@
       "chapter_title": "정식 연합체",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-d24a1b0a8549b64a1b5ba1649d6a3a9ec6f24293cb089998b0150296d2c7416d",
       "node_id": "loc-forest",
@@ -16088,7 +16088,7 @@
       "chapter_title": "백운생활관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-d2de3cf1c87a02f1ddc87e6a1c6cec329dbe7139b053b78c49ec8580e5aeea0c",
       "node_id": "char-taehoon",
@@ -16117,7 +16117,7 @@
       "chapter_title": "2027년 7월 13일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-d38d97a97896ecb69c2057836a2a95ce330365c5766e21034809dc661bbbefc1",
       "node_id": "char-wiki-8499006fbd51eb7a8c88ab1f",
@@ -16139,7 +16139,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-d3df8009197cc20db8a15181267a7babb86d6d9fbfa40cdde3e643de9bc709cf",
       "node_id": "char-seojin",
@@ -16164,7 +16164,7 @@
       "chapter_title": "2027년 4월 8일 11:36",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-d4199c9f68b8bd0e53e75c41faf0a39ffdd5d3d8136ba651bd6434640580f13b",
       "node_id": "loc-sports-complex",
@@ -16187,7 +16187,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-d501d05e759c17c8f1e99d67c536a0ea860c6e36e9c6d050fb1b36e35e2ab53c",
       "node_id": "char-minho",
@@ -16212,7 +16212,7 @@
       "chapter_title": "2027년 10월 31일 ~ 11월 4일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-d597db7cd840a37e37e3acedc29eee718af90a3061c650c12d9b5e1656d90821",
       "node_id": "loc-wiki-f73ae01ebcb8d89952911bbc",
@@ -16232,7 +16232,7 @@
       "chapter_title": "2027년 10월 31일 ~ 11월 4일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-d61634f6a676d837143b6f58cb59d690b55265656ce9d4e5c3e3070aa7185010",
       "node_id": "char-wiki-9cb69d0dc08460c215904370",
@@ -16252,7 +16252,7 @@
       "chapter_title": "정식 연합체",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-d6ce15609923c3bc1dbaec0d8fad08baf06d17461154242e1828007175fd6521",
       "node_id": "char-minho",
@@ -16276,7 +16276,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-d7f5fb1534a7f744bad6be6bb6ee180f357c8134cf9acda8db55de21770da2ec",
       "node_id": "char-jaemin",
@@ -16297,7 +16297,7 @@
       "chapter_title": "서쪽 화재선",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-d9561cbf2224b02e009e81c36cad0bb8a83c0ee523ab795e8149df64ad14d0d7",
       "node_id": "char-seojin",
@@ -16333,7 +16333,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-dc1ffd627cd01917b6ba748dc14ce6f750be65c75e5a0dabf693b999e7f61e15",
       "node_id": "char-sehoon",
@@ -16353,7 +16353,7 @@
       "chapter_title": "복지관의 두 축",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-dd10c5725499ef771c1ed4fc6edda378b8f016246606a0643b026fc5b2ce1655",
       "node_id": "char-mingyu",
@@ -16373,7 +16373,7 @@
       "chapter_title": "외곽 주민복지관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-ddb894009a016d423ca9165ca2a886a5a6c896d6396ecb2b4a1a94651ec179e4",
       "node_id": "loc-west-road",
@@ -16393,7 +16393,7 @@
       "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-de560c67418ee7ab0df86c39d587972f73b81408cb6ed5a62fa98582e2bc6b00",
       "node_id": "char-hajin",
@@ -16416,7 +16416,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-deb50e860634744795365fd8b7a01aaafe8b4a9a688833975c941edf5b13694d",
       "node_id": "event-shelter",
@@ -16432,7 +16432,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-df092bd30278aa1da2bf4b47649c9f108184ffb4fbe26751c28f14b2e95950db",
       "node_id": "char-cheolsu",
@@ -16452,7 +16452,7 @@
       "chapter_title": "외곽 주민복지관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-dfceddf2e9000dadce63df10c71e4bcc0c322eeb6bafa7a911b3176e46e41447",
       "node_id": "char-hayoung",
@@ -16468,7 +16468,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-e0254c932642854b2d3d9a197bb933a78929d35407e5f5a27dfb9ff3d2a29b58",
       "node_id": "char-taehoon",
@@ -16488,7 +16488,7 @@
       "chapter_title": "2027년 4월 11일 17:25",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-e12249718f15e41bac522d79516145050518cbadfad828c1d55f32b47459eedc",
       "node_id": "char-mingyu",
@@ -16509,7 +16509,7 @@
       "chapter_title": "동천교 바깥의 차량들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-e1407d52dbacc343d2e47d3799ce97269086d2f62c96166c2d5eac4a45de9556",
       "node_id": "loc-baekun",
@@ -16529,7 +16529,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-e1a9b5e86abf6b6cf9a341769f42a49c9dab685210a9332cfe3ff18e80694f0c",
       "node_id": "event-fireline",
@@ -16545,7 +16545,7 @@
       "chapter_title": "백운 밖의 잠자리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-e20d30f688e5c26727d2e96253cbe4513bc054a63d0c512b8422ff6365508d9c",
       "node_id": "char-hajin",
@@ -16580,7 +16580,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-e21ae52275570d3640cec91234fc8d22faaad9bfc4cba02bf44aa499eb8fceb4",
       "node_id": "char-minho",
@@ -16605,7 +16605,7 @@
       "chapter_title": "2027년 9월 23일 ~ 10월 14일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-e355b1db8ef1c1f88d1a8e3b59bee94849f08c4ad1c3f5db6040481c93b20064",
       "node_id": "loc-wiki-5b717b2a37f7f4375268b82a",
@@ -16625,7 +16625,7 @@
       "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-e3fabce5e955e18355ea01d3427f5f1d74634b871ce9baa1a84384ab7b04d312",
       "node_id": "char-seojin",
@@ -16647,7 +16647,7 @@
       "chapter_title": "2027년 10월 31일 ~ 11월 4일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-e4167c8693f81e06b994094f754d2c303ec385a9cd259bfe85c8b075017c1f1f",
       "node_id": "char-jinwoo",
@@ -16668,7 +16668,7 @@
       "chapter_title": "산림교육원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-e4d654a767098926c95e5b2d99a2af0b9fafc8b44f296adba8a4033141ad79e5",
       "node_id": "char-seongho",
@@ -16693,7 +16693,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-e8444e52c678800a49ce4d95442af3685891233a929f18a8d4b35c0a72ad3918",
       "node_id": "char-kyunghee",
@@ -16713,7 +16713,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-e87ba23a0769a12e192a5abe8be32f9bf5d463a63c00628114a3a2a1b4d3b2db",
       "node_id": "char-sehoon",
@@ -16741,7 +16741,7 @@
       "chapter_title": "북쪽 의원",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-e973c6bb71ae28e3d17ac0faeeb0ee87248b28a759e34d65af9a5206d1e849ae",
       "node_id": "char-seojin",
@@ -16763,7 +16763,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-e9acad0bbb3acba024cc8d21acf14af4ef72ea38d87934a74bbba634a5f38dd6",
       "node_id": "char-jaemin",
@@ -16790,7 +16790,7 @@
       "chapter_title": "2027년 4월 11일 17:25",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-eb81564d21b7f5295c0688466806c6822c01fa3715dc4c195a836a9e94196681",
       "node_id": "char-minho",
@@ -16810,7 +16810,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-eea884dd3e840c8ae26a81930f8a8c95f462895712a5438fe960dacd44899c23",
       "node_id": "char-seongho",
@@ -16831,7 +16831,7 @@
       "chapter_title": "두 번째 거점",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-eeb2982a91d248db847cb45983f20b47fab4b9c2ae46e852fb0c36f07781ae7d",
       "node_id": "char-seojin",
@@ -16867,7 +16867,7 @@
       "chapter_title": "복지관의 두 축",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-ef1d46db33cb257da83e780aa3524e3a1a1676c07da45567baef46ecd82ac94a",
       "node_id": "loc-bridge",
@@ -16890,7 +16890,7 @@
       "chapter_title": "2027년 6월 19일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-ef8ec36d09f32178abc73401dad09f6e6e1797d5d272edcd1f574a8b7a924819",
       "node_id": "char-wiki-cc15e0b3875ce0e734646be4",
@@ -16911,7 +16911,7 @@
       "chapter_title": "복지관의 두 축",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-ef9ae99a3ce27c140371a42a3584461a278433da99a328d3d5c1947bdde0027e",
       "node_id": "char-hajin",
@@ -16941,7 +16941,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f24ebdb3bab94ee0d17230ebb3e57adbc2083185688e58ff74a05512bd48df20",
       "node_id": "char-seongho",
@@ -16972,7 +16972,7 @@
       "chapter_title": "얼어붙은 관정",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f2e4448c81d5fde3b41c910e6c8197b432a0040fc5005f962e7a073586ab40cc",
       "node_id": "char-sehoon",
@@ -16999,7 +16999,7 @@
       "chapter_title": "겨울 전 갈무리",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f358584ad0134903db7a2e5faa6e81e8f7a882d5354ae7715015c6c1211c5ab6",
       "node_id": "loc-forest",
@@ -17020,7 +17020,7 @@
       "chapter_title": "서쪽 화재선",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f40de0fcdd6320c387f4220fb66870d04baee4fe92af4e71f778b3a35ec73709",
       "node_id": "char-minho",
@@ -17045,7 +17045,7 @@
       "chapter_title": "백운생활관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f42bb91c0994d0412e0c49fe3867347b95234da73131d79580db2724a31edd70",
       "node_id": "char-hayoung",
@@ -17065,7 +17065,7 @@
       "chapter_title": "실증단지의 불",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f44640e159333a24285d8841b978fd50d2db9e365011309c2e3676a73c5cab11",
       "node_id": "char-seojin",
@@ -17089,7 +17089,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f472619d81c0240b516d89389cc4cf4fed02e401460fe079eb6071fee8c12d2a",
       "node_id": "char-jisu",
@@ -17115,7 +17115,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f4f1161d91a8d632ea99df78918540ba54f5cb3be4c4eee4cb823342ad48dabc",
       "node_id": "char-minho",
@@ -17135,7 +17135,7 @@
       "chapter_title": "열세 사람의 밤",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f55edb5a0c9c64447a83f0da7eafee06a4765321c72d4f933c9c795ad4b4ccbd",
       "node_id": "char-hayoung",
@@ -17157,7 +17157,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f652625b92a80f4de8c2d9643515e44fc4d64110952e1987b2eb290041f1812c",
       "node_id": "char-hajin",
@@ -17208,7 +17208,7 @@
       "chapter_title": "다섯 거점의 선택",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f67aea194be1753e567e5767f41f38f9847cbbb5e739b7ae11c0e8f559d4a716",
       "node_id": "char-minho",
@@ -17228,7 +17228,7 @@
       "chapter_title": "체육시설의 낮",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f7c2cfa318c65112c00647e1abcfc39e39510b4fe8da0fe0d86a6ad0cc9b1ccd",
       "node_id": "char-taehoon",
@@ -17253,7 +17253,7 @@
       "chapter_title": "2027년 10월 31일 ~ 11월 4일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f7e3536e37934afd0f804e4f60d5b011787e2cbd5f1732b357555a14d9a0a851",
       "node_id": "char-wiki-cc15e0b3875ce0e734646be4",
@@ -17273,7 +17273,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f83226b79746baf0e0401bb447658809f9bb0c552ed8d39644f603d03120abb2",
       "node_id": "char-kyunghee",
@@ -17295,7 +17295,7 @@
       "chapter_title": "다섯 거점의 선택",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f877f0572c5c8f22580ead753c3e837cec5ce182cae61a6fcf3cd8768cde54d2",
       "node_id": "char-eunchae",
@@ -17319,7 +17319,7 @@
       "chapter_title": "2027년 9월 23일 ~ 10월 14일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f8e61701e7a97d2d97ef268e612ee1741843183e6bede1c63204f8e08f85284f",
       "node_id": "loc-sports-complex",
@@ -17339,7 +17339,7 @@
       "chapter_title": "동천교 바깥의 차량들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f9826f5be49fdcfa2f97fc2bb4244f6303958922bfa645acddcebcb572a76d88",
       "node_id": "char-minho",
@@ -17360,7 +17360,7 @@
       "chapter_title": "2027년 9월 23일 ~ 10월 14일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-f9fbcac7ad165de364724970dd425ef9ebb49c3b6515c466ee93d6aecc06e086",
       "node_id": "loc-wiki-6d44db0505ec3dcf97e41a4a",
@@ -17382,7 +17382,7 @@
       "chapter_title": "야간 감시",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-fa2fb3024290875bf19fca139ca454a9c66131cae6e5f0c8e979fe8b29d37e95",
       "node_id": "char-mingyu",
@@ -17411,7 +17411,7 @@
       "chapter_title": "백운생활관",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-fa4331e96888b7e40699f541f03673e5d454db57fbe96dad3171b270166b87d3",
       "node_id": "loc-baekun",
@@ -17442,7 +17442,7 @@
       "chapter_title": "공공대피시설",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-fabb4442d18ada702d84a5e95667ee8e48e8cdafe94cfe9ad3b0727b107fcf5f",
       "node_id": "char-sehoon",
@@ -17462,7 +17462,7 @@
       "chapter_title": "두 번째 거점",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-fb68f98ecc874362f51c6c5e03217459c4774cb662c203d8bbd7d795fca3f242",
       "node_id": "char-doyoon",
@@ -17487,7 +17487,7 @@
       "chapter_title": "복지관의 두 축",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-fb8dbb2154b713f6711a51adade222ae4b605748ebec7e538de24f895650c635",
       "node_id": "char-eunchae",
@@ -17507,7 +17507,7 @@
       "chapter_title": "2027년 6월 19일",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-fba290ce828757b6568c1b1aaa8f7c7aecd348272585b7f99f4b40da8681def1",
       "node_id": "char-seongho",
@@ -17527,7 +17527,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-fcbf4caedf0cca8a0e996cfb74dc30b5d2fed6f3c1fefeedf846d0b924902081",
       "node_id": "char-jinwoo",
@@ -17543,7 +17543,7 @@
       "chapter_title": "실증단지의 불",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-fcd989945ebdf2b5feaca5270c5bd7f00c49dad1443183b27e5c11b9de1ee857",
       "node_id": "char-jinwoo",
@@ -17567,7 +17567,7 @@
       "chapter_title": "교환지의 사람들",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-fce8042207869cdf9324350ffa6d08859a90b0054ae4e5be16a7385569f73d58",
       "node_id": "char-kyunghee",
@@ -17587,7 +17587,7 @@
       "chapter_title": "일곱 명의 원칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-fde32f8a8388bc65516f70d68dc07797d0eccae0d68d56cd9c704440b0ef785d",
       "node_id": "loc-bridge",
@@ -17607,7 +17607,7 @@
       "chapter_title": "열세 사람의 밤",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-fe5218d2b68406dbe752e8feda430ec578a2bca050cf9988c078bd179c21d199",
       "node_id": "char-hajin",
@@ -17661,7 +17661,7 @@
       "chapter_title": "연료장과 길의 규칙",
       "evidence": {
         "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
-        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
       },
       "id": "mention-fff6082a85ec9c3b474ef402fd06be33ef44b2d83ae2dfe92163292c8847c1f2",
       "node_id": "char-sehoon",
