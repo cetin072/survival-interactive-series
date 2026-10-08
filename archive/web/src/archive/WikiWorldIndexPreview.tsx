@@ -1,4 +1,4 @@
-import { chronicleRegistry, getChronicle } from './chronicleRegistry'
+import { chronicleRegistry, getChronicle, sortChroniclesNewestFirst } from './chronicleRegistry'
 import { chaptersForChronicle } from './storyData'
 import { hasPublishedWorldWiki, publishedWorldWikiIndex, type WorldWikiIndexItem } from './worldWikiIndexData'
 import { WikiTopbar } from './WikiTopbar'
@@ -61,7 +61,7 @@ function ChronicleWorldList() {
       <span>{chronicleRegistry.length}개 생존기</span>
     </div>
     <div className="wiki-chronicle-list">
-      {chronicleRegistry.map((item) => <article key={item.id}>
+      {sortChroniclesNewestFirst(chronicleRegistry).map((item) => <article key={item.id}>
         <span>{String(item.number).padStart(2, '0')}</span>
         <div>
           <strong>{item.title}</strong>

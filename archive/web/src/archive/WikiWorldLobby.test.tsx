@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { WikiWorldLobby } from './WikiWorldLobby'
 import { WikiShellPreview } from './WikiShellPreview'
-import { chronicleRegistry } from './chronicleRegistry'
+import { chronicleRegistry, sortChroniclesNewestFirst } from './chronicleRegistry'
 import { parseArchiveRoute, archiveRouteUrl } from './readerNavigation'
 import { publicNavigation, currentPublicMenu } from './publicNavigation'
 import { wikiLobbyHref } from './wikiLinks'
@@ -44,6 +44,27 @@ describe('shared world Wiki entrance', () => {
     expect(empty).not.toContain('href="/?view=wiki-preview&amp;page=world&amp;chronicle=C04-FIXTURE"')
     expect(html).not.toContain('C04-FIXTURE')
   })
+  it('shows newest Chronicles first in cards and remains correct for future C04, without modifying registry order', () => {
+    const before = chronicleRegistry.map((item) => item.id)
+    const markup = renderToStaticMarkup(createElement(WikiWorldLobby))
+    const cards = markup.split('class="wiki-home-section world-wiki-card"').slice(1)
+    expect(cards).toHaveLength(3)
+    expect(cards.map((card) => card.match(/<h2>([^<]+)<\/h2>/)?.[1]))
+      .toEqual(['서진우의 생존기', '박도현의 생존기', '한준호의 생존기'])
+
+    const future = {
+      ...chronicleRegistry[0], id: 'C04-FUTURE-FIXTURE', number: 4,
+      title: '미래 C04', status: 'PLANNED' as const, readerAvailable: false,
+    }
+    const shuffled = [chronicleRegistry[1], chronicleRegistry[0], future, chronicleRegistry[2]]
+    expect(sortChroniclesNewestFirst(shuffled).map((item) => item.number)).toEqual([4, 3, 2, 1])
+    const futureMarkup = renderToStaticMarkup(createElement(WikiWorldLobby, { registry: shuffled }))
+    expect(futureMarkup.indexOf('미래 C04')).toBeLessThan(futureMarkup.indexOf('서진우의 생존기'))
+    expect(futureMarkup).not.toContain('chronicle=C04-FUTURE-FIXTURE')
+    expect(chronicleRegistry.map((item) => item.id)).toEqual(before)
+    expect(shuffled.map((item) => item.number)).toEqual([2, 1, 4, 3])
+  })
+
   it('pins bare historical nodes to C03 and fails closed for explicit invalid Chronicle/node pairs', () => {
     expect(parseArchiveRoute('?view=wiki-preview&node=char-jinwoo')).toMatchObject({ chronicleId: 'C03-AFTERFALL' })
     const invalid = parseArchiveRoute('?view=wiki-preview&page=world&chronicle=NO-WORLD')

@@ -1,4 +1,4 @@
-import { chronicleRegistry, type Chronicle } from './chronicleRegistry'
+import { chronicleRegistry, sortChroniclesNewestFirst, type Chronicle } from './chronicleRegistry'
 import { chronicleBooks, chaptersForChronicle } from './storyData'
 import { publishedWorldWikiIndex } from './worldWikiIndexData'
 import { worldWikiHref } from './wikiLinks'
@@ -14,7 +14,7 @@ export function WikiWorldLobby({ registry = chronicleRegistry, notice }: { regis
       <header className="wiki-home-intro"><h1>세계관 위키</h1><p>생존기별 인물·장소·사건과 이야기 속 기록을 찾아보세요.</p></header>
       {notice && <p role="status">{notice}</p>}
       <div className="world-wiki-cards">
-        {registry.map((chronicle) => {
+        {sortChroniclesNewestFirst(registry).map((chronicle) => {
           const wiki = publishedWorldWikiIndex(chronicle.id)
           const book = chronicleBooks.find((b) => b.chronicleId === chronicle.id)
           const readable = chronicle.readerAvailable && chaptersForChronicle(chronicle.id).length > 0

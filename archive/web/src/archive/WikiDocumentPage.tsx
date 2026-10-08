@@ -6,6 +6,7 @@ import { WikiTopbar } from './WikiTopbar'
 import { wikiNodeHref, worldWikiHref } from './wikiLinks'
 import './wikiShell.css'
 import './survivalDesignLanguage.css'
+import './wikiDocumentQuickNav.css'
 
 type PlannedSection = {
   id: string
@@ -62,6 +63,12 @@ export function WikiDocumentPage({
         <a href="/">생존일기</a><span>›</span>
         <a href={worldWikiHref(document.chronicleId)}>{chronicle.title}</a><span>›</span>
         <span>{document.typeLabel}</span><span>›</span><strong>{document.title}</strong>
+      </nav>
+
+      <nav className="wiki-floating-nav" aria-label="문서 빠른 이동">
+        <a href="#wiki-toc" aria-label="목차">☷</a>
+        <a href="#wiki-top" aria-label="맨 위로">↑</a>
+        <a href="#wiki-bottom" aria-label="맨 아래로">↓</a>
       </nav>
 
       <article className="wiki-document">
@@ -207,11 +214,5 @@ export function WikiDocumentPage({
         </footer>
       </article>
     </div>
-
-    <nav className="wiki-floating-nav" aria-label="문서 빠른 이동">
-      <a href="#wiki-toc" aria-label="목차">☷</a>
-      <a href="#wiki-top" aria-label="맨 위로">↑</a>
-      <a href="#wiki-bottom" aria-label="맨 아래로">↓</a>
-    </nav>
   </main>
 }

@@ -59,6 +59,19 @@ describe('Wiki staged public structure', () => {
     }
   })
 
+  it('keeps the related Chronicle list in newest-first order, not the original registry order', () => {
+    const html = renderToStaticMarkup(createElement(WikiShellPreview, {
+      page: 'world', chronicleId: 'C03-AFTERFALL',
+    }))
+    const side = html.split('id="world-chronicle-list-title"')[1] ?? ''
+    const newest = side.indexOf('서진우의 생존기')
+    const middle = side.indexOf('박도현의 생존기')
+    const oldest = side.indexOf('한준호의 생존기')
+    expect(newest).toBeGreaterThan(0)
+    expect(middle).toBeGreaterThan(newest)
+    expect(oldest).toBeGreaterThan(middle)
+  })
+
   it('shows six document links per category, with native details for the rest', () => {
     const markup = renderToStaticMarkup(createElement(WikiShellPreview, {
       page: 'world', chronicleId: 'C03-AFTERFALL',
@@ -118,6 +131,21 @@ describe('Wiki staged public structure', () => {
     expect(markup).not.toContain('node=char-jinwoo')
     expect(markup).toContain('이야기 읽기')
     expect(markup).not.toContain('서진우의 생존 기록')
+  })
+
+  it('keeps the one quick navigation in document flow before the article on mobile', () => {
+    for (const props of [
+      { nodeId: 'char-jinwoo', chronicleId: 'C03-AFTERFALL' },
+      { nodeId: 'char-junho', chronicleId: 'C01-HAN-JUNHO' },
+      { nodeId: 'char-dohyun', chronicleId: 'C02-STRONGHOLD' },
+    ]) {
+      const html = renderToStaticMarkup(createElement(WikiShellPreview, props))
+      expect((html.match(/class="wiki-floating-nav"/g) ?? []).length).toBe(1)
+      expect(html.indexOf('class="wiki-floating-nav"')).toBeLessThan(html.indexOf('class="wiki-document"'))
+      expect(html).toContain('aria-label="목차"')
+      expect(html).toContain('aria-label="맨 위로"')
+      expect(html).toContain('aria-label="맨 아래로"')
+    }
   })
 
   it('renders real existing Archive data in a Wiki document when a node is selected', () => {
