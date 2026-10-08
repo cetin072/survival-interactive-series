@@ -1,0 +1,21 @@
+{
+  "id": "KC-c03-afterfall-chapter-09-52f0b5966e",
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-018",
+  "question": "대형 화재 주변의 새 불꽃은 어떻게 안전하게 신고할까",
+  "topic_id": "household-emergency-preparedness",
+  "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-chapter-09",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_001.md"
+  ],
+  "source_hashes": [
+    "d5cffaee29e4a79c6cc09f237f41d3b735e4ea636bfbe98df5e21359c19185ad"
+  ],
+  "source_sha256": "e04f888cd7906c51a9898bf9746e2853bee9b80656f786475413fadf6295d432",
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "disposition_note": "기존 글은 일반 정보 인계, 대피 결정, 이동경로를 다루지만 대형 화재 본체에서 떨어진 곳에 나타나는 새 불꽃·연기를 안전하게 신고하는 질문은 다루지 않는다. 현실 효용이 크지만 화재 대응은 중대한 위해 가능성이 있어 HUMAN_REVIEW로 보존한다. Reader는 허구 서사의 narrative provenance로만 사용한다.",
+  "reader_chapter_id": "c03-afterfall-chapter-09",
+  "reader_book_sha256": "53af20b4f4c499838399eb60b6b3046dae4e2a60c066fcaf7bad095e9154db64",
+  "reader_chapter_sha256": "e04f888cd7906c51a9898bf9746e2853bee9b80656f786475413fadf6295d432"
+}
