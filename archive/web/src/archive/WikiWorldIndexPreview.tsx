@@ -4,13 +4,25 @@ import { hasPublishedWorldWiki, publishedWorldWikiIndex, type WorldWikiIndexItem
 import { WikiTopbar } from './WikiTopbar'
 import './wikiShell.css'
 import './survivalDesignLanguage.css'
+import './worldIndexDisclosure.css'
 
 const wikiHref = (nodeId: string) => '/?view=wiki-preview&node=' + encodeURIComponent(nodeId)
 const chronicleHref = (id: string) => '/?view=wiki-preview&page=chronicle&chronicle=' + encodeURIComponent(id)
 const worldHref = (id: string) => '/?view=wiki-preview&page=world&chronicle=' + encodeURIComponent(id)
 const storyHref = (id: string) => '/?view=story&chronicle=' + encodeURIComponent(id)
 
-function WorldIndexSection({
+const worldIndexPreviewLimit = 6
+
+function WorldIndexLinks({ items }: { items: readonly WorldWikiIndexItem[] }) {
+  return <div className="wiki-world-index-list">
+    {items.map((item) => <a key={item.id} href={wikiHref(item.id)}>
+      <strong>{item.title}</strong>
+      {item.subtitle && <small>{item.subtitle}</small>}
+    </a>)}
+  </div>
+}
+
+export function WorldIndexSection({
   id,
   title,
   countLabel,
@@ -21,17 +33,22 @@ function WorldIndexSection({
   countLabel: string
   items: readonly WorldWikiIndexItem[]
 }) {
+  const first = items.slice(0, worldIndexPreviewLimit)
+  const remaining = items.slice(worldIndexPreviewLimit)
+
   return <section className="wiki-home-section wiki-world-index-section" id={id} aria-label={title + ' 전체 목록'}>
     <div className="wiki-section-heading">
       <h2>{title}</h2>
       <span>{items.length}{countLabel}</span>
     </div>
-    <div className="wiki-world-index-list">
-      {items.map((item) => <a key={item.id} href={wikiHref(item.id)}>
-        <strong>{item.title}</strong>
-        {item.subtitle && <small>{item.subtitle}</small>}
-      </a>)}
-    </div>
+    <WorldIndexLinks items={first} />
+    {remaining.length > 0 && <details className="wiki-world-index-disclosure">
+      <summary>
+        <span className="wiki-world-index-more-label">나머지 {remaining.length}{countLabel} 더 보기</span>
+        <span className="wiki-world-index-less-label">목록 접기</span>
+      </summary>
+      <WorldIndexLinks items={remaining} />
+    </details>}
   </section>
 }
 

@@ -1,0 +1,49 @@
+/* World Wiki only: six visible entries, native keyboard-accessible disclosure for the remainder. */
+.wiki-world-index-section .wiki-world-index-disclosure {
+  margin-top: 10px;
+}
+.wiki-world-index-section .wiki-world-index-disclosure > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 13px;
+  border: 1px solid #ccd2c9;
+  border-radius: 5px;
+  background: #f3f6f0;
+  color: #38543b;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  list-style: none;
+}
+.wiki-world-index-section .wiki-world-index-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+.wiki-world-index-section .wiki-world-index-disclosure > summary::after {
+  content: "⌄";
+  font-size: 16px;
+  line-height: 1;
+}
+.wiki-world-index-section .wiki-world-index-disclosure[open] > summary::after {
+  content: "⌃";
+}
+.wiki-world-index-section .wiki-world-index-disclosure .wiki-world-index-less-label,
+.wiki-world-index-section .wiki-world-index-disclosure[open] .wiki-world-index-more-label {
+  display: none;
+}
+.wiki-world-index-section .wiki-world-index-disclosure[open] .wiki-world-index-less-label {
+  display: inline;
+}
+.wiki-world-index-section .wiki-world-index-disclosure > summary:hover {
+  border-color: #8ba28a;
+  background: #eaf0e6;
+}
+.wiki-world-index-section .wiki-world-index-disclosure > summary:focus-visible {
+  outline: 2px solid #466847;
+  outline-offset: 3px;
+}
+.wiki-world-index-section .wiki-world-index-disclosure[open] > .wiki-world-index-list {
+  margin-top: 5px;
+}
+
