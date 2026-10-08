@@ -52,14 +52,17 @@ export type WikiDocumentMetaRow = {
 
 export type WikiDocument = {
   id: string
-  chronicleId: 'C03-AFTERFALL'
+  chronicleId: string
   type: ArchiveNodeType
   typeLabel: string
   title: string
   subtitle: string
   summary: string
-  anchor: { gameTime: string; saveVersion: number }
+  anchor: { gameTime: string; saveVersion?: number }
   metaRows: WikiDocumentMetaRow[]
+  recordBasis?: string
+  notice?: string
+  quotes?: { text: string; quote: string; chapterId: string; chapterTitle: string; kind: string }[]
   appearance?: string
   lead: string[]
   sections: ArchiveArticleSection[]

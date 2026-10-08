@@ -81,7 +81,7 @@ describe('STEP 3-1 shared public destinations', () => {
       const markup = renderRoute(path)
       const nav = markup.match(/<nav (?:aria-label="공용 메뉴"|class="archive-primary-nav")[^>]*>(.*?)<\/nav>/s)![1]
       expect([...nav.matchAll(/<a[^>]*>([^<]+)<\/a>/g)].map((link) => link[1])).toEqual(expected)
-      expect(nav).toContain('/?view=wiki-preview&amp;page=world&amp;chronicle=C03-AFTERFALL')
+      expect(nav).toContain('/?view=wiki-preview&amp;page=worlds')
     }
     expect(renderRoute('/?view=tools')).toContain('href="/?view=tools" aria-current="page"')
     expect(renderRoute('/?view=wiki-preview&page=world&chronicle=C03-AFTERFALL')).toContain('서진우의 생존기 · 세계관 전체보기')

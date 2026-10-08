@@ -17,7 +17,7 @@ export function publishedWorldWikiIndex(chronicleId: string) {
   if (!hasPublishedWorldWiki(chronicleId)) return null
   const recent = buildWikiDocuments(wikiSupportedNodeIds)
     .sort((a, b) => b.anchor.gameTime.localeCompare(a.anchor.gameTime)
-      || b.anchor.saveVersion - a.anchor.saveVersion)
+      || (b.anchor.saveVersion ?? 0) - (a.anchor.saveVersion ?? 0))
     .slice(0, 7)
   return {
     recent,

@@ -7,7 +7,7 @@ export type ArchiveRoute =
   | { view: 'home' | 'story' | 'tools' | 'media' | 'operator' | 'operator-visuals' | 'operator-knowledge' | 'operator-vault'; chronicleId: ChronicleId }
   | { view: 'operator-knowledge-detail'; chronicleId: ChronicleId; jobId: string }
   | { view: 'knowledge-preview'; chronicleId: ChronicleId; briefId?: string }
-  | { view: 'wiki-preview'; chronicleId: ChronicleId; nodeId?: string; page?: 'home' | 'chronicle' | 'world' }
+  | { view: 'wiki-preview'; chronicleId: ChronicleId; nodeId?: string; page?: 'home' | 'chronicle' | 'world' | 'worlds' }
   | { view: 'chronicle'; chronicleId: ChronicleId; section?: ChronicleSection }
   | { view: 'archive'; chronicleId: ChronicleId; nodeId?: string }
   | { view: 'book'; chronicleId: ChronicleId; chapterId?: string }
@@ -75,9 +75,9 @@ export function parseArchiveRoute(search: string, storage?: ReaderStorage, pathn
     const page = params.get('page')
     return {
       view: 'wiki-preview',
-      chronicleId,
+      chronicleId: requested ?? 'C03-AFTERFALL',
       nodeId: params.get('node') ?? undefined,
-      page: page === 'chronicle' ? 'chronicle' : page === 'world' ? 'world' : 'home',
+      page: page === 'chronicle' ? 'chronicle' : page === 'world' ? 'world' : page === 'worlds' ? 'worlds' : 'home',
     }
   }
   if (view === 'knowledge-preview') return { view: 'knowledge-preview', chronicleId, briefId: params.get('brief') ?? undefined }
@@ -97,13 +97,14 @@ export function archiveRouteUrl(route: ArchiveRoute, href: string): URL {
     }
   } else {
     url.pathname = '/'
-    const isWikiHome = route.view === 'wiki-preview' && !route.nodeId && route.page !== 'chronicle' && route.page !== 'world'
+    const isWikiHome = route.view === 'wiki-preview' && !route.nodeId && route.page !== 'chronicle' && route.page !== 'world' && route.page !== 'worlds'
     if (route.view !== 'home' && !isWikiHome) url.searchParams.set('view', route.view === 'book' ? 'story' : route.view)
     if (route.view === 'wiki-preview' && route.nodeId) url.searchParams.set('node', route.nodeId)
     if (route.view === 'knowledge-preview' && route.briefId) url.searchParams.set('brief', route.briefId)
     if (route.view === 'wiki-preview' && !route.nodeId && route.page === 'chronicle') url.searchParams.set('page', 'chronicle')
+    if (route.view === 'wiki-preview' && !route.nodeId && route.page === 'worlds') url.searchParams.set('page', 'worlds')
     if (route.view === 'wiki-preview' && !route.nodeId && route.page === 'world') url.searchParams.set('page', 'world')
-    if (route.view === 'chronicle' || route.view === 'book' || route.view === 'raw' || (route.view === 'wiki-preview' && (route.page === 'chronicle' || route.page === 'world'))) url.searchParams.set('chronicle', route.chronicleId)
+    if (route.view === 'chronicle' || route.view === 'book' || route.view === 'raw' || (route.view === 'wiki-preview' && (route.nodeId || route.page === 'chronicle' || route.page === 'world'))) url.searchParams.set('chronicle', route.chronicleId)
     if (route.view === 'chronicle' && route.section && route.section !== 'overview') url.searchParams.set('section', route.section)
     if (route.view === 'book' && route.chapterId) url.searchParams.set('chapter', route.chapterId)
     if (route.view === 'raw' && route.partId) url.searchParams.set('part', route.partId)

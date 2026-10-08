@@ -35,3 +35,10 @@ Current state is not HUMAN_CHECK_READY.
 ## Resumption
 Read this file and git status/log first. Resume PHASE1; keep completed source IDs stable. Do not re-extract reviewed unchanged chapters.
 Last verified head before this checkpoint: ac13a85 (main sync). Current checkpoint commit is identified by git log.
+
+## PHASE1 checkpoint
+- Implemented card lobby, common React/static Knowledge menu target, root-home preservation, pinned C03 legacy route and explicit invalid-world/node state.
+- PASS: web 29 files/171 tests, knowledge:build, reader:check, build:verified, diff check. App JS 5,274.38kB (gzip1,624.64kB) at this checkpoint; compare final build.
+- Existing orphan seed type failures were real baseline failures and are now fixed by optional common display fields; no receipt/save values fabricated.
+- Local Vite running in exec session87367 at http://127.0.0.1:5177/. CUA browser kernel cannot start: windows sandbox helper setup refresh error. Actual local browser clicks NOT_VERIFIED; final Preview gate remains required. Continue independent PHASE2 data work.
+- Current last commit5426e0a; this checkpoint commit is the next git log entry. No C01/C02 extraction completed.

@@ -1,3 +1,7 @@
+import { WikiWorldLobby } from './WikiWorldLobby'
+import { chronicleRegistry } from './chronicleRegistry'
+import { WikiTopbar } from './WikiTopbar'
+import { wikiLobbyHref } from './wikiLinks'
 import { WikiChroniclePreview } from './WikiChroniclePreview'
 import { WikiDocumentPage } from './WikiDocumentPage'
 import { WikiHomePreview } from './WikiHomePreview'
@@ -20,9 +24,12 @@ export function WikiShellPreview({
   chronicleId = 'C03-AFTERFALL',
 }: {
   nodeId?: string
-  page?: 'home' | 'chronicle' | 'world'
+  page?: 'home' | 'chronicle' | 'world' | 'worlds'
   chronicleId?: string
 }) {
+  if (page === 'worlds') return <WikiWorldLobby />
+  if ((nodeId || page === 'world' || page === 'chronicle') && !chronicleRegistry.some((item) => item.id === chronicleId)) return <WikiNotFound />
+  if (nodeId && (chronicleId !== 'C03-AFTERFALL' || !isWikiSupportedNodeId(nodeId))) return <WikiNotFound />
   if (nodeId && isWikiSupportedNodeId(nodeId)) {
     const document = buildWikiDocument(nodeId)
 
@@ -62,4 +69,8 @@ export function WikiShellPreview({
   if (page === 'chronicle') return <WikiChroniclePreview chronicleId={chronicleId} />
   if (page === 'world') return <WikiWorldIndexPreview chronicleId={chronicleId} />
   return <WikiHomePreview />
+}
+
+export function WikiNotFound() {
+  return <main className="wiki-shell"><WikiTopbar /><div className="wiki-home-frame"><header className="wiki-home-intro"><h1>세계관 문서를 찾을 수 없습니다</h1><p>작품과 문서 주소를 확인해 주세요.</p><a href={wikiLobbyHref}>세계관 위키 선택으로</a></header></div></main>
 }

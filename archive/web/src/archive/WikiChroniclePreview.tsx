@@ -16,7 +16,7 @@ export function WikiChroniclePreview({ chronicleId }: { chronicleId: string }) {
   const hasWorldWiki = hasPublishedWorldWiki(chronicleId)
   const recentDocuments = hasWorldWiki
     ? buildWikiDocuments(wikiSupportedNodeIds)
-      .sort((a, b) => b.anchor.gameTime.localeCompare(a.anchor.gameTime) || b.anchor.saveVersion - a.anchor.saveVersion)
+      .sort((a, b) => b.anchor.gameTime.localeCompare(a.anchor.gameTime) || (b.anchor.saveVersion ?? 0) - (a.anchor.saveVersion ?? 0))
       .slice(0, 8)
     : []
 
