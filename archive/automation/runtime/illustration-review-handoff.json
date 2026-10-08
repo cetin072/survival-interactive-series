@@ -1,17 +1,17 @@
 {
   "version": "illustration-review-handoff-v1",
-  "job_id": "illustration-event-winter-council-c0048fceecc3-20261008-37682453254",
-  "main_sha": "400536cacf5f8fb3d9d8a15ab3f601c74fbe571c",
-  "point_id": "point-e5c2e0b5f6a8074663afdc72b11fe87f9b5fac618fd5b5ee551eca7e359a10e7",
-  "generation_key": "generation-c0048fceecc3e197534a67c851bbddb79673430f781a9b35d01197b68f11dac6",
-  "subject_id": "event-winter-council",
-  "prompt_sha256": "80669c440415d19307e21649687a1da55b93b8306d2bf343a79d3aa112255491",
-  "review_context_sha256": "e685c5074c6d23c6cb580ba1c3c6ba912570fae21358cef4cd75b49c0c3f6b98",
+  "job_id": "illustration-event-guild-warehouse-option-5d70e344c196-20261009-37839899164",
+  "main_sha": "bf49a49e0966beef2d8442d33a4540945280491b",
+  "point_id": "point-f1325bef904fb7ed5048d5e9ccbc7bb7eedbfc486d04591666fd084845a96305",
+  "generation_key": "generation-5d70e344c19613400a472c318135c6f01c09a2b96dffc3338d2d430a565efe3f",
+  "subject_id": "event-guild-warehouse-option",
+  "prompt_sha256": "b7b2c707a45487e72a08392449fab4f249316d9c9b3d1ba9a89b632a1954c7cd",
+  "review_context_sha256": "b028afe116c1927f163fd144056f5e5393a98ec25834fe5933d92bd7e0723577",
   "source_library_path": "/IMAGE-RENDER/output/current.png",
-  "source_library_file_id": "file_00000000f780823081265718c1d2b401",
+  "source_library_file_id": "file_00000000abf481f7bf60909e01a57429",
   "decision": "PASS",
   "review_provider": "native_chatgpt_vision",
-  "review_summary": "Matches the bound winter emergency council scene: four non-identifying people in practical cold-weather workwear confer around paper maps, notes, and supply-like documents in a believable contemporary Korean work space. The cool blue-gray painterly composition conveys calm practical cooperation and restrained tension without unsupported violence, weapons, branding, legible identity text, or invented outcomes.",
+  "review_summary": "Matches the bound warehouse-startup scene: a wide contemporary Korean warehouse shows first stored goods arriving, cartons and pallet-handling tools in active use, and mostly empty shelving that clearly conveys an early transitional operating stage. Small non-identifying workers, cool blue-gray natural light, restrained painterly realism, and ample environmental space support the requested quiet practical mood without invented violence, weapons, branding, legible identity text, or unsupported outcomes.",
   "rejection_codes": [],
-  "created_at": "2026-10-07T23:27:32.746Z"
+  "created_at": "2026-10-08T23:32:33.679Z"
 }
