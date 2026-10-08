@@ -8,7 +8,7 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, cpSync } from 'node:fs'
 import { applySemanticPackage, buildSemanticContext, chapterHash, hashPolicyBytes, knowledgeOperationalDate, makeWorkKey, nextBriefId, reservedCandidateId, selectBackfillChapter, validateSemanticResult } from './knowledge-semantic-jobs.mjs'
 import { finalizerAction, semanticBranchRef, reconcilePullRequest, runSemanticFinalizer, verifyPins } from '../knowledge-semantic-finalize.mjs'
-import { runPackage } from '../knowledge-semantic-finalize.mjs'
+import { runPackage, validateReservedBriefTarget } from '../knowledge-semantic-finalize.mjs'
 import { detectLegacyWorkerBlocker, discoverReaderBookRefs, planSemanticPreparation, selectExperienceSeed } from '../knowledge-semantic-prepare.mjs'
 
 const digest = (value) => createHash('sha256').update(value).digest('hex')
@@ -181,6 +181,18 @@ test('Reader discovery automatically admits a future Chronicle and ignores empty
     await makeBook('C03-EMPTY', false)
     await makeBook('C04-NEW-STORY')
     const refs = await discoverReaderBookRefs({ base })
+    const choice = selectBackfillChapter({ book: JSON.parse(await readFile(join(base, refs[0]), 'utf8')), readerBookRef: refs[0], candidates: [] })
+    assert.equal(choice.readerBookRef, 'archive/content/stories/C04-NEW-STORY/BOOK.json')
+    const source = { kind: 'PUBLIC_READER', reader_book_ref: refs[0], reader_book_sha256: 'd'.repeat(64),
+      chapter_id: choice.chapter.id, chapter_sha256: choice.chapterSha, refs: choice.chapter.sourceRefs, hashes: choice.chapter.sourceHashes }
+    const reserved = nextBriefId([{ id: 'K-014' }], ['K-015'])
+    const c04Job = { ...baseJob, job_type: 'BACKFILL_BRIEF', source_kind: 'PUBLIC_READER', source_ref: choice.sourceRef, source_sha256: choice.chapterSha, semantic_context: { source, target: { brief_id: reserved, candidate_id: baseJob.semantic_context.target.candidate_id } } }
+    const c04Result = packageResult()
+    Object.assign(c04Result.candidate, { source_kind: 'PUBLIC_READER', reader_book_ref: source.reader_book_ref,
+      reader_book_sha256: source.reader_book_sha256, reader_chapter_id: source.chapter_id,
+      reader_chapter_sha256: source.chapter_sha256, source_refs: source.refs, source_hashes: source.hashes })
+    c04Result.brief.id = reserved; c04Result.candidate.brief_id = reserved; c04Result.evidence.brief_id = reserved
+    assert.equal(validateReservedBriefTarget(c04Job, c04Result, [{ id: 'K-014' }]), 'K-016')
     assert.deepEqual(refs, [
       'archive/content/stories/C04-NEW-STORY/BOOK.json',
       'archive/content/stories/C02-STRONGHOLD/BOOK.json',
@@ -507,7 +519,7 @@ test('C-FINALIZER drives an exact-target package through a Git worker branch to 
 
     const { loadKnowledge } = await import('./knowledge-content.mjs')
     const fixtureData = await loadKnowledge(root)
-    const briefId = nextBriefId(fixtureData.briefs)
+    const briefId = nextBriefId(fixtureData.briefs, ['K-015'])
 
     const sourceRef = 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_999/SOURCE_MANIFEST.json'
     const sourceDir = join(root, 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_999')
@@ -602,6 +614,7 @@ test('C-FINALIZER drives an exact-target package through a Git worker branch to 
     const requestRpc = async (name, args) => {
       rpcCalls.push({ name, args })
       if (name === 'archive_knowledge_semantic_job_claim_finalizer') return finalizingJob
+      if (name === 'archive_knowledge_semantic_job_verify_reservation') { assert.equal(args.p_brief_id, briefId); return { status: 'VALID' } }
       if (name === 'archive_knowledge_semantic_job_update') return { status: args.p_status }
       throw new Error(`Unexpected RPC in isolated finalizer test: ${name}`)
     }
