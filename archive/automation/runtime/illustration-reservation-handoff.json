@@ -48,17 +48,40 @@
     "readback_at": "2026-10-07T22:28:52.884Z"
   },
   "review": {
-    "status": "HANDOFF_COMMITTED",
+    "status": "PROGRAM_DECISION_APPLIED",
     "review_handoff_commit": "f1511b2ebfa19f3f30536a09be28c2f23549a917",
     "decision": "PASS",
     "review_provider": "native_chatgpt_vision",
-    "reviewed_at": "2026-10-07T23:27:32.746Z",
+    "reviewed_at": "2026-10-07T23:27:43.803061+00:00",
     "source_library_path": "/IMAGE-RENDER/output/current.png",
     "source_file_id": "file_00000000f780823081265718c1d2b401",
     "source_library_file_id": "libfile_60b7ca3cf93c819198c5fa8abdfea152",
     "source_version_id": null,
     "source_sha256": "78c9db6360e3104ff14e46a26240344aa439c468ae2a47350160ba0f204b4f28"
   },
-  "transfer": null,
+  "transfer": {
+    "status": "FINALIZE_QUEUED",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_00000000f780823081265718c1d2b401",
+    "source_library_file_id": "libfile_60b7ca3cf93c819198c5fa8abdfea152",
+    "source_version_id": null,
+    "source_sha256": "78c9db6360e3104ff14e46a26240344aa439c468ae2a47350160ba0f204b4f28",
+    "staging_id": "site-illustration-event-winter-council-c0048fceecc3-20261008-37682453254",
+    "derivative_sha256": "7c8d61c5f9bec279f4ce4efa1baa2c99b57c104dc9994bc91fbec235877eb85a",
+    "derivative_size_bytes": 166925,
+    "derivative_width": 512,
+    "derivative_height": 512,
+    "derivative_mime_type": "image/png",
+    "derivative_palette_colors": 128,
+    "chunk_count": 2,
+    "stored_chunk_indexes": [
+      0,
+      1
+    ],
+    "finalizer_dispatch_request_id": 104,
+    "finalizer_dispatch_at": "2026-10-08T00:31:10.72149+00:00",
+    "job_status_readback": "FINALIZING",
+    "completed_at": "2026-10-08T00:31:56.531Z"
+  },
   "result": null
 }
