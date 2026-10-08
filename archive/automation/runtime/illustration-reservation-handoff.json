@@ -25,7 +25,25 @@
     "next_run_time": null,
     "prompt_exact_readback": true
   },
-  "collection": null,
+  "collection": {
+    "status": "READY_FOR_PROVIDER_COMPLETE",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_00000000abf481f7bf60909e01a57429",
+    "source_library_file_id": "libfile_963b41f600e0819181b1531b40328a6a",
+    "source_version_id": null,
+    "source_sha256": "b2a3171a710fe2587badff40ad140c04f2b2dc0b6f9f4b842a3d0de660ecc4ce",
+    "source_width": 1942,
+    "source_height": 809,
+    "source_size_bytes": 2292144,
+    "source_modified_at": "2026-10-08T21:30:35.257038Z",
+    "observed_at": "2026-10-08T22:32:32.615Z",
+    "png_verify": true,
+    "png_full_decode": true,
+    "provider_complete": {
+      "p_job_id": "illustration-event-guild-warehouse-option-5d70e344c196-20261009-37839899164",
+      "p_prompt_sha256": "b7b2c707a45487e72a08392449fab4f249316d9c9b3d1ba9a89b632a1954c7cd"
+    }
+  },
   "review": null,
   "transfer": null,
   "result": null
