@@ -171,7 +171,7 @@ function fakeClient({ ss = [session(1), session(2)], role = allowedRole, bad = f
     queries.push({ sql, values })
     if (/from pg_roles/.test(sql)) return { rows: [role] }
     if (/from survival_rpg.transcript_sessions s/.test(sql)) return { rows: ss }
-    if (/as hash_valid/.test(sql)) return { rows: [...c.hashes].map(([message_order, content_sha256]) => ({ message_order, content_sha256, hash_valid: !bad })) }
+    if (/select message_order,content,content_sha256/.test(sql)) return { rows: [...c.hashes].map(([message_order, content_sha256]) => ({ message_order, content_sha256, content: bad ? 'changed' : row(session(1), message_order).content })) }
     if (/recorded_at/.test(sql)) return { rows: [row(ss[1], 0), row(ss[1], 1)] }
     return { rows: [] }
   } }
@@ -234,3 +234,43 @@ test('post-CI revalidation rejects changed adoption, RAW or state link, permitti
   assertMainBase(current)
   assert.throws(() => assertMainBase('0'.repeat(40)), /STALE_BASE_HUMAN_REVIEW_REQUIRED/)
 })
+
+test('isolated restricted PostgreSQL login executes bounded discovery with original grants',
+  { skip: !process.env.ARCHIVE_ISOLATED_DB_URL }, async () => {
+    const address = new URL(process.env.ARCHIVE_ISOLATED_DB_URL)
+    assert.ok(['localhost', '127.0.0.1'].includes(address.hostname), 'isolated local PostgreSQL only')
+    assert.equal(address.pathname, '/postgres')
+    const { Client } = await import('pg')
+    const admin = new Client({ connectionString: address.href }), s1 = session(1), s2 = session(2, {
+      season_id: 'S04', status: 'OPEN', archive_intent: intent(id(1), { kind: 'NEW_SEASON' }) })
+    await admin.connect()
+    try {
+      await admin.query("ALTER ROLE archive_exporter PASSWORD 'isolated-test'")
+      await admin.query('SET ROLE service_role')
+      for (const s of [s1, s2]) {
+        await admin.query(`insert into survival_rpg.transcript_sessions
+          (id,worldline_id,chronicle_id,season_id,status,last_message_order,closed_at,archive_intent)
+          values ($1,'AFTERFALL','C03',$2,$3,1,$4,$5)`,
+        [s.id, s.season_id, s.status, s.status === 'CLOSED' ? new Date() : null, s.archive_intent])
+        for (const r of [row(s, 0), row(s, 1)]) {
+          await admin.query(`insert into survival_rpg.transcript_messages
+            (worldline_id,chronicle_id,season_id,session_id,turn_no,message_order,role,content,content_sha256,game_time,idempotency_key)
+            values ('AFTERFALL','C03',$1,$2,$3,$4,$5,$6,$7,$8,gen_random_uuid())`,
+          [s.season_id, s.id, r.turn_no, r.message_order, r.role, r.content, r.content_sha256, r.game_time])
+        }
+      }
+    } finally { await admin.end() }
+    address.username = 'archive_exporter'; address.password = 'isolated-test'
+    const exporter = new Client({ connectionString: address.href })
+    await exporter.connect()
+    try {
+      const c = cursor(); c.lastTurn = 0
+      const pub = published(); pub.cursors.set(id(1), c)
+      const result = await readDiscoverySnapshot(exporter, pub)
+      assert.equal(result.report.candidate.source_session_uuid, id(2))
+      assert.equal(result.report.candidate.pairs, 1)
+      assert.equal(result.report.candidate.season_id, 'S04')
+      assert.equal(result.report.database_writes, 0)
+      assert.equal((await exporter.query("select current_setting('transaction_read_only') as ro")).rows[0].ro, 'on')
+    } finally { await exporter.end() }
+  })

@@ -1,5 +1,6 @@
 /** Bounded snapshot extraction. Transaction ends before candidate building or CI. */
 import { assertRestrictedExportRole } from './archive-export-role.mjs'
+import { createHash } from 'node:crypto'
 import { C03_SCOPE, DISCOVERY_LIMITS, planSourceSessions, verifyPublishedHashes } from './archive-source-discovery.mjs'
 import { discoverCompletePairs, materializeSegment } from './archive-daily-core.mjs'
 
@@ -16,12 +17,13 @@ export async function readDiscoverySnapshot(client, published, { scope = C03_SCO
     [scope.chronicle_id, scope.worldline_id, DISCOVERY_LIMITS.sessions + 1])).rows
     const report = planSourceSessions(sessions, published, { scope })
     for (const [id, cursor] of published.cursors) {
-      const hashes = (await client.query(`select message_order,content_sha256,
-        content_sha256=encode(extensions.digest(convert_to(content,'UTF8'),'sha256'),'hex') as hash_valid
+      const hashes = (await client.query(`select message_order,content,content_sha256
         from survival_rpg.transcript_messages where session_id=$1::uuid
           and message_order between $2::integer and $3::integer order by message_order limit $4`,
       [id, cursor.ranges[0].min, cursor.nextOrder - 1, DISCOVERY_LIMITS.publishedMessages + 1])).rows
-      try { verifyPublishedHashes(cursor, hashes) }
+      try { verifyPublishedHashes(cursor, hashes.map((r) => ({ message_order: r.message_order,
+        content_sha256: r.content_sha256, hash_valid: typeof r.content === 'string'
+          && createHash('sha256').update(Buffer.from(r.content, 'utf8')).digest('hex') === r.content_sha256 }))) }
       catch (error) {
         const plan = report.sessions.find((p) => p.source_session_uuid === id)
         plan.status = 'BLOCKED'; plan.blocker = error.message
