@@ -8,7 +8,7 @@ import {
   buildWikiFactJob, buildWikiFactReviewJob, validateWikiFactReview, WIKI_REVIEW_VERSION,
 } from './lib/wiki-fact-extractor.mjs'
 import {
-  compileSubmittedExtractor, inspectSubmittedReview, mergedPublication, confirmMergedPublication,
+  compileAWikiVisualCatalog, compileSubmittedExtractor, inspectSubmittedReview, mergedPublication, confirmMergedPublication,
   prepareNativeJob, publicationBranch, consumeNativeJob,
 } from './a-wiki-native-control.mjs'
 
@@ -297,6 +297,92 @@ test('consumer reports PUBLISHED only after the matching DB transition is confir
       headSha: 'a'.repeat(40), mergeSha: 'b'.repeat(40) }),
   })
   assert.equal(result.status, 'PUBLISHED')
+})
+
+test('A-Wiki visual sync recompiles the derived B catalog from the current approved Graph', async () => {
+  const [graph, previousCatalog, appearanceBytes, sources] = await Promise.all([
+    readFile(resolve(base, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'), 'utf8').then(JSON.parse),
+    readFile(resolve(base, 'archive/content/visuals/C03-AFTERFALL/VISUALS.json'), 'utf8').then(JSON.parse),
+    readFile(resolve(base, 'archive/content/public-facts/C03-AFTERFALL/S02/APPEARANCES_APPROVED_20260926.json')),
+    discoverWikiSources(base),
+  ])
+  const source = sources.find((item) => item.seasonId === 'S03'
+    && item.sourceSession.session_id === 'SESSION_008')
+  assert.ok(source)
+  const job = buildWikiFactJob(source, graph)
+  const { catalog } = compileAWikiVisualCatalog({ job, graph, appearanceBytes, previousCatalog })
+  assert.deepEqual(catalog.anchor, graph.anchor)
+  assert.equal(catalog.graph_sha256, graph.content_sha256)
+  const nextBySubject = new Map(catalog.points.map((point) => [point.subject_id, point]))
+  for (const point of previousCatalog.points) {
+    if (point.point_type === 'MAP') continue
+    assert.equal(nextBySubject.get(point.subject_id)?.point_id, point.point_id)
+  }
+})
+
+test('approved GitHub publication transport failure resumes FINALIZING without re-running semantics', async () => {
+  const [graph, sources] = await Promise.all([
+    readFile(resolve(base, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'), 'utf8').then(JSON.parse),
+    discoverWikiSources(base),
+  ])
+  const source = sources.find((item) => item.seasonId === 'S03'
+    && item.sourceSession.session_id === 'SESSION_008')
+  assert.ok(source)
+  const job = buildWikiFactJob(source, graph)
+  const result = {
+    version: 'wiki-fact-result-v1',
+    job_id: job.job_id,
+    decision: 'NO_FACTS',
+    coverage: { status: 'COMPLETE', reviewed_blocks: job.source.gm_blocks.map((block) => block.block_id) },
+    nodes: [], relations: [], citations: [], deferred: [],
+    note: 'Test-only complete no-facts extraction.',
+  }
+  const compiled = compileSubmittedExtractor({
+    status: 'EXTRACTOR_SUBMITTED', prepared_job: job, extractor_result: result,
+  })
+  const reviewResult = {
+    version: WIKI_REVIEW_VERSION,
+    proposal_sha256: compiled.proposal.proposal_sha256,
+    decision: 'APPROVE',
+    note: 'Test-only independent approval.',
+  }
+  const row = {
+    status: 'BLOCKED',
+    blocker_code: 'A_WIKI_COMMAND_GH_1',
+    job_id: 'blocked-db-job',
+    session_id: source.sourceSession.session_id,
+    source_ref: source.sourceManifestRef,
+    source_sha256: source.sourceDigest,
+    graph_sha256: graph.content_sha256,
+    prepared_job: job,
+    proposal: compiled.proposal,
+    review_job: compiled.reviewJob,
+    review_result: reviewResult,
+  }
+  const calls = []
+  const recovered = await prepareNativeJob({
+    base,
+    collectCompletion: async () => null,
+    requestRpc: async (name, args) => {
+      calls.push(name)
+      if (name === 'archive_a_wiki_native_job_recovery_current') return row
+      if (name === 'archive_a_wiki_native_job_advance') {
+        assert.equal(args.p_expected_status, 'BLOCKED')
+        assert.equal(args.p_status, 'FINALIZING')
+        return { status: 'FINALIZING', job_id: row.job_id }
+      }
+      if (name === 'archive_a_wiki_native_dispatch') return { status: 'DISPATCHED', request_id: 123 }
+      assert.fail(`Unexpected RPC ${name}`)
+    },
+  })
+  assert.equal(recovered.status, 'FINALIZING')
+  assert.equal(recovered.recovery, 'GITHUB_PUBLICATION_RETRY')
+  assert.equal(recovered.dispatch_request_id, 123)
+  assert.deepEqual(calls, [
+    'archive_a_wiki_native_job_recovery_current',
+    'archive_a_wiki_native_job_advance',
+    'archive_a_wiki_native_dispatch',
+  ])
 })
 
 test('merged native retry requires source, receipt, exact proposal and independent review evidence', () => {
