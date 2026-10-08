@@ -157,6 +157,14 @@ export async function compileCandidate(state, live, { workspace = root, discover
         'EXISTING_VISUAL_IDENTITY_CHANGED')
     }
     await writeFile(absolute(visualRef), visualBytes(catalog))
+  } else if (discoveryV2) {
+    // Reader evidence must track the appended book even without a new trusted
+    // structured anchor. Preserve the current facts, history and Visual state.
+    const reconciled = reconcileReaderOnlyGraph({ previous: priorGraph,
+      book, bookSource: { source_ref: bookRef, source_sha256: byteHash(bytes(book)) },
+      boundary: priorGraph.anchor })
+    graphReport = reconciled.report
+    await writeFile(absolute(graphRef), graphBytes(reconciled.graph))
   }
 
   const inventory = await publicKnowledgeInventory(workspace)
@@ -459,11 +467,17 @@ export async function candidateCheck(fixture) {
     const protectedFiles = paths.filter((ref) => ref.startsWith('archive/content/')
       && ![bookRef, graphRef, visualRef, `archive/content/transcripts/C03-AFTERFALL/${session.season_id}/MANIFEST.json`].includes(ref))
     const before = new Map(await Promise.all(protectedFiles.map(async (ref) => [ref, sha(await readFile(resolve(workspace, ref)))])))
+    const priorGraph = JSON.parse(await readFile(resolve(workspace, graphRef)))
+    const priorVisual = await readFile(resolve(workspace, visualRef))
     const candidate = await compileCandidate(candidateState(session, published), { session, discovery, links }, { workspace, discoveryV2: true })
     for (const [ref, hash] of before) insist(sha(await readFile(resolve(workspace, ref))) === hash, 'EXISTING_PUBLIC_FILE_CHANGED')
+    const graph = JSON.parse(await readFile(resolve(workspace, graphRef)))
     return { status: 'ISOLATED_CANDIDATE_PASS', preserved_public_files: before.size, season_id: session.season_id, session_id: candidate.source.entry.session_id,
       source_session_uuid: session.id, publication_segment_id: candidate.source.segmentId,
       pairs: discovery.pairs, reader_chapters_added: candidate.additions.length, graph: candidate.graphReport.status,
+      graph_anchor_preserved: JSON.stringify(graph.anchor) === JSON.stringify(priorGraph.anchor),
+      graph_records_preserved: JSON.stringify([graph.nodes, graph.relations]) === JSON.stringify([priorGraph.nodes, priorGraph.relations]),
+      visual_preserved: priorVisual.equals(await readFile(resolve(workspace, visualRef))),
       database_writes: 0, remote_writes: 0 }
   } finally { await rm(workspace, { recursive: true, force: true }) }
 }
