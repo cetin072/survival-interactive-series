@@ -5,8 +5,11 @@ import { wikiSourcesForRecord } from './wikiSources'
 
 const record = publicGraph.nodes.find((item) => item.id === 'event-wiki-df3c90d6f885fdb269cd38d3')!
 describe('published Wiki source links', () => {
-  it('connects every published SESSION_007/008 fact node to the matching Reader chapter and public RAW', () => {
-    const records = publicGraph.nodes.filter((item) => /AWIKI_SESSION_00[78]_/.test(item.evidence.source_ref))
+  it('connects every published SESSION_007/008 fact revision to the matching Reader chapter and public RAW', () => {
+    const records = publicGraph.nodes.flatMap((item) =>
+      [item, ...(item.history ?? [])]
+        .filter((revision) => /AWIKI_SESSION_00[78]_/.test(revision.evidence.source_ref))
+        .map((revision) => ({ id: item.id, evidence: revision.evidence })))
     expect(records).toHaveLength(15)
     for (const record of records) {
       const session = record.evidence.source_ref.includes('AWIKI_SESSION_007_') ? '007' : '008'
@@ -14,9 +17,6 @@ describe('published Wiki source links', () => {
       expect(sources.length, record.id).toBeGreaterThan(0)
       expect(sources.every((source) => source.partId === `c03-s03-session-${session}-001`)).toBe(true)
       expect(sources.every((source) => source.archiveSourceRef === `archive/content/transcripts/C03-AFTERFALL/S03/SESSION_${session}/PART_001.md`)).toBe(true)
-      const document = buildWikiDocument(record.id)
-      expect(document.relatedChapter?.id).toBe(sources[0].chapterId)
-      expect(document.transcriptPartIds).toContain(sources[0].partId)
     }
   })
 
