@@ -1310,3 +1310,80 @@
     gap: 6px;
   }
 }
+
+/* STEP 3-2 subject cues: restrained identity, not risk/status colors.
+   Scoped to the published Knowledge shelf and its home topic shortcuts. */
+.knowledge-library-shell [data-knowledge-category="household"],
+.wiki-knowledge-home [data-knowledge-category="household"] {
+  --knowledge-topic-accent: #4f684b;
+  --knowledge-topic-tint: #edf3eb;
+  --knowledge-topic-line: #c9d7c4;
+}
+.knowledge-library-shell [data-knowledge-category="information"],
+.wiki-knowledge-home [data-knowledge-category="information"] {
+  --knowledge-topic-accent: #466d83;
+  --knowledge-topic-tint: #edf3f6;
+  --knowledge-topic-line: #bfd3df;
+}
+.knowledge-library-shell [data-knowledge-category="evacuation"],
+.wiki-knowledge-home [data-knowledge-category="evacuation"] {
+  --knowledge-topic-accent: #86602f;
+  --knowledge-topic-tint: #f8f0e5;
+  --knowledge-topic-line: #e4cfae;
+}
+.knowledge-library-shell [data-knowledge-category="community"],
+.wiki-knowledge-home [data-knowledge-category="community"] {
+  --knowledge-topic-accent: #82564e;
+  --knowledge-topic-tint: #f5edeb;
+  --knowledge-topic-line: #dec8c3;
+}
+.knowledge-library-shell [data-knowledge-category="other"],
+.wiki-knowledge-home [data-knowledge-category="other"] {
+  --knowledge-topic-accent: #626b77;
+  --knowledge-topic-tint: #f0f2f5;
+  --knowledge-topic-line: #d5dbe1;
+}
+
+/* Reuse the same color identity on home shortcuts and the static library. */
+.knowledge-library-shell nav.knowledge-category-nav a[data-knowledge-category],
+.wiki-knowledge-home nav[aria-label="주제별 생존 지식"] a[data-knowledge-category] {
+  border: 1px solid var(--knowledge-topic-line);
+  border-left: 3px solid var(--knowledge-topic-accent);
+  color: var(--knowledge-topic-accent);
+  background: var(--knowledge-topic-tint);
+  text-decoration: none;
+}
+.knowledge-library-shell nav.knowledge-category-nav a[data-knowledge-category]:hover,
+.wiki-knowledge-home nav[aria-label="주제별 생존 지식"] a[data-knowledge-category]:hover {
+  background: #fff;
+  border-color: var(--knowledge-topic-accent);
+  color: var(--knowledge-topic-accent);
+}
+.knowledge-library-shell nav.knowledge-category-nav a[data-knowledge-category]:focus-visible,
+.wiki-knowledge-home nav[aria-label="주제별 생존 지식"] a[data-knowledge-category]:focus-visible {
+  outline: 2px solid var(--knowledge-topic-accent);
+  outline-offset: 3px;
+}
+.knowledge-library-shell section.knowledge-library-list[data-knowledge-category] {
+  border-top: 3px solid var(--knowledge-topic-accent);
+}
+.knowledge-library-shell .knowledge-library-list[data-knowledge-category] > .wiki-section-heading {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-bottom-color: var(--knowledge-topic-line);
+  border-left: 4px solid var(--knowledge-topic-accent);
+  border-radius: 3px;
+  background: var(--knowledge-topic-tint);
+}
+.knowledge-library-shell .knowledge-library-list[data-knowledge-category] > .wiki-section-heading h2,
+.knowledge-library-shell .knowledge-library-list[data-knowledge-category] > .wiki-section-heading span {
+  color: var(--knowledge-topic-accent);
+}
+.knowledge-library-shell .knowledge-library-list[data-knowledge-category] h3 a,
+.knowledge-library-shell .knowledge-library-list[data-knowledge-category] .knowledge-library-footer a {
+  color: var(--knowledge-topic-accent);
+}
+.knowledge-library-shell .knowledge-library-list[data-knowledge-category] a:focus-visible {
+  outline: 2px solid var(--knowledge-topic-accent);
+  outline-offset: 3px;
+}

@@ -28,6 +28,10 @@ describe('Knowledge home public data', () => {
       expect(html).toContain('/knowledge/#knowledge-' + category)
     }
     expect(html).toContain('주제로 찾아보기')
+    for (const id of ['household', 'information', 'evacuation', 'community']) {
+      expect(html).toContain('data-knowledge-category="' + id + '"')
+    }
+
   })
 
   it('does not fill missing featured positions with unpublished guides or their tools', () => {

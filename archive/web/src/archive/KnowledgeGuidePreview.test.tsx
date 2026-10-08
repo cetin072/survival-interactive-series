@@ -18,6 +18,10 @@ describe('Knowledge practical guide rollout', () => {
       expect(markup).toContain(guide.title)
       expect(markup).toContain('/knowledge/' + guide.slug + '/')
     }
+    for (const id of ['household', 'information', 'evacuation', 'community']) {
+      expect(markup).toContain('data-knowledge-category="' + id + '"')
+      expect(markup).toContain('href="#knowledge-' + id + '"')
+    }
     expect(markup).not.toContain('K-004')
     expect(markup).not.toContain('K-005')
   })

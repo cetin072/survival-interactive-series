@@ -21,12 +21,12 @@ export function KnowledgeGuideLibraryPreview({ notice, showTopbar = true, guides
       </header>
 
       <nav className="wiki-home-actions knowledge-category-nav" aria-label="생존 지식 주제">
-        {groups.map((group) => <a key={group.id} href={'#knowledge-' + group.id}>{group.label} {group.guides.length}</a>)}
+        {groups.map((group) => <a key={group.id} data-knowledge-category={group.id} href={'#knowledge-' + group.id}>{group.label} {group.guides.length}</a>)}
       </nav>
 
       {notice && <p className="knowledge-library-notice" role="status">{notice}</p>}
 
-      {groups.map((group) => <section key={group.id} id={"knowledge-" + group.id} className="knowledge-library-list" aria-label={group.label}>
+      {groups.map((group) => <section key={group.id} id={"knowledge-" + group.id} data-knowledge-category={group.id} className="knowledge-library-list" aria-label={group.label}>
         <div className="wiki-section-heading">
           <h2>{group.label}</h2>
           <span>{group.guides.length}개</span>

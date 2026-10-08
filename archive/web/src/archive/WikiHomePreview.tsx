@@ -50,7 +50,7 @@ export function WikiHomePreview({ knowledge = selectHomeKnowledge(), chronicles 
         <div className="wiki-section-heading"><h2 id="wiki-home-topics-title">주제로 찾아보기</h2><a href="/knowledge/">전체 지식 →</a></div>
         <nav className="wiki-home-actions" aria-label="주제별 생존 지식">
           {groupKnowledge(publishedKnowledgeGuides).map((category) =>
-            <a key={category.id} href={'/knowledge/#knowledge-' + category.id}>
+            <a key={category.id} data-knowledge-category={category.id} href={'/knowledge/#knowledge-' + category.id}>
               {category.label} · {category.guides.length}개
             </a>)}
         </nav>
