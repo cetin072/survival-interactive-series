@@ -15,7 +15,29 @@ export async function readDiscoverySnapshot(client, published, { scope = C03_SCO
       to_jsonb(s)->'archive_intent' as archive_intent from survival_rpg.transcript_sessions s
       where chronicle_id=$1 and worldline_id=$2 order by id limit $3`,
     [scope.chronicle_id, scope.worldline_id, DISCOVERY_LIMITS.sessions + 1])).rows
-    const report = planSourceSessions(sessions, published, { scope })
+    // Old live DBs have no protected approval table: all unpublished sources stay pending.
+    // Exact column grants expose metadata only, never operator identity or other ops tables.
+    const present = (await client.query(`select c.oid from pg_class c join pg_namespace n on n.oid=c.relnamespace
+      where n.nspname='survival_ops' and c.relname='archive_source_authorizations' and c.relkind='r'`)).rows[0]
+    let authorizations = []
+    if (present) {
+      const columns = ['session_id','chronicle_id','worldline_id','season_id','runtime_intent','decision']
+      const role = (await client.query(`select
+        bool_and(has_column_privilege(current_user,$1::oid,name,'SELECT')) as can_read,
+        has_table_privilege(current_user,$1::oid,'INSERT,UPDATE,DELETE,TRUNCATE,TRIGGER,REFERENCES')
+          or has_any_column_privilege(current_user,$1::oid,'INSERT,UPDATE,REFERENCES') as can_write,
+        has_function_privilege(current_user,'public.archive_operator_authorize_source(uuid,jsonb,jsonb,jsonb)','EXECUTE') as can_approve,
+        (select count(*)::integer from pg_class c join pg_namespace n on n.oid=c.relnamespace
+          where n.nspname='survival_ops' and c.relkind in ('r','p','v','m') and c.oid<>$1::oid
+            and has_any_column_privilege(current_user,c.oid,'SELECT')) as other_ops_reads
+        from unnest($2::text[]) name`, [present.oid, columns])).rows[0]
+      if (!role?.can_read || role.can_write !== false || role.can_approve !== false || role.other_ops_reads !== 0)
+        throw new Error('RESTRICTED_APPROVAL_METADATA_ROLE_REQUIRED')
+      authorizations = (await client.query(`select session_id::text,chronicle_id,worldline_id,season_id,runtime_intent,decision
+        from survival_ops.archive_source_authorizations where chronicle_id=$1 and worldline_id=$2
+        order by session_id limit $3`, [scope.chronicle_id,scope.worldline_id,DISCOVERY_LIMITS.sessions+1])).rows
+    }
+    const report = planSourceSessions(sessions, published, { scope, authorizations })
     for (const [id, cursor] of published.cursors) {
       const hashes = (await client.query(`select message_order,content,content_sha256
         from survival_rpg.transcript_messages where session_id=$1::uuid
@@ -66,7 +88,7 @@ export async function readDiscoverySnapshot(client, published, { scope = C03_SCO
         selected.status = discovery.status
         selected.discovered_range = discovery.status === 'NEW_SOURCE_RANGE' ? [discovery.startOrder, discovery.endOrder] : null
         selected.pairs = discovery.pairs ?? 0
-        live = { session, discovery, links }
+        live = { session, discovery, links, authorization_sha256: selected.authorization_sha256 }
       } catch (error) { selected.status = 'BLOCKED'; selected.blocker = /^[A-Z_]+$/.test(error.message) ? error.message : 'SOURCE_VALIDATION_FAILED' }
     }
     await client.query('COMMIT')

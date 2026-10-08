@@ -1,11 +1,13 @@
-/** C03 discovery: committed manifests are cursors; Runtime intent is adoption evidence. */
+/** C03 discovery: manifests are cursors; protected operator decisions grant approval. */
 import { createHash } from 'node:crypto'
 import { approvedSeasonCatalog } from './approved-reader-sources.mjs'
 
 export const C03_SCOPE = Object.freeze({ chronicle_id: 'C03', worldline_id: 'AFTERFALL', archive_id: 'C03-AFTERFALL' })
 export const DISCOVERY_LIMITS = Object.freeze({ sessions: 100, publishedMessages: 10000, page: 200 })
 const need = (ok, code) => { if (!ok) throw new Error(code) }
-export const intentDigest = (value) => createHash('sha256').update(JSON.stringify(value ?? null)).digest('hex')
+const canonical = (v) => Array.isArray(v) ? v.map(canonical) : v && typeof v === 'object'
+  ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, canonical(v[k])])) : v
+export const intentDigest = (value) => createHash('sha256').update(JSON.stringify(canonical(value ?? null))).digest('hex')
 const uuid = (v) => typeof v === 'string' && /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(v)
 const digest = (v) => typeof v === 'string' && /^[a-f0-9]{64}$/.test(v)
 
@@ -92,8 +94,72 @@ export async function loadPublishedIndex({ read, paths, scope = C03_SCOPE }) {
   return { seasons, cursors, legacy, frontier, latestSeason: Math.max(0, ...[...seasons.keys()].map((s) => Number(s.slice(1)))) }
 }
 
+/** Only protected operator rows can grant approval; Runtime fields are advisory. */
+function authorizedSessions(sessions, authorizations, published) {
+  need(authorizations.length <= DISCOVERY_LIMITS.sessions
+    && new Set(authorizations.map((a) => a.session_id)).size === authorizations.length, 'INVALID_AUTHORIZATION_INVENTORY')
+  const approvals = new Map(authorizations.map((a) => [a.session_id, a]))
+  const effective = sessions.map((s) => {
+    const i = s.archive_intent, a = approvals.get(s.id)
+    let valid = false
+    try { validateIntent(i, s); valid = true } catch {}
+    const matched = valid && a && a.chronicle_id === s.chronicle_id && a.worldline_id === s.worldline_id
+      && a.season_id === s.season_id && intentDigest(a.runtime_intent) === intentDigest(i)
+    const d = matched ? a.decision : null
+    const approved = d && ['ADOPTED','SUPERSEDED','REVIEW_REQUIRED'].includes(d.disposition)
+      && ['APPROVED','REVIEW_REQUIRED'].includes(d.publication) && typeof d.allow_continuation === 'boolean'
+      && (d.published_predecessor_id === null || uuid(d.published_predecessor_id))
+      && (d.supersedes_id === null || uuid(d.supersedes_id))
+      && (d.approved_through === null || (Number.isSafeInteger(d.approved_through)
+        && d.approved_through >= i.initial_order && d.approved_through % 2 === 1))
+    return { ...s, runtime_intent: i, authorization: approved ? d : null,
+      archive_intent: i ? { ...i, disposition: approved ? d.disposition : 'REVIEW_REQUIRED',
+        publication: approved ? d.publication : 'REVIEW_REQUIRED' } : null }
+  })
+  const byId = new Map(effective.map((s) => [s.id, s]))
+  // Recheck reviewed supersession on every page and after publication, before inheritance.
+  for (const s of effective) {
+    if (s.archive_intent?.kind !== 'RESTART' || s.archive_intent.disposition !== 'ADOPTED') continue
+    const d=s.authorization, skipped=byId.get(d.supersedes_id)
+    const seasonEntries=published.seasons.get(s.season_id)?.manifest.sessions ?? []
+    if (!skipped || skipped.status !== 'CLOSED' || skipped.season_id !== s.season_id
+      || skipped.worldline_id !== s.worldline_id || skipped.chronicle_id !== s.chronicle_id
+      || skipped.archive_intent?.disposition !== 'SUPERSEDED' || skipped.runtime_intent?.kind !== 'NEW_SEASON'
+      || s.runtime_intent.predecessor_id !== skipped.id || skipped.runtime_intent.predecessor_id !== d.published_predecessor_id
+      || d.approved_through === null || published.cursors.has(skipped.id) || published.legacy?.has(skipped.id)
+      || (seasonEntries.length > 0 && (!published.cursors.has(s.id) || seasonEntries[0].source_session_uuid !== s.id))) {
+      s.authorization=null;s.archive_intent={...s.archive_intent,disposition:'REVIEW_REQUIRED',publication:'REVIEW_REQUIRED'}
+    }
+  }
+  // A trusted same-season policy is inherited only along actual closed continuity.
+  // Fork/backlog/frontier checks still run below before any bodies are selected.
+  for (let pass = 0; pass < sessions.length; pass++) {
+    let changed = false
+    for (const s of effective) {
+      const i = s.archive_intent, prior = byId.get(i?.predecessor_id)
+      if (s.authorization || !i || approvals.has(s.id) || i.kind !== 'CONTINUE' || i.history !== 'NEW_CAPTURE'
+        || i.initial_order !== 0 || prior?.status !== 'CLOSED' || prior.season_id !== s.season_id
+        || prior.chronicle_id !== s.chronicle_id || prior.worldline_id !== s.worldline_id
+        || prior.archive_intent?.disposition !== 'ADOPTED' || prior.archive_intent?.publication !== 'APPROVED'
+        || prior.authorization?.allow_continuation !== true) continue
+      try { validateIntent(s.runtime_intent, s) } catch { continue }
+      // Runtime cannot promote an explicitly unapproved/legacy/restart source.
+      if (s.runtime_intent.disposition !== 'REVIEW_REQUIRED' || s.runtime_intent.publication !== 'REVIEW_REQUIRED') continue
+      s.authorization = { disposition: 'ADOPTED', publication: 'APPROVED', allow_continuation: true,
+        published_predecessor_id: i.predecessor_id, supersedes_id: null, approved_through: null,
+        inherited_from: prior.id }
+      s.archive_intent = { ...i, disposition: 'ADOPTED', publication: 'APPROVED' }
+      changed = true
+    }
+    if (!changed) break
+  }
+  return effective
+}
+
 /** No bodies, no dates used for narrative ordering, no state changes. */
-export function planSourceSessions(sessions, published, { scope = C03_SCOPE } = {}) {
+export function planSourceSessions(runtimeSessions, published, { scope = C03_SCOPE, authorizations = published.authorizations ?? [] } = {}) {
+  const sessions = authorizedSessions(runtimeSessions, authorizations, published)
+  const authorizationHash = intentDigest([...authorizations].sort((a,b) => a.session_id.localeCompare(b.session_id)))
   need(scope.chronicle_id === 'C03' && scope.worldline_id === 'AFTERFALL', 'UNAPPROVED_DISCOVERY_SCOPE')
   need(sessions.length <= DISCOVERY_LIMITS.sessions, 'SESSION_INVENTORY_LIMIT_REVIEW_REQUIRED')
   need(new Set(sessions.map((s) => s.id)).size === sessions.length, 'SOURCE_ID_COLLISION')
@@ -105,7 +171,8 @@ export function planSourceSessions(sessions, published, { scope = C03_SCOPE } = 
       published_ranges: cursor?.ranges.map(({ min, max }) => [min, max]) ?? (legacy ? [[legacy.range.min, legacy.range.max]] : []),
       ...(legacy ? { legacy_archive_session: legacy.archive_session_id, legacy_capture_quality: legacy.capture_quality } : {}),
       next_order: cursor?.nextOrder ?? null, snapshot_upper: s.last_message_order,
-      status: 'REVIEW_REQUIRED', blocker: 'MISSING_STRUCTURED_INTENT', intent_sha256: intentDigest(s.archive_intent) }
+      status: 'REVIEW_REQUIRED', blocker: 'MISSING_STRUCTURED_INTENT', intent_sha256: intentDigest(s.runtime_intent),
+      authorization_sha256: authorizationHash }
     if (!uuid(s.id) || s.chronicle_id !== scope.chronicle_id || s.worldline_id !== scope.worldline_id
       || !/^S\d{2,3}$/.test(s.season_id) || !['OPEN', 'CLOSED'].includes(s.status)
       || !Number.isSafeInteger(s.last_message_order) || s.last_message_order < -1) {
@@ -127,18 +194,23 @@ export function planSourceSessions(sessions, published, { scope = C03_SCOPE } = 
             plan.status = 'BLOCKED'; plan.blocker = 'INITIAL_ORDER_CONFLICT'
           } else {
             plan.next_order ??= intent.initial_order
-            plan.status = plan.next_order > s.last_message_order ? 'NO_NEW_SOURCE' : 'PLANNED'
+            plan.snapshot_upper = Math.min(s.last_message_order, s.authorization.approved_through ?? s.last_message_order)
+            plan.status = plan.next_order > plan.snapshot_upper ? 'NO_NEW_SOURCE' : 'PLANNED'
             plan.blocker = null
+            if (plan.status === 'NO_NEW_SOURCE' && plan.next_order <= s.last_message_order) {
+              plan.status='REVIEW_REQUIRED';plan.blocker='APPROVED_RANGE_EXHAUSTED'
+            }
           }
-        } else plan.blocker = 'ADOPTION_OR_PUBLICATION_REVIEW_REQUIRED'
+        } else plan.blocker = intent.kind === 'RESTART' ? 'RESTART_REQUIRES_EDITORIAL_REVIEW' : 'ADOPTION_OR_PUBLICATION_REVIEW_REQUIRED'
       } catch (error) { plan.status = 'BLOCKED'; plan.blocker = error.message }
     }
     return [s.id, plan]
   }))
   const children = new Map()
   for (const s of sessions) {
-    if (s.archive_intent?.disposition !== 'ADOPTED') continue
-    const pred = s.archive_intent.predecessor_id
+    if (!s.archive_intent || s.archive_intent.disposition === 'SUPERSEDED') continue
+    const pred = s.archive_intent.kind === 'RESTART' && s.authorization
+      ? s.authorization.published_predecessor_id : s.archive_intent.predecessor_id
     children.set(pred, [...(children.get(pred) ?? []), s.id])
   }
   // Validate metadata ancestry even for mapped published baselines.
@@ -161,7 +233,8 @@ export function planSourceSessions(sessions, published, { scope = C03_SCOPE } = 
     if (visiting.has(id)) { p.status = 'BLOCKED'; p.blocker = 'CONTINUITY_CYCLE'; return p }
     visiting.add(id)
     if (['PLANNED', 'NO_NEW_SOURCE'].includes(p.status)) {
-      const pred = s.archive_intent.predecessor_id, prior = sourceMap.get(pred)
+      const restart = s.archive_intent.kind === 'RESTART'
+      const pred = restart ? s.authorization.published_predecessor_id : s.archive_intent.predecessor_id, prior = sourceMap.get(pred)
       let reason = null
       if ((children.get(pred)?.length ?? 0) > 1) reason = 'CONTINUITY_FORK_REVIEW_REQUIRED'
       // Published history establishes a baseline, never authorization for new RAW.
@@ -172,8 +245,18 @@ export function planSourceSessions(sessions, published, { scope = C03_SCOPE } = 
           const committedEnd = published.cursors.get(pred)?.nextOrder
           if (prior.status !== 'CLOSED' || committedEnd !== prior.last_message_order + 1
             || pp.status !== 'NO_NEW_SOURCE') reason ??= 'PREDECESSOR_BACKLOG_OR_REVIEW'
-          if ((s.archive_intent.kind === 'CONTINUE') !== (prior.season_id === s.season_id)) reason ??= 'CONTINUITY_SEASON_CONFLICT'
-          if (s.archive_intent.kind === 'RESTART') reason ??= 'RESTART_REQUIRES_EDITORIAL_REVIEW'
+          if (!restart && (s.archive_intent.kind === 'CONTINUE') !== (prior.season_id === s.season_id)) reason ??= 'CONTINUITY_SEASON_CONFLICT'
+          if (restart) {
+            const skipped = sourceMap.get(s.authorization.supersedes_id)
+            if (!skipped || s.runtime_intent.predecessor_id !== skipped.id || skipped.status !== 'CLOSED'
+              || skipped.season_id !== s.season_id || skipped.chronicle_id !== s.chronicle_id
+              || skipped.worldline_id !== s.worldline_id || skipped.archive_intent?.disposition !== 'SUPERSEDED'
+              || skipped.runtime_intent?.predecessor_id !== pred || skipped.runtime_intent?.kind !== 'NEW_SEASON'
+              || s.authorization.approved_through === null) reason ??= 'RESTART_REQUIRES_EDITORIAL_REVIEW'
+            if (skipped && (published.cursors.has(skipped.id) || published.legacy?.has(skipped.id))) reason ??= 'RESTART_SKIPS_PUBLISHED_SOURCE'
+            if (published.frontier !== id && published.frontier !== pred) reason ??= 'READER_FRONTIER_REVIEW_REQUIRED'
+            if (prior.season_id === s.season_id || (published.seasons.get(s.season_id)?.manifest.sessions.length ?? 0) > 0) reason ??= 'RESTART_DUPLICATE_SEASON_INTRO'
+          } else if (s.authorization.published_predecessor_id !== pred || s.authorization.supersedes_id !== null) reason ??= 'AUTHORIZATION_CONTINUITY_MISMATCH'
         }
         if (Number(s.season_id.slice(1)) < published.latestSeason) reason ??= 'LATE_HISTORICAL_SOURCE_REVIEW_REQUIRED'
       }
@@ -198,6 +281,7 @@ export function verifyPublishedHashes(cursor, rows) {
 /** Compare a newly admitted snapshot after build/CI, including optional provenance. */
 export function verifyDiscoveryCandidate(original, current) {
   need(current?.session.id === original.session.id
+    && current.authorization_sha256 === original.authorization_sha256
     && intentDigest(current.session.archive_intent) === intentDigest(original.session.archive_intent)
     && current.discovery.startOrder === original.discovery.startOrder, 'SOURCE_ADOPTION_CHANGED')
   const retained = current.discovery.rows.filter((r) => r.message_order <= original.discovery.endOrder)

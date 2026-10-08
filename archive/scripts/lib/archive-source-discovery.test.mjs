@@ -3,7 +3,7 @@ import { test } from 'node:test'
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { resolve } from 'node:path'
-import { loadPublishedIndex, planSourceSessions, candidateState, verifyPublishedHashes, verifyDiscoveryCandidate, validateIntent } from './archive-source-discovery.mjs'
+import { loadPublishedIndex, planSourceSessions, candidateState, verifyPublishedHashes, verifyDiscoveryCandidate, validateIntent, intentDigest } from './archive-source-discovery.mjs'
 import { discoverCompletePairs, materializeSegment } from './archive-daily-core.mjs'
 import { readDiscoverySnapshot } from './archive-discovery-read.mjs'
 
@@ -24,7 +24,14 @@ const row = (s, order) => {
 const cursor = (max = 1) => ({ season: 'S03', nextOrder: max + 1, ranges: [{ min: 0, max }],
   hashes: new Map(Array.from({ length: max + 1 }, (_, i) => [i, sha(row(session(1), i).content)])) })
 const published = () => ({ cursors: new Map([[id(1), cursor()]]), seasons: new Map(), frontier: id(1), latestSeason: 3 })
-const plans = (ss, pub = published()) => planSourceSessions(ss, pub)
+// Explicit isolated authority fixtures; caller strings alone are tested separately below.
+const approvals = (ss) => ss.filter(s => s.archive_intent && s.archive_intent.disposition !== 'REVIEW_REQUIRED'
+  && s.archive_intent.publication === 'APPROVED').map(s => ({ session_id:s.id,chronicle_id:s.chronicle_id,
+  worldline_id:s.worldline_id,season_id:s.season_id,runtime_intent:structuredClone(s.archive_intent),decision:{
+    disposition:s.archive_intent.disposition,publication:s.archive_intent.disposition === 'SUPERSEDED' ? 'REVIEW_REQUIRED' : 'APPROVED',
+    evidence_ref:s.archive_intent.evidence_ref,allow_continuation:s.archive_intent.disposition === 'ADOPTED',
+    published_predecessor_id:s.archive_intent.predecessor_id,supersedes_id:null,approved_through:null }}))
+const plans = (ss, pub = published()) => planSourceSessions(ss, pub, {authorizations:approvals(ss)})
 const base = resolve(import.meta.dirname, '../../..')
 async function actualIndex() {
   const revision = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: base, encoding: 'utf8' }).trim()
@@ -169,6 +176,9 @@ function fakeClient({ ss = [session(1), session(2)], role = allowedRole, bad = f
   const queries = [], c = cursor()
   return { queries, async query(sql, values) {
     queries.push({ sql, values })
+    if (/c.relname='archive_source_authorizations'/.test(sql)) return { rows: [{oid:123}] }
+    if (/as other_ops_reads/.test(sql)) return { rows: [{can_read:true,can_write:false,can_approve:false,other_ops_reads:0}] }
+    if (/from survival_ops.archive_source_authorizations where/.test(sql)) return { rows: approvals(ss) }
     if (/from pg_roles/.test(sql)) return { rows: [role] }
     if (/from survival_rpg.transcript_sessions s/.test(sql)) return { rows: ss }
     if (/select message_order,content,content_sha256/.test(sql)) return { rows: [...c.hashes].map(([message_order, content_sha256]) => ({ message_order, content_sha256, content: bad ? 'changed' : row(session(1), message_order).content })) }
@@ -215,6 +225,85 @@ test('post-CI revalidation rejects changed adoption, RAW or state link, permitti
   assert.throws(() => verifyDiscoveryCandidate(original, changed), /SOURCE_CANDIDATE_CHANGED/)
   const link = clone(); link.links = [{ turn_no: 0, outcome: 'APPLIED' }]
   assert.throws(() => verifyDiscoveryCandidate(original, link), /SOURCE_STATE_LINK_CHANGED/)
+  const approval = clone(); approval.authorization_sha256 = sha('different protected policy')
+  assert.throws(() => verifyDiscoveryCandidate(original, approval), /SOURCE_ADOPTION_CHANGED/)
+})
+
+test('forged APPROVED, real Issue URL and notes alone never authorize RAW', () => {
+  const ss = [session(1),session(2, {close_note:'approved by operator'})]
+  const out = planSourceSessions(ss,published())
+  assert.equal(out.candidate,null)
+  assert.equal(out.sessions.find(s => s.source_session_uuid === id(2)).blocker,'ADOPTION_OR_PUBLICATION_REVIEW_REQUIRED')
+  const a = approvals(ss); a[1].runtime_intent.kind='NEW_SEASON'
+  assert.equal(planSourceSessions(ss,published(),{authorizations:a}).candidate,null)
+  a[1].runtime_intent=ss[1].archive_intent; a[1].worldline_id='OTHER'
+  assert.equal(planSourceSessions(ss,published(),{authorizations:a}).candidate,null)
+})
+
+const pending = (i) => ({...i,disposition:'REVIEW_REQUIRED',publication:'REVIEW_REQUIRED'})
+test('trusted same-season policy auto inherits pending normal continuity only', () => {
+  const root=session(1), child=session(2,{archive_intent:pending(intent(id(1)))})
+  const auth=approvals([root])
+  const out=planSourceSessions([child,root],published(),{authorizations:auth})
+  assert.equal(out.candidate.source_session_uuid,child.id)
+  auth[0].decision.allow_continuation=false
+  assert.equal(planSourceSessions([root,child],published(),{authorizations:auth}).candidate,null)
+  auth[0].decision.allow_continuation=true
+  for (const kind of ['NEW_SEASON','RESTART','LEGACY']) {
+    const bad={...child,archive_intent:{...child.archive_intent,kind}}
+    assert.equal(planSourceSessions([root,bad],published(),{authorizations:auth}).candidate,null)
+  }
+  const fork=session(3,{archive_intent:pending(intent(root.id))})
+  assert.equal(planSourceSessions([root,child,fork],published(),{authorizations:auth}).candidate,null)
+})
+
+function reviewedRestart() {
+  const root=session(1), a=session(2,{season_id:'S04',archive_intent:pending(intent(id(1),{kind:'NEW_SEASON'}))})
+  const b=session(3,{season_id:'S04',status:'OPEN',last_message_order:3,archive_intent:pending(intent(a.id,{kind:'RESTART'}))})
+  const auth=approvals([root])
+  for (const s of [a,b]) auth.push({session_id:s.id,chronicle_id:s.chronicle_id,worldline_id:s.worldline_id,season_id:s.season_id,
+    runtime_intent:structuredClone(s.archive_intent),decision:{disposition:s===a?'SUPERSEDED':'ADOPTED',
+      publication:s===a?'REVIEW_REQUIRED':'APPROVED',evidence_ref:s.archive_intent.evidence_ref,
+      allow_continuation:s===b,published_predecessor_id:root.id,supersedes_id:s===b?a.id:null,approved_through:s===b?1:null}})
+  return {ss:[root,a,b],auth,pub:published(),root,a,b}
+}
+test('reviewed RESTART skips exactly the protected unpublished start and preserves original bytes/hashes', () => {
+  const {ss,auth,pub,a,b}=reviewedRestart(), before=JSON.stringify(ss), rawA=[row(a,0),row(a,1)]
+  const originalHashes=rawA.map(r => r.content_sha256)
+  const out=planSourceSessions(ss,pub,{authorizations:auth})
+  assert.equal(out.sessions.find(s => s.source_session_uuid===a.id).status,'SUPERSEDED')
+  assert.equal(out.candidate.source_session_uuid,b.id); assert.equal(out.candidate.snapshot_upper,1)
+  assert.equal(b.archive_intent.kind,'RESTART')
+  const d=discoverCompletePairs(b,[row(b,0),row(b,1)],0,{snapshotEnd:out.candidate.snapshot_upper})
+  const materialized=materializeSegment({session:b,discovery:d,sessionId:'SESSION_001',sealedAt:'synthetic'})
+  assert.equal(materialized.source.source_session_uuid,b.id)
+  assert.equal(materialized.source.season_id,'S04')
+  assert.equal(JSON.stringify(ss),before); assert.deepEqual(rawA.map(r=>sha(r.content)),originalHashes)
+  pub.cursors.set(b.id,{...cursor(),season:'S04'});pub.frontier=b.id;pub.latestSeason=4
+  const retained=pub.cursors.get(b.id).nextOrder
+  assert.equal(planSourceSessions(ss,pub,{authorizations:auth}).candidate,null)
+  assert.equal(pub.cursors.get(b.id).nextOrder,retained)
+})
+test('unreviewed RESTART stays guarded; missing supersession and wrong connection fail closed', () => {
+  const f=reviewedRestart()
+  let out=planSourceSessions(f.ss,f.pub,{authorizations:f.auth.slice(0,1)})
+  assert.equal(out.candidate,null)
+  assert.equal(out.sessions.find(s => s.source_session_uuid===f.b.id).blocker,'RESTART_REQUIRES_EDITORIAL_REVIEW')
+  for (const mutate of [a => a.pop(), a => a[1].decision.disposition='REVIEW_REQUIRED',
+    a => a[2].decision.supersedes_id=id(9), a => a[2].decision.approved_through=null,
+    a => a[2].decision.published_predecessor_id=id(9)]) {
+    const auth=structuredClone(f.auth);mutate(auth)
+    assert.equal(planSourceSessions(f.ss,f.pub,{authorizations:auth}).candidate,null)
+  }
+})
+test('reviewed RESTART cannot skip published RAW, change frontier, or repeat a season intro', () => {
+  for (const mutate of [f=>f.pub.cursors.set(f.a.id,{...cursor(),season:'S04'}),
+    f=>f.pub.frontier=id(9),f=>f.pub.seasons.set('S04',{manifest:{sessions:[{session_id:'SESSION_001'}]}}),
+    f=>f.a.worldline_id='OTHER',f=>f.a.season_id='S05',
+    f=>{f.a.archive_intent.predecessor_id=f.b.id;f.auth[1].runtime_intent=structuredClone(f.a.archive_intent)}]) {
+    const f=reviewedRestart();mutate(f)
+    assert.equal(planSourceSessions(f.ss,f.pub,{authorizations:f.auth}).candidate,null)
+  }
 })
 
  test('isolated synthetic S04 integration preserves all public source files and appends exactly one Reader chapter', async () => {
@@ -226,6 +315,29 @@ test('post-CI revalidation rejects changed adoption, RAW or state link, permitti
   assert.ok(result.preserved_public_files > 100)
   assert.equal(result.database_writes, 0); assert.equal(result.remote_writes, 0)
   assert.equal(result.graph, 'NO_STRUCTURED_ANCHOR')
+})
+
+test('reviewed RESTART uses the existing isolated Reader compiler with preserved S03 order and source IDs', async () => {
+  const {readFile,writeFile,mkdtemp,rm}=await import('node:fs/promises')
+  const {tmpdir}=await import('node:os'),{join}=await import('node:path')
+  const {candidateCheck}=await import('../run-daily-archive.mjs')
+  const input=JSON.parse(await readFile(resolve(import.meta.dirname,'fixtures/archive-discovery-synthetic.json'),'utf8'))
+  input.superseded=structuredClone(input.session);input.superseded.status='CLOSED'
+  input.session.id=id(3);input.session.archive_intent= {...input.session.archive_intent,kind:'RESTART',predecessor_id:input.superseded.id}
+  input.rows.forEach(r=>r.session_id=input.session.id)
+  const a=input.authorizations[1]
+  a.decision={...a.decision,disposition:'SUPERSEDED',publication:'REVIEW_REQUIRED',allow_continuation:false}
+  input.authorizations.push({...a,session_id:input.session.id,runtime_intent:structuredClone(input.session.archive_intent),
+    decision:{...a.decision,disposition:'ADOPTED',publication:'APPROVED',allow_continuation:true,
+      supersedes_id:input.superseded.id,approved_through:1}})
+  const temp=await mkdtemp(join(tmpdir(),'archive-restart-fixture-'))
+  try {
+    const path=join(temp,'synthetic.json');await writeFile(path,JSON.stringify(input))
+    const result=await candidateCheck(path)
+    assert.equal(result.status,'ISOLATED_CANDIDATE_PASS');assert.equal(result.source_session_uuid,input.session.id)
+    assert.equal(result.session_id,'SESSION_001');assert.equal(result.reader_chapters_added,1)
+    assert.ok(result.preserved_public_files>100)
+  } finally {await rm(temp,{recursive:true,force:true})}
 })
 
  test('publication admission checks the actual origin/main ref and rejects an older candidate base', async () => {
@@ -243,9 +355,13 @@ test('isolated restricted PostgreSQL login executes bounded discovery with origi
     const { Client } = await import('pg')
     const admin = new Client({ connectionString: address.href }), s1 = session(1), s2 = session(2, {
       season_id: 'S04', status: 'OPEN', archive_intent: intent(id(1), { kind: 'NEW_SEASON' }) })
+    const trusted = approvals([s1,s2])
+    for (const s of [s1,s2]) { s.archive_intent.disposition='REVIEW_REQUIRED'; s.archive_intent.publication='REVIEW_REQUIRED' }
+    for (const a of trusted) a.runtime_intent=structuredClone([s1,s2].find(s => s.id===a.session_id).archive_intent)
     await admin.connect()
     try {
       await admin.query("ALTER ROLE archive_exporter PASSWORD 'isolated-test'")
+      await admin.query("ALTER ROLE service_role LOGIN PASSWORD 'isolated-service-test'")
       await admin.query('SET ROLE service_role')
       for (const s of [s1, s2]) {
         await admin.query(`insert into survival_rpg.transcript_sessions
@@ -259,18 +375,77 @@ test('isolated restricted PostgreSQL login executes bounded discovery with origi
           [s.season_id, s.id, r.turn_no, r.message_order, r.role, r.content, r.content_sha256, r.game_time])
         }
       }
+      // Protected approval is made through the existing operator RPC, never GM service_role.
+      await admin.query('RESET ROLE')
+      await admin.query('SET ROLE authenticated')
+      await admin.query("select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000099',false)")
+      for (const a of trusted) await admin.query('select public.archive_operator_authorize_source($1,$2,$3)',[a.session_id,a.runtime_intent,a.decision])
     } finally { await admin.end() }
+    const serviceAddress = new URL(address.href); serviceAddress.username='service_role';serviceAddress.password='isolated-service-test'
+    const gm=new Client({connectionString:serviceAddress.href});await gm.connect()
+    try {
+      await gm.query("select set_config('request.jwt.claims','{\"role\":\"authenticated\",\"sub\":\"00000000-0000-4000-8000-000000000099\"}',false)")
+      await assert.rejects(gm.query('SET ROLE authenticated'), e=>e.code==='42501')
+      await assert.rejects(gm.query('select public.archive_operator_authorize_source($1,$2,$3)',[s2.id,s2.archive_intent,trusted[1].decision]),e=>e.code==='42501')
+      await assert.rejects(gm.query("update survival_ops.archive_source_authorizations set decision='{}'"),e=>e.code==='42501')
+      await assert.rejects(gm.query("update public.profiles set can_review=true"),e=>e.code==='42501')
+      await assert.rejects(gm.query('update survival_rpg.transcript_sessions set archive_intent=$1 where id=$2',
+        [{...s2.archive_intent,disposition:'ADOPTED',publication:'APPROVED'},s2.id]),e=>e.code==='23514')
+      // Changing an otherwise valid intent also invalidates its protected attestation.
+      await gm.query('update survival_rpg.transcript_sessions set archive_intent=$1 where id=$2',
+        [{...s2.archive_intent,evidence_ref:'https://github.com/cetin072/survival-interactive-series/issues/193'},s2.id])
+    } finally { await gm.end() }
     address.username = 'archive_exporter'; address.password = 'isolated-test'
     const exporter = new Client({ connectionString: address.href })
     await exporter.connect()
     try {
       const c = cursor(); c.lastTurn = 0
       const pub = published(); pub.cursors.set(id(1), c)
+      const rejected = await readDiscoverySnapshot(exporter,pub)
+      assert.equal(rejected.live,null)
+      // Restore only the synthetic Runtime intent through the isolated GM login.
+      const restore=new Client({connectionString:serviceAddress.href});await restore.connect()
+      try { await restore.query('update survival_rpg.transcript_sessions set archive_intent=$1 where id=$2',[s2.archive_intent,s2.id]) }
+      finally {await restore.end()}
       const result = await readDiscoverySnapshot(exporter, pub)
       assert.equal(result.report.candidate.source_session_uuid, id(2))
       assert.equal(result.report.candidate.pairs, 1)
       assert.equal(result.report.candidate.season_id, 'S04')
       assert.equal(result.report.database_writes, 0)
+      await assert.rejects(exporter.query('select approved_by from survival_ops.archive_source_authorizations'),e=>e.code==='42501')
       assert.equal((await exporter.query("select current_setting('transaction_read_only') as ro")).rows[0].ro, 'on')
+      // A real isolated RESTART RPC decision + restricted snapshot, not a mocked DTO.
+      const b=session(3,{season_id:'S04',status:'OPEN',archive_intent:pending(intent(s2.id,{kind:'RESTART'}))})
+      const capture=new Client({connectionString:serviceAddress.href});await capture.connect()
+      try {
+        await capture.query('select survival_rpg.close_public_transcript_session($1)',[s2.id])
+        await capture.query('select survival_rpg.open_public_transcript_session_with_archive_intent($1,$2,$3,$4,$5)',
+          [b.id,b.worldline_id,b.chronicle_id,b.season_id,b.archive_intent])
+        for(const r of [row(b,0),row(b,1)]) await capture.query(`insert into survival_rpg.transcript_messages
+          (worldline_id,chronicle_id,season_id,session_id,turn_no,message_order,role,content,content_sha256,game_time,idempotency_key)
+          values ('AFTERFALL','C03',$1,$2,$3,$4,$5,$6,$7,$8,gen_random_uuid())`,
+          [b.season_id,b.id,r.turn_no,r.message_order,r.role,r.content,r.content_sha256,r.game_time])
+        await capture.query('update survival_rpg.transcript_sessions set last_message_order=1 where id=$1',[b.id])
+      } finally {await capture.end()}
+      const decide=new Client({connectionString:process.env.ARCHIVE_ISOLATED_DB_URL});await decide.connect()
+      try {
+        await decide.query('SET ROLE authenticated')
+        await decide.query("select set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000099',false)")
+        const superseded={...trusted[1].decision,disposition:'SUPERSEDED',publication:'REVIEW_REQUIRED',allow_continuation:false}
+        const restart={...trusted[1].decision,supersedes_id:s2.id,approved_through:1}
+        await assert.rejects(decide.query('select public.archive_operator_authorize_source($1,$2,$3)',
+          [b.id,b.archive_intent,restart]),e=>e.message==='RESTART_SUPERSESSION_UNVERIFIED')
+        await decide.query('select public.archive_operator_authorize_source($1,$2,$3,$4)',
+          [s2.id,s2.archive_intent,superseded,trusted[1].decision])
+        await decide.query('select public.archive_operator_authorize_source($1,$2,$3)',[b.id,b.archive_intent,restart])
+      } finally {await decide.end()}
+      const restarted=await readDiscoverySnapshot(exporter,pub)
+      assert.equal(restarted.report.candidate.source_session_uuid,b.id)
+      assert.equal(restarted.report.candidate.pairs,1)
+      assert.equal(restarted.live.session.archive_intent.kind,'RESTART')
+      pub.cursors.set(b.id,{...cursor(),season:'S04',lastTurn:0});pub.frontier=b.id;pub.latestSeason=4
+      const repeat=await readDiscoverySnapshot(exporter,pub)
+      assert.equal(repeat.live,null);assert.equal(repeat.report.candidate,null)
+      assert.equal(pub.cursors.get(b.id).nextOrder,2)
     } finally { await exporter.end() }
   })

@@ -11,7 +11,7 @@
 
 ```text
 C03 세션 metadata (최대 100개, 일관된 read-only snapshot)
-  → 명시적 archive_intent / committed main MANIFEST 대조
+  → GM의 승인 대기 archive_intent + 보호된 운영자 승인 / committed main MANIFEST 대조
   → 세션별 cursor + predecessor / Reader frontier 검증
   → 선택된 세션의 고정 상한 안에서 최대 200행
   → 기존 exact RAW 봉인 / Reader append-only / Graph·Visual / PR gate
@@ -31,20 +31,25 @@ C03 세션 metadata (최대 100개, 일관된 read-only snapshot)
 
 ## 최소 metadata 계약 (migration 미적용)
 
-`transcript_sessions.archive_intent` JSONB 하나를 추가한다. 기존 open/close RPC,
+`transcript_sessions.archive_intent`는 GM의 승인 대기 의도만 저장한다. 기존 open/close RPC,
 RAW, RLS 및 exporter의 transcript 3개 테이블 SELECT 계약을 유지한다.
+기존 `survival_ops.private_require_archive_operator()`와 `survival_archive.review` 권한을 재사용한다.
+보호된 `survival_ops.archive_source_authorizations` 한 테이블에 실제 승인, 대상 namespace,
+정확한 runtime_intent, actor와 승인 시점을 저장한다. GM/service_role은 이 테이블에 읽기·쓰기 권한이 없다.
+제한 exporter에는 같은 C03/AFTERFALL의 6개 승인 metadata column SELECT만 추가한다.
+운영자 identity나 다른 ops 테이블·함수 권한은 부여하지 않는다.
 기존 행은 NULL로 남긴다. 자동 backfill/승인/재시작 추론은 없다.
 
 | 필드 | 의미 |
 |---|---|
 | version | 1 |
-| disposition | ADOPTED / SUPERSEDED / REVIEW_REQUIRED (본편 채택) |
-| publication | APPROVED / REVIEW_REQUIRED (명시적 공개 승인) |
+| disposition | Runtime은 REVIEW_REQUIRED만 저장 가능; 실제 ADOPTED / SUPERSEDED 결정은 보호된 승인 테이블 |
+| publication | Runtime은 REVIEW_REQUIRED만 저장 가능; APPROVED는 보호된 운영자 결정 |
 | kind | CONTINUE / NEW_SEASON / RESTART / LEGACY (Runtime의 의도) |
 | history | NEW_CAPTURE / MAPPED_BASELINE / LEGACY |
 | initial_order | 새 capture는 0; 기존 게시 source는 확정된 baseline과 일치 |
 | predecessor_id | 실제 앞 source UUID; NULL은 새 이야기의 승인이 아니다 |
-| evidence_ref | 이 저장소 Issue/PR의 결정 근거 URL |
+| evidence_ref | 참고 URL; 존재나 형식만으로 승인되지 않음 |
 | checkpoint_ref, checkpoint_revision | 선택적, 같은 시즌의 실제 immutable checkpoint ref와 commit |
 
 `public_safe`는 개별 행의 안전성이다. 채택이나 명시적 공개 승인과 의미가 다르다.
@@ -58,7 +63,31 @@ OPEN/CLOSED는 lifecycle이며 시즌 COMPLETE를 만들지 않는다.
 승인 후 `worldline/afterfall-rpg`의 실제 `PLAY_SESSION_PROTOCOL_V3.md` room-boot 경로에서
 Runtime이 이전 room UUID와 CONTINUE/NEW_SEASON 의도를 wrapper에 전달하도록 연결한다.
 정상 세션마다 사용자에게 UUID 설정 파일을 쓰게 하지 않는다. 이번에는 해당 branch/BOOT를 수정하지 않았다.
-RESTART는 자동 append하지 않고 편집 검토가 필요하다. SUPERSEDED는 원문을 보존하고 수집을 제외한다.
+### 승인 권한과 자동 승계
+
+`public.archive_operator_authorize_source`는 실제 DB role `authenticated`와 기존 활성 운영자 capability를
+모두 검사한다. PUBLIC/anon/service_role/archive_exporter에는 EXECUTE를 주지 않는다.
+JSON의 JWT role 문자열로 DB role을 대체하지 않는다. 직접 GM UPDATE도 pending-only CHECK에 걸린다.
+승인은 실제 session intent와 정확히 일치해야 하고, 결정 변경에는 기존 결정과 비교하는 CAS가 필요하다.
+별도 service_role 승인 RPC, 새 secret, 신규 actor/role 또는 범용 승인 플랫폼은 없다.
+
+`allow_continuation=true`인 검증된 정책에서 CLOSED predecessor의 같은 시즌 정상 CONTINUE만
+서버 runner가 자동 승계한다. NEW_SEASON/RESTART/legacy, namespace 불일치, 임의 APPROVED 값,
+정책 변경/의도 불일치, 분기, predecessor backlog 또는 Reader frontier 불일치는 승계하지 않는다.
+명시적 보류 결정은 자동 승계로 덮어쓰지 않는다. build 후와 merge 직전에 승인 snapshot hash도 재검증한다.
+
+### 검토된 RESTART
+
+RESTART_REQUIRES_EDITORIAL_REVIEW는 유지한다. 승인된 RESTART의 최소 모델은
+`P(마지막 게시 본편) → A(미게시 NEW_SEASON 시작) → B(RESTART)` 하나의 명시적 대체다.
+운영자는 A의 SUPERSEDED 결정을 먼저 기록하고, B에 published_predecessor_id=P,
+supersedes_id=A, approved_through=실제 승인된 마지막 GM order를 지정한다.
+RPC가 동일 namespace/시즌, CLOSED A, 정확한 Runtime 의도와 대체 결정을 확인하고,
+Discovery가 main의 P 종료 cursor, Reader frontier, A의 미게시 여부와 기존 시즌 도입부 부재를 다시 확인한다.
+A 원문을 읽어 candidate에 복사하거나 삭제/수정하지 않는다. B의 kind는 RESTART로 유지한다.
+게시 후 다음 page/승계에도 대체 근거를 재확인한다. 승인 범위 밖 RAW는 APPROVED_RANGE_EXHAUSTED다.
+복수 미게시 세션을 건너뛰는 일반 플랫폼, 이미 게시된 도입부 교체, 과거 본편 rewrite는 지원하지 않는다.
+SUPERSEDED는 원문을 보존하고 수집을 제외한다.
 이미 게시된 source를 SUPERSEDED로 바꾸면 게시 이력 충돌로 차단한다.
 
 ## 실제 read-only 진단
@@ -66,10 +95,16 @@ RESTART는 자동 append하지 않고 편집 검토가 필요하다. SUPERSEDED�
 Supabase `jgsxpdflgkqroecfjzxq`, `survival_rpg`에서 C03/AFTERFALL metadata/count/hash만 확인했다.
 각 질의는 REPEATABLE READ READ ONLY로 종료했다. S04 본문은 출력·저장·fixture·PR·Preview에 넣지 않았다.
 
-MCP 연결은 `SET ROLE archive_exporter`를 허용하지 않았다. 로컬
-`ARCHIVE_EXPORT_DATABASE_URL`도 없어 실제 CLI는 `BLOCKER_SECRET_SETUP_REQUIRED`로 종료했다.
-따라서 **실제 제한 login 실행은 NOT_VERIFIED**다. 메타데이터 진단은 MCP의 read-only 연결을
-사용했으며, role 자체의 grants/RLS는 catalog에서 별도로 확인했다. 대체 login으로 runner를 실행하지 않았다.
+기존 신뢰 가능한 daily Actions는 실제 exporter로 `NO_NEW_SOURCE`, `AUTO`,
+last_published_order=105를 반환한 운영 근거가 있다. 로컬 URL 부재는 신규 secret 생성 사유가 아니다.
+이번 **V2 실제 제한 login 실행은 NOT_RUN**이다. MCP의 read-only catalog 조회는 실제 V2 login 검증이 아니다.
+
+이번 catalog 조사에서 service_role은 transcript_sessions UPDATE/BYPASSRLS를 갖지만
+운영자 profiles/roles/profile_roles/role_capability_grants와 기존 review 테이블에는 쓰기가 없고,
+authenticated/archive_exporter 역할 membership도 없다. 기존 operator helper는 auth.uid(), 활성 profile,
+실제 survival_archive.review capability를 검사한다. 기존 operator RPC의 service_role EXECUTE는 없다.
+archive_exporter에 실행 가능한 survival_ops 함수도 없다. 새 migration과 실제 S04 결정은 적용하지 않았다.
+main은 branch protection이 없으므로 Git URL/main 파일을 독립적인 운영자 승인으로 간주하지 않는다.
 
 | 시즌 | source UUID | 상태 | 이미 저장소에 반영된 범위 | 미처리/검토 대상 | V2 제안 |
 |---|---|---|---|---|---|
@@ -134,18 +169,23 @@ Windows checkout이 RAW를 CRLF로 바꾼 상태에서는 원본 byte hash 검�
 172개의 CRLF-only 차이를 확인한 뒤 committed bytes로 복원했다. PR에는 EOL 변경을 넣지 않는다.
 기존 atomic rename/link 테스트의 sandbox EPERM은 정상 로컬 권한으로 재실행해 통과했다.
 
-## 승인 후 순서
+## 승인 후 순서 — 이번에는 실행하지 않음
 
-1. Draft 코드/격리 DB CI 검토. 코드 main 병합은 별도 승인이다.
-2. 이번 additive metadata migration과 실제 S03 baseline/S04 두 세션의 채택·연속성·공개 결정을 확인하고
-   승인한 값만 CAS 등록한다. exporter role/password/secret 재설정이나 새로운 테이블 권한은 필요 없다.
-3. worldline의 room-boot wrapper 연결을 별도 승인해 적용한다. worldline 전체를 main으로 합치지 않는다.
-4. 기존 제한 exporter 접속으로 `--discovery-check`를 재검증한다.
-5. 승인된 작은 공개 구간 한 개를 V2 opt-in 어댑터와 기존 PR/CI/Preview 경로로 검증하고,
-   main 반영 후 같은 구간을 다시 check하여 중복 없음과 cursor를 확인한다.
-6. 정규 runner의 호출을 V2로 전환하는 별도 승인 후 기존 예약을 유지한다.
-   현재 AUTO 설정이나 Production 2일 묶음 정책을 이번 PR에서 바꾸지 않는다.
-7. 기존 batched Production release에서 실제 반영을 확인한다.
+1. 동일 HEAD의 Draft 코드/PG17 권한·RPC/Reader/Preview 검토 후 별도 승인으로 코드 병합.
+2. 기존 운영자 capability 경계를 그대로 사용하는 미적용 migration을 별도 승인으로 적용.
+   새 role/password/secret을 만들지 않는다. exporter에는 범위 제한 승인 metadata 6개 column만 부여한다.
+3. 사용자가 S03 baseline 정책과 실제 S04 A/B의 채택·대체·공개·Reader 연결·승인 범위를 결정한다.
+   GM은 pending Runtime 의도만 등록하고, 기존 authenticated 운영자가 authorize RPC로 해당 정확한 의도를 승인한다.
+4. 병합된 **main에서만** 별도 수동 `Archive source discovery read-only check` Actions를 1회 실행한다:
+   `gh workflow run archive-source-discovery-check.yml --ref main`.
+   이 workflow는 workflow_dispatch만 있고 schedule/pull_request가 없으며 contents:read,
+   main checkout, 기존 exporter secret만 사용한다. 승인/RAW/PR/DB 쓰기와 --discovery-apply는 호출하지 않는다.
+   main SHA, 정책/연결 판정, S03 cursor=106, 승인된 범위와 DB writes=0을 확인한다.
+   미승인 S04는 계속 REVIEW_REQUIRED여야 한다. PR 브랜치에는 운영 secret을 주입하지 않는다.
+5. worldline room-boot wrapper 연결과 V2 소구간 proposal 시험은 각각 별도 승인이다.
+   main 반영 후 replay check로 cursor/중복/NOOP를 검증한다.
+6. 실제 확인 뒤 별도 승인으로 정규 runner를 V2로 전환한다. 기존 AUTO, 예약,
+   A-Wiki/B/C와 Production 2일 묶음 정책을 유지한다.
 
-이번 실행 범위: 운영 활성화 NOT_RUN, 실제 처분 쓰기 NOT_RUN, 실제 RAW 공개 NOT_RUN,
-main/worldline 병합 NOT_RUN, Production 배포 NOT_RUN.
+이번 실행 범위: 운영 활성화 NOT_RUN, live migration NOT_RUN, 실제 처분 쓰기 NOT_RUN,
+실제 V2 exporter NOT_RUN, 실제 RAW 공개 NOT_RUN, main/worldline 병합 NOT_RUN, Production 배포 NOT_RUN.

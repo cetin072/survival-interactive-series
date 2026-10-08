@@ -434,7 +434,6 @@ export async function candidateCheck(fixture) {
   const { session, rows, links = [], nextOrder = 0 } = input
   const { validateIntent } = await import('./lib/archive-source-discovery.mjs')
   const intent = validateIntent(session.archive_intent, session)
-  insist(intent.disposition === 'ADOPTED' && intent.publication === 'APPROVED', 'UNAPPROVED_CANDIDATE')
   const discovery = discoverCompletePairs(session, rows, nextOrder)
   insist(discovery.status === 'NEW_SOURCE_RANGE', 'NO_CANDIDATE_RANGE')
   const workspace = await mkdtemp(join(tmpdir(), 'archive-discovery-candidate-'))
@@ -450,6 +449,11 @@ export async function candidateCheck(fixture) {
     }
     const published = await loadPublishedIndex({ paths,
       read: async (ref) => execFileSync('git', ['show', `HEAD:${ref}`], { cwd: root, maxBuffer: 4_000_000 }) })
+    const { planSourceSessions } = await import('./lib/archive-source-discovery.mjs')
+    const admission = planSourceSessions([input.predecessor, ...(input.superseded ? [input.superseded] : []), session], published,
+      { authorizations: input.authorizations ?? [] })
+    insist(admission.candidate?.source_session_uuid === session.id
+      && admission.candidate.next_order === nextOrder && discovery.endOrder <= admission.candidate.snapshot_upper, 'UNAPPROVED_CANDIDATE')
     const protectedFiles = paths.filter((ref) => ref.startsWith('archive/content/')
       && ![bookRef, graphRef, visualRef, `archive/content/transcripts/C03-AFTERFALL/${session.season_id}/MANIFEST.json`].includes(ref))
     const before = new Map(await Promise.all(protectedFiles.map(async (ref) => [ref, sha(await readFile(resolve(workspace, ref)))])))

@@ -1,0 +1,39 @@
+name: Archive source discovery read-only check
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: archive-source-discovery-check
+  cancel-in-progress: false
+jobs:
+  check:
+    # Never supply production secrets to a PR/ref under review.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: archive/scripts/package-lock.json
+      - run: npm ci --prefix archive/scripts
+      - name: Verify immutable main baseline
+        run: |
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+      - name: Trust existing Supabase production root CA
+        run: |
+          ca="$RUNNER_TEMP/supabase-prod-ca-2021.crt"
+          curl --fail --silent --show-error --location \
+            https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt --output "$ca"
+          printf '%s  %s\n' '700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7' "$ca" | sha256sum --check --status
+          echo "NODE_EXTRA_CA_CERTS=$ca" >> "$GITHUB_ENV"
+      - name: Read-only V2 inventory and pairing check
+        env:
+          ARCHIVE_EXPORT_DATABASE_URL: ${{ secrets.ARCHIVE_EXPORT_DATABASE_URL }}
+        run: node archive/scripts/run-daily-archive.mjs --discovery-check
