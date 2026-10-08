@@ -5,6 +5,8 @@ on:
     paths:
       - 'archive/web/**'
       - 'archive/content/**'
+      - 'archive/scripts/run-daily-archive.mjs'
+      - 'archive/scripts/lib/archive-source-discovery*'
       - 'archive/scripts/check-reader-browser.py'
       - 'archive/scripts/reader_deploy_identity.py'
       - 'archive/scripts/test_reader_deploy_identity.py'
