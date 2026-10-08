@@ -42,7 +42,10 @@
     "provider_complete": {
       "p_job_id": "illustration-event-guild-warehouse-option-5d70e344c196-20261009-37839899164",
       "p_prompt_sha256": "b7b2c707a45487e72a08392449fab4f249316d9c9b3d1ba9a89b632a1954c7cd"
-    }
+    },
+    "provider_completed_at": "2026-10-08T22:32:48.274123+00:00",
+    "job_status_after_provider_complete": "INGESTING",
+    "readback_at": "2026-10-08T22:32:59.877Z"
   },
   "review": null,
   "transfer": null,
