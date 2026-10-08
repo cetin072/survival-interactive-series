@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
-import { finalizerAction, reconcilePullRequest, runSemanticFinalizer, semanticBranchRef } from '../knowledge-semantic-finalize.mjs'
+import { humanReviewPackageAllowed, validateReservedBriefTarget, verifyBriefReservation, finalizerAction, reconcilePullRequest, runSemanticFinalizer, semanticBranchRef } from '../knowledge-semantic-finalize.mjs'
 
 const job = { job_id: '287c20fb-7ad2-41e4-b9be-12426675d234', source_kind: 'PUBLIC_ARCHIVE', source_ref: 'manifest', source_sha256: 'a'.repeat(64), semantic_context: { target: { brief_id: 'K-011', candidate_id: 'KC-test' }, source: { kind: 'PUBLIC_ARCHIVE' } } }
 
@@ -151,4 +151,44 @@ test('main drift leaves HUMAN_REVIEW and BRIEF_READY open; semantic, source and 
     const failed=await runSemanticFinalizer({...h,mainSha:'0'.repeat(40),verifyPinsFn:async()=>{}})
     assert.equal(failed.jobs[0].code,'SEMANTIC_RESULT_IDENTITY_CHANGED')
   }
+})
+
+test('K-015..K-019 reservations survive gaps in main K-014', () => {
+  const j=structuredClone(job), r=packagedResult()
+  for(const id of ['K-015','K-016','K-017','K-018','K-019']) {
+    j.semantic_context.target.brief_id=id
+    r.brief.id=r.candidate.brief_id=r.evidence.brief_id=id
+    assert.equal(validateReservedBriefTarget(j,r,[{id:'K-014'}]),id)
+  }
+})
+test('main collision and mismatched package identities fail closed', () => {
+  const j=structuredClone(job), r=packagedResult()
+  j.semantic_context.target.brief_id='K-018'
+  r.brief.id=r.candidate.brief_id=r.evidence.brief_id='K-018'
+  assert.throws(()=>validateReservedBriefTarget(j,r,[{id:'K-018',title:'different'}]),/SEMANTIC_TARGET_BRIEF_STALE/)
+  for(const field of ['brief','candidate','evidence']) {
+    const changed=structuredClone(r)
+    changed[field][field==='brief'?'id':'brief_id']='K-019'
+    assert.throws(()=>validateReservedBriefTarget(j,changed),/SEMANTIC_TARGET_BRIEF_STALE/)
+  }
+})
+test('DB reservation and result binding rejection fail closed', async () => {
+  const j={...job,policy_sha256:'b'.repeat(64),semantic_result_sha256:'c'.repeat(64)}
+  for(const code of ['SEMANTIC_TARGET_BRIEF_STALE','SEMANTIC_RESULT_IDENTITY_CHANGED']) {
+    await assert.rejects(verifyBriefReservation(j,packagedResult(),{requestRpc:async(name,args)=>{
+      assert.equal(name,'archive_knowledge_semantic_job_verify_reservation')
+      assert.equal(args.p_job_id,j.job_id)
+      assert.equal(args.p_source_ref,j.source_ref)
+      assert.equal(args.p_source_sha256,j.source_sha256)
+      assert.equal(args.p_policy_sha256,j.policy_sha256)
+      assert.equal(args.p_result_sha256,j.semantic_result_sha256)
+      return {status:'REJECTED',code}
+    }}),new RegExp(code))
+  }
+})
+
+test('material unknowns enter human review while incomplete or rejected packages stay blocked', () => {
+  assert.equal(humanReviewPackageAllowed({decision:'HOLD',requires_human:true,reasons:['MATERIAL_UNKNOWNS:K-018']}),true)
+  assert.equal(humanReviewPackageAllowed({decision:'HUMAN_REVIEW_REQUIRED',requires_human:true}),true)
+  for(const gate of [{decision:'HOLD',requires_human:false},{decision:'REJECTED',requires_human:true},{decision:'AUTO_PUBLISH_ELIGIBLE',requires_human:false}]) assert.equal(humanReviewPackageAllowed(gate),false)
 })

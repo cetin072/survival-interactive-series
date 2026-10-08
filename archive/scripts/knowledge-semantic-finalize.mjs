@@ -128,7 +128,35 @@ export async function verifyPins(job, base) {
   return { context, config }
 }
 
-export async function runPackage(job, result, { currentMainSha, headRef, currentRoot = root, runCommand = run }) {
+// Prep owns allocation. Gaps in main are valid while reservations remain in the ledger.
+export function validateReservedBriefTarget(job, result, briefs = []) {
+  const reserved = job.semantic_context?.target?.brief_id
+  if (!/^K-[0-9]{3,}$/.test(reserved ?? '')
+    || result?.brief?.id !== reserved || result?.candidate?.brief_id !== reserved
+    || result?.evidence?.brief_id !== reserved
+    || briefs.some((brief) => brief.id === reserved)) throw new Error('SEMANTIC_TARGET_BRIEF_STALE')
+  validateSemanticResult(job, result)
+  return reserved
+}
+
+export async function verifyBriefReservation(job, result, { requestRpc = rpc } = {}) {
+  const briefId = validateReservedBriefTarget(job, result)
+  const verified = await requestRpc('archive_knowledge_semantic_job_verify_reservation', {
+    p_job_id: job.job_id, p_brief_id: briefId,
+    p_source_ref: job.source_ref, p_source_sha256: job.source_sha256,
+    p_policy_sha256: job.policy_sha256, p_result_sha256: job.semantic_result_sha256,
+  })
+  if (verified?.status !== 'VALID') throw new Error(verified?.code ?? 'SEMANTIC_TARGET_BRIEF_STALE')
+  return verified
+}
+
+// HOLD with an explicit human reason can enter the review inbox, never publication.
+export function humanReviewPackageAllowed(gate) {
+  return gate?.requires_human === true
+    && ['HUMAN_REVIEW_REQUIRED', 'HOLD'].includes(gate.decision)
+}
+
+export async function runPackage(job, result, { currentMainSha, headRef, currentRoot = root, runCommand = run, requestRpc = rpc }) {
   const temp = await mkdtemp(join(tmpdir(), `knowledge-semantic-${job.job_id}-`))
   let worktreeAdded = false
   try {
@@ -136,9 +164,8 @@ export async function runPackage(job, result, { currentMainSha, headRef, current
     worktreeAdded = true
     const initial = await loadKnowledge(temp)
     await validateKnowledge(initial)
-    if (initial.briefs.some((brief) => brief.id === result.brief.id)) throw new Error('SEMANTIC_TARGET_BRIEF_ALREADY_EXISTS')
-    const expectedBriefId = `K-${String(initial.briefs.reduce((max, brief) => Math.max(max, Number(/^K-(\d+)$/.exec(brief.id)?.[1] ?? 0)), 0) + 1).padStart(3, '0')}`
-    if (result.brief.id !== expectedBriefId) throw new Error('SEMANTIC_TARGET_BRIEF_STALE')
+    validateReservedBriefTarget(job, result, initial.briefs)
+    await verifyBriefReservation(job, result, { requestRpc })
     await verifyPins(job, temp)
     const applied = await applySemanticPackage({ root: temp, job, result, now: new Date(job.submitted_at ?? job.prepared_at).toISOString() })
 
@@ -152,10 +179,10 @@ export async function runPackage(job, result, { currentMainSha, headRef, current
     const deterministicData = { ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK', auto_publish_enabled: true } }
     const deterministic = await checkRelease(deterministicData, { changedFiles, briefIds: [result.brief.id], mode: 'AUTO_LOW_RISK', base: temp })
     if (result.decision === 'BRIEF_READY' && deterministic.decision !== 'AUTO_PUBLISH_ELIGIBLE') throw new Error(`SEMANTIC_RELEASE_GATE:${deterministic.decision}:${deterministic.reasons.join(',')}`)
-    if (result.decision === 'HUMAN_REVIEW' && deterministic.decision !== 'HUMAN_REVIEW_REQUIRED') throw new Error(`SEMANTIC_REVIEW_GATE:${deterministic.decision}`)
+    if (result.decision === 'HUMAN_REVIEW' && !humanReviewPackageAllowed(deterministic)) throw new Error(`SEMANTIC_REVIEW_GATE:${deterministic.decision}`)
     const release = await checkRelease(data, { changedFiles, briefIds: [result.brief.id], mode: data.config.publication_mode, base: temp })
     if (result.decision === 'BRIEF_READY' && !['AUTO_PUBLISH_ELIGIBLE', 'WOULD_AUTO_PUBLISH', 'PR_ONLY'].includes(release.decision)) throw new Error(`SEMANTIC_MODE_GATE:${release.decision}:${release.reasons.join(',')}`)
-    if (result.decision === 'HUMAN_REVIEW' && !['HUMAN_REVIEW_REQUIRED', 'PR_ONLY'].includes(release.decision)) throw new Error(`SEMANTIC_MODE_REVIEW_GATE:${release.decision}`)
+    if (result.decision === 'HUMAN_REVIEW' && release.decision !== 'PR_ONLY' && !humanReviewPackageAllowed(release)) throw new Error(`SEMANTIC_MODE_REVIEW_GATE:${release.decision}`)
 
     runCommand('git', ['checkout', '-b', headRef], temp)
     runCommand('git', ['add', '-A', '--', 'knowledge/content', 'knowledge/automation/state.json', 'knowledge/automation/runtime-state.json', 'archive/web/public/knowledge', 'archive/web/public/sitemap.xml'], temp)
@@ -247,7 +274,7 @@ export async function runSemanticFinalizer({ requestRpc = rpc, shell = run, pack
     const { context } = await verifyPinsFn(job, currentRoot)
     if (context.target.brief_id !== result.brief.id) throw new Error('SEMANTIC_TARGET_BINDING_MISMATCH')
     const headRef = semanticBranchRef(job.job_id)
-    const packageResult = await packageSemantic(job, result, { currentMainSha, headRef })
+    const packageResult = await packageSemantic(job, result, { currentMainSha, headRef, requestRpc })
     const pr = await createDraft(job, result, headRef, packageResult.head_sha)
 
     if (result.decision === 'HUMAN_REVIEW') {
