@@ -9,7 +9,7 @@ import {
 } from './lib/wiki-fact-extractor.mjs'
 import {
   compileAWikiVisualCatalog, compileSubmittedExtractor, inspectSubmittedReview, mergedPublication, confirmMergedPublication,
-  prepareNativeJob, publicationBranch, consumeNativeJob,
+  prepareNativeJob, publicationBranch, consumeNativeJob, waitForPullRequestBinding, waitForCheckRegistration,
 } from './a-wiki-native-control.mjs'
 
 const NS = { chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', visibility: 'PUBLIC_ARCHIVE' }
@@ -350,7 +350,7 @@ test('A-Wiki visual sync recompiles the derived B catalog from the current appro
   }
 })
 
-test('approved GitHub publication transport failure resumes FINALIZING without re-running semantics', async () => {
+test('approved GitHub publication transport/readback failures resume FINALIZING without re-running semantics', async () => {
   const [graph, sources] = await Promise.all([
     readFile(resolve(base, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'), 'utf8').then(JSON.parse),
     discoverWikiSources(base),
@@ -376,43 +376,46 @@ test('approved GitHub publication transport failure resumes FINALIZING without r
     decision: 'APPROVE',
     note: 'Test-only independent approval.',
   }
-  const row = {
-    status: 'BLOCKED',
-    blocker_code: 'A_WIKI_COMMAND_GH_1',
-    job_id: 'blocked-db-job',
-    session_id: source.sourceSession.session_id,
-    source_ref: source.sourceManifestRef,
-    source_sha256: source.sourceDigest,
-    graph_sha256: graph.content_sha256,
-    prepared_job: job,
-    proposal: compiled.proposal,
-    review_job: compiled.reviewJob,
-    review_result: reviewResult,
+
+  for (const blockerCode of ['A_WIKI_COMMAND_GH_1', 'A_WIKI_PR_BINDING_INVALID']) {
+    const row = {
+      status: 'BLOCKED',
+      blocker_code: blockerCode,
+      job_id: 'blocked-db-job',
+      session_id: source.sourceSession.session_id,
+      source_ref: source.sourceManifestRef,
+      source_sha256: source.sourceDigest,
+      graph_sha256: graph.content_sha256,
+      prepared_job: job,
+      proposal: compiled.proposal,
+      review_job: compiled.reviewJob,
+      review_result: reviewResult,
+    }
+    const calls = []
+    const recovered = await prepareNativeJob({
+      base,
+      collectCompletion: async () => null,
+      requestRpc: async (name, args) => {
+        calls.push(name)
+        if (name === 'archive_a_wiki_native_job_recovery_current') return row
+        if (name === 'archive_a_wiki_native_job_advance') {
+          assert.equal(args.p_expected_status, 'BLOCKED')
+          assert.equal(args.p_status, 'FINALIZING')
+          return { status: 'FINALIZING', job_id: row.job_id }
+        }
+        if (name === 'archive_a_wiki_native_dispatch') return { status: 'DISPATCHED', request_id: 123 }
+        assert.fail(`Unexpected RPC ${name}`)
+      },
+    })
+    assert.equal(recovered.status, 'FINALIZING')
+    assert.equal(recovered.recovery, 'GITHUB_PUBLICATION_RETRY')
+    assert.equal(recovered.dispatch_request_id, 123)
+    assert.deepEqual(calls, [
+      'archive_a_wiki_native_job_recovery_current',
+      'archive_a_wiki_native_job_advance',
+      'archive_a_wiki_native_dispatch',
+    ])
   }
-  const calls = []
-  const recovered = await prepareNativeJob({
-    base,
-    collectCompletion: async () => null,
-    requestRpc: async (name, args) => {
-      calls.push(name)
-      if (name === 'archive_a_wiki_native_job_recovery_current') return row
-      if (name === 'archive_a_wiki_native_job_advance') {
-        assert.equal(args.p_expected_status, 'BLOCKED')
-        assert.equal(args.p_status, 'FINALIZING')
-        return { status: 'FINALIZING', job_id: row.job_id }
-      }
-      if (name === 'archive_a_wiki_native_dispatch') return { status: 'DISPATCHED', request_id: 123 }
-      assert.fail(`Unexpected RPC ${name}`)
-    },
-  })
-  assert.equal(recovered.status, 'FINALIZING')
-  assert.equal(recovered.recovery, 'GITHUB_PUBLICATION_RETRY')
-  assert.equal(recovered.dispatch_request_id, 123)
-  assert.deepEqual(calls, [
-    'archive_a_wiki_native_job_recovery_current',
-    'archive_a_wiki_native_job_advance',
-    'archive_a_wiki_native_dispatch',
-  ])
 })
 
 test('merged native retry requires source, receipt, exact proposal and independent review evidence', () => {
@@ -431,4 +434,68 @@ test('merged native retry requires source, receipt, exact proposal and independe
   assert.throws(() => confirmMergedPublication(row, publication, null), /EVIDENCE_INVALID/)
   assert.throws(() => confirmMergedPublication(row, publication, { ...evidence, review_sha256: 'c'.repeat(64) }), /EVIDENCE_INVALID/)
   assert.throws(() => confirmMergedPublication(row, publication, { ...evidence, receipt_job_id: 'different-job' }), /EVIDENCE_INVALID/)
+})
+
+const publicationPr = {
+  number: 474, state: 'OPEN', headRefName: 'automation/a-wiki-publish-s04-001-test',
+  headRefOid: 'b'.repeat(40), baseRefName: 'main',
+}
+
+test('publication binding retries a stale head and accepts only the exact next readback', async () => {
+  const waits = [], heads = ['a'.repeat(40), publicationPr.headRefOid]
+  let reads = 0
+  const actual = await waitForPullRequestBinding(474, publicationPr.headRefName, publicationPr.headRefOid, {
+    readPr: async (number) => { assert.equal(number, 474); return { ...publicationPr, headRefOid: heads[reads++] } },
+    wait: async (ms) => waits.push(ms), attempts: 3,
+  })
+  assert.equal(actual.headRefOid, publicationPr.headRefOid)
+  assert.equal(reads, 2)
+  assert.deepEqual(waits, [1000])
+})
+
+test('publication binding rejects a different PR, branch, base or closed state without retry', async () => {
+  for (const mismatch of [{ number: 475 }, { headRefName: 'other-branch' }, { baseRefName: 'other-base' }, { state: 'MERGED' }, { state: 'CLOSED' }]) {
+    let reads = 0
+    await assert.rejects(waitForPullRequestBinding(474, publicationPr.headRefName, publicationPr.headRefOid, {
+      readPr: async () => { reads++; return { ...publicationPr, ...mismatch } },
+      wait: async () => assert.fail('Binding identity mismatch must not retry'), attempts: 3,
+    }), /A_WIKI_PR_BINDING_INVALID/)
+    assert.equal(reads, 1)
+  }
+})
+
+test('publication binding never accepts a persistent wrong head and stops at the retry limit', async () => {
+  let reads = 0, waits = 0
+  await assert.rejects(waitForPullRequestBinding(474, publicationPr.headRefName, publicationPr.headRefOid, {
+    readPr: async () => { reads++; return { ...publicationPr, headRefOid: 'a'.repeat(40) } },
+    wait: async () => waits++, attempts: 3,
+  }), /A_WIKI_PR_BINDING_INVALID/)
+  assert.equal(reads, 3)
+  assert.equal(waits, 2)
+})
+
+test('publication waits for CI registration before watching checks', async () => {
+  let reads = 0
+  const waits = []
+  await waitForCheckRegistration(474, publicationPr.headRefOid, {
+    readPr: async () => ({ headRefOid: publicationPr.headRefOid,
+      statusCheckRollup: ++reads === 2 ? [{ status: 'QUEUED' }] : [] }),
+    wait: async (ms) => waits.push(ms), attempts: 3,
+  })
+  assert.equal(reads, 2)
+  assert.deepEqual(waits, [2000])
+})
+
+test('CI registration rejects changed head and fails finitely when no checks register', async () => {
+  await assert.rejects(waitForCheckRegistration(474, publicationPr.headRefOid, {
+    readPr: async () => ({ headRefOid: 'a'.repeat(40), statusCheckRollup: [{ status: 'QUEUED' }] }),
+    wait: async () => assert.fail('Changed head must not retry'), attempts: 3,
+  }), /A_WIKI_PR_HEAD_CHANGED/)
+  let reads = 0, waits = 0
+  await assert.rejects(waitForCheckRegistration(474, publicationPr.headRefOid, {
+    readPr: async () => { reads++; return { headRefOid: publicationPr.headRefOid, statusCheckRollup: [] } },
+    wait: async () => waits++, attempts: 3,
+  }), /A_WIKI_PR_CHECK_REGISTRATION_TIMEOUT/)
+  assert.equal(reads, 3)
+  assert.equal(waits, 2)
 })

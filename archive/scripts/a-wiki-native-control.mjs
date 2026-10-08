@@ -180,7 +180,9 @@ export async function prepareNativeJob({
         'A_WIKI_COMPLETION_RECONCILE_FAILED')
       reconciledJobId = active.job_id
     } else if (active.status === 'BLOCKED'
-      && /^A_WIKI_COMMAND_GH_(?:1|FAILED)$/.test(active.blocker_code ?? '')) {
+      && (/^A_WIKI_COMMAND_GH_(?:1|FAILED)$/.test(active.blocker_code ?? '')
+        || ['A_WIKI_PR_BINDING_INVALID', 'A_WIKI_PR_HEAD_CHANGED',
+          'A_WIKI_PR_CHECK_REGISTRATION_TIMEOUT'].includes(active.blocker_code ?? ''))) {
       const graph = JSON.parse(await readFile(join(base, graphRef), 'utf8'))
       if (graph.content_sha256 !== active.graph_sha256) {
         const source = sources.find((candidate) => candidate.sourceManifestRef === active.source_ref
@@ -375,13 +377,34 @@ async function buildPublicationHead(row, branch, currentMain, remoteSha = null) 
   }
 }
 
-async function waitForCheckRegistration(prNumber, headSha) {
-  for (let attempt = 0; attempt < 60; attempt += 1) {
-    const info = JSON.parse(run('gh', ['pr', 'view', String(prNumber), '--repo', repository,
-      '--json', 'headRefOid,statusCheckRollup'], root))
+const waitForReadback = (ms) => new Promise((resolveWait) => setTimeout(resolveWait, ms))
+const readPublicationPr = (prNumber, fields) => JSON.parse(run('gh', [
+  'pr', 'view', String(prNumber), '--repo', repository, '--json', fields,
+], root))
+
+export async function waitForPullRequestBinding(prNumber, branch, headSha, {
+  readPr = readPublicationPr, wait = waitForReadback, attempts = 60,
+} = {}) {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const info = await readPr(prNumber,
+      'number,url,state,headRefName,headRefOid,baseRefName,baseRefOid,mergeStateStatus')
+    insist(info.number === prNumber && info.state === 'OPEN'
+      && info.headRefName === branch && info.baseRefName === 'main',
+    'A_WIKI_PR_BINDING_INVALID')
+    if (info.headRefOid === headSha) return info
+    if (attempt < attempts - 1) await wait(1000)
+  }
+  throw new Error('A_WIKI_PR_BINDING_INVALID')
+}
+
+export async function waitForCheckRegistration(prNumber, headSha, {
+  readPr = readPublicationPr, wait = waitForReadback, attempts = 60,
+} = {}) {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const info = await readPr(prNumber, 'headRefOid,statusCheckRollup')
     insist(info.headRefOid === headSha, 'A_WIKI_PR_HEAD_CHANGED')
     if ((info.statusCheckRollup ?? []).length > 0) return
-    if (attempt < 59) await new Promise((resolveWait) => setTimeout(resolveWait, 2000))
+    if (attempt < attempts - 1) await wait(2000)
   }
   throw new Error('A_WIKI_PR_CHECK_REGISTRATION_TIMEOUT')
 }
@@ -422,13 +445,9 @@ async function buildPublication(row) {
     const url = run('gh', ['pr', 'create', '--repo', repository, '--base', 'main', '--head', branch,
       '--title', `A-Wiki semantic ${row.session_id}`,
       '--body', 'Native Extractor + independent Reviewer approved. Program Finalizer applied exact source-bound facts and refreshed the derived Visual catalog. Receipt is the durable completion signal. Production remains batched.'], root)
-    pr = JSON.parse(run('gh', ['pr', 'view', url, '--repo', repository,
-      '--json', 'number,url,state,headRefName,headRefOid,baseRefName,baseRefOid,mergeStateStatus'], root))
-  } else {
-    pr = JSON.parse(run('gh', ['pr', 'view', String(pr.number), '--repo', repository,
-      '--json', 'number,url,state,headRefName,headRefOid,baseRefName,baseRefOid,mergeStateStatus'], root))
+    pr = JSON.parse(run('gh', ['pr', 'view', url, '--repo', repository, '--json', 'number,url,state'], root))
   }
-  insist(pr.headRefOid === headSha && pr.baseRefName === 'main', 'A_WIKI_PR_BINDING_INVALID')
+  pr = await waitForPullRequestBinding(pr.number, branch, headSha)
 
   await waitForCheckRegistration(pr.number, headSha)
   run('gh', ['pr', 'checks', String(pr.number), '--repo', repository, '--watch', '--interval', '10'], root, { timeout: 1_200_000 })
