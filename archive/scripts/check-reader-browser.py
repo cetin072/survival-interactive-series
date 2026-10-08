@@ -423,12 +423,12 @@ def audit_world_wiki(page, base: str, width: int, screenshots: str | None):
     search = page.locator('#site-search input')
     search.fill('민석')
     for chronicle, title in [('C01-HAN-JUNHO', '민석'), ('C02-STRONGHOLD', '강민석')]:
-        result = page.locator(f'.wiki-search-group a[href*="chronicle={chronicle}&node=char-minseok"]')
+        result = page.locator(f'.wiki-search-group a[href*="chronicle={chronicle}"][href*="node=char-minseok"]')
         expect(result).to_have_count(1)
         expect(result.locator('strong')).to_have_text(title)
         expect(result.locator('small')).to_contain_text(BOOKS[chronicle]['title'])
     capture('scoped-search')
-    tap(page.locator('.wiki-search-group a[href*="chronicle=C02-STRONGHOLD&node=char-minseok"]'), mobile)
+    tap(page.locator('.wiki-search-group a[href*="chronicle=C02-STRONGHOLD"][href*="node=char-minseok"]'), mobile)
     expect(page.locator('.wiki-document-header h1')).to_have_text('강민석')
     for params in [dict(view='wiki-preview', page='world', chronicle='NOT-A-WORK'),
                    dict(view='wiki-preview', chronicle='C01-HAN-JUNHO', node='char-jinwoo'),
