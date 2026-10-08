@@ -90,3 +90,10 @@ Last verified head before this checkpoint: ac13a85 (main sync). Current checkpoi
 - Other Park Do-hyun is a separate source identity; statements about Park Hyun-woo/the matching house remain REPORTED until actual observation. No C01 family/C03 history used.
 - C01 final review correction binds relation86 to the actual store-owner quote, keeping REDACTED.
 - Prior head1896a7c. Next exact action: C02 chapter07 body in two complete chunks, then08–11, semantic source review; scoped global search and final CI/Preview/browser still pending. Not HUMAN_CHECK_READY.
+
+## C02 all-chapter read / scoped search checkpoint
+- Actual C02 public Reader11 bodies fully read. Snapshot65 documents/72 relations; source review10–11 pending, coverage remains PARTIAL until that audit. Reviewed earlier claims narrowed to their direct quotes; no fabricated source transitions.
+- Reused existing search groups/scoring; Wiki IDs and links now scoped, work title shown, actual candidate facts searchable. Unregistered candidates filtered out of browser projection use. Candidate overview summarizes latest two facts; all original facts and quoted evidence remain in sources section.
+- Added test-only C04/C05 valid adapters with colliding char-seojin, shared chapter/part IDs, scoped relations/Reader/RAW, no media, six-first disclosure; C06 registry-only empty state. Real registry unchanged.
+- PASS web31 files/179 tests. Latest origin/main ccde6a740fe0cf4a1bde3872addf7da44e6ca25d adds C03 SESSION_001 semantic publication and readback/source-check fixes(#474/#477); inspect then normal merge, do not overwrite Graph/receipts.
+- Prior committed headf99f915. Next: finish C02 semantic audit, synchronize main, full local gates, push Draft478 and exact-head CI/Preview. Browser gates NOT_VERIFIED. No main/Production operation.

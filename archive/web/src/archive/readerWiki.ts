@@ -1,4 +1,5 @@
 import packages from 'virtual:reader-wiki-seeds'
+import { chronicleRegistry } from './chronicleRegistry'
 import { readerChapters, type ReaderChapter } from './storyData'
 import { transcriptPartsFor } from './transcriptData'
 import type { WikiDocument } from './wikiDocument'
@@ -6,7 +7,7 @@ import type { WikiDocument } from './wikiDocument'
 type Evidence = { chapterId: string; quote: string }
 type SeedNode = { id: string; type: 'character' | 'location' | 'event'; title: string; subtitle: string; facts: { text: string; kind: string; evidence: Evidence }[] }
 export type ReaderWikiSeed = { chronicleId: string; notice: string; nodes: SeedNode[]; relations: { from: string; to: string; label: string; evidence: Evidence }[] }
-const seeds = packages as ReaderWikiSeed[]
+const seeds = (packages as ReaderWikiSeed[]).filter(seed => chronicleRegistry.some(chronicle => chronicle.id === seed.chronicleId))
 const labels = { character: '인물', location: '장소', event: '사건' }
 
 /** One supplied Chronicle only. Missing evidence links fail closed after build validation. */
@@ -28,7 +29,7 @@ export function buildReaderWikiDocuments(seed: ReaderWikiSeed, chapters: ReaderC
     }))
     return {
       id: node.id, chronicleId: seed.chronicleId, type: node.type, typeLabel: labels[node.type], title: node.title, subtitle: node.subtitle,
-      summary: node.facts.map((fact) => fact.text).join(' '),
+      summary: node.facts.slice(-2).map((fact) => fact.text).join(' '),
       sourceOrder: latest.chapterNumber,
       anchor: { gameTime: '제' + latest.chapterNumber + '장 · ' + latest.title },
       metaRows: [{ label: '유형', value: labels[node.type] }, { label: '범위', value: '현재 공개된 Reader 기록' }],
