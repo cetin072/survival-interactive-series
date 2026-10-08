@@ -42,3 +42,13 @@ Last verified head before this checkpoint: ac13a85 (main sync). Current checkpoi
 - Existing orphan seed type failures were real baseline failures and are now fixed by optional common display fields; no receipt/save values fabricated.
 - Local Vite running in exec session87367 at http://127.0.0.1:5177/. CUA browser kernel cannot start: windows sandbox helper setup refresh error. Actual local browser clicks NOT_VERIFIED; final Preview gate remains required. Continue independent PHASE2 data work.
 - Current last commit5426e0a; this checkpoint commit is the next git log entry. No C01/C02 extraction completed.
+
+## PHASE2 / C01 first-chapter vertical slice checkpoint
+- Last committed head before this unit: 28e81ad; inspect git log for this checkpoint commit.
+- Common renderer reused: scoped world data and document lookup, source quotes for every fact/relation, all RAW refs per chapter, no invented save/history/images.
+- Build-only BOOK/body/RAW hashes, strict chapter ledger and source scope; minimal browser projection. Candidates cannot self-promote by HUMAN_APPROVED label and are excluded when CONTEXT=production.
+- Source processed: C01 chapter01 read in full; 10 documents (4 characters /4 locations /2 events),9 relations. Reader and RAW links tested. Remaining C01 chapters02–10 and C02 chapters01–11 are NOT_PROCESSED.
+- PASS: web30 files/174 tests, seed3 tests, build:verified, git diff --check. Existing C03 compiler/Graph/history/provenance files untouched.
+- Browser retry after kernel reset still fails before opening a tab: Windows sandbox helper setup refresh error. Interactive local gate NOT_VERIFIED. Continue independent source processing; preserve final exact-head Preview gate.
+- Next: read C01 chapter02 in full, extend same snapshot with exact quoted evidence; progress chronologically through chapter10. Then C02, scoped search, source review and CI/Preview.
+- No main merge or Production operation.

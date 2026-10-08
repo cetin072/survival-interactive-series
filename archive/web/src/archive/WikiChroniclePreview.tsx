@@ -1,12 +1,11 @@
-import { hasPublishedWorldWiki } from './worldWikiIndexData'
+import { hasPublishedWorldWiki, publishedWorldWikiIndex } from './worldWikiIndexData'
 import { getChronicle } from './chronicleRegistry'
 import { chaptersForChronicle } from './storyData'
-import { buildWikiDocuments, wikiCharacterIndex, wikiEventIndex, wikiLocationIndex, wikiSupportedNodeIds } from './wikiDocument'
+import { wikiNodeHref } from './wikiLinks'
 import { WikiTopbar } from './WikiTopbar'
 import './wikiShell.css'
 import './survivalDesignLanguage.css'
 
-const wikiHref = (nodeId: string) => '/?view=wiki-preview&node=' + encodeURIComponent(nodeId)
 const storyHref = (chronicleId: string) => '/?view=story&chronicle=' + encodeURIComponent(chronicleId)
 const worldHref = (chronicleId: string, section?: 'characters' | 'locations' | 'events') => '/?view=wiki-preview&page=world&chronicle=' + encodeURIComponent(chronicleId) + (section ? '#' + section : '')
 
@@ -14,12 +13,10 @@ export function WikiChroniclePreview({ chronicleId }: { chronicleId: string }) {
   const chronicle = getChronicle(chronicleId)
   const chapters = chaptersForChronicle(chronicleId)
   const hasWorldWiki = hasPublishedWorldWiki(chronicleId)
-  const recentDocuments = hasWorldWiki
-    ? buildWikiDocuments(wikiSupportedNodeIds)
-      .sort((a, b) => b.anchor.gameTime.localeCompare(a.anchor.gameTime) || (b.anchor.saveVersion ?? 0) - (a.anchor.saveVersion ?? 0))
-      .slice(0, 8)
-    : []
+  const world = publishedWorldWikiIndex(chronicleId)
+  const recentDocuments = world?.recent ?? []
 
+  const wikiHref = (id: string) => wikiNodeHref(chronicleId, id)
   return <main className="wiki-shell">
     <WikiTopbar />
 
@@ -34,7 +31,7 @@ export function WikiChroniclePreview({ chronicleId }: { chronicleId: string }) {
         <p>{chronicle.protagonist}의 생존 기록</p>
         <div className="wiki-home-actions">
           {chapters.length > 0 && <a className="primary" href={storyHref(chronicle.id)}>이야기 읽기 · {chapters.length}장</a>}
-          {hasWorldWiki && <a href={wikiHref('char-jinwoo')}>세계관 문서 보기</a>}
+          {hasWorldWiki && <a href={worldHref(chronicle.id)}>세계관 문서 보기</a>}
         </div>
       </header>
 
@@ -43,14 +40,16 @@ export function WikiChroniclePreview({ chronicleId }: { chronicleId: string }) {
           <section className="wiki-home-section" aria-labelledby="wiki-world-title">
             <div className="wiki-section-heading"><h2 id="wiki-world-title">세계관</h2><span>인물 · 장소 · 사건</span></div>
             <div className="wiki-category-grid">
-              <section><strong>인물</strong><b>{wikiCharacterIndex.length}</b><div>{wikiCharacterIndex.slice(0, 8).map((item) => <a key={item.id} href={wikiHref(item.id)}>{item.title}</a>)}</div><a className="wiki-category-more" href={worldHref(chronicle.id, 'characters')}>인물 전체보기 →</a></section>
-              <section><strong>장소</strong><b>{wikiLocationIndex.length}</b><div>{wikiLocationIndex.slice(0, 8).map((item) => <a key={item.id} href={wikiHref(item.id)}>{item.title}</a>)}</div><a className="wiki-category-more" href={worldHref(chronicle.id, 'locations')}>장소 전체보기 →</a></section>
-              <section><strong>사건</strong><b>{wikiEventIndex.length}</b><div>{wikiEventIndex.slice(0, 8).map((item) => <a key={item.id} href={wikiHref(item.id)}>{item.title}</a>)}</div><a className="wiki-category-more" href={worldHref(chronicle.id, 'events')}>사건 전체보기 →</a></section>
+              {world?.categories.map((category) => <section key={category.id}>
+                <strong>{category.label}</strong><b>{category.items.length}</b>
+                <div>{category.items.slice(0,6).map((item) => <a key={item.id} href={wikiHref(item.id)}>{item.title}</a>)}</div>
+                <a className="wiki-category-more" href={worldHref(chronicle.id, category.id as 'characters' | 'locations' | 'events')}>{category.label} 전체보기 →</a>
+              </section>)}
             </div>
           </section>
 
           <section className="wiki-home-section" aria-labelledby="wiki-chronicle-recent-title">
-            <div className="wiki-section-heading"><h2 id="wiki-chronicle-recent-title">최근 기록</h2><span>공개 Graph 기준</span></div>
+            <div className="wiki-section-heading"><h2 id="wiki-chronicle-recent-title">최근 기록</h2><span>{chronicleId === 'C03-AFTERFALL' ? '공개 Graph 기준' : '공개 Reader 장 순서 기준'}</span></div>
             <div className="wiki-change-list">
               {recentDocuments.map((document) => <a key={document.id} href={wikiHref(document.id)}>
                 <span className="wiki-type-badge">{document.typeLabel}</span>
@@ -64,23 +63,23 @@ export function WikiChroniclePreview({ chronicleId }: { chronicleId: string }) {
 
         <aside>
           <section className="wiki-home-section">
-            <div className="wiki-section-heading"><h2>이 생존기</h2><span>C03</span></div>
+            <div className="wiki-section-heading"><h2>이 생존기</h2><span>{chronicle.id.split('-')[0]}</span></div>
             <dl className="wiki-chronicle-info">
               <div><dt>주인공</dt><dd>{chronicle.protagonist}</dd></div>
               <div><dt>상태</dt><dd>{chronicle.status === 'LIVE' ? '현재 진행 중' : '완결'}</dd></div>
               <div><dt>이야기</dt><dd>{chapters.length}장 공개</dd></div>
-              <div><dt>인물</dt><dd>{wikiCharacterIndex.length}명</dd></div>
-              <div><dt>장소</dt><dd>{wikiLocationIndex.length}곳</dd></div>
-              <div><dt>사건</dt><dd>{wikiEventIndex.length}건</dd></div>
+              {world?.categories.map((category) => <div key={category.id}><dt>{category.label}</dt><dd>{category.items.length}{category.counter}</dd></div>)}
             </dl>
           </section>
 
           <section className="wiki-home-section">
             <div className="wiki-section-heading"><h2>바로가기</h2></div>
             <nav className="wiki-quick-links">
-              <a href={wikiHref('char-jinwoo')}>서진우</a>
-              <a href={wikiHref('loc-agri')}>북유성 농업기술 실증단지</a>
-              <a href={wikiHref('event-fireline')}>서쪽 대형화재 방어선</a>
+              {chronicleId === 'C03-AFTERFALL' ? <>
+                <a href={wikiHref('char-jinwoo')}>서진우</a>
+                <a href={wikiHref('loc-agri')}>북유성 농업기술 실증단지</a>
+                <a href={wikiHref('event-fireline')}>서쪽 대형화재 방어선</a>
+              </> : recentDocuments.slice(0,3).map((document) => <a key={document.id} href={wikiHref(document.id)}>{document.title}</a>)}
             </nav>
           </section>
         </aside>

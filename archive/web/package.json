@@ -15,7 +15,8 @@
     "knowledge:test": "node --test ../scripts/lib/knowledge.test.mjs ../scripts/lib/knowledge-experience.test.mjs ../scripts/lib/knowledge-public.test.mjs ../scripts/lib/knowledge-page.test.mjs",
     "knowledge:semantic:test": "node --test ../scripts/lib/knowledge-semantic-jobs.test.mjs ../scripts/lib/knowledge-semantic-finalizer.test.mjs ../scripts/lib/knowledge-main-drift.test.mjs",
     "knowledge:publish-prepare": "node ../scripts/knowledge-publish-prepare.mjs",
-    "knowledge:review-sync": "node ../scripts/knowledge-review-sync.mjs"
+    "knowledge:review-sync": "node ../scripts/knowledge-review-sync.mjs",
+    "wiki:seed:test": "node --test ../scripts/lib/reader-wiki-seed.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.1",

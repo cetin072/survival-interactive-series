@@ -1,7 +1,8 @@
 import { WikiWorldLobby } from './WikiWorldLobby'
 import { chronicleRegistry } from './chronicleRegistry'
 import { WikiTopbar } from './WikiTopbar'
-import { wikiLobbyHref } from './wikiLinks'
+import { readerWikiDocuments } from './readerWiki'
+import { wikiLobbyHref, wikiNodeHref } from './wikiLinks'
 import { WikiChroniclePreview } from './WikiChroniclePreview'
 import { WikiDocumentPage } from './WikiDocumentPage'
 import { WikiHomePreview } from './WikiHomePreview'
@@ -14,10 +15,6 @@ import {
   wikiLocationIndex,
 } from './wikiDocument'
 
-function wikiHref(nodeId: string) {
-  return '/?view=wiki-preview&node=' + encodeURIComponent(nodeId)
-}
-
 export function WikiShellPreview({
   nodeId,
   page = 'home',
@@ -29,14 +26,18 @@ export function WikiShellPreview({
 }) {
   if (page === 'worlds') return <WikiWorldLobby />
   if ((nodeId || page === 'world' || page === 'chronicle') && !chronicleRegistry.some((item) => item.id === chronicleId)) return <WikiNotFound />
-  if (nodeId && (chronicleId !== 'C03-AFTERFALL' || !isWikiSupportedNodeId(nodeId))) return <WikiNotFound />
+  if (nodeId && chronicleId !== 'C03-AFTERFALL') {
+    const document = readerWikiDocuments(chronicleId).find((item) => item.id === nodeId)
+    return document ? <WikiDocumentPage document={document} /> : <WikiNotFound />
+  }
+  if (nodeId && !isWikiSupportedNodeId(nodeId)) return <WikiNotFound />
   if (nodeId && isWikiSupportedNodeId(nodeId)) {
     const document = buildWikiDocument(nodeId)
 
     const previewTools = <form className="wiki-preview-tools" action="/" method="get" onSubmit={(event) => {
       event.preventDefault()
       const selected = new FormData(event.currentTarget).get('node')
-      if (typeof selected === 'string' && isWikiSupportedNodeId(selected)) window.location.assign(wikiHref(selected))
+      if (typeof selected === 'string' && isWikiSupportedNodeId(selected)) window.location.assign(wikiNodeHref(chronicleId, selected))
     }}>
       <input type="hidden" name="view" value="wiki-preview" />
       <label>
@@ -61,7 +62,7 @@ export function WikiShellPreview({
       document={document}
       previewTools={previewTools}
       relationHref={(relation) => isWikiSupportedNodeId(relation.nodeId)
-        ? wikiHref(relation.nodeId)
+        ? wikiNodeHref(chronicleId, relation.nodeId)
         : '/?view=archive&node=' + encodeURIComponent(relation.nodeId)}
     />
   }

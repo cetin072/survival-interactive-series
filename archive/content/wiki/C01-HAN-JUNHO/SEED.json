@@ -1,0 +1,317 @@
+{
+  "version": "reader-wiki-seed-v1",
+  "chronicleId": "C01-HAN-JUNHO",
+  "worldlineId": "CANON-V2",
+  "publication": "PREVIEW_ONLY",
+  "coverage": "PARTIAL",
+  "notice": "공개 Reader 기록을 바탕으로 정리한 위키 검수 후보입니다. 현재 첫 장을 다뤘으며, 작품 전체의 설정이나 독립적인 검증을 보장하지 않습니다.",
+  "bookSha256": "98235add2392dc66591e26772aa07fb2c45f60b2ecb609ff1a36be4837f290c3",
+  "chapters": [
+    {
+      "chapterId": "c01-han-junho-chapter-01",
+      "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+      "status": "REVIEWED",
+      "note": "첫 장 전체를 읽고 실제 행동·상태와 진술·계획을 구분했다. 시청역 합류와 농로 통과는 실행 확정 사실에서 제외했다."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "char-junho",
+      "type": "character",
+      "title": "한준호",
+      "subtitle": "흩어진 가족을 확인하는 주인공",
+      "facts": [
+        {
+          "text": "첫 장 끝에는 민석이 있는 역을 향해 도보로 이동 중이다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-01",
+            "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "- **준호** — 민석 역까지 도보 약 15분\n- **민석** — 역 내부 대기\n- **서윤** — 병원 잔류\n- **정호** — 농로 장애물 앞, 연기 악화"
+          }
+        }
+      ]
+    },
+    {
+      "id": "char-seoyun",
+      "type": "character",
+      "title": "서윤",
+      "subtitle": "한준호의 아내 · 병원 잔류",
+      "facts": [
+        {
+          "text": "준호의 아내로 첫 장 초반 병원에 있다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-01",
+            "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "- **한준호(본인)** — 회사\n- **서윤(아내)** — 병원\n- **민석(아들)** — 학원\n- **정호(아버지)** — 외곽주택\n- **가족은 네 곳으로 흩어져 있음**"
+          }
+        },
+        {
+          "text": "병원 비상전원이 가동되는 가운데 서윤은 병원에 머문다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-01",
+            "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "- 서윤 — 병원 비상전원 가동\n- 정호 — 연기 낀 농로, 장애물 앞"
+          }
+        }
+      ]
+    },
+    {
+      "id": "char-minseok",
+      "type": "character",
+      "title": "민석",
+      "subtitle": "한준호의 아들 · 역에서 대기",
+      "facts": [
+        {
+          "text": "첫 장 초반 학원에 있던 준호의 아들이다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-01",
+            "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "- **한준호(본인)** — 회사\n- **서윤(아내)** — 병원\n- **민석(아들)** — 학원\n- **정호(아버지)** — 외곽주택"
+          }
+        },
+        {
+          "text": "전력 불안정 속 지하철역 비상조명 아래에서 대기한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-01",
+            "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "- 민석 — 지하철역 비상조명 아래 대기\n- 준호 — 신호등 꺼진 교차로 정체"
+          }
+        }
+      ]
+    },
+    {
+      "id": "char-jeongho",
+      "type": "character",
+      "title": "정호",
+      "subtitle": "한준호의 아버지 · 외곽 대피",
+      "facts": [
+        {
+          "text": "준호의 아버지로, 처음에는 산과 밭이 이어진 외곽 집에 혼자 있다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-01",
+            "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "정호(아버지)는 외곽 집에 혼자 있다.  \n그 집 뒤쪽은 낮은 산과 밭으로 이어진다."
+          }
+        },
+        {
+          "text": "첫 장 끝에는 연기가 악화되는 농로 장애물 앞에 있으며 통과 여부는 확정되지 않았다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-01",
+            "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "- **준호** — 민석 역까지 도보 약 15분\n- **민석** — 역 내부 대기\n- **서윤** — 병원 잔류\n- **정호** — 농로 장애물 앞, 연기 악화"
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-station",
+      "type": "location",
+      "title": "민석이 대기하는 지하철역",
+      "subtitle": "고유 역명은 확인되지 않음",
+      "facts": [
+        {
+          "text": "민석이 비상조명 아래에서 대기하는 장소이다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-01",
+            "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "- 민석 — 지하철역 비상조명 아래 대기\n- 준호 — 신호등 꺼진 교차로 정체"
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-hospital",
+      "type": "location",
+      "title": "서윤의 병원",
+      "subtitle": "고유 병원명은 확인되지 않음",
+      "facts": [
+        {
+          "text": "서윤이 잔류하는 병원으로 첫 장에 비상전원이 가동된다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-01",
+            "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "- 서윤 — 병원 비상전원 가동\n- 정호 — 연기 낀 농로, 장애물 앞"
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-outskirts-house",
+      "type": "location",
+      "title": "정호의 외곽 집",
+      "subtitle": "뒤편에 낮은 산과 밭이 이어지는 집",
+      "facts": [
+        {
+          "text": "정호가 처음 혼자 있던 집이며 뒤편에는 낮은 산과 밭이 이어진다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-01",
+            "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "정호(아버지)는 외곽 집에 혼자 있다.  \n그 집 뒤쪽은 낮은 산과 밭으로 이어진다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-farm-road",
+      "type": "location",
+      "title": "정호의 대피 농로",
+      "subtitle": "연기와 장애물이 있는 이동 경로",
+      "facts": [
+        {
+          "text": "정호가 대피 도중 장애물 앞에서 멈춘 농로이다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-01",
+            "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "- **준호** — 민석 역까지 도보 약 15분\n- **민석** — 역 내부 대기\n- **서윤** — 병원 잔류\n- **정호** — 농로 장애물 앞, 연기 악화"
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-blackout",
+      "type": "event",
+      "title": "도심 정전과 교차로 정체",
+      "subtitle": "첫 장의 전력·교통 불안정",
+      "facts": [
+        {
+          "text": "민석은 비상조명 아래에 있고 준호는 신호등이 꺼진 교차로에서 정체를 겪는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-01",
+            "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "- 민석 — 지하철역 비상조명 아래 대기\n- 준호 — 신호등 꺼진 교차로 정체"
+          }
+        },
+        {
+          "text": "준호는 차량을 세운 뒤 필요한 물품을 챙긴다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-01",
+            "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "비상등을 켜고 차를 세운 뒤, 필요한 것만 챙긴다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-farm-obstacle",
+      "type": "event",
+      "title": "농로 장애물 앞의 대피",
+      "subtitle": "정호의 통과 결정은 아직 미확정",
+      "facts": [
+        {
+          "text": "정호는 첫 장 끝에 농로 장애물 앞에 있으며 연기가 악화된다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-01",
+            "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "- **준호** — 민석 역까지 도보 약 15분\n- **민석** — 역 내부 대기\n- **서윤** — 병원 잔류\n- **정호** — 농로 장애물 앞, 연기 악화"
+          }
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "from": "char-junho",
+      "to": "char-seoyun",
+      "label": "아내",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-01",
+        "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+        "quote": "- **한준호(본인)** — 회사\n- **서윤(아내)** — 병원\n- **민석(아들)** — 학원\n- **정호(아버지)** — 외곽주택"
+      }
+    },
+    {
+      "from": "char-junho",
+      "to": "char-minseok",
+      "label": "아들",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-01",
+        "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+        "quote": "- **한준호(본인)** — 회사\n- **서윤(아내)** — 병원\n- **민석(아들)** — 학원\n- **정호(아버지)** — 외곽주택"
+      }
+    },
+    {
+      "from": "char-junho",
+      "to": "char-jeongho",
+      "label": "아버지",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-01",
+        "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+        "quote": "- **한준호(본인)** — 회사\n- **서윤(아내)** — 병원\n- **민석(아들)** — 학원\n- **정호(아버지)** — 외곽주택"
+      }
+    },
+    {
+      "from": "char-minseok",
+      "to": "loc-station",
+      "label": "첫 장 끝에 대기",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-01",
+        "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+        "quote": "- **준호** — 민석 역까지 도보 약 15분\n- **민석** — 역 내부 대기\n- **서윤** — 병원 잔류\n- **정호** — 농로 장애물 앞, 연기 악화"
+      }
+    },
+    {
+      "from": "char-seoyun",
+      "to": "loc-hospital",
+      "label": "첫 장 끝에 잔류",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-01",
+        "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+        "quote": "- **준호** — 민석 역까지 도보 약 15분\n- **민석** — 역 내부 대기\n- **서윤** — 병원 잔류\n- **정호** — 농로 장애물 앞, 연기 악화"
+      }
+    },
+    {
+      "from": "char-jeongho",
+      "to": "loc-outskirts-house",
+      "label": "첫 장 초반 거처",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-01",
+        "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+        "quote": "- **한준호(본인)** — 회사\n- **서윤(아내)** — 병원\n- **민석(아들)** — 학원\n- **정호(아버지)** — 외곽주택"
+      }
+    },
+    {
+      "from": "char-jeongho",
+      "to": "loc-farm-road",
+      "label": "대피 중 장애물 앞",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-01",
+        "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+        "quote": "- **준호** — 민석 역까지 도보 약 15분\n- **민석** — 역 내부 대기\n- **서윤** — 병원 잔류\n- **정호** — 농로 장애물 앞, 연기 악화"
+      }
+    },
+    {
+      "from": "char-junho",
+      "to": "event-blackout",
+      "label": "정체 뒤 차량을 두고 도보 이동",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-01",
+        "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+        "quote": "- **준호** — 민석 역까지 도보 약 15분\n- **민석** — 역 내부 대기\n- **서윤** — 병원 잔류\n- **정호** — 농로 장애물 앞, 연기 악화"
+      }
+    },
+    {
+      "from": "char-jeongho",
+      "to": "event-farm-obstacle",
+      "label": "장애물 앞에서 결정 대기",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-01",
+        "bodySha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+        "quote": "- **준호** — 민석 역까지 도보 약 15분\n- **민석** — 역 내부 대기\n- **서윤** — 병원 잔류\n- **정호** — 농로 장애물 앞, 연기 악화"
+      }
+    }
+  ]
+}

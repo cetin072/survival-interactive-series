@@ -6,16 +6,16 @@ import './wikiShell.css'
 import './survivalDesignLanguage.css'
 import './worldIndexDisclosure.css'
 
-const wikiHref = (nodeId: string) => '/?view=wiki-preview&node=' + encodeURIComponent(nodeId)
+import { wikiNodeHref } from './wikiLinks'
 const chronicleHref = (id: string) => '/?view=wiki-preview&page=chronicle&chronicle=' + encodeURIComponent(id)
 const worldHref = (id: string) => '/?view=wiki-preview&page=world&chronicle=' + encodeURIComponent(id)
 const storyHref = (id: string) => '/?view=story&chronicle=' + encodeURIComponent(id)
 
 const worldIndexPreviewLimit = 6
 
-function WorldIndexLinks({ items }: { items: readonly WorldWikiIndexItem[] }) {
+function WorldIndexLinks({ items, chronicleId }: { items: readonly WorldWikiIndexItem[]; chronicleId: string }) {
   return <div className="wiki-world-index-list">
-    {items.map((item) => <a key={item.id} href={wikiHref(item.id)}>
+    {items.map((item) => <a key={item.id} href={wikiNodeHref(chronicleId, item.id)}>
       <strong>{item.title}</strong>
       {item.subtitle && <small>{item.subtitle}</small>}
     </a>)}
@@ -26,11 +26,13 @@ export function WorldIndexSection({
   id,
   title,
   countLabel,
+  chronicleId = 'C03-AFTERFALL',
   items,
 }: {
   id: string
   title: string
   countLabel: string
+  chronicleId?: string
   items: readonly WorldWikiIndexItem[]
 }) {
   const first = items.slice(0, worldIndexPreviewLimit)
@@ -41,13 +43,13 @@ export function WorldIndexSection({
       <h2>{title}</h2>
       <span>{items.length}{countLabel}</span>
     </div>
-    <WorldIndexLinks items={first} />
+    <WorldIndexLinks items={first} chronicleId={chronicleId} />
     {remaining.length > 0 && <details className="wiki-world-index-disclosure">
       <summary>
         <span className="wiki-world-index-more-label">나머지 {remaining.length}{countLabel} 더 보기</span>
         <span className="wiki-world-index-less-label">목록 접기</span>
       </summary>
-      <WorldIndexLinks items={remaining} />
+      <WorldIndexLinks items={remaining} chronicleId={chronicleId} />
     </details>}
   </section>
 }
@@ -98,16 +100,17 @@ export function WikiWorldIndexPreview({ chronicleId = 'C03-AFTERFALL' }: { chron
         </div>
       </header>
 
+      {world?.recent[0]?.notice && <p className="wiki-muted">{world.recent[0].notice}</p>}
       {world ? <>
         <div className="wiki-home-columns">
           <div>
             <section className="wiki-home-section" aria-labelledby="world-recent-title">
               <div className="wiki-section-heading">
                 <h2 id="world-recent-title">최근 세계관 기록</h2>
-                <span>작품 속 최근 기준시각 순</span>
+                <span>{world.recent.some((document) => document.recordBasis) ? '공개 이야기의 장 순서 기준' : '작품 속 최근 기준시각 순'}</span>
               </div>
               <div className="wiki-change-list">
-                {world.recent.map((document) => <a key={document.id} href={wikiHref(document.id)}>
+                {world.recent.map((document) => <a key={document.id} href={wikiNodeHref(chronicleId, document.id)}>
                   <span className="wiki-type-badge">{document.typeLabel}</span>
                   <strong>{document.title}</strong>
                   <small>{document.subtitle}</small>
@@ -125,7 +128,7 @@ export function WikiWorldIndexPreview({ chronicleId = 'C03-AFTERFALL' }: { chron
                 {world.categories.map((category) => <section key={category.id}>
                   <strong>{category.label}</strong><b>{category.items.length}</b>
                   <div>{category.items.slice(0, 6).map((item) =>
-                    <a key={item.id} href={wikiHref(item.id)}>{item.title}</a>)}</div>
+                    <a key={item.id} href={wikiNodeHref(chronicleId, item.id)}>{item.title}</a>)}</div>
                   <a className="wiki-category-more" href={'#' + category.id}>{category.label} 전체보기 →</a>
                 </section>)}
               </div>
@@ -154,6 +157,7 @@ export function WikiWorldIndexPreview({ chronicleId = 'C03-AFTERFALL' }: { chron
           title={category.label}
           countLabel={category.counter}
           items={category.items}
+          chronicleId={chronicleId}
         />)}
       </> : <>
         <section className="wiki-home-section" aria-labelledby="world-unavailable-title">

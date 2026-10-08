@@ -3,6 +3,7 @@ import { getChronicle } from './chronicleRegistry'
 import type { WikiDocument } from './wikiDocument'
 import type { WikiSourceLink } from './wikiSources'
 import { WikiTopbar } from './WikiTopbar'
+import { wikiNodeHref, worldWikiHref } from './wikiLinks'
 import './wikiShell.css'
 import './survivalDesignLanguage.css'
 
@@ -50,7 +51,7 @@ export function WikiDocumentPage({
   const numberFor = (kind: PlannedSection['kind']) => plan.findIndex((section) => section.kind === kind) + 1
   const roleSection = document.sections.find((section) => /(?:^|-)role$/.test(section.id))
   const historySections = document.sections.filter((section) => section !== roleSection)
-  const hrefForRelation = relationHref ?? ((relation: WikiDocument['relations'][number]) => '/?view=archive&node=' + encodeURIComponent(relation.nodeId))
+  const hrefForRelation = relationHref ?? ((relation: WikiDocument['relations'][number]) => wikiNodeHref(document.chronicleId, relation.nodeId))
 
   return <main className="wiki-shell" id="wiki-top">
     <WikiTopbar />
@@ -58,8 +59,8 @@ export function WikiDocumentPage({
     <div className="wiki-frame">
       {previewTools}
       <nav className="wiki-breadcrumb" aria-label="현재 위치">
-        <a href="/?view=wiki-preview">생존일기</a><span>›</span>
-        <a href="/?view=wiki-preview&page=chronicle&chronicle=C03-AFTERFALL">{chronicle.title}</a><span>›</span>
+        <a href="/">생존일기</a><span>›</span>
+        <a href={worldWikiHref(document.chronicleId)}>{chronicle.title}</a><span>›</span>
         <span>{document.typeLabel}</span><span>›</span><strong>{document.title}</strong>
       </nav>
 
@@ -71,11 +72,9 @@ export function WikiDocumentPage({
         </header>
 
         <aside className="wiki-infobox" aria-label={document.title + ' 정보표'}>
-          <div className={'wiki-infobox-cover' + (document.visual ? ' has-image' : '')}>
-            {document.visual
-              ? <img src={document.visual.public_path} width={document.visual.width} height={document.visual.height} alt={document.title + ' 대표 삽화'} />
-              : <span>대표 삽화 없음</span>}
-          </div>
+          {document.visual && <div className="wiki-infobox-cover has-image">
+            <img src={document.visual.public_path} width={document.visual.width} height={document.visual.height} alt={document.title + ' 대표 삽화'} />
+          </div>}
           <h2>{document.title}</h2>
           <dl>
             {document.metaRows.map((row) => <div key={row.label}><dt>{row.label}</dt><dd>{row.value}</dd></div>)}
@@ -91,6 +90,7 @@ export function WikiDocumentPage({
         <div className="wiki-article-body">
           <section id="wiki-overview">
             <h2><span>{numberFor('overview')}.</span> 개요</h2>
+            {document.notice && <p className="wiki-muted">{document.notice}</p>}
             <p className="wiki-lead">{document.summary}</p>
             {!!document.lead.length && <details className="wiki-previous-context">
               <summary>이전 기록의 개요와 해설</summary>
@@ -105,7 +105,7 @@ export function WikiDocumentPage({
               {document.activities.map((item) => <article key={item.nodeId}>
                 <time>{item.date}</time>
                 <div>
-                  <strong><a href={'/?view=wiki-preview&node=' + encodeURIComponent(item.nodeId)}>{item.title}</a></strong>
+                  <strong><a href={wikiNodeHref(document.chronicleId, item.nodeId)}>{item.title}</a></strong>
                   <p className="wiki-activity-role">{item.relationship}</p>
                   <p>{item.summary}</p>
                   <SourceLinks sources={item.sources} chronicleId={document.chronicleId} />
@@ -177,6 +177,13 @@ export function WikiDocumentPage({
 
           <section id="wiki-sources">
             <h2><span>{numberFor('sources')}.</span> 관련 이야기 · 기록 근거</h2>
+            {!!document.quotes?.length && <div className="wiki-state-history">
+              {document.quotes.map((record, index) => <article key={record.chapterId + index}>
+                <h3>{record.text}</h3><p className="wiki-muted">{record.kind}</p>
+                <blockquote>{record.quote}</blockquote>
+                <SourceLinks sources={document.sources.filter((source) => source.chapterId === record.chapterId)} chronicleId={document.chronicleId} />
+              </article>)}
+            </div>}
             <div className="wiki-source-box">
               <strong>관련 이야기</strong>
               <span>{document.sources.length ? document.sources.map((source) => <span className="wiki-inline-source" key={source.chapterId + source.partId}>
@@ -185,7 +192,7 @@ export function WikiDocumentPage({
                 ? <a href={'/?view=story&chronicle=' + encodeURIComponent(document.chronicleId) + '&chapter=' + encodeURIComponent(document.relatedChapter.id)}>{document.relatedChapter.title}</a>
                 : '직접 연결된 공개 장 없음'}</span>
               <strong>현재 상태</strong>
-              <span>공개 Graph · {document.anchor.gameTime} · save {document.anchor.saveVersion}</span>
+              <span>{document.recordBasis ? document.recordBasis + ' · ' + document.anchor.gameTime : <>공개 Graph · {document.anchor.gameTime} · save {document.anchor.saveVersion}</>}</span>
               <strong>원문 기록</strong>
               <span>{document.transcriptPartIds.length
                 ? document.transcriptPartIds.map((partId, index) => <span className="wiki-inline-source" key={partId}><a href={'/?view=raw&chronicle=' + encodeURIComponent(document.chronicleId) + '&part=' + encodeURIComponent(partId)}>{document.sources.find((source) => source.partId === partId)?.partTitle ?? partId}</a>{index < document.transcriptPartIds.length - 1 ? ' · ' : ''}</span>)

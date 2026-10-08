@@ -13,10 +13,18 @@ describe('world Wiki Chronicle boundary', () => {
     expect(current?.recent.every((document) => document.chronicleId === 'C03-AFTERFALL')).toBe(true)
   })
 
-  it('does not invent C01, C02 or future C04 world records', () => {
-    for (const id of ['C01-HAN-JUNHO', 'C02-STRONGHOLD', 'C04-NEW-WORLD']) {
+  it('does not invent unbuilt or future world records', () => {
+    for (const id of ['C02-STRONGHOLD', 'C04-NEW-WORLD']) {
       expect(hasPublishedWorldWiki(id)).toBe(false)
       expect(publishedWorldWikiIndex(id)).toBeNull()
     }
+  })
+  it('uses source-bound C01 candidate documents without C03 fallback', () => {
+    const world = publishedWorldWikiIndex('C01-HAN-JUNHO')!
+    expect(hasPublishedWorldWiki('C01-HAN-JUNHO')).toBe(true)
+    expect(world.categories[0].items.map((item) => item.id)).toContain('char-junho')
+    expect(world.categories.flatMap((group) => group.items).map((item) => item.id)).not.toContain('char-jinwoo')
+    expect(world.recent.every((document) => document.chronicleId === 'C01-HAN-JUNHO'
+      && document.anchor.saveVersion === undefined && document.sources.length > 0)).toBe(true)
   })
 })

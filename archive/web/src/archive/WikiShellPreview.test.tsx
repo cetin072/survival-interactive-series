@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { WikiShellPreview } from './WikiShellPreview'
 import { wikiCharacterIndex, wikiEventIndex, wikiLocationIndex } from './wikiDocument'
 import { archiveRouteUrl, parseArchiveRoute } from './readerNavigation'
+import { hasPublishedWorldWiki } from './worldWikiIndexData'
 import { WorldIndexSection } from './WikiWorldIndexPreview'
 
 describe('Wiki staged public structure', () => {
@@ -96,11 +97,11 @@ describe('Wiki staged public structure', () => {
   it('does not leak C03 wiki nodes into C01 or C02 world views', () => {
     for (const chronicleId of ['C01-HAN-JUNHO', 'C02-STRONGHOLD']) {
       const markup = renderToStaticMarkup(createElement(WikiShellPreview, { page: 'world', chronicleId }))
-      expect(markup).toContain('세계관 문서 준비 중')
+      expect(markup).toContain(hasPublishedWorldWiki(chronicleId) ? '최근 세계관 기록' : '세계관 문서 준비 중')
       expect(markup).toContain('생존기별 세계관')
       expect(markup).not.toContain('char-jinwoo')
-      expect(markup).not.toContain('최근 세계관 기록')
-      expect(markup).not.toContain('현재 공개된 세계관 문서 기준')
+      expect(markup).not.toContain('node=char-seojin')
+      expect(markup).not.toContain('node=loc-agri')
     }
   })
 
@@ -110,7 +111,9 @@ describe('Wiki staged public structure', () => {
       chronicleId: 'C01-HAN-JUNHO',
     }))
     expect(markup).toContain('한준호의 생존기')
-    expect(markup).toContain('Reader 중심으로 공개')
+    expect(markup).toContain('공개 Reader 장 순서 기준')
+    expect(markup).toContain('node=char-junho')
+    expect(markup).not.toContain('node=char-jinwoo')
     expect(markup).toContain('이야기 읽기')
     expect(markup).not.toContain('서진우의 생존 기록')
   })

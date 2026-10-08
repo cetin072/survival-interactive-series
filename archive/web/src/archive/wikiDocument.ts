@@ -60,6 +60,7 @@ export type WikiDocument = {
   summary: string
   anchor: { gameTime: string; saveVersion?: number }
   metaRows: WikiDocumentMetaRow[]
+  sourceOrder?: number
   recordBasis?: string
   notice?: string
   quotes?: { text: string; quote: string; chapterId: string; chapterTitle: string; kind: string }[]
