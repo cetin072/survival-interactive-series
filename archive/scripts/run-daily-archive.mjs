@@ -9,7 +9,7 @@ import { pathToFileURL } from 'node:url'
 import { assertRestrictedExportRole } from './lib/archive-export-role.mjs'
 import { DAILY_SOURCE_SESSION, discoverCompletePairs, materializeSegment, publishedWatermark } from './lib/archive-daily-core.mjs'
 import { readDiscoverySnapshot } from './lib/archive-discovery-read.mjs'
-import { candidateState, loadPublishedIndex, verifyDiscoveryCandidate } from './lib/archive-source-discovery.mjs'
+import { candidateState, loadPublishedIndex, verifyDiscoveryCandidate, assertDiscoveryRange } from './lib/archive-source-discovery.mjs'
 import { approvedSeasonCatalog } from './lib/approved-reader-sources.mjs'
 import { checkAppendOnlyEdition } from './lib/reader-auto.mjs'
 import { createBatch, fingerprint } from './lib/publication-plan.mjs'
@@ -394,7 +394,7 @@ export async function discoveryCheck() {
 }
 
 /** Unscheduled opt-in V2 adapter. Deployment/activation still requires separate approval. */
-export async function discoveryApply() {
+export async function discoveryApply({ expectedRange } = {}) {
   insist(git('status', '--porcelain') === '', 'DIRTY_WORKTREE_HUMAN_REVIEW_REQUIRED')
   git('fetch', 'origin', 'main')
   const base = git('rev-parse', 'origin/main')
@@ -406,6 +406,7 @@ export async function discoveryApply() {
     try { return await readDiscoverySnapshot(client, published) } finally { await client.end() }
   }
   const { live, report } = await readSnapshot()
+  if (expectedRange) assertDiscoveryRange(live, expectedRange)
   if (!live || live.discovery.status !== 'NEW_SOURCE_RANGE') return report
   const mode = (await readJSON('archive/automation/config.json')).mode
   insist(['SHADOW', 'AUTO'].includes(mode), 'INVALID_ARCHIVE_MODE')
@@ -413,6 +414,7 @@ export async function discoveryApply() {
     git('fetch', 'origin', 'main')
     assertMainBase(base, 'BASE_MOVED_HUMAN_REVIEW_REQUIRED')
     const current = await readSnapshot()
+    if (expectedRange) assertDiscoveryRange(current.live, expectedRange)
     verifyDiscoveryCandidate(live, current.live)
   }
   insist(process.env.GH_TOKEN, 'BLOCKER_GITHUB_TOKEN_SETUP_REQUIRED')
