@@ -279,10 +279,32 @@ test('reviewed RESTART skips exactly the protected unpublished start and preserv
   assert.equal(materialized.source.source_session_uuid,b.id)
   assert.equal(materialized.source.season_id,'S04')
   assert.equal(JSON.stringify(ss),before); assert.deepEqual(rawA.map(r=>sha(r.content)),originalHashes)
+  b.last_message_order=1
   pub.cursors.set(b.id,{...cursor(),season:'S04'});pub.frontier=b.id;pub.latestSeason=4
   const retained=pub.cursors.get(b.id).nextOrder
   assert.equal(planSourceSessions(ss,pub,{authorizations:auth}).candidate,null)
   assert.equal(pub.cursors.get(b.id).nextOrder,retained)
+})
+test('reviewed start must be committed before an explicit policy admits normal ongoing capture', () => {
+  const f=reviewedRestart()
+  assert.equal(planSourceSessions(f.ss,f.pub,{authorizations:f.auth}).candidate.snapshot_upper,1)
+  f.pub.cursors.set(f.b.id,{...cursor(),season:'S04'});f.pub.frontier=f.b.id;f.pub.latestSeason=4
+  const tail=planSourceSessions(f.ss,f.pub,{authorizations:f.auth}).candidate
+  assert.equal(tail.source_session_uuid,f.b.id);assert.equal(tail.next_order,2);assert.equal(tail.snapshot_upper,3)
+  assert.equal(f.pub.cursors.get(f.b.id).nextOrder,2)
+  f.auth[2].decision.allow_continuation=false
+  const held=planSourceSessions(f.ss,f.pub,{authorizations:f.auth})
+  assert.equal(held.candidate,null)
+  assert.equal(held.sessions.find(s=>s.source_session_uuid===f.b.id).blocker,'APPROVED_RANGE_EXHAUSTED')
+  // A later normal source does not create a second season intro or invalidate B.
+  f.auth[2].decision.allow_continuation=true;f.b.last_message_order=1;f.b.status='CLOSED'
+  f.pub.seasons.set('S04',{manifest:{sessions:[{source_session_uuid:f.b.id}]}})
+  const next=session(4,{season_id:'S04',archive_intent:pending(intent(f.b.id))})
+  assert.equal(planSourceSessions([...f.ss,next],f.pub,{authorizations:f.auth}).candidate.source_session_uuid,next.id)
+  f.pub.cursors.set(next.id,{...cursor(),season:'S04'});f.pub.frontier=next.id
+  f.pub.seasons.get('S04').manifest.sessions.push({source_session_uuid:next.id})
+  const following=session(5,{season_id:'S04',archive_intent:pending(intent(next.id))})
+  assert.equal(planSourceSessions([...f.ss,next,following],f.pub,{authorizations:f.auth}).candidate.source_session_uuid,following.id)
 })
 test('unreviewed RESTART stays guarded; missing supersession and wrong connection fail closed', () => {
   const f=reviewedRestart()

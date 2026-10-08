@@ -85,7 +85,9 @@ supersedes_id=A, approved_through=실제 승인된 마지막 GM order를 지정�
 RPC가 동일 namespace/시즌, CLOSED A, 정확한 Runtime 의도와 대체 결정을 확인하고,
 Discovery가 main의 P 종료 cursor, Reader frontier, A의 미게시 여부와 기존 시즌 도입부 부재를 다시 확인한다.
 A 원문을 읽어 candidate에 복사하거나 삭제/수정하지 않는다. B의 kind는 RESTART로 유지한다.
-게시 후 다음 page/승계에도 대체 근거를 재확인한다. 승인 범위 밖 RAW는 APPROVED_RANGE_EXHAUSTED다.
+게시 후 다음 page/승계에도 대체 근거를 재확인한다. 검토된 시작 범위가 main에 전부 게시된 뒤에만
+allow_continuation=true 정책이 동일 source의 정상 연속 tail과 다음 CONTINUE를 자동 승계한다.
+정책이 없으면 승인 범위 밖 RAW는 APPROVED_RANGE_EXHAUSTED다. 이 승계도 기존 SHA/pair/frontier 검사를 통과해야 한다.
 복수 미게시 세션을 건너뛰는 일반 플랫폼, 이미 게시된 도입부 교체, 과거 본편 rewrite는 지원하지 않는다.
 SUPERSEDED는 원문을 보존하고 수집을 제외한다.
 이미 게시된 source를 SUPERSEDED로 바꾸면 게시 이력 충돌로 차단한다.

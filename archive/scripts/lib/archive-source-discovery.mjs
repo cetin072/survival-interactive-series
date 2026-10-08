@@ -140,6 +140,7 @@ function authorizedSessions(sessions, authorizations, published) {
       if (s.authorization || !i || approvals.has(s.id) || i.kind !== 'CONTINUE' || i.history !== 'NEW_CAPTURE'
         || i.initial_order !== 0 || prior?.status !== 'CLOSED' || prior.season_id !== s.season_id
         || prior.chronicle_id !== s.chronicle_id || prior.worldline_id !== s.worldline_id
+        || published.cursors.get(prior.id)?.nextOrder !== prior.last_message_order + 1
         || prior.archive_intent?.disposition !== 'ADOPTED' || prior.archive_intent?.publication !== 'APPROVED'
         || prior.authorization?.allow_continuation !== true) continue
       try { validateIntent(s.runtime_intent, s) } catch { continue }
@@ -194,7 +195,13 @@ export function planSourceSessions(runtimeSessions, published, { scope = C03_SCO
             plan.status = 'BLOCKED'; plan.blocker = 'INITIAL_ORDER_CONFLICT'
           } else {
             plan.next_order ??= intent.initial_order
-            plan.snapshot_upper = Math.min(s.last_message_order, s.authorization.approved_through ?? s.last_message_order)
+            const reviewedEnd = s.authorization.approved_through
+            // Once the whole reviewed start is committed, an explicit ongoing-play
+            // policy can admit its normal contiguous tail without per-turn review.
+            const inheritedTail = s.authorization.allow_continuation === true && cursor
+              && reviewedEnd !== null && cursor.nextOrder > reviewedEnd
+            plan.snapshot_upper = Math.min(s.last_message_order,
+              inheritedTail ? s.last_message_order : reviewedEnd ?? s.last_message_order)
             plan.status = plan.next_order > plan.snapshot_upper ? 'NO_NEW_SOURCE' : 'PLANNED'
             plan.blocker = null
             if (plan.status === 'NO_NEW_SOURCE' && plan.next_order <= s.last_message_order) {
