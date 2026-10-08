@@ -165,7 +165,23 @@
       "width": 512,
       "height": 512,
       "mime_type": "image/png"
+    },
+    {
+      "point_id": "point-e5c2e0b5f6a8074663afdc72b11fe87f9b5fac618fd5b5ee551eca7e359a10e7",
+      "generation_key": "generation-c0048fceecc3e197534a67c851bbddb79673430f781a9b35d01197b68f11dac6",
+      "subject_id": "event-winter-council",
+      "source_sha256": "7c8d61c5f9bec279f4ce4efa1baa2c99b57c104dc9994bc91fbec235877eb85a",
+      "storage_bucket": "survival-archive-originals",
+      "storage_object_path": "AFTERFALL/point-e5c2e0b5f6a8074663afdc72b11fe87f9b5fac618fd5b5ee551eca7e359a10e7/generation-c0048fceecc3e197534a67c851bbddb79673430f781a9b35d01197b68f11dac6/7c8d61c5f9bec279f4ce4efa1baa2c99b57c104dc9994bc91fbec235877eb85a.png",
+      "registry_asset_id": "AF-EVENT-E5C2E0B5F6A8074663AFDC72",
+      "derivative_version": "site-png-512-v1",
+      "public_path": "/visual-assets/a9d0df4d31b830e1a57bfd77f27b260b05497bc1b45e97a37c45f59991aae0cd.png",
+      "sha256": "a9d0df4d31b830e1a57bfd77f27b260b05497bc1b45e97a37c45f59991aae0cd",
+      "bytes": 166929,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png"
     }
   ],
-  "content_sha256": "50e61af1d639b9692c7f0f8aba474c899556375e8ec3dadc278d90d1d96ee750"
+  "content_sha256": "97654dfcfc84785b222ceb546356680ee15cb1e7e714bde37f50a59c52b4dc15"
 }
