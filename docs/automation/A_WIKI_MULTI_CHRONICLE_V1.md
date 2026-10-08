@@ -67,3 +67,10 @@ Last verified head before this checkpoint: ac13a85 (main sync). Current checkpoi
 - Chapter05 title does not mean a second base was acquired: candidate B is still a plan; two-house loss is hypothetical. Neither an actual new-base visit nor destruction was invented.
 - Current prior head464e4ac; checkpoint commit follows. Remaining C01 chapters06–10 and C02all unread/unprocessed. Next exact action: read chapter06 fully and extend same snapshot after checking quotes.
 - Browser gate remains NOT_VERIFIED due pre-launch sandbox error; Draft478 and final CI/Preview still in progress, not HUMAN_CHECK_READY.
+
+## C01 chapters06–07 checkpoint
+- Full C01 chapters01–07 read; same snapshot35 documents/69 relations. Chapters08–10 and C02all remain unprocessed. Actual B-1 stay and B-2 inspection now differ from previous planning; no B-2 contract/settlement invented.
+- Second read-only review: chapters04–05 read22,745 chars,26new facts/18new relations; narrowed claims and strengthened direct evidence. Refuel/stock/shift/contact-rule quotes now bind exact support. Third review audits chapters06–07.
+- No source/Canon/RAW/Reader edits. C03 data and jobs untouched. Candidate stays PREVIEW_ONLY/PARTIAL.
+- Current prior headac22a11; next git log identifies completed unit. Next exact action: read chapter08 in two complete body chunks; curate real new characters and external-house facts.
+- Draft478 final CI/Preview and browser captures still pending; HUMAN_CHECK_READY not reached.

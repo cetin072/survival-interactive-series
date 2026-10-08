@@ -4,7 +4,7 @@
   "worldlineId": "CANON-V2",
   "publication": "PREVIEW_ONLY",
   "coverage": "PARTIAL",
-  "notice": "공개 Reader 기록을 바탕으로 정리한 위키 검수 후보입니다. 현재 공개 장 중 5장을 다뤘으며, 작품 전체의 설정이나 독립적인 검증을 보장하지 않습니다.",
+  "notice": "공개 Reader 기록을 바탕으로 정리한 위키 검수 후보입니다. 현재 공개 장 중 7장을 다뤘으며, 작품 전체의 설정이나 독립적인 검증을 보장하지 않습니다.",
   "bookSha256": "98235add2392dc66591e26772aa07fb2c45f60b2ecb609ff1a36be4837f290c3",
   "chapters": [
     {
@@ -36,6 +36,18 @@
       "bodySha256": "820f9dd95bed716aabc694d68f27b3797a95c99d6dfb233f9a39d4dd8d55f0f3",
       "status": "REVIEWED",
       "note": "제5장 전체를 읽었다. 두 거주지 상실은 가정이며 실제 소실로 처리하지 않았다. 남쪽 후보 B와 B-1/B-2는 조사·퇴로 계획이지 확보한 장소가 아니다. 실제 아파트 복귀와 대피소 폐쇄는 없고 서윤의 출근 보류 판단과 수압 약화는 확인된다."
+    },
+    {
+      "chapterId": "c01-han-junho-chapter-06",
+      "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+      "status": "REVIEWED",
+      "note": "제6장 전체를 두 구간으로 읽었다. 실제 아파트 복귀와 정호 생활공간, 정전·급수 장애는 기록했다. 후보 B 이동 조건은 충족되지만 장 종료 때 남쪽 출발은 아직 없으므로 방문·숙박 확보로 기록하지 않는다."
+    },
+    {
+      "chapterId": "c01-han-junho-chapter-07",
+      "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+      "status": "REVIEWED",
+      "note": "제7장 전체를 두 구간으로 읽었다. 가까운 호텔 하룻밤, B-1 일주일 숙박, B-2 실제 차량 조사, 아파트 재복귀와 공식 허용 뒤 외곽 집 확인이 실제 실행된다. B-2는 계약·정착하지 않았다. 5일차 이후 08:15 표기에 없는 날짜를 추가하지 않는다."
     }
   ],
   "nodes": [
@@ -78,7 +90,7 @@
           "evidence": {
             "chapterId": "c01-han-junho-chapter-03",
             "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
-            "quote": "차량은 회수했다.\n\n이제 선택은 **차를 얻는 문제**가 아니라 **차를 어떻게 보존하고 가족에게 가져갈 것인가**다."
+            "quote": "- 준호 — 차량 회수 성공\n- 연료 약 58%\n- 민석·정호 — 남쪽 대피소\n- 서윤 — 남동쪽 의료원"
           }
         },
         {
@@ -91,7 +103,7 @@
           }
         },
         {
-          "text": "제4장에서 회수 차량을 남쪽 체육관 대피소로 가져오고, 저녁에는 허가를 받아 퇴근한 서윤을 태워 돌아온다.",
+          "text": "제4장에서 회수 차량을 남쪽 체육관 대피소로 가져온다.",
           "kind": "RECORDED",
           "evidence": {
             "chapterId": "c01-han-junho-chapter-04",
@@ -106,6 +118,33 @@
             "chapterId": "c01-han-junho-chapter-05",
             "bodySha256": "820f9dd95bed716aabc694d68f27b3797a95c99d6dfb233f9a39d4dd8d55f0f3",
             "quote": "준호는 아파트가 살아 있다는 사실만 확인하고, **오늘 바로 거점으로 복귀하지 않기로 한다.**"
+          }
+        },
+        {
+          "text": "제6장에서 가족 네 명이 아파트로 복귀한 뒤에도 차량 비상창고와 남쪽 후보 B 퇴로를 유지한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-06",
+            "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+            "quote": "- 가족 4인 아파트 복귀\n- 아파트 기능 대부분 회복\n- 외곽주택 복귀 금지 지속\n- 차량 비상창고 유지\n- 남쪽 후보 B 유지"
+          }
+        },
+        {
+          "text": "제7장에서 남쪽 후보 B로 바로 장거리 이동하지 않고 가까운 비즈니스호텔에서 먼저 하룻밤을 보낸다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "준호는 후보 B까지 바로 내려가는 선택을 접는다.\n\n지금은 밤 10시가 넘었다."
+          }
+        },
+        {
+          "text": "다음 날 남쪽 B-1 생활권으로 이동해 일주일 단위 생활거점을 확보한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "가족은 이곳을 선택한다.\n\n**일주일 단위로 우선 확보한다.**"
           }
         }
       ]
@@ -171,7 +210,7 @@
           }
         },
         {
-          "text": "제4장에서 원래 병원으로 복귀해 근무한 뒤 교대 처리와 퇴근 허가를 받고 준호 차량에 탄다.",
+          "text": "제4장에서 퇴근한 뒤 병원 쪽에서 걸어와 준호 차량에 탄다.",
           "kind": "RECORDED",
           "evidence": {
             "chapterId": "c01-han-junho-chapter-04",
@@ -180,7 +219,7 @@
           }
         },
         {
-          "text": "제4장 · 같은 장에서 남쪽 대피소에 돌아와 민석·정호와 만나 네 가족이 모인다.",
+          "text": "제4장 · 같은 장에서 남쪽 대피소에 돌아와 민석·정호와 만나 가족 네 명이 모인다.",
           "kind": "RECORDED",
           "evidence": {
             "chapterId": "c01-han-junho-chapter-04",
@@ -194,7 +233,25 @@
           "evidence": {
             "chapterId": "c01-han-junho-chapter-05",
             "bodySha256": "820f9dd95bed716aabc694d68f27b3797a95c99d6dfb233f9a39d4dd8d55f0f3",
-            "quote": "서윤이 답한다.\n\n“오늘은 안 간다.”\n\n이번 결정은 준호가 강요한 게 아니다.\n\n서윤이 직접 판단한다."
+            "quote": "# 06:12 — 서윤, 병원에 조건 확인\n\n서윤이 병원에 연락한다.\n\n질문은 세 가지다.\n\n1. 오늘 실제로 인력이 부족한가  \n2. 출퇴근 경로가 유지되는가  \n3. 근무 종료가 가능한가\n\n한동안 답이 없다.\n\n10분쯤 지나 담당자에게서 회신이 온다.\n\n> **행정 인력 부족은 있음.**  \n> 다만 필수 인력 수준은 아님.  \n> 출근 가능한 직원 위주로 요청 중.\n\n두 번째.\n\n> **출퇴근 경로는 개인 판단 필요. 병원에서 이동 보장 불가.**\n\n세 번째.\n\n> **근무 종료 시각 확정 어려움. 상황에 따라 연장 가능.**\n\n서윤이 화면을 그대로 보여준다.\n\n“세 개 중 하나도 만족 못 하네.”\n\n준호가 묻는다.\n\n“그러면?”\n\n서윤이 답한다.\n\n“오늘은 안 간다.”\n\n이번 결정은 준호가 강요한 게 아니다.\n\n서윤이 직접 판단한다."
+          }
+        },
+        {
+          "text": "제6장에서 아파트 복귀 후 냉장·위생·의약품을 점검하고 정전 재발 시 사용 순서를 정리하는 역할을 맡는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-06",
+            "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+            "quote": "### 서윤\n- 냉장·위생·의약품 점검\n- 정전 재발 시 우선 사용 순서 정리"
+          }
+        },
+        {
+          "text": "제7장 B-1 생활거점에서 식사·위생·의약품·건강 상태와 인근 의료시설 확인을 맡는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "## 서윤\n- 식사·위생·의약품·건강상태\n- 인근 의료시설 확인\n- 가족 생활 리듬 복구\n- 병원 측 근무 요청은 안전조건 충족 시에만 검토"
           }
         }
       ]
@@ -256,7 +313,7 @@
           "evidence": {
             "chapterId": "c01-han-junho-chapter-04",
             "bodySha256": "31a3df03c47a6728a7d0156179c1e6c0e6afac957e4f7ea49c4b320204c1f642",
-            "quote": "민석은 기록한다.\n\n### 차량 비상물자\n- 물\n- 간편식\n- 간식\n- 위생용품\n- 손전등\n- 건전지\n- 충전 케이블\n- 기본 상비품\n- 빈 공간 유지"
+            "quote": "민석은 기록한다.\n\n### 차량 비상물자\n- 물\n- 간편식\n- 간식\n- 위생용품\n- 손전등\n- 건전지\n- 충전 케이블\n- 기본 상비품\n- 빈 공간 유지\n\n그리고 마지막에:\n\n> **연료 51% — 불필요 운행 금지**"
           }
         },
         {
@@ -265,7 +322,25 @@
           "evidence": {
             "chapterId": "c01-han-junho-chapter-05",
             "bodySha256": "820f9dd95bed716aabc694d68f27b3797a95c99d6dfb233f9a39d4dd8d55f0f3",
-            "quote": "민석이 제목을 적는다.\n\n## `거점 0 상태`"
+            "quote": "# 22:47 — 가족의 최악 상황 계획\n\n민석이 제목을 적는다.\n\n## `거점 0 상태`\n\n### 단계 1 — 지금\n공공 대피시설 이용.\n\n### 단계 2 — 수일\n대피소가 불안정해지면\n안전지역의 숙박·친척·민간 임시거처 확보.\n\n### 단계 3 — 장기화 확인\n남쪽 평야권을 중심으로 **새 임시 생활거점** 확보.\n\n### 단계 4 — 사회기능 추가 악화\n전력·물·식량·연료 접근성을 기준으로 다시 이동.\n\n그리고 한 줄을 굵게 표시한다.\n\n> **원래 집으로 돌아가는 것이 목표가 아니다.  \n> 가족이 계속 생활할 수 있는 장소를 유지하는 것이 목표다.**"
+          }
+        },
+        {
+          "text": "제6장에서 집 재고표와 차량 재고표를 분리하고 충전·조명 상태와 공식 재난정보를 기록한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-06",
+            "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+            "quote": "### 민석\n- 집 재고표와 차량 재고표 분리 관리\n- 충전 상태·보조배터리·조명 확인\n- 공식 재난정보 기록"
+          }
+        },
+        {
+          "text": "제7장 B-1 생활거점에서 공식 정보·재고표·충전과 통신 상태·이동경로 저장을 맡는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "## 민석\n- 공식정보 상황판\n- 차량/거점 재고표\n- 충전·통신 상태\n- 지도·이동경로 저장"
           }
         }
       ]
@@ -329,6 +404,24 @@
             "bodySha256": "820f9dd95bed716aabc694d68f27b3797a95c99d6dfb233f9a39d4dd8d55f0f3",
             "quote": "**정호**\n\n“물이 있어야 한다. 오래 있을 거면 그게 제일 먼저다.”"
           }
+        },
+        {
+          "text": "제6장에서 자기 외곽 집으로 돌아갈 수 없으므로 가족 아파트의 작은 방을 사용하게 된다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-06",
+            "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+            "quote": "정호가 당장 자기 집으로 돌아갈 수 없으므로, 임시 손님처럼 두지 않는다.\n\n작은 방 하나를 정호가 사용할 수 있게 비운다."
+          }
+        },
+        {
+          "text": "제7장에서 준호와 외곽 주택을 확인하러 가고 직접 화재 피해가 없는 집을 다시 확인한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "집은 서 있다.\n\n직접적인 화재 피해는 없다.\n\n정호가 차에서 내린다.\n\n대문을 열고 들어간다."
+          }
         }
       ]
     },
@@ -379,7 +472,7 @@
       "id": "loc-outskirts-house",
       "type": "location",
       "title": "정호의 외곽 집",
-      "subtitle": "뒤편에 낮은 산과 밭이 이어지는 집",
+      "subtitle": "정호의 집 · 가족의 보조 거점",
       "facts": [
         {
           "text": "제1장 · 정호가 처음 혼자 있던 집이며 뒤편에는 낮은 산과 밭이 이어진다.",
@@ -406,6 +499,24 @@
             "chapterId": "c01-han-junho-chapter-05",
             "bodySha256": "820f9dd95bed716aabc694d68f27b3797a95c99d6dfb233f9a39d4dd8d55f0f3",
             "quote": "공식 안내는 여전히 **복귀 금지**.\n\n정호 동네가 포함된 지역은 밤사이 산불 확산세가 둔화됐지만, 잔불·전력설비·도로 안전 점검이 끝나지 않았다."
+          }
+        },
+        {
+          "text": "제7장 공식 복귀 허용 뒤 확인한 외곽 집은 직접 화재 피해가 없고 수도와 창고·공구가 남아 있다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "집은 서 있다.\n\n직접적인 화재 피해는 없다."
+          }
+        },
+        {
+          "text": "전력 안정성·냉장식품·잔재·연기와 재 냄새 등은 복구하거나 정리할 필요가 있다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "### 복구 필요\n- 전력 안정성\n- 냉장식품 정리\n- 마당·주변 잔재 정리\n- 연기·재 냄새 제거\n- 주변 산불 재위험 확인"
           }
         }
       ]
@@ -580,6 +691,33 @@
             "bodySha256": "820f9dd95bed716aabc694d68f27b3797a95c99d6dfb233f9a39d4dd8d55f0f3",
             "quote": "“○○동 ○○아파트인데요. 현재 단지는 큰 피해 없습니다.”\n\n“전기는요?”\n\n“일부 동이 새벽에 정전됐고 지금도 완전 복구는 아닙니다. 엘리베이터는 제한 운영 중입니다.”\n\n“수도는요?”\n\n“나오긴 하는데 수압이 약합니다.”"
           }
+        },
+        {
+          "text": "제6장에서 가족 네 명이 도착해 엘리베이터·냉장고가 작동하고 집 안이 그대로임을 확인한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-06",
+            "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+            "quote": "엘리베이터도 작동한다.\n\n현관문을 연다.\n\n집 안은 그대로다.\n\n냉장고도 다시 돌아가고 있다."
+          }
+        },
+        {
+          "text": "다음 날에는 짧은 정전 뒤 장시간 전력 중단과 고층 급수 장애가 발생한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-06",
+            "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+            "quote": "- 전력 약 4시간 이상 중단\n- 복구시각 불명\n- 고층 급수 장애 발생\n- 통신 저하\n- 차량 연료 약 80%\n- 비상물자 적재 완료\n- 가족 4인 전원 함께 있음"
+          }
+        },
+        {
+          "text": "제7장에서 가족 네 명이 다시 복귀할 때 전력·수도·엘리베이터·인터넷은 정상으로 기록된다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "가족 네 명이 다시 아파트로 들어간다.\n\n이번에는 처음 돌아왔을 때와 다르다.\n\n전력 정상.\n\n수도 정상.\n\n엘리베이터 정상.\n\n인터넷 정상."
+          }
         }
       ]
     },
@@ -642,7 +780,7 @@
           }
         },
         {
-          "text": "제4장 말미에 네 가족이 모두 모이는 대피소이다. 다음 날 통합 운영은 검토 중일 뿐 폐쇄가 결정되지 않았다.",
+          "text": "제4장 말미에 가족 네 명이 모두 모이는 대피소이다.",
           "kind": "RECORDED",
           "evidence": {
             "chapterId": "c01-han-junho-chapter-04",
@@ -675,6 +813,15 @@
             "chapterId": "c01-han-junho-chapter-05",
             "bodySha256": "820f9dd95bed716aabc694d68f27b3797a95c99d6dfb233f9a39d4dd8d55f0f3",
             "quote": "> “본 시설 역시 오후 운영 여부는 전력 및 급수 상황을 확인한 뒤 결정하겠습니다.”"
+          }
+        },
+        {
+          "text": "제6장에서 가족은 대피소를 떠나 아파트로 이동하며 나중에 다시 올 수도 있음을 염두에 둔다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-06",
+            "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+            "quote": "정호가 체육관을 한번 돌아본다.\n\n“며칠은 더 있을 줄 알았는데.”\n\n준호가 대답한다.\n\n“다시 올 수도 있어요.”"
           }
         }
       ]
@@ -734,11 +881,11 @@
           "evidence": {
             "chapterId": "c01-han-junho-chapter-03",
             "bodySha256": "ab42b60d9c76bd0996c1a7984ebfc6e18ade0cf3e43321330efc4f4f6604e0fa",
-            "quote": "> 통신 끊기면 이렇게 하자.  \n> 1. 네가 의료원 도착하면 거기 유지  \n> 2. 다른 곳으로 이동 지시받으면 공식 지시 따름  \n> 3. 우리 쪽으로 무리해서 이동하지 않음  \n> 4. 통신 복구되면 현재 위치부터 서로 알림  \n> 5. 우리가 대피소를 옮기면 가능한 한 문자 남김\n\n서윤의 답이 온다.\n\n> **동의.**"
+            "quote": "> 통신 끊기면 이렇게 하자.  \n> 1. 네가 의료원 도착하면 거기 유지  \n> 2. 다른 곳으로 이동 지시받으면 공식 지시 따름  \n> 3. 우리 쪽으로 무리해서 이동하지 않음  \n> 4. 통신 복구되면 현재 위치부터 서로 알림  \n> 5. 우리가 대피소를 옮기면 가능한 한 문자 남김\n\n서윤의 답이 온다.\n\n> **동의.**\n\n그리고 잠시 뒤.\n\n> **당신도 나 찾으러 오지 마.**\n\n준호가 짧게 답한다.\n\n> 알겠어."
           }
         },
         {
-          "text": "제4장에서 준호와 서윤은 무조건 합류하거나 무조건 흩어져 있는 대신 상황에 따라 합류 시점을 판단할 기준을 가족에게 설명한다.",
+          "text": "제4장에서 서윤이 상황에 따른 가족 합류 기준을 민석과 정호에게도 설명한다.",
           "kind": "RECORDED",
           "evidence": {
             "chapterId": "c01-han-junho-chapter-04",
@@ -795,7 +942,7 @@
           "evidence": {
             "chapterId": "c01-han-junho-chapter-04",
             "bodySha256": "31a3df03c47a6728a7d0156179c1e6c0e6afac957e4f7ea49c4b320204c1f642",
-            "quote": "### 15:10~17:30\n\n세 사람은 대피소를 중심으로 움직이며:\n\n- 대피소 배급은 정상적으로 받음\n- 구매 가능한 물자는 카드로 보강\n- 현금은 최대한 보존\n- 차량은 불필요하게 운행하지 않음\n- 재고는 민석이 계속 기록\n- 정호가 과잉 구매를 막음\n- 준호는 공식 정보와 서윤 상태를 병행 확인"
+            "quote": "# 14:02 — 2차 물자 확보\n\n세 사람은 역할을 나눈다.\n\n### 준호\n결제·우선순위·운반\n\n### 민석\n가격·재고·차량 적재목록\n\n### 정호\n필요성 검토·무게·중복 구매 통제\n\n목표는 품목을 무작정 쌓는 게 아니라,\n\n> **차량에 실린 것만으로도 가족 셋이 며칠간 독립적으로 움직일 선택권을 만드는 것**\n\n이다.\n\n상점이 정상 운영되는 범위에서 다음이 조금씩 늘어난다.\n\n- 물\n- 상온 보관 식품\n- 즉석식품\n- 위생용품\n- 쓰레기봉투\n- 휴대용 조명\n- 배터리·충전류\n- 여벌 양말·속옷 같은 최소 생활품\n- 기본 상비품\n\n냉장·냉동 식품은 거의 사지 않는다.\n\n전력이 흔들리고 있기 때문이다.\n\n---\n\n## 14:38 — 연료\n\n주유소 상태도 확인한다.\n\n정상 영업 중인 곳은 있지만 차량 대기줄이 길다.\n\n준호는 **차량 연료 확보를 우선하되**, 별도 연료 보관은 현장 안전규정과 판매 가능 범위 안에서만 판단하고 무리하지 않는다.\n\n결국 차량 자체의 연료를 확보하는 데 집중한다.\n\n대기시간은 길지만 아직 카드 결제가 된다.\n\n연료계가 올라간다.\n\n**51% → 84%**\n\n정호가 계기판을 보며 말한다.\n\n“이 정도면 됐다. 기름 때문에 줄 더 서지 마.”\n\n준호도 동의한다.\n\n이동 선택권이 상당히 회복됐다.\n\n---\n\n# 15:10 — 자동 운영\n\n이후 몇 시간 동안 큰 사건은 없다.\n\n반복 행동은 압축된다.\n\n### 15:10~17:30\n\n세 사람은 대피소를 중심으로 움직이며:\n\n- 대피소 배급은 정상적으로 받음\n- 구매 가능한 물자는 카드로 보강\n- 현금은 최대한 보존\n- 차량은 불필요하게 운행하지 않음\n- 재고는 민석이 계속 기록\n- 정호가 과잉 구매를 막음\n- 준호는 공식 정보와 서윤 상태를 병행 확인\n\n차량 트렁크와 뒷좌석 일부가 이제 비상물자로 채워진다."
           }
         },
         {
@@ -815,6 +962,15 @@
             "bodySha256": "31a3df03c47a6728a7d0156179c1e6c0e6afac957e4f7ea49c4b320204c1f642",
             "quote": "결국 차량 자체의 연료를 확보하는 데 집중한다.\n\n대기시간은 길지만 아직 카드 결제가 된다.\n\n연료계가 올라간다.\n\n**51% → 84%**"
           }
+        },
+        {
+          "text": "제6장에서 아파트로 돌아가도 차량 비상창고를 유지하고 집과 차량 재고를 따로 관리한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-06",
+            "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+            "quote": "- 집과 차량 재고 분리 유지\n- 차량 연료 보존\n- 카드 결제 가능할 때 카드 사용\n- 현금은 비상용 유지"
+          }
         }
       ]
     },
@@ -825,7 +981,7 @@
       "subtitle": "병원 근무 교대·퇴근 허가 뒤 합류",
       "facts": [
         {
-          "text": "제4장에서 준호는 병원 외곽 공영주차장에 기다리고, 교대를 마친 서윤이 걸어와 차량에 탄다.",
+          "text": "제4장에서 서윤이 병원 쪽에서 걸어와 준호 차량에 탄다.",
           "kind": "RECORDED",
           "evidence": {
             "chapterId": "c01-han-junho-chapter-04",
@@ -838,11 +994,11 @@
     {
       "id": "event-full-family-reunion",
       "type": "event",
-      "title": "남쪽 대피소에서 네 가족 합류",
+      "title": "남쪽 대피소에서 가족 네 명 합류",
       "subtitle": "준호·서윤·민석·정호의 첫 전원 합류",
       "facts": [
         {
-          "text": "제4장에서 준호와 서윤이 돌아오면서 네 가족이 처음으로 한곳에 모인다.",
+          "text": "제4장에서 준호와 서윤이 돌아오면서 가족 네 명이 처음으로 한곳에 모인다.",
           "kind": "RECORDED",
           "evidence": {
             "chapterId": "c01-han-junho-chapter-04",
@@ -893,12 +1049,220 @@
       "subtitle": "제5장 · 수도 공급은 유지되지만 수압이 약해짐",
       "facts": [
         {
-          "text": "제5장 아침에는 대피소 수도가 나오지만 수압이 약해졌으며 오후 운영은 아직 확정되지 않았다.",
+          "text": "제5장 끝에는 대피소 오후 운영 여부가 불확실해진다.",
           "kind": "RECORDED",
           "evidence": {
             "chapterId": "c01-han-junho-chapter-05",
             "bodySha256": "820f9dd95bed716aabc694d68f27b3797a95c99d6dfb233f9a39d4dd8d55f0f3",
             "quote": "- 대피소 오후 운영 불확실\n- 이동 발동 조건 1개 발생"
+          }
+        },
+        {
+          "text": "제5장 아침에는 대피소 수도가 나오지만 수압이 전날보다 약하다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-05",
+            "bodySha256": "820f9dd95bed716aabc694d68f27b3797a95c99d6dfb233f9a39d4dd8d55f0f3",
+            "quote": "**물은 나온다.**\n\n다만 어제보다 수압이 약하다.\n\n전기는 들어와 있지만 조명은 최소 운영."
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-apartment-return",
+      "type": "event",
+      "title": "가족 네 명의 아파트 복귀",
+      "subtitle": "제6장 · 사용 가능한 거점 재확보",
+      "facts": [
+        {
+          "text": "가족은 대피소에서 아파트로 복귀해 생활 거점을 되찾지만 재난 종료로 간주하지 않는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-06",
+            "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+            "quote": "- 가족 4인 아파트 복귀\n- 아파트 기능 대부분 회복\n- 외곽주택 복귀 금지 지속\n- 차량 비상창고 유지\n- 남쪽 후보 B 유지\n- 전력·수도·유통 아직 불안정\n- 산불은 둔화됐지만 종료 아님"
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-apartment-outage-water",
+      "type": "event",
+      "title": "아파트 장시간 정전과 급수 장애",
+      "subtitle": "제6장 말미 · 남쪽 이동 조건 충족",
+      "facts": [
+        {
+          "text": "제6장 말미에는 장시간 전력 중단과 급수 장애라는 두 가지 가족 이동 기준이 충족된다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-06",
+            "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+            "quote": "가족이 정했던 기준 두 개가 이제 명확해졌다.\n\n- **장시간 전력 중단 ✅**\n- **급수 장애 ✅**"
+          }
+        },
+        {
+          "text": "그때 남쪽 도로는 혼잡하지만 이동 가능하며 아직 가족이 실제 출발한 장면은 나오지 않는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-06",
+            "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+            "quote": "- 후보 B 이동경로 확보\n- 남쪽 도로 혼잡하지만 이동 가능"
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-business-hotel",
+      "type": "location",
+      "title": "남쪽 업무지구 비즈니스호텔",
+      "subtitle": "제7장 · 가까운 하룻밤 임시 숙박",
+      "facts": [
+        {
+          "text": "제7장에서 가족은 패밀리룸을 카드로 결제해 전기·수도·온수·충전이 가능한 방에 묵는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "“패밀리룸 하나 남았습니다.”\n\n가격은 평소보다 비싸지 않았다.\n\n카드 결제도 된다.\n\n준호는 현금을 건드리지 않는다.\n\n**카드 결제.**\n\n방을 잡는다."
+          }
+        },
+        {
+          "text": "이 숙박은 그날 밤을 위한 임시 장소이며 장기 거점으로 취급하지 않는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "준호는 바로 선을 긋는다.\n\n“여기는 그냥 오늘 밤이야.”"
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-b1-lodging",
+      "type": "location",
+      "title": "B-1 장기숙박형 시설",
+      "subtitle": "남쪽 소도시 생활권의 일주일 임시 생활거점",
+      "facts": [
+        {
+          "text": "제7장에서 취사·세탁·주차가 가능한 장기숙박형 시설을 확인한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "조금 떨어진 장기숙박형 시설을 확인한다.\n\n방은 있다.\n\n간단한 취사 가능.\n\n세탁 가능.\n\n주차 가능.\n\n최소 일주일 단위 계약 가능."
+          }
+        },
+        {
+          "text": "가족은 이곳을 일주일 단위로 우선 확보하며 차량 비상물자는 전부 방으로 옮기지 않는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "가족은 이곳을 선택한다.\n\n**일주일 단위로 우선 확보한다.**\n\n카드 결제가 정상적으로 된다.\n\n현금은 그대로 보존한다.\n\n방에 짐을 조금만 옮긴다.\n\n차량 비상물자는 전부 빼지 않는다."
+          }
+        },
+        {
+          "text": "아파트가 회복된 뒤에는 연장하지 않고 임시거점의 역할을 마치고 떠난다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "숙박 연장은 하지 않는다.\n\n짐을 정리한다.\n\n차량 비상물자는 그대로 둔다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-b2-outskirts",
+      "type": "location",
+      "title": "B-2 남쪽 읍 외곽 후보지",
+      "subtitle": "실제 조사한 제3 퇴로 · 제7장에는 계약하지 않음",
+      "facts": [
+        {
+          "text": "제7장에서 준호와 정호가 B-2 외곽 평야지역을 차량으로 조사한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "준호와 정호가 차량으로 B-2 외곽 평야지역을 본다.\n\n민석과 서윤은 B-1에 남는다."
+          }
+        },
+        {
+          "text": "읍 외곽 후보는 주거·마트·의료·주유와 도로 세 축이 있는 지역으로, 장기 임시임대 가능성을 확인하지만 당장 집을 구하지 않는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "그리고 부동산 중개업소도 정상 영업 중이다.\n\n준호가 그걸 기억해둔다.\n\n당장 집을 구하지 않는다.\n\n하지만 **장기 임시임대가 필요한 경우 실제 가능성이 있는 곳**이다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-nearby-hotel",
+      "type": "event",
+      "title": "정전·급수 장애 후 가까운 호텔 이동",
+      "subtitle": "제7장 · 장거리 출발 전 하룻밤 확보",
+      "facts": [
+        {
+          "text": "가족 네 명이 정전된 아파트에서 계단으로 내려가 비상물자가 실린 차량으로 출발한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "엘리베이터는 멈춰 있다.\n\n가족 네 명은 계단으로 내려간다.\n\n차량에는 비상물자가 그대로 있다."
+          }
+        },
+        {
+          "text": "비즈니스호텔에서 남은 패밀리룸을 결제해 가까운 정상 생활권의 하룻밤을 확보한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "“패밀리룸 하나 남았습니다.”\n\n가격은 평소보다 비싸지 않았다.\n\n카드 결제도 된다.\n\n준호는 현금을 건드리지 않는다.\n\n**카드 결제.**\n\n방을 잡는다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-b1-base",
+      "type": "event",
+      "title": "B-1 임시 생활거점 확보",
+      "subtitle": "일주일 운영 후 아파트 회복과 비교",
+      "facts": [
+        {
+          "text": "제7장에서 가족은 B-1의 장기숙박형 시설을 일주일 단위로 확보한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "가족은 이곳을 선택한다.\n\n**일주일 단위로 우선 확보한다.**"
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-outskirts-inspection",
+      "type": "event",
+      "title": "공식 복귀 허용 뒤 외곽 집 확인",
+      "subtitle": "준호·정호가 확인 · 보조 거점으로 복구",
+      "facts": [
+        {
+          "text": "제7장에서 준호와 정호는 공식 복귀 허용 뒤 외곽 집을 확인하러 간다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "정호와 준호가 함께 간다.\n\n서윤과 민석은 아파트에 남는다.\n\n이번에는 공식 복귀 허용 이후 움직인다."
+          }
+        },
+        {
+          "text": "최소 정리 뒤 아파트로 돌아가며 아파트를 주 거점, 외곽 집을 보조 거점, B-2를 제3 퇴로로 구분한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c01-han-junho-chapter-07",
+            "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+            "quote": "준호와 정호는 최소한만 정리하고 아파트로 돌아간다.\n\n이제 구조가 완성된다.\n\n## 주 거점\n**아파트**\n\n## 보조 거점\n**정호 외곽주택**\n\n## 제3 퇴로\n**B-2 남쪽 평야권**"
           }
         }
       ]
@@ -1232,7 +1596,7 @@
       "evidence": {
         "chapterId": "c01-han-junho-chapter-04",
         "bodySha256": "31a3df03c47a6728a7d0156179c1e6c0e6afac957e4f7ea49c4b320204c1f642",
-        "quote": "- **준호 + 서윤** — 차량\n- **민석 + 정호** — 남쪽 대피소"
+        "quote": "# 20:54\n\n전화가 온다.\n\n서윤이다.\n\n“준호야.”\n\n목소리가 지쳐 있다.\n\n“응.”\n\n“나갈 수 있을 것 같아.”\n\n“확정?”\n\n“응. 21시 교대 처리하고 퇴근시키겠대.”\n\n준호가 처음으로 등을 좌석에 기대어 힘을 뺀다.\n\n“알겠어. 주차장 위치 보낼게.”\n\n“근데 하나 있어.”\n\n“뭐?”\n\n“내일 다시 출근할 수 있으면 연락 달래.”\n\n준호가 바로 말한다.\n\n“내일은 내일 상황 보고.”\n\n서윤도 반박하지 않는다.\n\n“나도 그렇게 말했어.”\n\n---\n\n# 21:12 — 서윤 퇴근\n\n병원 쪽에서 서윤이 걸어온다.\n\n작은 가방 하나.\n\n하루 넘게 제대로 쉬지 못한 얼굴이다.\n\n차 문을 열고 타자마자 준호를 본다.\n\n“민석이랑 아버님은?”\n\n“대피소.”\n\n서윤이 안전벨트를 맨다.\n\n“가자.”\n\n차가 출발한다."
       }
     },
     {
@@ -1242,7 +1606,7 @@
       "evidence": {
         "chapterId": "c01-han-junho-chapter-04",
         "bodySha256": "31a3df03c47a6728a7d0156179c1e6c0e6afac957e4f7ea49c4b320204c1f642",
-        "quote": "- **준호 + 서윤** — 차량\n- **민석 + 정호** — 남쪽 대피소"
+        "quote": "# 20:54\n\n전화가 온다.\n\n서윤이다.\n\n“준호야.”\n\n목소리가 지쳐 있다.\n\n“응.”\n\n“나갈 수 있을 것 같아.”\n\n“확정?”\n\n“응. 21시 교대 처리하고 퇴근시키겠대.”\n\n준호가 처음으로 등을 좌석에 기대어 힘을 뺀다.\n\n“알겠어. 주차장 위치 보낼게.”\n\n“근데 하나 있어.”\n\n“뭐?”\n\n“내일 다시 출근할 수 있으면 연락 달래.”\n\n준호가 바로 말한다.\n\n“내일은 내일 상황 보고.”\n\n서윤도 반박하지 않는다.\n\n“나도 그렇게 말했어.”\n\n---\n\n# 21:12 — 서윤 퇴근\n\n병원 쪽에서 서윤이 걸어온다.\n\n작은 가방 하나.\n\n하루 넘게 제대로 쉬지 못한 얼굴이다.\n\n차 문을 열고 타자마자 준호를 본다.\n\n“민석이랑 아버님은?”\n\n“대피소.”\n\n서윤이 안전벨트를 맨다.\n\n“가자.”\n\n차가 출발한다."
       }
     },
     {
@@ -1252,13 +1616,13 @@
       "evidence": {
         "chapterId": "c01-han-junho-chapter-04",
         "bodySha256": "31a3df03c47a6728a7d0156179c1e6c0e6afac957e4f7ea49c4b320204c1f642",
-        "quote": "병원 쪽에서 서윤이 걸어온다.\n\n작은 가방 하나.\n\n하루 넘게 제대로 쉬지 못한 얼굴이다."
+        "quote": "# 20:54\n\n전화가 온다.\n\n서윤이다.\n\n“준호야.”\n\n목소리가 지쳐 있다.\n\n“응.”\n\n“나갈 수 있을 것 같아.”\n\n“확정?”\n\n“응. 21시 교대 처리하고 퇴근시키겠대.”\n\n준호가 처음으로 등을 좌석에 기대어 힘을 뺀다.\n\n“알겠어. 주차장 위치 보낼게.”\n\n“근데 하나 있어.”\n\n“뭐?”\n\n“내일 다시 출근할 수 있으면 연락 달래.”\n\n준호가 바로 말한다.\n\n“내일은 내일 상황 보고.”\n\n서윤도 반박하지 않는다.\n\n“나도 그렇게 말했어.”\n\n---\n\n# 21:12 — 서윤 퇴근\n\n병원 쪽에서 서윤이 걸어온다.\n\n작은 가방 하나.\n\n하루 넘게 제대로 쉬지 못한 얼굴이다.\n\n차 문을 열고 타자마자 준호를 본다.\n\n“민석이랑 아버님은?”\n\n“대피소.”\n\n서윤이 안전벨트를 맨다.\n\n“가자.”\n\n차가 출발한다."
       }
     },
     {
       "from": "char-junho",
       "to": "event-full-family-reunion",
-      "label": "제4장 · 네 가족 전원 합류",
+      "label": "제4장 · 가족 네 명 전원 합류",
       "evidence": {
         "chapterId": "c01-han-junho-chapter-04",
         "bodySha256": "31a3df03c47a6728a7d0156179c1e6c0e6afac957e4f7ea49c4b320204c1f642",
@@ -1268,7 +1632,7 @@
     {
       "from": "char-seoyun",
       "to": "event-full-family-reunion",
-      "label": "제4장 · 네 가족 전원 합류",
+      "label": "제4장 · 가족 네 명 전원 합류",
       "evidence": {
         "chapterId": "c01-han-junho-chapter-04",
         "bodySha256": "31a3df03c47a6728a7d0156179c1e6c0e6afac957e4f7ea49c4b320204c1f642",
@@ -1278,7 +1642,7 @@
     {
       "from": "char-minseok",
       "to": "event-full-family-reunion",
-      "label": "제4장 · 네 가족 전원 합류",
+      "label": "제4장 · 가족 네 명 전원 합류",
       "evidence": {
         "chapterId": "c01-han-junho-chapter-04",
         "bodySha256": "31a3df03c47a6728a7d0156179c1e6c0e6afac957e4f7ea49c4b320204c1f642",
@@ -1288,7 +1652,7 @@
     {
       "from": "char-jeongho",
       "to": "event-full-family-reunion",
-      "label": "제4장 · 네 가족 전원 합류",
+      "label": "제4장 · 가족 네 명 전원 합류",
       "evidence": {
         "chapterId": "c01-han-junho-chapter-04",
         "bodySha256": "31a3df03c47a6728a7d0156179c1e6c0e6afac957e4f7ea49c4b320204c1f642",
@@ -1373,6 +1737,226 @@
         "chapterId": "c01-han-junho-chapter-05",
         "bodySha256": "820f9dd95bed716aabc694d68f27b3797a95c99d6dfb233f9a39d4dd8d55f0f3",
         "quote": "**물은 나온다.**\n\n다만 어제보다 수압이 약하다.\n\n전기는 들어와 있지만 조명은 최소 운영."
+      }
+    },
+    {
+      "from": "char-junho",
+      "to": "event-apartment-return",
+      "label": "제6장 · 가족 네 명 복귀",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-06",
+        "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+        "quote": "- 가족 4인 아파트 복귀\n- 아파트 기능 대부분 회복"
+      }
+    },
+    {
+      "from": "char-seoyun",
+      "to": "event-apartment-return",
+      "label": "제6장 · 가족 네 명 복귀",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-06",
+        "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+        "quote": "- 가족 4인 아파트 복귀\n- 아파트 기능 대부분 회복"
+      }
+    },
+    {
+      "from": "char-minseok",
+      "to": "event-apartment-return",
+      "label": "제6장 · 가족 네 명 복귀",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-06",
+        "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+        "quote": "- 가족 4인 아파트 복귀\n- 아파트 기능 대부분 회복"
+      }
+    },
+    {
+      "from": "char-jeongho",
+      "to": "event-apartment-return",
+      "label": "제6장 · 가족 네 명 복귀",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-06",
+        "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+        "quote": "- 가족 4인 아파트 복귀\n- 아파트 기능 대부분 회복"
+      }
+    },
+    {
+      "from": "event-apartment-return",
+      "to": "loc-family-apartment",
+      "label": "전력·수도 회복 뒤 복귀",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-06",
+        "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+        "quote": "- 가족 4인 아파트 복귀\n- 아파트 기능 대부분 회복"
+      }
+    },
+    {
+      "from": "char-jeongho",
+      "to": "loc-family-apartment",
+      "label": "제6장 · 작은 방을 생활 공간으로",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-06",
+        "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+        "quote": "정호가 당장 자기 집으로 돌아갈 수 없으므로, 임시 손님처럼 두지 않는다.\n\n작은 방 하나를 정호가 사용할 수 있게 비운다."
+      }
+    },
+    {
+      "from": "event-apartment-outage-water",
+      "to": "loc-family-apartment",
+      "label": "제6장 · 전력·고층 급수 장애",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-06",
+        "bodySha256": "505b8bdc93df1d0c80f062354bf9af662e6f2e21359d36e9ad98e8b1e3826375",
+        "quote": "동시에 관리사무소 방송.\n\n> “현재 지역 가압시설 전력 문제로 고층부 급수 장애가 발생하고 있습니다.”"
+      }
+    },
+    {
+      "from": "char-junho",
+      "to": "event-nearby-hotel",
+      "label": "제7장 · 가족 네 명 숙박 이동",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-07",
+        "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+        "quote": "엘리베이터는 멈춰 있다.\n\n가족 네 명은 계단으로 내려간다.\n\n차량에는 비상물자가 그대로 있다."
+      }
+    },
+    {
+      "from": "char-seoyun",
+      "to": "event-nearby-hotel",
+      "label": "제7장 · 가족 네 명 숙박 이동",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-07",
+        "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+        "quote": "엘리베이터는 멈춰 있다.\n\n가족 네 명은 계단으로 내려간다.\n\n차량에는 비상물자가 그대로 있다."
+      }
+    },
+    {
+      "from": "char-minseok",
+      "to": "event-nearby-hotel",
+      "label": "제7장 · 가족 네 명 숙박 이동",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-07",
+        "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+        "quote": "엘리베이터는 멈춰 있다.\n\n가족 네 명은 계단으로 내려간다.\n\n차량에는 비상물자가 그대로 있다."
+      }
+    },
+    {
+      "from": "char-jeongho",
+      "to": "event-nearby-hotel",
+      "label": "제7장 · 가족 네 명 숙박 이동",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-07",
+        "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+        "quote": "엘리베이터는 멈춰 있다.\n\n가족 네 명은 계단으로 내려간다.\n\n차량에는 비상물자가 그대로 있다."
+      }
+    },
+    {
+      "from": "event-nearby-hotel",
+      "to": "loc-business-hotel",
+      "label": "패밀리룸 확보",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-07",
+        "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+        "quote": "호텔 건물에 불이 켜져 있다.\n\n주차장도 운영 중이다.\n\n가장 중요한 건 객실이다."
+      }
+    },
+    {
+      "from": "char-junho",
+      "to": "loc-b1-lodging",
+      "label": "제7장 · 일주일 생활거점",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-07",
+        "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+        "quote": "- 가족 4인 전원 합류\n- 남쪽 후보 B-1 도착\n- 일주일 임시 생활거점 확보"
+      }
+    },
+    {
+      "from": "char-seoyun",
+      "to": "loc-b1-lodging",
+      "label": "제7장 · 일주일 생활거점",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-07",
+        "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+        "quote": "- 가족 4인 전원 합류\n- 남쪽 후보 B-1 도착\n- 일주일 임시 생활거점 확보"
+      }
+    },
+    {
+      "from": "char-minseok",
+      "to": "loc-b1-lodging",
+      "label": "제7장 · 일주일 생활거점",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-07",
+        "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+        "quote": "- 가족 4인 전원 합류\n- 남쪽 후보 B-1 도착\n- 일주일 임시 생활거점 확보"
+      }
+    },
+    {
+      "from": "char-jeongho",
+      "to": "loc-b1-lodging",
+      "label": "제7장 · 일주일 생활거점",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-07",
+        "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+        "quote": "- 가족 4인 전원 합류\n- 남쪽 후보 B-1 도착\n- 일주일 임시 생활거점 확보"
+      }
+    },
+    {
+      "from": "event-b1-base",
+      "to": "loc-b1-lodging",
+      "label": "취사·세탁 가능한 시설 선택",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-07",
+        "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+        "quote": "가족은 이곳을 선택한다.\n\n**일주일 단위로 우선 확보한다.**"
+      }
+    },
+    {
+      "from": "char-junho",
+      "to": "loc-b2-outskirts",
+      "label": "제7장 · 실제 후보 지역 조사",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-07",
+        "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+        "quote": "준호와 정호가 차량으로 B-2 외곽 평야지역을 본다.\n\n민석과 서윤은 B-1에 남는다."
+      }
+    },
+    {
+      "from": "char-jeongho",
+      "to": "loc-b2-outskirts",
+      "label": "제7장 · 실제 후보 지역 조사",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-07",
+        "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+        "quote": "준호와 정호가 차량으로 B-2 외곽 평야지역을 본다.\n\n민석과 서윤은 B-1에 남는다."
+      }
+    },
+    {
+      "from": "char-junho",
+      "to": "event-outskirts-inspection",
+      "label": "공식 복귀 허용 뒤 확인",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-07",
+        "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+        "quote": "정호와 준호가 함께 간다.\n\n서윤과 민석은 아파트에 남는다.\n\n이번에는 공식 복귀 허용 이후 움직인다."
+      }
+    },
+    {
+      "from": "char-jeongho",
+      "to": "event-outskirts-inspection",
+      "label": "공식 복귀 허용 뒤 확인",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-07",
+        "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+        "quote": "정호와 준호가 함께 간다.\n\n서윤과 민석은 아파트에 남는다.\n\n이번에는 공식 복귀 허용 이후 움직인다."
+      }
+    },
+    {
+      "from": "event-outskirts-inspection",
+      "to": "loc-outskirts-house",
+      "label": "제7장 · 직접 화재 피해 없이 유지",
+      "evidence": {
+        "chapterId": "c01-han-junho-chapter-07",
+        "bodySha256": "a1e4ee4a98eac69d421d619523a4352f1147c06b6f8768fc039706b6d8b30665",
+        "quote": "집은 서 있다.\n\n직접적인 화재 피해는 없다.\n\n정호가 차에서 내린다.\n\n대문을 열고 들어간다."
       }
     }
   ]
