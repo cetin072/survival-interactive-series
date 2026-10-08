@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { WikiShellPreview } from './WikiShellPreview'
 import { wikiCharacterIndex, wikiEventIndex, wikiLocationIndex } from './wikiDocument'
 import { archiveRouteUrl, parseArchiveRoute } from './readerNavigation'
+import { WorldIndexSection } from './WikiWorldIndexPreview'
 
 describe('Wiki staged public structure', () => {
   it('uses the Wiki home as the default preview entrance', () => {
@@ -43,6 +44,10 @@ describe('Wiki staged public structure', () => {
     }))
 
     expect(markup).toContain('세계관 전체보기')
+    expect(markup).toContain('최근 세계관 기록')
+    expect(markup).toContain('세계관 분류')
+    expect(markup).toContain('생존기별 세계관')
+    expect(markup).toContain('전체 세계관 문서')
     expect(markup).toContain(`인물 ${wikiCharacterIndex.length}`)
     expect(markup).toContain(`장소 ${wikiLocationIndex.length}`)
     expect(markup).toContain(`사건 ${wikiEventIndex.length}`)
@@ -50,6 +55,52 @@ describe('Wiki staged public structure', () => {
     for (const item of [...wikiCharacterIndex, ...wikiLocationIndex, ...wikiEventIndex]) {
       expect(markup).toContain(item.title)
       expect(markup).toContain('node=' + item.id)
+    }
+  })
+
+  it('shows six document links per category, with native details for the rest', () => {
+    const markup = renderToStaticMarkup(createElement(WikiShellPreview, {
+      page: 'world', chronicleId: 'C03-AFTERFALL',
+    }))
+    expect((markup.match(/class="wiki-world-index-disclosure"/g) ?? []).length).toBe(3)
+    const categories = [
+      ['characters', wikiCharacterIndex, '명'],
+      ['locations', wikiLocationIndex, '곳'],
+      ['events', wikiEventIndex, '건'],
+    ] as const
+    for (const [id, items, unit] of categories) {
+      const section = markup.split('id="' + id + '" aria-label=')[1]?.split('</section>')[0] ?? ''
+      const initiallyVisible = section.split('<details')[0]
+      const collapsed = section.split('<details')[1] ?? ''
+      expect((initiallyVisible.match(/href="\/\?view=wiki-preview&amp;node=/g) ?? []).length).toBe(6)
+      expect(initiallyVisible).toContain(items[0].title)
+      expect(initiallyVisible).not.toContain(items[6].title)
+      expect(collapsed).toContain('나머지 ' + (items.length - 6) + unit + ' 더 보기')
+      expect(collapsed).toContain('목록 접기')
+      expect(collapsed).toContain(items[6].title)
+    }
+  })
+
+  it('does not show an empty disclosure when a world category has six or fewer items', () => {
+    const items = wikiCharacterIndex.slice(0, 5)
+    const markup = renderToStaticMarkup(createElement(WorldIndexSection, {
+      id: 'preview-five',
+      title: '인물',
+      countLabel: '명',
+      items,
+    }))
+    expect(markup).not.toContain('wiki-world-index-disclosure')
+    expect((markup.match(/href="\/\?view=wiki-preview&amp;node=/g) ?? []).length).toBe(5)
+  })
+
+  it('does not leak C03 wiki nodes into C01 or C02 world views', () => {
+    for (const chronicleId of ['C01-HAN-JUNHO', 'C02-STRONGHOLD']) {
+      const markup = renderToStaticMarkup(createElement(WikiShellPreview, { page: 'world', chronicleId }))
+      expect(markup).toContain('세계관 문서 준비 중')
+      expect(markup).toContain('생존기별 세계관')
+      expect(markup).not.toContain('char-jinwoo')
+      expect(markup).not.toContain('최근 세계관 기록')
+      expect(markup).not.toContain('현재 공개된 세계관 문서 기준')
     }
   })
 
