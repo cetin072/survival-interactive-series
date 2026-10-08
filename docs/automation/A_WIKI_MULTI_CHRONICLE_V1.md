@@ -82,3 +82,11 @@ Last verified head before this checkpoint: ac13a85 (main sync). Current checkpoi
 - C02 first chapter read18868 chars; vertical slice17 documents/13 relations in working tree. Discovered original canonical paths differ from archive paths; validator now binds existing catalog pairs and adapter uses validated sourceRefs for real RAW links. No original Reader/transcript changes.
 - PASS: web30 files/176 tests; seed4 tests; build:verified. Preview bundle5,398.76kB/gzip1,655.75kB before final C01 quote corrections. Browser still NOT_VERIFIED (pre-launch Windows sandbox helper).
 - Prior committed head0e14f3c; this checkpoint follows in git log. Next: C02 chapters02–11 full read and curation, source review, scoped search, final CI/Preview/browser gates. HUMAN_CHECK_READY not reached.
+
+## C02 chapters02–06 checkpoint
+- Full public bodies read: C02 chapters01–06, source gaps kept explicit. Snapshot42 documents/44 relations. First independent source review of chapter01 in progress.
+- Chapter02 title says yard but body is wildfire preparation with no evacuation outcome; chapter03 ends mid-sentence; do not synthesize missing transitions.
+- Chapter04 existing region network and outage recovery, chapter05 independent business, chapter06 actual22% investment distinguished from nationwide expansion proposals.
+- Other Park Do-hyun is a separate source identity; statements about Park Hyun-woo/the matching house remain REPORTED until actual observation. No C01 family/C03 history used.
+- C01 final review correction binds relation86 to the actual store-owner quote, keeping REDACTED.
+- Prior head1896a7c. Next exact action: C02 chapter07 body in two complete chunks, then08–11, semantic source review; scoped global search and final CI/Preview/browser still pending. Not HUMAN_CHECK_READY.

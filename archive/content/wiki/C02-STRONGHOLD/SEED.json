@@ -4,7 +4,7 @@
   "worldlineId": "STRONGHOLD",
   "publication": "PREVIEW_ONLY",
   "coverage": "PARTIAL",
-  "notice": "현재 공개 Reader를 바탕으로 정리한 첫 장 검수 후보입니다. 전체 역사 확보나 인간 승인을 의미하지 않습니다.",
+  "notice": "공개 Reader 기록을 바탕으로 정리한 위키 검수 후보입니다. 현재 공개 장 중 6장을 다뤘으며, 작품 전체의 설정이나 독립적인 검증을 보장하지 않습니다.",
   "bookSha256": "cc21254acc575113b00713bf92dc27d807a14ea6baee727e3acbe2ff85c64fba",
   "chapters": [
     {
@@ -12,6 +12,36 @@
       "bodySha256": "568211d9f8514b126a2fcb4d803c7315ab4d9740ee0c0145fb0bf2e99a4c7d66",
       "status": "REVIEWED",
       "note": "첫 장 전체18868자를 세 구간으로 읽었다. 실제 번호판 확인과 방비 보강·관계 변화를 기록했다. 발신자의 신원·범죄 책임·관계의 공식 정의는 확정하지 않는다. 첫 장 전의 정전·절도·사업 시작 경위를 보충하지 않는다."
+    },
+    {
+      "chapterId": "c02-stronghold-chapter-02",
+      "bodySha256": "bcf2c88e513f9de43680f5e55927eb7991ee66e89a59d0646bdfd69415dcb801",
+      "status": "REVIEWED",
+      "note": "제2장 전체4269자를 읽었다. 제목은 마산의 야적장이지만 본문은2031-03-21 산불 접근과 대피 준비이다. 실제 야적장 방문·두 집 소실·서진 가족 구조·도현 대피 결과는 장 종료에 없어 보류한다."
+    },
+    {
+      "chapterId": "c02-stronghold-chapter-03",
+      "bodySha256": "659a7934447a6c504bcd0721541bc8aa281ccf011fcf39f45109e1baecdf6b68",
+      "status": "REVIEWED",
+      "note": "제3장 전체6188자를 읽었다. 산불 실제 대응·창고 화재 경위는 앞뒤 공개 구간이 비어 있어 재구성하지 않는다. 김 노인 집에 들어온 태훈 가족, 실제 제설 협력과 식사를 기록했다. 본문 끝은 문장 중단이며 이준 학교 통폐합과 정착 확정은 보류한다."
+    },
+    {
+      "chapterId": "c02-stronghold-chapter-04",
+      "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+      "status": "REVIEWED",
+      "note": "제4장 전체9945자를 두 구간으로 읽었다. 실제 통신불안 속 귀환·지역망 확인과 자원우선거래 합의를 기록했다. 폐목장 피난·위성통신 설치·전기차 구매는 하지 않았다. 앞 장과 날짜 연결·폐목장 취득경위·지역위원회 기원을 꾸미지 않는다."
+    },
+    {
+      "chapterId": "c02-stronghold-chapter-05",
+      "bodySha256": "9eabbcf8a2ce203472ca0072de01424aee573f8cb965f9f458db5f8ee1eb346b",
+      "status": "REVIEWED",
+      "note": "제5장 전체5015자를 읽었다. 독립 이후 실제 계약·역할분리·회사 규모를 기록했다. 초기퇴사통보와 이후퇴사후사업을 구분한다. 투자 상담과 역제안은 아직 계약 수락이 아니며 지연과 혼인 등 신분을 만들지 않는다."
+    },
+    {
+      "chapterId": "c02-stronghold-chapter-06",
+      "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+      "status": "REVIEWED",
+      "note": "제6장 전체5741자를 읽었다. 지분22% 투자 수락·분산투자·사업 성장과 지연의 생활 변화를 확인했다. 전국확장/대형유통 계약은 제안이지 수락이 아니다. 다른박도현·윤서현·박현우는 사진·전화로 확인되는 범위만 기록한다. 방문 선택은 마지막에 미실행이며 두 과거의 과학적 원인을 만들어 넣지 않는다."
     }
   ],
   "nodes": [
@@ -19,7 +49,7 @@
       "id": "char-dohyun",
       "type": "character",
       "title": "박도현",
-      "subtitle": "두 집을 기반으로 생활하는 주인공",
+      "subtitle": "분산 협력망으로 독립 사업을 운영하는 주인공",
       "facts": [
         {
           "text": "제1장에서 번호판 사건의 추가 추적을 경찰에게 맡기고 생활로 돌아간다.",
@@ -28,6 +58,42 @@
             "chapterId": "c02-stronghold-chapter-01",
             "bodySha256": "568211d9f8514b126a2fcb4d803c7315ab4d9740ee0c0145fb0bf2e99a4c7d66",
             "quote": "도현은 운전하면서 말했다.\n\n“여기까지만 하죠.”\n\n지연이 옆을 봤다.\n\n“사건?”\n\n“네.”\n\n“경찰도 들어왔고, 서진 씨 아버지도 찾았고.”\n\n도현은 앞을 보며 말했다.\n\n“우리가 더 들어갈 이유가 없습니다.”\n\n지연은 바로 이해했다.\n\n“오정태 찾으러 다니지도 않고.”\n\n“네.”\n\n“마산 야적장도 안 가고.”\n\n“그렇고.”\n\n“서진 씨가 연락해도?”\n\n도현은 잠깐 생각했다.\n\n“알려주는 건 듣죠. 하지만 해결하러 움직이지는 않습니다.”\n\n지연이 고개를 끄덕였다.\n\n“그게 맞아요.”"
+          }
+        },
+        {
+          "text": "제2장에서 산불 접근을 확인하고 비상가방을 차에 싣는다. 장 종료 시 실제 대피 결과는 아직 없다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-02",
+            "bodySha256": "bcf2c88e513f9de43680f5e55927eb7991ee66e89a59d0646bdfd69415dcb801",
+            "quote": "도현은 1번 집으로 들어갔다.\n\n이미 수년 동안 위기를 겪었다.\n\n그래서 생각보다 할 일이 많지 않았다.\n\n서류.\n\n현금.\n\n약.\n\n휴대전화와 보조배터리.\n\n간단한 옷.\n\n물.\n\n차량 열쇠.\n\n기본적인 비상가방은 애초에 준비돼 있었다.\n\n도현은 그것부터 차에 실었다."
+          }
+        },
+        {
+          "text": "제4장에서 회사 담당자들에게 판단 기준을 넘기고 통신이 끊겨도 계획대로 1번 집으로 돌아간다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-04",
+            "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+            "quote": "도현은 담당자들에게 각자 판단 범위를 넘겼다.\n\n공장장이 물었다.\n\n> “박 팀장, 들어가게?”\n\n“네. 지금부터는 제가 여기 계속 있어도 결과가 크게 달라지지 않을 것 같습니다.”\n\n공장장은 반박하지 않았다.\n\n> “그래. 연락 안 되면 오늘 기준 그대로 간다.”\n\n“네.”\n\n그 말이면 됐다.\n\n도현은 회사를 자기 부재에도 굴러가게 만들고 나왔다."
+          }
+        },
+        {
+          "text": "제5장에서 독립 후 첫 식품가공업체 계약을 맡고 진단·연결·운영설계를 중심으로 업무를 재편한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-05",
+            "bodySha256": "9eabbcf8a2ce203472ca0072de01424aee573f8cb965f9f458db5f8ee1eb346b",
+            "quote": "### 7월\n\n그래서 방식을 바꿨다.\n\n도현은 직접 수리하지 않았다.\n\n강민석과 태경 같은 기술자들이 현장을 맡았다.\n\n지연 씨 회사가 물류를 맡았다.\n\n도현은 고객에게 딱 세 가지를 팔았다.\n\n**진단.  \n연결.  \n운영설계.**\n\n그 순간부터 일이 조금씩 달라졌다.\n\n도현이 현장에 없는 날에도 프로젝트가 돌아가기 시작했다."
+          }
+        },
+        {
+          "text": "제6장에서 지분22%·경영권 유지·합병과 계열사 우선거래 없는 투자 계약을 수락한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-06",
+            "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+            "quote": "## 2월\n\n세 번의 협상 끝에 구조가 바뀌었다.\n\n**지분 22%.**\n\n경영권은 도현에게 유지.\n\n합병 없음.\n\n계열사 우선거래 없음.\n\n대신 투자사에는 정기적인 경영정보와 일정 규모 이상 투자에 대한 협의권을 줬다.\n\n완벽하게 도현에게 유리한 계약은 아니었다.\n\n외부 돈을 받는다는 건 그만큼 다른 사람의 시선도 회사 안으로 들어오는 것이었다.\n\n도현은 수락했다."
           }
         }
       ]
@@ -46,6 +112,42 @@
             "bodySha256": "568211d9f8514b126a2fcb4d803c7315ab4d9740ee0c0145fb0bf2e99a4c7d66",
             "quote": "“우리 이거…”\n\n도현은 기다렸다.\n\n“급하게 이름 붙이진 말죠.”\n\n“네.”\n\n“근데 없는 일처럼도 하지 말고.”\n\n“그것도 네.”\n\n지연은 그제야 만족한 듯 고개를 끄덕였다.\n\n“좋아요.”"
           }
+        },
+        {
+          "text": "제2장에서 도시 쪽에서 도로 상황을 보고 10분마다 연락하기로 도현과 합의한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-02",
+            "bodySha256": "bcf2c88e513f9de43680f5e55927eb7991ee66e89a59d0646bdfd69415dcb801",
+            "quote": "“내가 밖에서 도로 상황만 볼게요.”\n\n도현은 반대하려다가 멈췄다.\n\n지연이 여기로 들어오는 것과—\n\n도시에서 정보를 보는 것은 전혀 다른 일이었다.\n\n“좋아요.”\n\n“10분마다 연락해요.”\n\n“네.”"
+          }
+        },
+        {
+          "text": "제4장에서 통화 불안에도 약속대로 1번 집에서 기다려 도현을 맞는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-04",
+            "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+            "quote": "### 12:37  \n### 1번 집\n\n마당에 지연의 차가 그대로 있었다.\n\n도현은 그걸 보는 순간 속도를 줄였다.\n\n현관문이 열렸다.\n\n한지연이 나왔다.\n\n> “전화 안 되죠?”\n\n“네.”\n\n> “저도 몇 번 해봤는데 안 됐어요.”\n\n도현이 차에서 내렸다.\n\n“잘했어요. 안 움직여서.”\n\n지연은 짧게 웃었다.\n\n> “우리 어제 정한 게 아니라 몇 달 전에 정한 거잖아요.”\n\n도현도 웃었다.\n\n그 말이 맞았다."
+          }
+        },
+        {
+          "text": "제5장에서 지연은 소수지분 투자만 허용하고 경영권·독립 협력망을 유지하는 재협상을 권한다.",
+          "kind": "REPORTED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-05",
+            "bodySha256": "9eabbcf8a2ce203472ca0072de01424aee573f8cb965f9f458db5f8ee1eb346b",
+            "quote": "지연 씨가 원하는 구조는 명확했다.\n\n- 소수지분 투자만 허용.\n- 도현의 경영권 유지.\n- 기존 협력업체 독립성 유지.\n- 특정 핵심부품은 한곳에 몰지 않음.\n- 물류도 지연 씨 회사 하나에 독점시키지 않음.\n- 투자금은 사람과 회사를 사들이는 데보다 **시스템·운전자금·예비재고**에 사용.\n- 향후 추가투자 때도 동일 원칙 유지."
+          }
+        },
+        {
+          "text": "제6장 2036년 여름에는 1번 집에서 지내는 날이 많아졌다고 도현과 이야기한다.",
+          "kind": "REPORTED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-06",
+            "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+            "quote": "“이 정도면 공식 동거 아니라고 우기기도 애매하네요.”\n\n지연 씨가 바로 받았다.\n\n“그럼 우기지 마요.”\n\n도현이 쳐다봤다.\n\n지연 씨는 별일 아니라는 듯 음료를 마셨다.\n\n“나도 이제 여기서 사는 날이 더 많아요.”"
+          }
         }
       ]
     },
@@ -62,6 +164,15 @@
             "chapterId": "c02-stronghold-chapter-01",
             "bodySha256": "568211d9f8514b126a2fcb4d803c7315ab4d9740ee0c0145fb0bf2e99a4c7d66",
             "quote": "“누구십니까?”\n\n“김상배 씨 딸입니다.”"
+          }
+        },
+        {
+          "text": "제2장에서 서진은 아버지 집 뒤 전봇대 쪽에 불이 붙었고 아버지를 차에 태우려 한다고 전화한다.",
+          "kind": "REPORTED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-02",
+            "bodySha256": "bcf2c88e513f9de43680f5e55927eb7991ee66e89a59d0646bdfd69415dcb801",
+            "quote": "“아빠 집 뒤쪽 전봇대 쪽에 불 붙었어요.”\n\n“집에 불 붙은 겁니까?”\n\n“아직 아니에요.”\n\n“서진 씨 지금 어디예요?”\n\n“차에 태우려고 하는데—”\n\n뒤에서 김상배의 목소리가 크게 들렸다.\n\n“발전기만 싣고 가면 된다니까!”\n\n서진이 거의 소리쳤다.\n\n“아빠!”\n\n---\n\n그리고 통화가 끊겼다."
           }
         }
       ]
@@ -120,8 +231,8 @@
     {
       "id": "char-youngsu",
       "type": "character",
-      "title": "영수",
-      "subtitle": "마을 이웃 · 유진의 아버지",
+      "title": "최영수",
+      "subtitle": "마을 이웃 · 최유진의 아버지",
       "facts": [
         {
           "text": "제1장에서 도현과 함께 두 집의 사각지대와 창고 접근부를 살펴본다.",
@@ -131,14 +242,23 @@
             "bodySha256": "568211d9f8514b126a2fcb4d803c7315ab4d9740ee0c0145fb0bf2e99a4c7d66",
             "quote": "영수 씨는 웃음을 거두고 집을 봤다.\n\n1분 정도.\n\n그리고 바로 현관을 가리키지 않았다.\n\n옆쪽으로 걸어갔다.\n\n“나는 여기요.”\n\n1번 집 측면.\n\n도로에서는 잘 안 보이고—\n\n창문 하나와 작은 창고가 있는 곳.\n\n“왜요?”\n\n“밤에 여기 들어오면 밖에서 안 보여요.”\n\n도현도 그 자리에 섰다.\n\n맞았다.\n\n자기에게는 그냥 집 옆 공간이었다.\n\n다른 사람에게는—\n\n**머물기 좋은 사각지대였다.**\n\n---\n\n둘은 2번 집도 봤다.\n\n이번에는 영수 씨가 바로 말했다.\n\n“여긴 창고부터 보겠죠.”\n\n“그렇죠.”\n\n“그리고 이쪽 담은…”\n\n그가 손으로 눌러봤다.\n\n“넘는다고 마음먹으면 어렵지도 않고.”\n\n담을 높일 필요까지는 없었다.\n\n하지만 담이 있다고 안심할 정도도 아니었다."
           }
+        },
+        {
+          "text": "제3장에서 최영수로 호명되며 도현·태훈과 함께 각자 앞길의 눈을 치워 길을 잇는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-03",
+            "bodySha256": "659a7934447a6c504bcd0721541bc8aa281ccf011fcf39f45109e1baecdf6b68",
+            "quote": "도현과 최영수가 자기 집 앞을 정리하다 자연스럽게 가운데 구간에서 만났다.\n\n누가 지시한 것도 아닌데,\n\n각자 자기 앞을 밀다 보니 도로 한쪽이 연결됐다.\n\n태훈도 그걸 보고 자기 쪽에서 조금 더 내려왔다.\n\n세 사람이 한 시간 정도 움직이자 승용차 한 대가 다닐 정도 길이 만들어졌다."
+          }
         }
       ]
     },
     {
       "id": "char-minseok",
       "type": "character",
-      "title": "민석 사장",
-      "subtitle": "창고 문 보강을 조언한 인물",
+      "title": "강민석",
+      "subtitle": "지역망의 농기계·펌프·발전기 수리 연락선",
       "facts": [
         {
           "text": "제1장에서 민석 사장은 고급 장비보다 걸쇠·경첩·문 소리 등을 보강하는 정도를 제안한다.",
@@ -147,6 +267,15 @@
             "chapterId": "c02-stronghold-chapter-01",
             "bodySha256": "568211d9f8514b126a2fcb4d803c7315ab4d9740ee0c0145fb0bf2e99a4c7d66",
             "quote": "민석은 고급 장비도 추천하지 않았다.\n\n걸쇠를 문틀에 제대로 물리게 하고,\n\n경첩이 바깥에서 쉽게 분해되지 않게 하고,\n\n문이 흔들릴 때 소리가 나게 만드는 정도.\n\n“이런 건 돈 얼마 안 듭니다.”"
+          }
+        },
+        {
+          "text": "제4장에서는 강민석이 농기계·펌프·발전기 수리와 관련 공급선 담당으로 기록된다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-04",
+            "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+            "quote": "- 민석은 농기계·펌프·발전기 수리와 관련 공급선"
           }
         }
       ]
@@ -207,6 +336,33 @@
             "chapterId": "c02-stronghold-chapter-01",
             "bodySha256": "568211d9f8514b126a2fcb4d803c7315ab4d9740ee0c0145fb0bf2e99a4c7d66",
             "quote": "## 오후 5시 29분 · 1번 집\n\n도현은 집에 들어오자 경찰 관련 메시지를 따로 묶어두고 알림을 껐다.\n\n서진 연락은 그대로 두었다."
+          }
+        },
+        {
+          "text": "제2장에서 1번 집 뒤 능선에 붉은 불빛이 보인다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-02",
+            "bodySha256": "bcf2c88e513f9de43680f5e55927eb7991ee66e89a59d0646bdfd69415dcb801",
+            "quote": "### 오후 6시 37분\n\n1번 집 앞.\n\n영수 씨 트럭이 이미 와 있었다.\n\n영수 씨는 작업복 위에 얇은 점퍼만 걸친 채 마당에 서 있었다.\n\n도현이 내리자 바로 말했다.\n\n“생각보다 빨리 넘어옵니다.”\n\n둘은 집 뒤쪽으로 갔다.\n\n능선 사이로—\n\n이번에는 붉은빛이 보였다.\n\n아직 멀었다.\n\n하지만 확실히 **불이었다.**"
+          }
+        },
+        {
+          "text": "제4장 귀환 때 1번 집은 저전력·물·냉장 기능을 유지하지만 계통전원과 외부 통신은 불안하다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-04",
+            "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+            "quote": "집 안은 그대로였다.\n\n저전력 체계 정상.\n\n물 충분.\n\n냉장·냉동은 아직 버틸 수 있는 범위.\n\n계통전원은 여전히 죽어 있었다.\n\n다만 이제 상황이 한 단계 달라졌다.\n\n**1번 집은 버티고 있다.  \n사람도 안전하다.  \n하지만 외부와 연결되는 통신이 상당히 약해졌다.**"
+          }
+        },
+        {
+          "text": "제5장에서 1번 집은 도현 사업의 작은 모델 거점으로 유지되며 사람을 계속 불러 모으지는 않는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-05",
+            "bodySha256": "9eabbcf8a2ce203472ca0072de01424aee573f8cb965f9f458db5f8ee1eb346b",
+            "quote": "### 그리고 1번 집도 다시 변했다.\n\n예전에는 생존거점.\n\n그다음에는 지역질서의 중심.\n\n이제는 도현 사업의 실험장이 됐다.\n\n저전력 전원.\n\n물 저장.\n\n소형 농업.\n\n예비통신.\n\n분산부품.\n\n하지만 사람을 계속 불러 모으지는 않았다.\n\n실제로 보여줄 수 있는 **작은 모델 거점** 정도로 유지했다."
           }
         }
       ]
@@ -327,6 +483,494 @@
             "chapterId": "c02-stronghold-chapter-01",
             "bodySha256": "568211d9f8514b126a2fcb4d803c7315ab4d9740ee0c0145fb0bf2e99a4c7d66",
             "quote": "관계를 정의하지도 않았고,\n\n약속을 만들지도 않았다.\n\n하지만 다음 날부터는—\n\n둘 다 더 이상 이 관계를 예전과 똑같다고 말하기 어려워졌다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-wildfire-approach",
+      "type": "event",
+      "title": "산불 접근과 대피 준비",
+      "subtitle": "제2장 · 대피 실행 결과는 미기록",
+      "facts": [
+        {
+          "text": "제2장에서 마을 입구에 도착한 도현은 능선의 연기가 마을 쪽으로 흐르는 것을 본다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-02",
+            "bodySha256": "bcf2c88e513f9de43680f5e55927eb7991ee66e89a59d0646bdfd69415dcb801",
+            "quote": "도현은 마을 입구를 통과했다.\n\n그때 처음—\n\n하늘을 봤다.\n\n북서쪽 능선 위로 회색 연기가 올라오고 있었다.\n\n얇은 연기가 아니었다.\n\n산 하나 뒤에서 큰 무언가가 타고 있다는 걸 멀리서도 알 수 있을 정도였다.\n\n바람 때문에 연기는 수직으로 올라가지 않았다.\n\n**옆으로 누워 있었다.**\n\n그리고 그 방향이—\n\n마을 쪽이었다."
+          }
+        },
+        {
+          "text": "북측 주민에게 임시대피소 이동 문자가 오지만 도현 집이 대상 경계에 포함되는지는 애매하다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-02",
+            "bodySha256": "bcf2c88e513f9de43680f5e55927eb7991ee66e89a59d0646bdfd69415dcb801",
+            "quote": "그리고 거의 동시에 재난문자가 도착했다.\n\n> **산불 확산 우려.  \n> ○○리 북측 주민은 △△초등학교 임시대피소로 이동 바랍니다.**\n\n북측.\n\n도현 집은 행정상 경계에 걸쳐 있었다.\n\n아직 정확히 포함되는지 애매했다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-sangbae-house",
+      "type": "location",
+      "title": "김상배의 집",
+      "subtitle": "산불 진행 방향에 더 가까운 집",
+      "facts": [
+        {
+          "text": "제2장에서 김상배 집과 위쪽 창고는 도현 집보다 불길 방향에 더 가깝다고 서술된다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-02",
+            "bodySha256": "bcf2c88e513f9de43680f5e55927eb7991ee66e89a59d0646bdfd69415dcb801",
+            "quote": "김상배 집과 비워진 위쪽 창고 쪽은—\n\n도현 집보다 불길 방향에 더 가까웠다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "char-taehoon",
+      "type": "character",
+      "title": "서태훈",
+      "subtitle": "새로 들어온 이웃 · 소프트웨어 유지보수 업무",
+      "facts": [
+        {
+          "text": "제3장에서 김 어르신 댁에 새로 들어온 사람으로 자신을 소개하며 도현에게 인사한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-03",
+            "bodySha256": "659a7934447a6c504bcd0721541bc8aa281ccf011fcf39f45109e1baecdf6b68",
+            "quote": "“저 위 김 어르신 댁에 들어온 사람입니다.”\n\n“아.”\n\n“서태훈이라고 합니다.”"
+          }
+        },
+        {
+          "text": "제3장 식사 기록에서 소프트웨어 유지보수 일을 하며 대부분 원격근무가 가능하다고 소개된다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-03",
+            "bodySha256": "659a7934447a6c504bcd0721541bc8aa281ccf011fcf39f45109e1baecdf6b68",
+            "quote": "서태훈은 소프트웨어 유지보수 일을 한다.\n\n회사 자체는 수도권에 있지만 대부분 원격근무가 가능했다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "char-harin",
+      "type": "character",
+      "title": "윤하린",
+      "subtitle": "태훈의 아내 · 인근 병원 검사실 근무",
+      "facts": [
+        {
+          "text": "제3장 식사에서 윤하린은 인근 종합병원 검사실 쪽으로 직장을 옮겼다고 소개된다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-03",
+            "bodySha256": "659a7934447a6c504bcd0721541bc8aa281ccf011fcf39f45109e1baecdf6b68",
+            "quote": "윤하린은 인근 종합병원 검사실 쪽으로 직장을 옮겼다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "char-ijun",
+      "type": "character",
+      "title": "서이준",
+      "subtitle": "태훈·하린 가구의 여섯 살 아이",
+      "facts": [
+        {
+          "text": "제3장에서 이준은 하린 옆에서 도현에게 인사하며 여섯 살로 소개된다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-03",
+            "bodySha256": "659a7934447a6c504bcd0721541bc8aa281ccf011fcf39f45109e1baecdf6b68",
+            "quote": "아이도 옆에서 도현을 올려다봤다.\n\n“안녕하세요.”\n\n“안녕.”\n\n아이 이름은 서이준이었다.\n\n여섯 살."
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-taehoon-house",
+      "type": "location",
+      "title": "태훈·하린의 집",
+      "subtitle": "김 노인이 쓰던 집에 들어온 새 가구",
+      "facts": [
+        {
+          "text": "제3장에서 도현과 지연은 태훈·하린 집의 식사에 함께 간다. 김 노인이 쓰던 장롱이 남아 있다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-03",
+            "bodySha256": "659a7934447a6c504bcd0721541bc8aa281ccf011fcf39f45109e1baecdf6b68",
+            "quote": "### 1월 17일 토요일 · 오후 6시 21분  \n서태훈·윤하린 집\n\n도현과 지연은 결국 함께 갔다.\n\n집 안은 아직 새집 같은 느낌이 아니었다.\n\n김 노인이 쓰던 장롱 하나가 그대로 있었고,\n\n새로 산 식탁과 오래된 찬장이 묘하게 섞여 있었다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-neighbor-snow-clearing",
+      "type": "event",
+      "title": "이웃들의 제설 협력",
+      "subtitle": "각자 필요만큼 움직여 이어진 작은 길",
+      "facts": [
+        {
+          "text": "제3장에서 도현·최영수·태훈은 각자 앞길을 치우며 승용차 한 대가 다닐 정도의 길을 만든다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-03",
+            "bodySha256": "659a7934447a6c504bcd0721541bc8aa281ccf011fcf39f45109e1baecdf6b68",
+            "quote": "도현과 최영수가 자기 집 앞을 정리하다 자연스럽게 가운데 구간에서 만났다.\n\n누가 지시한 것도 아닌데,\n\n각자 자기 앞을 밀다 보니 도로 한쪽이 연결됐다.\n\n태훈도 그걸 보고 자기 쪽에서 조금 더 내려왔다.\n\n세 사람이 한 시간 정도 움직이자 승용차 한 대가 다닐 정도 길이 만들어졌다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "char-woojin",
+      "type": "character",
+      "title": "정우진",
+      "subtitle": "지역망의 도시 물류·재고 정보 연락선",
+      "facts": [
+        {
+          "text": "제4장에서 우진은 도시 전력과 배송 감소를 도현에게 전한다.",
+          "kind": "REPORTED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-04",
+            "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+            "quote": "지역 연락망에서 중요한 정보 하나가 들어왔다.\n\n정우진이었다.\n\n전화가 두 번 끊긴 뒤 세 번째에 연결됐다.\n\n> “형, 도시 쪽은 전기가 많이 돌아왔어요.”\n\n“그런데?”\n\n> “문제는 변전 쪽이 아직 불안정하대요. 복구된 데도 다시 나간 곳 있고.”\n\n그건 도현도 알고 있었다.\n\n우진은 말을 이었다.\n\n> “그리고 물류센터 쪽에서 들은 건데, 오늘 밤 배송차량이 많이 줄어든답니다.”\n\n“연료 때문에?”\n\n> “연료도 있고, 신호 문제도 있고. 냉장차는 아예 출발 미루는 데도 있고요.”\n\n그 말은 중요했다.\n\n전기 하나가 아니라 **유통으로 번지고 있었다.**"
+          }
+        }
+      ]
+    },
+    {
+      "id": "char-ohsehoon",
+      "type": "character",
+      "title": "오세훈",
+      "subtitle": "폐목장 쪽의 전력 상황을 전한 연락선",
+      "facts": [
+        {
+          "text": "제4장에서 오세훈은 폐목장 쪽 전력이 들어오며 오후에는 끊기지 않았다고 전한다.",
+          "kind": "REPORTED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-04",
+            "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+            "quote": "먼저 오세훈.\n\n두 번 만에 연결됐다.\n\n> “박도현 씨. 여긴 전기는 들어옵니다.”\n\n“계속 안정적입니까?”\n\n> “오후 들어서는 아직 안 나갔습니다.”"
+          }
+        }
+      ]
+    },
+    {
+      "id": "char-baekseungho",
+      "type": "character",
+      "title": "백승호",
+      "subtitle": "공장 유지보수 쪽 전력 복구 정보를 전한 인물",
+      "facts": [
+        {
+          "text": "제4장에서 백승호는 자신이 일하는 공장 유지보수 쪽에서 전력 복구 상황을 확인한 답을 전한다.",
+          "kind": "REPORTED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-04",
+            "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+            "quote": "백승호 쪽에서도 비슷한 답이 왔다.\n\n그가 일하는 공장 유지보수 쪽에서 확인한 바로는 도시권 주요 변전 구간 상당수가 복구됐고, 산업단지도 중요 시설부터 순차적으로 전원이 살아나고 있었다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "char-yoonjeongsik",
+      "type": "character",
+      "title": "윤정식",
+      "subtitle": "창고 거래처 정보를 전한 인물",
+      "facts": [
+        {
+          "text": "제4장에서 윤정식은 창고 거래처 쪽의 배송과 주유소 재개 정보를 전한다.",
+          "kind": "REPORTED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-04",
+            "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+            "quote": "윤정식은 창고 거래처 쪽 정보를 전했다.\n\n> “오늘 밤 배송은 많이 줄겠지만 내일 물량은 다시 움직이려는 곳이 많습니다.”\n\n“연료는요?”\n\n> “주유소가 완전히 다 닫힌 건 아닙니다. 전기 돌아온 쪽은 다시 여는 중이고요.”"
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-factory",
+      "type": "location",
+      "title": "도현이 일하던 회사",
+      "subtitle": "생산·설비 보존 기준을 남긴 일터",
+      "facts": [
+        {
+          "text": "제4장에서 도현은 회사 생산·설비 책임자들과 불안정 전력 아래 재가동 가능 상태를 보존하는 기준을 공유한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-04",
+            "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+            "quote": "### 11:08\n\n도현은 공장장과 생산·설비 책임자들을 다시 모았다.\n\n길게 할 이야기는 없었다.\n\n이미 기준은 잡혔다.\n\n- 생산량보다 재가동 가능 상태 보존\n- 불안정한 계통전력에 대형 설비를 무리하게 태우지 않음\n- 비상발전기 연료는 필수설비 중심\n- 전압이 다시 흔들리면 미련 없이 추가 정지\n- 생산 재개 확대는 전력 안정이 확인된 뒤 결정\n\n도현은 담당자들에게 각자 판단 범위를 넘겼다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-abandoned-ranch",
+      "type": "location",
+      "title": "산 너머 폐목장",
+      "subtitle": "1번 집과 다른 역할의 예비거점",
+      "facts": [
+        {
+          "text": "제4장에서 도현은 폐목장 쪽 연락선으로 복구 방향을 확인하고 그곳으로 이동하지 않는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-04",
+            "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+            "quote": "### 17:22  \n### 1번 집\n\n도현은 이번에는 폐목장 쪽으로 전화를 돌렸다.\n\n먼저 오세훈.\n\n두 번 만에 연결됐다.\n\n> “박도현 씨. 여긴 전기는 들어옵니다.”\n\n“계속 안정적입니까?”\n\n> “오후 들어서는 아직 안 나갔습니다.”\n\n백승호 쪽에서도 비슷한 답이 왔다.\n\n그가 일하는 공장 유지보수 쪽에서 확인한 바로는 도시권 주요 변전 구간 상당수가 복구됐고, 산업단지도 중요 시설부터 순차적으로 전원이 살아나고 있었다.\n\n윤정식은 창고 거래처 쪽 정보를 전했다.\n\n> “오늘 밤 배송은 많이 줄겠지만 내일 물량은 다시 움직이려는 곳이 많습니다.”\n\n“연료는요?”\n\n> “주유소가 완전히 다 닫힌 건 아닙니다. 전기 돌아온 쪽은 다시 여는 중이고요.”\n\n세 사람의 정보가 조금씩 달랐지만 방향은 같았다.\n\n**도시 기능이 무너지는 쪽이 아니라, 불안정하게 복구되는 쪽이었다.**\n\n도현은 그걸로 충분하다고 판단했다.\n\n폐목장으로 움직이지 않았다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-youngsu-house",
+      "type": "location",
+      "title": "최영수의 집",
+      "subtitle": "지역망 자원 교류 원칙을 이야기한 곳",
+      "facts": [
+        {
+          "text": "제4장에서 최영수 집 앞에 도현·최영수·정우진·강민석·지연이 모여 식량 교류 방식을 논의한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-04",
+            "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+            "quote": "### 8월 27일 — 18:40  \n### 최영수 집 앞\n\n식량 문제는 지역망에서 직접 한번 꺼내봤다.\n\n도현, 최영수, 정우진, 강민석.\n\n한지연도 함께 있었다.\n\n회의처럼 만들지는 않았다.\n\n저녁 먹기 전에 음료 몇 개 놓고 앉아서 이야기한 정도였다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-outage-response",
+      "type": "event",
+      "title": "정전 속 생활권 정리",
+      "subtitle": "귀환·필수 부하 축소·냉장 식품 우선 사용",
+      "facts": [
+        {
+          "text": "제4장에서 도현과 지연은 식품을 사용할 순서로 정리하고 필수 전력 부하만 남긴다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-04",
+            "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+            "quote": "### 14:06\n\n그다음은 식량이었다.\n\n지연과 둘이 냉장고와 냉동고를 열었다.\n\n오래 보관해야 하는 것.\n\n오늘이나 내일 먹어야 하는 것.\n\n전력 없이도 상관없는 것.\n\n세 종류로 나눴다.\n\n먼저 먹을 건 앞으로 뺐다.\n\n냉동고는 불필요하게 열지 않았다.\n\n상온 식품과 물은 충분했다.\n\n도현이 말했다.\n\n“당분간은 냉장식품부터 먹죠.”\n\n지연이 고개를 끄덕였다.\n\n> “장기화돼도 굶을 문제는 아니네요.”\n\n“네. 버리는 양을 줄이는 문제죠.”\n\n둘은 식량을 새로 쌓지 않았다.\n\n이미 있는 걸 **손실 없이 쓰는 순서**만 잡았다.\n\n---\n\n### 15:18\n\n전력도 다시 확인했다.\n\n도현은 1번 집의 저전력 체계를 기준으로 부하를 줄였다.\n\n필수:\n\n- 전화 충전\n- 최소 조명\n- 기본 통신기기\n- 꼭 필요한 소형 부하\n\n나머지는 껐다.\n\n냉장·냉동을 계속 전력으로 붙잡을지 여부는 배터리 상태를 보면서 판단하기로 했다.\n\n집 전체를 평소처럼 유지하려고 하면 오래 못 간다.\n\n반대로 생활 수준을 낮추면 꽤 오래 버틸 수 있었다.\n\n지연이 숫자를 보다가 말했다.\n\n> “폐목장에서 했던 거랑 똑같네요.”\n\n“원리는 같죠.”\n\n> “없어도 되는 거부터 끄기.”\n\n도현이 고개를 끄덕였다."
+          }
+        },
+        {
+          "text": "이후 정전은 이틀에 걸쳐 대부분 정상화됐다고 서술된다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-04",
+            "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+            "quote": "정전은 이틀에 걸쳐 대부분 정상화됐다.\n\n외곽은 도시보다 늦었지만, 결국 큰 붕괴로 번지지는 않았다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-priority-trade",
+      "type": "event",
+      "title": "지역망 우선거래 약속",
+      "subtitle": "최저 보유선을 지키고 공동재산은 만들지 않는다",
+      "facts": [
+        {
+          "text": "제4장에서 핵심 자원의 최저 보유선을 지킨 뒤 외부 거래 전에 서로 먼저 확인하기로 한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-04",
+            "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+            "quote": "### 18:47  \n### 최영수 집 앞\n\n“핵심 품목만 약속하죠.”\n\n도현이 말했다.\n\n정우진이 바로 물었다.\n\n> “공동으로 쌓아두는 건 아니고?”\n\n“각자 가지고 있습니다. 대신 진짜 부족할 때 **외부로 내보내기 전에 서로 먼저 확인하는 정도**로요.”\n\n최영수도 고개를 끄덕였다.\n\n> “그 정도면 할 수 있지.”\n\n하지만 강민석은 바로 한 가지를 짚었다.\n\n> “연료는 식량하고 다릅니다. 나도 발전기니 수리차니 쓰는 게 있어서 무조건 몇 통 내놓겠다고는 못 합니다.”\n\n도현은 그걸 반대하지 않았다.\n\n오히려 그 말 때문에 약속의 형태가 정리됐다.\n\n**자기 가족과 생업을 유지할 최소량까지 내놓으라는 약속은 만들지 않는다.**\n\n남는 물건을 나누는 것도 아니다.\n\n각자 미리 정한 **최저 보유선**을 지킨 뒤, 그 위에서만 우선 거래한다."
+          }
+        },
+        {
+          "text": "지역망은 회장·회비·공동창고를 두지 않고 일부 자원을 먼저 살펴주는 관계로 남는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-04",
+            "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+            "quote": "지역망은 그대로 **지역망**이었다.\n\n회장도 없고 회비도 없고 공동창고도 없다.\n\n다만 예전보다 한 가지가 달라졌다.\n\n정보만 주고받던 사람들이 이제는 위기 때 **일부 자원을 서로 먼저 살펴주는 관계**가 됐다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "char-taekyung",
+      "type": "character",
+      "title": "김태경",
+      "subtitle": "전기·설비와 현장 기술을 담당하는 인물",
+      "facts": [
+        {
+          "text": "제5장에서 김태경은 전기·설비 역할로 연결되며 강민석과 함께 기술 현장을 맡는다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-05",
+            "bodySha256": "9eabbcf8a2ce203472ca0072de01424aee573f8cb965f9f458db5f8ee1eb346b",
+            "quote": "지연 씨 물류망은 여기에 운송을 붙일 수 있었다.\n\n강민석 쪽은 현장 정비.\n\n김태경은 전기·설비.\n\n도현은 구조와 거래처를 만들었다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-food-processor",
+      "type": "location",
+      "title": "첫 계약 식품가공업체",
+      "subtitle": "독립 후 첫 점검을 맡긴 업체",
+      "facts": [
+        {
+          "text": "제5장에서 도현은 직원 34명의 인근 식품가공업체에서 발전기·연료·부품 상태를 점검하고 저렴한 문제부터 고친다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-05",
+            "bodySha256": "9eabbcf8a2ce203472ca0072de01424aee573f8cb965f9f458db5f8ee1eb346b",
+            "quote": "도현이 독립 후 처음 맡은 건 거창한 사업이 아니었다.\n\n인근 식품가공업체.\n\n직원 34명.\n\n냉동창고 하나.\n\n예비발전기는 있었지만 관리가 엉망이었다.\n\n연료는 충분하다고 했는데 실제로 확인해보니 절반도 안 됐다.\n\n부품 목록에는 모터 두 개가 있다고 돼 있었지만 창고에는 하나뿐이었다.\n\n예전 같으면 문서 오류로 끝났을 문제였다.\n\n지금은 업체 대표가 먼저 물었다.\n\n“그러면 뭘 해야 합니까?”\n\n도현은 새 설비부터 팔지 않았다.\n\n있는 걸 먼저 확인했다.\n\n전력.\n\n물.\n\n연료.\n\n부품.\n\n운송.\n\n핵심직원.\n\n48시간 멈췄을 때 무엇부터 죽는지 순서를 잡았다.\n\n그리고 가장 싼 것부터 고쳤다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-independent-business",
+      "type": "event",
+      "title": "독립 사업과 역할 재편",
+      "subtitle": "진단·연결·운영설계가 중심인 분산 협력망",
+      "facts": [
+        {
+          "text": "제5장 2035년 10월에는 정규직 3명과 상시 협력업체 7곳으로 사업이 이어진다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-05",
+            "bodySha256": "9eabbcf8a2ce203472ca0072de01424aee573f8cb965f9f458db5f8ee1eb346b",
+            "quote": "# 2035년 10월\n\n첫해 하반기.\n\n직원은 정규직 3명.\n\n상시 협력업체 7곳.\n\n고객은 제조업체, 식품가공업체, 농장, 중형 물류창고까지 늘었다."
+          }
+        },
+        {
+          "text": "현장은 기술자들이, 물류는 지연 회사가 맡고 도현은 진단·연결·운영설계에 집중한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-05",
+            "bodySha256": "9eabbcf8a2ce203472ca0072de01424aee573f8cb965f9f458db5f8ee1eb346b",
+            "quote": "### 7월\n\n그래서 방식을 바꿨다.\n\n도현은 직접 수리하지 않았다.\n\n강민석과 태경 같은 기술자들이 현장을 맡았다.\n\n지연 씨 회사가 물류를 맡았다.\n\n도현은 고객에게 딱 세 가지를 팔았다.\n\n**진단.  \n연결.  \n운영설계.**\n\n그 순간부터 일이 조금씩 달라졌다.\n\n도현이 현장에 없는 날에도 프로젝트가 돌아가기 시작했다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "char-other-dohyun",
+      "type": "character",
+      "title": "다른 박도현",
+      "subtitle": "안경 쓴 도현 · 북서쪽 동일한 집을 알린 인물",
+      "facts": [
+        {
+          "text": "제6장에서 안경 쓴 다른 박도현이 윤서현과 함께 찍힌 사진을 보내 연락한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-06",
+            "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+            "quote": "오래전에 끊겼던 번호.\n\n안경 쓴 다른 박도현."
+          }
+        },
+        {
+          "text": "전화로 박현우라는 사람이 도현과 오래 함께 살았다고 말한다는 주장을 전한다. 주인공은 그 사람을 기억하지 못한다.",
+          "kind": "REPORTED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-06",
+            "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+            "quote": "> “이름은 **박현우**라고 합니다.”\n\n처음 듣는 이름이었다.\n\n“나를 압니까?”\n\n> “압니다.”\n\n“어떻게?”\n\n> “자기 말로는 박도현 형하고 오래 같이 살았답니다.”\n\n도현은 말이 없었다.\n\n지연 씨도 옆에서 듣고 있었다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "char-seohyun",
+      "type": "character",
+      "title": "윤서현",
+      "subtitle": "다른 박도현과 사진에 등장한 인물",
+      "facts": [
+        {
+          "text": "제6장에서 다른 박도현이 보낸 사진에 윤서현이 함께 등장한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-06",
+            "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+            "quote": "그 아래 사진 한 장.\n\n두 사람이 서 있었다.\n\n윤서현.\n\n다른 박도현."
+          }
+        }
+      ]
+    },
+    {
+      "id": "char-hyunwoo",
+      "type": "character",
+      "title": "박현우",
+      "subtitle": "북서쪽 집에 산다는 전언의 인물",
+      "facts": [
+        {
+          "text": "제6장에서 다른 박도현은 그 집의 거주자가 박현우이며 도현과 오래 같이 살았다고 말한다고 전한다.",
+          "kind": "REPORTED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-06",
+            "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+            "quote": "> “이름은 **박현우**라고 합니다.”\n\n처음 듣는 이름이었다.\n\n“나를 압니까?”\n\n> “압니다.”\n\n“어떻게?”\n\n> “자기 말로는 박도현 형하고 오래 같이 살았답니다.”"
+          }
+        }
+      ]
+    },
+    {
+      "id": "loc-northwest-house",
+      "type": "location",
+      "title": "북서쪽의 동일한 집",
+      "subtitle": "180km 밖 사진 속 1번 집과 닮은 장소",
+      "facts": [
+        {
+          "text": "제6장에서 도현은 1번 집과 같은 외벽·창문·창고·외부등이지만 주변 산·도로·이웃집은 다른 사진을 확인한다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-06",
+            "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+            "quote": "집은 정말 같았다.\n\n외벽.\n\n창문 간격.\n\n창고 위치.\n\n마당 경사.\n\n심지어 도현이 몇 년 전 직접 달아놓은 외부등 위치까지 같았다.\n\n다른 건 주변이었다.\n\n산 모양도 다르고,\n\n도로도 다르고,\n\n담장 너머 이웃집도 전혀 달랐다."
+          }
+        },
+        {
+          "text": "그 집의 철거와 물건 반출 금지는 다른 박도현의 전언이며 이상현상 발생의 직접 근거는 없다고 인정한다.",
+          "kind": "REPORTED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-06",
+            "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+            "quote": "“왜 지금 만나야 합니까?”\n\n다른 도현이 한동안 침묵했다.\n\n> “그 집을 철거한다고 합니다.”\n\n“누가?”\n\n> “새 도로사업 때문에요.”\n\n“언제?”\n\n> “다음 달.”\n\n“그러면 사진하고 물건만 확보하면 되잖습니까.”\n\n> “그게 문제입니다.”\n\n목소리가 낮아졌다.\n\n> “박현우 씨가 아무것도 내보내지 못하게 합니다.”\n\n“왜?”\n\n> “그 사람 말로는…”\n\n잠깐.\n\n> “그 집을 건드리면 또 시작된다고 합니다.”\n\n도현은 바로 묻지 않았다.\n\n몇 년 전이라면 그 말 하나로 움직였을 수도 있다.\n\n지금은 달랐다.\n\n“근거 있습니까?”\n\n> “없습니다.”\n\n“직접 본 현상?”\n\n> “없습니다.”\n\n“그럼 그 사람 주장일 뿐이네요.”\n\n> “네.”\n\n다른 도현도 인정했다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-minority-investment",
+      "type": "event",
+      "title": "소수지분 투자 수락",
+      "subtitle": "경영권·독립 협력망을 유지한 재협상",
+      "facts": [
+        {
+          "text": "제6장에서 지분22% 투자 수락 뒤 돈을 운전자금·분산재고·현장관리 시스템·사람에 나누고 프로젝트 책임자 두 명을 키운다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-06",
+            "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+            "quote": "## 2월\n\n세 번의 협상 끝에 구조가 바뀌었다.\n\n**지분 22%.**\n\n경영권은 도현에게 유지.\n\n합병 없음.\n\n계열사 우선거래 없음.\n\n대신 투자사에는 정기적인 경영정보와 일정 규모 이상 투자에 대한 협의권을 줬다.\n\n완벽하게 도현에게 유리한 계약은 아니었다.\n\n외부 돈을 받는다는 건 그만큼 다른 사람의 시선도 회사 안으로 들어오는 것이었다.\n\n도현은 수락했다.\n\n---\n\n### 투자금이 들어오자 가장 먼저 한 일\n\n사옥을 크게 짓지 않았다.\n\n차량을 대량 구매하지도 않았다.\n\n도현은 돈을 네 군데로 나눴다.\n\n운전자금.\n\n핵심부품 분산재고.\n\n현장관리 시스템.\n\n사람.\n\n그리고 처음으로 도현 없이 고객을 처음부터 끝까지 맡을 수 있는 **프로젝트 책임자 두 명**을 키우기 시작했다.\n\n그게 가장 비싼 투자였다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-northwest-contact",
+      "type": "event",
+      "title": "다른 도현의 북서쪽 연락",
+      "subtitle": "기억하지 못하는 집과 사진 기록",
+      "facts": [
+        {
+          "text": "제6장에서 도현·지연·태경·현우가 함께 찍힌 사진과 도현 글씨의 문장이 도착하지만 도현은 쓴 기억이 없다.",
+          "kind": "RECORDED",
+          "evidence": {
+            "chapterId": "c02-stronghold-chapter-06",
+            "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+            "quote": "### 12월 12일\n\n다른 박도현에게서 마지막으로 한 가지 자료가 왔다.\n\n집 내부 사진.\n\n거실 벽.\n\n액자 하나.\n\n네 사람이 찍혀 있었다.\n\n도현.\n\n지연.\n\n태경.\n\n그리고 박현우.\n\n사진 아래 손글씨.\n\n> **2030. 5. 14  \n> 여기까지 왔으면 이번엔 오래 가자.**\n\n글씨는 도현 것이었다.\n\n도현은 그 문장을 쓴 기억이 없다."
           }
         }
       ]
@@ -461,6 +1105,316 @@
         "chapterId": "c02-stronghold-chapter-01",
         "bodySha256": "568211d9f8514b126a2fcb4d803c7315ab4d9740ee0c0145fb0bf2e99a4c7d66",
         "quote": "관계를 정의하지도 않았고,\n\n약속을 만들지도 않았다.\n\n하지만 다음 날부터는—\n\n둘 다 더 이상 이 관계를 예전과 똑같다고 말하기 어려워졌다."
+      }
+    },
+    {
+      "from": "char-dohyun",
+      "to": "event-wildfire-approach",
+      "label": "비상가방 차량 적재",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-02",
+        "bodySha256": "bcf2c88e513f9de43680f5e55927eb7991ee66e89a59d0646bdfd69415dcb801",
+        "quote": "기본적인 비상가방은 애초에 준비돼 있었다.\n\n도현은 그것부터 차에 실었다."
+      }
+    },
+    {
+      "from": "event-wildfire-approach",
+      "to": "loc-house-one",
+      "label": "제2장 뒤 능선의 불빛",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-02",
+        "bodySha256": "bcf2c88e513f9de43680f5e55927eb7991ee66e89a59d0646bdfd69415dcb801",
+        "quote": "### 오후 6시 37분\n\n1번 집 앞.\n\n영수 씨 트럭이 이미 와 있었다.\n\n영수 씨는 작업복 위에 얇은 점퍼만 걸친 채 마당에 서 있었다.\n\n도현이 내리자 바로 말했다.\n\n“생각보다 빨리 넘어옵니다.”\n\n둘은 집 뒤쪽으로 갔다.\n\n능선 사이로—\n\n이번에는 붉은빛이 보였다.\n\n아직 멀었다.\n\n하지만 확실히 **불이었다.**"
+      }
+    },
+    {
+      "from": "char-seojin",
+      "to": "loc-sangbae-house",
+      "label": "아버지 대피 준비라는 전화",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-02",
+        "bodySha256": "bcf2c88e513f9de43680f5e55927eb7991ee66e89a59d0646bdfd69415dcb801",
+        "quote": "“아빠 집 뒤쪽 전봇대 쪽에 불 붙었어요.”\n\n“집에 불 붙은 겁니까?”\n\n“아직 아니에요.”\n\n“서진 씨 지금 어디예요?”\n\n“차에 태우려고 하는데—”\n\n뒤에서 김상배의 목소리가 크게 들렸다.\n\n“발전기만 싣고 가면 된다니까!”\n\n서진이 거의 소리쳤다.\n\n“아빠!”\n\n---\n\n그리고 통화가 끊겼다."
+      }
+    },
+    {
+      "from": "char-taehoon",
+      "to": "char-harin",
+      "label": "부부로 소개",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-03",
+        "bodySha256": "659a7934447a6c504bcd0721541bc8aa281ccf011fcf39f45109e1baecdf6b68",
+        "quote": "식사하면서 조금씩 이 부부 이야기가 나왔다.\n\n서태훈은 소프트웨어 유지보수 일을 한다.\n\n회사 자체는 수도권에 있지만 대부분 원격근무가 가능했다.\n\n윤하린은 인근 종합병원 검사실 쪽으로 직장을 옮겼다."
+      }
+    },
+    {
+      "from": "char-harin",
+      "to": "char-ijun",
+      "label": "아이와 함께 인사",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-03",
+        "bodySha256": "659a7934447a6c504bcd0721541bc8aa281ccf011fcf39f45109e1baecdf6b68",
+        "quote": "서태훈의 아내인 듯했다.\n\n여자가 도현과 영수를 보고 먼저 인사했다.\n\n“안녕하세요.”\n\n태훈에게 이야기를 들었는지 도현을 알아봤다.\n\n“박도현 씨 맞으시죠?”\n\n“네.”\n\n“저는 윤하린입니다.”\n\n말투가 차분했다.\n\n긴 머리를 목 뒤로 묶었고, 검은 롱패딩 아래로 병원이나 연구소에서 입을 법한 단정한 바지가 보였다.\n\n아이도 옆에서 도현을 올려다봤다.\n\n“안녕하세요.”\n\n“안녕.”\n\n아이 이름은 서이준이었다.\n\n여섯 살."
+      }
+    },
+    {
+      "from": "char-dohyun",
+      "to": "loc-taehoon-house",
+      "label": "지연과 식사 방문",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-03",
+        "bodySha256": "659a7934447a6c504bcd0721541bc8aa281ccf011fcf39f45109e1baecdf6b68",
+        "quote": "### 1월 17일 토요일 · 오후 6시 21분  \n서태훈·윤하린 집\n\n도현과 지연은 결국 함께 갔다."
+      }
+    },
+    {
+      "from": "char-jiyeon",
+      "to": "loc-taehoon-house",
+      "label": "도현과 식사 방문",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-03",
+        "bodySha256": "659a7934447a6c504bcd0721541bc8aa281ccf011fcf39f45109e1baecdf6b68",
+        "quote": "### 1월 17일 토요일 · 오후 6시 21분  \n서태훈·윤하린 집\n\n도현과 지연은 결국 함께 갔다."
+      }
+    },
+    {
+      "from": "char-dohyun",
+      "to": "event-neighbor-snow-clearing",
+      "label": "각자 앞길 제설로 연결",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-03",
+        "bodySha256": "659a7934447a6c504bcd0721541bc8aa281ccf011fcf39f45109e1baecdf6b68",
+        "quote": "도현과 최영수가 자기 집 앞을 정리하다 자연스럽게 가운데 구간에서 만났다.\n\n누가 지시한 것도 아닌데,\n\n각자 자기 앞을 밀다 보니 도로 한쪽이 연결됐다.\n\n태훈도 그걸 보고 자기 쪽에서 조금 더 내려왔다.\n\n세 사람이 한 시간 정도 움직이자 승용차 한 대가 다닐 정도 길이 만들어졌다."
+      }
+    },
+    {
+      "from": "char-youngsu",
+      "to": "event-neighbor-snow-clearing",
+      "label": "각자 앞길 제설로 연결",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-03",
+        "bodySha256": "659a7934447a6c504bcd0721541bc8aa281ccf011fcf39f45109e1baecdf6b68",
+        "quote": "도현과 최영수가 자기 집 앞을 정리하다 자연스럽게 가운데 구간에서 만났다.\n\n누가 지시한 것도 아닌데,\n\n각자 자기 앞을 밀다 보니 도로 한쪽이 연결됐다.\n\n태훈도 그걸 보고 자기 쪽에서 조금 더 내려왔다.\n\n세 사람이 한 시간 정도 움직이자 승용차 한 대가 다닐 정도 길이 만들어졌다."
+      }
+    },
+    {
+      "from": "char-taehoon",
+      "to": "event-neighbor-snow-clearing",
+      "label": "각자 앞길 제설로 연결",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-03",
+        "bodySha256": "659a7934447a6c504bcd0721541bc8aa281ccf011fcf39f45109e1baecdf6b68",
+        "quote": "도현과 최영수가 자기 집 앞을 정리하다 자연스럽게 가운데 구간에서 만났다.\n\n누가 지시한 것도 아닌데,\n\n각자 자기 앞을 밀다 보니 도로 한쪽이 연결됐다.\n\n태훈도 그걸 보고 자기 쪽에서 조금 더 내려왔다.\n\n세 사람이 한 시간 정도 움직이자 승용차 한 대가 다닐 정도 길이 만들어졌다."
+      }
+    },
+    {
+      "from": "char-dohyun",
+      "to": "loc-factory",
+      "label": "제4장 기준 인계 뒤 퇴근",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-04",
+        "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+        "quote": "도현은 담당자들에게 각자 판단 범위를 넘겼다.\n\n공장장이 물었다.\n\n> “박 팀장, 들어가게?”\n\n“네. 지금부터는 제가 여기 계속 있어도 결과가 크게 달라지지 않을 것 같습니다.”\n\n공장장은 반박하지 않았다.\n\n> “그래. 연락 안 되면 오늘 기준 그대로 간다.”\n\n“네.”\n\n그 말이면 됐다.\n\n도현은 회사를 자기 부재에도 굴러가게 만들고 나왔다."
+      }
+    },
+    {
+      "from": "char-dohyun",
+      "to": "loc-house-one",
+      "label": "제4장 통신 불안 속 귀환",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-04",
+        "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+        "quote": "### 12:37  \n### 1번 집\n\n마당에 지연의 차가 그대로 있었다.\n\n도현은 그걸 보는 순간 속도를 줄였다.\n\n현관문이 열렸다.\n\n한지연이 나왔다.\n\n> “전화 안 되죠?”\n\n“네.”\n\n> “저도 몇 번 해봤는데 안 됐어요.”\n\n도현이 차에서 내렸다.\n\n“잘했어요. 안 움직여서.”\n\n지연은 짧게 웃었다.\n\n> “우리 어제 정한 게 아니라 몇 달 전에 정한 거잖아요.”\n\n도현도 웃었다.\n\n그 말이 맞았다."
+      }
+    },
+    {
+      "from": "char-jiyeon",
+      "to": "loc-house-one",
+      "label": "약속대로 기다림",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-04",
+        "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+        "quote": "### 12:37  \n### 1번 집\n\n마당에 지연의 차가 그대로 있었다.\n\n도현은 그걸 보는 순간 속도를 줄였다.\n\n현관문이 열렸다.\n\n한지연이 나왔다.\n\n> “전화 안 되죠?”\n\n“네.”\n\n> “저도 몇 번 해봤는데 안 됐어요.”\n\n도현이 차에서 내렸다.\n\n“잘했어요. 안 움직여서.”\n\n지연은 짧게 웃었다.\n\n> “우리 어제 정한 게 아니라 몇 달 전에 정한 거잖아요.”\n\n도현도 웃었다.\n\n그 말이 맞았다."
+      }
+    },
+    {
+      "from": "event-outage-response",
+      "to": "loc-house-one",
+      "label": "식량 사용 순서 정리",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-04",
+        "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+        "quote": "### 14:06\n\n그다음은 식량이었다.\n\n지연과 둘이 냉장고와 냉동고를 열었다.\n\n오래 보관해야 하는 것.\n\n오늘이나 내일 먹어야 하는 것.\n\n전력 없이도 상관없는 것.\n\n세 종류로 나눴다.\n\n먼저 먹을 건 앞으로 뺐다.\n\n냉동고는 불필요하게 열지 않았다.\n\n상온 식품과 물은 충분했다.\n\n도현이 말했다.\n\n“당분간은 냉장식품부터 먹죠.”\n\n지연이 고개를 끄덕였다.\n\n> “장기화돼도 굶을 문제는 아니네요.”\n\n“네. 버리는 양을 줄이는 문제죠.”\n\n둘은 식량을 새로 쌓지 않았다.\n\n이미 있는 걸 **손실 없이 쓰는 순서**만 잡았다."
+      }
+    },
+    {
+      "from": "char-ohsehoon",
+      "to": "loc-abandoned-ranch",
+      "label": "전력 상황 전화",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-04",
+        "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+        "quote": "### 17:22  \n### 1번 집\n\n도현은 이번에는 폐목장 쪽으로 전화를 돌렸다.\n\n먼저 오세훈.\n\n두 번 만에 연결됐다.\n\n> “박도현 씨. 여긴 전기는 들어옵니다.”\n\n“계속 안정적입니까?”\n\n> “오후 들어서는 아직 안 나갔습니다.”"
+      }
+    },
+    {
+      "from": "char-dohyun",
+      "to": "event-priority-trade",
+      "label": "자원교류 논의 참여",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-04",
+        "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+        "quote": "### 8월 27일 — 18:40  \n### 최영수 집 앞\n\n식량 문제는 지역망에서 직접 한번 꺼내봤다.\n\n도현, 최영수, 정우진, 강민석.\n\n한지연도 함께 있었다.\n\n회의처럼 만들지는 않았다.\n\n저녁 먹기 전에 음료 몇 개 놓고 앉아서 이야기한 정도였다."
+      }
+    },
+    {
+      "from": "char-youngsu",
+      "to": "event-priority-trade",
+      "label": "자원교류 논의 참여",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-04",
+        "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+        "quote": "### 8월 27일 — 18:40  \n### 최영수 집 앞\n\n식량 문제는 지역망에서 직접 한번 꺼내봤다.\n\n도현, 최영수, 정우진, 강민석.\n\n한지연도 함께 있었다.\n\n회의처럼 만들지는 않았다.\n\n저녁 먹기 전에 음료 몇 개 놓고 앉아서 이야기한 정도였다."
+      }
+    },
+    {
+      "from": "char-woojin",
+      "to": "event-priority-trade",
+      "label": "자원교류 논의 참여",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-04",
+        "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+        "quote": "### 8월 27일 — 18:40  \n### 최영수 집 앞\n\n식량 문제는 지역망에서 직접 한번 꺼내봤다.\n\n도현, 최영수, 정우진, 강민석.\n\n한지연도 함께 있었다.\n\n회의처럼 만들지는 않았다.\n\n저녁 먹기 전에 음료 몇 개 놓고 앉아서 이야기한 정도였다."
+      }
+    },
+    {
+      "from": "char-minseok",
+      "to": "event-priority-trade",
+      "label": "자원교류 논의 참여",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-04",
+        "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+        "quote": "### 8월 27일 — 18:40  \n### 최영수 집 앞\n\n식량 문제는 지역망에서 직접 한번 꺼내봤다.\n\n도현, 최영수, 정우진, 강민석.\n\n한지연도 함께 있었다.\n\n회의처럼 만들지는 않았다.\n\n저녁 먹기 전에 음료 몇 개 놓고 앉아서 이야기한 정도였다."
+      }
+    },
+    {
+      "from": "char-jiyeon",
+      "to": "event-priority-trade",
+      "label": "자원교류 논의 참여",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-04",
+        "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+        "quote": "### 8월 27일 — 18:40  \n### 최영수 집 앞\n\n식량 문제는 지역망에서 직접 한번 꺼내봤다.\n\n도현, 최영수, 정우진, 강민석.\n\n한지연도 함께 있었다.\n\n회의처럼 만들지는 않았다.\n\n저녁 먹기 전에 음료 몇 개 놓고 앉아서 이야기한 정도였다."
+      }
+    },
+    {
+      "from": "event-priority-trade",
+      "to": "loc-youngsu-house",
+      "label": "집 앞에서 논의",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-04",
+        "bodySha256": "4fea38498a1cd42f7355443fc6a01e30c439f1044fbe971ed7aa2d4e8aec6768",
+        "quote": "### 8월 27일 — 18:40  \n### 최영수 집 앞\n\n식량 문제는 지역망에서 직접 한번 꺼내봤다.\n\n도현, 최영수, 정우진, 강민석.\n\n한지연도 함께 있었다.\n\n회의처럼 만들지는 않았다.\n\n저녁 먹기 전에 음료 몇 개 놓고 앉아서 이야기한 정도였다."
+      }
+    },
+    {
+      "from": "char-dohyun",
+      "to": "event-independent-business",
+      "label": "독립 사업 역할 재편",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-05",
+        "bodySha256": "9eabbcf8a2ce203472ca0072de01424aee573f8cb965f9f458db5f8ee1eb346b",
+        "quote": "### 7월\n\n그래서 방식을 바꿨다.\n\n도현은 직접 수리하지 않았다.\n\n강민석과 태경 같은 기술자들이 현장을 맡았다.\n\n지연 씨 회사가 물류를 맡았다.\n\n도현은 고객에게 딱 세 가지를 팔았다.\n\n**진단.  \n연결.  \n운영설계.**\n\n그 순간부터 일이 조금씩 달라졌다.\n\n도현이 현장에 없는 날에도 프로젝트가 돌아가기 시작했다."
+      }
+    },
+    {
+      "from": "char-minseok",
+      "to": "event-independent-business",
+      "label": "현장 기술 담당",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-05",
+        "bodySha256": "9eabbcf8a2ce203472ca0072de01424aee573f8cb965f9f458db5f8ee1eb346b",
+        "quote": "강민석과 태경 같은 기술자들이 현장을 맡았다.\n\n지연 씨 회사가 물류를 맡았다."
+      }
+    },
+    {
+      "from": "char-taekyung",
+      "to": "event-independent-business",
+      "label": "현장 기술 담당",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-05",
+        "bodySha256": "9eabbcf8a2ce203472ca0072de01424aee573f8cb965f9f458db5f8ee1eb346b",
+        "quote": "강민석과 태경 같은 기술자들이 현장을 맡았다.\n\n지연 씨 회사가 물류를 맡았다."
+      }
+    },
+    {
+      "from": "char-jiyeon",
+      "to": "event-independent-business",
+      "label": "회사 물류 담당",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-05",
+        "bodySha256": "9eabbcf8a2ce203472ca0072de01424aee573f8cb965f9f458db5f8ee1eb346b",
+        "quote": "강민석과 태경 같은 기술자들이 현장을 맡았다.\n\n지연 씨 회사가 물류를 맡았다."
+      }
+    },
+    {
+      "from": "char-dohyun",
+      "to": "loc-food-processor",
+      "label": "독립 후 첫 점검 계약",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-05",
+        "bodySha256": "9eabbcf8a2ce203472ca0072de01424aee573f8cb965f9f458db5f8ee1eb346b",
+        "quote": "도현이 독립 후 처음 맡은 건 거창한 사업이 아니었다.\n\n인근 식품가공업체.\n\n직원 34명.\n\n냉동창고 하나.\n\n예비발전기는 있었지만 관리가 엉망이었다.\n\n연료는 충분하다고 했는데 실제로 확인해보니 절반도 안 됐다.\n\n부품 목록에는 모터 두 개가 있다고 돼 있었지만 창고에는 하나뿐이었다.\n\n예전 같으면 문서 오류로 끝났을 문제였다.\n\n지금은 업체 대표가 먼저 물었다.\n\n“그러면 뭘 해야 합니까?”\n\n도현은 새 설비부터 팔지 않았다.\n\n있는 걸 먼저 확인했다.\n\n전력.\n\n물.\n\n연료.\n\n부품.\n\n운송.\n\n핵심직원.\n\n48시간 멈췄을 때 무엇부터 죽는지 순서를 잡았다.\n\n그리고 가장 싼 것부터 고쳤다."
+      }
+    },
+    {
+      "from": "char-dohyun",
+      "to": "event-minority-investment",
+      "label": "투자 계약 수락",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-06",
+        "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+        "quote": "## 2월\n\n세 번의 협상 끝에 구조가 바뀌었다.\n\n**지분 22%.**\n\n경영권은 도현에게 유지.\n\n합병 없음.\n\n계열사 우선거래 없음.\n\n대신 투자사에는 정기적인 경영정보와 일정 규모 이상 투자에 대한 협의권을 줬다.\n\n완벽하게 도현에게 유리한 계약은 아니었다.\n\n외부 돈을 받는다는 건 그만큼 다른 사람의 시선도 회사 안으로 들어오는 것이었다.\n\n도현은 수락했다."
+      }
+    },
+    {
+      "from": "char-other-dohyun",
+      "to": "event-northwest-contact",
+      "label": "사진·전화 연락",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-06",
+        "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+        "quote": "오래전에 끊겼던 번호.\n\n안경 쓴 다른 박도현."
+      }
+    },
+    {
+      "from": "char-other-dohyun",
+      "to": "char-seohyun",
+      "label": "함께 찍힌 사진",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-06",
+        "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+        "quote": "그 아래 사진 한 장.\n\n두 사람이 서 있었다.\n\n윤서현.\n\n다른 박도현."
+      }
+    },
+    {
+      "from": "char-other-dohyun",
+      "to": "char-hyunwoo",
+      "label": "현우에 대한 전화 전언",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-06",
+        "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+        "quote": "> “이름은 **박현우**라고 합니다.”\n\n처음 듣는 이름이었다.\n\n“나를 압니까?”\n\n> “압니다.”\n\n“어떻게?”\n\n> “자기 말로는 박도현 형하고 오래 같이 살았답니다.”"
+      }
+    },
+    {
+      "from": "event-northwest-contact",
+      "to": "loc-northwest-house",
+      "label": "현재 집과 같은 사진",
+      "evidence": {
+        "chapterId": "c02-stronghold-chapter-06",
+        "bodySha256": "7532798046d5568c9e89673d175c5e18c5eab1d152286f438ad9d699aabed1ea",
+        "quote": "집은 정말 같았다.\n\n외벽.\n\n창문 간격.\n\n창고 위치.\n\n마당 경사.\n\n심지어 도현이 몇 년 전 직접 달아놓은 외부등 위치까지 같았다.\n\n다른 건 주변이었다.\n\n산 모양도 다르고,\n\n도로도 다르고,\n\n담장 너머 이웃집도 전혀 달랐다."
       }
     }
   ]
