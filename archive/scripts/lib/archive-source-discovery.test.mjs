@@ -145,7 +145,8 @@ test('real committed S03 cursor retains baseline 42 and next 106', async () => {
   assert.equal(actual.ranges[0].min, 42); assert.equal(actual.nextOrder, 106)
   const state = candidateState({ season_id: 'S03' }, index)
   assert.equal(state.nextSessionId, 'SESSION_009')
-  assert.equal(candidateState({ season_id: 'S04' }, index).nextSessionId, 'SESSION_001')
+  const nextSeason = `S${String(index.latestSeason + 1).padStart(2, '0')}`
+  assert.equal(candidateState({ season_id: nextSeason }, index).nextSessionId, 'SESSION_001')
 })
 test('committed overlapping ranges and reused Archive SESSION identifiers are rejected', async () => {
   const paths = execFileSync('git', ['ls-tree', '-r', '--name-only', 'HEAD'], { cwd: base, encoding: 'utf8' }).trim().split('\n')
@@ -328,7 +329,7 @@ test('reviewed RESTART cannot skip published RAW, change frontier, or repeat a s
   }
 })
 
- test('isolated synthetic S04 integration preserves all public source files and appends exactly one Reader chapter', async () => {
+ test('isolated first-S04 fixture preserves its pinned public baseline and appends exactly one Reader chapter', async () => {
   const { candidateCheck } = await import('../run-daily-archive.mjs')
   const result = await candidateCheck(resolve(import.meta.dirname, 'fixtures/archive-discovery-synthetic.json'))
   assert.equal(result.status, 'ISOLATED_CANDIDATE_PASS')

@@ -448,7 +448,12 @@ export async function candidateCheck(fixture) {
   insist(discovery.status === 'NEW_SOURCE_RANGE', 'NO_CANDIDATE_RANGE')
   const workspace = await mkdtemp(join(tmpdir(), 'archive-discovery-candidate-'))
   try {
-    const baseline = git('rev-parse', 'HEAD')
+    // This fixture models the first S04 opening, so its historical source state
+    // must remain explicit after the real S04 opening is published. Production
+    // discovery/apply always use latest origin/main and never this fixture ref.
+    const baseline = input.baseline_revision ?? git('rev-parse', 'HEAD')
+    insist(/^[a-f0-9]{40}$/.test(baseline), 'INVALID_SYNTHETIC_BASELINE')
+    git('merge-base', '--is-ancestor', baseline, git('rev-parse', 'HEAD'))
     const paths = git('ls-tree', '-r', '--name-only', baseline).split('\n')
     // Gates also run with an uncommitted content candidate present. Never treat it
     // as baseline or copy its unpublished bodies into a synthetic test.
@@ -458,7 +463,7 @@ export async function candidateCheck(fixture) {
       await writeFile(target, execFileSync('git', ['-c', 'core.longpaths=true', 'show', `${baseline}:${ref}`], { cwd: root, maxBuffer: 4_000_000 }))
     }
     const published = await loadPublishedIndex({ paths,
-      read: async (ref) => execFileSync('git', ['show', `HEAD:${ref}`], { cwd: root, maxBuffer: 4_000_000 }) })
+      read: async (ref) => execFileSync('git', ['show', `${baseline}:${ref}`], { cwd: root, maxBuffer: 4_000_000 }) })
     const { planSourceSessions } = await import('./lib/archive-source-discovery.mjs')
     const admission = planSourceSessions([input.predecessor, ...(input.superseded ? [input.superseded] : []), session], published,
       { authorizations: input.authorizations ?? [] })
