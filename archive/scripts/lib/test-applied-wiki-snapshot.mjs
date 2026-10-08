@@ -28,7 +28,7 @@ export async function createAppliedWikiTestSnapshot(sourceRoot) {
     const publicRoot = resolve(base, contentRoot, 'transcripts/C03-AFTERFALL')
     const excluded = []
     for (const folder of await readdir(publicRoot, { withFileTypes: true })) {
-      if (!folder.isDirectory() || !/^S\\d{2,3}$/.test(folder.name)) continue
+      if (!folder.isDirectory() || !/^S[0-9]{2,3}$/.test(folder.name)) continue
       const path = resolve(publicRoot, folder.name, 'MANIFEST.json')
       let bytes
       try { bytes = await readFile(path) } catch (error) {
