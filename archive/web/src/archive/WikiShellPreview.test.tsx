@@ -43,6 +43,10 @@ describe('Wiki staged public structure', () => {
     }))
 
     expect(markup).toContain('세계관 전체보기')
+    expect(markup).toContain('최근 세계관 기록')
+    expect(markup).toContain('세계관 분류')
+    expect(markup).toContain('생존기별 세계관')
+    expect(markup).toContain('전체 세계관 문서')
     expect(markup).toContain(`인물 ${wikiCharacterIndex.length}`)
     expect(markup).toContain(`장소 ${wikiLocationIndex.length}`)
     expect(markup).toContain(`사건 ${wikiEventIndex.length}`)
@@ -50,6 +54,17 @@ describe('Wiki staged public structure', () => {
     for (const item of [...wikiCharacterIndex, ...wikiLocationIndex, ...wikiEventIndex]) {
       expect(markup).toContain(item.title)
       expect(markup).toContain('node=' + item.id)
+    }
+  })
+
+  it('does not leak C03 wiki nodes into C01 or C02 world views', () => {
+    for (const chronicleId of ['C01-HAN-JUNHO', 'C02-STRONGHOLD']) {
+      const markup = renderToStaticMarkup(createElement(WikiShellPreview, { page: 'world', chronicleId }))
+      expect(markup).toContain('세계관 문서 준비 중')
+      expect(markup).toContain('생존기별 세계관')
+      expect(markup).not.toContain('char-jinwoo')
+      expect(markup).not.toContain('최근 세계관 기록')
+      expect(markup).not.toContain('현재 공개된 세계관 문서 기준')
     }
   })
 

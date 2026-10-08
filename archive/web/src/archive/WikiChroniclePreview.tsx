@@ -1,3 +1,4 @@
+import { hasPublishedWorldWiki } from './worldWikiIndexData'
 import { getChronicle } from './chronicleRegistry'
 import { chaptersForChronicle } from './storyData'
 import { buildWikiDocuments, wikiCharacterIndex, wikiEventIndex, wikiLocationIndex, wikiSupportedNodeIds } from './wikiDocument'
@@ -12,7 +13,7 @@ const worldHref = (chronicleId: string, section?: 'characters' | 'locations' | '
 export function WikiChroniclePreview({ chronicleId }: { chronicleId: string }) {
   const chronicle = getChronicle(chronicleId)
   const chapters = chaptersForChronicle(chronicleId)
-  const hasWorldWiki = chronicleId === 'C03-AFTERFALL'
+  const hasWorldWiki = hasPublishedWorldWiki(chronicleId)
   const recentDocuments = hasWorldWiki
     ? buildWikiDocuments(wikiSupportedNodeIds)
       .sort((a, b) => b.anchor.gameTime.localeCompare(a.anchor.gameTime) || b.anchor.saveVersion - a.anchor.saveVersion)

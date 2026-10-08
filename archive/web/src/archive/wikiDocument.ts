@@ -80,7 +80,8 @@ const typeLabels: Record<ArchiveNodeType, string> = {
   reference: '자료',
 }
 
-const c03Chronicle = getChronicle('C03-AFTERFALL')
+export const wikiDocumentChronicleId = 'C03-AFTERFALL' as const
+const c03Chronicle = getChronicle(wikiDocumentChronicleId)
 
 const metaValueLabels: Record<string, string> = {
   ACTIVE: '활동 중',
@@ -213,7 +214,7 @@ export function buildWikiDocument(nodeId: string): WikiDocument {
 
   return {
     id: node.id,
-    chronicleId: 'C03-AFTERFALL',
+    chronicleId: wikiDocumentChronicleId,
     type: node.type,
     typeLabel: typeLabels[node.type],
     title: node.label,
