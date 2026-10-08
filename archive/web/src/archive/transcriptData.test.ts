@@ -23,13 +23,21 @@ describe('Chronicle-isolated public transcript catalog', () => {
   it('publishes only verified C03 raw while retaining every known gap and session boundary', () => {
     expect(activeChronicle).toMatchObject({ id: 'C03-AFTERFALL', active: true, transcriptStatus: 'partial' })
     const c03 = transcriptPartsFor('C03-AFTERFALL')
-    const preS03 = c03.filter((part) => part.seasonId !== 'S03')
+    const preS03 = c03.filter((part) => ['S01', 'S02'].includes(part.seasonId))
     const s03Verified = c03.filter((part) => part.seasonId === 'S03' && part.status === 'verified_transcript')
+    const capturedVerified = c03.filter((part) =>
+      /^S\d{2,3}$/.test(part.seasonId) && Number(part.seasonId.slice(1)) >= 3 && part.status === 'verified_transcript')
     expect(preS03).toHaveLength(43)
     expect(preS03.filter((part) => part.status === 'verified_transcript')).toHaveLength(39)
     expect(s03Verified.length).toBeGreaterThanOrEqual(1)
-    expect(c03).toHaveLength(44 + s03Verified.length)
-    expect(c03.filter((part) => part.status === 'verified_transcript')).toHaveLength(39 + s03Verified.length)
+    expect(c03).toHaveLength(44 + capturedVerified.length)
+    expect(c03.filter((part) => part.status === 'verified_transcript')).toHaveLength(39 + capturedVerified.length)
+    expect(capturedVerified.every((part) =>
+      part.source.startsWith(`archive/content/transcripts/C03-AFTERFALL/${part.seasonId}/SESSION_`)
+      && part.sourceVerified && Boolean(part.content?.trim())
+      && /원본 순서 \d+–\d+$/.test(part.range)
+    )).toBe(true)
+    expect(new Set(capturedVerified.map((part) => part.id)).size).toBe(capturedVerified.length)
     expect(c03.slice(0, 2)).toMatchObject([
       { id: 'c03-s01-opening-001', range: '2026-09-18 13:42 → 14:12', status: 'verified_transcript' },
       { id: 'c03-s01-missing-before', status: 'verified_transcript' },
