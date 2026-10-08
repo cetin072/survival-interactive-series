@@ -181,3 +181,10 @@ BOOK SHA256: cc21254acc575113b00713bf92dc27d807a14ea6baee727e3acbe2ff85c64fba
 - c02-stronghold-chapter-11: worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_2039_CURRENT_ROOM/PART_004.md → archive/content/transcripts/C02-STRONGHOLD/SESSIONS/SESSION_20260925_2039_CURRENT_ROOM/PART_004.md — ba3b66fe48241308a2432444be4eaa851f03fdf921a5f4db0c247d8afe2793e6
 
 </details>
+
+## Browser CI reuse checkpoint
+- Prior implementation head3735a352de014ac4855f882aabe71fe645609507: all six Actions PASS and Netlify Preview ready; deploy-meta commit_ref exactly matches.
+- Existing check-reader-browser.py already runs real Chromium locally in CI and on Netlify. Added opt-in --world-wiki audit using the same browser/test toolchain: all five existing widths including1280/390/360, actual card/menu/document/relation/Reader/RAW/search/error/portrait clicks, native keyboard and touch disclosure, no-overflow, captures and completed JSON. No existing assertion removed.
+- Preview identity now exact in this workflow (no ancestor-equivalence flag); Archive build ref is the actual PR head. Production audit command and release detection remain unchanged. Artifact archive-browser-review contains local/preview captures and JSON even on failure.
+- Local Python compile PASS. Browser audit itself is pending new exact head CI; no PASS or HUMAN_CHECK_READY claimed until test results/captures inspected. CUA remains unavailable; this is repository browser CI reuse, no custom Windows helper or production mutation.
+- Next: commit/push this test unit; wait for real final-head CI+Preview; inspect archived1280/390/360 screenshots and completed JSON; record exact tested head in final report/checkpoint.

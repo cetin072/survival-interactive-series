@@ -59,7 +59,7 @@ jobs:
           python -m pip install playwright==1.55.0
           python -m playwright install --with-deps chromium
       - name: Audit built app on touch mobile and desktop
-        run: python ../scripts/check-reader-browser.py
+        run: python ../scripts/check-reader-browser.py --world-wiki --screenshots "$RUNNER_TEMP/archive-browser/local"
       - name: Fetch recent PR history for source-equivalent preview verification
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         working-directory: .
@@ -71,7 +71,7 @@ jobs:
         run: python -m unittest discover -s archive/scripts -p "test_reader_deploy_identity.py"
       - name: Verify tested assets and navigation on Deploy Preview
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        run: python ../scripts/check-reader-browser.py --url https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app --wait-assets --allow-ancestor-equivalent
+        run: python ../scripts/check-reader-browser.py --url https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app --wait-assets --world-wiki --screenshots "$RUNNER_TEMP/archive-browser/preview"
       - name: Detect a batched Production release commit
         id: production_release
         if: github.event_name == 'push'
@@ -88,3 +88,10 @@ jobs:
       - name: Verify tested assets and navigation on Production
         if: github.event_name == 'push' && steps.production_release.outputs.changed == 'true'
         run: python ../scripts/check-reader-browser.py --url https://survival-diary-archive.netlify.app --wait-assets
+      - name: Upload browser review captures and audit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: archive-browser-review
+          path: ${{ runner.temp }}/archive-browser
+          if-no-files-found: warn
