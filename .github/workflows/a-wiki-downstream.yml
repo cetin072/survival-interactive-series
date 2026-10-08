@@ -72,6 +72,8 @@ jobs:
               try { manifest = JSON.parse(await readFile(resolve(transcriptRoot, folder.name, 'MANIFEST.json'), 'utf8')) }
               catch (e) { if (e.code === 'ENOENT') continue; throw e }
               for (const session of manifest.sessions ?? []) {
+                // S03's legacy baseline starts at SESSION_005 only after its verified applied receipt.
+                if (folder.name === 'S03' && Number(session.session_id.slice('SESSION_'.length)) < 5) continue
                 if (session.visibility !== 'PUBLIC_ARCHIVE' || !session.atomic_pairing_complete) continue
                 const source = JSON.parse(await readFile(resolve(transcriptRoot, folder.name, session.source_manifest), 'utf8'))
                 const last = source.content_sha256?.at(-1)
