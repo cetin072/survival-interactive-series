@@ -188,3 +188,8 @@ BOOK SHA256: cc21254acc575113b00713bf92dc27d807a14ea6baee727e3acbe2ff85c64fba
 - Preview identity now exact in this workflow (no ancestor-equivalence flag); Archive build ref is the actual PR head. Production audit command and release detection remain unchanged. Artifact archive-browser-review contains local/preview captures and JSON even on failure.
 - Local Python compile PASS. Browser audit itself is pending new exact head CI; no PASS or HUMAN_CHECK_READY claimed until test results/captures inspected. CUA remains unavailable; this is repository browser CI reuse, no custom Windows helper or production mutation.
 - Next: commit/push this test unit; wait for real final-head CI+Preview; inspect archived1280/390/360 screenshots and completed JSON; record exact tested head in final report/checkpoint.
+
+## Browser source-selection correction checkpoint
+- Prior headb81364ede50a3dc23aeffe4981fe23680504af94: Netlify exact-head HTTP PASS for10 Knowledge pages/authoredHTML/meta, sitemap/robots/download/release bytes, missing slug404, Preview+Operatornoindex/CSP and both candidate bundle inclusion. Netlify known Preview toolbar was separated from authored HTML, not mistaken for source mutation.
+- Browser CI actually passed C01/C02360px full card/detail/relation/Reader/RAW routes then failed the C03 test assumption: its first legacy profile has no direct RAW link. No original link removed or source invented. Test now clicks existing source-bound char-seojin for current/history Reader/RAW checks; legacy bare char-jinwoo/portrait still explicitly checked separately. No assertion weakened and no C03 data changed.
+- Next: push this precise test correction and await complete final-head local+Preview browser audit/captures. Current status not HUMAN_CHECK_READY.

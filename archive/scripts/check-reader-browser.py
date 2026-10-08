@@ -370,7 +370,16 @@ def audit_world_wiki(page, base: str, width: int, screenshots: str | None):
         no_overflow(page)
         capture(chronicle + '-world')
         for group in ['characters', 'locations', 'events']:
-            link = page.locator('#' + group + ' > .wiki-world-index-list > a').first
+            # Legacy C03 profiles need not have a directly bound RAW source.
+            # Use its existing, source-bound current+history profile for this
+            # source navigation check; verify bare char-jinwoo separately below.
+            if chronicle == 'C03-AFTERFALL' and group == 'characters':
+                link = page.locator('#characters a[href*="node=char-seojin"]')
+                expect(link).to_have_count(1)
+                if not link.is_visible():
+                    tap(page.locator('#characters > details > summary'), mobile)
+            else:
+                link = page.locator('#' + group + ' > .wiki-world-index-list > a').first
             title = link.locator('strong').inner_text()
             tap(link, mobile)
             expect(page.locator('.wiki-document-header h1')).to_have_text(title)
