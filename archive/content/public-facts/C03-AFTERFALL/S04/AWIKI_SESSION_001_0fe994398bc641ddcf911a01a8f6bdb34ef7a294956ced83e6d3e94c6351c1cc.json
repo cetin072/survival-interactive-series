@@ -1,0 +1,111 @@
+{
+  "anchor": {
+    "game_time": "2027-11-23 15:42",
+    "save_version": 290
+  },
+  "chronicle_id": "C03-AFTERFALL",
+  "nodes": [
+    {
+      "id": "event-wiki-eb0397c1607ee222060dcaca",
+      "label": "북쪽 연료장 겨울 연료·운송 협의",
+      "source": "S04 SESSION_001 GM 공개 블록 005, 007, 009",
+      "subtitle": "2027년 11월 23일",
+      "summary": "북쪽 연료장 회의에서 연료장이 실제 가용량과 배분 우선순위를 정하고 사유를 기록하며, 길드는 신청·반출·정산·운송완료 기록과 중복·이중반출 방지를 맡는 잠정 구조가 정리됐다. 길드 수수료는 반출 1건당 기본 처리비에 추가 작업비를 더하고 현금 또는 사전 합의된 현물로 받을 수 있게 했으며, 도로관리조와 운송집단의 비용은 별도 정산하기로 했다.",
+      "tags": [
+        "S04",
+        "연료",
+        "운송",
+        "길드",
+        "정산"
+      ],
+      "type": "event"
+    },
+    {
+      "id": "char-wiki-6e626c477ade25e68140f8ea",
+      "label": "박동철",
+      "source": "S04 SESSION_001 GM 공개 블록 005",
+      "subtitle": "길드 일상 운영 실무자",
+      "summary": "2027년 11월 23일 서진우·최은채·장태훈이 북쪽 연료장 회의에 간 동안 오세린과 함께 길드 쪽 일상 운영을 맡았다.",
+      "tags": [
+        "S04",
+        "길드",
+        "운영"
+      ],
+      "type": "character"
+    },
+    {
+      "id": "loc-wiki-f73ae01ebcb8d89952911bbc",
+      "label": "북쪽 연료장 생활권",
+      "source": "S04 SESSION_001 GM 공개 블록 005",
+      "subtitle": "구 물류장 기반 연료 저장·배분 거점",
+      "summary": "구 물류장 안쪽에 차량 대기선과 작업구역이 분리되고 저장탱크 주변에 펜스와 통제선이 설치됐다. 2027년 11월 23일 장부상 21킬로리터를 조금 넘게 보유했고, 손실·침전·자체 겨울운영분을 뺀 약 18킬로리터를 외부 배분 상한으로 제시했으며 실제 반출량은 날짜별로 다시 계측하기로 했다.",
+      "tags": [
+        "S03",
+        "장소",
+        "연료",
+        "북쪽"
+      ],
+      "type": "location"
+    }
+  ],
+  "relations": [
+    {
+      "from": "char-jinwoo",
+      "kind": "participated_in",
+      "label": "길드 책임경계·수수료 원칙 협상",
+      "to": "event-wiki-eb0397c1607ee222060dcaca"
+    },
+    {
+      "from": "char-eunchae",
+      "kind": "participated_in",
+      "label": "기록·정산 구조와 가치기준 정리",
+      "to": "event-wiki-eb0397c1607ee222060dcaca"
+    },
+    {
+      "from": "char-taehoon",
+      "kind": "participated_in",
+      "label": "연료 상태·당일 계측 확인",
+      "to": "event-wiki-eb0397c1607ee222060dcaca"
+    },
+    {
+      "from": "char-seongho",
+      "kind": "participated_in",
+      "label": "도로 작업비 별도 정산 제안",
+      "to": "event-wiki-eb0397c1607ee222060dcaca"
+    },
+    {
+      "from": "char-hajin",
+      "kind": "participated_in",
+      "label": "배분결정 사유 기록 제안",
+      "to": "event-wiki-eb0397c1607ee222060dcaca"
+    },
+    {
+      "from": "event-wiki-eb0397c1607ee222060dcaca",
+      "kind": "occurred_at",
+      "label": "북쪽 연료장 구 물류장 회의",
+      "to": "loc-wiki-f73ae01ebcb8d89952911bbc"
+    },
+    {
+      "from": "event-wiki-934cea538155fc7bc102a21c",
+      "kind": "related_to",
+      "label": "전날 회의 초청의 후속 협의",
+      "to": "event-wiki-eb0397c1607ee222060dcaca"
+    },
+    {
+      "from": "char-wiki-6e626c477ade25e68140f8ea",
+      "kind": "related_to",
+      "label": "길드 일상 운영 담당",
+      "to": "loc-sports-complex"
+    },
+    {
+      "from": "char-wiki-6e626c477ade25e68140f8ea",
+      "kind": "related_to",
+      "label": "길드 일상 운영 공동 담당",
+      "to": "char-wiki-6f18bfaa7aba3f5b5456f96f"
+    }
+  ],
+  "season_id": "S04",
+  "version": "public-graph-facts-v1",
+  "visibility": "PUBLIC_ARCHIVE",
+  "worldline_id": "AFTERFALL"
+}

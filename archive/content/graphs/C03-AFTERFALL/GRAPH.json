@@ -1,7 +1,7 @@
 {
   "anchor": {
-    "game_time": "2027-11-22 22:40",
-    "save_version": 285
+    "game_time": "2027-11-23 15:42",
+    "save_version": 290
   },
   "articles": [
     {
@@ -99,6 +99,13 @@
         {
           "direction": "outgoing",
           "kind": "participated_in",
+          "label": "기록·정산 구조와 가치기준 정리",
+          "other_id": "event-wiki-eb0397c1607ee222060dcaca",
+          "relation_id": "rel-238857ccf9825130a2cd65e43fffce84d1515613072bc8da97ce2702ebcd3cd2"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
           "label": "표준품 후보 관찰표 작성·기록",
           "other_id": "event-wiki-ad8b8dbcdc75bcabfcae2cf7",
           "relation_id": "rel-24355c6112acde8deb454abeb3bf1a45b7c58edf8391522eddc5b9bb92cbaf6c"
@@ -161,6 +168,7 @@
         "mention-3ba2436b68fb5a3b97804d107d7697181f0e9e7d6a81f1030ecc40b86a55f17d",
         "mention-3df90ff83540f90414fcc4296e007ab9678ad94a0389397482061aa7efbc75ae",
         "mention-3f96e014b82a4b98d958f9ee6d5a3af2d41aa412d503de9d884da6e2705c63e4",
+        "mention-64d37a58d4d93aca98a0a78232d7b30a8304293f1d86435c99a5be13ce27e698",
         "mention-6e08afbf483bae03ad334f762ed4e68016a03ee9651857da19da6ed5c271cc7e",
         "mention-81b16ade7125a6ad836a082e8f1b8478537c658546702731ac289ef7ce32546c",
         "mention-941f5a4e8ac03a5e1b5c9d5b7aadc235b0335d0fcdef8e13cec7f0bec4c25515",
@@ -189,6 +197,13 @@
       "label": "문하진",
       "overview": "북서권 지방행정 잔존 대응팀의 시설·급수 실무자. 공공수원 복구와 제한적 연락망을 유지한다.",
       "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "배분결정 사유 기록 제안",
+          "other_id": "event-wiki-eb0397c1607ee222060dcaca",
+          "relation_id": "rel-029c949cacfa1abed9223292382bb5a9c21f4c5af00435b2d66fed6cdf67036f"
+        },
         {
           "direction": "outgoing",
           "kind": "participated_in",
@@ -243,6 +258,7 @@
         "mention-a21ab17993c2e80db54194e1239222a19d79a6e4e31bba50485da65161b83fcd",
         "mention-c64b91108c0dc24215300b8bc0961b128472f2285962b61d3a4b5e4481e41565",
         "mention-cefbf8a6707c77f5e2553692e8e4a51052181b9e22adff56bf5fe130b3c67002",
+        "mention-de560c67418ee7ab0df86c39d587972f73b81408cb6ed5a62fa98582e2bc6b00",
         "mention-e20d30f688e5c26727d2e96253cbe4513bc054a63d0c512b8422ff6365508d9c",
         "mention-ef9ae99a3ce27c140371a42a3584461a278433da99a328d3d5c1947bdde0027e",
         "mention-f652625b92a80f4de8c2d9643515e44fc4d64110952e1987b2eb290041f1812c",
@@ -482,6 +498,13 @@
           "label": "사용권 협상·합의에 참여",
           "other_id": "event-wiki-bf4768814dd7f1559d9f7496",
           "relation_id": "rel-2f8ad14936dd46d8f08325022edd1c80295ca07e8b1b797966c86635b340b871"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "길드 책임경계·수수료 원칙 협상",
+          "other_id": "event-wiki-eb0397c1607ee222060dcaca",
+          "relation_id": "rel-45ca7847fe2ddfc14718323eb677f2b4b6af91390133353a7b3fea5a770e7e3e"
         },
         {
           "direction": "incoming",
@@ -1093,6 +1116,7 @@
         "mention-c749719818634a65149ab37ba297fac8685db884e0615c412af1cf163be7a4c9",
         "mention-d3df8009197cc20db8a15181267a7babb86d6d9fbfa40cdde3e643de9bc709cf",
         "mention-d9561cbf2224b02e009e81c36cad0bb8a83c0ee523ab795e8149df64ad14d0d7",
+        "mention-e3fabce5e955e18355ea01d3427f5f1d74634b871ce9baa1a84384ab7b04d312",
         "mention-e973c6bb71ae28e3d17ac0faeeb0ee87248b28a759e34d65af9a5206d1e849ae",
         "mention-eeb2982a91d248db847cb45983f20b47fab4b9c2ae46e852fb0c36f07781ae7d",
         "mention-f44640e159333a24285d8841b978fd50d2db9e365011309c2e3676a73c5cab11"
@@ -1119,11 +1143,19 @@
           "label": "관리조 접점",
           "other_id": "loc-west-road",
           "relation_id": "rel-297df0d034fcf1cb2d66c8323fda77b0dadd1cb23b5bc8ce2b1eedea80a8090e"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "도로 작업비 별도 정산 제안",
+          "other_id": "event-wiki-eb0397c1607ee222060dcaca",
+          "relation_id": "rel-933fd11864ec7551ea0520f495c2824aa0f239f736a2e16c33d254cf9c416f34"
         }
       ],
       "story_link_ids": [
         "mention-09c02eaee3b5384b396fb591dcf65ac826d78717b0526a7d91a8bd7e7d5f6ef3",
         "mention-17955dac4d5b35823331f37f2aa10f9e457cfc55f1adb277240b0d335a160f7c",
+        "mention-19844aa2e81ae82dc3cffb931459483e8a92fe8b4ac1b6589aeb850e298faf11",
         "mention-4b0373e3f4644f1c769adf9e151507ffb270d3d1cf658b2e47f5172194c87830",
         "mention-6b447c754bb090b21c7136ce35d0433574727e5fb3965bccbc15eed648757e6a",
         "mention-81fe6573b20d187f868d2a909693ea7576ba88727deb04e2d230d0625624f707",
@@ -1184,6 +1216,13 @@
         {
           "direction": "outgoing",
           "kind": "participated_in",
+          "label": "연료 상태·당일 계측 확인",
+          "other_id": "event-wiki-eb0397c1607ee222060dcaca",
+          "relation_id": "rel-ea718eefb1a67d99c1cfd58348363fb0dcb3f25483145e4c125e196caf477ec0"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
           "label": "현장조사·설비 판단",
           "other_id": "event-wiki-b7ffeffefd90e9765d184979",
           "relation_id": "rel-ed4f4ce28860d2c8d4035251c78ca9ce5f94636af36793b651b35ff489143b24"
@@ -1216,6 +1255,7 @@
         "mention-857c76c02c6ffc059fcfd5e65037bb20fc78312dd2bcfe323066ec9d92bedf4d",
         "mention-a7b1c1ea8b6dfefab0d6d4a4069ac81cd51973de517ba70d99f1bac8066cbead",
         "mention-b13791ca69926aecee8d9edcaa9e3f6c1e14a0fb01b6f017c6f0d47526b9211c",
+        "mention-b52fdab518d420aef1de51a6f85a28503f9a83a5941bb41245c08cf289c95437",
         "mention-be44eccd9389e0f70b68e5ddd10975fa61b9dbf9458ed9b19d170b1a47ccd679",
         "mention-c777140c9b9a9dc5b0559d66b38f8e159a49206cb8592fc3edb461a319173562",
         "mention-cdb48fd2e2695e5eb3e82f68224d3a8f2c0e35da92e8262153c90e9ded450021",
@@ -1300,6 +1340,40 @@
     },
     {
       "facts": {},
+      "id": "char-wiki-6e626c477ade25e68140f8ea",
+      "label": "박동철",
+      "overview": "2027년 11월 23일 서진우·최은채·장태훈이 북쪽 연료장 회의에 간 동안 오세린과 함께 길드 쪽 일상 운영을 맡았다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "related_to",
+          "label": "길드 일상 운영 공동 담당",
+          "other_id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+          "relation_id": "rel-1cd280d560f5df1ca90e64ea3af267f7104fb45574aaa51727724ffe58efb289"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "related_to",
+          "label": "길드 일상 운영 담당",
+          "other_id": "loc-sports-complex",
+          "relation_id": "rel-6c60c7f2b09ff93068e9cb40157c88d5e7e877c9c32ed829e9e3b78068ceefaa"
+        }
+      ],
+      "story_link_ids": [
+        "mention-0a854e5a5898db1e36357acf52da7f3f8498da339bb53e4e1614ae5e149b7b87",
+        "mention-0ba35d4c2287822507ca3ae4bc21b52b195368f498ed4afaeafccb51deeb1d24",
+        "mention-131677fd225978c91275851381cfcf412cea220ba2e7b2e96dae624829f3df7e"
+      ],
+      "subtitle": "길드 일상 운영 실무자",
+      "tags": [
+        "S04",
+        "길드",
+        "운영"
+      ],
+      "type": "character"
+    },
+    {
+      "facts": {},
       "id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
       "label": "오세린",
       "overview": "길드 접수와 관리동 논의에 참여하며 거래 책임범위를 안내하고 등록상인·에스크로·보증거래의 차이를 정리하는 실무 접점이다.",
@@ -1310,6 +1384,13 @@
           "label": "접수대 장부 확인 안내",
           "other_id": "event-wiki-d12d5299a253870e3748a92e",
           "relation_id": "rel-0f9310e0cef73c26e49dd28c8525691b7910d9207749a69c5a663ea7f80d8c3b"
+        },
+        {
+          "direction": "incoming",
+          "kind": "related_to",
+          "label": "길드 일상 운영 공동 담당",
+          "other_id": "char-wiki-6e626c477ade25e68140f8ea",
+          "relation_id": "rel-1cd280d560f5df1ca90e64ea3af267f7104fb45574aaa51727724ffe58efb289"
         },
         {
           "direction": "outgoing",
@@ -1327,6 +1408,7 @@
         }
       ],
       "story_link_ids": [
+        "mention-1c9d5ed5837d673d0580f53a1b15976145946f77d0b59518809a96ea57b8b030",
         "mention-b026005591f0dba5d281c7e41d8f75d2b8ec4f29f7ea291b41b44c331283e6a8",
         "mention-beb4e8509801741b345602e5fe17464f1c323d0a49283d96261f2cf7574300a4",
         "mention-bedd3a2307f0f8946954eaf71eb14eca7f7bd89af50424c966ea24f95e7902f3"
@@ -2136,6 +2218,13 @@
           "relation_id": "rel-9887cbe19fc7de95d747d9e666cf3324872aa4942f8802a71045d3041b8ab50e"
         },
         {
+          "direction": "outgoing",
+          "kind": "related_to",
+          "label": "전날 회의 초청의 후속 협의",
+          "other_id": "event-wiki-eb0397c1607ee222060dcaca",
+          "relation_id": "rel-a0760d01e82101992289bb99dc1489fb5892dd81039e2dd1ba2ab36a46f47acd"
+        },
+        {
           "direction": "incoming",
           "kind": "participated_in",
           "label": "북쪽 초청장 전달",
@@ -2582,6 +2671,73 @@
         "표준펌프",
         "보증",
         "유지보수"
+      ],
+      "type": "event"
+    },
+    {
+      "facts": {},
+      "id": "event-wiki-eb0397c1607ee222060dcaca",
+      "label": "북쪽 연료장 겨울 연료·운송 협의",
+      "overview": "북쪽 연료장 회의에서 연료장이 실제 가용량과 배분 우선순위를 정하고 사유를 기록하며, 길드는 신청·반출·정산·운송완료 기록과 중복·이중반출 방지를 맡는 잠정 구조가 정리됐다. 길드 수수료는 반출 1건당 기본 처리비에 추가 작업비를 더하고 현금 또는 사전 합의된 현물로 받을 수 있게 했으며, 도로관리조와 운송집단의 비용은 별도 정산하기로 했다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "배분결정 사유 기록 제안",
+          "other_id": "char-hajin",
+          "relation_id": "rel-029c949cacfa1abed9223292382bb5a9c21f4c5af00435b2d66fed6cdf67036f"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "기록·정산 구조와 가치기준 정리",
+          "other_id": "char-eunchae",
+          "relation_id": "rel-238857ccf9825130a2cd65e43fffce84d1515613072bc8da97ce2702ebcd3cd2"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "길드 책임경계·수수료 원칙 협상",
+          "other_id": "char-jinwoo",
+          "relation_id": "rel-45ca7847fe2ddfc14718323eb677f2b4b6af91390133353a7b3fea5a770e7e3e"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "도로 작업비 별도 정산 제안",
+          "other_id": "char-seongho",
+          "relation_id": "rel-933fd11864ec7551ea0520f495c2824aa0f239f736a2e16c33d254cf9c416f34"
+        },
+        {
+          "direction": "incoming",
+          "kind": "related_to",
+          "label": "전날 회의 초청의 후속 협의",
+          "other_id": "event-wiki-934cea538155fc7bc102a21c",
+          "relation_id": "rel-a0760d01e82101992289bb99dc1489fb5892dd81039e2dd1ba2ab36a46f47acd"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "북쪽 연료장 구 물류장 회의",
+          "other_id": "loc-wiki-f73ae01ebcb8d89952911bbc",
+          "relation_id": "rel-bfc1ca6abf21fcd6b988534aea495ab9d1cb076d9d92388a2e29a0904e149210"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "연료 상태·당일 계측 확인",
+          "other_id": "char-taehoon",
+          "relation_id": "rel-ea718eefb1a67d99c1cfd58348363fb0dcb3f25483145e4c125e196caf477ec0"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 11월 23일",
+      "tags": [
+        "S04",
+        "연료",
+        "운송",
+        "길드",
+        "정산"
       ],
       "type": "event"
     },
@@ -3043,6 +3199,13 @@
         },
         {
           "direction": "incoming",
+          "kind": "related_to",
+          "label": "길드 일상 운영 담당",
+          "other_id": "char-wiki-6e626c477ade25e68140f8ea",
+          "relation_id": "rel-6c60c7f2b09ff93068e9cb40157c88d5e7e877c9c32ed829e9e3b78068ceefaa"
+        },
+        {
+          "direction": "incoming",
           "kind": "occurred_at",
           "label": "길드 접수·정산에서 사건 확인 및 처리",
           "other_id": "event-wiki-281823f8f1b6fb2c770b1925",
@@ -3094,6 +3257,7 @@
         "mention-3444c966b1c641e3a7983018fad73b185f1b724501b3cb93eca2bb1ab4fb8d1f",
         "mention-4239f3d413c5196f6f0fb5f7a4428c5bbed2ec0da4bbc4d07d8546ecda414546",
         "mention-42967d92c8366ad1b5d7d2e7c7fa8f41ef1d4229c22b55492af10774c1baea03",
+        "mention-65a17bc3e8d7b8dae9b16c1969324be850612b92cdced5861dbc29bf67f411b3",
         "mention-676ee5d8cfc6ee5e4bd61d956a7af40e69dc51c1d0b4b90c73e8e2ff0976d05f",
         "mention-a1b94a7eec5ae236093d1510f082c54ee51854d00d8a0af53ee4434de03570ba",
         "mention-d4199c9f68b8bd0e53e75c41faf0a39ffdd5d3d8136ba651bd6434640580f13b",
@@ -3150,6 +3314,7 @@
         "mention-99b655fb45cb8f11d847cc179f658cdb17101e9bae199421e72916900de84004",
         "mention-9e1d3def9f4904ae85f4e29653baa1a7ff043513a3f0248d263791704412a462",
         "mention-b6c02fcbc70826af17061de9a30062705bbe54d4875f05b532b354f7dfac921b",
+        "mention-c4c28a40655bce1b2ce5c2986f41d0f95dba901768fdcb071bc6471341e1ebc3",
         "mention-caa246e338f6043bef7bcf9fa9cc6c2f26db01038bfaeb3f3f490b3a6b1490bb",
         "mention-cb0c546e08187bd185644faee49039e53d361c82b9dc3632ecca797273a5c042",
         "mention-d01c23b8a2c8a8ad9c3c4fae2fdf8ca204808a30137179c08d8616efc78b375c",
@@ -3326,7 +3491,7 @@
       "facts": {},
       "id": "loc-wiki-f73ae01ebcb8d89952911bbc",
       "label": "북쪽 연료장 생활권",
-      "overview": "겨울 전 운송 가능한 집단과 거래거점을 불러 실제 배분 가능한 연료량과 운송능력을 논의하는 회의를 제안한 북쪽 생활권이다.",
+      "overview": "구 물류장 안쪽에 차량 대기선과 작업구역이 분리되고 저장탱크 주변에 펜스와 통제선이 설치됐다. 2027년 11월 23일 장부상 21킬로리터를 조금 넘게 보유했고, 손실·침전·자체 겨울운영분을 뺀 약 18킬로리터를 외부 배분 상한으로 제시했으며 실제 반출량은 날짜별로 다시 계측하기로 했다.",
       "relations": [
         {
           "direction": "incoming",
@@ -3334,12 +3499,20 @@
           "label": "초청 발신 생활권",
           "other_id": "event-wiki-934cea538155fc7bc102a21c",
           "relation_id": "rel-9887cbe19fc7de95d747d9e666cf3324872aa4942f8802a71045d3041b8ab50e"
+        },
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "북쪽 연료장 구 물류장 회의",
+          "other_id": "event-wiki-eb0397c1607ee222060dcaca",
+          "relation_id": "rel-bfc1ca6abf21fcd6b988534aea495ab9d1cb076d9d92388a2e29a0904e149210"
         }
       ],
       "story_link_ids": [
+        "mention-595a2cd24f4e9e78fc4041c8570a1577d9faed6d5486931f9967da57764906c0",
         "mention-d597db7cd840a37e37e3acedc29eee718af90a3061c650c12d9b5e1656d90821"
       ],
-      "subtitle": "겨울 전 연료·운송 협의 발신 생활권",
+      "subtitle": "구 물류장 기반 연료 저장·배분 거점",
       "tags": [
         "S03",
         "장소",
@@ -3463,7 +3636,7 @@
     }
   ],
   "chronicle_id": "C03-AFTERFALL",
-  "content_sha256": "da78d80d03c66d09cd60abcfd41238afd9aaee440e9566d723dd4902065291a7",
+  "content_sha256": "0ca9ee2c9159ed37d174752c6249d82ce3523b05ea01518e6a504dd7ce88c523",
   "nodes": [
     {
       "anchor": {
@@ -4221,6 +4394,32 @@
       },
       "history": [],
       "id": "char-wiki-322a5a52d57198d4a6f25429"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 15:42",
+        "save_version": 290
+      },
+      "data": {
+        "id": "char-wiki-6e626c477ade25e68140f8ea",
+        "label": "박동철",
+        "source": "S04 SESSION_001 GM 공개 블록 005",
+        "subtitle": "길드 일상 운영 실무자",
+        "summary": "2027년 11월 23일 서진우·최은채·장태훈이 북쪽 연료장 회의에 간 동안 오세린과 함께 길드 쪽 일상 운영을 맡았다.",
+        "tags": [
+          "S04",
+          "길드",
+          "운영"
+        ],
+        "type": "character"
+      },
+      "evidence": {
+        "pointer": "/nodes/1",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
+        "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
+      },
+      "history": [],
+      "id": "char-wiki-6e626c477ade25e68140f8ea"
     },
     {
       "anchor": {
@@ -5040,6 +5239,34 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-23 15:42",
+        "save_version": 290
+      },
+      "data": {
+        "id": "event-wiki-eb0397c1607ee222060dcaca",
+        "label": "북쪽 연료장 겨울 연료·운송 협의",
+        "source": "S04 SESSION_001 GM 공개 블록 005, 007, 009",
+        "subtitle": "2027년 11월 23일",
+        "summary": "북쪽 연료장 회의에서 연료장이 실제 가용량과 배분 우선순위를 정하고 사유를 기록하며, 길드는 신청·반출·정산·운송완료 기록과 중복·이중반출 방지를 맡는 잠정 구조가 정리됐다. 길드 수수료는 반출 1건당 기본 처리비에 추가 작업비를 더하고 현금 또는 사전 합의된 현물로 받을 수 있게 했으며, 도로관리조와 운송집단의 비용은 별도 정산하기로 했다.",
+        "tags": [
+          "S04",
+          "연료",
+          "운송",
+          "길드",
+          "정산"
+        ],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/0",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
+        "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
+      },
+      "history": [],
+      "id": "event-wiki-eb0397c1607ee222060dcaca"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -5492,15 +5719,15 @@
     },
     {
       "anchor": {
-        "game_time": "2027-11-22 22:40",
-        "save_version": 285
+        "game_time": "2027-11-23 15:42",
+        "save_version": 290
       },
       "data": {
         "id": "loc-wiki-f73ae01ebcb8d89952911bbc",
         "label": "북쪽 연료장 생활권",
-        "source": "S03 SESSION_008 GM 공개 블록 003",
-        "subtitle": "겨울 전 연료·운송 협의 발신 생활권",
-        "summary": "겨울 전 운송 가능한 집단과 거래거점을 불러 실제 배분 가능한 연료량과 운송능력을 논의하는 회의를 제안한 북쪽 생활권이다.",
+        "source": "S04 SESSION_001 GM 공개 블록 005",
+        "subtitle": "구 물류장 기반 연료 저장·배분 거점",
+        "summary": "구 물류장 안쪽에 차량 대기선과 작업구역이 분리되고 저장탱크 주변에 펜스와 통제선이 설치됐다. 2027년 11월 23일 장부상 21킬로리터를 조금 넘게 보유했고, 손실·침전·자체 겨울운영분을 뺀 약 18킬로리터를 외부 배분 상한으로 제시했으며 실제 반출량은 날짜별로 다시 계측하기로 했다.",
         "tags": [
           "S03",
           "장소",
@@ -5510,11 +5737,38 @@
         "type": "location"
       },
       "evidence": {
-        "pointer": "/nodes/5",
-        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_008_3d15073c796967f27b1dd094ceecd948ab28b93aed7971818de48cb0e6cd4dc0.json",
-        "source_sha256": "b0833f958e8c3ea3395f1b9aa1fbe8cd368183e3336971f0d9d85479f710530a"
+        "pointer": "/nodes/2",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
+        "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
       },
-      "history": [],
+      "history": [
+        {
+          "anchor": {
+            "game_time": "2027-11-22 22:40",
+            "save_version": 285
+          },
+          "data": {
+            "id": "loc-wiki-f73ae01ebcb8d89952911bbc",
+            "label": "북쪽 연료장 생활권",
+            "source": "S03 SESSION_008 GM 공개 블록 003",
+            "subtitle": "겨울 전 연료·운송 협의 발신 생활권",
+            "summary": "겨울 전 운송 가능한 집단과 거래거점을 불러 실제 배분 가능한 연료량과 운송능력을 논의하는 회의를 제안한 북쪽 생활권이다.",
+            "tags": [
+              "S03",
+              "장소",
+              "연료",
+              "북쪽"
+            ],
+            "type": "location"
+          },
+          "data_sha256": "3bc52538fd8c3817ba29a102fe1f6653d5e8934dbdd17c051647aae07cc6c499",
+          "evidence": {
+            "pointer": "/nodes/5",
+            "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_008_3d15073c796967f27b1dd094ceecd948ab28b93aed7971818de48cb0e6cd4dc0.json",
+            "source_sha256": "b0833f958e8c3ea3395f1b9aa1fbe8cd368183e3336971f0d9d85479f710530a"
+          }
+        }
+      ],
       "id": "loc-wiki-f73ae01ebcb8d89952911bbc"
     },
     {
@@ -5623,6 +5877,25 @@
     }
   ],
   "relations": [
+    {
+      "anchor": {
+        "game_time": "2027-11-23 15:42",
+        "save_version": 290
+      },
+      "data": {
+        "from": "char-hajin",
+        "kind": "participated_in",
+        "label": "배분결정 사유 기록 제안",
+        "to": "event-wiki-eb0397c1607ee222060dcaca"
+      },
+      "evidence": {
+        "pointer": "/relations/4",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
+        "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
+      },
+      "history": [],
+      "id": "rel-029c949cacfa1abed9223292382bb5a9c21f4c5af00435b2d66fed6cdf67036f"
+    },
     {
       "anchor": {
         "game_time": "2027-03-23 17:50",
@@ -5853,6 +6126,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-23 15:42",
+        "save_version": 290
+      },
+      "data": {
+        "from": "char-wiki-6e626c477ade25e68140f8ea",
+        "kind": "related_to",
+        "label": "길드 일상 운영 공동 담당",
+        "to": "char-wiki-6f18bfaa7aba3f5b5456f96f"
+      },
+      "evidence": {
+        "pointer": "/relations/8",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
+        "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
+      },
+      "history": [],
+      "id": "rel-1cd280d560f5df1ca90e64ea3af267f7104fb45574aaa51727724ffe58efb289"
+    },
+    {
+      "anchor": {
         "game_time": "2027-10-30 13:20",
         "save_version": 282
       },
@@ -5945,6 +6237,25 @@
       },
       "history": [],
       "id": "rel-2262bb5680e30c2a58c36aad536faa852113f9780bf2f34ae91ccd82c6db2188"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 15:42",
+        "save_version": 290
+      },
+      "data": {
+        "from": "char-eunchae",
+        "kind": "participated_in",
+        "label": "기록·정산 구조와 가치기준 정리",
+        "to": "event-wiki-eb0397c1607ee222060dcaca"
+      },
+      "evidence": {
+        "pointer": "/relations/1",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
+        "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
+      },
+      "history": [],
+      "id": "rel-238857ccf9825130a2cd65e43fffce84d1515613072bc8da97ce2702ebcd3cd2"
     },
     {
       "anchor": {
@@ -6211,6 +6522,25 @@
       },
       "history": [],
       "id": "rel-443dc241512a9226aa94f281b56367117503b9967af8f625446c7c11d30834a5"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 15:42",
+        "save_version": 290
+      },
+      "data": {
+        "from": "char-jinwoo",
+        "kind": "participated_in",
+        "label": "길드 책임경계·수수료 원칙 협상",
+        "to": "event-wiki-eb0397c1607ee222060dcaca"
+      },
+      "evidence": {
+        "pointer": "/relations/0",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
+        "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
+      },
+      "history": [],
+      "id": "rel-45ca7847fe2ddfc14718323eb677f2b4b6af91390133353a7b3fea5a770e7e3e"
     },
     {
       "anchor": {
@@ -6515,6 +6845,25 @@
       },
       "history": [],
       "id": "rel-6b5ad09b43d062858e5ec4f4d54ad4dfb464825eaaa33770ccb606d408989a28"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 15:42",
+        "save_version": 290
+      },
+      "data": {
+        "from": "char-wiki-6e626c477ade25e68140f8ea",
+        "kind": "related_to",
+        "label": "길드 일상 운영 담당",
+        "to": "loc-sports-complex"
+      },
+      "evidence": {
+        "pointer": "/relations/7",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
+        "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
+      },
+      "history": [],
+      "id": "rel-6c60c7f2b09ff93068e9cb40157c88d5e7e877c9c32ed829e9e3b78068ceefaa"
     },
     {
       "anchor": {
@@ -6879,6 +7228,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-23 15:42",
+        "save_version": 290
+      },
+      "data": {
+        "from": "char-seongho",
+        "kind": "participated_in",
+        "label": "도로 작업비 별도 정산 제안",
+        "to": "event-wiki-eb0397c1607ee222060dcaca"
+      },
+      "evidence": {
+        "pointer": "/relations/3",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
+        "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
+      },
+      "history": [],
+      "id": "rel-933fd11864ec7551ea0520f495c2824aa0f239f736a2e16c33d254cf9c416f34"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -7028,6 +7396,25 @@
       },
       "history": [],
       "id": "rel-9b68e9bb1adcc22ff4f485e96d0b8b80ed55321f9fe16fc89989a42bd69cfe68"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 15:42",
+        "save_version": 290
+      },
+      "data": {
+        "from": "event-wiki-934cea538155fc7bc102a21c",
+        "kind": "related_to",
+        "label": "전날 회의 초청의 후속 협의",
+        "to": "event-wiki-eb0397c1607ee222060dcaca"
+      },
+      "evidence": {
+        "pointer": "/relations/6",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
+        "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
+      },
+      "history": [],
+      "id": "rel-a0760d01e82101992289bb99dc1489fb5892dd81039e2dd1ba2ab36a46f47acd"
     },
     {
       "anchor": {
@@ -7294,6 +7681,25 @@
       },
       "history": [],
       "id": "rel-b808579e2bd7719dc687412bc80373f7063244c09d0bd20d33c1c5d990ebcec5"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 15:42",
+        "save_version": 290
+      },
+      "data": {
+        "from": "event-wiki-eb0397c1607ee222060dcaca",
+        "kind": "occurred_at",
+        "label": "북쪽 연료장 구 물류장 회의",
+        "to": "loc-wiki-f73ae01ebcb8d89952911bbc"
+      },
+      "evidence": {
+        "pointer": "/relations/5",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
+        "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
+      },
+      "history": [],
+      "id": "rel-bfc1ca6abf21fcd6b988534aea495ab9d1cb076d9d92388a2e29a0904e149210"
     },
     {
       "anchor": {
@@ -7636,6 +8042,25 @@
       },
       "history": [],
       "id": "rel-e460fe3bdd950983f6a38df4e66916083fa31e5bbea69bd5651d107d4e18abd5"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 15:42",
+        "save_version": 290
+      },
+      "data": {
+        "from": "char-taehoon",
+        "kind": "participated_in",
+        "label": "연료 상태·당일 계측 확인",
+        "to": "event-wiki-eb0397c1607ee222060dcaca"
+      },
+      "evidence": {
+        "pointer": "/relations/2",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
+        "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
+      },
+      "history": [],
+      "id": "rel-ea718eefb1a67d99c1cfd58348363fb0dcb3f25483145e4c125e196caf477ec0"
     },
     {
       "anchor": {
@@ -8409,6 +8834,26 @@
       ]
     },
     {
+      "body_sha256": "ebe446c17de46b8365ae317ef41cca4d56dc7db831f0721e33ec7b46081b8d3b",
+      "chapter_id": "c03-afterfall-auto-b99011e5ad999a9b2469cea47dc185e1aeb6d3d084234cb2fc5037ab04dd0a4e",
+      "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+      },
+      "id": "mention-0a854e5a5898db1e36357acf52da7f3f8498da339bb53e4e1614ae5e149b7b87",
+      "node_id": "char-wiki-6e626c477ade25e68140f8ea",
+      "reasons": [
+        {
+          "alias": "박동철",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            2528
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "9beb279b9f4f20a015257c2354fd6549853ef887242f2d8d3cddd3f947361087",
       "chapter_id": "c03-afterfall-auto-a10359ad99e31369dccfe2526d95309968cd930ba35847b9b0f6c5fe0e6436c3",
       "chapter_title": "2027년 7월 13일",
@@ -8447,6 +8892,26 @@
           "kind": "EXACT_TEXT_MENTION",
           "offsets": [
             1266
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "8c707558b3002f0e63f6c3196de60efa1169c8b0f4558cc38c7df8cba18809d2",
+      "chapter_id": "c03-afterfall-auto-7a589e3a941834319a82033e0169df5b7270a24315fbe18f30d8a368daee6b4a",
+      "chapter_title": "2027년 10월 31일 ~ 11월 4일",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+      },
+      "id": "mention-0ba35d4c2287822507ca3ae4bc21b52b195368f498ed4afaeafccb51deeb1d24",
+      "node_id": "char-wiki-6e626c477ade25e68140f8ea",
+      "reasons": [
+        {
+          "alias": "박동철",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            6843
           ]
         }
       ]
@@ -8717,6 +9182,35 @@
       ]
     },
     {
+      "body_sha256": "b9c7c9db6a785834a5afa51302905661443a61ea0970f8ccd618d039a513f82d",
+      "chapter_id": "c03-afterfall-auto-a4fae733c4c5f58987a52d6ce1061f9f82e055bbfb41a851fc24d4cea450cc7c",
+      "chapter_title": "2027년 5월 4일 09:00",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+      },
+      "id": "mention-131677fd225978c91275851381cfcf412cea220ba2e7b2e96dae624829f3df7e",
+      "node_id": "char-wiki-6e626c477ade25e68140f8ea",
+      "reasons": [
+        {
+          "alias": "박동철",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            4151,
+            4378,
+            4870,
+            5523,
+            5988,
+            7436,
+            8483,
+            8610,
+            8634,
+            8753
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "806f1e28d21e9d5a6c5c1a3880f3bdf862a0ec04ff377acf9ad92f169056982f",
       "chapter_id": "c03-afterfall-auto-10aac28e95b9f0c21d6caa86b33abe3c3210e5b05df5f80e904e6f3b8f353663",
       "chapter_title": "2027년 4월 11일 17:25",
@@ -8953,6 +9447,31 @@
       ]
     },
     {
+      "body_sha256": "ebe446c17de46b8365ae317ef41cca4d56dc7db831f0721e33ec7b46081b8d3b",
+      "chapter_id": "c03-afterfall-auto-b99011e5ad999a9b2469cea47dc185e1aeb6d3d084234cb2fc5037ab04dd0a4e",
+      "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+      },
+      "id": "mention-19844aa2e81ae82dc3cffb931459483e8a92fe8b4ac1b6589aeb850e298faf11",
+      "node_id": "char-seongho",
+      "reasons": [
+        {
+          "alias": "김성호",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            3367,
+            3738,
+            4180,
+            4809,
+            5364,
+            6793
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "2ed5f25b324080bb0e1c753032f448639a75a78908786469c448b8313e7958d7",
       "chapter_id": "c03-afterfall-chapter-09",
       "chapter_title": "서쪽 화재선",
@@ -9055,6 +9574,26 @@
             11296,
             11381,
             11405
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "ebe446c17de46b8365ae317ef41cca4d56dc7db831f0721e33ec7b46081b8d3b",
+      "chapter_id": "c03-afterfall-auto-b99011e5ad999a9b2469cea47dc185e1aeb6d3d084234cb2fc5037ab04dd0a4e",
+      "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+      },
+      "id": "mention-1c9d5ed5837d673d0580f53a1b15976145946f77d0b59518809a96ea57b8b030",
+      "node_id": "char-wiki-6f18bfaa7aba3f5b5456f96f",
+      "reasons": [
+        {
+          "alias": "오세린",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            2523
           ]
         }
       ]
@@ -11528,6 +12067,27 @@
       ]
     },
     {
+      "body_sha256": "ebe446c17de46b8365ae317ef41cca4d56dc7db831f0721e33ec7b46081b8d3b",
+      "chapter_id": "c03-afterfall-auto-b99011e5ad999a9b2469cea47dc185e1aeb6d3d084234cb2fc5037ab04dd0a4e",
+      "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+      },
+      "id": "mention-595a2cd24f4e9e78fc4041c8570a1577d9faed6d5486931f9967da57764906c0",
+      "node_id": "loc-wiki-f73ae01ebcb8d89952911bbc",
+      "reasons": [
+        {
+          "alias": "북쪽 연료장 생활권",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            1003,
+            2429
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "7e6d795ab02ce8381b9103da6943dcbb9aeb90c125ef168f756a134439453a6b",
       "chapter_id": "c03-afterfall-auto-668e820685498b88560bd4b41869c32da0b69b5712af55b27b787c648bd40e5e",
       "chapter_title": "2027년 6월 19일",
@@ -11668,6 +12228,48 @@
       "reasons": [
         {
           "kind": "EDITORIAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "body_sha256": "ebe446c17de46b8365ae317ef41cca4d56dc7db831f0721e33ec7b46081b8d3b",
+      "chapter_id": "c03-afterfall-auto-b99011e5ad999a9b2469cea47dc185e1aeb6d3d084234cb2fc5037ab04dd0a4e",
+      "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+      },
+      "id": "mention-64d37a58d4d93aca98a0a78232d7b30a8304293f1d86435c99a5be13ce27e698",
+      "node_id": "char-eunchae",
+      "reasons": [
+        {
+          "alias": "최은채",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            193,
+            1315
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "ebe446c17de46b8365ae317ef41cca4d56dc7db831f0721e33ec7b46081b8d3b",
+      "chapter_id": "c03-afterfall-auto-b99011e5ad999a9b2469cea47dc185e1aeb6d3d084234cb2fc5037ab04dd0a4e",
+      "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+      },
+      "id": "mention-65a17bc3e8d7b8dae9b16c1969324be850612b92cdced5861dbc29bf67f411b3",
+      "node_id": "loc-sports-complex",
+      "reasons": [
+        {
+          "alias": "폐쇄 체육시설",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            22,
+            1278
+          ]
         }
       ]
     },
@@ -14539,6 +15141,27 @@
       ]
     },
     {
+      "body_sha256": "ebe446c17de46b8365ae317ef41cca4d56dc7db831f0721e33ec7b46081b8d3b",
+      "chapter_id": "c03-afterfall-auto-b99011e5ad999a9b2469cea47dc185e1aeb6d3d084234cb2fc5037ab04dd0a4e",
+      "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+      },
+      "id": "mention-b52fdab518d420aef1de51a6f85a28503f9a83a5941bb41245c08cf289c95437",
+      "node_id": "char-taehoon",
+      "reasons": [
+        {
+          "alias": "장태훈",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            383,
+            1466
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "16e3f9a31315014e476866454da0bf0cb6e04804c549ecd7032aca3cbec68ea0",
       "chapter_id": "c03-afterfall-chapter-24",
       "chapter_title": "동천교 바깥의 차량들",
@@ -14880,6 +15503,26 @@
             16830,
             19405,
             19608
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "ebe446c17de46b8365ae317ef41cca4d56dc7db831f0721e33ec7b46081b8d3b",
+      "chapter_id": "c03-afterfall-auto-b99011e5ad999a9b2469cea47dc185e1aeb6d3d084234cb2fc5037ab04dd0a4e",
+      "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+      },
+      "id": "mention-c4c28a40655bce1b2ce5c2986f41d0f95dba901768fdcb071bc6471341e1ebc3",
+      "node_id": "loc-west-road",
+      "reasons": [
+        {
+          "alias": "서쪽길",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            1769
           ]
         }
       ]
@@ -15745,6 +16388,29 @@
       ]
     },
     {
+      "body_sha256": "ebe446c17de46b8365ae317ef41cca4d56dc7db831f0721e33ec7b46081b8d3b",
+      "chapter_id": "c03-afterfall-auto-b99011e5ad999a9b2469cea47dc185e1aeb6d3d084234cb2fc5037ab04dd0a4e",
+      "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+      },
+      "id": "mention-de560c67418ee7ab0df86c39d587972f73b81408cb6ed5a62fa98582e2bc6b00",
+      "node_id": "char-hajin",
+      "reasons": [
+        {
+          "alias": "문하진",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            3440,
+            4121,
+            5060,
+            6827
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "77f86ad6116f2643fff5f4b502167fdddae5688be49b18770fcc0680320c2bb0",
       "chapter_id": "c03-afterfall-chapter-14",
       "chapter_title": "공공대피시설",
@@ -15949,6 +16615,28 @@
           "kind": "EXACT_TEXT_MENTION",
           "offsets": [
             3750
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "ebe446c17de46b8365ae317ef41cca4d56dc7db831f0721e33ec7b46081b8d3b",
+      "chapter_id": "c03-afterfall-auto-b99011e5ad999a9b2469cea47dc185e1aeb6d3d084234cb2fc5037ab04dd0a4e",
+      "chapter_title": "2027-11-23 08:20 — 폐쇄 체육시설, 길드 관리동",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a232e183a760b13ed06270c272bc65cd534cdfcf9f3d59d336007da79928f3bc"
+      },
+      "id": "mention-e3fabce5e955e18355ea01d3427f5f1d74634b871ce9baa1a84384ab7b04d312",
+      "node_id": "char-seojin",
+      "reasons": [
+        {
+          "alias": "윤서진",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            558,
+            1525,
+            2544
           ]
         }
       ]
