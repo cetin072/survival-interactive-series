@@ -37,6 +37,7 @@ export type KnowledgeGuide = {
   id: string
   slug: string
   status: string
+  topicId: string
   label: string
   title: string
   summary: string
@@ -56,6 +57,7 @@ type KnowledgeBriefFile = {
   id: string
   slug: string
   status: string
+  topic_id: string
   label: string
   title: string
   summary: string
@@ -107,6 +109,7 @@ export function adaptKnowledgeBrief(brief: KnowledgeBriefFile): KnowledgeGuide {
     id: brief.id,
     slug: brief.slug,
     status: brief.status,
+    topicId: brief.topic_id,
     label: brief.label,
     title: brief.title,
     summary: brief.summary,

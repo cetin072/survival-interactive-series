@@ -177,10 +177,20 @@ test('canonical index reuses the existing Library UI as static HTML with origina
   assert.ok(page.includes('<link rel="canonical" href="' + data.config.site_origin + '/knowledge/" />'))
   assert.equal([...page.matchAll(/<meta property="og:/g)].length, 6)
   assert.ok(page.includes('<meta property="og:type" content="website" />'))
+  for (const id of ['household', 'information', 'evacuation', 'community']) {
+    assert.ok(page.includes('data-knowledge-category="' + id + '"'))
+  }
+  const colorStyles = await readFile(join(root, 'archive/web/public/knowledge/wikiShell.css'), 'utf8')
+  assert.ok(colorStyles.includes('STEP 3-2 subject cues'))
+  assert.ok(colorStyles.includes('--knowledge-topic-tint'))
   for (const brief of published) assert.ok(page.includes('href="' + knowledgeHref(brief) + '"'))
   assert.doesNotMatch(page, /<script|knowledge-card|knowledge-hero|noindex/)
   const added = { ...projections[0], id: 'K-fixture', slug: 'fixture-new-guide', label: '새 공개 가이드' }
   const html = renderer.renderLibrary([...projections, added])
   assert.ok(html.includes('/knowledge/fixture-new-guide/'))
-  assert.ok(html.includes('<span>' + (published.length + 1) + '개</span>'))
+  const categoryCount = projections.filter((brief) => brief.topic_id === added.topic_id).length + 1
+  assert.ok(html.includes('<span>' + categoryCount + '개</span>'))
+  for (const section of ['생활 대비', '연락·정보', '대피·이동', '공동 대응']) {
+    assert.ok(html.includes(section))
+  }
 })

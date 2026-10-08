@@ -1295,3 +1295,96 @@
   .wiki-knowledge-home .wiki-home-intro { padding: 16px 14px; }
   .wiki-knowledge-home .wiki-home-frame > .wiki-home-section { margin-top: 10px; }
 }
+
+/* STEP 3-2: static Knowledge topic navigation, public only. */
+.knowledge-library-shell .knowledge-category-nav { margin: 15px 0 0; }
+.knowledge-library-shell .knowledge-category-nav a:focus-visible { outline: 2px solid var(--sd-olive); outline-offset: 3px; }
+.knowledge-library-shell .knowledge-library-list { scroll-margin-top: 18px; }
+.knowledge-library-shell .knowledge-library-list > .wiki-section-heading { margin-bottom: 8px; }
+/* Keep mobile Knowledge list action links legible beside long scope text. */
+.knowledge-library-shell .knowledge-library-footer a { white-space: nowrap; flex-shrink: 0; }
+@media (max-width: 600px) {
+  .knowledge-library-shell .knowledge-library-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
+/* STEP 3-2 subject cues: restrained identity, not risk/status colors.
+   Scoped to the published Knowledge shelf and its home topic shortcuts. */
+.knowledge-library-shell [data-knowledge-category="household"],
+.wiki-knowledge-home [data-knowledge-category="household"] {
+  --knowledge-topic-accent: #385f34;
+  --knowledge-topic-tint: #e0edda;
+  --knowledge-topic-line: #aac79f;
+}
+.knowledge-library-shell [data-knowledge-category="information"],
+.wiki-knowledge-home [data-knowledge-category="information"] {
+  --knowledge-topic-accent: #2e6281;
+  --knowledge-topic-tint: #dfeefa;
+  --knowledge-topic-line: #a4c5d8;
+}
+.knowledge-library-shell [data-knowledge-category="evacuation"],
+.wiki-knowledge-home [data-knowledge-category="evacuation"] {
+  --knowledge-topic-accent: #8a581c;
+  --knowledge-topic-tint: #f7e7cf;
+  --knowledge-topic-line: #ddbe8e;
+}
+.knowledge-library-shell [data-knowledge-category="community"],
+.wiki-knowledge-home [data-knowledge-category="community"] {
+  --knowledge-topic-accent: #874940;
+  --knowledge-topic-tint: #f4dfda;
+  --knowledge-topic-line: #d7aba2;
+}
+.knowledge-library-shell [data-knowledge-category="other"],
+.wiki-knowledge-home [data-knowledge-category="other"] {
+  --knowledge-topic-accent: #626b77;
+  --knowledge-topic-tint: #f0f2f5;
+  --knowledge-topic-line: #d5dbe1;
+}
+
+/* Reuse the same color identity on home shortcuts and the static library. */
+.knowledge-library-shell nav.knowledge-category-nav a[data-knowledge-category],
+.wiki-knowledge-home nav[aria-label="주제별 생존 지식"] a[data-knowledge-category] {
+  border: 1px solid var(--knowledge-topic-line);
+  border-left: 4px solid var(--knowledge-topic-accent);
+  color: var(--knowledge-topic-accent);
+  background: var(--knowledge-topic-tint);
+  text-decoration: none;
+}
+.knowledge-library-shell nav.knowledge-category-nav a[data-knowledge-category]:hover,
+.wiki-knowledge-home nav[aria-label="주제별 생존 지식"] a[data-knowledge-category]:hover {
+  background: #fff;
+  border-color: var(--knowledge-topic-accent);
+  color: var(--knowledge-topic-accent);
+}
+.knowledge-library-shell nav.knowledge-category-nav a[data-knowledge-category]:focus-visible,
+.wiki-knowledge-home nav[aria-label="주제별 생존 지식"] a[data-knowledge-category]:focus-visible {
+  outline: 2px solid var(--knowledge-topic-accent);
+  outline-offset: 3px;
+}
+.knowledge-library-shell section.knowledge-library-list[data-knowledge-category] {
+  border-top: 4px solid var(--knowledge-topic-accent);
+  background: linear-gradient(180deg, var(--knowledge-topic-tint) 0, #fff 96px);
+}
+.knowledge-library-shell .knowledge-library-list[data-knowledge-category] > .wiki-section-heading {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-bottom-color: var(--knowledge-topic-line);
+  border-left: 4px solid var(--knowledge-topic-accent);
+  border-radius: 3px;
+  background: var(--knowledge-topic-tint);
+}
+.knowledge-library-shell .knowledge-library-list[data-knowledge-category] > .wiki-section-heading h2,
+.knowledge-library-shell .knowledge-library-list[data-knowledge-category] > .wiki-section-heading span {
+  color: var(--knowledge-topic-accent);
+}
+.knowledge-library-shell .knowledge-library-list[data-knowledge-category] h3 a,
+.knowledge-library-shell .knowledge-library-list[data-knowledge-category] .knowledge-library-footer a {
+  color: var(--knowledge-topic-accent);
+}
+.knowledge-library-shell .knowledge-library-list[data-knowledge-category] a:focus-visible {
+  outline: 2px solid var(--knowledge-topic-accent);
+  outline-offset: 3px;
+}

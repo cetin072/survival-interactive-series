@@ -1,3 +1,5 @@
+import { groupKnowledge } from './knowledgeCategories'
+import { publishedKnowledgeGuides } from './knowledgeGuide'
 import { chronicleRegistry, type Chronicle } from './chronicleRegistry'
 import { chaptersForChronicle } from './storyData'
 import { knowledgeHref, type KnowledgeGuide } from './knowledgeGuide'
@@ -42,6 +44,16 @@ export function WikiHomePreview({ knowledge = selectHomeKnowledge(), chronicles 
         {knowledge.featured.length ? <div className="wiki-home-knowledge-grid">
           {knowledge.featured.map((guide) => <KnowledgeCard key={guide.id} guide={guide} />)}
         </div> : <p>공개된 지식을 정리하고 있습니다.</p>}
+      </section>
+
+      <section className="wiki-home-section" aria-labelledby="wiki-home-topics-title">
+        <div className="wiki-section-heading"><h2 id="wiki-home-topics-title">주제로 찾아보기</h2><a href="/knowledge/">전체 지식 →</a></div>
+        <nav className="wiki-home-actions" aria-label="주제별 생존 지식">
+          {groupKnowledge(publishedKnowledgeGuides).map((category) =>
+            <a key={category.id} data-knowledge-category={category.id} href={'/knowledge/#knowledge-' + category.id}>
+              {category.label} · {category.guides.length}개
+            </a>)}
+        </nav>
       </section>
 
       <section className="wiki-home-section" aria-labelledby="wiki-recent-knowledge-title">

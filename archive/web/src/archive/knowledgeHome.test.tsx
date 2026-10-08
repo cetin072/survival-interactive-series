@@ -24,6 +24,14 @@ describe('Knowledge home public data', () => {
     expect(html.indexOf('비상용품 관리')).toBeLessThan(html.indexOf('가족 비상연락'))
     expect(html).toContain('공식 안내 우선')
     expect(html).not.toContain('안전 보장')
+    for (const category of ['household', 'information', 'evacuation', 'community']) {
+      expect(html).toContain('/knowledge/#knowledge-' + category)
+    }
+    expect(html).toContain('주제로 찾아보기')
+    for (const id of ['household', 'information', 'evacuation', 'community']) {
+      expect(html).toContain('data-knowledge-category="' + id + '"')
+    }
+
   })
 
   it('does not fill missing featured positions with unpublished guides or their tools', () => {

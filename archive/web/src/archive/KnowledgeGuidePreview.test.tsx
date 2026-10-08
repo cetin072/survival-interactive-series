@@ -13,10 +13,14 @@ describe('Knowledge practical guide rollout', () => {
   it('renders a Knowledge library when no brief is selected', () => {
     const markup = renderToStaticMarkup(createElement(KnowledgeGuideLibraryPreview))
     expect(markup).toContain('생존 지식')
-    expect(markup).toContain('공개 가이드')
+    for (const label of ['생활 대비', '연락·정보', '대피·이동', '공동 대응']) expect(markup).toContain(label)
     for (const guide of publishedKnowledgeGuides) {
       expect(markup).toContain(guide.title)
       expect(markup).toContain('/knowledge/' + guide.slug + '/')
+    }
+    for (const id of ['household', 'information', 'evacuation', 'community']) {
+      expect(markup).toContain('data-knowledge-category="' + id + '"')
+      expect(markup).toContain('href="#knowledge-' + id + '"')
     }
     expect(markup).not.toContain('K-004')
     expect(markup).not.toContain('K-005')

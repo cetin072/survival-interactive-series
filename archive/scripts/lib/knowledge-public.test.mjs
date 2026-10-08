@@ -20,6 +20,7 @@ test('public projection preserves approved bodies, sources and tools and strips 
   assert.equal(projected.sections[0].blocks[0].text, brief.sections[0].blocks[0].text)
   assert.equal(projected.sources[0].url, brief.sources[0].url)
   assert.equal(projected.tools[0].path, brief.tools[0].path)
+  assert.equal(projected.topic_id, brief.topic_id)
   assert.ok(!JSON.stringify(projected).includes('PRIVATE_'))
   assert.ok(!JSON.stringify(projected).includes(brief.editorial_note))
 })
