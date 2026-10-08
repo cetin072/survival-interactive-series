@@ -47,6 +47,9 @@ safe Finalizer
           |
 Fact + Graph + Receipt LAST
           |
+derived Visual catalog refresh
+(no image generation)
+          |
 PR / exact-head CI / merge
           |
           v
@@ -115,6 +118,8 @@ The original prepared package, Extractor/Reviewer fields and submission times
 remain unchanged; the external work is never represented as a Native run.
 Repeating the same reconciliation is a no-op. A source with no Native row is not
 given a fabricated run history.
+
+A publication-stage GitHub transport/check failure after an independent APPROVE review is recoverable only while the exact prepared Graph hash is still current. `prepare` revalidates the persisted review, moves that same durable job from `BLOCKED` back to `FINALIZING`, and redispatches the Program consumer. It does not run Extractor or Reviewer again. If main moved for unrelated code while the Graph stayed identical, the publication branch is rebuilt from latest main with the exact approved Fact/Graph/Receipt package plus the deterministic Visual catalog refresh, using force-with-lease on the existing publication branch.
 
 For unfinished work blocked by `A_WIKI_GRAPH_CHANGED_REPREPARE_REQUIRED`, the
 program reads a fresh main worktree and calls the narrow
@@ -216,7 +221,8 @@ For `REVIEW_READY`:
 7. A-Wiki tests;
 8. publication branch and PR;
 9. exact-head CI wait and merge;
-10. PUBLISHED DB state.
+10. PUBLISHED DB state;
+11. deterministic `VISUALS.json` refresh from the finalized public Graph and the existing approved appearance input. This is derived worklist synchronization only; Automation B still exclusively owns image generation, review, transfer and site-asset finalization.
 
 Native AI owns none of those mutations.
 
@@ -241,6 +247,8 @@ Native AI owns none of those mutations.
 | merged external receipt with stale Native job | exact publication evidence checked, original Native history preserved |
 | Finalizer validation fails | BLOCKED |
 | Fact/Graph persistence fails | no Receipt |
+| Visual catalog refresh fails | main unchanged; no image generation |
+| PR CI / GitHub transport fails after APPROVE | BLOCKED; exact approved publication may resume if Graph binding is unchanged |
 | PR CI fails | main unchanged |
 | exact merge fails | DB never becomes PUBLISHED |
 | successful merge | DB=PUBLISHED; main push prepares next source |
