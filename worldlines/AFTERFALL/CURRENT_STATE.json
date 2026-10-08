@@ -47,7 +47,7 @@
     "status": "S03_CLOSED_AWAIT_S04_NEW_SESSION",
     "mode": "FAST_RAW_PAIR_WITH_LINKED_DURABLE_TURNS",
     "storage": "survival_rpg.transcript_sessions + survival_rpg.transcript_messages",
-    "open_function": "survival_rpg.open_public_transcript_session",
+    "open_function": "survival_rpg.open_public_transcript_session_with_archive_intent",
     "append_function": "survival_rpg.append_public_transcript_turn",
     "raw_fallback_function": null,
     "close_function": "survival_rpg.close_public_transcript_session",
