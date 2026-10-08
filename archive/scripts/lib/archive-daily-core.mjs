@@ -35,13 +35,16 @@ export function publishedWatermark(manifest, sources) {
   return { nextOrder: last + 1, nextSessionId: `SESSION_${String(Math.max(...manifest.sessions.map((s) => Number(s.session_id?.slice(8)))) + 1).padStart(3, '0')}` }
 }
 
-export function discoverCompletePairs(session, rows, nextOrder) {
-  requireThat(session?.id === sourceId && session.worldline_id === 'AFTERFALL'
-    && session.chronicle_id === 'C03' && session.season_id === 'S03'
+export function discoverCompletePairs(session, rows, nextOrder, { snapshotEnd = session?.last_message_order,
+  scope = { chronicle_id: 'C03', worldline_id: 'AFTERFALL' } } = {}) {
+  requireThat(typeof session?.id === 'string' && session.worldline_id === scope.worldline_id
+    && session.chronicle_id === scope.chronicle_id && /^S\d{2,3}$/.test(session.season_id)
     && ['OPEN', 'CLOSED'].includes(session.status) && Number.isSafeInteger(session.last_message_order), 'SOURCE_NAMESPACE_MISMATCH')
   requireThat(nextOrder >= 0 && nextOrder % 2 === 0, 'INVALID_WATERMARK')
-  if (session.last_message_order < nextOrder) return { status: 'NO_NEW_SOURCE', rows: [] }
-  requireThat(Array.isArray(rows) && rows.length === session.last_message_order - nextOrder + 1
+  requireThat(Number.isSafeInteger(snapshotEnd) && snapshotEnd <= session.last_message_order, 'INVALID_SNAPSHOT_BOUND')
+  if (snapshotEnd < nextOrder) return { status: 'NO_NEW_SOURCE', rows: [] }
+  const pageEnd = Math.min(snapshotEnd, nextOrder + 199)
+  requireThat(Array.isArray(rows) && rows.length === pageEnd - nextOrder + 1
     && rows.length <= 200, 'SOURCE_RANGE_GAP_OR_TOO_LARGE')
   const selected = []
   for (const [index, row] of rows.entries()) {
@@ -49,14 +52,14 @@ export function discoverCompletePairs(session, rows, nextOrder) {
     // A lone USER at the live tail is not yet a publishable pair. Its content
     // may still be edited before the GM reply, so only check its identity.
     if (index % 2 === 0 && index === rows.length - 1) {
-      requireThat(row.message_order === order && row.session_id === sourceId
-        && row.worldline_id === 'AFTERFALL' && row.chronicle_id === 'C03'
-        && row.season_id === 'S03' && row.role === 'USER', 'SOURCE_RANGE_GAP_OR_TOO_LARGE')
+      requireThat(row.message_order === order && row.session_id === session.id
+        && row.worldline_id === scope.worldline_id && row.chronicle_id === scope.chronicle_id
+        && row.season_id === session.season_id && row.role === 'USER', 'SOURCE_RANGE_GAP_OR_TOO_LARGE')
       break
     }
-    requireThat(row.message_order === order && row.session_id === sourceId
-      && row.worldline_id === 'AFTERFALL' && row.chronicle_id === 'C03'
-      && row.season_id === 'S03' && row.role === (index % 2 ? 'GM' : 'USER')
+    requireThat(row.message_order === order && row.session_id === session.id
+      && row.worldline_id === scope.worldline_id && row.chronicle_id === scope.chronicle_id
+      && row.season_id === session.season_id && row.role === (index % 2 ? 'GM' : 'USER')
       && row.public_safe === true && row.source_type === 'LIVE'
       && typeof row.content === 'string' && row.content.trim().length > 0
       && !row.content.includes('\0') && Buffer.byteLength(row.content) <= 200_000
@@ -77,6 +80,9 @@ export function discoverCompletePairs(session, rows, nextOrder) {
 }
 
 export function materializeSegment({ session, discovery, sessionId, links = [], sealedAt }) {
+  const sourceId = session.id
+  requireThat(session.chronicle_id === 'C03' && session.worldline_id === 'AFTERFALL'
+    && /^S\d{2,3}$/.test(session.season_id), 'SOURCE_NAMESPACE_MISMATCH')
   requireThat(discovery.status === 'NEW_SOURCE_RANGE' && /^SESSION_\d{3}$/.test(sessionId), 'INVALID_NEW_SEGMENT')
   const rows = discovery.rows, start = discovery.startOrder, end = discovery.endOrder
   const linked = new Map(links.map((item) => [item.turn_no, item]))
@@ -88,7 +94,7 @@ export function materializeSegment({ session, discovery, sessionId, links = [], 
       && link.linked_save_version === gm.save_version
   }), 'INVALID_OPTIONAL_STATE_LINK')
   const blocks = rows.map((row, index) => `## ${row.role} ${String(index).padStart(3, '0')}\n\n${row.content}`)
-  const preface = `# Chronicle 03 / AFTERFALL / S03 — daily RAW ${sessionId}\n\nSource session UUID: \`${sourceId}\` (${session.status} at capture).\nOriginal message orders: **${start}–${end}**. Archive labels 000–${String(rows.length - 1).padStart(3, '0')} map to those orders in SOURCE_MANIFEST.json.\nContent below is verbatim from public_safe USER/GM rows; headers and this note are archive metadata.\n\n`
+  const preface = `# Chronicle 03 / AFTERFALL / ${session.season_id} — daily RAW ${sessionId}\n\nSource session UUID: \`${sourceId}\` (${session.status} at capture).\nOriginal message orders: **${start}–${end}**. Archive labels 000–${String(rows.length - 1).padStart(3, '0')} map to those orders in SOURCE_MANIFEST.json.\nContent below is verbatim from public_safe USER/GM rows; headers and this note are archive metadata.\n\n`
   const part = Buffer.from(preface + blocks.join('\n\n') + '\n', 'utf8')
   const parsed = splitRoleBlocks(part.toString('utf8'))
   requireThat(parsed.length === rows.length && parsed.every((block, index) =>
@@ -108,7 +114,7 @@ export function materializeSegment({ session, discovery, sessionId, links = [], 
     user_messages: discovery.pairs, gm_public_blocks: discovery.pairs,
   }
   const source = {
-    chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', protagonist: '서진우', season_id: 'S03',
+    chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', protagonist: '서진우', season_id: session.season_id,
     session_id: sessionId, publication_segment_id: segmentId,
     source_type: entry.source_type, source_session_uuid: sourceId,
     source_session_status_at_capture: session.status, visibility: 'PUBLIC_ARCHIVE', archive_class: 'COLD_RAW',

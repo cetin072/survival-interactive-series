@@ -1,0 +1,68 @@
+name: Archive source discovery V2
+on:
+  pull_request:
+    paths:
+      - 'archive/scripts/**'
+      - 'supabase/migrations/20261008053006_archive_source_intent_v2.sql'
+      - 'supabase/tests/archive_source_intent_v2_verification.sql'
+      - 'supabase/tests/archive_source_operator_test_bootstrap.sql'
+      - '.github/workflows/archive-source-discovery.yml'
+permissions:
+  contents: read
+jobs:
+  discovery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test archive/scripts/lib/archive-daily-core.test.mjs archive/scripts/lib/archive-source-discovery.test.mjs archive/scripts/lib/archive-source-pilot.test.mjs
+      - run: node archive/scripts/run-daily-archive.mjs --candidate-check archive/scripts/lib/fixtures/archive-discovery-synthetic.json
+  metadata:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Isolated transcript prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+          psql -v ON_ERROR_STOP=1 -c "CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE ROLE service_role NOLOGIN BYPASSRLS; CREATE ROLE archive_exporter LOGIN NOINHERIT; ALTER ROLE archive_exporter SET default_transaction_read_only='on'; ALTER ROLE archive_exporter SET statement_timeout='10s'; GRANT CONNECT ON DATABASE postgres TO archive_exporter; CREATE SCHEMA extensions; CREATE SCHEMA survival_rpg; CREATE EXTENSION pgcrypto WITH SCHEMA extensions;"
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260924173125_rolling_raw_capture_v1.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260925003736_public_transcript_capture_session_api_v1.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260925044647_public_transcript_turn_pair_api_v1.sql
+          psql -v ON_ERROR_STOP=1 -c 'CREATE TABLE survival_rpg.transcript_turn_state_links (worldline_id text,chronicle_id text,season_id text,session_id uuid,turn_no integer,user_message_id uuid,gm_message_id uuid,outcome text,user_save_version integer,gm_save_version integer,linked_save_version integer);'
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20260928050000_archive_exporter_readonly.sql
+      - name: Additive metadata and unchanged exporter boundary
+        run: |
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/archive_source_operator_test_bootstrap.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261008053006_archive_source_intent_v2.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/archive_source_intent_v2_verification.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/archive_exporter_readonly_verification.sql
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exercise actual isolated exporter login and bounded SQL
+        env:
+          ARCHIVE_ISOLATED_DB_URL: postgresql://postgres:postgres@localhost:5432/postgres
+        run: |
+          npm ci --prefix archive/scripts
+          node --test --test-name-pattern='isolated restricted PostgreSQL' archive/scripts/lib/archive-source-discovery.test.mjs

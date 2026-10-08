@@ -1,0 +1,128 @@
+{
+  "synthetic": true,
+  "baseline_revision": "93b4fb4c40825ebdf6d23609b11533a9b203d1d3",
+  "session": {
+    "id": "00000000-0000-4000-8000-000000000002",
+    "chronicle_id": "C03",
+    "worldline_id": "AFTERFALL",
+    "season_id": "S04",
+    "status": "OPEN",
+    "last_message_order": 1,
+    "archive_intent": {
+      "version": 1,
+      "disposition": "REVIEW_REQUIRED",
+      "publication": "REVIEW_REQUIRED",
+      "kind": "NEW_SEASON",
+      "history": "NEW_CAPTURE",
+      "initial_order": 0,
+      "predecessor_id": "8ef127f7-4729-4161-9784-49123171ad2a",
+      "evidence_ref": "https://github.com/cetin072/survival-interactive-series/issues/150"
+    }
+  },
+  "rows": [
+    {
+      "id": "00000000-0000-4000-8000-000000001000",
+      "session_id": "00000000-0000-4000-8000-000000000002",
+      "chronicle_id": "C03",
+      "worldline_id": "AFTERFALL",
+      "season_id": "S04",
+      "turn_no": 0,
+      "message_order": 0,
+      "role": "USER",
+      "content": "문을 확인한다.",
+      "content_sha256": "b5f2a74a30a520747451bd554666ce6e93a950b664e2464305f260402b9d4ea8",
+      "public_safe": true,
+      "source_type": "LIVE",
+      "game_time": "2027-12-01 10:00",
+      "save_version": null,
+      "recorded_at": "2026-10-08T00:00:00Z"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000001001",
+      "session_id": "00000000-0000-4000-8000-000000000002",
+      "chronicle_id": "C03",
+      "worldline_id": "AFTERFALL",
+      "season_id": "S04",
+      "turn_no": 0,
+      "message_order": 1,
+      "role": "GM",
+      "content": "# AFTERFALL\n그는 멈춰 서서 문을 바라보았다.",
+      "content_sha256": "0bcda7e5c25d873291ce1a957bada07f11cffc3de18e0f1ae302304eeebf412c",
+      "public_safe": true,
+      "source_type": "LIVE",
+      "game_time": "2027-12-01 10:00",
+      "save_version": null,
+      "recorded_at": "2026-10-08T00:00:00Z"
+    }
+  ],
+  "predecessor": {
+    "id": "8ef127f7-4729-4161-9784-49123171ad2a",
+    "worldline_id": "AFTERFALL",
+    "chronicle_id": "C03",
+    "season_id": "S03",
+    "status": "CLOSED",
+    "last_message_order": 105,
+    "archive_intent": {
+      "version": 1,
+      "disposition": "REVIEW_REQUIRED",
+      "publication": "REVIEW_REQUIRED",
+      "kind": "CONTINUE",
+      "history": "MAPPED_BASELINE",
+      "initial_order": 42,
+      "predecessor_id": null,
+      "evidence_ref": "https://github.com/cetin072/survival-interactive-series/issues/150"
+    }
+  },
+  "authorizations": [
+    {
+      "session_id": "8ef127f7-4729-4161-9784-49123171ad2a",
+      "worldline_id": "AFTERFALL",
+      "chronicle_id": "C03",
+      "season_id": "S03",
+      "runtime_intent": {
+        "version": 1,
+        "disposition": "REVIEW_REQUIRED",
+        "publication": "REVIEW_REQUIRED",
+        "kind": "CONTINUE",
+        "history": "MAPPED_BASELINE",
+        "initial_order": 42,
+        "predecessor_id": null,
+        "evidence_ref": "https://github.com/cetin072/survival-interactive-series/issues/150"
+      },
+      "decision": {
+        "disposition": "ADOPTED",
+        "publication": "APPROVED",
+        "evidence_ref": "https://github.com/cetin072/survival-interactive-series/issues/150",
+        "allow_continuation": true,
+        "published_predecessor_id": null,
+        "supersedes_id": null,
+        "approved_through": null
+      }
+    },
+    {
+      "session_id": "00000000-0000-4000-8000-000000000002",
+      "worldline_id": "AFTERFALL",
+      "chronicle_id": "C03",
+      "season_id": "S04",
+      "runtime_intent": {
+        "version": 1,
+        "disposition": "REVIEW_REQUIRED",
+        "publication": "REVIEW_REQUIRED",
+        "kind": "NEW_SEASON",
+        "history": "NEW_CAPTURE",
+        "initial_order": 0,
+        "predecessor_id": "8ef127f7-4729-4161-9784-49123171ad2a",
+        "evidence_ref": "https://github.com/cetin072/survival-interactive-series/issues/150"
+      },
+      "decision": {
+        "disposition": "ADOPTED",
+        "publication": "APPROVED",
+        "evidence_ref": "https://github.com/cetin072/survival-interactive-series/issues/150",
+        "allow_continuation": true,
+        "published_predecessor_id": "8ef127f7-4729-4161-9784-49123171ad2a",
+        "supersedes_id": null,
+        "approved_through": null
+      }
+    }
+  ]
+}

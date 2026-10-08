@@ -1,11 +1,7 @@
-name: AFTERFALL daily Archive
+name: AFTERFALL S04 approved Archive pilot
 
 on:
   workflow_dispatch:
-  schedule:
-    # Secondary fallback: 20:07 UTC is 05:07 KST on the following day.
-    # Primary scheduling is handled by Supabase Cron at 04:37 KST.
-    - cron: '7 20 * * *'
 
 permissions:
   contents: write
@@ -18,6 +14,7 @@ concurrency:
 
 jobs:
   archive:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Verify required credentials exist
@@ -31,6 +28,7 @@ jobs:
           fi
       - uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
           # A dedicated token makes proposal pushes trigger CI and permits PR creation.
           token: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
@@ -55,9 +53,8 @@ jobs:
             --output "$ca"
           printf '%s  %s\n' '700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7' "$ca" | sha256sum --check --status
           echo "NODE_EXTRA_CA_CERTS=$ca" >> "$GITHUB_ENV"
-      - name: One daily Archive cycle
+      - name: Publish exactly the approved S04 orders 0–9
         env:
           ARCHIVE_EXPORT_DATABASE_URL: ${{ secrets.ARCHIVE_EXPORT_DATABASE_URL }}
           GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-        run: node archive/scripts/run-daily-archive.mjs --discovery-apply
+        run: node archive/scripts/run-s04-archive-pilot.mjs

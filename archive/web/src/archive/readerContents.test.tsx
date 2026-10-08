@@ -14,7 +14,10 @@ afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks() })
 describe('approved Reader contents', () => {
   it('numbers all opening and recovery chapters consecutively within each season', () => {
     const contents = readerContentsForChronicle('C03-AFTERFALL')
-    expect(contents.groups.map((group) => group.label)).toEqual(['시즌 1', '시즌 2', '시즌 3'])
+    const seasons = [...new Set(chaptersForChronicle('C03-AFTERFALL').map((item) => item.seasonId))]
+    expect(contents.groups.map((group) => group.id)).toEqual(seasons.map((seasonId) => `season:${seasonId}`))
+    expect(contents.groups.slice(0, 3).map((group) => group.label)).toEqual(['시즌 1', '시즌 2', '시즌 3'])
+    expect(contents.groups.slice(3).map((group) => group.label)).toEqual(seasons.slice(3).map((seasonId) => `시즌 ${Number(seasonId?.slice(1))}`))
     for (const group of contents.groups) expect(group.entries.map((entry) => entry.displayNumber)).toEqual(group.entries.map((_, index) => index + 1))
     expect(contents.entries[0].label).toBe('제1장')
     expect(contents.entries[1].label).toBe('제2장')
