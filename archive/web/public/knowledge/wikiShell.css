@@ -1301,3 +1301,12 @@
 .knowledge-library-shell .knowledge-category-nav a:focus-visible { outline: 2px solid var(--sd-olive); outline-offset: 3px; }
 .knowledge-library-shell .knowledge-library-list { scroll-margin-top: 18px; }
 .knowledge-library-shell .knowledge-library-list > .wiki-section-heading { margin-bottom: 8px; }
+/* Keep mobile Knowledge list action links legible beside long scope text. */
+.knowledge-library-shell .knowledge-library-footer a { white-space: nowrap; flex-shrink: 0; }
+@media (max-width: 600px) {
+  .knowledge-library-shell .knowledge-library-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
