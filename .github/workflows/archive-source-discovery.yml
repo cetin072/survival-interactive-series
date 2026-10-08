@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test archive/scripts/lib/archive-daily-core.test.mjs archive/scripts/lib/archive-source-discovery.test.mjs
+      - run: node --test archive/scripts/lib/archive-daily-core.test.mjs archive/scripts/lib/archive-source-discovery.test.mjs archive/scripts/lib/archive-source-pilot.test.mjs
       - run: node archive/scripts/run-daily-archive.mjs --candidate-check archive/scripts/lib/fixtures/archive-discovery-synthetic.json
   metadata:
     runs-on: ubuntu-latest

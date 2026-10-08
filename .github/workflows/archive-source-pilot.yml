@@ -1,0 +1,60 @@
+name: AFTERFALL S04 approved Archive pilot
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: archive-daily
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify required credentials exist
+        env:
+          EXPORT_URL: ${{ secrets.ARCHIVE_EXPORT_DATABASE_URL }}
+          PROPOSAL_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+        run: |
+          if [ -z "$EXPORT_URL" ] || [ -z "$PROPOSAL_TOKEN" ]; then
+            echo 'BLOCKER_SECRET_SETUP_REQUIRED: ARCHIVE_EXPORT_DATABASE_URL and ARCHIVE_GITHUB_TOKEN'
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          # A dedicated token makes proposal pushes trigger CI and permits PR creation.
+          token: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            archive/scripts/package-lock.json
+            archive/web/package-lock.json
+      - name: Install restricted source reader
+        run: npm ci --prefix archive/scripts
+      - name: Verify main baseline
+        run: |
+          git fetch origin main
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+      - name: Trust Supabase production root CA
+        run: |
+          ca="$RUNNER_TEMP/supabase-prod-ca-2021.crt"
+          curl --fail --silent --show-error --location \
+            https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt \
+            --output "$ca"
+          printf '%s  %s\n' '700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7' "$ca" | sha256sum --check --status
+          echo "NODE_EXTRA_CA_CERTS=$ca" >> "$GITHUB_ENV"
+      - name: Publish exactly the approved S04 orders 0–9
+        env:
+          ARCHIVE_EXPORT_DATABASE_URL: ${{ secrets.ARCHIVE_EXPORT_DATABASE_URL }}
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+        run: node archive/scripts/run-s04-archive-pilot.mjs

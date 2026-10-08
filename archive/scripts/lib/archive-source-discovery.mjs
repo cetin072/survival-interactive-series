@@ -5,6 +5,16 @@ import { approvedSeasonCatalog } from './approved-reader-sources.mjs'
 export const C03_SCOPE = Object.freeze({ chronicle_id: 'C03', worldline_id: 'AFTERFALL', archive_id: 'C03-AFTERFALL' })
 export const DISCOVERY_LIMITS = Object.freeze({ sessions: 100, publishedMessages: 10000, page: 200 })
 const need = (ok, code) => { if (!ok) throw new Error(code) }
+/** Optional caller bound for an explicitly approved one-range manual pilot. */
+export function assertDiscoveryRange(live, expected) {
+  need(live?.discovery?.status === 'NEW_SOURCE_RANGE'
+    && live.session.id === expected.source_session_uuid
+    && live.discovery.startOrder === expected.start_order
+    && live.discovery.endOrder === expected.end_order
+    && live.discovery.pairs === expected.pairs
+    && live.authorization_sha256 === expected.authorization_sha256,
+  'APPROVED_PILOT_RANGE_MISMATCH')
+}
 const canonical = (v) => Array.isArray(v) ? v.map(canonical) : v && typeof v === 'object'
   ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, canonical(v[k])])) : v
 export const intentDigest = (value) => createHash('sha256').update(JSON.stringify(canonical(value ?? null))).digest('hex')
