@@ -41,10 +41,14 @@ test('real SESSION_007/008 facts and five amended profiles resolve to approved R
     [node, ...(node.history ?? [])]
       .filter((revision) => /AWIKI_SESSION_00[78]_/.test(revision.evidence.source_ref))
       .map((revision) => ({ nodeId: node.id, evidence: revision.evidence })))
-  const amended = graph.nodes.filter((node) => node.evidence.source_ref === amendmentRef)
-  const amendedBindings = amended.map((node) => ({ nodeId: node.id, evidence: node.evidence }))
+  const amended = graph.nodes.filter((node) => [node, ...(node.history ?? [])]
+    .some((revision) => revision.evidence.source_ref === amendmentRef))
+  const amendedBindings = amended.flatMap((node) => [node, ...(node.history ?? [])]
+    .filter((revision) => revision.evidence.source_ref === amendmentRef)
+    .map((revision) => ({ nodeId: node.id, evidence: revision.evidence })))
   assert.equal(recentFacts.length, 15)
   assert.equal(amended.length, 5)
+  assert.equal(amendedBindings.length, 5)
   assert.ok(data.sources.every((source) => JSON.stringify(Object.keys(source).sort()) === JSON.stringify(['evidence', 'links', 'nodeId'])))
   assert.ok(data.sources.flatMap((source) => source.links).every((link) =>
     JSON.stringify(Object.keys(link).sort()) === JSON.stringify(['archiveSourceRef', 'chapterId', 'chapterTitle', 'partId', 'partTitle'])))
@@ -198,4 +202,27 @@ test('a source listed as approved fails closed if its public safety metadata is 
   source.public_safe_only = false
   await writeJson(base, sourceRef, source)
   await assert.rejects(loadPublicWikiData(base), /INVALID_APPROVED_READER_SOURCE/)
+})
+
+test('a later character revision retains the exact amended Reader and RAW source in history', async (t) => {
+  const base = await fixture(t)
+  const graph = await jsonAt(base, graphRef)
+  const node = graph.nodes.find((item) => item.id === 'char-jinwoo')
+  const amended = structuredClone([node, ...node.history].find((revision) => revision.evidence.source_ref === amendmentRef))
+  assert.ok(amended)
+  const priorLinks = (await loadPublicWikiData(base)).sources.find((source) =>
+    source.nodeId === node.id && graphHash(source.evidence) === graphHash(amended.evidence)).links
+  node.history.push({ data: structuredClone(node.data), anchor: structuredClone(node.anchor), evidence: structuredClone(node.evidence) })
+  node.data = { ...node.data, summary: 'SYNTHETIC_TEST_ONLY future character update' }
+  node.anchor = { ...graph.anchor, save_version: graph.anchor.save_version + 1 }
+  node.evidence = { source_ref: 'SYNTHETIC_TEST_ONLY', source_sha256: 'f'.repeat(64), pointer: '/nodes/0' }
+  const { content_sha256, ...body } = graph
+  graph.content_sha256 = graphHash(body)
+  await writeJson(base, graphRef, graph)
+  const data = await loadPublicWikiData(base)
+  const preserved = data.sources.filter((source) => source.nodeId === node.id
+    && graphHash(source.evidence) === graphHash(amended.evidence))
+  assert.equal(preserved.length, 1)
+  assert.deepEqual(preserved[0].links, priorLinks)
+  assert.ok(priorLinks.every((link) => link.partId === 'c03-s03-session-008-001'))
 })
