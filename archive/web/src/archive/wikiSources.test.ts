@@ -9,7 +9,7 @@ describe('published Wiki source links', () => {
     const records = publicGraph.nodes.flatMap((item) =>
       [item, ...(item.history ?? [])]
         .filter((revision) => /AWIKI_SESSION_00[78]_/.test(revision.evidence.source_ref))
-        .map((revision) => ({ id: item.id, evidence: revision.evidence })))
+        .map((revision) => ({ id: item.id, evidence: revision.evidence, current: revision === item })))
     expect(records).toHaveLength(15)
     for (const record of records) {
       const session = record.evidence.source_ref.includes('AWIKI_SESSION_007_') ? '007' : '008'
@@ -17,6 +17,11 @@ describe('published Wiki source links', () => {
       expect(sources.length, record.id).toBeGreaterThan(0)
       expect(sources.every((source) => source.partId === `c03-s03-session-${session}-001`)).toBe(true)
       expect(sources.every((source) => source.archiveSourceRef === `archive/content/transcripts/C03-AFTERFALL/S03/SESSION_${session}/PART_001.md`)).toBe(true)
+      if (record.current) {
+        const document = buildWikiDocument(record.id)
+        expect(document.relatedChapter?.id).toBe(sources[0].chapterId)
+        expect(document.transcriptPartIds).toContain(sources[0].partId)
+      }
     }
   })
 
