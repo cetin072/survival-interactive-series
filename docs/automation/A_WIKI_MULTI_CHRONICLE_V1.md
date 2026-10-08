@@ -59,3 +59,11 @@ Last verified head before this checkpoint: ac13a85 (main sync). Current checkpoi
 - Read-only source re-review agent c01_source_review audits chapters01–03; this is not human approval.
 - Draft PR478 created/attached at head62320ad2c71311b4aaa6b27122e9e9d3e02a38ac. Remains Draft/incomplete. No merge or Production.
 - Next: chapter04 full read and same snapshot extension; remaining C01 chapters04–10, C02all, scoped search/final browser gate pending.
+
+## C01 chapters04–05 checkpoint
+- Full bodies read: C01 chapters01–05. Current snapshot:27 documents,47 relations. Source-bound hashes remain checked; coverage stays PARTIAL.
+- First read-only review audited chapters01–03 (21 docs/46 facts/29 relations). Corrected ambiguous family counts, stale subtitles and narrowed compound claims; strengthened direct rule/vehicle quotes. Do not infer a clinical profession from hospital employment.
+- Second read-only review audits chapters04–05. Pending findings are not approval.
+- Chapter05 title does not mean a second base was acquired: candidate B is still a plan; two-house loss is hypothetical. Neither an actual new-base visit nor destruction was invented.
+- Current prior head464e4ac; checkpoint commit follows. Remaining C01 chapters06–10 and C02all unread/unprocessed. Next exact action: read chapter06 fully and extend same snapshot after checking quotes.
+- Browser gate remains NOT_VERIFIED due pre-launch sandbox error; Draft478 and final CI/Preview still in progress, not HUMAN_CHECK_READY.
