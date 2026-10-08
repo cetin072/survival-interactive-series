@@ -3,7 +3,7 @@ on:
   pull_request:
     paths:
       - 'archive/scripts/**'
-      - 'supabase/migrations/20261008013409_archive_source_intent_v2.sql'
+      - 'supabase/migrations/20261008053006_archive_source_intent_v2.sql'
       - 'supabase/tests/archive_source_intent_v2_verification.sql'
       - 'supabase/tests/archive_source_operator_test_bootstrap.sql'
       - '.github/workflows/archive-source-discovery.yml'
@@ -54,7 +54,7 @@ jobs:
       - name: Additive metadata and unchanged exporter boundary
         run: |
           psql -v ON_ERROR_STOP=1 -f supabase/tests/archive_source_operator_test_bootstrap.sql
-          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261008013409_archive_source_intent_v2.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261008053006_archive_source_intent_v2.sql
           psql -v ON_ERROR_STOP=1 -f supabase/tests/archive_source_intent_v2_verification.sql
           psql -v ON_ERROR_STOP=1 -f supabase/tests/archive_exporter_readonly_verification.sql
       - uses: actions/setup-node@v4
