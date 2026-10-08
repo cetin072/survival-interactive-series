@@ -336,7 +336,10 @@ test('reviewed RESTART cannot skip published RAW, change frontier, or repeat a s
   assert.equal(result.reader_chapters_added, 1)
   assert.ok(result.preserved_public_files > 100)
   assert.equal(result.database_writes, 0); assert.equal(result.remote_writes, 0)
-  assert.equal(result.graph, 'NO_STRUCTURED_ANCHOR')
+  assert.equal(result.graph, 'READER_LINKS_RECONCILED')
+  assert.equal(result.graph_anchor_preserved, true)
+  assert.equal(result.graph_records_preserved, true)
+  assert.equal(result.visual_preserved, true)
 })
 
 test('reviewed RESTART uses the existing isolated Reader compiler with preserved S03 order and source IDs', async () => {
