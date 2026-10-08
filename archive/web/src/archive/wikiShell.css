@@ -1295,3 +1295,9 @@
   .wiki-knowledge-home .wiki-home-intro { padding: 16px 14px; }
   .wiki-knowledge-home .wiki-home-frame > .wiki-home-section { margin-top: 10px; }
 }
+
+/* STEP 3-2: static Knowledge topic navigation, public only. */
+.knowledge-library-shell .knowledge-category-nav { margin: 15px 0 0; }
+.knowledge-library-shell .knowledge-category-nav a:focus-visible { outline: 2px solid var(--sd-olive); outline-offset: 3px; }
+.knowledge-library-shell .knowledge-library-list { scroll-margin-top: 18px; }
+.knowledge-library-shell .knowledge-library-list > .wiki-section-heading { margin-bottom: 8px; }

@@ -17,10 +17,10 @@ export function KnowledgeGuideLibraryPreview({ notice, showTopbar = true, guides
       <header className="knowledge-library-header">
         <p className="wiki-document-kicker">SURVIVAL DIARY · PRACTICAL KNOWLEDGE</p>
         <h1>생존 지식</h1>
-        <p>현실에서 참고할 수 있도록 행동 방법, 주의사항, 도구와 근거를 함께 정리한 실전 가이드입니다.</p>
+        <p>생활 대비부터 연락·이동·공동 대응까지, 공개된 지식을 주제별로 찾아보세요.</p>
       </header>
 
-      <nav className="wiki-home-actions" aria-label="생존 지식 주제">
+      <nav className="wiki-home-actions knowledge-category-nav" aria-label="생존 지식 주제">
         {groups.map((group) => <a key={group.id} href={'#knowledge-' + group.id}>{group.label} {group.guides.length}</a>)}
       </nav>
 

@@ -5,7 +5,7 @@ describe('unified public Wiki search', () => {
   it('searches current Wiki documents from the Graph index', () => {
     const results = searchPublicArchive('서진우')
     expect(results[0]).toMatchObject({ kind: 'wiki', title: '서진우' })
-    expect(results.some((entry) => entry.kind === 'resource' && entry.title.includes('서진우'))).toBe(true)
+    expect(results.some((entry) => entry.kind === 'wiki' && entry.kindLabel === '작품 삽화' && entry.title.includes('서진우'))).toBe(true)
   })
 
   it('searches only published Knowledge briefs', () => {
@@ -28,7 +28,14 @@ describe('unified public Wiki search', () => {
 
     const groups = searchResultGroups(searchPublicArchive('서진우'))
     expect(groups.wiki.length).toBeGreaterThan(0)
-    expect(groups.resource.length).toBeGreaterThan(0)
+    expect(groups.wiki.length).toBeGreaterThan(0)
+  })
+
+  it('searches existing practical resources and links to the same public tools page', () => {
+    const results = searchPublicArchive('재고 관리표')
+    expect(results.some((entry) =>
+      entry.kind === 'resource' && entry.title.includes('비상용품·재고 관리표') && entry.href === '/?view=tools')).toBe(true)
+    expect(publicSearchIndex.filter((item) => item.kind === 'resource').every((item) => item.kindLabel === '실용 자료')).toBe(true)
   })
 
   it('returns no fake result for empty queries', () => {

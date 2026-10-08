@@ -25,6 +25,7 @@ function SearchGroup({ title, entries }: { title: string; entries: PublicSearchE
 export function WikiSearchBox() {
   const [query, setQuery] = useState('')
   const searchInput = useRef<HTMLInputElement>(null)
+  const resultsPanel = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (window.location.hash === '#site-search') searchInput.current?.focus()
   }, [])
@@ -34,7 +35,7 @@ export function WikiSearchBox() {
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (hasQuery) document.getElementById('site-search-results')?.focus()
+    if (hasQuery) resultsPanel.current?.focus()
   }
 
   return <div className="wiki-search-area">
@@ -50,7 +51,7 @@ export function WikiSearchBox() {
       <button type="submit">검색</button>
     </form>
 
-    {hasQuery && <div id="site-search-results" className="wiki-search-results" aria-live="polite" tabIndex={-1}>
+    {hasQuery && <div ref={resultsPanel} id="site-search-results" className="wiki-search-results" aria-live="polite" tabIndex={-1}>
       <div className="wiki-search-result-head">
         <strong>통합 검색</strong>
         <span>{results.length}건</span>
@@ -61,7 +62,7 @@ export function WikiSearchBox() {
             <SearchGroup title={groupMeta.resource.title} entries={groups.resource} />
             <SearchGroup title={groupMeta.wiki.title} entries={groups.wiki} />
           </>
-        : <p className="wiki-search-empty">일치하는 공개 문서나 자료가 없습니다.</p>}
+        : <p className="wiki-search-empty">일치하는 공개 자료를 찾지 못했습니다. <a href="/knowledge/">생존 지식 전체 보기</a></p>}
     </div>}
   </div>
 }

@@ -1,4 +1,5 @@
 import publicBriefFiles from 'virtual:knowledge-public'
+import { selectKnowledgeResources } from './knowledgeResources'
 import { isWikiSupportedNodeId, requireWikiNode, wikiNodeIndex } from './wikiDocument'
 import { siteVisualsFor } from './siteVisual'
 
@@ -66,12 +67,23 @@ export const publishedKnowledgeEntries: (PublicSearchEntry & { publishedAt?: str
   }))
   .sort((a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? '') || a.title.localeCompare(b.title, 'ko'))
 
-const resourceEntries: PublicSearchEntry[] = siteVisualsFor('C03-AFTERFALL').map((asset) => {
+const resourceEntries: PublicSearchEntry[] = selectKnowledgeResources().map(({ guide, tool }) => ({
+  id: 'resource:tool:' + tool.path,
+  kind: 'resource',
+  kindLabel: '실용 자료',
+  title: tool.title,
+  subtitle: guide.label,
+  summary: tool.description,
+  href: '/?view=tools',
+  terms: [tool.title, tool.label, tool.description, tool.type, guide.label, guide.title, '관리표', '자료', '다운로드'],
+}))
+
+const visualEntries: PublicSearchEntry[] = siteVisualsFor('C03-AFTERFALL').map((asset) => {
   const node = requireWikiNode(asset.subject_id)
   return {
-    id: 'resource:visual:' + asset.subject_id,
-    kind: 'resource' as const,
-    kindLabel: '공개 삽화',
+    id: 'wiki:visual:' + asset.subject_id,
+    kind: 'wiki' as const,
+    kindLabel: '작품 삽화',
     title: node.label + ' 삽화',
     subtitle: node.type === 'character' ? '인물 삽화' : node.type === 'location' ? '장소 삽화' : '세계관 삽화',
     summary: asset.caption ?? node.summary,
@@ -86,6 +98,7 @@ export const publicSearchIndex: PublicSearchEntry[] = [
   ...wikiEntries,
   ...publishedKnowledgeEntries,
   ...resourceEntries,
+  ...visualEntries,
 ]
 
 const kindPriority: Record<PublicSearchKind, number> = {
