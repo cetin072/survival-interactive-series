@@ -32,7 +32,15 @@ export function publicBriefData(brief, data) {
   return {
     ...pick(brief, ['id', 'slug', 'status', 'topic_id', 'label', 'title', 'summary', 'lead', 'scope', 'basis', 'footer', 'risk_level', 'source_checked_at', 'published_at', 'updated_at', 'publication_policy']),
     related_briefs: (brief.related_brief_ids ?? []).map((id) => data?.briefs.find((item) => item.id === id && item.status === 'PUBLISHED')).filter(Boolean).map((item) => pick(item, ['id', 'slug', 'label', 'title'])),
-    related_stories: (brief.story_refs ?? []).map((id) => data?.stories.find((item) => item.id === id && item.verified === true)).filter(Boolean).map((item) => pick(item, ['id', 'title', 'path'])),
+    related_stories: [...new Set([
+      ...(brief.story_refs ?? []),
+      ...(data?.stories ?? []).filter((story) => story.verified===true
+        && (story.knowledge_links ?? []).some((link) => link.brief_id===brief.id)).map((story) => story.id),
+    ])].map((id) => data?.stories.find((item) => item.id===id && item.verified===true))
+      .filter(Boolean).map((item) => ({
+        ...pick(item,['id','title','path','work_title']),
+        ...(item.illustration ? {illustration:pick(item.illustration,['src','alt'])} : {}),
+      })),
     related_guide: (() => { const guide = data?.guides.find((item) => item.id === brief.guide_id && item.status === 'PUBLISHED'); return guide ? pick(guide, ['id', 'slug', 'title']) : null })(),
     sections: brief.sections.map((section) => ({ heading: section.heading,
       blocks: section.blocks.map((block) => {

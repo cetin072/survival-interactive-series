@@ -9,7 +9,267 @@
     "reader_book_sha256": "782b5a26a0a49f856a087ec0c865dabe30f1f6bd5b2d11f2c7ab2af2ab931a1e",
     "reader_chapter_id": "c03-afterfall-chapter-02",
     "reader_chapter_sha256": "fdca37fa2d5be93728a520253d57176f1d0e27cea645c1c0104b62ac3540cd81",
-    "source_refs": ["worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_002.md"],
-    "source_hashes": ["59b1e81c56e0de115a6748bb8ec8bae63a27c33c89fad95c4391ce17ade65e0e"]
+    "source_refs": [
+      "worldlines/AFTERFALL/seasons/S01/raw_transcript/PART_C03_002.md"
+    ],
+    "source_hashes": [
+      "59b1e81c56e0de115a6748bb8ec8bae63a27c33c89fad95c4391ce17ade65e0e"
+    ],
+    "knowledge_links": [
+      {
+        "brief_id": "K-002",
+        "quote": "공동비상재고는 별도 지정하고"
+      },
+      {
+        "brief_id": "K-010",
+        "quote": "합병이 아니라 정식 두 거점 연합체"
+      }
+    ],
+    "work_title": "서진우의 생존기"
+  },
+  {
+    "id": "han-junho-family-contact-rule",
+    "title": "가족이 연락 두절에 대비해 약속한 규칙",
+    "path": "/?view=story&chronicle=C01-HAN-JUNHO&chapter=c01-han-junho-chapter-03",
+    "verified": true,
+    "source_kind": "PUBLIC_READER",
+    "reader_book_ref": "archive/content/stories/C01-HAN-JUNHO/BOOK.json",
+    "reader_book_sha256": "98235add2392dc66591e26772aa07fb2c45f60b2ecb609ff1a36be4837f290c3",
+    "reader_chapter_id": "c01-han-junho-chapter-03",
+    "reader_chapter_sha256": "63699e5bd8e2dd125ba52dea6881e87cc388470e4567b6cb3b4a8338bad277c6",
+    "source_refs": [
+      "seasons_v2/S01/raw_transcript/PART_003.md"
+    ],
+    "source_hashes": [
+      "1cc4e060513a0d7831be27f79abc4baf553b8429babc12c860708b7b48c53086"
+    ],
+    "work_title": "한준호의 생존기",
+    "knowledge_links": [
+      {
+        "brief_id": "K-003",
+        "quote": "## 23:22 — 통신이 끊길 경우의 규칙"
+      }
+    ]
+  },
+  {
+    "id": "han-junho-evacuation-decision",
+    "title": "밤새 이동하지 않고 대피 판단 기준을 정하다",
+    "path": "/?view=story&chronicle=C01-HAN-JUNHO&chapter=c01-han-junho-chapter-05",
+    "verified": true,
+    "source_kind": "PUBLIC_READER",
+    "reader_book_ref": "archive/content/stories/C01-HAN-JUNHO/BOOK.json",
+    "reader_book_sha256": "98235add2392dc66591e26772aa07fb2c45f60b2ecb609ff1a36be4837f290c3",
+    "reader_chapter_id": "c01-han-junho-chapter-05",
+    "reader_chapter_sha256": "ba987f5fa3b0e91970836e189e68155a541d5bfc5fb8458b673510c287917bd2",
+    "source_refs": [
+      "seasons_v2/S01/raw_transcript/PART_005.md"
+    ],
+    "source_hashes": [
+      "755c7b59fe0ca3f141614dd082ec340eb60bee3bf1737c10f34e990a10385d9b"
+    ],
+    "work_title": "한준호의 생존기",
+    "knowledge_links": [
+      {
+        "brief_id": "K-008",
+        "quote": "내일 아침 1차 판단 기준"
+      }
+    ]
+  },
+  {
+    "id": "han-junho-apartment-power-water",
+    "title": "아파트 복귀 전에 전력과 급수 상태를 확인하다",
+    "path": "/?view=story&chronicle=C01-HAN-JUNHO&chapter=c01-han-junho-chapter-06",
+    "verified": true,
+    "source_kind": "PUBLIC_READER",
+    "reader_book_ref": "archive/content/stories/C01-HAN-JUNHO/BOOK.json",
+    "reader_book_sha256": "98235add2392dc66591e26772aa07fb2c45f60b2ecb609ff1a36be4837f290c3",
+    "reader_chapter_id": "c01-han-junho-chapter-06",
+    "reader_chapter_sha256": "d640fa618f092af9d20a25b04d3433db249600a21905bcabcfc398b48c719409",
+    "source_refs": [
+      "seasons_v2/S01/raw_transcript/PART_006.md"
+    ],
+    "source_hashes": [
+      "2ba316af9bfdcd25460e25b0134f6a7f9a088da18af8b2109d8beba8abac4df4"
+    ],
+    "work_title": "한준호의 생존기",
+    "knowledge_links": [
+      {
+        "brief_id": "K-014",
+        "quote": "단지 전력 대부분 복구"
+      }
+    ]
+  },
+  {
+    "id": "han-junho-route-backup",
+    "title": "야간 이동에서 숙박지와 우회 경로를 비교하다",
+    "path": "/?view=story&chronicle=C01-HAN-JUNHO&chapter=c01-han-junho-chapter-07",
+    "verified": true,
+    "source_kind": "PUBLIC_READER",
+    "reader_book_ref": "archive/content/stories/C01-HAN-JUNHO/BOOK.json",
+    "reader_book_sha256": "98235add2392dc66591e26772aa07fb2c45f60b2ecb609ff1a36be4837f290c3",
+    "reader_chapter_id": "c01-han-junho-chapter-07",
+    "reader_chapter_sha256": "91f7f67fdc17a482fa94a584387302c9ce3ce97a8a0b7a8038c84945cf0c8a9c",
+    "source_refs": [
+      "seasons_v2/S01/raw_transcript/PART_007.md"
+    ],
+    "source_hashes": [
+      "d5ec46540c3f0329e6ecedd69739937a4485dc1f30976d401bf3ef4e9c0d17d8"
+    ],
+    "work_title": "한준호의 생존기",
+    "knowledge_links": [
+      {
+        "brief_id": "K-011",
+        "quote": "후보 B 방향과 반대로 들어가지 않을 것"
+      }
+    ]
+  },
+  {
+    "id": "han-junho-supply-inventory",
+    "title": "두 거점을 오가며 차량 비상재고를 점검하다",
+    "path": "/?view=story&chronicle=C01-HAN-JUNHO&chapter=c01-han-junho-chapter-08",
+    "verified": true,
+    "source_kind": "PUBLIC_READER",
+    "reader_book_ref": "archive/content/stories/C01-HAN-JUNHO/BOOK.json",
+    "reader_book_sha256": "98235add2392dc66591e26772aa07fb2c45f60b2ecb609ff1a36be4837f290c3",
+    "reader_chapter_id": "c01-han-junho-chapter-08",
+    "reader_chapter_sha256": "98e76aeb8faae0c088c942c2e7abdca349b823ed3f569db06608dbf2ec1b139f",
+    "source_refs": [
+      "seasons_v2/S01/raw_transcript/PART_008.md"
+    ],
+    "source_hashes": [
+      "cc64e8d0b6adb05e52007cc919b11e5b0eba55dff5b4d72fcefc655e942e91ea"
+    ],
+    "work_title": "한준호의 생존기",
+    "knowledge_links": [
+      {
+        "brief_id": "K-002",
+        "quote": "그리고 차량 재고가 줄면 먼저 알려준다."
+      }
+    ]
+  },
+  {
+    "id": "park-dohyun-responsibility",
+    "title": "정비·물류·운영설계의 역할을 분리하다",
+    "path": "/?view=story&chronicle=C02-STRONGHOLD&chapter=c02-stronghold-chapter-05",
+    "verified": true,
+    "source_kind": "PUBLIC_READER",
+    "reader_book_ref": "archive/content/stories/C02-STRONGHOLD/BOOK.json",
+    "reader_book_sha256": "cc21254acc575113b00713bf92dc27d807a14ea6baee727e3acbe2ff85c64fba",
+    "reader_chapter_id": "c02-stronghold-chapter-05",
+    "reader_chapter_sha256": "7e2312b2c47ba9d59bdd3904eaed40b672a456101b470daabff8e7f2a9b19d02",
+    "source_refs": [
+      "worldlines/STRONGHOLD/raw_transcript/SESSION_C02_20260925_ROOM_01/PART_001.md"
+    ],
+    "source_hashes": [
+      "ff0d713854574ac1c909ef3cf29470f086063fdeb0efc9e7812bca1ef29a11fc"
+    ],
+    "work_title": "박도현의 생존기",
+    "knowledge_links": [
+      {
+        "brief_id": "K-009",
+        "quote": "강민석 쪽은 현장 정비."
+      }
+    ]
+  },
+  {
+    "id": "park-dohyun-record-truth",
+    "title": "확인된 시계 차이와 알 수 없는 원인을 구분하다",
+    "path": "/?view=story&chronicle=C02-STRONGHOLD&chapter=c02-stronghold-chapter-08",
+    "verified": true,
+    "source_kind": "PUBLIC_READER",
+    "reader_book_ref": "archive/content/stories/C02-STRONGHOLD/BOOK.json",
+    "reader_book_sha256": "cc21254acc575113b00713bf92dc27d807a14ea6baee727e3acbe2ff85c64fba",
+    "reader_chapter_id": "c02-stronghold-chapter-08",
+    "reader_chapter_sha256": "bd478dca79470306a664fed1ac59751fce334f1bc794cf87b042a3da3afe3d76",
+    "source_refs": [
+      "worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_2039_CURRENT_ROOM/PART_001.md"
+    ],
+    "source_hashes": [
+      "91441202840f07d70474212a8bd07e5ac525951902136ee28fe5519fe7597c06"
+    ],
+    "work_title": "박도현의 생존기",
+    "knowledge_links": [
+      {
+        "brief_id": "K-007",
+        "quote": "그걸 ‘시간이 빨라졌다’고 기록하지 마세요."
+      }
+    ]
+  },
+  {
+    "id": "park-dohyun-warning-access",
+    "title": "위험 경보를 공유하고 내부 원자료는 보호하다",
+    "path": "/?view=story&chronicle=C02-STRONGHOLD&chapter=c02-stronghold-chapter-10",
+    "verified": true,
+    "source_kind": "PUBLIC_READER",
+    "reader_book_ref": "archive/content/stories/C02-STRONGHOLD/BOOK.json",
+    "reader_book_sha256": "cc21254acc575113b00713bf92dc27d807a14ea6baee727e3acbe2ff85c64fba",
+    "reader_chapter_id": "c02-stronghold-chapter-10",
+    "reader_chapter_sha256": "a239e30650da0f991a828376ddc89e35f49deaec1fad144fd3ea88524254c4ae",
+    "source_refs": [
+      "worldlines/STRONGHOLD/raw_transcript/SESSION_20260925_2039_CURRENT_ROOM/PART_003.md"
+    ],
+    "source_hashes": [
+      "09c51466ecaf070e0fcc1e4ed64ee4b9760e92a7e37f689a9f3179da8fb6ddb3"
+    ],
+    "work_title": "박도현의 생존기",
+    "knowledge_links": [
+      {
+        "brief_id": "K-012",
+        "quote": "원자료와 아래 거점 내부 시스템은 비공개로 유지한다."
+      }
+    ]
+  },
+  {
+    "id": "afterfall-shared-tools-handover",
+    "title": "공용 공구와 개인 물품을 구분해 인계하다",
+    "path": "/?view=story&chronicle=C03-AFTERFALL&chapter=c03-afterfall-chapter-23",
+    "verified": true,
+    "source_kind": "PUBLIC_READER",
+    "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+    "reader_book_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b",
+    "reader_chapter_id": "c03-afterfall-chapter-23",
+    "reader_chapter_sha256": "1f0cd60a9a02897b68dbecff8b7fffbd9784b72304105eaaaa450f863f753af8",
+    "source_refs": [
+      "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_009/PART_001.md"
+    ],
+    "source_hashes": [
+      "23e1c56dbad9e5ffbb708953500cae20c2c8dd0602f0af5b1ce985f435d0db1a"
+    ],
+    "work_title": "서진우의 생존기",
+    "knowledge_links": [
+      {
+        "brief_id": "K-016",
+        "quote": "현재 관리실에 둔 공구와 물품은 서로 목록을 확인해서 옮긴다."
+      }
+    ]
+  },
+  {
+    "id": "afterfall-dongcheon-bridge-access",
+    "title": "동천교와 서쪽길의 진입 동선을 나누다",
+    "path": "/?view=story&chronicle=C03-AFTERFALL&chapter=c03-afterfall-chapter-24",
+    "verified": true,
+    "source_kind": "PUBLIC_READER",
+    "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+    "reader_book_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b",
+    "reader_chapter_id": "c03-afterfall-chapter-24",
+    "reader_chapter_sha256": "67658a7c6c21ded9208118d859910470987c8765d2b85379c3cfaad373c8a929",
+    "source_refs": [
+      "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_009/PART_002.md"
+    ],
+    "source_hashes": [
+      "da7ad9639154e66728608e33064d5d4f8e304a49dc3cbb5226c9d40fb17650e6"
+    ],
+    "work_title": "서진우의 생존기",
+    "knowledge_links": [
+      {
+        "brief_id": "K-011",
+        "quote": "동천교 쪽이든 서쪽길 쪽이든, 뭐가 들어오면 여기가 제일 먼저 봐."
+      }
+    ],
+    "illustration": {
+      "subject_id": "loc-bridge",
+      "src": "/visual-assets/12267791ac6cafd5bf762135a3794990c7b777269cb3daeded85131796e58149.png",
+      "alt": "《서진우의 생존기》 동천교 환경을 그린 작품 삽화"
+    }
   }
 ]

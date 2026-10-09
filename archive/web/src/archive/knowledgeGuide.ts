@@ -71,7 +71,7 @@ type KnowledgeBriefFile = {
   updated_at: string
   publication_policy: string
   related_briefs: { id: string; slug: string; label: string; title: string }[]
-  related_stories: { id: string; title: string; path: string }[]
+  related_stories: { id: string; title: string; path: string; work_title?: string; illustration?: { src: string; alt: string } }[]
   related_guide: { id: string; slug: string; title: string } | null
   sections: KnowledgeGuideSection[]
   sources: KnowledgeGuideSource[]

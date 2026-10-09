@@ -64,3 +64,16 @@ STEP 2A는 기존 생성기의 최초 HTML head에 기존 label 기반 검색 �
 정상 Production 배포 후: robots 200/text/plain와 Production origin Sitemap 줄, sitemap 200/XML·URL 집합, 목록/대표 상세 200, 없는 slug 404, 유일한 title/description/canonical·OG·JSON-LD, 공개 noindex 부재, Operator 로그인/noindex, 기존 preview 호환 이동과 다운로드·media CSP를 실제 응답으로 확인합니다. 실제 공개 영상 재생은 합성 미디어 렌더링 검사와 별도입니다. 향후 별도 테스트 branch가 실제 사용되면 정확한 context와 alias 응답의 noindex를 확인하고 누락된 경우에만 별도 보완합니다. Production 강제 배포와 release marker 변경은 하지 않습니다.
 
 STEP 2B에서 계정 담당자가 확인할 사항: 기존 Google Search Console/네이버 서치어드바이저 속성·소유권·기존 인증 방식, Production 배포 반영, sitemap 처리 상태·제출 이력, 대표 URL canonical/수집/색인 상태. 계정 로그인·속성 생성·소유권 변경·제출·색인 요청·DNS 작업은 이번 STEP 2A에서 수행하지 않습니다.
+
+
+## STEP 3-3: Verified Knowledge-to-Story bridge and existing tools (2026-10-09)
+
+- The primary asset is factual, source-checked **real-life Knowledge**. Fiction is optional discovery and never the evidence for practical safety guidance.
+- Reuse the existing static canonical Knowledge pages, shared renderer, available-download selector and published-source security gate; no second Knowledge page renderer, database, API, reservation, paid media service or Production forced release.
+- The curated public story registry now holds 11 pinned Reader story targets and 12 Knowledge-to-Story associations across C01 Han Jun-ho, C02 Park Do-hyun and C03 Seo Jin-woo. Each one binds exact public Reader chapter identity, verified chapter SHA, story URL and an actual verbatim quote. 10 of 11 currently PUBLISHED Knowledge articles receive at least one related fictional scene.
+- K-013 external responder credential-check article deliberately has no story link because the currently reviewed Reader does not support a tight fictional example; do not invent one.
+- All approved BRIEF content, citations, Evidence, publication states, timestamps and SEO are preserved byte-for-byte. An extra editorial association lives only in the validated story registry. No previously unpublished article may become public through this link feature.
+- K-002 remains the one actually available XLSX practical worksheet. Home and Tools already use the same PUBLISHED + AVAILABLE resource selector. No invented, duplicate or empty downloadable resources are added.
+- The illustrated C03 bridge fictional scene, linked from the route-redundancy article, reuses an already published SITE_ASSETS image. Its subject, path, SHA256, byte size and media type are validated before inclusion; the fiction image is not shown as a real disaster response diagram.
+- The relevant Knowledge pages label links as fictional scenes and explicitly warn that they are NOT factual emergency guidelines or evidence for real-world claims. Only public title, work label, route and optional published image enter the output; excerpt proofs and Reader/asset pins remain build-only.
+- Do not generate unverified YouTube videos or force media into unrelated articles. STEP 2B Google/Naver verification and the ordinary batched Production gate remain deferred at the user's request.

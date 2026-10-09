@@ -9,7 +9,7 @@ describe('STEP 3-2 public Knowledge shelf', () => {
       ['household', '생활 대비', 3],
       ['information', '연락·정보', 2],
       ['evacuation', '대피·이동', 2],
-      ['community', '공동 대응', 3],
+      ['community', '공동 대응', 4],
     ])
     const ids = groups.flatMap((group) => group.guides.map((guide) => guide.id))
     expect(ids.length).toBe(publishedKnowledgeGuides.length)

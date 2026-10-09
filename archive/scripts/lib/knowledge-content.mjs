@@ -41,6 +41,14 @@ async function verifiedReaderReference(item, base, label) {
   fail(chapter?.sourceKind === 'VERIFIED_GM_NARRATIVE' && chapter.body?.trim(), `${label} Reader chapter missing`)
   fail(createHash('sha256').update(JSON.stringify(chapter)).digest('hex') === item.reader_chapter_sha256, `${label} Reader chapter changed`)
   fail(JSON.stringify(item.source_refs) === JSON.stringify(chapter.sourceRefs) && JSON.stringify(item.source_hashes) === JSON.stringify(chapter.sourceHashes), `${label} Reader provenance mismatch`)
+  // Knowledge Candidate Reader proofs have no public route or work label.
+  if (Object.hasOwn(item, 'path')) {
+    const cid=item.reader_book_ref.split('/')[3]
+    fail(book.chronicleId===cid && item.work_title===book.title
+      && item.path==='/?view=story&chronicle='+encodeURIComponent(cid)+'&chapter='+encodeURIComponent(chapter.id),
+      label+' Reader route/work mismatch')
+  }
+  return chapter
 }
 
 export async function loadKnowledge(base = root) {
@@ -77,10 +85,44 @@ export async function validateKnowledge(data) {
     if (guide.status === 'PUBLISHED') fail((await stat(join(base, 'archive/web/public/knowledge/guides', guide.slug, 'index.html')).catch(() => null))?.isFile(), `broken guide ${guide.id}`)
     guideIds.add(guide.id)
   }
+  const publishedBriefIds = new Set(briefs.filter(b=>b.status==='PUBLISHED').map(b=>b.id))
+  const linkedPerBrief = new Map()
   for (const story of stories) {
-    fail(nonempty(story.id) && !storyIds.has(story.id) && nonempty(story.title) && /^\/[^/]/.test(story.path) && story.verified === true, 'invalid story registry')
-    if (story.source_kind === 'PUBLIC_READER') await verifiedReaderReference(story, base, `${story.id} story`)
-    else fail(/^archive\/content\/transcripts\/C03-AFTERFALL\//.test(story.source_manifest_ref), 'invalid story registry source')
+    fail(nonempty(story.id) && !storyIds.has(story.id) && nonempty(story.title)
+      && /^\/[^/]/.test(story.path) && story.verified===true, 'invalid story registry')
+    const chapter=story.source_kind==='PUBLIC_READER'
+      ? await verifiedReaderReference(story,base,story.id+' story') : null
+    if (!chapter) fail(/^archive\/content\/transcripts\/C03-AFTERFALL\//.test(story.source_manifest_ref),'invalid story registry source')
+    if (Object.hasOwn(story,'knowledge_links')) {
+      fail(chapter && Array.isArray(story.knowledge_links) && story.knowledge_links.length>0,story.id+' knowledge links require verified Reader')
+      const ownIds=new Set()
+      for(const link of story.knowledge_links) {
+        fail(link && typeof link==='object' && !Array.isArray(link)
+          && Object.keys(link).sort().join(',')==='brief_id,quote'
+          && publishedBriefIds.has(link.brief_id) && !ownIds.has(link.brief_id)
+          && typeof link.quote==='string' && link.quote.length>=12 && link.quote.length<=280
+          && chapter.body.includes(link.quote), story.id+' unsupported Knowledge/story relation')
+        ownIds.add(link.brief_id)
+        linkedPerBrief.set(link.brief_id,(linkedPerBrief.get(link.brief_id)??0)+1)
+        fail(linkedPerBrief.get(link.brief_id)<=3,link.brief_id+' too many fiction examples')
+      }
+    }
+    if (Object.hasOwn(story,'illustration')) {
+      const a=story.illustration
+      fail(chapter && a && Object.keys(a).sort().join(',')==='alt,src,subject_id'
+        && /^\/visual-assets\/[a-f0-9]{64}\.png$/.test(a.src)
+        && nonempty(a.alt) && a.alt.length<200 && /^[a-z]+-[a-z0-9-]+$/.test(a.subject_id),
+        story.id+' invalid illustration metadata')
+      const cid=story.reader_book_ref.split('/')[3]
+      const catalog=JSON.parse(await readFile(join(base,'archive/content/visuals',cid,'SITE_ASSETS.json')))
+      const asset=catalog.assets?.find(entry=>entry.subject_id===a.subject_id && entry.public_path===a.src)
+      fail(catalog.chronicle_id===cid && asset?.mime_type==='image/png'
+        && asset.sha256===a.src.split('/').at(-1).replace('.png',''),
+        story.id+' illustration not in published SITE_ASSETS')
+      const imageBytes=await readFile(join(base,'archive/web/public',a.src.slice(1)))
+      fail(imageBytes.length===asset.bytes && createHash('sha256').update(imageBytes).digest('hex')===asset.sha256,
+        story.id+' illustration bytes mismatch')
+    }
     storyIds.add(story.id)
   }
   for (const topic of topics) {
