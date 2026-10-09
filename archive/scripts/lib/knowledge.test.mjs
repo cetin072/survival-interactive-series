@@ -147,11 +147,10 @@ test('STEP 3-3 requires verified Reader excerpts and existing site illustration'
   assert.equal(art.length,1)
   assert.equal(art[0].illustration.subject_id,'loc-bridge')
 })
-test('STEP 3-3 refuses invented or unpublished links and altered illustration', async () => {
+test('STEP 3-3 refuses invented links, cross-world routes and altered illustration', async () => {
   const data=await loadKnowledge(root)
   const mutations=[
     stories=>{stories[0].knowledge_links[0].quote='가짜로 만든 장면 인용은 허용되지 않는다.'},
-    stories=>{stories[0].knowledge_links[0].brief_id='K-004'},
     stories=>{stories[0].knowledge_links[0].brief_id='K-NO-SUCH-ARTICLE'},
     stories=>{stories[1].path='/?view=story&chronicle=C02-STRONGHOLD&chapter=c02-stronghold-chapter-08'},
     stories=>{stories[1].work_title='잘못된 세계관 제목'},
@@ -162,6 +161,14 @@ test('STEP 3-3 refuses invented or unpublished links and altered illustration', 
     mutation(stories)
     await assert.rejects(validateKnowledge({...data,stories}),/KNOWLEDGE_CONTRACT:/)
   }
+})
+
+test('STEP 3-3 does not block an Operator draft revising an existing published article', async () => {
+  const data=await loadKnowledge(root)
+  const briefs=data.briefs.map(b=>b.id==='K-012'
+    ? {...b,status:'READY',publication_policy:'HUMAN_APPROVED',semantic_qa_status:'REVIEW'}
+    : b)
+  assert.equal(await validateKnowledge({...data,briefs}),true)
 })
 
 test('Reader backfill is pinned to verified public chapter and source metadata', async () => {

@@ -85,7 +85,8 @@ export async function validateKnowledge(data) {
     if (guide.status === 'PUBLISHED') fail((await stat(join(base, 'archive/web/public/knowledge/guides', guide.slug, 'index.html')).catch(() => null))?.isFile(), `broken guide ${guide.id}`)
     guideIds.add(guide.id)
   }
-  const publishedBriefIds = new Set(briefs.filter(b=>b.status==='PUBLISHED').map(b=>b.id))
+  // Curation binds a real Brief identity; published projection owns visibility.
+  const knownBriefIds = new Set(briefs.map(b=>b.id))
   const linkedPerBrief = new Map()
   for (const story of stories) {
     fail(nonempty(story.id) && !storyIds.has(story.id) && nonempty(story.title)
@@ -99,7 +100,7 @@ export async function validateKnowledge(data) {
       for(const link of story.knowledge_links) {
         fail(link && typeof link==='object' && !Array.isArray(link)
           && Object.keys(link).sort().join(',')==='brief_id,quote'
-          && publishedBriefIds.has(link.brief_id) && !ownIds.has(link.brief_id)
+          && knownBriefIds.has(link.brief_id) && !ownIds.has(link.brief_id)
           && typeof link.quote==='string' && link.quote.length>=12 && link.quote.length<=280
           && chapter.body.includes(link.quote), story.id+' unsupported Knowledge/story relation')
         ownIds.add(link.brief_id)
