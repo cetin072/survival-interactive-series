@@ -1,0 +1,21 @@
+{
+  "version": "reader-wiki-public-approvals-v1",
+  "scope": "INITIAL_PUBLIC_READER_WORLD_WIKI",
+  "approvalReference": "USER_CHAT_EXPLICIT_APPROVAL_2026-10-09",
+  "approvedOnKst": "2026-10-09",
+  "sourceMainSha": "e47b23c9a3ad7c84195f50c622fbbaee6b527f5b",
+  "items": [
+    {
+      "chronicleId": "C01-HAN-JUNHO",
+      "decision": "APPROVE",
+      "seedSha256": "8d637e81adae45048d9f36bab7e0d0b588b87bcd9a9acb9283b8002a6c9da9fe",
+      "bookSha256": "98235add2392dc66591e26772aa07fb2c45f60b2ecb609ff1a36be4837f290c3"
+    },
+    {
+      "chronicleId": "C02-STRONGHOLD",
+      "decision": "APPROVE",
+      "seedSha256": "a040d5b885714c9259046e1d54c34b70e3269dc53df440e5f816f929eaf50197",
+      "bookSha256": "cc21254acc575113b00713bf92dc27d807a14ea6baee727e3acbe2ff85c64fba"
+    }
+  ]
+}

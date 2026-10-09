@@ -61,19 +61,65 @@ export function validateReaderWikiSeed(seed, book, bookBytes) {
   return seed
 }
 
+const approvedReaderWikiNotice = (seed) =>
+  '사람이 공개를 승인한 세계관 위키입니다. 현재 확보된 공개 Reader ' +
+  seed.chapters.filter((row) => row.status === 'REVIEWED').length +
+  '장에 근거하며, 누락된 과거 기록이나 미확인 사항을 추정해 채우지 않았습니다.'
+
+/** Approval record binds the original verified candidate bytes + exact Reader bytes.
+ *  The candidate remains PREVIEW_ONLY on disk so changing its content never
+ *  silently inherits approval. A separate approved digest is required.
+ */
+export async function loadReaderWikiApprovals(base = root) {
+  let bytes
+  try { bytes = await readFile(resolve(base, 'archive/content/wiki/PUBLIC_APPROVALS.json')) }
+  catch (error) {
+    if (error.code === 'ENOENT') return new Map()
+    throw error
+  }
+  const record = JSON.parse(bytes.toString('utf8'))
+  insist(fields(record, ['version', 'scope', 'approvalReference', 'approvedOnKst', 'sourceMainSha', 'items'])
+    && record.version === 'reader-wiki-public-approvals-v1'
+    && record.scope === 'INITIAL_PUBLIC_READER_WORLD_WIKI'
+    && /^USER_CHAT_EXPLICIT_APPROVAL_[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(record.approvalReference)
+    && /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(record.approvedOnKst)
+    && /^[a-f0-9]{40}$/.test(record.sourceMainSha)
+    && Array.isArray(record.items), 'APPROVAL_MANIFEST')
+  const approvals = new Map()
+  for (const item of record.items) {
+    insist(fields(item, ['chronicleId', 'decision', 'seedSha256', 'bookSha256'])
+      && /^C[0-9]{2,}-[A-Z0-9-]+$/.test(item.chronicleId)
+      && item.chronicleId !== 'C03-AFTERFALL' && item.decision === 'APPROVE'
+      && /^[a-f0-9]{64}$/.test(item.seedSha256) && /^[a-f0-9]{64}$/.test(item.bookSha256)
+      && !approvals.has(item.chronicleId), 'APPROVAL_ENTRY')
+    approvals.set(item.chronicleId, item)
+  }
+  return approvals
+}
+
 export async function loadReaderWikiSeeds(base = root, { allowPreview = process.env.CONTEXT !== 'production', catalog = rawCatalog } = {}) {
   const folder = resolve(base, 'archive/content/wiki')
+  const approvals = await loadReaderWikiApprovals(base)
+  const approvedIdsFound = new Set()
   const entries = await readdir(folder, { withFileTypes: true }).catch((error) => {
     if (error.code === 'ENOENT') return []; throw error
   })
   const output = []
   for (const entry of entries.sort((a,b) => a.name.localeCompare(b.name))) {
     if (!entry.isDirectory() || !/^C\d{2,}-[A-Z0-9-]+$/.test(entry.name)) continue
-    const seed = JSON.parse(await readFile(resolve(folder, entry.name, 'SEED.json'), 'utf8'))
+    const seedBytes = await readFile(resolve(folder, entry.name, 'SEED.json'))
+    const seed = JSON.parse(seedBytes.toString('utf8'))
     const bookBytes = await readFile(resolve(base, 'archive/content/stories', entry.name, 'BOOK.json'))
     const book = JSON.parse(bookBytes)
     insist(seed.chronicleId === entry.name, 'FOLDER_SCOPE')
     validateReaderWikiSeed(seed, book, bookBytes)
+    const approval = approvals.get(entry.name)
+    if (approval) {
+      // Even one changed subtitle or citation revokes the matched approval.
+      insist(approval.seedSha256 === byteHash(seedBytes)
+        && approval.bookSha256 === byteHash(bookBytes), 'APPROVAL_SOURCE_CHANGED')
+      approvedIdsFound.add(entry.name)
+    }
     const publicParts = catalog[entry.name] ?? []
     const publicPaths = new Set(publicParts.map((part) => part.archivePath))
     for (const row of seed.chapters) {
@@ -88,15 +134,17 @@ export async function loadReaderWikiSeeds(base = root, { allowPreview = process.
         insist(byteHash(await readFile(resolve(base, ref))) === chapter.sourceHashes[index], 'RAW_CHANGED')
       }
     }
-    if (allowPreview) output.push(seed)
+    if (approval) output.push({ ...seed, publication: 'HUMAN_APPROVED', notice: approvedReaderWikiNotice(seed) })
+    else if (allowPreview) output.push(seed)
   }
+  insist([...approvals.keys()].every((id) => approvedIdsFound.has(id)), 'APPROVAL_ORPHAN')
   return output
 }
 
 // Validation ledger and hashes stay build-only; no second copy of Reader prose.
 export function readerWikiProjection(seeds) {
-  return seeds.map(({ chronicleId, notice, nodes, relations }) => ({
-    chronicleId, notice,
+  return seeds.map(({ chronicleId, notice, publication, nodes, relations }) => ({
+    chronicleId, notice, publication,
     nodes: nodes.map((node) => ({ ...node, facts: node.facts.map(({ text, kind, evidence }) => ({
       text, kind, evidence: { chapterId: evidence.chapterId, quote: evidence.quote },
     })) })),

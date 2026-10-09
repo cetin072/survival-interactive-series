@@ -6,7 +6,7 @@ import type { WikiDocument } from './wikiDocument'
 
 type Evidence = { chapterId: string; quote: string }
 type SeedNode = { id: string; type: 'character' | 'location' | 'event'; title: string; subtitle: string; facts: { text: string; kind: string; evidence: Evidence }[] }
-export type ReaderWikiSeed = { chronicleId: string; notice: string; nodes: SeedNode[]; relations: { from: string; to: string; label: string; evidence: Evidence }[] }
+export type ReaderWikiSeed = { chronicleId: string; notice: string; publication?: 'PREVIEW_ONLY' | 'HUMAN_APPROVED'; nodes: SeedNode[]; relations: { from: string; to: string; label: string; evidence: Evidence }[] }
 const seeds = (packages as ReaderWikiSeed[]).filter(seed => chronicleRegistry.some(chronicle => chronicle.id === seed.chronicleId))
 const labels = { character: '인물', location: '장소', event: '사건' }
 
@@ -33,7 +33,9 @@ export function buildReaderWikiDocuments(seed: ReaderWikiSeed, chapters: ReaderC
       sourceOrder: latest.chapterNumber,
       anchor: { gameTime: '제' + latest.chapterNumber + '장 · ' + latest.title },
       metaRows: [{ label: '유형', value: labels[node.type] }, { label: '범위', value: '현재 공개된 Reader 기록' }],
-      recordBasis: '공개 Reader 근거 · 위키 검수 후보', notice: seed.notice,
+      recordBasis: seed.publication === 'HUMAN_APPROVED'
+        ? '공개 Reader 근거 · 게시 승인' : '공개 Reader 근거 · 위키 검수 후보',
+      notice: seed.notice,
       quotes: records.map((record) => ({ text: record.text, quote: record.evidence.quote,
         chapterId: record.evidence.chapterId, chapterTitle: cited.find((chapter) => chapter.id === record.evidence.chapterId)!.title,
         kind: record.label })),

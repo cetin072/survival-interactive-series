@@ -35,7 +35,9 @@ describe('Reader Wiki shared contract and source identity',()=>{
     const document=readerWikiDocuments('C01-HAN-JUNHO').find(item=>item.id==='char-junho')!
     const markup=renderToStaticMarkup(createElement(WikiShellPreview,{chronicleId:'C01-HAN-JUNHO',nodeId:document.id}))
     expect(markup).toContain('한준호')
-    expect(markup).toContain('위키 검수 후보')
+    expect(markup).toContain('공개 Reader 근거 · 게시 승인')
+    expect(markup).toContain('누락된 과거 기록')
+    expect(markup).not.toContain('위키 검수 후보')
     expect(markup).toContain('관계의 기록 근거')
     expect(markup).toContain('chronicle=C01-HAN-JUNHO&amp;chapter=c01-han-junho-chapter-01')
     expect(markup).toContain('chronicle=C01-HAN-JUNHO&amp;part=')
@@ -56,5 +58,7 @@ describe('Reader Wiki shared contract and source identity',()=>{
    const markup=renderToStaticMarkup(createElement(WikiShellPreview,{chronicleId:'C02-STRONGHOLD',nodeId:document.id}));
    expect(markup).toContain('chronicle=C02-STRONGHOLD&amp;chapter=c02-stronghold-chapter-01');
    expect(markup).toContain('chronicle=C02-STRONGHOLD&amp;part=');
+   expect(markup).toContain('공개 Reader 근거 · 게시 승인');
+   expect(markup).not.toContain('위키 검수 후보');
    expect(markup).not.toContain('node=char-jinwoo'); expect(markup).not.toContain('wiki-visuals');
  });

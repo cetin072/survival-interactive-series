@@ -29,6 +29,9 @@ describe('shared world Wiki entrance', () => {
     expect(html).toContain('page=world&amp;chronicle=C03-AFTERFALL')
     expect(html).toContain('완결')
     expect(html).toContain('진행 중')
+    // User-approved C01/C02 now display as public, not review candidates.
+    expect((html.match(/공개 세계관 기록/g) ?? []).length).toBe(3)
+    expect(html).not.toContain('사람 검토 대기')
     expect(html).not.toContain('<img')
     let anchorDepth = 0
     for (const tag of html.match(/<\/?a(?:\s[^>]*)?>/g) ?? []) {

@@ -22,7 +22,7 @@ export function WikiWorldLobby({ registry = chronicleRegistry, notice }: { regis
             <p className="wiki-document-kicker">생존기 {String(chronicle.number).padStart(2,'0')} · {status[chronicle.status]}</p>
             <h2>{chronicle.title}</h2><p>주인공 · {chronicle.protagonist}</p><p>{book?.subtitle ?? chronicle.availabilityNote}</p>
             <p>{wiki ? wiki.categories.map((group) => group.label + ' ' + group.items.length).join(' · ') : '세계관 문서 준비 중'}</p>
-            <small>{wiki?.recent.some((document) => document.notice) ? '공개 Reader 기반 기본 문서 · 사람 검토 대기' : wiki ? '공개 세계관 기록' : '검증된 자료가 준비되면 위키를 연결합니다.'}</small>
+            <small>{wiki?.recent.some((document) => document.recordBasis?.includes('위키 검수 후보')) ? '공개 Reader 기반 기본 문서 · 사람 검토 대기' : wiki ? '공개 세계관 기록' : '검증된 자료가 준비되면 위키를 연결합니다.'}</small>
             <div className="wiki-home-actions">
               {wiki && <a className="primary" href={worldWikiHref(chronicle.id)}>세계관 위키 보기</a>}
               {readable && <a href={'/?view=story&chronicle=' + encodeURIComponent(chronicle.id)}>이야기 읽기</a>}
