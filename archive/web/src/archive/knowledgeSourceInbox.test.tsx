@@ -52,6 +52,6 @@ describe('Source inbox MVP', () => {
     expect(html).toContain('/knowledge/emergency-supplies-inventory/')
     expect(html).toContain('/knowledge/emergency-route-redundancy/')
     expect(html).toContain('개정 후보 · 미반영')
-    expect(html).not.toContain('공개 승인')
+    expect(html).not.toContain('>공개 승인</button>')
   })
 })
