@@ -100,6 +100,17 @@ preserved; later seasons begin with their first approved source. A session is
 identified by its full season-qualified source path and source hash. Entity IDs
 continue across seasons. A live/open S04 session is not a public source.
 
+A-Core treats per-GM Runtime state links as optional provenance. For an already
+verified and sealed PUBLIC session, A-Wiki may anchor the entire GM narrative
+to its final public narrative time even when the last GM itself has no state
+link, but **only** when an earlier GM within the same session has an exact
+`APPLIED` link and every later public USER/GM message records exactly that
+same verified save version without any conflicting state link. The unlinked
+GM is not described as Runtime-applied. Missing applied evidence, unknown
+tail save versions or later save changes fail closed with
+`WIKI_PUBLIC_ANCHOR_NOT_APPLIED`. Immutable source/RAW SHA and the independent
+Extractor/Reviewer/finalizer safeguards remain unchanged.
+
 ## Publication reconciliation and graph drift
 
 `prepare` checks the durable job ledger **before** returning `NO_JOB`. A source
