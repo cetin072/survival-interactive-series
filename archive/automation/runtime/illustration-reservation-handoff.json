@@ -88,5 +88,86 @@
     "job_status_readback": "FINALIZE_QUEUED",
     "completed_at": "2026-10-09T01:34:50.095Z"
   },
-  "result": null
+  "result": {
+    "status": "REGULAR_E2E_PASS",
+    "audited_main_sha": "e0afbf7875b7fe8bfdc1fe10fffcdf743a8d287d",
+    "job": {
+      "job_id": "illustration-event-guild-warehouse-option-5d70e344c196-20261009-37839899164",
+      "title": "뒤편 창고 사용 합의",
+      "status": "SUCCEEDED",
+      "point_id": "point-f1325bef904fb7ed5048d5e9ccbc7bb7eedbfc486d04591666fd084845a96305",
+      "generation_key": "generation-5d70e344c19613400a472c318135c6f01c09a2b96dffc3338d2d430a565efe3f",
+      "subject_id": "event-guild-warehouse-option",
+      "prompt_sha256": "b7b2c707a45487e72a08392449fab4f249316d9c9b3d1ba9a89b632a1954c7cd",
+      "review_context_sha256": "b028afe116c1927f163fd144056f5e5393a98ec25834fe5933d92bd7e0723577",
+      "provider_asset_id": "chatgpt-library:file_00000000abf481f7bf60909e01a57429",
+      "source_commit": "7e6e212aeee1ad86df4dd6227523137aed09a274",
+      "identity_path": "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_EVENT_GUILD_WAREHOUSE_OPTION.json"
+    },
+    "library_source": {
+      "path": "/IMAGE-RENDER/output/current.png",
+      "file_id": "file_00000000abf481f7bf60909e01a57429",
+      "library_file_id": "libfile_963b41f600e0819181b1531b40328a6a",
+      "version_id": null,
+      "sha256": "b2a3171a710fe2587badff40ad140c04f2b2dc0b6f9f4b842a3d0de660ecc4ce",
+      "bytes": 2292144,
+      "width": 1942,
+      "height": 809,
+      "modified_at": "2026-10-08T21:30:35.257038Z"
+    },
+    "review": {
+      "decision": "PASS",
+      "provider": "native_chatgpt_vision",
+      "handoff_commit": "a5635cab0a4ab9f3a4f3028c79e9053c3f90f42b",
+      "reviewed_at": "2026-10-09T00:35:17.884658+00:00"
+    },
+    "transfer": {
+      "staging_id": "site-illustration-event-guild-warehouse-option-5d70e344c196-20261009-37839899164",
+      "sha256": "f8b5fa6251a044d1a1fcb8c291cfc1fc30ee364ed1c1e06a10a3dcf595f979a5",
+      "bytes": 189240,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png",
+      "palette_colors": 256,
+      "chunk_count": 7
+    },
+    "finalizer": {
+      "dispatch_request_id": 125,
+      "dispatch_at": "2026-10-09T01:34:26.820283+00:00",
+      "status": "SUCCEEDED",
+      "finalized_at": "2026-10-09T01:50:10.799297+00:00"
+    },
+    "storage": {
+      "provider": "supabase_storage",
+      "bucket": "survival-archive-originals",
+      "object_path": "AFTERFALL/point-f1325bef904fb7ed5048d5e9ccbc7bb7eedbfc486d04591666fd084845a96305/generation-5d70e344c19613400a472c318135c6f01c09a2b96dffc3338d2d430a565efe3f/f8b5fa6251a044d1a1fcb8c291cfc1fc30ee364ed1c1e06a10a3dcf595f979a5.png",
+      "sha256": "f8b5fa6251a044d1a1fcb8c291cfc1fc30ee364ed1c1e06a10a3dcf595f979a5",
+      "bytes": 189240,
+      "mime_type": "image/png",
+      "storage_verified": true
+    },
+    "registry": {
+      "status": "READY",
+      "asset_id": "AF-EVENT-F1325BEF904FB7ED5048D5E9",
+      "exact_match_count": 1,
+      "point_id": "point-f1325bef904fb7ed5048d5e9ccbc7bb7eedbfc486d04591666fd084845a96305",
+      "generation_key": "generation-5d70e344c19613400a472c318135c6f01c09a2b96dffc3338d2d430a565efe3f",
+      "subject_id": "event-guild-warehouse-option",
+      "source_sha256": "f8b5fa6251a044d1a1fcb8c291cfc1fc30ee364ed1c1e06a10a3dcf595f979a5"
+    },
+    "site_assets": {
+      "path": "archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json",
+      "exact_subject_count": 1,
+      "public_path": "/visual-assets/dca92f2e213a15cdc5e7355925372f9e0cdb4d61571451cfbc959c2fe946ed01.png",
+      "public_sha256": "dca92f2e213a15cdc5e7355925372f9e0cdb4d61571451cfbc959c2fe946ed01",
+      "source_sha256": "f8b5fa6251a044d1a1fcb8c291cfc1fc30ee364ed1c1e06a10a3dcf595f979a5",
+      "bytes": 189244,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png",
+      "published_main_sha": "7e6e212aeee1ad86df4dd6227523137aed09a274"
+    },
+    "completed_at": "2026-10-09T01:50:10.799297+00:00",
+    "audited_at": "2026-10-09T02:28:31.854614+00:00"
+  }
 }
