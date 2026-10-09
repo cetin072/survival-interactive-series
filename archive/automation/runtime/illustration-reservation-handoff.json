@@ -42,7 +42,10 @@
     "provider_complete": {
       "p_job_id": "illustration-char-hajin-2ff606063ff6-20261010-37987397187",
       "p_prompt_sha256": "4e40e5c351fdad287b7859e993c12f39d71e30c3c55f95e3576729a076bd7d64"
-    }
+    },
+    "provider_completed_at": "2026-10-09T22:30:20.383941+00:00",
+    "job_status_after_provider_complete": "INGESTING",
+    "readback_at": "2026-10-09T22:30:30.324Z"
   },
   "review": null,
   "transfer": null,
