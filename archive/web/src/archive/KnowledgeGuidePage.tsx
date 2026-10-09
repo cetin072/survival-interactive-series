@@ -96,6 +96,11 @@ export function KnowledgeGuidePage({ guide, showTopbar = true }: { guide: Knowle
         {guide.detail.related_guide && <section className="knowledge-guide-related"><h2>더 깊게 알아보기</h2><p><a href={'/knowledge/guides/' + guide.detail.related_guide.slug + '/'}>전문 가이드 보기 →</a></p></section>}
         {!!guide.detail.related_stories.length && <section className="knowledge-guide-related" aria-label="창작 이야기로 이어보기">
           <h2>관련 이야기 · 작품 속 장면</h2>
+          {guide.sections.some((section) => section.blocks.some((block) =>
+            block.type === 'prose' && /관련 본편 장면.*원문 대조/.test(block.text)
+          )) && <p className="knowledge-guide-fiction-notice">
+            연결 상태 업데이트: 본문에 남아 있는 ‘원문 대조 후 연결’ 안내는 작성 당시 내용입니다. 이후 공개 Reader 원문을 확인해 아래 작품 장면을 연결했습니다.
+          </p>}
           <p className="knowledge-guide-fiction-notice">아래는 창작물 속 장면입니다. 현실의 재난 대응 수칙이나 이 글의 근거 자료는 아닙니다.</p>
           <div className="knowledge-guide-fiction-stories">{guide.detail.related_stories.map((item) =>
             <a key={item.id} className="knowledge-guide-fiction-story" href={item.path}>
