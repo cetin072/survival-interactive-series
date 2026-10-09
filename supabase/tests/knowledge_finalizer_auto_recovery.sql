@@ -141,9 +141,20 @@ begin
     raise exception 'invalid result identity was auto-retried';
   end if;
 
-  update survival_ops.knowledge_semantic_jobs
-    set semantic_result_sha256=hbad, blocker_code='KNOWLEDGE_CONTRACT'
-  where job_id=bad;
+  delete from survival_ops.knowledge_semantic_jobs where job_id=bad;
+  insert into survival_ops.knowledge_semantic_jobs(
+    job_id,job_type,status,source_kind,source_ref,source_sha256,work_key,
+    policy_version,policy_sha256,policy_pin,main_sha_at_prepare,semantic_context,
+    semantic_result,semantic_result_sha256,result_decision,blocker_code,blocker_stage,
+    submitted_at,prepared_at
+  ) values (
+    bad,'BACKFILL_BRIEF','BLOCKED','PUBLIC_ARCHIVE','synthetic://bad',repeat('c',64),'auto-bad-nonallow',
+    'ci',repeat('d',64),jsonb_build_object('sha256',repeat('d',64)),repeat('1',40),
+    jsonb_build_object('source',jsonb_build_object('kind','PUBLIC_ARCHIVE','ref','synthetic://bad','sha256',repeat('c',64)),
+      'target',jsonb_build_object('brief_id','K-020','candidate_id','KC-auto-bad')),
+    rbad,hbad,'BRIEF_READY','KNOWLEDGE_CONTRACT','FINALIZER',
+    clock_timestamp(),clock_timestamp()
+  );
   dispatched := survival_ops.dispatch_knowledge_semantic_finalizer();
   if dispatched is not null
     or (select status from survival_ops.knowledge_semantic_jobs where job_id=bad) <> 'BLOCKED'
