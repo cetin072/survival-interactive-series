@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabaseClient } from './supabaseClient'
+import { OperatorKnowledgeSources } from './OperatorKnowledgeSources'
 import { formatOperatorTime } from './operatorSystemStatus'
 import {
   emptyKnowledgeInbox,
@@ -37,7 +38,7 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
       <div>
         <p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p>
         <h1>Knowledge Inbox</h1>
-        <p>{email} · 모든 C3 글감은 이곳에서 상태를 확인하고, 글을 누르면 별도 상세 페이지에서 읽고 편집합니다.</p>
+        <p>{email} · C3 자동화 글감과 외부 참고자료를 한곳에서 확인합니다. C3 글감은 기존 상세 페이지에서 읽고 편집합니다.</p>
       </div>
       <div className="operator-heading-actions">
         <a className="operator-secondary" href="/operator/">대시보드</a>
@@ -49,7 +50,7 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
     {error && <p className="operator-error" role="alert">{error}</p>}
 
     <div className="operator-counts">
-      <article><span>전체 글감</span><strong>{inbox.total_count}</strong></article>
+      <article><span>C3 작업 글감</span><strong>{inbox.total_count}</strong></article>
       <article><span>작업 중</span><strong>{inbox.working_count}</strong></article>
       <article><span>사람 검토</span><strong>{inbox.review_count}</strong></article>
       <article><span>보관</span><strong>{inbox.held_count}</strong></article>
@@ -70,6 +71,8 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
         )}
       </div>
     </section>
+
+    <OperatorKnowledgeSources />
 
     <section className="operator-panel knowledge-inbox-list-page">
       <header><h2>글감 목록</h2><strong>{visibleItems.length}건</strong></header>
