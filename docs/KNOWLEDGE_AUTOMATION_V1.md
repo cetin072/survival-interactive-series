@@ -77,3 +77,14 @@ STEP 2B에서 계정 담당자가 확인할 사항: 기존 Google Search Console
 - The illustrated C03 bridge fictional scene, linked from the route-redundancy article, reuses an already published SITE_ASSETS image. Its subject, path, SHA256, byte size and media type are validated before inclusion; the fiction image is not shown as a real disaster response diagram.
 - The relevant Knowledge pages label links as fictional scenes and explicitly warn that they are NOT factual emergency guidelines or evidence for real-world claims. Only public title, work label, route and optional published image enter the output; excerpt proofs and Reader/asset pins remain build-only.
 - Do not generate unverified YouTube videos or force media into unrelated articles. STEP 2B Google/Naver verification and the ordinary batched Production gate remain deferred at the user's request.
+
+
+## Search & Share P1 - Static Knowledge article sharing MVP (2026-10-09)
+
+- Master roadmap: https://github.com/cetin072/survival-interactive-series/issues/491. This P1 intentionally reuses existing individual static Knowledge pages, original canonical URLs, the OG metadata, approved-source gate, sitemap and 2-day Production marker.
+- One small disclosure panel appears only on published individual Knowledge articles. A readonly absolute canonical URL remains selectable even with JavaScript disabled. No extra widget is added to the Knowledge index.
+- A small local deferred script at /knowledge/share.js uses Web Share API when supported and Clipboard API when supported. Clipboard rejection selects the readonly URL for manual copy. Native share cancellations are neutral. No tracking or external SDK.
+- Adds twitter:card=summary without inventing representative images. The existing six OG tags and canonical stay unchanged. Related *fictional* illustrations are not substituted as factual disaster safety guide SNS cards.
+- Preserve script-src self CSP and static text/Article/Breadcrumb structured data, risk labels, sources, publication dates and content. Tests explicitly allow only the local share.js script on detail pages, never arbitrary executable code.
+- Node runtime tests exercise mobile native sharing, correct canonical URL, clipboard success and manual fallback, cancellations, and canonical mismatch rejection. Exact-head CI and Netlify Preview are required before merging.
+- No Search Console changes, external news ingestion, extra worker/schedule, paid APIs, new DB or forced Production deploy in P1.

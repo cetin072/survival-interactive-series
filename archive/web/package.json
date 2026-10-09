@@ -12,7 +12,7 @@
     "reader:check": "node ../scripts/check-reader-edition.mjs",
     "knowledge:build": "node ../scripts/build-knowledge.mjs",
     "knowledge:check": "node ../scripts/build-knowledge.mjs --check && node ../scripts/knowledge-scan.mjs --check",
-    "knowledge:test": "node --test ../scripts/lib/knowledge.test.mjs ../scripts/lib/knowledge-experience.test.mjs ../scripts/lib/knowledge-public.test.mjs ../scripts/lib/knowledge-page.test.mjs",
+    "knowledge:test": "node --test ../scripts/lib/knowledge.test.mjs ../scripts/lib/knowledge-experience.test.mjs ../scripts/lib/knowledge-public.test.mjs ../scripts/lib/knowledge-page.test.mjs ../scripts/lib/knowledge-share.test.mjs",
     "knowledge:semantic:test": "node --test ../scripts/lib/knowledge-semantic-jobs.test.mjs ../scripts/lib/knowledge-semantic-finalizer.test.mjs ../scripts/lib/knowledge-main-drift.test.mjs",
     "knowledge:publish-prepare": "node ../scripts/knowledge-publish-prepare.mjs",
     "knowledge:review-sync": "node ../scripts/knowledge-review-sync.mjs",
