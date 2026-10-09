@@ -74,10 +74,28 @@ async function materializeWikiSource(root, seasonId, approved, session) {
   demand(gmBlocks.length === session.gm_public_blocks && gmBlocks.length === session.user_messages, 'WIKI_GM_PAIR_COUNT_MISMATCH')
   demand(gmBlocks.every((block) => block.header.messageLabel !== undefined), 'WIKI_GM_BLOCK_ORDER_MISSING')
 
-  const lastPublicMessage = sourceManifest.content_sha256.at(-1)
-  demand(lastPublicMessage?.role === 'GM' && lastPublicMessage.state_link?.outcome === 'APPLIED', 'WIKI_PUBLIC_ANCHOR_NOT_APPLIED')
+  const messages = sourceManifest.content_sha256
+  const lastPublicMessage = messages.at(-1)
+  demand(lastPublicMessage?.role === 'GM', 'WIKI_PUBLIC_ANCHOR_NOT_APPLIED')
+  // A-Core state links are optional provenance. Later PUBLIC GM blocks may
+  // narrate facts at the same save version without another Runtime commit.
+  // Keep their original narrative time, but only reuse a verified APPLIED
+  // save when every subsequent turn records that exact same save version.
+  // An unlinked turn itself is never represented as APPLIED.
+  const appliedIndex = messages.findLastIndex((message) => message.role === 'GM'
+    && message.state_link?.outcome === 'APPLIED'
+    && Number.isSafeInteger(message.state_link.linked_save_version)
+    && message.state_link.linked_save_version > 0
+    && (message.save_version === undefined
+      || message.save_version === message.state_link.linked_save_version))
+  demand(appliedIndex >= 0, 'WIKI_PUBLIC_ANCHOR_NOT_APPLIED')
+  const appliedSave = messages[appliedIndex].state_link.linked_save_version
+  demand(messages.slice(appliedIndex + 1).every((message) =>
+    Number.isSafeInteger(message.save_version)
+      && message.save_version === appliedSave
+      && message.state_link === undefined), 'WIKI_PUBLIC_ANCHOR_NOT_APPLIED')
   const anchor = {
-    save_version: lastPublicMessage.state_link.linked_save_version,
+    save_version: appliedSave,
     game_time: sourceManifest.captured_message_range.end,
   }
   demand(Number.isSafeInteger(anchor.save_version) && anchor.save_version > 0

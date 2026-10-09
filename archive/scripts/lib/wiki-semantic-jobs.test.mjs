@@ -190,6 +190,71 @@ async function writeSyntheticSeason(targetRoot, seasonId, sessionId = 'SESSION_0
   return { seasonRef, manifest }
 }
 
+test('real S04 SESSION_002 remains eligible without dropping later same-save GM blocks', async () => {
+  const sources = await discoverWikiSources(root)
+  const source = sources.find((item) => item.seasonId === 'S04'
+    && item.sourceSession.session_id === 'SESSION_002')
+  assert.ok(source, 'verified published S04 SESSION_002 must enter the A-Wiki source inventory')
+  assert.deepEqual(source.anchor, { save_version: 291, game_time: '2027-11-23 16:17' })
+  assert.deepEqual(source.gmBlocks.map((block) => block.messageLabel), ['001', '003', '005'])
+  const { buildWikiFactJob } = await import('./wiki-fact-extractor.mjs')
+  const job = buildWikiFactJob(source, publicGraph)
+  assert.equal(job.season_id, 'S04')
+  assert.deepEqual(job.source.gm_blocks.map((block) => block.block_id), ['001', '003', '005'])
+  assert.equal(job.source.manifest_ref, source.sourceManifestRef)
+  assert.equal(job.source.manifest_sha256, source.sourceDigest)
+})
+
+test('same-save unlinked tail is allowed; changed, unknown or conflicting save is rejected', async () => {
+  const testRoot = await mkdtemp(resolve(tmpdir(), 'wiki-applied-anchor-'))
+  try {
+    const season = 'S04', session = 'SESSION_123'
+    const { seasonRef } = await writeSyntheticSeason(testRoot, season, session, 3)
+    const manifestRef = resolve(testRoot, seasonRef, session, 'SOURCE_MANIFEST.json')
+    const original = JSON.parse(await readFile(manifestRef, 'utf8'))
+    const messages = original.content_sha256.map((message) => {
+      const updated = { ...message, save_version: 400 }
+      if (message.message_order > 1) delete updated.state_link
+      return updated
+    })
+    const runCase = async (update) => {
+      await writeFile(manifestRef, JSON.stringify({ ...original, content_sha256: update }))
+      return discoverWikiSources(testRoot)
+    }
+    const accepted = await runCase(messages)
+    assert.equal(accepted.length, 1)
+    assert.deepEqual(accepted[0].anchor, { save_version: 400, game_time: '2099-01-01 10:00' })
+    assert.deepEqual(accepted[0].gmBlocks.map((b) => b.messageLabel), ['001', '003', '005'])
+
+    const withoutEvidence = messages.map(({ state_link, ...rest }) => rest)
+    await assert.rejects(runCase(withoutEvidence), /WIKI_PUBLIC_ANCHOR_NOT_APPLIED/)
+
+    const newerUnapplied = structuredClone(messages)
+    newerUnapplied[5].save_version = 401
+    await assert.rejects(runCase(newerUnapplied), /WIKI_PUBLIC_ANCHOR_NOT_APPLIED/)
+
+    const unknownTail = structuredClone(messages)
+    delete unknownTail[5].save_version
+    await assert.rejects(runCase(unknownTail), /WIKI_PUBLIC_ANCHOR_NOT_APPLIED/)
+
+    const conflictingLink = structuredClone(messages)
+    conflictingLink[5].state_link = { outcome: 'REJECTED', linked_save_version: 400 }
+    await assert.rejects(runCase(conflictingLink), /WIKI_PUBLIC_ANCHOR_NOT_APPLIED/)
+
+    const invalidAppliedVersion = structuredClone(messages)
+    invalidAppliedVersion[1].state_link.linked_save_version = 399
+    await assert.rejects(runCase(invalidAppliedVersion), /WIKI_PUBLIC_ANCHOR_NOT_APPLIED/)
+
+    // A manifest/source job may use the verified save, but cannot assert that
+    // an unlinked late narrative block itself was committed to Runtime.
+    const sameVersionButUserAdvance = structuredClone(messages)
+    sameVersionButUserAdvance[4].save_version = 401
+    await assert.rejects(runCase(sameVersionButUserAdvance), /WIKI_PUBLIC_ANCHOR_NOT_APPLIED/)
+  } finally {
+    await rm(testRoot, { recursive: true, force: true })
+  }
+})
+
 test('S03 and S04 with the same session number have separate completion identities', async () => {
   const testRoot = await mkdtemp(resolve(tmpdir(), 'wiki-seasons-'))
   try {
