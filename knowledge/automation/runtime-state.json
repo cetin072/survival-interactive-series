@@ -1,9 +1,9 @@
 {
   "version": 1,
   "backfill": {
-    "last_attempted_at": "2026-10-07T09:01:10.209Z",
-    "last_work_key": "PUBLIC_READER:archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-chapter-07:e7e4e5ea77e533b36b4e695a8b93c386615afe1450732707bfcf3724d6e18c75",
-    "last_result": "PR_CREATED",
+    "last_attempted_at": "2026-10-08T03:03:51.594Z",
+    "last_work_key": "PUBLIC_READER:archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-chapter-09:e04f888cd7906c51a9898bf9746e2853bee9b80656f786475413fadf6295d432",
+    "last_result": "HUMAN_REVIEW",
     "reviewed_items": [
       {
         "work_key": "PUBLIC_READER:c03-afterfall-prelude-07:150e28ec1809490010bf960d1ff2c9caaf5edfc88cc26b18cb3bbdac995ba6bc",
@@ -29,6 +29,11 @@
         "work_key": "PUBLIC_READER:archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-chapter-07:e7e4e5ea77e533b36b4e695a8b93c386615afe1450732707bfcf3724d6e18c75",
         "status": "PR_CREATED",
         "processed_at": "2026-10-07T09:01:10.209Z"
+      },
+      {
+        "work_key": "PUBLIC_READER:archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-chapter-09:e04f888cd7906c51a9898bf9746e2853bee9b80656f786475413fadf6295d432",
+        "status": "HUMAN_REVIEW",
+        "processed_at": "2026-10-08T03:03:51.594Z"
       }
     ]
   }
