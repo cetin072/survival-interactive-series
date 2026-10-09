@@ -25,5 +25,26 @@
     "next_run_time": null,
     "prompt_exact_readback": true
   },
-  "collection": null
+  "collection": {
+    "status": "READY_FOR_PROVIDER_COMPLETE",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_0000000033a081f5ba2535a7dcda8aa1",
+    "source_library_file_id": "libfile_e45776e87e808191839b3459afd6d402",
+    "source_version_id": null,
+    "source_sha256": "28aef0a78d22100c73d17ef59ead1402be4b60b5a9cc5d4dd8b9dd3e540f7767",
+    "source_width": 1024,
+    "source_height": 1536,
+    "source_size_bytes": 2200635,
+    "source_modified_at": "2026-10-09T21:37:26.495830Z",
+    "observed_at": "2026-10-09T22:30:07.013Z",
+    "png_verify": true,
+    "png_full_decode": true,
+    "provider_complete": {
+      "p_job_id": "illustration-char-hajin-2ff606063ff6-20261010-37987397187",
+      "p_prompt_sha256": "4e40e5c351fdad287b7859e993c12f39d71e30c3c55f95e3576729a076bd7d64"
+    }
+  },
+  "review": null,
+  "transfer": null,
+  "result": null
 }
