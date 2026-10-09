@@ -69,6 +69,27 @@ test('all existing canonical routes retain original content, SEO, sitemap, downl
   }
 })
 
+test('STEP 3-3 static guides keep fictional navigation apart from real-world evidence', async () => {
+  const data=await loadKnowledge()
+  const published=await publicBriefs(data)
+  const linked=published.map(b=>({id:b.id,links:publicBriefData(b,data).related_stories}))
+  assert.equal(linked.filter(x=>x.links.length).length,10)
+  assert.equal(linked.reduce((n,x)=>n+x.links.length,0),12)
+  assert.deepEqual(linked.find(x=>x.id==='K-013').links,[])
+  const route=await readFile(join(root,'archive/web/public/knowledge/emergency-route-redundancy/index.html'),'utf8')
+  assert.ok(route.includes('관련 이야기 · 작품 속 장면'))
+  assert.ok(route.includes('현실의 재난 대응 수칙이나 이 글의 근거 자료는 아닙니다.'))
+  assert.ok(route.includes('/visual-assets/12267791ac6cafd5bf762135a3794990c7b777269cb3daeded85131796e58149.png'))
+  assert.ok(route.includes('loading="lazy"'))
+  for (const slug of ['emergency-supplies-inventory','family-emergency-contact-plan']) {
+    const page=await readFile(join(root,'archive/web/public/knowledge',slug,'index.html'),'utf8')
+    assert.ok(page.includes('연결 상태 업데이트: 본문에 남아 있는'))
+    assert.ok(page.includes('이후 공개 Reader 원문을 확인해 아래 작품 장면을 연결했습니다.'))
+  }
+  const credential=await readFile(join(root,'archive/web/public/knowledge/emergency-external-personnel-credentialing/index.html'),'utf8')
+  assert.ok(!credential.includes('관련 이야기 · 작품 속 장면'))
+})
+
 test('media and all relation types render together without data loss or unsafe HTML', async () => {
   const data = await loadKnowledge()
   const brief = structuredClone(data.briefs.find((item) => item.id === 'K-002'))

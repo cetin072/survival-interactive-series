@@ -51,11 +51,22 @@ async function validateWithReaderBook(data, mutateBook) {
   const base = await mkdtemp(join(tmpdir(), 'knowledge-reader-book-'))
   try {
     const bookRef = data.stories[0].reader_book_ref
-    const book = JSON.parse(await readFile(join(root, bookRef), 'utf8'))
+    for (const ref of new Set(data.stories.map(story=>story.reader_book_ref))) {
+      await mkdir(dirname(join(base,ref)),{recursive:true})
+      await copyFile(join(root,ref),join(base,ref))
+    }
+    const book = JSON.parse(await readFile(join(base, bookRef), 'utf8'))
     mutateBook(book)
-    const bookPath = join(base, bookRef)
-    await mkdir(dirname(bookPath), { recursive: true })
-    await writeFile(bookPath, JSON.stringify(book))
+    await writeFile(join(base, bookRef), JSON.stringify(book))
+    for(const story of data.stories.filter(story=>story.illustration)) {
+      const cid=story.reader_book_ref.split('/')[3]
+      const siteRef='archive/content/visuals/'+cid+'/SITE_ASSETS.json'
+      await mkdir(dirname(join(base,siteRef)),{recursive:true})
+      await copyFile(join(root,siteRef),join(base,siteRef))
+      const imageRef='archive/web/public'+story.illustration.src
+      await mkdir(dirname(join(base,imageRef)),{recursive:true})
+      await copyFile(join(root,imageRef),join(base,imageRef))
+    }
     const download = 'archive/web/public/knowledge/downloads/survival-diary-emergency-inventory-v1.xlsx'
     const downloadPath = join(base, download)
     await mkdir(dirname(downloadPath), { recursive: true })
@@ -124,6 +135,42 @@ test('golden fixtures satisfy content contract and policy gate', async () => {
   assert.equal(publicationEligibility(brief, { ...evidence, conflicts: ['unresolved'] }, data.config), 'HOLD')
   assert.equal(publicationEligibility({ ...brief, risk_domains: ['WATER_PURIFICATION'] }, evidence, data.config), 'HUMAN_REVIEW')
 })
+test('STEP 3-3 requires verified Reader excerpts and existing site illustration', async () => {
+  const data=await loadKnowledge(root)
+  assert.equal(await validateKnowledge(data),true)
+  assert.equal(data.stories.length,11)
+  const links=data.stories.flatMap(s=>(s.knowledge_links??[]).map(x=>[x.brief_id,s.id]))
+  assert.equal(links.length,12)
+  assert.equal(new Set(links.map(x=>x[0])).size,10)
+  assert.ok(!links.some(x=>x[0]==='K-013'))
+  const art=data.stories.filter(s=>s.illustration)
+  assert.equal(art.length,1)
+  assert.equal(art[0].illustration.subject_id,'loc-bridge')
+})
+test('STEP 3-3 refuses invented links, cross-world routes and altered illustration', async () => {
+  const data=await loadKnowledge(root)
+  const mutations=[
+    stories=>{stories[0].knowledge_links[0].quote='가짜로 만든 장면 인용은 허용되지 않는다.'},
+    stories=>{stories[0].knowledge_links[0].brief_id='K-NO-SUCH-ARTICLE'},
+    stories=>{stories[1].path='/?view=story&chronicle=C02-STRONGHOLD&chapter=c02-stronghold-chapter-08'},
+    stories=>{stories[1].work_title='잘못된 세계관 제목'},
+    stories=>{stories.find(s=>s.illustration).illustration.src='/visual-assets/'+'f'.repeat(64)+'.png'},
+  ]
+  for(const mutation of mutations) {
+    const stories=structuredClone(data.stories)
+    mutation(stories)
+    await assert.rejects(validateKnowledge({...data,stories}),/KNOWLEDGE_CONTRACT:/)
+  }
+})
+
+test('STEP 3-3 does not block an Operator draft revising an existing published article', async () => {
+  const data=await loadKnowledge(root)
+  const briefs=data.briefs.map(b=>b.id==='K-012'
+    ? {...b,status:'READY',publication_policy:'HUMAN_APPROVED',semantic_qa_status:'REVIEW'}
+    : b)
+  assert.equal(await validateKnowledge({...data,briefs}),true)
+})
+
 test('Reader backfill is pinned to verified public chapter and source metadata', async () => {
   const data = await loadKnowledge(root)
   const candidate = data.candidates.find((item) => item.id === 'KC-community-reserve-tracking')
@@ -421,11 +468,11 @@ test('production publication is complete only when deploy, page, index, and site
 test('duplicate identity, broken relations and missing downloads fail validation', async () => {
   const data = await loadKnowledge(root)
   await assert.rejects(validateKnowledge({ ...data, briefs: [...data.briefs, { ...data.briefs[0] }] }), /duplicate or invalid brief id/)
-  await assert.rejects(validateKnowledge({ ...data, briefs: [{ ...data.briefs[0], related_brief_ids: ['K-999'] }, data.briefs[1]] }), /related ref/)
+  await assert.rejects(validateKnowledge({ ...data, briefs: data.briefs.map((brief,i)=>i===0?{ ...brief, related_brief_ids: ['K-999'] }:brief) }), /related ref/)
   const broken = { ...data.briefs[0],
     tools: [{ ...data.briefs[0].tools[0], path: '/knowledge/downloads/missing.xlsx' }],
     sections: data.briefs[0].sections.map((section) => ({ ...section, blocks: section.blocks.map((block) => block.type === 'download/tool' ? { ...block, tool_path: '/knowledge/downloads/missing.xlsx' } : block) })) }
-  await assert.rejects(validateKnowledge({ ...data, briefs: [broken, data.briefs[1]] }), /broken tool/)
+  await assert.rejects(validateKnowledge({ ...data, briefs: data.briefs.map((brief,i)=>i===0?broken:brief) }), /broken tool/)
 })
 test('generated golden pages remain static, searchable, linked and downloadable', async () => {
   const data = await loadKnowledge(root)

@@ -25,6 +25,19 @@ test('public projection preserves approved bodies, sources and tools and strips 
   assert.ok(!JSON.stringify(projected).includes(brief.editorial_note))
 })
 
+test('STEP 3-3 projects story examples without leaking internal quote pins', async () => {
+  const data=await loadKnowledge()
+  const k002=publicBriefData(data.briefs.find(b=>b.id==='K-002'),data)
+  const k011=publicBriefData(data.briefs.find(b=>b.id==='K-011'),data)
+  assert.deepEqual(k002.related_stories.map(s=>s.id),['afterfall-two-site-reserve','han-junho-supply-inventory'])
+  assert.deepEqual(k011.related_stories.map(s=>s.id),['han-junho-route-backup','afterfall-dongcheon-bridge-access'])
+  assert.ok(k011.related_stories[1].illustration.alt.includes('작품 삽화'))
+  assert.deepEqual(publicBriefData(data.briefs.find(b=>b.id==='K-013'),data).related_stories,[])
+  const projected=JSON.stringify([...k002.related_stories,...k011.related_stories])
+  for(const secret of ['knowledge_links','reader_book_sha256','reader_chapter_sha256','source_refs','subject_id','quote'])
+    assert.ok(!projected.includes('"'+secret+'"'),secret)
+})
+
 test('PUBLISHED alone cannot bypass existing public approval conditions', async () => {
   for (const mutation of [
     (brief, data) => { data.evidence.delete(brief.id) },

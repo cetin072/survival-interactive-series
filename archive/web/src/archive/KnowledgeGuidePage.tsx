@@ -94,7 +94,20 @@ export function KnowledgeGuidePage({ guide, showTopbar = true }: { guide: Knowle
 
         {!!guide.detail.related_briefs.length && <section className="knowledge-guide-related"><h2>관련 글</h2>{guide.detail.related_briefs.map((item) => <p key={item.id}><a href={knowledgeHref(item)}><strong>{item.label} →</strong><small className="related-question">{item.title}</small></a></p>)}</section>}
         {guide.detail.related_guide && <section className="knowledge-guide-related"><h2>더 깊게 알아보기</h2><p><a href={'/knowledge/guides/' + guide.detail.related_guide.slug + '/'}>전문 가이드 보기 →</a></p></section>}
-        {!!guide.detail.related_stories.length && <section className="knowledge-guide-related"><h2>관련 이야기</h2>{guide.detail.related_stories.map((item) => <p key={item.id}><a href={item.path}>{item.title} →</a></p>)}</section>}
+        {!!guide.detail.related_stories.length && <section className="knowledge-guide-related" aria-label="창작 이야기로 이어보기">
+          <h2>관련 이야기 · 작품 속 장면</h2>
+          {guide.sections.some((section) => section.blocks.some((block) =>
+            block.type === 'prose' && /관련 본편 장면.*원문 대조/.test(block.text)
+          )) && <p className="knowledge-guide-fiction-notice">
+            연결 상태 업데이트: 본문에 남아 있는 ‘원문 대조 후 연결’ 안내는 작성 당시 내용입니다. 이후 공개 Reader 원문을 확인해 아래 작품 장면을 연결했습니다.
+          </p>}
+          <p className="knowledge-guide-fiction-notice">아래는 창작물 속 장면입니다. 현실의 재난 대응 수칙이나 이 글의 근거 자료는 아닙니다.</p>
+          <div className="knowledge-guide-fiction-stories">{guide.detail.related_stories.map((item) =>
+            <a key={item.id} className="knowledge-guide-fiction-story" href={item.path}>
+              {item.illustration && <img src={item.illustration.src} alt={item.illustration.alt} width="104" height="74" loading="lazy" decoding="async" />}
+              <span><strong>{item.title} →</strong><small>{item.work_title ?? '생존일기'} · 창작 이야기</small></span>
+            </a>)}</div>
+        </section>}
         <footer className="knowledge-guide-footer">
           <p>{guide.footer}</p>
           <p>{review.completed ? '사람의 편집 검토와 공개 승인을 거친 글입니다.' : 'AI 보조 작성 · 자동 게시 기준을 충족한 글입니다.'}</p>

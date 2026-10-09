@@ -16,6 +16,16 @@
 .knowledge-guide-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .knowledge-guide-related { margin-top: 28px; padding-top: 18px; border-top: 1px solid #d7d1c5; }
 .knowledge-guide-related .related-question { display: block; margin-top: 4px; }
+.knowledge-guide-fiction-notice { color: #63665f; font-size: 0.9em; margin: 6px 0 13px; line-height: 1.55; }
+.knowledge-guide-fiction-stories { display: grid; gap: 8px; }
+.knowledge-guide-fiction-story { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border: 1px solid #d9ddd6; border-radius: 6px; background: #f7f8f5; text-decoration: none; }
+.knowledge-guide-fiction-story:hover { border-color: #8b9c86; background: #eef2eb; }
+.knowledge-guide-fiction-story:focus-visible { outline: 2px solid #496546; outline-offset: 2px; }
+.knowledge-guide-fiction-story img { flex: none; width: 104px; height: 74px; object-fit: cover; border-radius: 4px; }
+.knowledge-guide-fiction-story span { min-width: 0; }
+.knowledge-guide-fiction-story strong { display: block; color: #334b37; }
+.knowledge-guide-fiction-story small { display: block; margin-top: 4px; color: #626861; }
+@media (max-width: 420px) { .knowledge-guide-fiction-story { align-items: flex-start; } .knowledge-guide-fiction-story img { width: 88px; height: 68px; } }
 
 .wiki-topbar {
   position: sticky;
