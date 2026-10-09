@@ -8,7 +8,7 @@
   "title": "비상 운영 조직에서 사람이 떠날 때 공용 장비와 개인 물품을 어떻게 인수인계해야 할까",
   "tools": [],
   "footer": "이 글은 일반적인 자원관리·기록 원칙이며 법적 소유권, 강제 퇴거, 압류 권한을 판단하지 않습니다. 소유 분쟁이나 신체적 위협이 있으면 당사자 간 물품 인계를 중단하고 관할 법률과 공식 기관의 절차를 따르세요.",
-  "status": "READY",
+  "status": "PUBLISHED",
   "sources": [
     {
       "id": "S1",
@@ -90,7 +90,7 @@
   "topic_id": "community-emergency-resource-management",
   "risk_level": "LOW",
   "story_refs": [],
-  "updated_at": "2026-10-07",
+  "updated_at": "2026-10-09",
   "ai_assisted": true,
   "content_type": "BRIEF",
   "published_at": "2026-10-07",
