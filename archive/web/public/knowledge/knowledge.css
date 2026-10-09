@@ -75,26 +75,26 @@ a { color: inherit; }
 .knowledge-nav a:focus-visible { outline: 2px solid #52575b; outline-offset: 2px; }
 
 
-/* STEP P1: optional share enhancement for already-static Knowledge articles. */
-.knowledge-share { width: 100%; max-width: 840px; margin: 18px auto 42px; padding: 20px 22px;
-  border: 1px solid #d9ded6; border-radius: 10px; background: #f7f9f5; }
-.knowledge-share h2 { margin: 0 0 6px; font-size: 19px; letter-spacing: -.02em; }
+/* Direct share actions: no accordion, no third-party SDK. */
+.knowledge-share { width: 100%; max-width: 840px; margin: 22px auto 42px; padding: 22px;
+  border: 1px solid #d9ded6; border-radius: 12px; background: #f7f9f5; }
+.knowledge-share h2 { margin: 0 0 8px; font-size: 21px; letter-spacing: -.02em; }
 .knowledge-share p { margin: 0 0 12px; color: #60675e; font-size: 14px; line-height: 1.6; }
-.knowledge-share-panel > summary { display: inline-block; cursor: pointer; padding: 9px 14px;
-  border: 1px solid #648063; border-radius: 7px; color: #2f5034; font-weight: 700; background: #fff; }
-.knowledge-share-panel > summary::marker { color: #2f5034; }
-.knowledge-share-panel > summary::after { content: '⌄'; margin-left: 10px; }
-.knowledge-share-panel[open] > summary::after { content: '⌃'; }
-.knowledge-share-body { padding-top: 14px; }
-.knowledge-share-body label { display: block; margin-bottom: 5px; font-size: 13px; color: #424a43; }
-.knowledge-share-body input { width: 100%; min-width: 0; padding: 10px 11px; border: 1px solid #b9c7b7;
-  border-radius: 6px; font: inherit; font-size: 13px; background: white; color: #263c29; }
-.knowledge-share-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-.knowledge-share-actions[hidden], .knowledge-share-actions button[hidden] { display: none; }
-.knowledge-share-actions button { padding: 10px 14px; border: 1px solid #779576; border-radius: 7px;
-  color: #25452b; background: #fff; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
-.knowledge-share-actions button:hover { background: #eaf2e8; }
-.knowledge-share :focus-visible { outline: 2px solid #35653a; outline-offset: 2px; }
+.knowledge-share-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+.knowledge-share-actions[hidden], .knowledge-share-actions [hidden] { display: none; }
+.knowledge-share-actions :is(button, a) { display: inline-flex; flex: 1 1 145px;
+  align-items: center; justify-content: center; min-height: 44px; padding: 10px 12px;
+  border: 1px solid #779576; border-radius: 8px; background: #fff; color: #25452b;
+  font: inherit; font-size: 14px; font-weight: 700; text-align: center;
+  text-decoration: none; cursor: pointer; }
+.knowledge-share-actions :is(button, a):hover { background: #eaf2e8; }
+.knowledge-share-actions .knowledge-share-copy { border-color: #26533d; background: #26533d; color: #fff; }
+.knowledge-share-actions .knowledge-share-copy:hover { background: #19452f; }
+.knowledge-share > label { display: block; margin: 12px 0 6px; font-size: 13px; color: #424a43; font-weight: 700; }
+.knowledge-share > input { display: block; width: 100%; min-width: 0; padding: 11px 12px;
+  border: 1px solid #b9c7b7; border-radius: 8px; font: inherit; font-size: 13px;
+  background: white; color: #263c29; text-overflow: ellipsis; }
+.knowledge-share :focus-visible { outline: 2px solid #35653a; outline-offset: 3px; }
 .knowledge-share .knowledge-share-status { min-height: 1.5em; margin: 8px 0 0; }
-@media (max-width: 420px) { .knowledge-share { padding: 16px; }
-  .knowledge-share-actions button { flex: 1 1 120px; } }
+@media (max-width: 420px) { .knowledge-share { padding: 16px; margin: 20px auto 28px; }
+  .knowledge-share-actions :is(button, a) { flex: 1 1 132px; } }

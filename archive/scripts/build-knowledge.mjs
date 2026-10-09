@@ -14,21 +14,19 @@ const site = data.config.site_origin
 const searchTitle = (brief) => `${brief.label?.trim() || brief.title} | 생존일기`
 // Small static, progressively enhanced UI: link remains selectable without JS.
 const sharePanel = (canonical) => [
-  '<section class="knowledge-share" aria-labelledby="knowledge-share-heading">',
+  '<section class="knowledge-share" aria-labelledby="knowledge-share-heading" data-knowledge-share>',
   '  <h2 id="knowledge-share-heading">이 글 공유하기</h2>',
-  '  <p>필요한 사람에게 이 생존지식의 주소를 전달하세요.</p>',
-  '  <details class="knowledge-share-panel" data-knowledge-share>',
-  '    <summary>공유 옵션</summary>',
-  '    <div class="knowledge-share-body">',
-  '      <label for="knowledge-share-url">이 글의 공개 주소</label>',
-  '      <input id="knowledge-share-url" type="url" value="' + esc(site + canonical) + '" readonly spellcheck="false" />',
-  '      <div class="knowledge-share-actions" data-knowledge-share-actions hidden>',
-  '        <button type="button" data-knowledge-native-share hidden>휴대전화·기기 공유</button>',
-  '        <button type="button" data-knowledge-copy>링크 복사</button>',
-  '      </div>',
-  '      <p class="knowledge-share-status" data-knowledge-share-status role="status" aria-live="polite"></p>',
-  '    </div>',
-  '  </details>',
+  '  <p>이 글의 공식 주소를 복사하거나 SNS로 전달할 수 있습니다.</p>',
+  '  <div class="knowledge-share-actions" data-knowledge-share-actions hidden>',
+  '    <button type="button" data-knowledge-native-share hidden>휴대전화·기기 공유</button>',
+  '    <button type="button" class="knowledge-share-copy" data-knowledge-copy>링크 복사</button>',
+  '    <a data-knowledge-naver-share target="_blank" rel="noopener noreferrer">네이버</a>',
+  '    <a data-knowledge-x-share target="_blank" rel="noopener noreferrer">X</a>',
+  '    <a data-knowledge-facebook-share target="_blank" rel="noopener noreferrer">Facebook</a>',
+  '  </div>',
+  '  <label for="knowledge-share-url">이 글의 공식 주소</label>',
+  '  <input id="knowledge-share-url" type="url" value="' + esc(site + canonical) + '" readonly spellcheck="false" />',
+  '  <p class="knowledge-share-status" data-knowledge-share-status role="status" aria-live="polite"></p>',
   '</section>',
 ].join('\n')
 
