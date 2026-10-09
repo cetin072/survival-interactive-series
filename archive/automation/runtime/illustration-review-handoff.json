@@ -1,17 +1,17 @@
 {
   "version": "illustration-review-handoff-v1",
-  "job_id": "illustration-event-guild-warehouse-option-5d70e344c196-20261009-37839899164",
-  "main_sha": "bf49a49e0966beef2d8442d33a4540945280491b",
-  "point_id": "point-f1325bef904fb7ed5048d5e9ccbc7bb7eedbfc486d04591666fd084845a96305",
-  "generation_key": "generation-5d70e344c19613400a472c318135c6f01c09a2b96dffc3338d2d430a565efe3f",
-  "subject_id": "event-guild-warehouse-option",
-  "prompt_sha256": "b7b2c707a45487e72a08392449fab4f249316d9c9b3d1ba9a89b632a1954c7cd",
-  "review_context_sha256": "b028afe116c1927f163fd144056f5e5393a98ec25834fe5933d92bd7e0723577",
+  "job_id": "illustration-char-hajin-2ff606063ff6-20261010-37987397187",
+  "main_sha": "f9458bb08c5074e6bd34eceeda7619ea73b74370",
+  "point_id": "point-1cdda50112b4df4f34612475282667d290fcee120e54ee38b2fdff5f4767b8de",
+  "generation_key": "generation-2ff606063ff67c43e8c84b044e8cc77574877dd47b579267cc64706b95962364",
+  "subject_id": "char-hajin",
+  "prompt_sha256": "4e40e5c351fdad287b7859e993c12f39d71e30c3c55f95e3576729a076bd7d64",
+  "review_context_sha256": "6976483b135558ea96f1c9f64f54b2da331e7120daaf00ea68dd3a4efe71d08c",
   "source_library_path": "/IMAGE-RENDER/output/current.png",
-  "source_library_file_id": "file_00000000abf481f7bf60909e01a57429",
+  "source_library_file_id": "file_0000000033a081f5ba2535a7dcda8aa1",
   "decision": "PASS",
   "review_provider": "native_chatgpt_vision",
-  "review_summary": "Matches the bound warehouse-startup scene: a wide contemporary Korean warehouse shows first stored goods, cartons, pallet-handling tools, and mostly empty shelving, clearly conveying an early transitional operating stage. Small non-identifying workers, cool blue-gray natural light, restrained painterly realism, and ample environmental space support the quiet practical mood without invented violence, weapons, branding, legible identity text, or unsupported outcomes.",
+  "review_summary": "Matches the bound character portrait: one Korean woman in her mid-thirties has a slim upright build, calm eyes, straight brows, a short side-swept black bob with one ear visible, a worn fluorescent safety vest, oil-stained work gloves, and folded facility plans. Natural posture, a believable contemporary Korean worksite, cool blue-gray light, restrained painterly realism, and no legible branding, weapons, gore, fantasy elements, or unsupported narrative outcomes.",
   "rejection_codes": [],
-  "created_at": "2026-10-09T00:35:00.225Z"
+  "created_at": "2026-10-09T23:35:14.197Z"
 }
