@@ -65,7 +65,16 @@ test('all existing canonical routes retain original content, SEO, sitemap, downl
     for (const source of brief.sources) assert.ok(normalizedPage.includes(esc(source.url)))
     for (const related of projection.related_briefs) assert.ok(page.includes(`href="${knowledgeHref(related)}"`))
     for (const story of projection.related_stories) assert.ok(page.includes(`href="${esc(story.path)}"`))
-    assert.doesNotMatch(page, /knowledge-preview|<script(?! type="application\/ld\+json")/)
+    assert.doesNotMatch(page, /knowledge-preview/)
+    // Static content and sources remain in the first HTML response. The
+    // sole executable addition is one local, deferred, share-only script.
+    const executableScripts = [...page.matchAll(/<script\b[^>]*>/g)].map((m) => m[0])
+      .filter((tag) => !tag.includes('type="application/ld+json"'))
+    assert.deepEqual(executableScripts, ['<script defer src="/knowledge/share.js">'])
+    assert.ok(page.includes('<meta name="twitter:card" content="summary" />'))
+    assert.ok(page.includes('data-knowledge-share'))
+    assert.ok(page.includes('value="' + esc(url) + '" readonly'))
+    assert.ok(page.includes('data-knowledge-share-actions hidden'))
   }
 })
 

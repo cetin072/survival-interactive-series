@@ -12,6 +12,26 @@ const esc = (value) => String(value).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;'
 const site = data.config.site_origin
 // Existing labels are the concise visible headings; preserve the original question in the page/schema.
 const searchTitle = (brief) => `${brief.label?.trim() || brief.title} | 생존일기`
+// Small static, progressively enhanced UI: link remains selectable without JS.
+const sharePanel = (canonical) => [
+  '<section class="knowledge-share" aria-labelledby="knowledge-share-heading">',
+  '  <h2 id="knowledge-share-heading">이 글 공유하기</h2>',
+  '  <p>필요한 사람에게 이 생존지식의 주소를 전달하세요.</p>',
+  '  <details class="knowledge-share-panel" data-knowledge-share>',
+  '    <summary>공유 옵션</summary>',
+  '    <div class="knowledge-share-body">',
+  '      <label for="knowledge-share-url">이 글의 공개 주소</label>',
+  '      <input id="knowledge-share-url" type="url" value="' + esc(site + canonical) + '" readonly spellcheck="false" />',
+  '      <div class="knowledge-share-actions" data-knowledge-share-actions hidden>',
+  '        <button type="button" data-knowledge-native-share hidden>휴대전화·기기 공유</button>',
+  '        <button type="button" data-knowledge-copy>링크 복사</button>',
+  '      </div>',
+  '      <p class="knowledge-share-status" data-knowledge-share-status role="status" aria-live="polite"></p>',
+  '    </div>',
+  '  </details>',
+  '</section>',
+].join('\n')
+
 const shell = (title, description, canonical, body, schema = '', detail = false, guideUi = detail) => `<!doctype html>
 <html lang="ko">
 <head>
@@ -25,7 +45,7 @@ const shell = (title, description, canonical, body, schema = '', detail = false,
   <meta property="og:type" content="${detail ? 'article' : 'website'}" />
   <meta property="og:url" content="${esc(site + canonical)}" />
   <meta property="og:site_name" content="생존일기" />
-  <meta property="og:locale" content="ko_KR" />
+  <meta property="og:locale" content="ko_KR" />${detail ? '\n  <meta name="twitter:card" content="summary" />' : ''}
   <link rel="stylesheet" href="/knowledge/knowledge.css" />${guideUi ? '\n  <link rel="stylesheet" href="/knowledge/wikiShell.css" />\n  <link rel="stylesheet" href="/knowledge/survivalDesignLanguage.css" />' : ''}
 ${schema}
 </head>
@@ -35,8 +55,8 @@ ${schema}
       <a class="knowledge-brand" href="/"><p class="knowledge-kicker">SURVIVAL DIARY</p><strong>생존일기</strong><span>생존 지식과 이야기</span></a>
       <nav class="knowledge-nav" aria-label="주요 탐색">${renderer.navigation.map((item) => `<a href="${esc(item.href)}"${item.id === 'knowledge' ? ' aria-current="page"' : ''}>${esc(item.label)}</a>`).join('')}<a href="/#site-search">검색</a></nav>
     </header>
-    ${body}
-  </div>
+    ${body}${detail ? '\n    ' + sharePanel(canonical) : ''}
+  </div>${detail ? '\n  <script defer src="/knowledge/share.js"></script>' : ''}
 </body>
 </html>
 `

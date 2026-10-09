@@ -73,3 +73,28 @@ a { color: inherit; }
 
 .knowledge-brand span { display: block; margin-top: 4px; color: #626269; font-size: 12px; }
 .knowledge-nav a:focus-visible { outline: 2px solid #52575b; outline-offset: 2px; }
+
+
+/* STEP P1: optional share enhancement for already-static Knowledge articles. */
+.knowledge-share { width: 100%; max-width: 840px; margin: 18px auto 42px; padding: 20px 22px;
+  border: 1px solid #d9ded6; border-radius: 10px; background: #f7f9f5; }
+.knowledge-share h2 { margin: 0 0 6px; font-size: 19px; letter-spacing: -.02em; }
+.knowledge-share p { margin: 0 0 12px; color: #60675e; font-size: 14px; line-height: 1.6; }
+.knowledge-share-panel > summary { display: inline-block; cursor: pointer; padding: 9px 14px;
+  border: 1px solid #648063; border-radius: 7px; color: #2f5034; font-weight: 700; background: #fff; }
+.knowledge-share-panel > summary::marker { color: #2f5034; }
+.knowledge-share-panel > summary::after { content: '⌄'; margin-left: 10px; }
+.knowledge-share-panel[open] > summary::after { content: '⌃'; }
+.knowledge-share-body { padding-top: 14px; }
+.knowledge-share-body label { display: block; margin-bottom: 5px; font-size: 13px; color: #424a43; }
+.knowledge-share-body input { width: 100%; min-width: 0; padding: 10px 11px; border: 1px solid #b9c7b7;
+  border-radius: 6px; font: inherit; font-size: 13px; background: white; color: #263c29; }
+.knowledge-share-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.knowledge-share-actions[hidden], .knowledge-share-actions button[hidden] { display: none; }
+.knowledge-share-actions button { padding: 10px 14px; border: 1px solid #779576; border-radius: 7px;
+  color: #25452b; background: #fff; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.knowledge-share-actions button:hover { background: #eaf2e8; }
+.knowledge-share :focus-visible { outline: 2px solid #35653a; outline-offset: 2px; }
+.knowledge-share .knowledge-share-status { min-height: 1.5em; margin: 8px 0 0; }
+@media (max-width: 420px) { .knowledge-share { padding: 16px; }
+  .knowledge-share-actions button { flex: 1 1 120px; } }
