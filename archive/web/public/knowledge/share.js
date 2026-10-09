@@ -5,15 +5,22 @@
   const actions = panel.querySelector('[data-knowledge-share-actions]')
   const nativeButton = panel.querySelector('[data-knowledge-native-share]')
   const copyButton = panel.querySelector('[data-knowledge-copy]')
+  const naverLink = panel.querySelector('[data-knowledge-naver-share]')
+  const xLink = panel.querySelector('[data-knowledge-x-share]')
+  const facebookLink = panel.querySelector('[data-knowledge-facebook-share]')
   const input = panel.querySelector('#knowledge-share-url')
   const status = panel.querySelector('[data-knowledge-share-status]')
   const canonical = document.querySelector('link[rel="canonical"]')?.getAttribute('href')
-  if (!actions || !nativeButton || !copyButton || !input || !status ||
+  if (!actions || !nativeButton || !copyButton || !naverLink || !xLink || !facebookLink || !input || !status ||
       !canonical || !canonical.startsWith('https://') || input.value !== canonical) return
 
   const title = document.querySelector('meta[property="og:title"]')?.getAttribute('content') || document.title
   const description = document.querySelector('meta[property="og:description"]')?.getAttribute('content') || ''
   const canNativeShare = typeof navigator.share === 'function'
+  // Only the verified public canonical is shared, never the Preview address.
+  naverLink.href = 'https://share.naver.com/web/shareView?url=' + encodeURIComponent(canonical) + '&title=' + encodeURIComponent(title)
+  xLink.href = 'https://x.com/intent/tweet?url=' + encodeURIComponent(canonical) + '&text=' + encodeURIComponent(title)
+  facebookLink.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(canonical)
   nativeButton.hidden = !canNativeShare
   actions.hidden = false
 

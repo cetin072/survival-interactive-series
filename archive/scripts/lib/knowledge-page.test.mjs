@@ -75,6 +75,13 @@ test('all existing canonical routes retain original content, SEO, sitemap, downl
     assert.ok(page.includes('data-knowledge-share'))
     assert.ok(page.includes('value="' + esc(url) + '" readonly'))
     assert.ok(page.includes('data-knowledge-share-actions hidden'))
+    assert.match(page, /<section class="knowledge-share"[^>]*data-knowledge-share>/)
+    assert.doesNotMatch(page, /class="knowledge-share-panel"|<summary>공유 옵션<\/summary>/)
+    for (const platform of ['naver', 'x', 'facebook']) {
+      assert.ok(page.includes('data-knowledge-' + platform + '-share target="_blank" rel="noopener noreferrer"'))
+    }
+    assert.ok(page.indexOf('data-knowledge-share-actions hidden') < page.indexOf('id="knowledge-share-url"'))
+
   }
 })
 

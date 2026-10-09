@@ -18,6 +18,9 @@ function fakePage(navigator, inputUrl = canonical) {
   const actions = fakeControl(true)
   const nativeButton = fakeControl(true)
   const copyButton = fakeControl(true)
+  const naverLink = {}
+  const xLink = {}
+  const facebookLink = {}
   const input = { value: inputUrl, focused: 0, selected: 0,
     focus() { this.focused++ },
     select() { this.selected++ },
@@ -27,6 +30,9 @@ function fakePage(navigator, inputUrl = canonical) {
     '[data-knowledge-share-actions]': actions,
     '[data-knowledge-native-share]': nativeButton,
     '[data-knowledge-copy]': copyButton,
+    '[data-knowledge-naver-share]': naverLink,
+    '[data-knowledge-x-share]': xLink,
+    '[data-knowledge-facebook-share]': facebookLink,
     '#knowledge-share-url': input,
     '[data-knowledge-share-status]': status,
   }
@@ -42,7 +48,7 @@ function fakePage(navigator, inputUrl = canonical) {
     },
   }
   runInNewContext(script, { document, navigator })
-  return { actions, nativeButton, copyButton, input, status }
+  return { actions, nativeButton, copyButton, naverLink, xLink, facebookLink, input, status }
 }
 
 test('mobile share uses exact canonical title/description and never Preview URL', async () => {
@@ -89,4 +95,29 @@ test('missing/mismatched canonical fails closed without enabling script controls
   assert.equal(page.actions.hidden, true)
   assert.equal(page.nativeButton.hidden, true)
   assert.equal(page.copyButton.handlers.click, undefined)
+})
+
+test('social choices are direct and only use canonical URL and OG title', () => {
+  const page = fakePage({})
+  assert.equal(page.actions.hidden, false)
+  const naver = new URL(page.naverLink.href)
+  const x = new URL(page.xLink.href)
+  const facebook = new URL(page.facebookLink.href)
+  assert.equal(naver.origin, 'https://share.naver.com')
+  assert.equal(naver.searchParams.get('url'), canonical)
+  assert.equal(naver.searchParams.get('title'), '가족 비상연락 | 생존일기')
+  assert.equal(x.origin, 'https://x.com')
+  assert.equal(x.searchParams.get('url'), canonical)
+  assert.equal(x.searchParams.get('text'), '가족 비상연락 | 생존일기')
+  assert.equal(facebook.origin, 'https://www.facebook.com')
+  assert.equal(facebook.searchParams.get('u'), canonical)
+  for (const link of [page.naverLink, page.xLink, page.facebookLink]) {
+    assert.ok(!link.href.includes('deploy-preview'))
+  }
+})
+
+test('unverified canonical leaves every social link inactive', () => {
+  const page = fakePage({}, 'https://deploy-preview.example.org/knowledge/family-emergency-contact-plan/')
+  assert.equal(page.actions.hidden, true)
+  for (const link of [page.naverLink, page.xLink, page.facebookLink]) assert.equal(link.href, undefined)
 })
