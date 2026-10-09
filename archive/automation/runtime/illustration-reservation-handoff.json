@@ -59,6 +59,34 @@
     "source_version_id": null,
     "source_sha256": "b2a3171a710fe2587badff40ad140c04f2b2dc0b6f9f4b842a3d0de660ecc4ce"
   },
-  "transfer": null,
+  "transfer": {
+    "status": "FINALIZE_QUEUED",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_00000000abf481f7bf60909e01a57429",
+    "source_library_file_id": "libfile_963b41f600e0819181b1531b40328a6a",
+    "source_version_id": null,
+    "source_sha256": "b2a3171a710fe2587badff40ad140c04f2b2dc0b6f9f4b842a3d0de660ecc4ce",
+    "staging_id": "site-illustration-event-guild-warehouse-option-5d70e344c196-20261009-37839899164",
+    "derivative_sha256": "f8b5fa6251a044d1a1fcb8c291cfc1fc30ee364ed1c1e06a10a3dcf595f979a5",
+    "derivative_size_bytes": 189240,
+    "derivative_width": 512,
+    "derivative_height": 512,
+    "derivative_mime_type": "image/png",
+    "derivative_palette_colors": 256,
+    "chunk_count": 7,
+    "stored_chunk_indexes": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "finalizer_dispatch_request_id": 125,
+    "finalizer_dispatch_at": "2026-10-09T01:34:26.820283+00:00",
+    "job_status_readback": "FINALIZE_QUEUED",
+    "completed_at": "2026-10-09T01:34:50.095Z"
+  },
   "result": null
 }
