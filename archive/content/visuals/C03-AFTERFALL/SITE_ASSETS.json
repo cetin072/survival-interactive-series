@@ -3,7 +3,7 @@
   "chronicle_id": "C03-AFTERFALL",
   "worldline_id": "AFTERFALL",
   "visibility": "PUBLIC_ARCHIVE",
-  "visual_catalog_sha256": "014e3d8e4a371d6045e80b4aabc2bbfdac0d0fa6e8535272739c31511d70226e",
+  "visual_catalog_sha256": "5afb2221b75a80c0c4d655aa250518d3beea7c10562e4fa8cefb145381afdbc1",
   "assets": [
     {
       "point_id": "point-e33f848046b1245234e579828dadc03939faf10d609c15bff315b8c421be1a72",
@@ -181,7 +181,23 @@
       "width": 512,
       "height": 512,
       "mime_type": "image/png"
+    },
+    {
+      "point_id": "point-f1325bef904fb7ed5048d5e9ccbc7bb7eedbfc486d04591666fd084845a96305",
+      "generation_key": "generation-5d70e344c19613400a472c318135c6f01c09a2b96dffc3338d2d430a565efe3f",
+      "subject_id": "event-guild-warehouse-option",
+      "source_sha256": "f8b5fa6251a044d1a1fcb8c291cfc1fc30ee364ed1c1e06a10a3dcf595f979a5",
+      "storage_bucket": "survival-archive-originals",
+      "storage_object_path": "AFTERFALL/point-f1325bef904fb7ed5048d5e9ccbc7bb7eedbfc486d04591666fd084845a96305/generation-5d70e344c19613400a472c318135c6f01c09a2b96dffc3338d2d430a565efe3f/f8b5fa6251a044d1a1fcb8c291cfc1fc30ee364ed1c1e06a10a3dcf595f979a5.png",
+      "registry_asset_id": "AF-EVENT-F1325BEF904FB7ED5048D5E9",
+      "derivative_version": "site-png-512-v1",
+      "public_path": "/visual-assets/dca92f2e213a15cdc5e7355925372f9e0cdb4d61571451cfbc959c2fe946ed01.png",
+      "sha256": "dca92f2e213a15cdc5e7355925372f9e0cdb4d61571451cfbc959c2fe946ed01",
+      "bytes": 189244,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png"
     }
   ],
-  "content_sha256": "97654dfcfc84785b222ceb546356680ee15cb1e7e714bde37f50a59c52b4dc15"
+  "content_sha256": "94dd57f83106cd6ff3be18f22d4f4c8030618eb9402cb2a620071f478774be18"
 }
