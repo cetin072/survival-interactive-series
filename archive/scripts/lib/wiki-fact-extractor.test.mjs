@@ -193,19 +193,30 @@ function isolateSampleGraph(graph, sample) {
   return { ...body, content_sha256: graphHash(body) }
 }
 
-test('incomplete public C03 source remains fail-closed in the original repository', async () => {
-  const manifest = JSON.parse(await readFile(resolve(root, 'archive/content/transcripts/C03-AFTERFALL/S04/MANIFEST.json'), 'utf8'))
-  let notApplied = 0
+test('real S04 public sources require same-save applied evidence before entering the native queue', async () => {
+  const manifest = JSON.parse(await readFile(resolve(root,
+    'archive/content/transcripts/C03-AFTERFALL/S04/MANIFEST.json'), 'utf8'))
+  const sources = await discoverWikiSources(root)
+  const s04 = sources.filter((source) => source.seasonId === 'S04')
+  assert.equal(s04.length, manifest.sessions.length)
+
   for (const session of manifest.sessions) {
     const snapshot = JSON.parse(await readFile(resolve(root,
       'archive/content/transcripts/C03-AFTERFALL/S04', session.source_manifest), 'utf8'))
-    const last = snapshot.content_sha256?.at(-1)
-    if (last?.state_link?.outcome !== 'APPLIED') notApplied++
-  }
-  if (notApplied > 0) {
-    await assert.rejects(discoverWikiSources(root), /WIKI_PUBLIC_ANCHOR_NOT_APPLIED/)
-  } else {
-    assert.ok((await discoverWikiSources(root)).length > 0)
+    const messages = snapshot.content_sha256
+    const source = s04.find((entry) => entry.sourceSession.session_id === session.session_id)
+    assert.ok(source, `missing approved S04 source: ${session.session_id}`)
+    assert.equal(source.anchor.game_time, snapshot.captured_message_range.end)
+    const appliedIndex = messages.findLastIndex((entry) =>
+      entry.role === 'GM' && entry.state_link?.outcome === 'APPLIED'
+        && entry.state_link.linked_save_version === entry.save_version)
+    assert.ok(appliedIndex >= 0, 'S04 must contain a verified applied save')
+    const appliedSave = messages[appliedIndex].state_link.linked_save_version
+    assert.equal(source.anchor.save_version, appliedSave)
+    assert.ok(messages.slice(appliedIndex + 1).every((entry) =>
+      entry.state_link === undefined && entry.save_version === appliedSave),
+    'unlinked public narrative must not advance the save number')
+    assert.equal(source.gmBlocks.length, session.gm_public_blocks)
   }
   assert.ok(appliedSnapshot.excluded.every((item) => item.reason === 'NO_APPLIED_PUBLIC_ANCHOR'))
 })
