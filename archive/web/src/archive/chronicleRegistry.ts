@@ -16,6 +16,11 @@ export const chronicleRegistry: Chronicle[] = [
   { id: 'C03-AFTERFALL', number: 3, ipId: 'survival-diary', label: 'C03 · 서진우', title: '서진우의 생존기', protagonist: '서진우', worldlineId: 'AFTERFALL', active: true, status: 'LIVE', sourceClass: 'LIVE_RPG', transcriptStatus: 'partial', sourceRoot: 'worldlines/AFTERFALL', readerAvailable: true, availabilityNote: '검증된 공개 GM 원문 구간을 수록합니다.' },
 ]
 
+/** Presentation order only: larger Chronicle numbers first, without mutating registry identity. */
+export const sortChroniclesNewestFirst = (registry: readonly Chronicle[]): Chronicle[] =>
+  [...registry].sort((a, b) => b.number - a.number || a.id.localeCompare(b.id, 'ko'))
+
+
 export function partitionChronicles(registry: Chronicle[] = chronicleRegistry) {
   const active = registry.filter((chronicle) => chronicle.active)
   if (active.length !== 1) throw new Error('Chronicle registry must have exactly one active record.')

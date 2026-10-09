@@ -1,14 +1,18 @@
-import { test } from 'node:test'
+import { test, after } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile, mkdtemp, writeFile, rm } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { byteHash, graphHash, reconcilePublicGraph, reconcilePublicGraphBackfill } from './publication-graph.mjs'
 import { discoverWikiSources, discoverWikiSource } from './wiki-semantic-jobs.mjs'
+import { createAppliedWikiTestSnapshot } from './test-applied-wiki-snapshot.mjs'
 import { buildWikiFactJob, buildWikiFactReviewJob, compileWikiFactProposal, extractWikiFacts, reviewWikiFactProposal, validateWikiFactReview, WIKI_RESULT_VERSION, WIKI_REVIEW_VERSION } from './wiki-fact-extractor.mjs'
 import { runWikiFactCli } from '../run-wiki-fact-extractor.mjs'
 
 const root = resolve(import.meta.dirname, '../../..')
+const appliedSnapshot = await createAppliedWikiTestSnapshot(root)
+after(async () => appliedSnapshot.cleanup())
+const appliedBase = appliedSnapshot.base
 const NS = { chronicle_id: 'C03-AFTERFALL', worldline_id: 'AFTERFALL', visibility: 'PUBLIC_ARCHIVE' }
 const ANCHOR = { save_version: 10, game_time: '2027-01-01 12:00' }
 const book = { chronicleId: 'C03-AFTERFALL', worldlineId: 'AFTERFALL', chapters: [] }
@@ -189,13 +193,30 @@ function isolateSampleGraph(graph, sample) {
   return { ...body, content_sha256: graphHash(body) }
 }
 
+test('incomplete public C03 source remains fail-closed in the original repository', async () => {
+  const manifest = JSON.parse(await readFile(resolve(root, 'archive/content/transcripts/C03-AFTERFALL/S04/MANIFEST.json'), 'utf8'))
+  let notApplied = 0
+  for (const session of manifest.sessions) {
+    const snapshot = JSON.parse(await readFile(resolve(root,
+      'archive/content/transcripts/C03-AFTERFALL/S04', session.source_manifest), 'utf8'))
+    const last = snapshot.content_sha256?.at(-1)
+    if (last?.state_link?.outcome !== 'APPLIED') notApplied++
+  }
+  if (notApplied > 0) {
+    await assert.rejects(discoverWikiSources(root), /WIKI_PUBLIC_ANCHOR_NOT_APPLIED/)
+  } else {
+    assert.ok((await discoverWikiSources(root)).length > 0)
+  }
+  assert.ok(appliedSnapshot.excluded.every((item) => item.reason === 'NO_APPLIED_PUBLIC_ANCHOR'))
+})
+
 test('real SESSION_006 and SESSION_007 samples compile with unchanged protected files', async () => {
   const samples = JSON.parse(await readFile(new URL('./fixtures/wiki-fact-results-v1.json', import.meta.url)))
   const protectedRefs = ['archive/content/graphs/C03-AFTERFALL/GRAPH.json', 'archive/content/stories/C03-AFTERFALL/BOOK.json',
     'archive/content/transcripts/C03-AFTERFALL/S03/MANIFEST.json', ...['SESSION_006', 'SESSION_007'].map((id) => `archive/content/transcripts/C03-AFTERFALL/S03/${id}/PART_001.md`)]
   const before = await Promise.all(protectedRefs.map(async (ref) => byteHash(await readFile(resolve(root, ref)))))
   const graph = JSON.parse(await readFile(resolve(root, protectedRefs[0])))
-  const sources = await discoverWikiSources(root)
+  const sources = await discoverWikiSources(appliedBase)
   for (const session of ['SESSION_006', 'SESSION_007']) {
     const source = sources.find((item) => item.sourceSession.session_id === session)
     assert.ok(source)
@@ -217,10 +238,10 @@ test('real SESSION_006 and SESSION_007 samples compile with unchanged protected 
 test('real CLI prepares the current pending source and validates a state-agnostic result', async () => {
   let source
   try {
-    source = await discoverWikiSource(root)
+    source = await discoverWikiSource(appliedBase)
   } catch (error) {
     assert.equal(error.message, 'WIKI_NO_PENDING_SOURCE')
-    const terminal = JSON.parse(await runWikiFactCli(['--prepare']))
+    const terminal = JSON.parse(await runWikiFactCli(['--prepare'], { root: appliedBase }))
     assert.deepEqual(terminal, {
       status: 'NOOP',
       reason: 'WIKI_NO_PENDING_SOURCE',
@@ -230,7 +251,7 @@ test('real CLI prepares the current pending source and validates a state-agnosti
     return
   }
 
-  const job = JSON.parse(await runWikiFactCli(['--prepare']))
+  const job = JSON.parse(await runWikiFactCli(['--prepare'], { root: appliedBase }))
   assert.equal(job.source.session_id, source.sourceSession.session_id)
   const dir = await mkdtemp(join(tmpdir(), 'wiki-native-'))
   try {
@@ -250,11 +271,11 @@ test('real CLI prepares the current pending source and validates a state-agnosti
       note: 'STATE_AGNOSTIC_CLI_TEST_ONLY',
     }
     await writeFile(path, JSON.stringify(result))
-    const proposal = JSON.parse(await runWikiFactCli(['--result', path, '--check']))
+    const proposal = JSON.parse(await runWikiFactCli(['--result', path, '--check'], { root: appliedBase }))
     assert.equal(proposal.status, 'NO_FACTS')
     assert.equal(proposal.coverage.status, 'COMPLETE')
     assert.equal(proposal.graph_changed, false)
-    await assert.rejects(runWikiFactCli(['--result', path, '--apply']), /WIKI_FACT_CLI_ARGUMENTS_INVALID/)
+    await assert.rejects(runWikiFactCli(['--result', path, '--apply'], { root: appliedBase }), /WIKI_FACT_CLI_ARGUMENTS_INVALID/)
   } finally { await rm(dir, { recursive: true, force: true }) }
 })
 

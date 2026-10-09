@@ -14,3 +14,8 @@ declare module 'virtual:archive-public-transcripts' {
   const parts: unknown
   export default parts
 }
+
+declare module 'virtual:reader-wiki-seeds' {
+  const seeds: unknown
+  export default seeds
+}

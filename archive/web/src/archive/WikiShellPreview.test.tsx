@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { WikiShellPreview } from './WikiShellPreview'
 import { wikiCharacterIndex, wikiEventIndex, wikiLocationIndex } from './wikiDocument'
 import { archiveRouteUrl, parseArchiveRoute } from './readerNavigation'
+import { hasPublishedWorldWiki } from './worldWikiIndexData'
 import { WorldIndexSection } from './WikiWorldIndexPreview'
 
 describe('Wiki staged public structure', () => {
@@ -58,6 +59,19 @@ describe('Wiki staged public structure', () => {
     }
   })
 
+  it('keeps the related Chronicle list in newest-first order, not the original registry order', () => {
+    const html = renderToStaticMarkup(createElement(WikiShellPreview, {
+      page: 'world', chronicleId: 'C03-AFTERFALL',
+    }))
+    const side = html.split('id="world-chronicle-list-title"')[1] ?? ''
+    const newest = side.indexOf('서진우의 생존기')
+    const middle = side.indexOf('박도현의 생존기')
+    const oldest = side.indexOf('한준호의 생존기')
+    expect(newest).toBeGreaterThan(0)
+    expect(middle).toBeGreaterThan(newest)
+    expect(oldest).toBeGreaterThan(middle)
+  })
+
   it('shows six document links per category, with native details for the rest', () => {
     const markup = renderToStaticMarkup(createElement(WikiShellPreview, {
       page: 'world', chronicleId: 'C03-AFTERFALL',
@@ -96,11 +110,13 @@ describe('Wiki staged public structure', () => {
   it('does not leak C03 wiki nodes into C01 or C02 world views', () => {
     for (const chronicleId of ['C01-HAN-JUNHO', 'C02-STRONGHOLD']) {
       const markup = renderToStaticMarkup(createElement(WikiShellPreview, { page: 'world', chronicleId }))
-      expect(markup).toContain('세계관 문서 준비 중')
+      expect(markup).toContain(hasPublishedWorldWiki(chronicleId) ? '최근 세계관 기록' : '세계관 문서 준비 중')
       expect(markup).toContain('생존기별 세계관')
       expect(markup).not.toContain('char-jinwoo')
-      expect(markup).not.toContain('최근 세계관 기록')
-      expect(markup).not.toContain('현재 공개된 세계관 문서 기준')
+      expect(markup).not.toContain('node=char-seojin&amp;chronicle=C03-AFTERFALL')
+      if (chronicleId === 'C01-HAN-JUNHO') expect(markup).not.toContain('node=char-seojin')
+      else expect(markup).toContain('node=char-seojin&amp;chronicle=C02-STRONGHOLD')
+      expect(markup).not.toContain('node=loc-agri')
     }
   })
 
@@ -110,9 +126,26 @@ describe('Wiki staged public structure', () => {
       chronicleId: 'C01-HAN-JUNHO',
     }))
     expect(markup).toContain('한준호의 생존기')
-    expect(markup).toContain('Reader 중심으로 공개')
+    expect(markup).toContain('공개 Reader 장 순서 기준')
+    expect(markup).toContain('node=char-junho')
+    expect(markup).not.toContain('node=char-jinwoo')
     expect(markup).toContain('이야기 읽기')
     expect(markup).not.toContain('서진우의 생존 기록')
+  })
+
+  it('keeps the one quick navigation in document flow before the article on mobile', () => {
+    for (const props of [
+      { nodeId: 'char-jinwoo', chronicleId: 'C03-AFTERFALL' },
+      { nodeId: 'char-junho', chronicleId: 'C01-HAN-JUNHO' },
+      { nodeId: 'char-dohyun', chronicleId: 'C02-STRONGHOLD' },
+    ]) {
+      const html = renderToStaticMarkup(createElement(WikiShellPreview, props))
+      expect((html.match(/class="wiki-floating-nav"/g) ?? []).length).toBe(1)
+      expect(html.indexOf('class="wiki-floating-nav"')).toBeLessThan(html.indexOf('class="wiki-document"'))
+      expect(html).toContain('aria-label="목차"')
+      expect(html).toContain('aria-label="맨 위로"')
+      expect(html).toContain('aria-label="맨 아래로"')
+    }
   })
 
   it('renders real existing Archive data in a Wiki document when a node is selected', () => {

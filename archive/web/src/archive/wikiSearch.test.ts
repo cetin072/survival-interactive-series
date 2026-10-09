@@ -42,3 +42,18 @@ describe('unified public Wiki search', () => {
     expect(searchPublicArchive('   ')).toEqual([])
   })
 })
+
+
+it('scopes actual same-node names, work labels and all Wiki result destinations', () => {
+  const same = publicSearchIndex.filter(entry => entry.kind==='wiki' && entry.id.endsWith(':char-minseok'));
+  expect(same.map(entry => entry.chronicleId).sort()).toEqual(['C01-HAN-JUNHO','C02-STRONGHOLD']);
+  expect(new Set(same.map(entry => entry.id)).size).toBe(2);
+  expect(same.every(entry => entry.href.includes('chronicle='+entry.chronicleId) && entry.workTitle?.includes('생존기'))).toBe(true);
+  expect(searchPublicArchive('박도현').filter(entry=>entry.title.includes('박도현')).map(entry=>entry.title)).toContain('다른 박도현');
+  for (const id of ['C01-HAN-JUNHO','C02-STRONGHOLD','C03-AFTERFALL']) {
+    expect(publicSearchIndex.some(entry=>entry.chronicleId===id)).toBe(true);
+  }
+  expect(publicSearchIndex.filter(entry=>entry.kind==='wiki').every(entry=>entry.chronicleId && entry.href.includes('chronicle='+entry.chronicleId))).toBe(true);
+  expect(publicSearchIndex.filter(entry=>entry.kindLabel==='작품 삽화').every(entry=>entry.chronicleId==='C03-AFTERFALL')).toBe(true);
+  expect(publicSearchIndex.some(entry=>entry.chronicleId?.startsWith('C04') || entry.chronicleId?.startsWith('C05'))).toBe(false);
+});

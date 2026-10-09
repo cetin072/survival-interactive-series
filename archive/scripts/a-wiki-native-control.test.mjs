@@ -1,8 +1,11 @@
-import { test } from 'node:test'
+import { test, after } from 'node:test'
 import assert from 'node:assert/strict'
-import { readFile } from 'node:fs/promises'
-import { resolve } from 'node:path'
-import { discoverWikiSources } from './lib/wiki-semantic-jobs.mjs'
+import { readFile, cp, mkdtemp, mkdir, rm, unlink } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { execFileSync } from 'node:child_process'
+import { resolve, join } from 'node:path'
+import { expectedWikiReceiptPath, discoverWikiSources } from './lib/wiki-semantic-jobs.mjs'
+import { createAppliedWikiTestSnapshot } from './lib/test-applied-wiki-snapshot.mjs'
 import { byteHash, reconcilePublicGraph } from './lib/publication-graph.mjs'
 import {
   buildWikiFactJob, buildWikiFactReviewJob, validateWikiFactReview, WIKI_REVIEW_VERSION,
@@ -192,8 +195,11 @@ test('publication identity keeps legacy branches and separates seasons and graph
 })
 
 const base = resolve(import.meta.dirname, '../..')
+const appliedSnapshot = await createAppliedWikiTestSnapshot(base)
+after(async () => appliedSnapshot.cleanup())
+const appliedBase = appliedSnapshot.base
 async function currentSourceRow(status = 'EXTRACTOR_READY') {
-  const source = (await discoverWikiSources(base)).find((item) => item.seasonId === 'S03'
+  const source = (await discoverWikiSources(appliedBase)).find((item) => item.seasonId === 'S03'
     && item.sourceSession.session_id === 'SESSION_007')
   assert.ok(source)
   return { source, row: { status, job_id: 'test-db-job', session_id: source.sourceSession.session_id,
@@ -201,8 +207,23 @@ async function currentSourceRow(status = 'EXTRACTOR_READY') {
     prepared_job: { season_id: source.seasonId }, graph_sha256: 'f'.repeat(64) } }
 }
 
-test('prepare reconciles a completed stale ledger before admitting the next pending source and does not reconcile twice', async () => {
+test('prepare reconciles a completed stale ledger before admitting the next pending source and does not reconcile twice', async (t) => {
   const { row } = await currentSourceRow()
+  // Main can publish S04 between test runs. Model a pending source only in
+  // a temporary copy, never by changing checked-in facts or live receipts.
+  const fixtureBase = await mkdtemp(join(tmpdir(), 'a-wiki-native-pending-'))
+  t.after(() => rm(fixtureBase, { recursive: true, force: true }))
+  for (const ref of ['archive/content/transcripts/C03-AFTERFALL', 'archive/content/public-facts/C03-AFTERFALL', 'archive/content/graphs/C03-AFTERFALL']) {
+    await mkdir(resolve(fixtureBase, ref, '..'), { recursive: true })
+    await cp(join(appliedBase, ref), join(fixtureBase, ref), { recursive: true })
+  }
+  const pending = (await discoverWikiSources(fixtureBase)).find((source) => source.seasonId === 'S04' && source.sourceSession.session_id === 'SESSION_001')
+  assert.ok(pending)
+  await unlink(join(fixtureBase, expectedWikiReceiptPath(pending))).catch((error) => {
+    if (error.code !== 'ENOENT') throw error
+  })
+  execFileSync('git', ['init', '-b', 'main'], { cwd: fixtureBase, stdio: 'pipe' })
+  execFileSync('git', ['-c', 'user.name=Wiki fixture', '-c', 'user.email=wiki-fixture@example.invalid', 'commit', '--allow-empty', '-m', 'isolated pending-source fixture'], { cwd: fixtureBase, stdio: 'pipe' })
   let completed = false
   let nextActive = null
   const calls = []
@@ -242,11 +263,11 @@ test('prepare reconciles a completed stale ledger before admitting the next pend
     }
     return null
   }
-  const first = await prepareNativeJob({ base, requestRpc, collectCompletion })
+  const first = await prepareNativeJob({ base: fixtureBase, requestRpc, collectCompletion })
   assert.equal(first.status, 'EXTRACTOR_READY')
   assert.equal(first.job_id, 'next-job')
   assert.equal(first.reconciled_job_id, row.job_id)
-  const second = await prepareNativeJob({ base, requestRpc, collectCompletion })
+  const second = await prepareNativeJob({ base: fixtureBase, requestRpc, collectCompletion })
   assert.equal(second.status, 'EXTRACTOR_READY')
   assert.equal(second.job_id, 'next-job')
   assert.equal(second.reconciled_job_id, undefined)
@@ -262,7 +283,7 @@ test('prepare reconciles a completed stale ledger before admitting the next pend
 test('invalid receipt evidence blocks prepare without faking completion or hiding it as NO_JOB', async () => {
   const { row } = await currentSourceRow()
   const calls = []
-  await assert.rejects(prepareNativeJob({ base,
+  await assert.rejects(prepareNativeJob({ base: appliedBase,
     requestRpc: async (name) => { calls.push(name); return row },
     collectCompletion: async () => { throw new Error('A_WIKI_COMPLETION_FACT_HASH_MISMATCH') },
   }), /FACT_HASH_MISMATCH/)
@@ -275,7 +296,7 @@ test('unfinished graph drift creates a fresh source-bound job instead of mutatin
   const original = structuredClone(row)
   const graph = JSON.parse(await readFile(resolve(base, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json')))
   let replacements = 0
-  const result = await prepareNativeJob({ base, collectCompletion: async () => null,
+  const result = await prepareNativeJob({ base: appliedBase, collectCompletion: async () => null,
     requestRpc: async (name, args) => {
       if (name === 'archive_a_wiki_native_job_recovery_current') return row
       assert.equal(name, 'archive_a_wiki_native_job_supersede_reprepare')
@@ -334,7 +355,7 @@ test('A-Wiki visual sync recompiles the derived B catalog from the current appro
     readFile(resolve(base, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'), 'utf8').then(JSON.parse),
     readFile(resolve(base, 'archive/content/visuals/C03-AFTERFALL/VISUALS.json'), 'utf8').then(JSON.parse),
     readFile(resolve(base, 'archive/content/public-facts/C03-AFTERFALL/S02/APPEARANCES_APPROVED_20260926.json')),
-    discoverWikiSources(base),
+    discoverWikiSources(appliedBase),
   ])
   const source = sources.find((item) => item.seasonId === 'S03'
     && item.sourceSession.session_id === 'SESSION_008')
@@ -353,7 +374,7 @@ test('A-Wiki visual sync recompiles the derived B catalog from the current appro
 test('approved GitHub publication transport/readback failures resume FINALIZING without re-running semantics', async () => {
   const [graph, sources] = await Promise.all([
     readFile(resolve(base, 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'), 'utf8').then(JSON.parse),
-    discoverWikiSources(base),
+    discoverWikiSources(appliedBase),
   ])
   const source = sources.find((item) => item.seasonId === 'S03'
     && item.sourceSession.session_id === 'SESSION_008')
@@ -393,7 +414,7 @@ test('approved GitHub publication transport/readback failures resume FINALIZING 
     }
     const calls = []
     const recovered = await prepareNativeJob({
-      base,
+      base: appliedBase,
       collectCompletion: async () => null,
       requestRpc: async (name, args) => {
         calls.push(name)

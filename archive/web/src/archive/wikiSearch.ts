@@ -2,6 +2,9 @@ import publicBriefFiles from 'virtual:knowledge-public'
 import { selectKnowledgeResources } from './knowledgeResources'
 import { isWikiSupportedNodeId, requireWikiNode, wikiNodeIndex } from './wikiDocument'
 import { siteVisualsFor } from './siteVisual'
+import { allReaderWikiDocuments } from './readerWiki'
+import { getChronicle } from './chronicleRegistry'
+import { wikiNodeHref } from './wikiLinks'
 
 export type PublicSearchKind = 'wiki' | 'knowledge' | 'resource'
 
@@ -14,6 +17,8 @@ export type PublicSearchEntry = {
   summary: string
   href: string
   terms: string[]
+  chronicleId?: string
+  workTitle?: string
 }
 
 type KnowledgeBrief = {
@@ -41,16 +46,28 @@ const normalize = (value: string) => value
 const wikiEntries: PublicSearchEntry[] = wikiNodeIndex.map((item) => {
   const node = requireWikiNode(item.id)
   return {
-    id: 'wiki:' + item.id,
+    id: 'wiki:C03-AFTERFALL:' + item.id,
+    chronicleId: 'C03-AFTERFALL', workTitle: getChronicle('C03-AFTERFALL').title,
     kind: 'wiki',
     kindLabel: node.type === 'character' ? '인물' : node.type === 'location' ? '장소' : '사건',
     title: node.label,
     subtitle: node.subtitle,
     summary: node.summary,
-    href: '/?view=wiki-preview&node=' + encodeURIComponent(node.id),
-    terms: [node.label, node.subtitle, node.summary, ...(node.tags ?? [])],
+    href: wikiNodeHref('C03-AFTERFALL', node.id),
+    terms: [getChronicle('C03-AFTERFALL').title, node.label, node.subtitle, node.summary, ...(node.tags ?? [])],
   }
 })
+
+export function readerWikiSearchEntries(documents: typeof allReaderWikiDocuments): PublicSearchEntry[] {
+  return documents.map(document => ({
+    id: 'wiki:' + document.chronicleId + ':' + document.id, kind: 'wiki',
+    chronicleId: document.chronicleId, workTitle: getChronicle(document.chronicleId).title,
+    kindLabel: document.typeLabel, title: document.title, subtitle: document.subtitle, summary: document.summary,
+    href: wikiNodeHref(document.chronicleId, document.id),
+    terms: [getChronicle(document.chronicleId).title, document.title, document.subtitle,
+      ...(document.quotes ?? []).map(record => record.text)],
+  }))
+}
 
 export const publishedKnowledgeEntries: (PublicSearchEntry & { publishedAt?: string })[] = Object.values(knowledgeBriefs)
   .filter((brief) => brief.status === 'PUBLISHED')
@@ -81,14 +98,15 @@ const resourceEntries: PublicSearchEntry[] = selectKnowledgeResources().map(({ g
 const visualEntries: PublicSearchEntry[] = siteVisualsFor('C03-AFTERFALL').map((asset) => {
   const node = requireWikiNode(asset.subject_id)
   return {
-    id: 'wiki:visual:' + asset.subject_id,
+    id: 'wiki:C03-AFTERFALL:visual:' + asset.subject_id,
+    chronicleId: 'C03-AFTERFALL', workTitle: getChronicle('C03-AFTERFALL').title,
     kind: 'wiki' as const,
     kindLabel: '작품 삽화',
     title: node.label + ' 삽화',
     subtitle: node.type === 'character' ? '인물 삽화' : node.type === 'location' ? '장소 삽화' : '세계관 삽화',
     summary: asset.caption ?? node.summary,
     href: isWikiSupportedNodeId(node.id)
-      ? '/?view=wiki-preview&node=' + encodeURIComponent(node.id) + '#wiki-visuals'
+      ? wikiNodeHref('C03-AFTERFALL', node.id) + '#wiki-visuals'
       : '/?view=media',
     terms: [node.label, node.subtitle, node.summary, '삽화', '이미지', asset.caption ?? ''],
   }
@@ -96,6 +114,7 @@ const visualEntries: PublicSearchEntry[] = siteVisualsFor('C03-AFTERFALL').map((
 
 export const publicSearchIndex: PublicSearchEntry[] = [
   ...wikiEntries,
+  ...readerWikiSearchEntries(allReaderWikiDocuments),
   ...publishedKnowledgeEntries,
   ...resourceEntries,
   ...visualEntries,

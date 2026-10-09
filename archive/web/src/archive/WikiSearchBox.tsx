@@ -15,7 +15,7 @@ function SearchGroup({ title, entries }: { title: string; entries: PublicSearchE
       {entries.map((entry) => <a key={entry.id} href={entry.href}>
         <span className="wiki-search-kind">{entry.kindLabel}</span>
         <strong>{entry.title}</strong>
-        <small>{entry.subtitle}</small>
+        <small>{entry.workTitle ? entry.workTitle + ' · ' : ''}{entry.subtitle}</small>
         <p>{entry.summary}</p>
       </a>)}
     </div>

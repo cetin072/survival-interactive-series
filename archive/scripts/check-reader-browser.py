@@ -312,6 +312,137 @@ def audit_story_shell(page, base: str, width: int, screenshots: str | None):
     report('shared shell / chapter-06 / season numbering / collapsible TOC / keyboard focus / introduction / related Wiki', width=width)
 
 
+def audit_world_wiki(page, base: str, width: int, screenshots: str | None):
+    """Actual shared-world routes, source navigation, isolation and review captures."""
+    mobile = width < 700
+    folder = Path(screenshots) if screenshots else None
+    if folder:
+        folder.mkdir(parents=True, exist_ok=True)
+
+    def capture(name):
+        if folder and width in [1280, 390, 360]:
+            page.screenshot(path=str(folder / f'wiki-{name}-{width}.png'), full_page=not name.endswith('-document'))
+
+    def world_menu():
+        return page.locator('.wiki-topbar nav').get_by_role('link', name='세계관 위키', exact=True)
+
+    page.goto(base)
+    expect(page.get_by_role('heading', name='일상과 비상상황에 필요한 생존 지식', exact=True)).to_be_visible()
+    expect(page.locator('#site-search input')).to_be_visible()
+    tap(world_menu(), mobile)
+    expect(page.locator('.world-wiki-card')).to_have_count(len(BOOKS))
+    no_overflow(page)
+    for item in page.locator('.wiki-topbar nav a').all():
+        box = item.bounding_box()
+        assert box and box['x'] >= -1 and box['x'] + box['width'] <= width + 1, 'Menu clipped'
+    capture('lobby')
+    # Static Knowledge must use its real HTML navigation, not a React search decoration.
+    page.goto(base.rstrip('/') + '/knowledge/emergency-supplies-inventory/')
+    tap(page.locator('.knowledge-nav').get_by_role('link', name='세계관 위키', exact=True), mobile)
+    expect(page.locator('.world-wiki-card')).to_have_count(len(BOOKS))
+    tap(page.locator('.wiki-topbar nav').get_by_role('link', name='생존 지식', exact=True), mobile)
+    expect(page.locator('.knowledge-nav')).to_be_visible()
+    tap(page.locator('.knowledge-nav').get_by_role('link', name='세계관 위키', exact=True), mobile)
+
+    for chronicle in BOOKS:
+        wiki_link = page.locator(f'.world-wiki-card a[href*="page=world&chronicle={chronicle}"]')
+        expect(wiki_link).to_have_count(1)
+        tap(wiki_link, mobile)
+        expect(page.locator('.wiki-world-index-page')).to_be_visible()
+        assert parse_qs(urlparse(page.url).query)['chronicle'] == [chronicle]
+        expect(page.locator('#world-recent-title')).to_be_visible()
+        for group in ['characters', 'locations', 'events']:
+            section = page.locator('#' + group)
+            shown = section.locator(':scope > .wiki-world-index-list > a')
+            assert 0 < shown.count() <= 6
+            disclosure = section.locator(':scope > details')
+            if disclosure.count():
+                expect(shown).to_have_count(6)
+                expect(disclosure).not_to_have_attribute('open', '')
+                summary = disclosure.locator(':scope > summary')
+                summary.focus()
+                page.keyboard.press('Space')
+                expect(disclosure).to_have_attribute('open', '')
+                assert summary.evaluate('(item) => getComputedStyle(item).outlineStyle') != 'none'
+                assert disclosure.locator('.wiki-world-index-list > a').count() > 0
+                tap(summary, mobile)
+                expect(disclosure).not_to_have_attribute('open', '')
+        no_overflow(page)
+        capture(chronicle + '-world')
+        for group in ['characters', 'locations', 'events']:
+            # Legacy C03 profiles need not have a directly bound RAW source.
+            # Use its existing, source-bound current+history profile for this
+            # source navigation check; verify bare char-jinwoo separately below.
+            if chronicle == 'C03-AFTERFALL' and group == 'characters':
+                link = page.locator('#characters a[href*="node=char-seojin"]')
+                expect(link).to_have_count(1)
+                if not link.is_visible():
+                    tap(page.locator('#characters > details > summary'), mobile)
+            else:
+                link = page.locator('#' + group + ' > .wiki-world-index-list > a').first
+            title = link.locator('strong').inner_text()
+            tap(link, mobile)
+            expect(page.locator('.wiki-document-header h1')).to_have_text(title)
+            expect(page.locator('.wiki-document-header')).to_contain_text(BOOKS[chronicle]['title'])
+            assert parse_qs(urlparse(page.url).query)['chronicle'] == [chronicle]
+            if chronicle != 'C03-AFTERFALL':
+                expect(page.locator('#wiki-visuals')).to_have_count(0)
+                expect(page.locator('.wiki-state-history blockquote').first).to_be_visible()
+            no_overflow(page)
+            if group == 'characters':
+                capture(chronicle + '-document')
+                relations = page.locator('#wiki-relations .wiki-relation-list > a')
+                assert relations.count() > 0
+                expected_title = relations.first.locator('strong').inner_text()
+                tap(relations.first, mobile)
+                expect(page.locator('.wiki-document-header h1')).to_have_text(expected_title)
+                assert parse_qs(urlparse(page.url).query)['chronicle'] == [chronicle]
+                page.go_back()
+                expect(page.locator('.wiki-document-header h1')).to_have_text(title)
+                source = page.locator('#wiki-sources a[href*="view=story"]').first
+                chapter_id = parse_qs(urlparse(source.get_attribute('href')).query)['chapter'][0]
+                chapter = next(ch for ch in BOOKS[chronicle]['chapters'] if ch['id'] == chapter_id)
+                tap(source, mobile)
+                selected_book(page, chapter, chronicle)
+                page.go_back()
+                expect(page.locator('.wiki-document-header h1')).to_have_text(title)
+                raw = page.locator('#wiki-sources a[href*="view=raw"]').first
+                part_id = parse_qs(urlparse(raw.get_attribute('href')).query)['part'][0]
+                tap(raw, mobile)
+                selected_raw(page, part_id)
+                page.go_back()
+                expect(page.locator('.wiki-document-header h1')).to_have_text(title)
+                page.reload()
+                expect(page.locator('.wiki-document-header h1')).to_have_text(title)
+            page.go_back()
+            expect(page.locator('.wiki-world-index-page')).to_be_visible()
+        tap(world_menu(), mobile)
+        expect(page.locator('.world-wiki-card')).to_have_count(len(BOOKS))
+        report('world card / six-first keyboard-touch disclosure / three document types / scoped relation / Reader-RAW sources / back-reload', width=width, chronicle=chronicle)
+
+    search = page.locator('#site-search input')
+    search.fill('민석')
+    for chronicle, title in [('C01-HAN-JUNHO', '민석'), ('C02-STRONGHOLD', '강민석')]:
+        result = page.locator(f'.wiki-search-group a[href*="chronicle={chronicle}"][href*="node=char-minseok"]')
+        expect(result).to_have_count(1)
+        expect(result.locator('strong')).to_have_text(title)
+        expect(result.locator('small')).to_contain_text(BOOKS[chronicle]['title'])
+    capture('scoped-search')
+    tap(page.locator('.wiki-search-group a[href*="chronicle=C02-STRONGHOLD"][href*="node=char-minseok"]'), mobile)
+    expect(page.locator('.wiki-document-header h1')).to_have_text('강민석')
+    for params in [dict(view='wiki-preview', page='world', chronicle='NOT-A-WORK'),
+                   dict(view='wiki-preview', chronicle='C01-HAN-JUNHO', node='char-jinwoo'),
+                   dict(view='wiki-preview', chronicle='C02-STRONGHOLD', node='missing-node')]:
+        page.goto(query_url(base, **params))
+        expect(page.get_by_role('heading', name='세계관 문서를 찾을 수 없습니다', exact=True)).to_be_visible()
+    page.goto(query_url(base, view='wiki-preview', node='char-jinwoo'))
+    expect(page.locator('.wiki-document-header h1')).to_have_text('서진우')
+    expect(page.locator('.wiki-main-visual img')).to_be_visible()
+    capture('c03-legacy-image')
+    no_overflow(page)
+    report('work-labeled colliding-node search / invalid scope fail-closed / legacy C03 portrait', width=width)
+
+
 def probe_original(browser, url: str):
     context = browser.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
     page = context.new_page()
@@ -332,13 +463,15 @@ def probe_original(browser, url: str):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--screenshots', help='Save Reader screenshots for visual review')
+    parser.add_argument('--screenshots', help='Save Reader/Wiki screenshots and JSON audit for review')
+    parser.add_argument('--world-wiki', action='store_true', help='Audit source-bound world Wiki candidates in local/Preview builds')
     parser.add_argument('--url', help='Audit this deployed site instead of local dist')
     parser.add_argument('--wait-assets', action='store_true', help='Wait for deployment identity and assets to match this build')
     parser.add_argument('--allow-ancestor-equivalent', action='store_true', help='For Deploy Preview only, allow a verified ancestor deploy when all site inputs match exactly')
     parser.add_argument('--probe-original', help='Only reproduce the original bug at an immutable old deploy URL')
     args = parser.parse_args()
     server = None
+    audit_completed = False
     if args.url or args.probe_original:
         base = (args.url or args.probe_original).rstrip('/')
     else:
@@ -366,6 +499,8 @@ def main():
                     audit_raw(page, base, chronicle, width)
                 audit_extra(page, base, width)
                 audit_story_shell(page, base, width, args.screenshots)
+                if args.world_wiki:
+                    audit_world_wiki(page, base, width, args.screenshots)
                 assert not errors, f'Browser runtime errors: {errors}'
                 assert not failures, f'HTTP failures: {failures}'
                 report('no runtime exceptions or same-site HTTP errors', width=width)
@@ -384,11 +519,16 @@ def main():
             report('blocked localStorage and invalid links remain navigable')
             blocked.close()
             browser.close()
+            audit_completed = True
     finally:
         if server:
             server.shutdown()
-        summary = json.dumps({'url': base, 'passed_groups': len(RESULTS), 'results': RESULTS}, ensure_ascii=False, indent=2)
+        summary = json.dumps({'url': base, 'completed': audit_completed, 'passed_groups': len(RESULTS), 'results': RESULTS}, ensure_ascii=False, indent=2)
         print(summary, flush=True)
+        if args.screenshots:
+            folder = Path(args.screenshots)
+            folder.mkdir(parents=True, exist_ok=True)
+            (folder / 'audit-summary.json').write_text(summary + '\n', encoding='utf-8')
         if os.environ.get('GITHUB_STEP_SUMMARY'):
             with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:
                 out.write('\n### Archive browser audit\n```json\n' + summary + '\n```\n')
