@@ -236,6 +236,8 @@ jobs:
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261007040326_knowledge_human_review_slot.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261008234315_knowledge_brief_reservation_contract.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_brief_reservation_contract.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261009011500_knowledge_finalizer_auto_recovery_v1.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_finalizer_auto_recovery.sql
 
   illustration-db-contract:
     runs-on: ubuntu-latest
