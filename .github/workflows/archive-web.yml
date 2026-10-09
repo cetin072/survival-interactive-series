@@ -81,9 +81,13 @@ jobs:
       - name: Test exact Netlify production deploy identity
         run: node --test ../scripts/lib/netlify-production.test.mjs
       - name: Test Archive CSP security boundary
-        run: node --test ../scripts/lib/archive-security.test.mjs
+        run: |
+          node --test ../scripts/lib/archive-security.test.mjs
+          node --test ../scripts/lib/archive-operator-security.test.mjs
       - name: Test batched Production release policy
         run: node --test ../scripts/lib/production-release.test.mjs
+      - name: Syntax-check the batched Production smoke runner
+        run: node --check ../scripts/archive-production-smoke.mjs
       - name: Verify real Reader roundtrip and isolated new-RAW publication
         run: node ../scripts/check-reader-batch.mjs
       - name: Test public graph reconciliation and atomic persistence
