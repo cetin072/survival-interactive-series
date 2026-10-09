@@ -5,12 +5,14 @@ import { publishedKnowledgeGuides, type KnowledgeGuide } from './knowledgeGuide'
 describe('STEP 3-2 public Knowledge shelf', () => {
   it('groups the existing public Knowledge exactly once into four stable categories', () => {
     const groups = groupKnowledge(publishedKnowledgeGuides)
-    expect(groups.map((group) => [group.id, group.label, group.guides.length])).toEqual([
-      ['household', '생활 대비', 3],
-      ['information', '연락·정보', 2],
-      ['evacuation', '대피·이동', 2],
-      ['community', '공동 대응', 3],
+    // Automation C keeps publishing: category identity stays fixed, counts don't.
+    expect(groups.map((group) => [group.id, group.label])).toEqual([
+      ['household', '생활 대비'],
+      ['information', '연락·정보'],
+      ['evacuation', '대피·이동'],
+      ['community', '공동 대응'],
     ])
+    expect(groups.every((group) => group.guides.length > 0)).toBe(true)
     const ids = groups.flatMap((group) => group.guides.map((guide) => guide.id))
     expect(ids.length).toBe(publishedKnowledgeGuides.length)
     expect(new Set(ids).size).toBe(ids.length)
