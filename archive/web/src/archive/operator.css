@@ -120,3 +120,26 @@
   .knowledge-detail-page .operator-heading-actions > * { flex:1 1 auto; text-align:center; }
   .knowledge-detail-card { padding:14px; }
 }
+
+
+/* Source inbox MVP: metadata only, adjacent to the existing authenticated C3 inbox. */
+.knowledge-source-section > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.knowledge-source-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.knowledge-source-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.knowledge-source-card { padding: 16px; border: 1px solid #e4e4e7; border-radius: 9px; background: #fff; overflow-wrap: anywhere; }
+.knowledge-source-card h3 { margin: 6px 0 5px; font-size: 19px; }
+.knowledge-source-card header p, .knowledge-source-card small { color: #66666e; }
+.knowledge-source-card > p { line-height: 1.6; }
+.knowledge-source-rights { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+.knowledge-source-rights > div { padding: 10px; border-radius: 6px; background: #f6f6f8; }
+.knowledge-source-rights dt { font-size: 12px; color: #65656d; }
+.knowledge-source-rights dd { margin: 4px 0 0; font-weight: 650; }
+.knowledge-source-links { display: flex; flex-wrap: wrap; gap: 14px; margin: 12px 0; }
+.knowledge-source-card details { margin-top: 10px; padding: 10px 0; border-top: 1px solid #e8e8eb; }
+.knowledge-source-card summary { cursor: pointer; font-weight: 650; }
+.knowledge-source-card details li { margin: 9px 0; }
+@media (max-width: 620px) {
+  .knowledge-source-section > header { align-items: flex-start; }
+  .knowledge-source-rights { grid-template-columns: 1fr; }
+  .knowledge-source-card { padding: 12px; }
+}
