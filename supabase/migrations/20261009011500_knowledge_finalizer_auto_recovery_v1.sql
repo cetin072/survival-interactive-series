@@ -83,7 +83,7 @@ begin
   );
 
   update survival_ops.knowledge_semantic_jobs
-    set finalizer_dispatch_count = pg_catalog.least(finalizer_dispatch_count + 1, 100000),
+    set finalizer_dispatch_count = least(finalizer_dispatch_count + 1, 100000),
         finalizer_dispatch_at = pg_catalog.clock_timestamp(),
         finalizer_dispatch_request_id = request_id
   where status = 'SUBMITTED'
