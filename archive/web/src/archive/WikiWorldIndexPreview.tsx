@@ -65,7 +65,7 @@ function ChronicleWorldList() {
         <span>{String(item.number).padStart(2, '0')}</span>
         <div>
           <strong>{item.title}</strong>
-          <small>{hasPublishedWorldWiki(item.id) ? (publishedWorldWikiIndex(item.id)?.recent[0]?.notice ? '세계관 위키 검수 후보' : '세계관 문서 공개') : '세계관 위키 준비 중'}</small>
+          <small>{hasPublishedWorldWiki(item.id) ? (publishedWorldWikiIndex(item.id)?.recent[0]?.recordBasis?.includes('위키 검수 후보') ? '세계관 위키 검수 후보' : '세계관 문서 공개') : '세계관 위키 준비 중'}</small>
         </div>
         <a href={hasPublishedWorldWiki(item.id) ? worldHref(item.id) : chronicleHref(item.id)}>
           {hasPublishedWorldWiki(item.id) ? '위키 보기' : '생존기 보기'}

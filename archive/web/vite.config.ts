@@ -38,6 +38,8 @@ export default defineConfig({
     async load(id) {
       if (id !== '\0reader-wiki-seeds') return
       const seeds = await loadReaderWikiSeeds()
+      // Approval digest changes trigger a fresh dev/Preview projection.
+      this.addWatchFile('../content/wiki/PUBLIC_APPROVALS.json')
       for (const seed of seeds) {
         this.addWatchFile('../content/wiki/' + seed.chronicleId + '/SEED.json')
         this.addWatchFile('../content/stories/' + seed.chronicleId + '/BOOK.json')

@@ -70,11 +70,76 @@ test('build validates RAW scope and bytes; production excludes all candidates; c
     await assert.rejects(loadReaderWikiSeeds(base,{catalog}),/RAW_CHANGED/)
   } finally {await rm(base,{recursive:true,force:true})}
 })
-test('actual snapshots validate in Preview and never enter Production',async()=>{
-  const seeds=await loadReaderWikiSeeds(undefined,{allowPreview:true})
-  assert.ok(seeds.some(s=>s.chronicleId==='C01-HAN-JUNHO'))
-  assert.ok(seeds.some(s=>s.chronicleId==='C02-STRONGHOLD'))
-  assert.deepEqual(await loadReaderWikiSeeds(undefined,{allowPreview:false}),[])
+test('actual approved snapshots enter Production only with byte-bound human approvals',async()=>{
+  const preview = await loadReaderWikiSeeds(undefined,{allowPreview:true})
+  const production = await loadReaderWikiSeeds(undefined,{allowPreview:false})
+  assert.deepEqual(production.map(s=>s.chronicleId),['C01-HAN-JUNHO','C02-STRONGHOLD'])
+  assert.ok(production.every(s=>s.publication==='HUMAN_APPROVED'))
+  assert.ok(production.every(s=>s.notice.includes('누락된 과거 기록')))
+  assert.ok(preview.every(s=>s.publication==='HUMAN_APPROVED'))
+  const projected=JSON.stringify(readerWikiProjection(production))
+  assert.ok(projected.includes('HUMAN_APPROVED'))
+  for (const secret of ['bookSha256','bodySha256','sourceHashes','approvalReference','USER_CHAT_EXPLICIT_APPROVAL','sourceMainSha'])
+    assert.ok(!projected.includes(secret),secret)
+})
+
+test('a human approval publishes only its exact immutable seed and book, never a future work', async () => {
+  const base = await mkdtemp(resolve(tmpdir(), 'reader-wiki-human-approval-'))
+  const catalog = {}
+  const manifestPath = resolve(base, 'archive/content/wiki/PUBLIC_APPROVALS.json')
+  const files = new Map()
+  try {
+    for (const id of ['C04-FIXTURE','C05-FIXTURE']) {
+      const f = fixture(id)
+      const seedBytes = Buffer.from(JSON.stringify(f.seed))
+      files.set(id,{...f,seedBytes})
+      catalog[id] = [{archivePath:f.book.chapters[0].archiveSourceRefs[0]}]
+      await mkdir(resolve(base,'archive/content/wiki',id),{recursive:true})
+      await mkdir(resolve(base,'archive/content/stories',id),{recursive:true})
+      await mkdir(resolve(base,'public'),{recursive:true})
+      await writeFile(resolve(base,'archive/content/wiki',id,'SEED.json'),seedBytes)
+      await writeFile(resolve(base,'archive/content/stories',id,'BOOK.json'),f.bytes)
+      await writeFile(resolve(base,f.book.chapters[0].archiveSourceRefs[0]),body)
+    }
+    const approval={
+      version:'reader-wiki-public-approvals-v1',scope:'INITIAL_PUBLIC_READER_WORLD_WIKI',
+      approvalReference:'USER_CHAT_EXPLICIT_APPROVAL_2026-10-09',approvedOnKst:'2026-10-09',
+      sourceMainSha:'a'.repeat(40),
+      items:[{
+        chronicleId:'C04-FIXTURE',decision:'APPROVE',
+        seedSha256:byteHash(files.get('C04-FIXTURE').seedBytes),
+        bookSha256:byteHash(files.get('C04-FIXTURE').bytes),
+      }],
+    }
+    const saveApproval=()=>writeFile(manifestPath,JSON.stringify(approval))
+    await saveApproval()
+    assert.deepEqual((await loadReaderWikiSeeds(base,{allowPreview:false,catalog})).map(s=>s.chronicleId),['C04-FIXTURE'])
+    const preview=await loadReaderWikiSeeds(base,{allowPreview:true,catalog})
+    assert.equal(preview[0].publication,'HUMAN_APPROVED')
+    assert.equal(preview[1].publication,'PREVIEW_ONLY')
+    assert.equal(preview[1].notice,'Fictional test fixture, never a public work.')
+    // A corrected subtitle still requires a renewed approval.
+    const seedPath=resolve(base,'archive/content/wiki/C04-FIXTURE/SEED.json')
+    const changed=structuredClone(files.get('C04-FIXTURE').seed)
+    changed.nodes[0].subtitle='Corrected, but not approved'
+    await writeFile(seedPath,JSON.stringify(changed))
+    await assert.rejects(loadReaderWikiSeeds(base,{allowPreview:false,catalog}),/APPROVAL_SOURCE_CHANGED/)
+    await writeFile(seedPath,files.get('C04-FIXTURE').seedBytes)
+    approval.items[0].bookSha256='b'.repeat(64)
+    await saveApproval()
+    await assert.rejects(loadReaderWikiSeeds(base,{allowPreview:true,catalog}),/APPROVAL_SOURCE_CHANGED/)
+    approval.items[0].bookSha256=byteHash(files.get('C04-FIXTURE').bytes)
+    approval.items[0].decision='REJECT'
+    await saveApproval()
+    await assert.rejects(loadReaderWikiSeeds(base,{allowPreview:false,catalog}),/APPROVAL_ENTRY/)
+    approval.items[0].decision='APPROVE'
+    approval.items.push({...approval.items[0],chronicleId:'C06-NOT-REGISTERED'})
+    await saveApproval()
+    await assert.rejects(loadReaderWikiSeeds(base,{allowPreview:false,catalog}),/APPROVAL_ORPHAN/)
+    approval.items.pop()
+    await saveApproval()
+    assert.deepEqual((await loadReaderWikiSeeds(base,{allowPreview:false,catalog})).map(s=>s.chronicleId),['C04-FIXTURE'])
+  } finally { await rm(base,{recursive:true,force:true}) }
 })
 
 test('canonical source refs must match the allowed archive mapping, not an arbitrary path', async () => {
