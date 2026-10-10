@@ -328,3 +328,32 @@ jobs:
           psql -v ON_ERROR_STOP=1 -c 'ALTER TABLE survival_ops.illustration_render_jobs ADD COLUMN provider_completed_at timestamptz;'
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261007062615_illustration_preserved_pass_recovery.sql
           psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_preserved_pass_recovery.sql
+      - name: Create Automation B RLS hardening test fixture
+        run: |
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE TABLE IF NOT EXISTS survival_ops.illustration_worker_runs(run_id text primary key);
+          CREATE TABLE IF NOT EXISTS survival_ops.illustration_vault_items(job_id text primary key);
+          CREATE TABLE IF NOT EXISTS survival_ops.knowledge_ex001_review_revalidations(id bigint primary key);
+          GRANT SELECT, INSERT, UPDATE ON survival_ops.illustration_worker_runs TO service_role;
+          GRANT SELECT, INSERT, UPDATE, DELETE ON survival_ops.illustration_vault_items TO service_role;
+
+          CREATE OR REPLACE FUNCTION public.archive_illustration_review_decide_v3(jsonb)
+          RETURNS jsonb LANGUAGE sql SECURITY DEFINER
+          AS 'SELECT NULL::jsonb';
+          CREATE OR REPLACE FUNCTION public.archive_illustration_site_staging_begin(jsonb)
+          RETURNS jsonb LANGUAGE sql SECURITY DEFINER
+          AS 'SELECT NULL::jsonb';
+          CREATE OR REPLACE FUNCTION public.archive_illustration_site_staging_finalize(text,uuid,text)
+          RETURNS jsonb LANGUAGE sql SECURITY DEFINER
+          AS 'SELECT NULL::jsonb';
+          CREATE OR REPLACE FUNCTION archive_ops.dispatch_afterfall_illustration_vault(text)
+          RETURNS bigint LANGUAGE sql SECURITY DEFINER
+          AS 'SELECT 1::bigint';
+          CREATE OR REPLACE FUNCTION archive_ops.dispatch_afterfall_illustration_vault_pending()
+          RETURNS jsonb LANGUAGE sql SECURITY DEFINER
+          AS 'SELECT NULL::jsonb';
+          SQL
+      - name: Apply Automation B survival_ops RLS hardening
+        run: psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261010143914_harden_automation_b_survival_ops_rls.sql
+      - name: Verify Automation B survival_ops RLS hardening
+        run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_survival_ops_rls_hardening.sql
