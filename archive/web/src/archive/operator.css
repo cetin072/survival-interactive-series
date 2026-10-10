@@ -143,3 +143,43 @@
   .knowledge-source-rights { grid-template-columns: 1fr; }
   .knowledge-source-card { padding: 12px; }
 }
+
+
+/* Bunker OS supervisor dashboard v1 */
+.bunker-os-overview .operator-muted { margin: 6px 0 0; }
+.bunker-os-log-list { display: grid; gap: 12px; margin-top: 14px; }
+.bunker-os-log { padding: 16px; border: 1px solid #e4e4e7; border-radius: 10px; background: #fafafa; }
+.bunker-os-log > header { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+.bunker-os-log h3 { margin: 2px 0 4px; font-size: 18px; }
+.bunker-os-log header small { color: #77777f; }
+.bunker-os-log > p { margin: 12px 0; color: #4d4d55; line-height: 1.6; }
+.bunker-os-log-section { margin-top: 12px; padding-top: 10px; border-top: 1px solid #e6e6e9; }
+.bunker-os-log-section h4 { margin: 0 0 7px; font-size: 13px; }
+.bunker-os-log-section ul { display: grid; gap: 5px; margin: 0; padding-left: 20px; color: #55555d; font-size: 13px; line-height: 1.5; }
+.bunker-os-log-section a { color: #3e5c82; }
+.bunker-os-approval { padding: 10px 12px; border: 1px solid #ecd5a7; border-radius: 8px; background: #fff9eb; }
+@media (max-width: 520px) { .bunker-os-log > header { flex-direction: column; } }
+
+
+/* Bunker OS supervisor dashboard v1.1 */
+.bunker-os-counts > a { display:grid; gap:10px; padding:16px; border:1px solid #e4e4e7; border-radius:9px; background:#fff; color:#2f2f35; text-decoration:none; }
+.bunker-os-counts > a:hover, .bunker-os-counts > a:focus-visible { border-color:#aaaab2; background:#f8f8f9; outline:none; }
+.bunker-os-counts > a span { color:#6e6e76; font-size:13px; }.bunker-os-counts > a strong { font-size:28px; }.bunker-os-counts > a small { color:#818188; font-size:11px; }
+.bunker-os-quick-links { display:flex; flex-wrap:wrap; gap:8px; margin:-4px 0 16px; }.bunker-os-quick-links a { text-decoration:none; }
+.bunker-os-recent > header a { color:#55555d; font-size:13px; font-weight:700; text-decoration:none; }
+.bunker-os-board-list { display:grid; gap:8px; margin:14px 0 0; padding:0; list-style:none; }
+.bunker-os-board-list a { display:block; padding:13px 14px; border:1px solid #e4e4e7; border-radius:9px; background:#fff; color:#2d2d33; text-decoration:none; }
+.bunker-os-board-list a:hover, .bunker-os-board-list a:focus-visible { border-color:#aaaab2; background:#f8f8f9; outline:none; }
+.bunker-os-board-list a > span { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:7px; }.bunker-os-board-list a > span b { padding:3px 6px; border-radius:5px; background:#f0f0f2; color:#62626a; font-size:11px; }
+.bunker-os-board-list strong { display:block; font-size:16px; }.bunker-os-board-list p { margin:6px 0; color:#66666e; font-size:13px; line-height:1.5; }.bunker-os-board-list small { color:#7a7a82; font-size:11px; }
+.bunker-os-status-nav, .bunker-os-source-filters { display:flex; flex-wrap:wrap; gap:7px; margin:14px 0; }
+.bunker-os-status-nav a { min-height:38px; padding:8px 11px; border:1px solid #d6d6da; border-radius:7px; background:#fff; color:#44444b; font-size:13px; font-weight:650; text-decoration:none; }
+.bunker-os-detail-page { max-width:960px; margin:0 auto; }.bunker-os-detail-head { display:flex; align-items:start; justify-content:space-between; gap:12px; }.bunker-os-detail-head h2 { margin:4px 0 6px; font-size:clamp(24px,4vw,34px); }.bunker-os-detail-head small { color:#77777f; }
+.bunker-os-detail-summary { margin:18px 0; color:#44444b; font-size:16px; line-height:1.7; }
+.bunker-os-human-check h3 { margin:0 0 6px; }.bunker-os-human-check > p { color:#66666e; font-size:13px; line-height:1.55; }.bunker-os-human-check label { display:grid; gap:7px; margin-top:12px; }
+.bunker-os-review-receipt { display:grid; gap:4px; margin-top:18px; padding:12px; border:1px solid #cfe4d5; border-radius:8px; background:#f4fbf6; color:#27633a; }.bunker-os-review-receipt span { font-size:12px; }
+.bunker-os-detail-footer { display:flex; flex-wrap:wrap; gap:8px; margin-top:20px; padding-top:16px; border-top:1px solid #e4e4e7; }.bunker-os-detail-footer a { text-decoration:none; }
+.bunker-os-source-list { display:grid; gap:10px; margin:0; padding:0; list-style:none; }.bunker-os-source-list article { padding:14px; border:1px solid #e4e4e7; border-radius:9px; background:#fafafa; }
+.bunker-os-source-list article > span { display:inline-block; padding:3px 7px; border-radius:999px; background:#ececef; color:#62626a; font-size:11px; font-weight:700; }
+.bunker-os-source-list h3 { margin:8px 0 5px; font-size:17px; }.bunker-os-source-list h3 a { color:#2d2d33; }.bunker-os-source-list p { color:#5f5f67; line-height:1.6; }.bunker-os-source-list small, .bunker-os-source-list small a { color:#77777f; font-size:11px; }
+@media (max-width: 620px) { .bunker-os-detail-head { flex-direction:column; }.bunker-os-status-nav a { flex:1 1 auto; text-align:center; } }

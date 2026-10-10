@@ -33,7 +33,7 @@ export function ArchiveApp() {
     window.addEventListener('popstate', restore)
     return () => window.removeEventListener('popstate', restore)
   }, [])
-  useEffect(() => { writeRoute(route, true) }, [route.view, 'chronicleId' in route ? route.chronicleId : '', 'section' in route ? route.section : '', 'chapterId' in route ? route.chapterId : '', 'partId' in route ? route.partId : '', 'nodeId' in route ? route.nodeId : '', 'page' in route ? route.page : '', 'briefId' in route ? route.briefId : '', 'jobId' in route ? route.jobId : ''])
+  useEffect(() => { writeRoute(route, true) }, [route.view, 'chronicleId' in route ? route.chronicleId : '', 'section' in route ? route.section : '', 'chapterId' in route ? route.chapterId : '', 'partId' in route ? route.partId : '', 'nodeId' in route ? route.nodeId : '', 'page' in route ? route.page : '', 'briefId' in route ? route.briefId : '', 'jobId' in route ? route.jobId : '', 'bunkerPath' in route ? route.bunkerPath : ''])
   const open = (next: ArchiveRoute) => {
     const resolved = resolveReaderRoute(next, browserReaderStorage())
     setRoute(resolved)
@@ -71,10 +71,10 @@ export function ArchiveApp() {
     {roomHasGraph && <ExplorerView key={route.chronicleId + ':' + roomSection} initialFilter={chronicleFilterFor(roomSection)} onOpenStory={(chapterId) => openBook(route.chronicleId, chapterId)} />}
     {route.view === 'archive' && <ExplorerView key={route.nodeId ?? 'default'} initialNodeId={route.nodeId} onOpenStory={(chapterId) => openBook('C03-AFTERFALL', chapterId)} />}
     {route.view === 'raw' && <RawTranscriptReader key={rawChronicle.id} chronicleId={rawChronicle.id} initialPartId={route.partId} onPartChange={(partId) => open({ ...route, partId })} onOpenNode={(nodeId) => open({ view: 'archive', chronicleId: activeChronicle.id, nodeId })} onOpenExplorer={() => open({ view: 'archive', chronicleId: activeChronicle.id })} />}
-    {(route.view === 'operator' || route.view === 'operator-visuals' || route.view === 'operator-knowledge' || route.view === 'operator-knowledge-detail' || route.view === 'operator-vault') && <Suspense fallback={<section className="operator-page" aria-live="polite">운영자 화면을 불러오는 중…</section>}><OperatorConsole
-      view={route.view === 'operator-visuals' ? 'visuals' : route.view === 'operator-knowledge' ? 'knowledge' : route.view === 'operator-knowledge-detail' ? 'knowledge-detail' : route.view === 'operator-vault' ? 'vault' : 'dashboard'}
+    {(route.view === 'operator' || route.view === 'operator-visuals' || route.view === 'operator-knowledge' || route.view === 'operator-knowledge-detail' || route.view === 'operator-vault' || route.view === 'operator-bunker-os') && <Suspense fallback={<section className="operator-page" aria-live="polite">운영자 화면을 불러오는 중…</section>}><OperatorConsole
+      view={route.view === 'operator-visuals' ? 'visuals' : route.view === 'operator-knowledge' ? 'knowledge' : route.view === 'operator-knowledge-detail' ? 'knowledge-detail' : route.view === 'operator-vault' ? 'vault' : route.view === 'operator-bunker-os' ? 'bunker-os' : 'dashboard'}
       knowledgeJobId={route.view === 'operator-knowledge-detail' ? route.jobId : undefined}
     /></Suspense>}
-    {route.view !== 'operator' && route.view !== 'operator-visuals' && route.view !== 'operator-knowledge' && route.view !== 'operator-knowledge-detail' && route.view !== 'operator-vault' && <footer className="archive-footer"><p>읽기 정책 · 공개된 이야기와 세계 기록은 실제 확인된 자료를 바탕으로 편집됩니다.</p><button onClick={() => open({ view: 'raw', chronicleId: activeChronicle.id })}>기록 원문 보관소</button></footer>}
+    {route.view !== 'operator' && route.view !== 'operator-visuals' && route.view !== 'operator-knowledge' && route.view !== 'operator-knowledge-detail' && route.view !== 'operator-vault' && route.view !== 'operator-bunker-os' && <footer className="archive-footer"><p>읽기 정책 · 공개된 이야기와 세계 기록은 실제 확인된 자료를 바탕으로 편집됩니다.</p><button onClick={() => open({ view: 'raw', chronicleId: activeChronicle.id })}>기록 원문 보관소</button></footer>}
   </main>
 }
