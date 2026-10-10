@@ -86,5 +86,86 @@
     "job_status_readback": "FINALIZE_QUEUED",
     "completed_at": "2026-10-10T00:37:25.123Z"
   },
-  "result": null
+  "result": {
+    "status": "REGULAR_E2E_PASS",
+    "audited_main_sha": "3b3b5200f527591db77b54d832c95ecdba8bb15b",
+    "job": {
+      "job_id": "illustration-char-hajin-2ff606063ff6-20261010-37987397187",
+      "title": "문하진",
+      "status": "SUCCEEDED",
+      "point_id": "point-1cdda50112b4df4f34612475282667d290fcee120e54ee38b2fdff5f4767b8de",
+      "generation_key": "generation-2ff606063ff67c43e8c84b044e8cc77574877dd47b579267cc64706b95962364",
+      "subject_id": "char-hajin",
+      "prompt_sha256": "4e40e5c351fdad287b7859e993c12f39d71e30c3c55f95e3576729a076bd7d64",
+      "review_context_sha256": "6976483b135558ea96f1c9f64f54b2da331e7120daaf00ea68dd3a4efe71d08c",
+      "provider_asset_id": "chatgpt-library:file_0000000033a081f5ba2535a7dcda8aa1",
+      "source_commit": "d2923ef6821361089be579ba444c59c4701c8934",
+      "identity_path": "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_CHAR_HAJIN.json"
+    },
+    "library_source": {
+      "path": "/IMAGE-RENDER/output/current.png",
+      "file_id": "file_0000000033a081f5ba2535a7dcda8aa1",
+      "library_file_id": "libfile_e45776e87e808191839b3459afd6d402",
+      "version_id": null,
+      "sha256": "28aef0a78d22100c73d17ef59ead1402be4b60b5a9cc5d4dd8b9dd3e540f7767",
+      "bytes": 2200635,
+      "width": 1024,
+      "height": 1536,
+      "modified_at": "2026-10-09T21:37:26.495830Z"
+    },
+    "review": {
+      "decision": "PASS",
+      "provider": "native_chatgpt_vision",
+      "handoff_commit": "d5b0630bf1da1fdbb1d13b402ecbfc7b52df5115",
+      "reviewed_at": "2026-10-09T23:35:23.77435+00:00"
+    },
+    "transfer": {
+      "staging_id": "site-illustration-char-hajin-2ff606063ff6-20261010-37987397187",
+      "sha256": "ec10145f88032e1737d85edcd3a12b4df15c10ac437b1ca3215d47159c3a0eb7",
+      "bytes": 146108,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png",
+      "palette_colors": 256,
+      "chunk_count": 5
+    },
+    "finalizer": {
+      "dispatch_request_id": 205,
+      "dispatch_at": "2026-10-10T00:37:10.02361+00:00",
+      "status": "SUCCEEDED",
+      "finalized_at": "2026-10-10T00:52:43.773043+00:00"
+    },
+    "storage": {
+      "provider": "supabase_storage",
+      "bucket": "survival-archive-originals",
+      "object_path": "AFTERFALL/point-1cdda50112b4df4f34612475282667d290fcee120e54ee38b2fdff5f4767b8de/generation-2ff606063ff67c43e8c84b044e8cc77574877dd47b579267cc64706b95962364/ec10145f88032e1737d85edcd3a12b4df15c10ac437b1ca3215d47159c3a0eb7.png",
+      "sha256": "ec10145f88032e1737d85edcd3a12b4df15c10ac437b1ca3215d47159c3a0eb7",
+      "bytes": 146108,
+      "mime_type": "image/png",
+      "storage_verified": true
+    },
+    "registry": {
+      "status": "READY",
+      "asset_id": "AF-CHAR-1CDDA50112B4DF4F34612475",
+      "exact_match_count": 1,
+      "point_id": "point-1cdda50112b4df4f34612475282667d290fcee120e54ee38b2fdff5f4767b8de",
+      "generation_key": "generation-2ff606063ff67c43e8c84b044e8cc77574877dd47b579267cc64706b95962364",
+      "subject_id": "char-hajin",
+      "source_sha256": "ec10145f88032e1737d85edcd3a12b4df15c10ac437b1ca3215d47159c3a0eb7"
+    },
+    "site_assets": {
+      "path": "archive/content/visuals/C03-AFTERFALL/SITE_ASSETS.json",
+      "exact_subject_count": 1,
+      "public_path": "/visual-assets/c7c85d8bc388fb05443f905c6f40c31e54b17c4709a56d93dedb4becb65192a9.png",
+      "public_sha256": "c7c85d8bc388fb05443f905c6f40c31e54b17c4709a56d93dedb4becb65192a9",
+      "source_sha256": "ec10145f88032e1737d85edcd3a12b4df15c10ac437b1ca3215d47159c3a0eb7",
+      "bytes": 146106,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png",
+      "published_main_sha": "3b3b5200f527591db77b54d832c95ecdba8bb15b"
+    },
+    "completed_at": "2026-10-10T00:52:43.773043+00:00",
+    "audited_at": "2026-10-10T01:30:21.622Z"
+  }
 }
