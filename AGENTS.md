@@ -65,6 +65,7 @@
 - 현재 Draft PR이 있으면 그 범위와 제품 결정을 존중합니다.
 - Preview 전용으로 명시된 PR을 임의로 Ready/merge/Production 배포하지 않습니다.
 - 사용자 승인 전에는 중요한 아키텍처 변경, 유료 API 비용 확대, Canon 영향 변경, main 병합, Production 배포를 하지 않습니다.
+- 사용자 검수용 고정 주소는 기존 Netlify 프로젝트의 `qa-preview` 브랜치 배포입니다. 실제 동기화 및 배포 검증 절차는 [`docs/operations/FIXED_QA_PREVIEW.md`](docs/operations/FIXED_QA_PREVIEW.md)를 따르며, PR별 Deploy Preview와 구분합니다. 브랜치 배포가 아직 활성화되지 않은 경우 사용 가능한 QA라고 보고하지 않습니다.
 
 ## Learning Loop v0 파일럿
 
