@@ -339,19 +339,19 @@ jobs:
 
           CREATE OR REPLACE FUNCTION public.archive_illustration_review_decide_v3(jsonb)
           RETURNS jsonb LANGUAGE sql SECURITY DEFINER
-          AS $ SELECT '{}'::jsonb $;
+          AS 'SELECT NULL::jsonb';
           CREATE OR REPLACE FUNCTION public.archive_illustration_site_staging_begin(jsonb)
           RETURNS jsonb LANGUAGE sql SECURITY DEFINER
-          AS $ SELECT '{}'::jsonb $;
+          AS 'SELECT NULL::jsonb';
           CREATE OR REPLACE FUNCTION public.archive_illustration_site_staging_finalize(text,uuid,text)
           RETURNS jsonb LANGUAGE sql SECURITY DEFINER
-          AS $ SELECT '{}'::jsonb $;
+          AS 'SELECT NULL::jsonb';
           CREATE OR REPLACE FUNCTION archive_ops.dispatch_afterfall_illustration_vault(text)
           RETURNS bigint LANGUAGE sql SECURITY DEFINER
-          AS $ SELECT 1::bigint $;
+          AS 'SELECT 1::bigint';
           CREATE OR REPLACE FUNCTION archive_ops.dispatch_afterfall_illustration_vault_pending()
           RETURNS jsonb LANGUAGE sql SECURITY DEFINER
-          AS $ SELECT '{}'::jsonb $;
+          AS 'SELECT NULL::jsonb';
           SQL
       - name: Apply Automation B survival_ops RLS hardening
         run: psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261010143914_harden_automation_b_survival_ops_rls.sql
