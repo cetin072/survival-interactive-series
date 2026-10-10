@@ -46,5 +46,17 @@
     "provider_completed_at": "2026-10-10T22:28:52.446024+00:00",
     "job_status_after_provider_complete": "INGESTING",
     "readback_at": "2026-10-10T22:29:02.352Z"
+  },
+  "review": {
+    "status": "HANDOFF_COMMITTED",
+    "review_handoff_commit": "a15149c30603f967e521c704f75c7e303d0eadd6",
+    "decision": "PASS",
+    "review_provider": "native_chatgpt_vision",
+    "reviewed_at": "2026-10-10T23:29:54.253Z",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_00000000338481f5b07bac0fc3e8ab47",
+    "source_library_file_id": "libfile_893862ed09788191af641e8a863fd4b2",
+    "source_version_id": null,
+    "source_sha256": "ab769d78bef476f42e32222db8fed342201fa6c766c884283774ab279f799ad4"
   }
 }
