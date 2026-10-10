@@ -197,7 +197,23 @@
       "width": 512,
       "height": 512,
       "mime_type": "image/png"
+    },
+    {
+      "point_id": "point-1cdda50112b4df4f34612475282667d290fcee120e54ee38b2fdff5f4767b8de",
+      "generation_key": "generation-2ff606063ff67c43e8c84b044e8cc77574877dd47b579267cc64706b95962364",
+      "subject_id": "char-hajin",
+      "source_sha256": "ec10145f88032e1737d85edcd3a12b4df15c10ac437b1ca3215d47159c3a0eb7",
+      "storage_bucket": "survival-archive-originals",
+      "storage_object_path": "AFTERFALL/point-1cdda50112b4df4f34612475282667d290fcee120e54ee38b2fdff5f4767b8de/generation-2ff606063ff67c43e8c84b044e8cc77574877dd47b579267cc64706b95962364/ec10145f88032e1737d85edcd3a12b4df15c10ac437b1ca3215d47159c3a0eb7.png",
+      "registry_asset_id": "AF-CHAR-1CDDA50112B4DF4F34612475",
+      "derivative_version": "site-png-512-v1",
+      "public_path": "/visual-assets/c7c85d8bc388fb05443f905c6f40c31e54b17c4709a56d93dedb4becb65192a9.png",
+      "sha256": "c7c85d8bc388fb05443f905c6f40c31e54b17c4709a56d93dedb4becb65192a9",
+      "bytes": 146106,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png"
     }
   ],
-  "content_sha256": "94dd57f83106cd6ff3be18f22d4f4c8030618eb9402cb2a620071f478774be18"
+  "content_sha256": "f3cdefd3a40876c3b9e77c80ca520bab86c9f51df32c5484d289cf22e3f0025b"
 }
