@@ -68,3 +68,12 @@
 - Decision: 사업·콘텐츠용 공개 공간과 실제 비상 사용 공간은 같은 위치/정보공개 수준을 전제로 하지 않는다.
 - Why: 콘텐츠/사업 활용과 실제 보안·프라이버시 요구를 동시에 만족시키기 위함.
 - Revisit when: 사업모델과 실제 벙커 요구조건이 구체화될 때.
+
+
+## D-010 — Month 01은 FIND THE ENGINE으로 운영
+- Date: 2026-10-10
+- Decision: 첫 30일은 매출 강제 목표 없이 `Find the Game → Find the Action → Find the Traffic → Find the Engine` 순서로 운영한다.
+- Why: 현재 단계에서 가장 중요한 것은 선형 수익이 아니라 어떤 고객·행동·유통·수익 구조가 실제로 맞는지 증거를 확보하는 것.
+- Success: 월말까지 시장/수익/유통 지도, Winning Theory V1, 행동 기준선, 외부 유통 실험, 수익 후보 TOP 3와 다음 60일 돈 실험 후보 1개.
+- Guard: 준비라는 이름으로 정체하지 않는다. 학습 또는 자산이 누적되지 않은 달은 실패로 본다.
+- Linked: Issue #501
