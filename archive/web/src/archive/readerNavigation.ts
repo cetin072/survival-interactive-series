@@ -61,7 +61,7 @@ export function parseArchiveRoute(search: string, storage?: ReaderStorage, pathn
   if (pathname === '/operator/knowledge' || pathname === '/operator/knowledge/' || pathname.startsWith('/operator/knowledge/')) return { view: 'operator-knowledge', chronicleId }
   if (pathname === '/operator/vault' || pathname.startsWith('/operator/vault/')) return { view: 'operator-vault', chronicleId }
   if (pathname === '/operator/bunker-os' || pathname.startsWith('/operator/bunker-os/')) {
-    const bunkerPath = pathname.slice('/operator/bunker-os'.length).replace(/^\\/+|\\/+$/g, '') || undefined
+    const bunkerPath = pathname.slice('/operator/bunker-os'.length).split('/').filter(Boolean).join('/') || undefined
     return { view: 'operator-bunker-os', chronicleId, bunkerPath }
   }
   if (pathname === '/operator' || pathname === '/operator/' || pathname.startsWith('/operator/')) return { view: 'operator', chronicleId }
