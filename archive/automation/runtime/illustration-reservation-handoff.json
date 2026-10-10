@@ -59,6 +59,32 @@
     "source_version_id": null,
     "source_sha256": "28aef0a78d22100c73d17ef59ead1402be4b60b5a9cc5d4dd8b9dd3e540f7767"
   },
-  "transfer": null,
+  "transfer": {
+    "status": "FINALIZE_QUEUED",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_0000000033a081f5ba2535a7dcda8aa1",
+    "source_library_file_id": "libfile_e45776e87e808191839b3459afd6d402",
+    "source_version_id": null,
+    "source_sha256": "28aef0a78d22100c73d17ef59ead1402be4b60b5a9cc5d4dd8b9dd3e540f7767",
+    "staging_id": "site-illustration-char-hajin-2ff606063ff6-20261010-37987397187",
+    "derivative_sha256": "ec10145f88032e1737d85edcd3a12b4df15c10ac437b1ca3215d47159c3a0eb7",
+    "derivative_size_bytes": 146108,
+    "derivative_width": 512,
+    "derivative_height": 512,
+    "derivative_mime_type": "image/png",
+    "derivative_palette_colors": 256,
+    "chunk_count": 5,
+    "stored_chunk_indexes": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "finalizer_dispatch_request_id": 205,
+    "finalizer_dispatch_at": "2026-10-10T00:37:10.02361+00:00",
+    "job_status_readback": "FINALIZE_QUEUED",
+    "completed_at": "2026-10-10T00:37:25.123Z"
+  },
   "result": null
 }
