@@ -5,6 +5,7 @@ import type { ChronicleSection } from './ChronicleRoom'
 
 export type ArchiveRoute =
   | { view: 'home' | 'story' | 'tools' | 'media' | 'operator' | 'operator-visuals' | 'operator-knowledge' | 'operator-vault'; chronicleId: ChronicleId }
+  | { view: 'operator-bunker-os'; chronicleId: ChronicleId; bunkerPath?: string }
   | { view: 'operator-knowledge-detail'; chronicleId: ChronicleId; jobId: string }
   | { view: 'knowledge-preview'; chronicleId: ChronicleId; briefId?: string }
   | { view: 'wiki-preview'; chronicleId: ChronicleId; nodeId?: string; page?: 'home' | 'chronicle' | 'world' | 'worlds' }
@@ -59,6 +60,10 @@ export function parseArchiveRoute(search: string, storage?: ReaderStorage, pathn
   if (knowledgeDetail) return { view: 'operator-knowledge-detail', chronicleId, jobId: knowledgeDetail[1].toLowerCase() }
   if (pathname === '/operator/knowledge' || pathname === '/operator/knowledge/' || pathname.startsWith('/operator/knowledge/')) return { view: 'operator-knowledge', chronicleId }
   if (pathname === '/operator/vault' || pathname.startsWith('/operator/vault/')) return { view: 'operator-vault', chronicleId }
+  if (pathname === '/operator/bunker-os' || pathname.startsWith('/operator/bunker-os/')) {
+    const bunkerPath = pathname.slice('/operator/bunker-os'.length).replace(/^\\/+|\\/+$/g, '') || undefined
+    return { view: 'operator-bunker-os', chronicleId, bunkerPath }
+  }
   if (pathname === '/operator' || pathname === '/operator/' || pathname.startsWith('/operator/')) return { view: 'operator', chronicleId }
   const view = params.get('view')
   if (view === 'reader' || view === 'raw') return resolveReaderRoute({ view: 'raw', chronicleId, partId: params.get('part') ?? undefined }, storage)
@@ -88,8 +93,8 @@ export function parseArchiveRoute(search: string, storage?: ReaderStorage, pathn
 export function archiveRouteUrl(route: ArchiveRoute, href: string): URL {
   const url = new URL(href)
   url.search = ''; url.hash = ''
-  if (route.view === 'operator' || route.view === 'operator-visuals' || route.view === 'operator-knowledge' || route.view === 'operator-knowledge-detail' || route.view === 'operator-vault') {
-    url.pathname = route.view === 'operator-visuals' ? '/operator/visuals/' : route.view === 'operator-knowledge' ? '/operator/knowledge/' : route.view === 'operator-knowledge-detail' ? `/operator/knowledge/${route.jobId}/` : route.view === 'operator-vault' ? '/operator/vault/' : '/operator/'
+  if (route.view === 'operator' || route.view === 'operator-visuals' || route.view === 'operator-knowledge' || route.view === 'operator-knowledge-detail' || route.view === 'operator-vault' || route.view === 'operator-bunker-os') {
+    url.pathname = route.view === 'operator-visuals' ? '/operator/visuals/' : route.view === 'operator-knowledge' ? '/operator/knowledge/' : route.view === 'operator-knowledge-detail' ? `/operator/knowledge/${route.jobId}/` : route.view === 'operator-vault' ? '/operator/vault/' : route.view === 'operator-bunker-os' ? `/operator/bunker-os/${route.bunkerPath ? `${route.bunkerPath}/` : ''}` : '/operator/'
   } else if (route.view === 'archive') {
     url.pathname = '/'
     if (route.nodeId) {
