@@ -143,3 +143,19 @@
   .knowledge-source-rights { grid-template-columns: 1fr; }
   .knowledge-source-card { padding: 12px; }
 }
+
+
+/* Bunker OS supervisor dashboard v1 */
+.bunker-os-overview .operator-muted { margin: 6px 0 0; }
+.bunker-os-log-list { display: grid; gap: 12px; margin-top: 14px; }
+.bunker-os-log { padding: 16px; border: 1px solid #e4e4e7; border-radius: 10px; background: #fafafa; }
+.bunker-os-log > header { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+.bunker-os-log h3 { margin: 2px 0 4px; font-size: 18px; }
+.bunker-os-log header small { color: #77777f; }
+.bunker-os-log > p { margin: 12px 0; color: #4d4d55; line-height: 1.6; }
+.bunker-os-log-section { margin-top: 12px; padding-top: 10px; border-top: 1px solid #e6e6e9; }
+.bunker-os-log-section h4 { margin: 0 0 7px; font-size: 13px; }
+.bunker-os-log-section ul { display: grid; gap: 5px; margin: 0; padding-left: 20px; color: #55555d; font-size: 13px; line-height: 1.5; }
+.bunker-os-log-section a { color: #3e5c82; }
+.bunker-os-approval { padding: 10px 12px; border: 1px solid #ecd5a7; border-radius: 8px; background: #fff9eb; }
+@media (max-width: 520px) { .bunker-os-log > header { flex-direction: column; } }

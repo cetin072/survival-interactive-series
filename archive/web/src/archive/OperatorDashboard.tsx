@@ -173,6 +173,7 @@ export function OperatorDashboard({
         <p>{email} · 자동화가 잘 돌아가는지와 확인이 필요한 항목을 한눈에 봅니다.</p>
       </div>
       <div className="operator-heading-actions">
+        <a className="operator-secondary" href="/operator/bunker-os/">Bunker OS 감독</a>
         <a className="operator-secondary" href="/operator/vault/">일러스트 보관함</a>
         <a className="operator-secondary" href="/operator/knowledge/">생존 지식 검토함</a>
         <a className="operator-secondary" href="/operator/visuals/">이미지 제작 정보</a>
