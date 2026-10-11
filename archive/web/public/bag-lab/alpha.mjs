@@ -7,7 +7,7 @@ const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>
 let record=null, screen='bag', filter='all', busy=false, editBase=null, mode=null, itemId=null, replacement=null;
 let catalogGroup='food',familyCount=1; // ephemeral guidance only; NEVER modifies recorded inventory
 function message(text,failed=false){$('save-status').textContent=text;$('save-status').classList.toggle('failure',failed);}
-function readiness(){document.querySelectorAll('[data-ready]').forEach(el=>{el.disabled=!record||busy;});$('submit').disabled=busy;$('cancel').disabled=busy;}
+function readiness(){document.querySelectorAll('[data-ready]').forEach(el=>{el.disabled=!record||busy||(el.id==='family-less'&&familyCount===1)||(el.id==='family-more'&&familyCount===8);});$('submit').disabled=busy;$('cancel').disabled=busy;}
 function showScreen(next){
   screen=next;
   document.querySelectorAll('[data-screen]').forEach(el=>{el.hidden=el.dataset.screen!==next;});
