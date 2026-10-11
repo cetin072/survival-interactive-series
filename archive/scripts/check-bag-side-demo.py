@@ -42,7 +42,7 @@ def run(browser, width, height, base_url):
     assert "간편식" in page.locator(".item").first.inner_text(),"physical shortage must rise in inventory"
     assert page.locator("#flow-qty").inner_text()=="4 / 6개"
     assert page.locator('[data-action="remove-two"]').is_disabled(),"double-tap must be disabled"
-    page.locator('[data-filter="short"]').click()
+    page.locator('.filters [data-filter="short"]').click()
     assert page.locator(".item").count()==1 and "간편식" in page.locator(".item").first.inner_text()
     page.locator('[data-action="ordered-two"]').click()
     assert page.locator("#flow-qty").inner_text()=="4 / 6개"
@@ -51,7 +51,7 @@ def run(browser, width, height, base_url):
     assert page.locator("#flow-qty").inner_text()=="6 / 6개"
     assert page.locator("#needs-count").inner_text()=="0"
     assert page.locator('[data-action="put-two"]').is_disabled()
-    page.locator('[data-filter="all"]').click()
+    page.locator('.filters [data-filter="all"]').click()
     assert page.locator(".item").count()==5
     assert "28.03.31" in page.locator("#item-food").inner_text(),"new batch date lost"
     page.locator("#snooze-button").click()
