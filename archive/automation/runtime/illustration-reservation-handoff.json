@@ -58,5 +58,30 @@
     "source_library_file_id": "libfile_893862ed09788191af641e8a863fd4b2",
     "source_version_id": null,
     "source_sha256": "ab769d78bef476f42e32222db8fed342201fa6c766c884283774ab279f799ad4"
+  },
+  "transfer": {
+    "status": "FINALIZE_QUEUED",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_00000000338481f5b07bac0fc3e8ab47",
+    "source_library_file_id": "libfile_893862ed09788191af641e8a863fd4b2",
+    "source_sha256": "ab769d78bef476f42e32222db8fed342201fa6c766c884283774ab279f799ad4",
+    "source_width": 1024,
+    "source_height": 1536,
+    "source_size_bytes": 2297032,
+    "derivative_sha256": "fd9db012a2dbb785a769c1399bd33825d5de0d4d95a812b3e9316bc6d3f1142b",
+    "derivative_width": 512,
+    "derivative_height": 512,
+    "derivative_size_bytes": 167407,
+    "palette_colors": 256,
+    "png_verify": true,
+    "png_full_decode": true,
+    "staging_id": "site-yujin-fd9db012a2dbb785",
+    "chunk_count": 2,
+    "uploaded_chunk_count": 2,
+    "finalizer_dispatch_request_id": 365,
+    "finalizer_dispatch_at": "2026-10-11T00:33:43.926693+00:00",
+    "job_status_after_finalize": "FINALIZING",
+    "current_png_cleanup": "MOVED_TO_TRASH",
+    "recorded_at": "2026-10-11T00:34:13.454Z"
   }
 }
