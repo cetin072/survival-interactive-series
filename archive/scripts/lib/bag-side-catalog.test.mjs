@@ -72,7 +72,8 @@ test('only physically stocked quantity reaches own target; ordering cannot satis
   bag=stockChange(bag,bag.items[0].id,'put',{batch:emptyBatch('new-whistle',1)});
   assert.equal(entryStatus(whistle,bag).meetsOwnTarget,true);
   assert.equal(catalogProgress(bag).ready,1);
-  bag=stockChange(bag,bag.items[0].id,'take',{quantity:1,batchId:'new-whistle'});
+  assert.equal(bag.items[0].batches.length,1,'the refill merged into the existing zero-stock batch');
+  bag=stockChange(bag,bag.items[0].id,'take',{quantity:1,batchId:bag.items[0].batches[0].id});
   assert.equal(catalogProgress(bag).ready,0);
 });
 
