@@ -33,9 +33,11 @@ test('physical refill adds C, preserves A/B dates and consumes outstanding order
   assert.equal(currentQuantity(next.items[0]),6);assert.equal(shortage(next.items[0]),0);assert.equal(next.items[0].orderedQuantity,0);
   assert.deepEqual(next.items[0].batches.slice(0,2),ordered.items[0].batches);
 });
-test('reject repeated replenishment with same batch ID',()=>{
-  const added=stockChange(bag(),'food','put',{batch:batch('C',2)});
-  assert.throws(()=>stockChange(added,'food','put',{batch:batch('C',2)}),/중복/);
+test('reject repeated replenishment with an ID that belongs to a separately stored batch',()=>{
+  const incoming=batch('C',2,'2028-03-31'); // Must differ from A/B to have its own stored ID.
+  const added=stockChange(bag(),'food','put',{batch:incoming});
+  assert.equal(added.items[0].batches.at(-1).id,'C');
+  assert.throws(()=>stockChange(added,'food','put',{batch:incoming}),/중복/);
 });
 test('reject over-consumption, negatives, empty, fractions and Infinity',()=>{
   for(const quantity of [5,-1,0,1.5,NaN,Infinity,'2'])assert.throws(()=>stockChange(bag(),'food','take',{quantity,batchId:'A'}));
