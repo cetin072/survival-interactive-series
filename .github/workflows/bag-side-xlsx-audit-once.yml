@@ -1,0 +1,88 @@
+name: One-time BAG-SIDE-01 existing XLSX audit
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/bag-side-xlsx-audit-once.yml'
+permissions:
+  contents: read
+jobs:
+  inventory-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect existing K-002 inventory workbook (read-only; Python stdlib)
+        shell: bash
+        run: |
+          from pathlib import Path
+          from zipfile import ZipFile
+          import xml.etree.ElementTree as ET
+          import hashlib, json, posixpath
+          
+          file=Path("archive/web/public/knowledge/downloads/survival-diary-emergency-inventory-v1.xlsx")
+          raw=file.read_bytes()
+          N={"m":"http://schemas.openxmlformats.org/spreadsheetml/2006/main",
+             "r":"http://schemas.openxmlformats.org/officeDocument/2006/relationships",
+             "p":"http://schemas.openxmlformats.org/package/2006/relationships"}
+          results={"file":str(file),"bytes":len(raw),"sha256":hashlib.sha256(raw).hexdigest(),"sheets":[]}
+          with ZipFile(file) as z:
+            names=set(z.namelist())
+            def read(path): return ET.fromstring(z.read(path))
+            book=read("xl/workbook.xml")
+            rels=read("xl/_rels/workbook.xml.rels")
+            map_rel={x.attrib["Id"]:x.attrib["Target"] for x in rels}
+            shared=[]
+            if "xl/sharedStrings.xml" in names:
+              xml=read("xl/sharedStrings.xml")
+              shared=["".join(x.itertext()) for x in xml.findall("m:si",N)]
+            def val(cell):
+              typ=cell.attrib.get("t")
+              v=cell.find("m:v",N)
+              inline=cell.find("m:is",N)
+              if typ=="s" and v is not None:
+                idx=int(v.text)
+                return shared[idx] if idx<len(shared) else f"#INVALID_SHARED_INDEX_{idx}"
+              if typ=="inlineStr" and inline is not None:return "".join(inline.itertext())
+              if v is not None:return v.text
+              return None
+            for node in book.find("m:sheets",N):
+              rid=node.attrib.get("{"+N["r"]+"}id")
+              target=map_rel.get(rid,"")
+              path=target.lstrip("/") if target.startswith("/") else posixpath.normpath(posixpath.join("xl",target))
+              if path not in names:
+                results["sheets"].append({"name":node.attrib["name"],"error":"sheet xml missing","path":path})
+                continue
+              sheet=read(path)
+              cells=sheet.findall(".//m:sheetData/m:row/m:c",N)
+              formulas=[]
+              errors=[]
+              nonempty=[]
+              for cell in cells:
+                ref=cell.attrib.get("r")
+                f=cell.find("m:f",N)
+                value=val(cell)
+                if f is not None:formulas.append({"cell":ref,"formula":(f.text or "")[:220],"cached":value})
+                if cell.attrib.get("t")=="e" or (isinstance(value,str) and value.startswith(("#REF!","#VALUE!","#DIV/0!","#NAME?","#N/A"))):errors.append({"cell":ref,"value":value})
+                if value is not None and value!="":nonempty.append({"cell":ref,"value":str(value)[:90]})
+              sample_rows=[]
+              rows=sheet.findall(".//m:sheetData/m:row",N)
+              for row in rows:
+                shown=[{"ref":x.attrib.get("r"),"text":str(val(x))[:100]} for x in list(row) if val(x) is not None and str(val(x)).strip()]
+                if shown:sample_rows.append({"row":row.attrib.get("r"),"cells":shown[:15]})
+                if len(sample_rows)>=12:break
+              results["sheets"].append({
+                "name":node.attrib["name"],
+                "dimension":sheet.find("m:dimension",N).attrib.get("ref") if sheet.find("m:dimension",N) is not None else None,
+                "total_cells":len(cells),"filled_cells":len(nonempty),
+                "formula_count":len(formulas),"formula_samples":formulas[:35],
+                "error_values":errors[:35],"data_validations":len(sheet.findall(".//m:dataValidation",N)),
+                "table_refs":len(sheet.findall(".//m:tablePart",N)),
+                "first_rows":sample_rows
+              })
+          print("XLSX_AUDIT_REPORT_BEGIN")
+          print(json.dumps(results,ensure_ascii=False,indent=2))
+          print("XLSX_AUDIT_REPORT_END")
+          if any(x.get("error") or x.get("error_values") for x in results["sheets"]):raise SystemExit("Found invalid Excel references or errors")
+          print("PASS: xlsx opened, sheets indexed, raw formula strings and cached values inspected")
+          
