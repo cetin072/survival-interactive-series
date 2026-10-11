@@ -1,7 +1,7 @@
 # BAG-SIDE-01 — Ąžuolas 벤치마킹 기반 한국형 추천 준비물 V1 인수인계
 
 작성: 2026-10-11 KST. 출발: Draft PR #515 head `e35d4a1a7c2639f1792fae9753656ca0f4562757`.
-작업 브랜치: `feat/bag-side-01-guided-catalog`. 이 브랜치의 PR은 #515를 base로 두는 **stacked Draft**여야 한다. #515가 main에 병합되기 전, 이번 변경을 main 대상으로 단독 병합하지 않는다.
+작업 브랜치: `feat/bag-side-01-guided-catalog`. PR #516은 **main 기준 Draft**지만 #515 알파의 미병합 커밋 위에서 개발했으므로, #515 병합 전에는 알파 변경도 PR diff에 함께 표시된다. Netlify Preview 검증을 위해 PR base만 main으로 변경한 것이다. #515를 먼저 검수·병합하고, #516을 다시 비교한 뒤 별도 승인해야 한다. 이 문서는 병합 승인이 아니다.
 
 ## 왜 벤치마킹했나
 원형: https://azuolas.mainline.inc/krepsys/
@@ -40,5 +40,5 @@
 
 ## 프로젝트 경계 / 다음 순서
 - BAG-SIDE-01만 수정. 기존 생존일기 Issue #501 Month 01, E-001/E-002/E-003, A/A-Wiki/B/C, Bunker OS, release marker, 48h Production 배포 정책 변경하지 않는다.
-- Draft PR + 자동 Netlify Deploy Preview를 통해 평가하되 main/Production 강제 배포나 새 예약 없음.
+- Draft PR #516 (base main) + 자동 Netlify Deploy Preview를 통해 평가하되 main/Production 강제 배포나 새 예약 없음. Preview가 생성되지 않거나 SHA 불일치면 안전하게 실패 처리하고 사용자에게 사용 가능한 링크라고 안내하지 않는다.
 - 실기기에서 실제 물품 5종 등록→꺼냄→보충→JSON 백업→추천 항목 이동이 불편하지 않은지 검수. 그 다음 우선순위는 **Android 장기 알림 신뢰성**, 이후 추가 인원·여러 가방 및 가족 계획 연결을 결정한다.
