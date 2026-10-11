@@ -20,6 +20,11 @@ command = "npm run build:verified"
 [context.qa-preview]
   command = "npm run build:verified && cp qa-noindex.headers dist/_headers"
 
+# BAG-SIDE-01 fixed manual QA. Enable this exact branch alongside qa-preview
+# in Netlify Branch Deploys; no production build, new site, or per-commit promotion.
+[context.qa-bag-side]
+  command = "npm run build:verified && cp qa-noindex.headers dist/_headers"
+
 [context.deploy-preview]
 # Rebuilt proposal branches must get a new Preview even when their content matches the old cached ref.
   ignore = "git merge-base --is-ancestor $CACHED_COMMIT_REF $COMMIT_REF && git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ':(top)archive/content' ':(top)archive/web' ':(top)archive/scripts'"
