@@ -15,6 +15,7 @@ jobs:
       - name: Inspect existing K-002 inventory workbook (read-only; Python stdlib)
         shell: bash
         run: |
+          python - <<'PY'
           from pathlib import Path
           from zipfile import ZipFile
           import xml.etree.ElementTree as ET
@@ -85,4 +86,5 @@ jobs:
           print("XLSX_AUDIT_REPORT_END")
           if any(x.get("error") or x.get("error_values") for x in results["sheets"]):raise SystemExit("Found invalid Excel references or errors")
           print("PASS: xlsx opened, sheets indexed, raw formula strings and cached values inspected")
+          PY
           
