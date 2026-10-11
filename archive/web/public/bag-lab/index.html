@@ -17,6 +17,12 @@
       <div class="brand"><span class="brand-symbol" aria-hidden="true">↗</span><span>나의 생존가방</span><span class="brand-small">BAG LAB</span></div>
       <a href="/knowledge/emergency-supplies-inventory/" class="link">준비 방법 알아보기 <span aria-hidden="true">↗</span></a>
     </header>
+    <nav class="bag-tabs" role="tablist" aria-label="나의 생존가방 주요 메뉴">
+      <button type="button" class="bag-tab active" id="tab-bag" role="tab" aria-selected="true" aria-controls="panel-bag" tabindex="0" data-nav="bag"><span class="tab-symbol" aria-hidden="true">▣</span><span>내 가방</span></button>
+      <button type="button" class="bag-tab" id="tab-inventory" role="tab" aria-selected="false" aria-controls="panel-inventory" tabindex="-1" data-nav="inventory"><span class="tab-symbol" aria-hidden="true">▤</span><span>물품 관리</span></button>
+      <button type="button" class="bag-tab" id="tab-learn" role="tab" aria-selected="false" aria-controls="panel-learn" tabindex="-1" data-nav="learn"><span class="tab-symbol" aria-hidden="true">◎</span><span>생존 지식</span></button>
+    </nav>
+    <div class="bag-screen" id="panel-bag" role="tabpanel" aria-labelledby="tab-bag" data-screen="bag">
     <section class="status-section" id="bag-home" aria-labelledby="status-title">
       <div class="status-top">
         <div>
@@ -50,6 +56,8 @@
       <div id="upcoming-list" class="upcoming-list" aria-live="polite"></div>
       <p class="schedule-hint">체험판에서는 물품에 적힌 표시기한 <strong>90일 전</strong>을 순환 검토일로 계산합니다. 이는 가상의 관리 설정이며 식품 안전기준이 아닙니다. 날짜만으로 섭취 가능 여부를 판단하지 마세요.</p>
     </section>
+    </div>
+    <div class="bag-screen" id="panel-inventory" role="tabpanel" aria-labelledby="tab-inventory" data-screen="inventory" hidden>
     <section class="list-section" id="inventory" aria-labelledby="bag-title">
       <div class="section-heading list-heading"><div><p class="smallcaps">MY INVENTORY</p><h2 id="bag-title">내 가방 물품</h2></div><button class="quiet-button" id="reset-top" type="button">샘플 초기화 ↺</button></div>
       <div class="filters" aria-label="물품 상태별 보기">
@@ -59,6 +67,30 @@
       </div>
       <div id="item-list" aria-live="polite" class="items"></div>
       <p class="list-footnote">표시기한과 점검일은 관리 일정이며 안전·섭취 적합성 보장이 아닙니다. 가상 수량은 실제 비축 권장량이 아닙니다.</p>
+    </section>
+    <section class="try-section" aria-labelledby="try-title">
+      <div class="try-header"><span class="lab-label">3-STEP EXPERIENCE</span><h2 id="try-title">꺼내고, 다시 채워보세요.</h2><p>가상 간편식 6개 중 2개를 꺼내고, 실제로 가방에 보충하는 상황을 체험합니다.</p></div>
+      <div class="demo-state"><span id="flow-label">가방에 6개가 들어 있어요</span><strong id="flow-qty">6 / 6개</strong></div>
+      <div class="demo-actions">
+        <button type="button" class="action primary-action" data-action="remove-two">① 2개 꺼냈어요</button>
+        <button type="button" class="action" data-action="ordered-two" disabled>② 2개 주문했어요</button>
+        <button type="button" class="action confirm-action" data-action="put-two" disabled>③ 실제로 2개 넣었어요</button>
+      </div>
+      <div class="sub-actions"><button type="button" id="snooze-button" data-action="snooze">알림 7일 미루기 (동작 시연)</button><button type="button" data-action="reset">다시 체험하기 ↺</button></div>
+      <p class="message" id="demo-message" role="status" aria-live="polite">샘플 가방에 물품 5종이 등록되어 있습니다.</p>
+      <div class="invariant"><span aria-hidden="true">◎</span><p>주문했더라도 <strong>실제로 가방에 넣기 전까지</strong> 부족 수량은 줄어들지 않습니다.</p></div>
+    </section>
+    </div>
+    <div class="bag-screen" id="panel-learn" role="tabpanel" aria-labelledby="tab-learn" data-screen="learn" hidden>
+    <section class="study-section" aria-labelledby="study-title">
+      <div class="section-heading"><div><p class="smallcaps">LEARN TO PREPARE</p><h2 id="study-title">생존가방을 공부하는 순서</h2></div></div>
+      <div class="study-cards">
+        <article><strong class="study-no">01</strong><h3>이동용 가방과 집 비축은 다릅니다</h3><p>직접 메고 이동할 가방과 집에 두는 비축품은 목적·무게·보관 방식이 다릅니다.</p></article>
+        <article><strong class="study-no">02</strong><h3>사람마다 준비물이 달라집니다</h3><p>가족 구성과 개인 필요, 영유아·반려동물·의료 용품 등을 고려해야 합니다.</p></article>
+        <article><strong class="study-no">03</strong><h3>날짜와 작동 여부를 함께 관리합니다</h3><p>식품의 표시기한·보관 조건과 손전등·보조배터리의 점검 일정은 구분해서 관리합니다.</p></article>
+      </div>
+      <p class="study-reference"><a href="/knowledge/emergency-supplies-inventory/">생존일기 비상용품 관리 지식 ↗</a><a href="https://old.safekorea.go.kr/idsiSFK/neo/main_m/chk/emergencySupplies.html" target="_blank" rel="noreferrer noopener">국민재난안전포털 비상대비용품 ↗</a><a href="https://www.redcross.org/get-help/how-to-prepare-for-emergencies/survival-kit-supplies.html" target="_blank" rel="noreferrer noopener">미국 적십자 준비물 분류 ↗</a></p>
+      <p class="study-disclaimer">외국 기관의 준비량을 한국의 법적 의무나 '배낭 하나'의 권장 수량으로 적용하지 않습니다. 자세한 근거와 개인별 조건을 확인해 주세요.</p>
     </section>
     <section class="hero">
       <div class="hero-copy">
@@ -74,28 +106,7 @@
         <div class="visual-caption">ONE BAG · ONE HABIT</div>
       </div>
     </section>
-    <section class="try-section" aria-labelledby="try-title">
-      <div class="try-header"><span class="lab-label">3-STEP EXPERIENCE</span><h2 id="try-title">꺼내고, 다시 채워보세요.</h2><p>가상 간편식 6개 중 2개를 꺼내고, 실제로 가방에 보충하는 상황을 체험합니다.</p></div>
-      <div class="demo-state"><span id="flow-label">가방에 6개가 들어 있어요</span><strong id="flow-qty">6 / 6개</strong></div>
-      <div class="demo-actions">
-        <button type="button" class="action primary-action" data-action="remove-two">① 2개 꺼냈어요</button>
-        <button type="button" class="action" data-action="ordered-two" disabled>② 2개 주문했어요</button>
-        <button type="button" class="action confirm-action" data-action="put-two" disabled>③ 실제로 2개 넣었어요</button>
-      </div>
-      <div class="sub-actions"><button type="button" id="snooze-button" data-action="snooze">알림 7일 미루기 (동작 시연)</button><button type="button" data-action="reset">다시 체험하기 ↺</button></div>
-      <p class="message" id="demo-message" role="status" aria-live="polite">샘플 가방에 물품 5종이 등록되어 있습니다.</p>
-      <div class="invariant"><span aria-hidden="true">◎</span><p>주문했더라도 <strong>실제로 가방에 넣기 전까지</strong> 부족 수량은 줄어들지 않습니다.</p></div>
-    </section>
-    <section class="study-section" aria-labelledby="study-title">
-      <div class="section-heading"><div><p class="smallcaps">LEARN TO PREPARE</p><h2 id="study-title">생존가방을 공부하는 순서</h2></div></div>
-      <div class="study-cards">
-        <article><strong class="study-no">01</strong><h3>이동용 가방과 집 비축은 다릅니다</h3><p>직접 메고 이동할 가방과 집에 두는 비축품은 목적·무게·보관 방식이 다릅니다.</p></article>
-        <article><strong class="study-no">02</strong><h3>사람마다 준비물이 달라집니다</h3><p>가족 구성과 개인 필요, 영유아·반려동물·의료 용품 등을 고려해야 합니다.</p></article>
-        <article><strong class="study-no">03</strong><h3>날짜와 작동 여부를 함께 관리합니다</h3><p>식품의 표시기한·보관 조건과 손전등·보조배터리의 점검 일정은 구분해서 관리합니다.</p></article>
-      </div>
-      <p class="study-reference"><a href="/knowledge/emergency-supplies-inventory/">생존일기 비상용품 관리 지식 ↗</a><a href="https://old.safekorea.go.kr/idsiSFK/neo/main_m/chk/emergencySupplies.html" target="_blank" rel="noreferrer noopener">국민재난안전포털 비상대비용품 ↗</a><a href="https://www.redcross.org/get-help/how-to-prepare-for-emergencies/survival-kit-supplies.html" target="_blank" rel="noreferrer noopener">미국 적십자 준비물 분류 ↗</a></p>
-      <p class="study-disclaimer">외국 기관의 준비량을 한국의 법적 의무나 '배낭 하나'의 권장 수량으로 적용하지 않습니다. 자세한 근거와 개인별 조건을 확인해 주세요.</p>
-    </section>
+    </div>
     <footer>
       <span>생존일기 · BAG-SIDE-01 사용성 실험</span>
       <span>샘플 5종 · 비회원 · 실제 알림/백업 없음 · 새로고침 시 초기화</span>
