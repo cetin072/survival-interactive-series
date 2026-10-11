@@ -18,7 +18,10 @@ def run(browser, width, height, base_url):
     page=browser.new_page(viewport={"width":width,"height":height},locale="ko-KR")
     errors=[]
     page.on("pageerror",lambda error: errors.append(str(error)))
-    page.goto(base_url.rstrip("/")+"/bag-lab/",wait_until="networkidle",timeout=30000)
+    # Netlify injects a bottom feedback drawer into Deploy Previews. Official
+    # test parameter hides only that preview overlay; all app controls stay real.
+    suffix="?ntl-drawer-state=hidden" if "netlify.app" in base_url else ""
+    page.goto(base_url.rstrip("/")+"/bag-lab/"+suffix,wait_until="networkidle",timeout=30000)
     assert page.locator("#panel-bag").is_visible(),"Default tab is bag status"
     assert page.locator("#panel-inventory").is_hidden(),"inventory should be a separate tab"
     assert page.locator("#panel-learn").is_hidden(),"learn should be a separate tab"
