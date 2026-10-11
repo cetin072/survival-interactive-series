@@ -114,7 +114,7 @@ function candidate(){
   if(mode==='add'||mode==='edit')return upsertItem(editBase.bag,{id:itemId,name:value('name').trim(),category:value('category'),target:Number(value('target')),unit:value('unit').trim(),orderedQuantity:Number(value('orderedQuantity')),batches:readBatches()});
   if(mode==='take')return stockChange(editBase.bag,itemId,'take',{quantity:Number(value('quantity')),batchId:value('batchId')});
   if(mode==='order')return stockChange(editBase.bag,itemId,'order',{quantity:Number(value('quantity'))});
-  if(mode==='put')return stockChange(editBase.bag,itemId,'put',{batch:readBatches()[0],separate:value('separate')==='on'});
+  if(mode==='put')return stockChange(editBase.bag,itemId,'put',{batch:readBatches()[0],separate:form.elements.namedItem('separate').checked});
   if(mode==='delete-batch')return removeBatch(editBase.bag,itemId,activeBatchId);
   if(mode==='delete')return removeItem(editBase.bag,itemId);
   if(mode==='restore'||mode==='undo')return validateBag(replacement);
