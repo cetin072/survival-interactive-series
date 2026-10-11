@@ -29,7 +29,22 @@ def stored(page):
 
 def confirm_save(page):
     page.locator('#submit').click()
-    expect(page.locator('#editor')).not_to_be_visible()
+    try:
+        expect(page.locator('#editor')).not_to_be_visible()
+    except AssertionError:
+        print('SAVE_DIAGNOSTIC',page.locator('#editor').inner_text(),flush=True)
+        print('INVALID_FIELDS',page.locator('#editor :invalid').evaluate_all('(els)=>els.map(el=>({name:el.name,message:el.validationMessage}))'),flush=True)
+        page.screenshot(path=str(REPORT/'save-failure.png'),full_page=True)
+        raise
+
+def undo_previous(page):
+    page.locator('#undo').click()
+    # IndexedDB read is async. A checked checkbox left inside the CLOSED dialog
+    # can satisfy Playwright.check() before the new unchecked form is rendered.
+    expect(page.locator('#editor')).to_be_visible()
+    expect(page.locator('#editor-title')).to_have_text('이전 저장 복원')
+    page.locator('#editor [name="confirm"]').check()
+    confirm_save(page)
 
 def fill_batch(row,quantity,date=None,inspection=None):
     row.locator('[name="quantity"]').fill(str(quantity))
@@ -133,8 +148,7 @@ def run(browser,width,base):
     restored=stored(page);assert restored['bag']==json.loads(short_backup)['bag']
     apply_restore(page,short_backup)
     assert stored(page)==restored,'re-importing identical backup must not duplicate or rewrite'
-    page.locator('#undo').click()
-    page.locator('#editor [name="confirm"]').check();confirm_save(page)
+    undo_previous(page)
     assert stored(page)['bag']==full['bag'],'previous snapshot did not restore exact pre-import state'
     stable=stored(page)
     malformed=['{',full_backup.replace('BAG-SIDE-01','OTHER'),full_backup.replace('2027-04-30','2027-02-30'),'x'*(1024*1024+1)]
@@ -175,7 +189,7 @@ def run(browser,width,base):
     assert stored(page)['bag']==prior_delete
     card(page).locator('[data-mode="delete"]').click();page.locator('#editor [name="confirm"]').check();confirm_save(page)
     assert len(stored(page)['bag']['items'])==4
-    page.locator('#undo').click();page.locator('#editor [name="confirm"]').check();confirm_save(page)
+    undo_previous(page)
     assert stored(page)['bag']==prior_delete
     if width==390:
         faults(page,context,url)
