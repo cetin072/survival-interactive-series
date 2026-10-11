@@ -60,7 +60,8 @@ h2{font-size:21px;letter-spacing:-.04em}
 .backup-panel p{font-size:13px;overflow-wrap:anywhere}
 .backup-panel button,.file-button{min-height:44px}
 .file-button{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:1px solid #cad4df;border-radius:10px;padding:10px 12px;font-size:13px}
-.file-button input{max-width:220px;font:inherit}
+.file-button{min-width:0;max-width:100%}
+.file-button input{width:220px;min-width:0;max-width:100%;font:inherit}
 .error-panel{color:#872b19;background:#fff0e9;border:1px solid #e6a78b;border-radius:10px;padding:12px;font-size:14px;overflow-wrap:anywhere}
 .error-panel button{margin:4px}
 #save-status{font-size:13px;min-height:42px;overflow-wrap:anywhere}
@@ -98,7 +99,7 @@ input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid
  .section-heading{align-items:flex-start}.section-heading small{max-width:90px;font-size:11px;text-align:right}
  dialog{padding:18px}.dialog-actions{bottom:-18px}.form-grid{grid-template-columns:1fr}
  .batch-fields .form-grid{grid-template-columns:1fr}.form-help{font-size:12px}
- .backup-panel{padding:14px}.file-button input{max-width:100%}
+ .backup-panel{padding:14px}.file-button{width:100%}.file-button input{width:100%;min-width:0;max-width:100%}
  .upcoming-copy{overflow-wrap:anywhere}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}

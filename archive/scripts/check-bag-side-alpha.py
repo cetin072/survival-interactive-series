@@ -71,9 +71,16 @@ def apply_restore(page,text):
     confirm_save(page)
 
 def no_overflow(page):
-    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2'),'page horizontal overflow'
-    if page.locator('#editor').is_visible():
-        assert page.locator('#editor').evaluate('(el)=>el.scrollWidth<=el.clientWidth+2'),'dialog horizontal overflow'
+    dimensions=page.evaluate("""()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,
+      elements:[...document.querySelectorAll('*')].map(el=>({tag:el.tagName,id:el.id,cls:el.className,
+      right:el.getBoundingClientRect().right,width:el.getBoundingClientRect().width}))
+      .filter(el=>el.right>innerWidth+2)})""")
+    dialog_ok=not page.locator('#editor').is_visible() or page.locator('#editor').evaluate('(el)=>el.scrollWidth<=el.clientWidth+2')
+    if dimensions['scroll']>dimensions['width']+2 or not dialog_ok:
+        page.screenshot(path=str(REPORT/f"overflow-{dimensions['width']}.png"),full_page=True)
+        print('OVERFLOW_DIAGNOSTIC',json.dumps(dimensions,ensure_ascii=False),flush=True)
+    assert dimensions['scroll']<=dimensions['width']+2,'page horizontal overflow'
+    assert dialog_ok,'dialog horizontal overflow'
 
 def run(browser,width,base):
     context=browser.new_context(viewport={'width':width,'height':844},locale='ko-KR',timezone_id='Asia/Seoul',accept_downloads=True)
