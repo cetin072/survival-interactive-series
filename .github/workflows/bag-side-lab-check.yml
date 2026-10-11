@@ -1,0 +1,28 @@
+name: BAG-SIDE-01 experimental UI state check
+on:
+  pull_request:
+    paths:
+      - 'archive/web/public/bag-lab/**'
+      - 'archive/scripts/lib/bag-side-lab.test.mjs'
+      - '.github/workflows/bag-side-lab-check.yml'
+permissions:
+  contents: read
+jobs:
+  model-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Check UI module syntax
+        run: |
+          node --check archive/web/public/bag-lab/logic.mjs
+          node --check archive/web/public/bag-lab/app.mjs
+      - name: Run bag scenario state tests
+        run: node --test archive/scripts/lib/bag-side-lab.test.mjs
+      - name: Verify standalone static screen is preview only
+        run: |
+          grep -q 'name="robots" content="noindex' archive/web/public/bag-lab/index.html
+          grep -q '가상 데이터 · 저장/알림 없음' archive/web/public/bag-lab/index.html

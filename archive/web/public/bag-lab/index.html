@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="robots" content="noindex,nofollow,noarchive"/>
+  <meta name="theme-color" content="#f5f6f4"/>
+  <title>나의 생존가방 · 준비하는 사람 실험</title>
+  <meta name="description" content="가상 물품 5종으로 생존가방 순환과 보충 흐름을 체험하는 비공개 제품 아이디어 시험판입니다."/>
+  <link rel="stylesheet" href="./style.css"/>
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <div class="notice" role="note"><span class="notice-dot"></span><span>별도 병행 과제 · <strong>체험용 화면</strong></span><span class="notice-right">가상 데이터 · 저장/알림 없음</span></div>
+  <main class="shell">
+    <header class="top">
+      <div class="brand"><span class="brand-symbol" aria-hidden="true">↗</span><span>나의 생존가방</span><span class="brand-small">BAG LAB</span></div>
+      <a href="/knowledge/emergency-supplies-inventory/" class="link">준비 방법 알아보기 <span aria-hidden="true">↗</span></a>
+    </header>
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="tiny-dot"></span> THE ART OF BEING READY</div>
+        <h1>나는<br/><em>준비하는 사람.</em></h1>
+        <p>걱정을 쌓아두기보다, 하나씩 준비하는 습관.<br/>내가 준비한 것들을 이곳에 차곡차곡 기록해요.</p>
+        <div class="hero-note"><span class="seal" aria-hidden="true">✓</span><span>작은 준비도, 분명한 시작입니다.</span></div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="visual-halo halo-one"></div><div class="visual-halo halo-two"></div>
+        <div class="bag-handle"></div><div class="bag-body"><div class="bag-pocket"><div class="bag-pocket-line"></div></div><div class="bag-badge">READY</div></div>
+        <div class="bag-straps"><i></i><i></i></div>
+        <div class="visual-caption">ONE BAG · ONE HABIT</div>
+      </div>
+    </section>
+    <section class="status-section" aria-labelledby="status-title">
+      <div class="section-heading"><h2 id="status-title">오늘의 준비</h2><span class="dim">실제 준비 수준이나 안전을 보증하지 않습니다</span></div>
+      <div class="stats">
+        <div class="stat"><div class="stat-label">기록한 물품</div><div class="stat-value"><span id="item-count">5</span><small>종</small></div><p>가상 샘플 기준</p></div>
+        <div class="stat stat-alert"><div class="stat-label">보충할 물품</div><div class="stat-value"><span id="needs-count">0</span><small>종</small></div><p id="needs-copy">부족 수량은 현재 없습니다</p></div>
+        <div class="stat"><div class="stat-label">다음 확인</div><div class="stat-date">11월 1일</div><p>손전등 작동 점검 · 예시</p></div>
+      </div>
+    </section>
+    <section class="list-section" aria-labelledby="bag-title">
+      <div class="section-heading list-heading"><div><p class="smallcaps">IN MY BAG</p><h2 id="bag-title">내 가방에 들어있는 것</h2></div><button class="quiet-button" id="reset-top" type="button">샘플 초기화 ↺</button></div>
+      <div class="filters" aria-label="물품 상태별 보기">
+        <button type="button" data-filter="all" class="selected" aria-pressed="true">전체</button>
+        <button type="button" data-filter="short" aria-pressed="false">보충 필요 <span id="filter-count">0</span></button>
+      </div>
+      <div id="item-list" aria-live="polite" class="items"></div>
+    </section>
+    <section class="try-section" aria-labelledby="try-title">
+      <div class="try-header"><span class="lab-label">3-STEP EXPERIENCE</span><h2 id="try-title">꺼내고, 다시 채워보세요.</h2><p>가상 간편식 6개 중 2개를 꺼내고, 실제로 가방에 보충하는 상황을 체험합니다.</p></div>
+      <div class="demo-state"><span id="flow-label">가방에 6개가 들어 있어요</span><strong id="flow-qty">6 / 6개</strong></div>
+      <div class="demo-actions">
+        <button type="button" class="action primary-action" data-action="remove-two">① 2개 꺼냈어요</button>
+        <button type="button" class="action" data-action="ordered-two" disabled>② 2개 주문했어요</button>
+        <button type="button" class="action confirm-action" data-action="put-two" disabled>③ 실제로 2개 넣었어요</button>
+      </div>
+      <div class="sub-actions"><button type="button" id="snooze-button" data-action="snooze">알림 7일 미루기 (동작 시연)</button><button type="button" data-action="reset">다시 체험하기 ↺</button></div>
+      <p class="message" id="demo-message" role="status" aria-live="polite">샘플 가방에 물품 5종이 등록되어 있습니다.</p>
+      <div class="invariant"><span aria-hidden="true">◎</span><p>주문했더라도 <strong>실제로 가방에 넣기 전까지</strong> 부족 수량은 줄어들지 않습니다.</p></div>
+    </section>
+    <footer>
+      <span>생존일기 · BAG-SIDE-01 사용성 실험</span>
+      <span>샘플 5종 · 비회원 · 실제 알림/백업 없음 · 새로고침 시 초기화</span>
+      <p>물품 수량과 표시기한은 가상의 예시입니다. 실제 비상대비 권장 수량이나 섭취 안전기준을 의미하지 않습니다.</p>
+    </footer>
+  </main>
+</body>
+</html>
