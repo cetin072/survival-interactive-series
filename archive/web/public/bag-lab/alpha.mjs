@@ -1,10 +1,10 @@
 import {currentQuantity,shortage,dashboardSummary,prioritizedItems,nextAction,dayDifference,localToday} from './logic.mjs';
-import {CATEGORIES,DATE_TYPES,MAX_BACKUP_BYTES,newId,newBatch,upsertItem,removeItem,stockChange,dashboardBag,backupText,parseBackup,validateBag} from './personal.mjs';
+import {CATEGORIES,DATE_TYPES,MAX_BACKUP_BYTES,newId,newBatch,upsertItem,removeItem,removeBatch,stockChange,dashboardBag,backupText,parseBackup,validateBag} from './personal.mjs';
 import {readBag,saveBag,readPreviousBag,readRawRecord} from './storage.mjs';
 import {GROUPS,CATALOG,targetFor,seedFor,entryStatus,catalogProgress} from './catalog.mjs';
 const $=id=>document.getElementById(id);
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let record=null, screen='bag', filter='all', busy=false, editBase=null, mode=null, itemId=null, replacement=null;
+let record=null, screen='bag', filter='all', busy=false, editBase=null, mode=null, itemId=null, activeBatchId=null, replacement=null;
 let catalogGroup='food',familyCount=1; // ephemeral guidance only; NEVER modifies recorded inventory
 function message(text,failed=false){$('save-status').textContent=text;$('save-status').classList.toggle('failure',failed);}
 function readiness(){document.querySelectorAll('[data-ready]').forEach(el=>{el.disabled=!record||busy||(el.id==='family-less'&&familyCount===1)||(el.id==='family-more'&&familyCount===8);});$('submit').disabled=busy;$('cancel').disabled=busy;}
@@ -55,7 +55,7 @@ function draw(){
   const chosen=ordered.filter(item=>filter==='short'?shortage(item)>0:filter==='soon'?(nextAction(item,bag.rotationLeadDays)&&dayDifference(nextAction(item,bag.rotationLeadDays).due,today)<=30):true);
   $('item-list').innerHTML=chosen.map(item=>{
     const gap=shortage(item);
-    const batches=item.batches.map((b,i)=>`<p>묶음 ${i+1} · ${b.quantity}${esc(item.unit)} · ${b.markedUntil?esc(DATE_TYPES[b.dateType])+' '+b.markedUntil:'표시기한 없음'}${b.nextInspection?' · 점검 '+b.nextInspection:''}</p>`).join('');
+    const batches=item.batches.map((b,i)=>`<div class="batch-row"><span>묶음 ${i+1} · ${b.quantity}${esc(item.unit)} · ${b.markedUntil?esc(DATE_TYPES[b.dateType])+' '+b.markedUntil:'표시기한 없음'}${b.nextInspection?' · 점검 '+b.nextInspection:''}</span><button type="button" class="quiet-button batch-remove" data-mode="delete-batch" data-item="${esc(item.id)}" data-batch-id="${esc(b.id)}" data-ready>이 묶음 기록 삭제</button></div>`).join('');
     return `<article class="item personal-item" id="item-${esc(item.id)}" tabindex="-1"><div class="item-head"><div><h3>${esc(item.name)}</h3><span class="item-tag ${gap?'short':''}">${gap?`보충 ${gap}${esc(item.unit)}`:'기록상 수량 충족'}</span></div><div class="item-number"><strong>${currentQuantity(item)} <span>/ ${item.target}${esc(item.unit)}</span></strong></div></div><p class="item-sub">${esc(schedule(item,bag))} · 주문 중 ${item.orderedQuantity}${esc(item.unit)} (가방 제외)</p><details class="batch-list"><summary>묶음 ${item.batches.length}개 · 날짜·수량 확인</summary>${batches||'<p>실물 묶음이 없습니다.</p>'}</details><div class="actions">${[['take','꺼냈어요'],['order','주문했어요'],['put','실제로 넣었어요'],['edit','수정'],['delete','삭제']].map(([action,label])=>`<button type="button" class="${action==='put'?'action confirm-action':'quiet-button'}" data-mode="${action}" data-item="${esc(item.id)}" data-ready ${action==='take'&&currentQuantity(item)===0?'data-empty disabled':''}>${label}</button>`).join('')}</div></article>`;
   }).join('')||'<div class="items-empty">해당하는 물품이 없습니다.</div>';
   document.querySelectorAll('.filters [data-filter]').forEach(el=>{const active=el.dataset.filter===filter;el.classList.toggle('selected',active);el.setAttribute('aria-pressed',String(active));});
@@ -69,11 +69,11 @@ function batchFields(batch,index,removable=false){
 function readBatches(){
   return [...$('editor-body').querySelectorAll('[data-batch]')].map(row=>({id:row.dataset.batch,quantity:Number(row.querySelector('[name="quantity"]').value),dateType:row.querySelector('[name="dateType"]').value,markedUntil:row.querySelector('[name="markedUntil"]').value||null,nextInspection:row.querySelector('[name="nextInspection"]').value||null}));
 }
-function openEditor(nextMode,id=null,bag=null,base=record,seed=null){
+function openEditor(nextMode,id=null,bag=null,base=record,seed=null,batchId=null){
   if(!base||busy)return;
-  mode=nextMode;itemId=id;editBase=base;replacement=bag;
+  mode=nextMode;itemId=id;activeBatchId=batchId;editBase=base;replacement=bag;
   const item=base.bag.items.find(x=>x.id===id);
-  if(['edit','take','order','put','delete'].includes(mode)&&!item)throw new Error('물품을 찾지 못했습니다.');
+  if(['edit','take','order','put','delete','delete-batch'].includes(mode)&&!item)throw new Error('물품을 찾지 못했습니다.');
   $('editor-error').hidden=true;
   let title,body,submit='저장';
   if(mode==='add'||mode==='edit'){
@@ -89,7 +89,13 @@ function openEditor(nextMode,id=null,bag=null,base=record,seed=null){
     body=field('주문한 수량','quantity','number',1,'required min="1" max="9999" step="1"')+'<p class="form-help">주문 기록만 추가합니다. 실제 가방 수량과 부족량은 바뀌지 않습니다.</p>';
   }else if(mode==='put'){
     title=`${item.name} · 실제로 넣었어요`;submit='가방 보충 반영';
-    body='<p class="form-help">새 물품을 실제로 넣은 뒤 기록하세요. 이전 묶음의 기한은 바꾸지 않습니다.</p>'+batchFields(newBatch(1),item.batches.length);
+    body='<p class="form-help">실제로 넣은 수량만 기록하세요. 표시기한 종류·날짜·점검일이 모두 같으면 기존 묶음에 합산하고, 다르면 새 묶음으로 관리합니다. 이전 묶음의 날짜는 바뀌지 않습니다.</p>'+batchFields(newBatch(1),item.batches.length)+'<label class="confirm-check"><input name="separate" type="checkbox"> 같은 날짜여도 따로 관리할 묶음입니다</label>';
+  }else if(mode==='delete-batch'){
+    const index=item.batches.findIndex(batch=>batch.id===activeBatchId);
+    if(index<0)throw new Error('삭제할 묶음 기록을 찾지 못했습니다.');
+    const batch=item.batches[index];
+    title=`${item.name} · 묶음 ${index+1} 삭제`;submit='확인하고 묶음 삭제';
+    body=`<p><strong>묶음 ${index+1}</strong> · ${batch.quantity}${esc(item.unit)} · ${batch.markedUntil?esc(DATE_TYPES[batch.dateType])+' '+batch.markedUntil:'표시기한 없음'}${batch.nextInspection?' · 점검 '+batch.nextInspection:''}</p><p>이 묶음의 수량·날짜 기록만 삭제합니다. 다른 묶음과 물품의 목표 수량은 유지됩니다. 실제 물품을 버리라는 뜻은 아닙니다. 삭제 전 기록은 '이전 저장 복원'으로 되돌릴 수 있습니다.</p><label class="confirm-check"><input name="confirm" type="checkbox" required>이 묶음 기록만 삭제하겠습니다.</label>`;
   }else if(mode==='delete'){
     title=`${item.name} · 기록 삭제`;submit='확인하고 삭제';
     body=`<p>이 물품과 묶음 ${item.batches.length}개의 기록을 삭제합니다. 실물을 버리라는 뜻은 아닙니다. 삭제 직전 기록은 이전 저장 복원으로 되돌릴 수 있습니다.</p><label class="confirm-check"><input name="confirm" type="checkbox" required>이 물품의 기록을 삭제하겠습니다.</label>`;
@@ -108,7 +114,8 @@ function candidate(){
   if(mode==='add'||mode==='edit')return upsertItem(editBase.bag,{id:itemId,name:value('name').trim(),category:value('category'),target:Number(value('target')),unit:value('unit').trim(),orderedQuantity:Number(value('orderedQuantity')),batches:readBatches()});
   if(mode==='take')return stockChange(editBase.bag,itemId,'take',{quantity:Number(value('quantity')),batchId:value('batchId')});
   if(mode==='order')return stockChange(editBase.bag,itemId,'order',{quantity:Number(value('quantity'))});
-  if(mode==='put')return stockChange(editBase.bag,itemId,'put',{batch:readBatches()[0]});
+  if(mode==='put')return stockChange(editBase.bag,itemId,'put',{batch:readBatches()[0],separate:value('separate')==='on'});
+  if(mode==='delete-batch')return removeBatch(editBase.bag,itemId,activeBatchId);
   if(mode==='delete')return removeItem(editBase.bag,itemId);
   if(mode==='restore'||mode==='undo')return validateBag(replacement);
   if(mode==='settings')return validateBag({...editBase.bag,bagName:value('bagName').trim(),rotationLeadDays:Number(value('rotationLeadDays'))});
@@ -164,7 +171,7 @@ document.addEventListener('click',async event=>{
     }
     if(button.dataset.filter){filter=button.dataset.filter;showScreen('inventory');draw();return;}
     if(button.dataset.focus){filter='all';showScreen('inventory');draw();const target=$('item-'+button.dataset.focus);target?.scrollIntoView({block:'center'});target?.focus({preventScroll:true});return;}
-    if(button.dataset.mode){openEditor(button.dataset.mode,button.dataset.item);return;}
+    if(button.dataset.mode){openEditor(button.dataset.mode,button.dataset.item,null,record,null,button.dataset.batchId??null);return;}
     if(button.dataset.command==='add'){openEditor('add');return;}
     if(button.dataset.command==='settings'){openEditor('settings');return;}
     if(button.dataset.command==='backup'){showScreen('inventory');$('backup-panel').open=true;$('backup-panel').scrollIntoView({block:'start'});return;}
