@@ -5,6 +5,8 @@ on:
       - 'archive/web/public/bag-lab/**'
       - 'archive/scripts/lib/bag-side-*.test.mjs'
       - 'archive/scripts/check-bag-side-*.py'
+      - 'archive/web/netlify.toml'
+      - 'archive/web/qa-noindex.headers'
       - '.github/workflows/bag-side-lab-check.yml'
 permissions:
   contents: read
@@ -56,6 +58,11 @@ jobs:
           grep -q '가상 데이터 · 저장/알림 없음' archive/web/public/bag-lab/index.html
           grep -q 'name="robots" content="noindex' archive/web/public/bag-lab/alpha.html
           grep -q '알림·클라우드 동기화 없음' archive/web/public/bag-lab/alpha.html
+      - name: QA branch context retains noindex without production override
+        run: |
+          grep -q '^\[context.qa-bag-side\]' archive/web/netlify.toml
+          grep -q 'command = "npm run build:verified && cp qa-noindex.headers dist/_headers"' archive/web/netlify.toml
+          grep -q 'X-Robots-Tag: noindex' archive/web/qa-noindex.headers
       - name: Keep synthetic-only browser evidence
         if: always()
         uses: actions/upload-artifact@v4
