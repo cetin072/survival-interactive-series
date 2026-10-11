@@ -1,0 +1,43 @@
+name: BAG-SIDE-01 experimental UI state check
+on:
+  pull_request:
+    paths:
+      - 'archive/web/public/bag-lab/**'
+      - 'archive/scripts/lib/bag-side-lab.test.mjs'
+      - '.github/workflows/bag-side-lab-check.yml'
+permissions:
+  contents: read
+jobs:
+  model-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Check UI module syntax
+        run: |
+          node --check archive/web/public/bag-lab/logic.mjs
+          node --check archive/web/public/bag-lab/app.mjs
+      - name: Run bag scenario state tests
+        run: node --test archive/scripts/lib/bag-side-lab.test.mjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser tools for click-through QA
+        run: |
+          python -m pip install playwright==1.55.0
+          python -m playwright install --with-deps chromium
+      - name: Real mobile and desktop click-through
+        run: python archive/scripts/check-bag-side-demo.py
+      - name: Real deployed Preview click-through with exact SHA
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          BAG_LAB_BASE_URL: https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app
+          BAG_LAB_EXPECTED_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python archive/scripts/check-bag-side-demo.py
+      - name: Verify standalone static screen is preview only
+        run: |
+          grep -q 'name="robots" content="noindex' archive/web/public/bag-lab/index.html
+          grep -q '가상 데이터 · 저장/알림 없음' archive/web/public/bag-lab/index.html
