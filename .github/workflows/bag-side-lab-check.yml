@@ -21,7 +21,7 @@ jobs:
         run: |
           for file in archive/web/public/bag-lab/*.mjs; do node --check "$file"; done
       - name: Run original demo and personal Alpha state tests
-        run: node --test archive/scripts/lib/bag-side-lab.test.mjs archive/scripts/lib/bag-side-alpha.test.mjs
+        run: node --test archive/scripts/lib/bag-side-lab.test.mjs archive/scripts/lib/bag-side-alpha.test.mjs archive/scripts/lib/bag-side-catalog.test.mjs
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
