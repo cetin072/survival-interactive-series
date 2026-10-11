@@ -56,7 +56,7 @@ def run(browser, width, height, base_url):
     assert "28.03.31" in page.locator("#item-food").inner_text(),"new batch date lost"
     page.locator("#snooze-button").click()
     assert page.locator("#flow-qty").inner_text()=="6 / 6개"
-    assert "실제 알림 예약은 하지 않았습니다" in page.locator("#demo-message").inner_text()
+    assert "실제 알림 예약이나 표시기한" in page.locator("#demo-message").inner_text()
     page.locator('[data-action="reset"]').click()
     assert page.locator("#flow-qty").inner_text()=="6 / 6개"
     assert page.locator("#needs-count").inner_text()=="0"
