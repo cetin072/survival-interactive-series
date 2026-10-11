@@ -211,12 +211,12 @@ def faults(page,context,url):
     # Throw after recovery-copy PUT, before current PUT; both writes must roll back.
     old=stored(page)
     previous=page.evaluate("async()=>(await import('./storage.mjs')).readRawRecord('previous')")
-    page.evaluate("window.originalPut=IDBObjectStore.prototype.put; IDBObjectStore.prototype.put=function(v,k){if(k==='current')throw new DOMException('test quota failure','QuotaExceededError');return window.originalPut.call(this,v,k);}")
+    page.evaluate("()=>{window.originalPut=IDBObjectStore.prototype.put; IDBObjectStore.prototype.put=function(v,k){if(k==='current')throw new DOMException('test quota failure','QuotaExceededError');return window.originalPut.call(this,v,k);};}")
     card(page).locator('[data-mode="edit"]').click();page.locator('#editor [name="target"]').fill('9');page.locator('#submit').click()
     expect(page.locator('#editor-error')).to_contain_text('quota')
     assert stored(page)==old,'quota failure changed current'
     assert page.evaluate("async()=>(await import('./storage.mjs')).readRawRecord('previous')")==previous,'quota failure changed recovery copy'
-    page.evaluate('IDBObjectStore.prototype.put=window.originalPut');page.locator('#cancel').click()
+    page.evaluate('()=>{IDBObjectStore.prototype.put=window.originalPut;delete window.originalPut;}');page.locator('#cancel').click()
     # Two concurrent writes at same revision: transactional winner + explicit conflict.
     result=page.evaluate("""async()=>{const m=await import('./storage.mjs'),r=await m.readBag();const a={...r.bag,bagName:'transaction A'},b={...r.bag,bagName:'transaction B'};return (await Promise.allSettled([m.saveBag(a,r.revision),m.saveBag(b,r.revision)])).map(x=>x.status==='fulfilled'?'OK':x.reason.code);} """)
     assert sorted(result)==['OK','STALE']
