@@ -19,6 +19,10 @@ def run(browser, width, height, base_url):
     errors=[]
     page.on("pageerror",lambda error: errors.append(str(error)))
     page.goto(base_url.rstrip("/")+"/bag-lab/",wait_until="networkidle",timeout=30000)
+    assert page.locator("#panel-bag").is_visible(),"Default tab is bag status"
+    assert page.locator("#panel-inventory").is_hidden(),"inventory should be a separate tab"
+    assert page.locator("#panel-learn").is_hidden(),"learn should be a separate tab"
+    assert page.locator('[data-nav="bag"]').get_attribute("aria-selected")=="true"
     assert page.locator("#item-count").inner_text()=="5"
     assert page.locator("#needs-count").inner_text()=="0"
     assert page.locator("#flow-qty").inner_text()=="6 / 6개"
@@ -30,10 +34,15 @@ def run(browser, width, height, base_url):
     assert page.locator("#soon-count").inner_text().isdigit()
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth+2"),"horizontal page overflow"
     page.locator(".stat-near").click()
+    assert page.locator("#panel-inventory").is_visible(),"top overview card must switch tabs"
+    assert page.locator('[data-nav="inventory"]').get_attribute("aria-selected")=="true"
     assert page.locator(".filters [data-filter='soon']").get_attribute("aria-pressed")=="true"
     assert page.locator(".item").count()>=1
     page.locator(".filters [data-filter='all']").click()
+    page.locator('[data-nav="bag"]').click()
+    assert page.locator("#panel-bag").is_visible()
     page.locator(".upcoming-row").first.click()
+    assert page.locator("#panel-inventory").is_visible()
     assert page.locator("#item-light").evaluate("(element) => document.activeElement === element"), "due-card click must focus item"
 
     page.locator('[data-action="remove-two"]').click()
@@ -60,6 +69,15 @@ def run(browser, width, height, base_url):
     page.locator('[data-action="reset"]').click()
     assert page.locator("#flow-qty").inner_text()=="6 / 6개"
     assert page.locator("#needs-count").inner_text()=="0"
+    page.locator('[data-nav="learn"]').click()
+    assert page.locator("#panel-learn").is_visible()
+    assert page.locator("#panel-inventory").is_hidden()
+    assert page.locator(".study-cards article").count()==3
+    assert page.locator('[data-nav="learn"]').get_attribute("aria-selected")=="true"
+    page.locator('[data-nav="bag"]').click()
+    assert page.locator("#panel-bag").is_visible()
+    assert page.locator("#panel-learn").is_hidden()
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth+2")
     assert not errors,"Browser JavaScript error: "+str(errors)
     print(f"PASS bag-lab browser width={width} clicks, filters, dates, state and reset")
     page.close()
