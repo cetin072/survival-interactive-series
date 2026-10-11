@@ -129,6 +129,45 @@ def check_guided_catalog(page,width):
     page.locator('[data-nav="bag"]').click()
     assert stored(page)==original
 
+def check_batch_management(page):
+    """Actual browser test: matching restock merges, deliberate separate restock stays,
+    single-batch deletion requires confirmation and never removes the parent item."""
+    original=stored(page)['bag']
+    backup_before=backup(page)
+    card(page).locator('[data-mode="put"]').click()
+    fill_batch(page.locator('#editor [data-batch]'),1,'2028-03-31')
+    expect(page.locator('#editor [name="separate"]')).not_to_be_checked()
+    expect(page.locator('#editor')).to_contain_text('기존 묶음에 합산')
+    confirm_save(page)
+    food=stored(page)['bag']['items'][0]
+    assert len(food['batches'])==3 and food['batches'][-1]['quantity']==3,'matching dates did not merge'
+    undo_previous(page)
+    assert stored(page)['bag']==original,'merge undo did not return original bag'
+
+    card(page).locator('[data-mode="put"]').click()
+    fill_batch(page.locator('#editor [data-batch]'),1,'2028-03-31')
+    page.locator('#editor [name="separate"]').check()
+    confirm_save(page)
+    separated=stored(page)['bag']
+    assert len(separated['items'][0]['batches'])==4,'explicitly separated date created no new batch'
+    item_card=card(page)
+    item_card.locator('.batch-list summary').click()
+    buttons=item_card.locator('[data-mode="delete-batch"]')
+    expect(buttons).to_have_count(4)
+    buttons.last.click()
+    expect(page.locator('#editor-title')).to_contain_text('묶음 4 삭제')
+    page.locator('#cancel').click()
+    assert stored(page)['bag']==separated,'canceled per-batch delete mutated data'
+    buttons.last.click()
+    page.locator('#editor [name="confirm"]').check()
+    confirm_save(page)
+    current=stored(page)['bag']
+    assert len(current['items'])==5 and len(current['items'][0]['batches'])==3
+    assert current['items'][0]['batches']==original['items'][0]['batches'],'single-batch delete changed other batches'
+    apply_restore(page,backup_before)
+    assert stored(page)['bag']==original,'test restore failed to preserve original bag'
+    print('PASS per-batch merge/split/confirmed deletion and original JSON recovery')
+
 def run(browser,width,base):
     context=browser.new_context(viewport={'width':width,'height':844},locale='ko-KR',timezone_id='Asia/Seoul',accept_downloads=True)
     page=context.new_page();page.set_default_timeout(10000)
@@ -167,6 +206,7 @@ def run(browser,width,base):
     fill_batch(page.locator('#editor [data-batch]'),2,'2028-03-31');no_overflow(page)
     if width==390: page.screenshot(path=str(REPORT/'alpha-mobile-refill.png'))
     confirm_save(page)
+    check_batch_management(page)
     full=stored(page);food=full['bag']['items'][0]
     assert [(b['quantity'],b['markedUntil']) for b in food['batches']]==[(2,'2027-04-30'),(2,'2027-12-31'),(2,'2028-03-31')]
     expect(page.locator('#needs-count')).to_have_text('0')
