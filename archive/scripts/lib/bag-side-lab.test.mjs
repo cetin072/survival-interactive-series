@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createDemo, changeDemo, currentQuantity, shortage, summary } from "../../web/public/bag-lab/logic.mjs";
+import { createDemo, changeDemo, currentQuantity, shortage, summary, nextAction, prioritizedItems, dashboardSummary, dayDifference, minusDays } from "../../web/public/bag-lab/logic.mjs";
 
 const food = state => state.items.find(item => item.id === "food");
 test("five-item bag is only a synthetic example",()=>{
@@ -46,4 +46,38 @@ test("refresh/reset only restores synthetic starting state",()=>{
   const done=changeDemo(changeDemo(createDemo(),"remove-two"),"put-two");
   assert.deepEqual(changeDemo(done,"reset"),createDemo());
   assert.deepEqual(JSON.parse(JSON.stringify(done)),done);
+});
+
+test("upcoming inspection and printed-date rotation are different kinds of management",()=>{
+  const s=createDemo();
+  assert.deepEqual(prioritizedItems(s).map(item=>item.id),["light","power","food","water","wipes"]);
+  assert.equal(nextAction(s.items[2]).kind,"inspection");
+  assert.equal(nextAction(s.items[2]).due,"2026-11-01");
+  assert.equal(minusDays("2027-04-30",90),"2027-01-30");
+  assert.equal(nextAction(s.items[0],90).due,"2027-01-30");
+  assert.equal(nextAction(s.items[0],90).markedUntil,"2027-04-30");
+});
+test("dashboard date summary counts due-soon items without fake safety score",()=>{
+  const s=createDemo();
+  const overview=dashboardSummary(s,"2026-10-11");
+  assert.equal(overview.items,5);
+  assert.equal(overview.shortages,0);
+  assert.equal(overview.soonCount,1);
+  assert.equal(overview.next.item.id,"light");
+  assert.equal(dayDifference(overview.next.task.due,"2026-10-11"),21);
+});
+test("physical shortage becomes first action even when its future label date is later",()=>{
+  const s=changeDemo(createDemo(),"remove-two");
+  assert.equal(prioritizedItems(s)[0].id,"food");
+  assert.equal(dashboardSummary(s,"2026-10-11").shortages,1);
+  const ordered=changeDemo(s,"ordered-two");
+  assert.equal(prioritizedItems(ordered)[0].id,"food");
+  const filled=changeDemo(ordered,"put-two");
+  assert.equal(prioritizedItems(filled)[0].id,"light");
+});
+test("empty batches do not produce false future checks",()=>{
+  const s=createDemo();
+  s.items[0].batches[0].quantity=0;
+  assert.equal(nextAction(s.items[0],90).markedUntil,"2027-12-31");
+  assert.equal(nextAction(s.items[0],90).due,"2027-10-02");
 });

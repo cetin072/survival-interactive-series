@@ -23,9 +23,23 @@ def run(browser, width, height, base_url):
     assert page.locator("#needs-count").inner_text()=="0"
     assert page.locator("#flow-qty").inner_text()=="6 / 6개"
     assert page.locator(".item").count()==5
+    assert page.locator("#bag-home h1").count()==1, "state dashboard must be the first major panel"
+    assert page.locator("#upcoming .upcoming-row").count()==4
+    assert "손전등" in page.locator(".item").first.inner_text(), "items must sort by nearest check date"
+    assert "손전등" in page.locator(".upcoming-row").first.inner_text()
+    assert page.locator("#soon-count").inner_text().isdigit()
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth+2"),"horizontal page overflow"
+    page.locator(".stat-near").click()
+    assert page.locator(".filters [data-filter='soon']").get_attribute("aria-pressed")=="true"
+    assert page.locator(".item").count()>=1
+    page.locator(".filters [data-filter='all']").click()
+    page.locator(".upcoming-row").first.click()
+    assert page.locator("#item-light").evaluate("(element) => document.activeElement === element"), "due-card click must focus item"
+
     page.locator('[data-action="remove-two"]').click()
     assert page.locator("#needs-count").inner_text()=="1"
+    assert "간편식" in page.locator(".upcoming-row").first.inner_text(),"physical shortage must rise to top"
+    assert "간편식" in page.locator(".item").first.inner_text(),"physical shortage must rise in inventory"
     assert page.locator("#flow-qty").inner_text()=="4 / 6개"
     assert page.locator('[data-action="remove-two"]').is_disabled(),"double-tap must be disabled"
     page.locator('[data-filter="short"]').click()
@@ -39,7 +53,7 @@ def run(browser, width, height, base_url):
     assert page.locator('[data-action="put-two"]').is_disabled()
     page.locator('[data-filter="all"]').click()
     assert page.locator(".item").count()==5
-    assert "28.03.31" in page.locator(".item").first.inner_text(),"new batch date lost"
+    assert "28.03.31" in page.locator("#item-food").inner_text(),"new batch date lost"
     page.locator("#snooze-button").click()
     assert page.locator("#flow-qty").inner_text()=="6 / 6개"
     assert "실제 알림 예약은 하지 않았습니다" in page.locator("#demo-message").inner_text()
