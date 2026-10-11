@@ -14,6 +14,18 @@
 3. QA 전용 [context.qa-preview] build는 `qa-noindex.headers`를 배포 산출물의 `_headers`로 복사한다. **`X-Robots-Tag: noindex` 응답 확인은 필수**이다. 이 빌드 명령은 Production에 적용되지 않는다.
 4. QA URL은 인터넷에서 열릴 수 있다. Operator 페이지는 로그인과 Supabase 서버 측 권한 검증을 통과해야 하며, 비밀키·비공개 자료가 정적 HTML/JS에 포함되면 안 된다.
 
+## BAG-SIDE-01 전용 고정 QA (2026-10-11 추가)
+
+- 기존 공용 `qa-preview`는 **운영자/Bunker OS 검수 전용으로 보존**한다. 생존가방으로 강제 리셋하거나 PR #516을 혼합하지 않는다.
+- 생존가방 실사용 검수용 **별도 브랜치 `qa-bag-side`**를 허용한다. 예상 주소 구조: `https://qa-bag-side--survival-diary-archive.netlify.app/bag-lab/alpha.html`. 실제 배포 확인 전에는 유효한 QA 주소라고 안내하지 않는다.
+- Netlify 기존 프로젝트의 **Branch Deploys → Let me add individual branches**에서 기존 `qa-preview`를 **삭제하지 않고** `qa-bag-side` 한 개를 추가한다. All branches 사용 금지. 새 Netlify 프로젝트·유료 API·새 예약 금지.
+- `[context.qa-bag-side]`는 `build:verified`와 `qa-noindex.headers` 복사를 재사용한다. 실제 HTTP 200, 번들/탭/실물등록·로컬 저장·백업·복원과 `X-Robots-Tag: noindex`, exact QA deploy SHA 확인이 모두 필요하다.
+- 새 PR의 HEAD와 이전 QA HEAD, 필수 CI를 먼저 읽는다. **필수 CI + PR Preview PASS 후 QA 브랜치가 fast-forward 가능한 경우에만** QA 승격한다. 충돌하면 승인 없는 강제 업데이트/운영 PR 합치기 금지. QA 배포는 **사람이 체험해야 할 묶음 단위**로만 수행해 불필요한 Netlify 크레딧 사용을 피한다.
+- `qa-bag-side`는 **같은 주소(origin)**를 유지하므로 그 안의 IndexedDB 개인 기록도 다음 배포에서 계속 보일 수 있다. 이는 데이터 지속성 보증이 아니며, 앱 스키마 변경·브라우저 초기화 등으로 기록을 잃을 수 있다. 중요한 실재고·가족 정보는 QA에 등록하지 말고 가상 데이터로 시험하고, 필요한 경우 매번 평문 JSON 파일을 직접 확인한다.
+- QA는 별도 운영 DB가 아니며 다른 Archive/Operator 화면도 포함할 수 있다. `/operator` 등 운영 변경 버튼을 QA 실험에 사용하지 않는다. 사이트 데이터/계정 정보를 브라우저에서 우회하거나 복사하지 않는다.
+- 앱 실사용 단계가 통과하면 **동일 앱 코드를** 기존 main/release-marker 정책을 통해 Production으로 안전하게 승격한다. QA 기록은 Production과 자동 동기화되지 않는다.
+- 새 코드 작업에서 PR의 `deploy-preview-NNN`은 CI·정확 버전 비교 용도로 계속 유지한다. 사용자 모바일 검수 링크만 고정 `qa-bag-side`를 사용한다.
+
 ## PR을 고정 QA에 올릴 때
 
 1. 현재 검수 중인 PR과 `qa-preview` 브랜치의 사용자가 다른지 확인한다. 한 번에 **한 PR만** 올린다.
