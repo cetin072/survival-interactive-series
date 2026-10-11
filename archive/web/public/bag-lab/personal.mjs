@@ -70,12 +70,33 @@ export function removeItem(bag,itemId) {
   next.items=next.items.filter(x=>x.id!==itemId);
   return next;
 }
-export function stockChange(bag,itemId,action,{quantity,batchId,batch}={}) {
+export function removeBatch(bag,itemId,batchId) {
+  const next=validateBag(bag), item=next.items.find(x=>x.id===itemId);
+  if(!item) fail('물품을 찾지 못했습니다.');
+  if(!item.batches.some(batch=>batch.id===batchId)) fail('삭제할 묶음 기록을 찾지 못했습니다.');
+  item.batches=item.batches.filter(batch=>batch.id!==batchId);
+  // Even the last batch can be removed; the parent item and its target remain.
+  return validateBag(next);
+}
+export function stockChange(bag,itemId,action,{quantity,batchId,batch,separate=false}={}) {
   const next=validateBag(bag), item=next.items.find(x=>x.id===itemId);
   if(!item) fail('물품을 찾지 못했습니다.');
   if(action==='put') {
     number(batch?.quantity,1,9999,'실제로 넣은 수량');
-    item.batches.push(copy(batch));
+    if(typeof separate!=='boolean') fail('별도 묶음 선택이 올바르지 않습니다.');
+    // Validate the incoming record BEFORE matching, so a malformed date, ID or
+    // unsupported field cannot be silently swallowed by an existing batch.
+    const probe=copy(next), probeItem=probe.items.find(x=>x.id===itemId);
+    probeItem.batches=[copy(batch)];
+    validateBag(probe);
+    if(item.batches.some(existing=>existing.id===batch.id)) fail('중복된 물품·묶음 ID가 있습니다.');
+    const existing=separate?null:item.batches.find(current=>
+      current.dateType===batch.dateType &&
+      current.markedUntil===batch.markedUntil &&
+      current.nextInspection===batch.nextInspection
+    );
+    if(existing) existing.quantity+=batch.quantity;
+    else item.batches.push(copy(batch));
     item.orderedQuantity=Math.max(0,item.orderedQuantity-batch.quantity);
   } else {
     number(quantity,1,9999,'수량');
