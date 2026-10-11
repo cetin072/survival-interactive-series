@@ -13,7 +13,12 @@
       "status": "HELD",
       "decision": "HOLD",
       "role": "QUESTION_SEED",
-      "topics": ["대설", "한파", "겨울철 사전점검", "집·점포"],
+      "topics": [
+        "대설",
+        "한파",
+        "겨울철 사전점검",
+        "집·점포"
+      ],
       "question": "겨울이 오기 전 집·가게 주변에서 무엇을 미리 점검해야 하는가?",
       "note": "시의 사전 대비계획 발표. 이미 시행된 점검 결과나 피해 예방 효과로 간주하지 않으며 실제 행동요령의 독립된 근거가 아니다.",
       "rights": {
@@ -44,6 +49,59 @@
           "date": "2026-10-09",
           "decision": "HOLD",
           "note": "URL·서지정보·이용조건·독자 질문을 우선 보존. 원문·사진 복제, 자동 게시, 공개 글 수정 없음."
+        }
+      ]
+    },
+    {
+      "id": "SRC-20261011-AZUOLAS-LT72",
+      "url": "https://azuolas.mainline.inc/krepsys/",
+      "title": "Ąžuolas · 72 valandų krepšys / 72시간 대피가방 대화형 체크리스트",
+      "publisher": "Ąžuolas / mainline.inc (제3자 웹사이트; 공식기관 여부 확인되지 않음)",
+      "kind": "EXTERNAL_INTERACTIVE_TOOL",
+      "published_at": null,
+      "modified_at": null,
+      "checked_at": "2026-10-11",
+      "status": "HELD",
+      "decision": "HOLD",
+      "role": "UX_BENCHMARK",
+      "topics": [
+        "72시간 대피가방",
+        "비상용품",
+        "가족별 준비",
+        "체크리스트",
+        "기한·정기 점검",
+        "가족 비상계획"
+      ],
+      "question": "검증된 생존지식을 가족 구성에 맞춘 체크리스트와 실제 준비 행동으로 연결하려면 무엇이 필요한가?",
+      "note": "리투아니아어 민간/제3자 웹페이지. 0/39 필수품 진행률, 가족 인원 조절, 준비물별 설명, 반기 점검 안내, 가족계획 이동 링크 확인. 정부 공식 안내 https://lt72.lt/isvykimo-krepsys-5/ 를 출처로 밝힘. 실제 개인 데이터 지속 저장·오프라인·알림 방식은 미검증. 사이트의 특정 물품 수량·요오드/의료/방호 지침은 한국 행동요령으로 그대로 전용하지 않음.",
+      "rights": {
+        "label": "사이트 저작권·오픈소스/상업적 재사용 허가 미확인",
+        "checked_at": "2026-10-11",
+        "notice_url": "https://azuolas.mainline.inc/krepsys/",
+        "policy_url": null,
+        "attribution": "REVIEW_REQUIRED",
+        "commercial_use": "UNKNOWN",
+        "modification": "UNKNOWN",
+        "scope_note": "링크·자체 메타데이터·분석 메모만 보관. 사이트의 원문, 이미지, UI 코드, 전체 항목 번역·재게시 권한 확인 전 복제 불가. 공식 LT72 자료도 별도 권리 확인."
+      },
+      "related_guides": [
+        {
+          "id": "K-002",
+          "relation": "REVIEW_CANDIDATE",
+          "reason": "기존 공개 비상용품 관리 지식에서 '읽기→개인별 확인·점검'으로 이동하는 구조 제안. 원문 정보의 사실 검증 및 수정·발행 없음."
+        },
+        {
+          "id": "K-003",
+          "relation": "REVIEW_CANDIDATE",
+          "reason": "체크리스트를 끝낸 뒤 가족 연락·만남장소 계획으로 이동하는 사용자 여정 제안. 본문 수정/공개 연결은 승인 전 없음."
+        }
+      ],
+      "next_action": "공식 LT72 근거와 국내 국민재난안전포털을 분리 대조하여 안전·저작권 검토. 좋은 정보 구조만 작은 행동 전환 후보로 연구하고 기존 인간 검토·승인 게이트를 유지. 생존가방 앱 Side Track의 개발과 본 로드맵을 혼동하지 않는다.",
+      "history": [
+        {
+          "date": "2026-10-11",
+          "decision": "HOLD",
+          "note": "제3자 사례 원본 링크·구조·권리·검토 후보 보관. 안전/권리 확인 전 원문·이미지 복제나 자동 게시·지식 글 변경 없음."
         }
       ]
     }
