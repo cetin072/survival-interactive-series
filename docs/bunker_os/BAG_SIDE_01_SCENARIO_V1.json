@@ -1,5 +1,5 @@
 {
-  "schema": "bunker-os-e002-bag-scenario-v1",
+  "schema": "bunker-os-bag-side-01-scenario-v1",
   "synthetic_only": true,
   "as_of": "2026-10-11",
   "bag": {
@@ -138,5 +138,7 @@
     "https://survival-diary-archive.netlify.app/knowledge/emergency-supplies-inventory/",
     "https://play.google.com/store/apps/details?id=cz.ember.evakuace",
     "https://play.google.com/store/apps/details?id=com.zawasystem.moshimono"
-  ]
+  ],
+  "track": "SIDE_BAG_MANAGEMENT",
+  "main_roadmap_impact": "NONE"
 }
