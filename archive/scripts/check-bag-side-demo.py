@@ -5,6 +5,7 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
+import json, os, time, urllib.request
 from playwright.sync_api import sync_playwright
 
 ROOT=Path(__file__).resolve().parent.parent/"web"/"public"
@@ -13,11 +14,11 @@ class QuietHTTP(SimpleHTTPRequestHandler):
     def log_message(self, fmt, *args):
         pass
 
-def run(browser, width, height):
+def run(browser, width, height, base_url):
     page=browser.new_page(viewport={"width":width,"height":height},locale="ko-KR")
     errors=[]
     page.on("pageerror",lambda error: errors.append(str(error)))
-    page.goto("http://127.0.0.1:8923/bag-lab/",wait_until="networkidle",timeout=20000)
+    page.goto(base_url.rstrip("/")+"/bag-lab/",wait_until="networkidle",timeout=30000)
     assert page.locator("#item-count").inner_text()=="5"
     assert page.locator("#needs-count").inner_text()=="0"
     assert page.locator("#flow-qty").inner_text()=="6 / 6개"
@@ -50,20 +51,39 @@ def run(browser, width, height):
     page.close()
 
 def main():
-    http=ThreadingHTTPServer(("127.0.0.1",8923),partial(QuietHTTP,directory=str(ROOT)))
-    thread=Thread(target=http.serve_forever,daemon=True)
-    thread.start()
+    base=os.environ.get("BAG_LAB_BASE_URL","http://127.0.0.1:8923")
+    expected=os.environ.get("BAG_LAB_EXPECTED_SHA")
+    http=None
+    if expected:
+        meta_url=base.rstrip("/")+"/deploy-meta.json"
+        for attempt in range(24):
+            try:
+                with urllib.request.urlopen(meta_url,timeout=8) as response:
+                    metadata=json.load(response)
+                if metadata.get("commit_ref")==expected and metadata.get("context")=="deploy-preview":
+                    print("PASS exact Preview metadata:",expected)
+                    break
+            except Exception as exc:
+                if attempt==23:raise
+            time.sleep(5)
+        else:
+            raise AssertionError("Deploy Preview exact SHA did not become ready")
+    else:
+        http=ThreadingHTTPServer(("127.0.0.1",8923),partial(QuietHTTP,directory=str(ROOT)))
+        thread=Thread(target=http.serve_forever,daemon=True)
+        thread.start()
     try:
         with sync_playwright() as p:
             browser=p.chromium.launch(headless=True,args=["--no-sandbox"])
             try:
-                run(browser,390,844)
-                run(browser,1280,850)
+                run(browser,390,844,base)
+                run(browser,1280,850,base)
             finally:
                 browser.close()
     finally:
-        http.shutdown()
-        http.server_close()
+        if http:
+            http.shutdown()
+            http.server_close()
 
 if __name__=="__main__":
     main()

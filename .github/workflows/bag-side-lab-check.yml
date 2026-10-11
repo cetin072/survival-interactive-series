@@ -31,6 +31,12 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Real mobile and desktop click-through
         run: python archive/scripts/check-bag-side-demo.py
+      - name: Real deployed Preview click-through with exact SHA
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          BAG_LAB_BASE_URL: https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app
+          BAG_LAB_EXPECTED_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python archive/scripts/check-bag-side-demo.py
       - name: Verify standalone static screen is preview only
         run: |
           grep -q 'name="robots" content="noindex' archive/web/public/bag-lab/index.html
