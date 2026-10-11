@@ -63,8 +63,8 @@ function draw(){
 }
 function options(values,current){return Object.entries(values).map(([key,value])=>`<option value="${esc(key)}" ${key===current?'selected':''}>${esc(value)}</option>`).join('');}
 function field(label,name,type,value,extra=''){return `<label class="field">${esc(label)}<input name="${name}" type="${type}" value="${esc(value??'')}" ${extra}></label>`;}
-function batchFields(batch,index,removable=false){
-  return `<fieldset class="batch-fields" data-batch="${esc(batch.id)}"><legend>묶음 ${index+1}</legend><div class="form-grid">${field('실제 가방 속 수량','quantity','number',batch.quantity,'required min="0" max="9999" step="1"')}<label class="field">표시기한 종류<select name="dateType">${options(DATE_TYPES,batch.dateType)}</select></label>${field('제품에 적힌 표시기한','markedUntil','date',batch.markedUntil,'min="2000-01-01" max="2099-12-31"')}${field('다음 점검일 (선택)','nextInspection','date',batch.nextInspection,'min="2000-01-01" max="2099-12-31"')}</div>${removable?'<button type="button" class="quiet-button" data-command="remove-draft">등록 전 묶음 삭제</button>':''}</fieldset>`;
+function batchFields(batch,index,removable=false,legend=null){
+  return `<fieldset class="batch-fields" data-batch="${esc(batch.id)}"><legend>${esc(legend??`묶음 ${index+1}`)}</legend><div class="form-grid">${field('실제 가방 속 수량','quantity','number',batch.quantity,'required min="0" max="9999" step="1"')}<label class="field">표시기한 종류<select name="dateType">${options(DATE_TYPES,batch.dateType)}</select></label>${field('제품에 적힌 표시기한','markedUntil','date',batch.markedUntil,'min="2000-01-01" max="2099-12-31"')}${field('다음 점검일 (선택)','nextInspection','date',batch.nextInspection,'min="2000-01-01" max="2099-12-31"')}</div>${removable?'<button type="button" class="quiet-button" data-command="remove-draft">등록 전 묶음 삭제</button>':''}</fieldset>`;
 }
 function readBatches(){
   return [...$('editor-body').querySelectorAll('[data-batch]')].map(row=>({id:row.dataset.batch,quantity:Number(row.querySelector('[name="quantity"]').value),dateType:row.querySelector('[name="dateType"]').value,markedUntil:row.querySelector('[name="markedUntil"]').value||null,nextInspection:row.querySelector('[name="nextInspection"]').value||null}));
@@ -89,7 +89,7 @@ function openEditor(nextMode,id=null,bag=null,base=record,seed=null,batchId=null
     body=field('주문한 수량','quantity','number',1,'required min="1" max="9999" step="1"')+'<p class="form-help">주문 기록만 추가합니다. 실제 가방 수량과 부족량은 바뀌지 않습니다.</p>';
   }else if(mode==='put'){
     title=`${item.name} · 실제로 넣었어요`;submit='가방 보충 반영';
-    body='<p class="form-help">실제로 넣은 수량만 기록하세요. 표시기한 종류·날짜·점검일이 모두 같으면 기존 묶음에 합산하고, 다르면 새 묶음으로 관리합니다. 이전 묶음의 날짜는 바뀌지 않습니다.</p>'+batchFields(newBatch(1),item.batches.length)+'<label class="confirm-check"><input name="separate" type="checkbox"> 같은 날짜여도 따로 관리할 묶음입니다</label>';
+    body='<p class="form-help">실제로 넣은 수량만 기록하세요. 표시기한 종류·날짜·점검일이 모두 같으면 기존 묶음에 합산하고, 다르면 새 묶음으로 관리합니다. 이전 묶음의 날짜는 바뀌지 않습니다.</p>'+batchFields(newBatch(1),item.batches.length,false,'추가할 물품')+'<label class="confirm-check"><input name="separate" type="checkbox"> 같은 날짜여도 따로 관리할 묶음입니다</label>';
   }else if(mode==='delete-batch'){
     const index=item.batches.findIndex(batch=>batch.id===activeBatchId);
     if(index<0)throw new Error('삭제할 묶음 기록을 찾지 못했습니다.');
