@@ -1,8 +1,30 @@
 import {createDemo,changeDemo,currentQuantity,shortage,dashboardSummary,prioritizedItems,nextAction,dayDifference,localToday} from "./logic.mjs";
-let state=createDemo(),filter="all",focusItem=null;
+let state=createDemo(),filter="all",focusItem=null,screen="bag";
 const $=id=>document.getElementById(id);
 const esc=value=>String(value).replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
 const displayDate=raw=>raw ? raw.slice(2).replaceAll("-",".") : "미등록";
+function showScreen(next,{focusTab=false}={}){
+  if(!["bag","inventory","learn"].includes(next))return;
+  screen=next;
+  document.querySelectorAll("[data-screen]").forEach(panel=>{panel.hidden=panel.dataset.screen!==next;});
+  document.querySelectorAll("[data-nav]").forEach(button=>{
+    const active=button.dataset.nav===next;
+    button.classList.toggle("active",active);
+    button.setAttribute("aria-selected",String(active));
+    button.tabIndex=active?0:-1;
+  });
+  if(focusTab)document.querySelector('[data-nav="'+next+'"]').focus({preventScroll:true});
+  window.scrollTo({top:0,behavior:"instant"});
+}
+document.querySelector(".bag-tabs").addEventListener("keydown",event=>{
+  if(!["ArrowLeft","ArrowRight","Home","End"].includes(event.key))return;
+  const tabs=[...document.querySelectorAll("[data-nav]")];
+  const index=tabs.findIndex(x=>x.dataset.nav===screen);
+  const nextIndex=event.key==="Home"?0:event.key==="End"?tabs.length-1:
+    (index+(event.key==="ArrowRight"?1:-1)+tabs.length)%tabs.length;
+  event.preventDefault();
+  showScreen(tabs[nextIndex].dataset.nav,{focusTab:true});
+});
 function scheduleFor(item,today){
   const action=nextAction(item,state.rotationLeadDays);
   if(!action)return {action:null,title:"확인 일정 미등록",chip:"일정 없음",css:"",info:"표시기한 또는 점검일을 확인하세요."};
@@ -77,9 +99,11 @@ function draw(){
 document.addEventListener("click",event=>{
   const btn=event.target.closest("button");
   if(!btn||btn.disabled)return;
+  if(btn.dataset.nav){showScreen(btn.dataset.nav);return;}
   if(btn.dataset.focus){
     focusItem=btn.dataset.focus;
     filter="all";
+    showScreen("inventory");
     draw();
     const target=$("item-"+focusItem);
     target?.scrollIntoView({behavior:"smooth",block:"center"});
@@ -87,7 +111,9 @@ document.addEventListener("click",event=>{
     return;
   }
   if(btn.dataset.filter){
-    focusItem=null;filter=btn.dataset.filter;draw();
+    focusItem=null;filter=btn.dataset.filter;
+    showScreen("inventory");
+    draw();
     if(btn.dataset.jump==="inventory")$("inventory").scrollIntoView({behavior:"smooth",block:"start"});
     return;
   }
