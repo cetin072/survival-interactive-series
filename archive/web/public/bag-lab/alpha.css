@@ -51,6 +51,10 @@ h2{font-size:21px;letter-spacing:-.04em}
 .personal-item .item-number span{color:#526477}
 .personal-item .batch-list{font-size:12px;color:#526477;margin:10px 0;overflow-wrap:anywhere}
 .personal-item .batch-list p{margin:3px 0}
+.batch-row{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:9px 0;border-top:1px solid #e1e7ee;overflow-wrap:anywhere}
+.batch-row>span{flex:1;min-width:0}
+.batch-row .batch-remove{flex:none;min-height:44px;color:#873d35;border-color:#d6b8b4;font-size:12px}
+@media(max-width:740px){.batch-row{align-items:stretch;flex-direction:column}.batch-row .batch-remove{align-self:flex-start}}
 .personal-item .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .personal-item .actions button{min-height:44px;padding:10px 14px;font-size:13px}
 .personal-item .item-tag{display:inline-block;margin-top:6px}
