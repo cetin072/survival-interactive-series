@@ -58,5 +58,30 @@
     "source_library_file_id": "libfile_432c160e98788191822b3721d4486d41",
     "source_version_id": null,
     "source_sha256": "f1eee77d320a8b6dd53efd48e6223bb3c263a2f7a9a54e8825495a3ebb22e86f"
+  },
+  "transfer": {
+    "status": "FINALIZE_QUEUED",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_00000000516481fabcc1f7bbdf290e74",
+    "source_library_file_id": "libfile_432c160e98788191822b3721d4486d41",
+    "source_sha256": "f1eee77d320a8b6dd53efd48e6223bb3c263a2f7a9a54e8825495a3ebb22e86f",
+    "source_width": 1024,
+    "source_height": 1536,
+    "source_size_bytes": 2292398,
+    "derivative_sha256": "f2ad27ff1a2ffcc873fa236ba3eb0b07d37f12593dc3cf98c8ed257b3457b19d",
+    "derivative_width": 512,
+    "derivative_height": 512,
+    "derivative_size_bytes": 177124,
+    "palette_colors": 256,
+    "png_verify": true,
+    "png_full_decode": true,
+    "staging_id": "site-minho-f2ad27ff1a2ffcc8",
+    "chunk_count": 2,
+    "uploaded_chunk_count": 2,
+    "finalizer_dispatch_request_id": 522,
+    "finalizer_dispatch_at": "2026-10-11T23:30:54.435509+00:00",
+    "job_status_after_finalize": "FINALIZE_QUEUED",
+    "current_png_cleanup": "MOVED_TO_TRASH",
+    "recorded_at": "2026-10-11T23:31:23.187Z"
   }
 }
