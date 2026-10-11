@@ -1,9 +1,11 @@
 import {currentQuantity,shortage,dashboardSummary,prioritizedItems,nextAction,dayDifference,localToday} from './logic.mjs';
 import {CATEGORIES,DATE_TYPES,MAX_BACKUP_BYTES,newId,newBatch,upsertItem,removeItem,stockChange,dashboardBag,backupText,parseBackup,validateBag} from './personal.mjs';
 import {readBag,saveBag,readPreviousBag,readRawRecord} from './storage.mjs';
+import {GROUPS,CATALOG,targetFor,seedFor,entryStatus,catalogProgress} from './catalog.mjs';
 const $=id=>document.getElementById(id);
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let record=null, screen='bag', filter='all', busy=false, editBase=null, mode=null, itemId=null, replacement=null;
+let catalogGroup='food',familyCount=1; // ephemeral guidance only; NEVER modifies recorded inventory
 function message(text,failed=false){$('save-status').textContent=text;$('save-status').classList.toggle('failure',failed);}
 function readiness(){document.querySelectorAll('[data-ready]').forEach(el=>{el.disabled=!record||busy;});$('submit').disabled=busy;$('cancel').disabled=busy;}
 function showScreen(next){
@@ -19,12 +21,35 @@ function schedule(item,bag){
   const label=['food','water'].includes(item.category)?'순환·교체 검토':'교체·보관 확인';
   return `${label} ${task.due} · 표시기한 ${task.markedUntil}`;
 }
+function drawCatalog(bag){
+  const stats=catalogProgress(bag);
+  $('catalog-ready-count').textContent=`${stats.ready} / ${stats.total}`;
+  $('catalog-progress').value=stats.total?Math.round(stats.ready/stats.total*100):0;
+  $('family-count').textContent=`${familyCount}명`;
+  $('family-less').disabled=busy||!record||familyCount<=1;
+  $('family-more').disabled=busy||!record||familyCount>=8;
+  $('catalog-groups').innerHTML=GROUPS.map(group=>
+    `<button type="button" data-guide-group="${esc(group.id)}" data-ready aria-pressed="${String(group.id===catalogGroup)}">${esc(group.label)}</button>`).join('');
+  const active=GROUPS.find(group=>group.id===catalogGroup)??GROUPS[0];
+  const entries=CATALOG.filter(entry=>entry.group===active.id);
+  $('catalog-group-intro').textContent=`${active.help} · 기본 ${entries.filter(entry=>entry.basic).length}종 / 선택 ${entries.filter(entry=>!entry.basic).length}종`;
+  $('catalog-items').innerHTML=entries.map(entry=>{
+    const status=entryStatus(entry,bag);
+    const note=status.registered?`실제 ${status.quantity}${status.item.unit} / 내 목표 ${status.item.target}${status.item.unit} · ${status.meetsOwnTarget?'개인 목표 충족':'부족 또는 확인 필요'}`:
+      `등록할 때 참고: ${targetFor(entry,familyCount)}${entry.unit} · 실제 보유량 0부터 시작`;
+    const action=status.registered?
+      `data-guide-focus="${esc(status.item.id)}" class="view-existing"`:
+      `data-guide-add="${esc(entry.id)}"`;
+    return `<article class="catalog-entry"><div><h4>${esc(entry.name)}<span class="catalog-badge ${entry.basic?'':'optional'}">${entry.basic?'기본':'선택'}</span></h4><p>${esc(entry.note)}</p><p class="catalog-meta">${esc(note)}</p></div><button type="button" ${action} data-ready>${status.registered?'내 기록 보기':'등록하기 +'}</button></article>`;
+  }).join('');
+}
 function draw(){
   if(!record)return;
   const bag=dashboardBag(record.bag), totals=dashboardSummary(bag), ordered=prioritizedItems(bag), today=localToday();
   $('bag-name').textContent=bag.bagName;
   $('item-count').textContent=totals.items;$('needs-count').textContent=totals.shortages;$('soon-count').textContent=totals.soonCount;
   $('next-check').textContent=totals.next?`가장 가까운 일정 · ${totals.next.item.name} · ${totals.next.task.due}`:bag.items.length?'관리 일정이 아직 없습니다. 물품별 날짜를 확인하세요.':'아직 등록한 물품이 없습니다. 내 물품부터 하나씩 기록하세요.';
+  drawCatalog(record.bag);
   $('lead-note').textContent=`표시기한 ${bag.rotationLeadDays}일 전을 교체·순환 검토일로 계산합니다. 이는 관리 설정이며 식품 안전기준이 아닙니다. 날짜만으로 섭취 가능 여부를 판단하지 마세요.`;
   $('upcoming-list').innerHTML=ordered.slice(0,4).map((item,index)=>`<button type="button" class="upcoming-row" data-focus="${esc(item.id)}"><span class="upcoming-index">${index+1}</span><span class="upcoming-copy"><strong>${esc(item.name)}</strong><small>${esc(schedule(item,bag))}</small></span><span class="upcoming-chip ${shortage(item)?'short':''}">${shortage(item)?`보충 ${shortage(item)}${esc(item.unit)}`:'물품 확인 →'}</span></button>`).join('')||'<div class="items-empty">빈 가방에서 시작합니다. 샘플 물품을 자동으로 넣지 않습니다.</div>';
   const chosen=ordered.filter(item=>filter==='short'?shortage(item)>0:filter==='soon'?(nextAction(item,bag.rotationLeadDays)&&dayDifference(nextAction(item,bag.rotationLeadDays).due,today)<=30):true);
@@ -44,7 +69,7 @@ function batchFields(batch,index,removable=false){
 function readBatches(){
   return [...$('editor-body').querySelectorAll('[data-batch]')].map(row=>({id:row.dataset.batch,quantity:Number(row.querySelector('[name="quantity"]').value),dateType:row.querySelector('[name="dateType"]').value,markedUntil:row.querySelector('[name="markedUntil"]').value||null,nextInspection:row.querySelector('[name="nextInspection"]').value||null}));
 }
-function openEditor(nextMode,id=null,bag=null,base=record){
+function openEditor(nextMode,id=null,bag=null,base=record,seed=null){
   if(!base||busy)return;
   mode=nextMode;itemId=id;editBase=base;replacement=bag;
   const item=base.bag.items.find(x=>x.id===id);
@@ -52,9 +77,9 @@ function openEditor(nextMode,id=null,bag=null,base=record){
   $('editor-error').hidden=true;
   let title,body,submit='저장';
   if(mode==='add'||mode==='edit'){
-    const draft=item??{id:newId(),name:'',category:'other',target:1,unit:'개',orderedQuantity:0,batches:[newBatch(0)]};itemId=draft.id;
+    const draft=item??{id:newId(),...(seed??{name:'',category:'other',target:1,unit:'개'}),orderedQuantity:0,batches:[newBatch(0)]};itemId=draft.id;
     title=mode==='add'?'내 물품 등록':'물품 수정';submit=mode==='add'?'가방에 등록':'변경 저장';
-    body=`<div class="form-grid">${field('물품 이름','name','text',draft.name,'required maxlength="80" autofocus')}<label class="field">분류<select name="category">${options(CATEGORIES,draft.category)}</select></label>${field('내 목표 수량','target','number',draft.target,'required min="1" max="9999" step="1"')}${field('단위','unit','text',draft.unit,'required maxlength="12"')}${field('주문 중 수량 (가방 제외)','orderedQuantity','number',draft.orderedQuantity,'required min="0" max="9999" step="1"')}</div><p class="form-help">실제 가방 안을 확인하고 입력하세요. 아직 없는 물품은 가방 속 수량을 0으로 기록합니다. 같은 제품도 기한이 다르면 묶음을 나눕니다.</p><div id="batch-fields">${draft.batches.map((b,i)=>batchFields(b,i,mode==='add')).join('')}</div><button type="button" class="quiet-button" data-command="add-batch">＋ 기한이 다른 묶음 추가</button>`;
+    body=`<div class="form-grid">${field('물품 이름','name','text',draft.name,'required maxlength="80" autofocus')}<label class="field">분류<select name="category">${options(CATEGORIES,draft.category)}</select></label>${field('내 목표 수량','target','number',draft.target,'required min="1" max="9999" step="1"')}${field('단위','unit','text',draft.unit,'required maxlength="12"')}${field('주문 중 수량 (가방 제외)','orderedQuantity','number',draft.orderedQuantity,'required min="0" max="9999" step="1"')}</div><p class="form-help">실제 가방 안을 확인하고 입력하세요. 아직 없는 물품은 가방 속 수량을 0으로 기록합니다. 같은 제품도 기한이 다르면 묶음을 나눕니다.${seed?' 추천 기본 수량은 예시일 뿐입니다. 충분한 생존 물자량이 아니므로 목표 수량을 직접 조정하세요.':''}</p><div id="batch-fields">${draft.batches.map((b,i)=>batchFields(b,i,mode==='add')).join('')}</div><button type="button" class="quiet-button" data-command="add-batch">＋ 기한이 다른 묶음 추가</button>`;
   }else if(mode==='take'){
     title=`${item.name} · 꺼냈어요`;submit='꺼낸 수량 반영';
     const choices=item.batches.map((b,i)=>[b,i]).filter(([b])=>b.quantity>0);
@@ -123,6 +148,20 @@ document.addEventListener('click',async event=>{
       download(JSON.stringify(raw,null,2),'bag-side-01-storage-original.json');message('저장 원본의 다운로드를 요청했습니다. 일반 백업 형식이 아니며 복구 검토용입니다.');return;
     }
     if(!record)return;
+    if(button.dataset.command==='catalog'){showScreen('inventory');$('catalog-panel').open=true;$('catalog-panel').scrollIntoView({block:'start'});return;}
+    if(button.dataset.guideGroup){catalogGroup=button.dataset.guideGroup;draw();return;}
+    if(button.id==='family-less'||button.id==='family-more'){familyCount=Math.max(1,Math.min(8,familyCount+(button.id==='family-more'?1:-1)));draw();return;}
+    if(button.dataset.guideAdd){
+      const entry=CATALOG.find(x=>x.id===button.dataset.guideAdd);
+      if(!entry)throw new Error('추천 항목을 찾지 못했습니다.');
+      const status=entryStatus(entry,record.bag);
+      if(status.registered)throw new Error('이미 등록한 이름입니다. 기존 기록에서 수량을 수정하세요.');
+      openEditor('add',null,null,record,seedFor(entry,familyCount));return;
+    }
+    if(button.dataset.guideFocus){
+      filter='all';showScreen('inventory');draw();
+      const target=$('item-'+button.dataset.guideFocus);target?.scrollIntoView({block:'center'});target?.focus({preventScroll:true});return;
+    }
     if(button.dataset.filter){filter=button.dataset.filter;showScreen('inventory');draw();return;}
     if(button.dataset.focus){filter='all';showScreen('inventory');draw();const target=$('item-'+button.dataset.focus);target?.scrollIntoView({block:'center'});target?.focus({preventScroll:true});return;}
     if(button.dataset.mode){openEditor(button.dataset.mode,button.dataset.item);return;}
