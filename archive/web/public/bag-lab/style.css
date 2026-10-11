@@ -155,3 +155,30 @@ footer p{color:#7b8a99}
  .study-cards h3{font-size:13px;margin:8px 0 5px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* BAG-SIDE-01 three-screen navigation: strong hierarchy without a long home scroll. */
+.bag-screen[hidden]{display:none!important}
+.bag-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:7px;background:#e1e7ef;border:1px solid #cdd8e3;border-radius:14px;margin-bottom:15px;position:sticky;top:8px;z-index:20;box-shadow:0 5px 15px #13263d0e}
+.bag-tab{display:flex;justify-content:center;align-items:center;gap:8px;min-height:47px;border:1px solid transparent;border-radius:10px;background:transparent;color:#41546b;font-size:14px;font-weight:800;letter-spacing:-.025em}
+.bag-tab .tab-symbol{font-size:18px;line-height:1;font-weight:900}
+.bag-tab.active{background:#142438;color:#fff;box-shadow:0 3px 9px #11293d2d}
+.bag-tab:not(.active):hover{background:#ffffff9c;color:#152b42}
+.bag-tab:focus-visible{outline:3px solid #f3783a;outline-offset:1px}
+.bag-screen{min-height:400px}
+.bag-screen .priority-section{margin-bottom:24px}
+#panel-inventory>.list-section{margin-top:16px}
+#panel-inventory>.try-section{margin-top:29px}
+#panel-learn>.study-section{margin-top:18px}
+#panel-learn>.hero{margin:26px 0 28px}
+@media(max-width:740px){
+  body{padding-bottom:calc(74px + env(safe-area-inset-bottom))}
+  .bag-tabs{position:fixed;top:auto;bottom:0;left:0;right:0;margin:0;z-index:100;border-radius:13px 13px 0 0;padding:8px 12px calc(8px + env(safe-area-inset-bottom));gap:6px;box-shadow:0 -5px 22px #0d1f3430;background:#f6f8fb;border-color:#c8d4df}
+  .bag-tab{min-height:53px;flex-direction:column;gap:4px;font-size:11px;border-radius:10px}
+  .bag-tab .tab-symbol{font-size:19px}
+  .bag-tab.active{background:#182d44;color:white}
+  .bag-screen{min-height:calc(100vh - 242px)}
+  #panel-bag>.priority-section{margin-bottom:12px}
+  #panel-inventory>.try-section{margin-top:25px}
+  #panel-learn>.study-section{margin-top:18px}
+  #panel-learn>.hero{margin-top:21px}
+}
