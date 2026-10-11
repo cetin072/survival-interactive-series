@@ -97,6 +97,37 @@ def no_overflow(page):
     assert dimensions['scroll']<=dimensions['width']+2,'page horizontal overflow'
     assert dialog_ok,'dialog horizontal overflow'
 
+def check_guided_catalog(page,width):
+    """Guidance can prefill a draft but cannot create actual inventory or change backups."""
+    original=stored(page)
+    expect(page.locator('#catalog-ready-count')).to_contain_text('0 /')
+    page.locator('[data-command="catalog"]').click()
+    expect(page.locator('#catalog-panel')).to_be_visible()
+    expect(page.locator('#catalog-items .catalog-entry')).to_have_count(7)
+    food=page.locator('.catalog-entry').filter(has=page.locator('h4',has_text='간편식'))
+    food.locator('[data-guide-add]').click()
+    expect(page.locator('#editor [name="name"]')).to_have_value('간편식')
+    expect(page.locator('#editor [name="category"]')).to_have_value('food')
+    expect(page.locator('#editor [name="target"]')).to_have_value('3')
+    expect(page.locator('#editor [name="quantity"]')).to_have_value('0')
+    assert stored(page)==original,'previewing a guide should never write stock'
+    page.locator('#cancel').click()
+    page.locator('#family-more').click()
+    expect(page.locator('#family-count')).to_have_text('2명')
+    food=page.locator('.catalog-entry').filter(has=page.locator('h4',has_text='간편식'))
+    food.locator('[data-guide-add]').click()
+    expect(page.locator('#editor [name="target"]')).to_have_value('6')
+    assert stored(page)==original,'family suggestions should not persist'
+    page.locator('#cancel').click()
+    page.locator('#family-less').click()
+    page.locator('[data-guide-group="documents"]').click()
+    expect(page.locator('#catalog-group-intro')).to_contain_text('서류')
+    page.locator('[data-guide-group="food"]').click()
+    no_overflow(page)
+    if width==390: page.screenshot(path=str(REPORT/'alpha-guided-catalog-390.png'))
+    page.locator('[data-nav="bag"]').click()
+    assert stored(page)==original
+
 def run(browser,width,base):
     context=browser.new_context(viewport={'width':width,'height':844},locale='ko-KR',timezone_id='Asia/Seoul',accept_downloads=True)
     page=context.new_page();page.set_default_timeout(10000)
@@ -106,6 +137,7 @@ def run(browser,width,base):
     assert stored(page)['revision']==0 and stored(page)['bag']['items']==[]
     assert page.locator('#panel-inventory').is_hidden()
     no_overflow(page)
+    check_guided_catalog(page,width)
     register(page,'간편식',6,'food',[(4,'2027-04-30'),(2,'2027-12-31')])
     register(page,'생수',2,'water',[(2,'2027-05-31')])
     register(page,'손전등',1,'equipment',[(1,None,'2026-11-01')])
