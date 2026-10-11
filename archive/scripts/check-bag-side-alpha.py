@@ -135,6 +135,7 @@ def check_batch_management(page):
     original=stored(page)['bag']
     backup_before=backup(page)
     card(page).locator('[data-mode="put"]').click()
+    expect(page.locator('#editor legend')).to_have_text('추가할 물품')
     fill_batch(page.locator('#editor [data-batch]'),1,'2028-03-31')
     expect(page.locator('#editor [name="separate"]')).not_to_be_checked()
     expect(page.locator('#editor')).to_contain_text('기존 묶음에 합산')
