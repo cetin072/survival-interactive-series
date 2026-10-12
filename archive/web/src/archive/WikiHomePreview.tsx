@@ -73,6 +73,12 @@ export function WikiHomePreview({ knowledge = selectHomeKnowledge(), chronicles 
         </div>
       </section>}
 
+      <section className="wiki-home-section" aria-labelledby="wiki-home-bag-title">
+        <div className="wiki-section-heading"><h2 id="wiki-home-bag-title">나의 생존가방 · Alpha</h2></div>
+        <p>필요한 물품을 고르고 실제 수량과 점검일을 기록하는 나만의 비상가방.</p>
+        <div className="wiki-home-actions"><a className="primary" href="/bag/">생존가방 소개 보기 →</a></div>
+      </section>
+
       <section className="wiki-home-section" aria-labelledby="wiki-home-stories-title">
         <div className="wiki-section-heading"><h2 id="wiki-home-stories-title">생존 이야기</h2><a href="/?view=story">전체 생존기 →</a></div>
         <div className="wiki-chronicle-list">
