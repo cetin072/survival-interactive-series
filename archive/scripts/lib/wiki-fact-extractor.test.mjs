@@ -8,6 +8,7 @@ import { discoverWikiSources, discoverWikiSource } from './wiki-semantic-jobs.mj
 import { createAppliedWikiTestSnapshot } from './test-applied-wiki-snapshot.mjs'
 import { buildWikiFactJob, buildWikiFactReviewJob, compileWikiFactProposal, extractWikiFacts, reviewWikiFactProposal, validateWikiFactReview, WIKI_RESULT_VERSION, WIKI_REVIEW_VERSION } from './wiki-fact-extractor.mjs'
 import { runWikiFactCli } from '../run-wiki-fact-extractor.mjs'
+import { normalizeWikiCitationIds } from './wiki-fact-extractor.mjs'
 
 const root = resolve(import.meta.dirname, '../../..')
 const appliedSnapshot = await createAppliedWikiTestSnapshot(root)
@@ -59,6 +60,50 @@ test('repeat compilation is byte-identical and caller-owned objects are not muta
   assert.deepEqual(compileWikiFactProposal(f.job, f.result), compileWikiFactProposal(f.job, f.result))
   assert.deepEqual(f, original)
 })
+test('citation spelling normalization preserves original hashes, quotes and all structured evidence', () => {
+  const f = fixture('SESSION_008', '시험_인물')
+  const ids = { q1: 'fuel_allocation', q2: 'three_days' }
+  f.result.citations.forEach((item) => { item.id = ids[item.id] })
+  for (const node of f.result.nodes) for (const field of Object.keys(node.evidence)) node.evidence[field] = node.evidence[field].map((id) => ids[id])
+  f.result.relations[0].evidence = ['fuel_allocation']
+  f.result.deferred = [{ reason: '보류_사유', evidence: ['three_days'] }]
+  f.result.note = '원본_보존'
+  const original = structuredClone(f), originalHash = graphHash(f.result)
+  const view = normalizeWikiCitationIds(f.result)
+  assert.deepEqual(view.citations.map((item) => item.id), ['fuel-allocation', 'three-days'])
+  assert.deepEqual(view.nodes[2].evidence['meta.새역할'], ['three-days'])
+  assert.deepEqual(view.relations[0].evidence, ['fuel-allocation'])
+  assert.deepEqual(view.deferred[0].evidence, ['three-days'])
+  assert.deepEqual(normalizeWikiCitationIds(view), view)
+  assert.deepEqual(view.nodes.map((node) => node.changes), f.result.nodes.map((node) => node.changes))
+  assert.deepEqual(view.citations.map(({ block_id, quote }) => ({ block_id, quote })), f.result.citations.map(({ block_id, quote }) => ({ block_id, quote })))
+  const proposal = compileWikiFactProposal(f.job, f.result)
+  assert.equal(proposal.result_sha256, originalHash)
+  assert.notEqual(originalHash, graphHash(view))
+  assert.equal(proposal.facts.nodes[0].label, '시험_인물')
+  assert.equal(proposal.deferred[0].reason, '보류_사유')
+  assert.equal(proposal.note, '원본_보존')
+  assert.deepEqual(f, original)
+  assert.deepEqual(compileWikiFactProposal(f.job, f.result), proposal)
+  assert.equal(buildWikiFactReviewJob(f.job, proposal).proposal.result_sha256, originalHash)
+})
+
+rejection('normalized ID collisions fail closed', ({ result }) => {
+  result.citations[0].id = 'fuel_allocation'
+  result.citations[1].id = 'fuel-allocation'
+}, /WIKI_CITATION_ID_COLLISION/)
+rejection('normalized spelling never resolves an originally missing reference', ({ result }) => {
+  result.citations[0].id = 'fuel_allocation'
+  result.nodes[0].evidence.type = ['fuel-allocation']
+}, /WIKI_EVIDENCE_REQUIRED/)
+rejection('normalization does not permit invalid uppercase citation IDs', ({ result }) => {
+  result.citations[0].id = 'Fuel_allocation'
+}, /WIKI_CITATION_ID_INVALID/)
+rejection('normalized citations still require exact valid quotations', ({ result }) => {
+  result.citations[0].id = 'fuel_allocation'
+  result.citations[0].quote = '없는_인용문'
+}, /WIKI_QUOTE_NOT_FOUND|WIKI_EVIDENCE_REQUIRED/)
+
 test('updates preserve unrelated existing metadata and identity', () => {
   const f = fixture(), p = compileWikiFactProposal(f.job, f.result), node = p.facts.nodes.find((n) => n.id === 'char-existing')
   assert.equal(node.meta.보존항목, '그대로'); assert.equal(node.meta.새역할, '새 기록 담당')

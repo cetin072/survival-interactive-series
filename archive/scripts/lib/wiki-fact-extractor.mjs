@@ -108,6 +108,31 @@ function namesFor(node) {
   return [node.label, ...(typeof node.meta?.별칭 === 'string' ? node.meta.별칭.split(/[,·/]/) : [])].filter(Boolean).map(normalize)
 }
 
+/** Transient transport spelling only. Stored result, quotes and facts stay intact. */
+export function normalizeWikiCitationIds(result) {
+  const view = structuredClone(result)
+  const mapping = new Map(), normalized = new Set()
+  for (const citation of view.citations) {
+    object(citation, ['id', 'block_id', 'quote'])
+    insist(typeof citation.id === 'string', 'WIKI_CITATION_ID_INVALID')
+    const id = citation.id.replaceAll('_', '-')
+    insist(/^[a-z][a-z0-9-]{0,60}$/.test(id), 'WIKI_CITATION_ID_INVALID')
+    insist(!normalized.has(id), 'WIKI_CITATION_ID_COLLISION')
+    normalized.add(id)
+    mapping.set(citation.id, id)
+    citation.id = id
+  }
+  const refs = (values) => Array.isArray(values) ? values.map((id) => {
+    insist(mapping.has(id), 'WIKI_EVIDENCE_REQUIRED')
+    return mapping.get(id)
+  }) : values // The existing strict schema rejects malformed evidence.
+  for (const node of view.nodes) {
+    if (plain(node) && plain(node.evidence)) node.evidence = Object.fromEntries(Object.entries(node.evidence).map(([field, values]) => [field, refs(values)]))
+  }
+  for (const item of [...view.relations, ...view.deferred]) if (plain(item)) item.evidence = refs(item.evidence)
+  return view
+}
+
 /** Compile a model result into a reviewable proposal, never authoritative Graph. */
 export function compileWikiFactProposal(job, result) {
   verifyJob(job)
@@ -127,6 +152,9 @@ export function compileWikiFactProposal(job, result) {
   if (result.decision === 'FACTS_READY') insist(result.nodes.length + result.relations.length > 0, 'WIKI_EMPTY_FACTS')
 
   insist(Array.isArray(result.citations) && result.citations.length <= 1000, 'WIKI_CITATIONS_INVALID')
+  // Proposal binding refers to the original semantic result, never the view.
+  const resultSha256 = graphHash(result)
+  result = normalizeWikiCitationIds(result)
   const citations = new Map()
   for (const item of result.citations) {
     object(item, ['id', 'block_id', 'quote'])
@@ -218,7 +246,7 @@ export function compileWikiFactProposal(job, result) {
   const body = { version: 'wiki-fact-proposal-v1', job_id: job.job_id, source: {
     session_id: job.source.session_id, manifest_ref: job.source.manifest_ref, manifest_sha256: job.source.manifest_sha256,
     raw_ref: job.source.raw_ref, raw_sha256: job.source.raw_sha256,
-  }, expected_graph_sha256: job.graph_sha256, result_sha256: graphHash(result),
+  }, expected_graph_sha256: job.graph_sha256, result_sha256: resultSha256,
     status: result.decision === 'FACTS_READY' ? 'FACTS_PROPOSED' : result.decision,
     review_required: true, application_status: backfill ? 'BACKFILL_REVIEW_REQUIRED' : 'SEMANTIC_REVIEW_REQUIRED',
     coverage: structuredClone(result.coverage), facts, evidence, deferred, note: result.note,
