@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "project": "bag-side-item-knowledge",
+  "catalogTotal": 49,
+  "maxPendingIndependentReview": 6,
+  "nextCandidate": "guide-07",
+  "articles": {
+    "guide-01": {
+      "state": "INDEPENDENT_PASS_USER_PENDING",
+      "file": "GUIDE_01_WATERPROOF_DOCUMENT_POUCH_DRAFT_V01.md"
+    },
+    "guide-02": {
+      "state": "INDEPENDENT_PASS_USER_PENDING",
+      "file": "GUIDE_02_IDENTITY_CARD_COPY_DRAFT_V01.md"
+    },
+    "guide-03": {
+      "state": "INDEPENDENT_PASS_USER_PENDING",
+      "file": "GUIDE_03_FAMILY_EMERGENCY_CONTACT_NOTE_DRAFT_V01.md"
+    },
+    "guide-04": {
+      "state": "INDEPENDENT_PASS_USER_PENDING",
+      "file": "GUIDE_04_SMALL_DENOMINATION_CASH_DRAFT_V01.md"
+    },
+    "guide-05": {
+      "state": "INDEPENDENT_PASS_USER_PENDING",
+      "file": "GUIDE_05_IMPORTANT_DOCUMENT_COPIES_DRAFT_V01.md"
+    },
+    "guide-06": {
+      "state": "INDEPENDENT_PASS_USER_PENDING",
+      "file": "GUIDE_06_SPARE_KEYS_DRAFT_V01.md"
+    },
+    "guide-43": {
+      "state": "PENDING_INDEPENDENT_REVIEW",
+      "file": "GUIDE_43_FLASHLIGHT_DRAFT_V01.md"
+    }
+  },
+  "reviewEvidence": {
+    "guide-01_to_guide-06": "https://github.com/cetin072/survival-interactive-series/pull/525#issuecomment-6134230795",
+    "guide-01_note": "A reviewer-approved wording received only a spacing correction in commit 45d4adfc560b06296593c9f82e1d0d264a9fedf7."
+  },
+  "writingPolicy": {
+    "oneArticlePerRun": true,
+    "contentApprovalIsNotPublication": true,
+    "nextNewFilename": "GUIDE_XX_DRAFT_V01.md",
+    "reviewStatusOwner": "independent review feedback verified by operator",
+    "noAutoPublish": true,
+    "noAutoApprove": true,
+    "writeBranch": "feat/bag-side-item-knowledge-template-v1",
+    "pullRequest": 525
+  }
+}
