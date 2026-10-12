@@ -42,6 +42,9 @@
     "provider_complete": {
       "p_job_id": "illustration-char-hayoung-e370231d4ed7-20261013-38304611827",
       "p_prompt_sha256": "c230581edc1d3d9a499a360f8581d0cb2d0e903cbda8687cd1c0da3a68407a25"
-    }
+    },
+    "provider_completed_at": "2026-10-12T21:28:26.781858+00:00",
+    "job_status_after_provider_complete": "INGESTING",
+    "readback_at": "2026-10-12T21:28:44.644Z"
   }
 }
