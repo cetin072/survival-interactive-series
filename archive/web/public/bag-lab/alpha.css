@@ -270,3 +270,62 @@ input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid
  .preset-item-detail[open]{flex-basis:100%}
  .catalog-entry{padding:9px 10px}
 }
+
+/* BAG-SIDE-01 More tab — keep user actions primary, explanations secondary. */
+.icon-sprite{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
+.ui-icon{display:inline-block;flex:none;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+.bag-tab .ui-icon{width:19px;height:19px}
+.settings-screen{display:grid;gap:14px;align-content:start;padding:7px 0 0}
+.settings-heading{padding:5px 4px 2px}
+.settings-heading h1{font-size:25px;font-weight:850;letter-spacing:-.05em;margin:0;display:flex;align-items:center;gap:9px}
+.settings-heading h1 .ui-icon{width:23px;height:23px;color:#2b5685}
+.settings-heading p{color:#5d6f81;margin:4px 0 0;font-size:12px}
+.settings-card{background:#fff;border:1px solid #d9e3ed;border-radius:14px;padding:17px 19px;min-width:0}
+.settings-card h2{display:flex;gap:10px;align-items:center;font-size:16px;margin:0 0 12px;line-height:1.5}
+.settings-card h2 .ui-icon{color:#355e92;width:19px;height:19px}
+.settings-card .toolbar{margin:10px 0 9px;justify-content:flex-start}
+.settings-caption{font-size:12px;color:#596d82;line-height:1.6;margin:7px 0}
+.settings-storage .backup-panel{margin:12px 0 0;padding:12px 0 0;border:0;border-top:1px solid #e3e9f0;border-radius:0}
+.settings-storage .backup-panel summary{font-size:14px}
+.settings-storage .backup-panel .settings-caption{margin:8px 0 10px}
+.settings-storage .backup-panel .toolbar{margin:7px 0;align-items:center}
+.settings-storage .backup-panel .toolbar button,.settings-storage .backup-panel .toolbar label{font-size:12px}
+.settings-storage .backup-panel .toolbar .action,.settings-storage .backup-panel .toolbar .quiet-button{padding:9px 12px}
+.settings-link{display:flex;gap:11px;align-items:center;padding:12px 11px;margin:9px 0;background:#f1f6fc;border:1px solid #d9e5f4;border-radius:10px;text-decoration:none;color:#203f61}
+.settings-link>span{flex:1;display:flex;flex-direction:column;min-width:0;gap:1px}
+.settings-link strong{font-size:13px}
+.settings-link small{font-size:11px;color:#5a7089}
+.settings-link .ui-icon:last-child{width:15px;height:15px}
+.settings-link:hover{background:#e5f0fd}
+.settings-details{font-size:12px;line-height:1.7;border-top:1px solid #e2e8f0;margin-top:12px;padding-top:10px;color:#425972}
+.settings-details summary{font-size:12px;font-weight:750;color:#2f557e;cursor:pointer;padding:6px 0}
+.settings-details p{font-size:12px;line-height:1.65;margin:9px 0;color:#4f647b;max-width:78ch}
+.settings-details ul{padding-left:20px;margin:8px 0 2px}
+.settings-details li{margin:5px 0}
+.settings-details a{color:#254f8a}
+.settings-brand{background:linear-gradient(115deg,#152840,#25425f);border-color:#294b71;color:#fff}
+.settings-brand h2 .ui-icon{color:#ffac74}
+.settings-overline{letter-spacing:.14em;font-size:10px;font-weight:900;color:#f5af83;margin:8px 0}
+.settings-brand h3{margin:6px 0 4px;font-size:24px;letter-spacing:-.06em;line-height:1.4}
+.settings-brand h3 em{color:#ffac74;font-style:normal}
+.brand-lead{margin:3px 0 10px;color:#d6e6f3;font-size:13px;line-height:1.65}
+.brand-manifesto{color:#b8cee0;margin:0 0 12px;font-size:12px}
+.settings-brand .settings-details{border-color:#4a6580}
+.settings-brand .settings-details summary{color:#b9d4e9}
+.settings-brand .settings-details p{color:#d1e0ee}
+.settings-copyright{font-size:11px;color:#9fbad3;margin:12px 0 0}
+.footer-settings{background:transparent;border:0;color:#284e83;font-size:11px;text-decoration:underline;font-weight:800;padding:0;cursor:pointer}
+footer{font-size:11px}
+@media(max-width:740px){
+ .bag-tab{gap:6px;flex-direction:column;justify-content:center;font-size:11px;padding:5px}
+ .bag-tab .ui-icon{width:19px;height:19px}
+ .settings-screen{gap:11px}
+ .settings-heading h1{font-size:22px}
+ .settings-card{padding:15px 13px}
+ .settings-card h2{font-size:15px}
+ .settings-storage .backup-panel .toolbar{gap:7px}
+ .settings-storage .backup-panel .toolbar .action,.settings-storage .backup-panel .toolbar .quiet-button{font-size:11px}
+ .settings-link{min-height:61px}
+ .settings-brand h3{font-size:22px}
+}
+@media(prefers-reduced-motion:reduce){.settings-link{transition:none}}
