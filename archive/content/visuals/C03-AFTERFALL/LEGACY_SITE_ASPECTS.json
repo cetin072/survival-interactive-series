@@ -1,0 +1,107 @@
+{
+  "version": "archive-legacy-site-aspects-v1",
+  "chronicle_id": "C03-AFTERFALL",
+  "purpose": "Display-only correction for site-png-512-v1 assets that were historically stretched to a square. Entries are bound to the exact published source SHA and authoritative pre-stretch dimensions.",
+  "entries": [
+    {
+      "subject_id": "loc-guild-rear-warehouse",
+      "site_source_sha256": "2eb7736605c96f23d089af36cbad001b06954989678a296db7a27696fc43e810",
+      "original_width": 1536,
+      "original_height": 1024,
+      "evidence": {
+        "kind": "identity-original-dimensions",
+        "ref": "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_WAREHOUSE.json"
+      }
+    },
+    {
+      "subject_id": "char-taehoon",
+      "site_source_sha256": "4512f65157aa85929ff3ba6d7157f6a5774a313fb4ea4972f611bf1342670cd7",
+      "original_width": 1536,
+      "original_height": 1024,
+      "evidence": {
+        "kind": "identity-original-dimensions",
+        "ref": "archive/content/visuals/C03-AFTERFALL/ILLUSTRATION_E2E_TAEHOON.json"
+      }
+    },
+    {
+      "subject_id": "event-fireline",
+      "site_source_sha256": "f1a01bbc7f00e1dd6fa2cf44378bc8d76eeae49cf12f198f3771e376a8fcfede",
+      "original_width": 1774,
+      "original_height": 887,
+      "evidence": {
+        "kind": "reservation-runtime-collection",
+        "ref": "eb6c71a725a4ed38a90aaa7f4501e7f76c25d522"
+      }
+    },
+    {
+      "subject_id": "event-network-decay",
+      "site_source_sha256": "da22faf4814cd8a4537c7961dff0825c1984db66d9e88cbf8329ef81aa1d0010",
+      "original_width": 1774,
+      "original_height": 887,
+      "evidence": {
+        "kind": "reservation-runtime-collection",
+        "ref": "44a8d67f9b0e9f92c9af10ec318e1f30625dc0bc"
+      }
+    },
+    {
+      "subject_id": "event-shelter",
+      "site_source_sha256": "edc73d65f08449c1a2f59ffd0c9e7778b06e4a50b9cc23a06a079b42abbd6604",
+      "original_width": 1774,
+      "original_height": 887,
+      "evidence": {
+        "kind": "reservation-runtime-collection",
+        "ref": "9bcb14bec4f88c25ab0198091d97877b026f1a78"
+      }
+    },
+    {
+      "subject_id": "event-winter-council",
+      "site_source_sha256": "7c8d61c5f9bec279f4ce4efa1baa2c99b57c104dc9994bc91fbec235877eb85a",
+      "original_width": 1672,
+      "original_height": 941,
+      "evidence": {
+        "kind": "reservation-runtime-collection",
+        "ref": "d0409055dcb6c077eefd73904d749dc3b6d3f38e"
+      }
+    },
+    {
+      "subject_id": "event-guild-warehouse-option",
+      "site_source_sha256": "f8b5fa6251a044d1a1fcb8c291cfc1fc30ee364ed1c1e06a10a3dcf595f979a5",
+      "original_width": 1942,
+      "original_height": 809,
+      "evidence": {
+        "kind": "reservation-runtime-collection",
+        "ref": "6220043dcb6cfc70098285a06ff8f0508027a0a9"
+      }
+    },
+    {
+      "subject_id": "char-hajin",
+      "site_source_sha256": "ec10145f88032e1737d85edcd3a12b4df15c10ac437b1ca3215d47159c3a0eb7",
+      "original_width": 1024,
+      "original_height": 1536,
+      "evidence": {
+        "kind": "reservation-runtime-collection",
+        "ref": "c7b1d4e82250ca96e3bfc8010d61d8eb2ceb9e66"
+      }
+    },
+    {
+      "subject_id": "char-yujin",
+      "site_source_sha256": "fd9db012a2dbb785a769c1399bd33825d5de0d4d95a812b3e9316bc6d3f1142b",
+      "original_width": 1024,
+      "original_height": 1536,
+      "evidence": {
+        "kind": "reservation-runtime-collection",
+        "ref": "d68219fddb330639abe4e8ba6af79adbf4194b2d"
+      }
+    },
+    {
+      "subject_id": "char-minho",
+      "site_source_sha256": "f2ad27ff1a2ffcc873fa236ba3eb0b07d37f12593dc3cf98c8ed257b3457b19d",
+      "original_width": 1024,
+      "original_height": 1536,
+      "evidence": {
+        "kind": "reservation-runtime-collection",
+        "ref": "cb352aa27d61cda616bc0ecfe1347cbf979b985a"
+      }
+    }
+  ]
+}

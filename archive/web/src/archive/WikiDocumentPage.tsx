@@ -4,6 +4,7 @@ import type { WikiDocument } from './wikiDocument'
 import type { WikiSourceLink } from './wikiSources'
 import { WikiTopbar } from './WikiTopbar'
 import { wikiNodeHref, worldWikiHref } from './wikiLinks'
+import { siteVisualDisplaySize } from './siteVisual'
 import './wikiShell.css'
 import './survivalDesignLanguage.css'
 import './wikiDocumentQuickNav.css'
@@ -53,6 +54,7 @@ export function WikiDocumentPage({
   const roleSection = document.sections.find((section) => /(?:^|-)role$/.test(section.id))
   const historySections = document.sections.filter((section) => section !== roleSection)
   const hrefForRelation = relationHref ?? ((relation: WikiDocument['relations'][number]) => wikiNodeHref(document.chronicleId, relation.nodeId))
+  const visualDisplay = document.visual ? siteVisualDisplaySize(document.visual) : undefined
 
   return <main className="wiki-shell" id="wiki-top">
     <WikiTopbar />
@@ -79,8 +81,11 @@ export function WikiDocumentPage({
         </header>
 
         <aside className="wiki-infobox" aria-label={document.title + ' 정보표'}>
-          {document.visual && <div className="wiki-infobox-cover has-image">
-            <img src={document.visual.public_path} width={document.visual.width} height={document.visual.height} alt={document.title + ' 대표 삽화'} />
+          {document.visual && visualDisplay && <div
+            className={'wiki-infobox-cover has-image' + (visualDisplay.corrected ? ' legacy-aspect-corrected' : '')}
+            style={{ aspectRatio: `${visualDisplay.width} / ${visualDisplay.height}` }}
+          >
+            <img src={document.visual.public_path} width={visualDisplay.width} height={visualDisplay.height} alt={document.title + ' 대표 삽화'} />
           </div>}
           <h2>{document.title}</h2>
           <dl>
@@ -174,10 +179,15 @@ export function WikiDocumentPage({
             </div>
           </section>}
 
-          {document.visual && <section id="wiki-visuals">
+          {document.visual && visualDisplay && <section id="wiki-visuals">
             <h2><span>{numberFor('visuals')}.</span> 삽화</h2>
-            <figure className="wiki-main-visual">
-              <img src={document.visual.public_path} width={document.visual.width} height={document.visual.height} alt={document.title + ' 공개 삽화'} />
+            <figure
+              className={'wiki-main-visual' + (visualDisplay.corrected ? ' legacy-aspect-corrected' : '')}
+              style={{ width: `${visualDisplay.width}px`, maxWidth: '100%' }}
+            >
+              <div className="wiki-main-visual-frame" style={{ aspectRatio: `${visualDisplay.width} / ${visualDisplay.height}` }}>
+                <img src={document.visual.public_path} width={visualDisplay.width} height={visualDisplay.height} alt={document.title + ' 공개 삽화'} />
+              </div>
               <figcaption>{document.visual.caption ?? document.title + ' · 공개 삽화'}</figcaption>
             </figure>
           </section>}
