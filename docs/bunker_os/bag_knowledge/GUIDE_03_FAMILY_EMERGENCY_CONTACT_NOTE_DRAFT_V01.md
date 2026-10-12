@@ -6,9 +6,9 @@ group: documents
 slug: family-emergency-contact-note
 title: 가족 비상연락처 메모는 왜 생존가방에 필요할까?
 status: DRAFT_NEEDS_INDEPENDENT_REVIEW
-version: 0.2.0
+version: 0.2.1
 createdAt: 2026-10-12
-updatedAt: 2026-10-12
+updatedAt: 2026-10-13
 category: documents
 reviewedAt: null
 sourceReview: VERIFIED_PAGE_CONTENT_2026_10_12
@@ -41,7 +41,7 @@ relatedKnowledgeSlugs: [family-emergency-contact-plan, emergency-supplies-invent
 - **대체 수단:** 전화가 안 될 때 시도할 다른 연락 방식과, 사전에 합의한 재회 장소를 간단히 기록합니다.
 - **읽기 편한 형식:** 큰 글씨, 방수에 도움이 되는 봉투, 수정하기 쉬운 종이를 선택합니다.
 
-관계 또는 이름, 전화번호, 연락이 안 될 때의 대체 담당자, 합의한 만남 장소를 짧게 적습니다. 긴급신고 112·119와 비긴급 민원상담 110도 구분해서 기록할 수 있습니다.
+관계 또는 이름, 전화번호, 연락이 안 될 때의 대체 담당자, 합의한 만남 장소를 짧게 적습니다. 범죄 등 경찰 긴급신고는 112, 화재·구조·구급은 119, 비긴급 민원상담은 110처럼 번호별 용도를 함께 적어 둡니다.
 
 연락 대상에게 자신의 번호가 비상연락망에 들어간다는 사실과 역할을 알려두는 것이 좋습니다. 재회 장소는 재난 종류와 공식 대피 안내에 따라 변경될 수 있습니다.
 
@@ -89,10 +89,9 @@ relatedKnowledgeSlugs: [family-emergency-contact-plan, emergency-supplies-invent
 
 - [국민안전24 — 비상대비 국민행동요령](https://safekorea.go.kr/safekorea-kor/acts/nacts/action-guide.do?actsHeaderTitle=%EB%B9%84%EC%83%81%EB%8C%80%EB%B9%84&category=stateOfEmergency&menuSn=4) — 통신 두절에 대비한 가족 연락처 기록·만남 장소 선정·연락카드의 생존배낭 보관을 안내합니다. 전쟁·비상사태 문맥입니다.
 - [행정안전부 — 긴급신고 통합서비스](https://www.mois.go.kr/frt/sub/a06/b10/emergencycall/screen.do) — 긴급신고 112·119와 비긴급 민원상담 110의 구분을 안내합니다.
-- [개인정보 포털 — 유출신고 안내](https://www.privacy.go.kr/front/wcp/spl/splRptInfo.do) — 분실 등으로 제3자가 내용을 알 수 있는 유출 개념을 설명합니다. 개인용 연락카드 작성 의무의 근거는 아닙니다.
 
-**출처 범위:** 큰 글씨·정보 최소화·대체 담당자 합의·분실 시 가족 통지는 편집상 실천 제안입니다. 종이 연락망이 전화망의 작동을 보장하지 않으며, 만남 장소는 실제 재난의 공식 안내에 따라 달라집니다. 사업자 유출신고 절차를 개인의 연락카드 분실 의무로 적용하지 않습니다.
+**출처 범위:** 큰 글씨·정보 최소화·대체 담당자 합의·분실 시 가족 통지는 편집상 실천 제안입니다. 종이 연락망이 전화망의 작동을 보장하지 않으며, 만남 장소는 실제 재난의 공식 안내에 따라 달라집니다.
 
 **자료·링크 확인:** 2026-10-12 원문 본문과 응답을 확인했습니다. 내부 글은 공개 URL의 200 응답과 본문, 저장소의 정적 페이지 경로를 확인했습니다. 게시 직전에는 링크를 다시 점검해야 합니다.
 
-**변경 이력:** 2026-10-12 v0.1.0 신규 초안. 같은 날 v0.2.0 휴대전화 방전 사례 보존, 메모 기재 항목·긴급번호 구분·개인정보와 위험한 재회 장소 주의 보강. 독립 검수·개별 사용자 승인·게시 전이며 `DRAFT_NEEDS_INDEPENDENT_REVIEW`를 유지합니다.
+**변경 이력:** 2026-10-12 v0.1.0 신규 초안. 같은 날 v0.2.0 휴대전화 방전 사례 보존, 메모 기재 항목·긴급번호 구분·개인정보와 위험한 재회 장소 주의 보강. 2026-10-13 v0.2.1 독립 검수 피드백 반영: 개인 독자에게 부적절한 신고용 근거를 제외하고 긴급번호별 용도를 명확히 함. 독립 재검수·개별 사용자 승인·게시 전이며 `DRAFT_NEEDS_INDEPENDENT_REVIEW`를 유지합니다.
