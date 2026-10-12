@@ -86,7 +86,9 @@ def landing(browser,base,width,height,label):
         assert not summary.evaluate('(el)=>el.parentElement.open')
     page.locator('.hero .primary').focus()
     assert page.locator('.hero .primary').evaluate('(el)=>getComputedStyle(el).outlineStyle')!='none'
-    page.keyboard.press('Enter');page.wait_for_url('**/bag-lab/alpha.html')
+    page.keyboard.press('Enter')
+    # Netlify Pretty URLs can canonicalize alpha.html to alpha; the app is the same.
+    page.wait_for_url(lambda url:urlsplit(url).path.rstrip('/') in ('/bag-lab/alpha.html','/bag-lab/alpha'))
     expect(page.locator('[data-command="add"]').first).to_be_enabled()
     assert await_bag(page)['bag']['items']==[],'landing must not apply a preset or sample inventory'
     # Round-trip a committed synthetic bag through landing and knowledge; preserve exact record.
