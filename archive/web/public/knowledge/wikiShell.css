@@ -183,8 +183,7 @@
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  object-fit: contain;
 }
 .wiki-lead {
   color: #24262b !important;
@@ -281,14 +280,16 @@
   line-height: 1.45;
 }
 .wiki-main-visual {
-  max-width: 560px;
+  width: fit-content;
+  max-width: 100%;
   margin: 12px 0 24px;
   border: 1px solid #d9dbde;
   background: #fff;
 }
 .wiki-main-visual img {
   display: block;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
 }
 .wiki-main-visual figcaption {
