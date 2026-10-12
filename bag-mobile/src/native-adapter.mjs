@@ -15,7 +15,7 @@ export function createAndroidNotificationDriver({notifications,settings,now=Date
       const [itemId,due]=JSON.parse(scheduleId),date=new Date(reminder.triggerAt);
       const localTime=`${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
       const id=numeric(reminder.identifier);
-      const result=await notifications.schedule({notifications:[{id,title:'생존가방 · 점검',body:reminder.title,channelId:CHANNEL,
+      const result=await notifications.schedule({notifications:[{id,isExactNotification:false,title:'생존가방 · 점검',body:reminder.title,channelId:CHANNEL,
         schedule:{at:date,allowWhileIdle:false},extra:{identifier:reminder.identifier,owner:REMINDER_OWNER,target:'schedule',scheduleId,offsetMinutes:0,triggerAt:reminder.triggerAt,itemId,due,localTime}}]});
       if(!result.notifications.some(n=>n.id===id))throw new Error('OS 예약 응답을 확인하지 못했습니다.');return reminder.identifier;
     },
@@ -23,7 +23,7 @@ export function createAndroidNotificationDriver({notifications,settings,now=Date
     openSettings:()=>settings.open(),
     test:async()=>{
       if((await notifications.checkPermissions()).display!=='granted')throw new Error('알림 권한이 필요합니다.');
-      await notifications.schedule({notifications:[{id:2147483646,title:'생존가방 · 테스트',body:'앱 종료 후 표시를 직접 확인하세요. 시험 중입니다.',channelId:CHANNEL,schedule:{at:new Date(now()+10000)},extra:{test:true}}]});
+      await notifications.schedule({notifications:[{id:2147483646,isExactNotification:false,title:'생존가방 · 테스트',body:'앱 종료 후 표시를 직접 확인하세요. 시험 중입니다.',channelId:CHANNEL,schedule:{at:new Date(now()+10000)},extra:{test:true}}]});
     },
     onClick:callback=>notifications.addListener('localNotificationActionPerformed',event=>{
       const extra=event.notification.extra;

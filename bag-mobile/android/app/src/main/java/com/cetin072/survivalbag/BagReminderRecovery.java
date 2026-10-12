@@ -13,7 +13,6 @@ import com.capacitorjs.plugins.localnotifications.LocalNotification;
 import com.capacitorjs.plugins.localnotifications.LocalNotificationManager;
 import com.capacitorjs.plugins.localnotifications.NotificationStorage;
 import com.capacitorjs.plugins.localnotifications.TimedNotificationPublisher;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,15 +36,16 @@ public class BagReminderRecovery extends BroadcastReceiver {
                     JSObject extra = source.getJSObject("extra");
                     if (extra == null || !"bag-side.schedule-reminder.v3".equals(extra.optString("owner"))) continue;
                     // Delivered one-shot reminders must never be resurrected after clock change/reboot.
-                    if (old.isTriggered() || old.getCancelled()) continue;
+                    if (old.isTriggered() || old.getCancelled()) { cancelTimer(context, old.getId()); continue; }
                     long trigger = BagReminderTime.future(extra.getString("due"), extra.getString("localTime"), ZoneId.systemDefault(), System.currentTimeMillis());
                     cancelTimer(context, old.getId());
                     if (trigger < 0) { storage.deleteNotification(key); continue; }
-                    source.getJSObject("schedule").put("at", Instant.ofEpochMilli(trigger).toString());
-                    extra.put("triggerAt", Instant.ofEpochMilli(trigger).toString());
+                    source.getJSObject("schedule").put("at", BagReminderTime.iso(trigger));
+                    extra.put("triggerAt", BagReminderTime.iso(trigger));
                     source.put("extra", extra);
                     future.add(LocalNotification.Companion.buildNotificationFromJSObject(source));
                 }
+                storage.appendNotifications(future);
                 // Uses plugin store + identifier/PendingIntent, not a custom scheduling engine.
                 new LocalNotificationManager(storage, null, context, CapConfig.loadDefault(context)).schedule(null, future);
             } catch (Exception error) { Log.e("BagReminderRecovery", "Recovery needs app reconciliation", error); }

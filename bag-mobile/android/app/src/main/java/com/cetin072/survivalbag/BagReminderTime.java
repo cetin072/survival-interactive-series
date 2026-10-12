@@ -1,6 +1,8 @@
 package com.cetin072.survivalbag;
 
 import java.time.LocalDate;
+import java.time.Instant;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -15,5 +17,6 @@ public final class BagReminderTime {
         long instant = zoned.toInstant().toEpochMilli();
         return instant > now ? instant : -1; // Missed dates resurface in-app, never replay as new alarms.
     }
+    public static String iso(long instant) { return new DateTimeFormatterBuilder().appendInstant(3).toFormatter().format(Instant.ofEpochMilli(instant)); }
     private BagReminderTime() {}
 }

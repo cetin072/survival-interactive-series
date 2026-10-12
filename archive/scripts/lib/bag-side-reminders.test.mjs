@@ -86,7 +86,7 @@ test('native adapter preserves requested IDs/ownership, settings and click targe
  const driver=createAndroidNotificationDriver({notifications:n,settings:{open:async()=>opened=true},now:()=>NOW});
  assert.equal(await driver.permission(),false);assert.equal(await driver.requestPermission(),'granted');
  const id='bag-side.reminder.v3.123';assert.equal(await driver.schedule({identifier:id,triggerAt:'2030-01-03T09:00:00.000Z',title:'시험'},'["light","2030-01-03"]'),id);
- assert.equal((await driver.list())[0].identifier,id);assert.equal(pending[0].extra.owner,REMINDER_OWNER);assert.equal(pending[0].extra.itemId,'light');
+ assert.equal((await driver.list())[0].identifier,id);assert.equal(pending[0].isExactNotification,false);assert.equal(pending[0].extra.owner,REMINDER_OWNER);assert.equal(pending[0].extra.itemId,'light');
  let target;globalThis.history={replaceState:(_,__,url)=>target=url};await driver.onClick(id=>target+='|'+id);click({notification:pending[0]});assert.match(target,/item=light\|light/);delete globalThis.history;
  await driver.openSettings();assert.equal(opened,true);await driver.cancel(id);assert.deepEqual(await driver.list(),[]);
 });
