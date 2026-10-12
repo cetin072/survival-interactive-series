@@ -1,17 +1,17 @@
 {
   "version": "illustration-review-handoff-v1",
-  "job_id": "illustration-char-minho-05fe09095e43-20261012-38172458375",
-  "main_sha": "e38a11c9f9e3f58877752f324a379c8f2b199daf",
-  "point_id": "point-675f7c0752b50f0e9915ca8ff3f0d65439dd0786c26ae68cf6b9b5c37d5c15cb",
-  "generation_key": "generation-05fe09095e43683495fdfdeba4ddfa7e560407e325ed3c1c58a78410f4d20b00",
-  "subject_id": "char-minho",
-  "prompt_sha256": "71eb795be4448a6780e95ce1565f6fb11c88f877a8b067faae41df7fb6166aca",
-  "review_context_sha256": "8f87dd4f758427e7e231aef1927d55457e20676bcbeeaf89e5f6da0475bca950",
+  "job_id": "illustration-char-hayoung-e370231d4ed7-20261013-38304611827",
+  "main_sha": "51ada44159e6b34475d70375cd0d31d265c02c5e",
+  "point_id": "point-78dbd828ebdc723b4b1d2971b567aba037a999deeab2d4042c9fefa2bd73b188",
+  "generation_key": "generation-e370231d4ed74a350bd74c0f26eaa3cce51e98b392f46f937ec42ad095f17de6",
+  "subject_id": "char-hayoung",
+  "prompt_sha256": "c230581edc1d3d9a499a360f8581d0cb2d0e903cbda8687cd1c0da3a68407a25",
+  "review_context_sha256": "6f26ca8343b038d7bfb5d06cdc92108ecafc7ca0f7cc8716932b57bc0cf40d74",
   "source_library_path": "/IMAGE-RENDER/output/current.png",
-  "source_library_file_id": "file_00000000516481fabcc1f7bbdf290e74",
+  "source_library_file_id": "file_0000000096ec82308abc6bd77d70b3b2",
   "decision": "PASS",
   "review_provider": "native_chatgpt_vision",
-  "review_summary": "Matches the bound character portrait: one Korean man in his late thirties has a solid build, sun-tanned skin, angular jaw, short swept-up black hair, and an old scar on his right temple. His relaxed posture, worn contemporary clothing, understated Korean living space, cool blue-gray palette, natural light, and painterly texture satisfy the stored brief. No extra figures, weapons, gore, fantasy elements, identifying text, or unsupported narrative outcome appears.",
+  "review_summary": "Matches the bound character portrait: one Korean woman in her early thirties has a lean, firm build, distinct eyes and facial features, a shallow dimple on one cheek, and long black hair loosely tied at the nape. Rolled sleeves, practical work clothes and apron, relaxed expression and hands, simple contemporary Korean living space, cool blue-gray palette, natural light, realistic proportions, and visible painterly texture satisfy the stored brief. No extra figures, readable text, weapons, gore, fantasy elements, or invented identifying features appear.",
   "rejection_codes": [],
-  "created_at": "2026-10-11T22:32:04.808Z"
+  "created_at": "2026-10-12T22:36:09.049Z"
 }
