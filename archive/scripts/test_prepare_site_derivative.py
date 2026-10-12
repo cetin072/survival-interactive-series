@@ -80,6 +80,16 @@ class SiteDerivativeTests(unittest.TestCase):
             self.assertEqual(len(derivative.getcolors(maxcolors=257)), 256)
         self.assertLessEqual(len(result), 200_000)
 
+    def test_wide_derivative_preserves_aspect_ratio(self):
+        result = site.derive(png_bytes(40, 20))
+        with Image.open(io.BytesIO(result)) as derivative:
+            self.assertEqual(derivative.size, (512, 256))
+
+    def test_portrait_derivative_preserves_aspect_ratio(self):
+        result = site.derive(png_bytes(20, 40))
+        with Image.open(io.BytesIO(result)) as derivative:
+            self.assertEqual(derivative.size, (256, 512))
+
     def test_256_color_overflow_falls_back_to_128_colors(self):
         source = deterministic_overflow_png()
         result = site.derive(source)
@@ -126,6 +136,34 @@ class SiteDerivativeTests(unittest.TestCase):
         second, existed = site.desired_manifest(first, "1" * 64, asset)
         self.assertTrue(existed)
         self.assertEqual(first, second)
+        self.assertEqual(asset["derivative_version"], "site-png-fit-512-v2")
+        self.assertEqual((asset["width"], asset["height"]), (512, 256))
+
+    def test_manifest_allows_v1_to_v2_derivative_upgrade_for_same_identity(self):
+        derivative = site.derive(self.source)
+        asset = site.build_site_asset(
+            self.record, self.registry, self.object_path, derivative
+        )
+        legacy = {
+            **asset,
+            "derivative_version": "site-png-512-v1",
+            "public_path": "/visual-assets/" + "c" * 64 + ".png",
+            "sha256": "c" * 64,
+            "width": 512,
+            "height": 512,
+        }
+        existing = {
+            "version": "archive-site-assets-v1",
+            "chronicle_id": "C03-AFTERFALL",
+            "worldline_id": "AFTERFALL",
+            "visibility": "PUBLIC_ARCHIVE",
+            "visual_catalog_sha256": "0" * 64,
+            "assets": [legacy],
+            "content_sha256": "old",
+        }
+        upgraded, existed = site.desired_manifest(existing, "1" * 64, asset)
+        self.assertFalse(existed)
+        self.assertEqual(upgraded["assets"], [asset])
 
     def test_manifest_rejects_same_subject_different_asset(self):
         derivative = site.derive(self.source)
