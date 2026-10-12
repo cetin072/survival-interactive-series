@@ -4,7 +4,7 @@ from urllib.parse import urlsplit
 
 def verify_remote(base, expected):
     url=urlsplit(base)
-    preview=re.fullmatch(r'deploy-preview-[1-9][0-9]*--survival-diary-archive.netlify.app',url.hostname or '')
+    preview=re.fullmatch(r'deploy-preview-[1-9][0-9]*--survival-diary-archive\.netlify\.app',url.hostname or '')
     fixed=url.hostname=='qa-bag-side--survival-diary-archive.netlify.app'
     if (url.scheme!='https' or not (preview or fixed) or url.port is not None or
         url.username or url.password or url.path not in ('','/') or url.query or url.fragment or
