@@ -1,0 +1,19 @@
+{
+  "id": "KC-c03-afterfall-chapter-11-031b07cd7e",
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-022",
+  "question": "장시간 비상운영의 교대와 휴식은 어떻게 정할까",
+  "topic_id": "community-continuity-roles",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_003.md"
+  ],
+  "source_hashes": [
+    "634b6b24db781b974c857c19bed3bea34a52124b5fc9a1d45efcea9b70de9f3d"
+  ],
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "disposition_note": "공개 Reader의 허구 서사에서 장시간 감시 중 피로가 누적되고 교대로 전환되는 장면이 질문의 계기가 됐다. 기존 K-009는 역할과 승인 권한의 분산을 다루지만, 이 후보는 연장·야간 운영에서 교대, 휴식, 작업량, 인계 기준을 함께 정하는 피로관리 문제에 초점을 두므로 실질적으로 중복되지 않는다.",
+  "reader_chapter_id": "c03-afterfall-chapter-11",
+  "reader_book_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b",
+  "reader_chapter_sha256": "86195e1f5e80de25ded8f17ad5f90c1434d38c4d60a0041eda08c161797b096f"
+}
