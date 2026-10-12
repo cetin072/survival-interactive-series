@@ -1,0 +1,19 @@
+{
+  "id": "KC-c03-afterfall-chapter-10-d2b5388b3c",
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-021",
+  "question": "재난 때 옮길 핵심자산은 어떻게 고를까",
+  "topic_id": "community-emergency-resource-management",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_002.md"
+  ],
+  "source_hashes": [
+    "8e966047202a051473784e264e9cf747f4e3039da1c19157abbbe29e1c1920b8"
+  ],
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "disposition_note": "기존 글은 대피 결정, 이동경로 이중화, 비상물자 기록을 각각 다루지만, 철수 전에 제한된 시간과 운반 능력 안에서 복구에 필수적인 휴대자산을 선별하고 사람·퇴로보다 앞서지 않게 하는 기준은 다루지 않는다. 공개 Reader의 허구 서사에서 질문을 얻었으며 현실 주장은 공식 자료로 별도 검증했다.",
+  "reader_chapter_id": "c03-afterfall-chapter-10",
+  "reader_book_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b",
+  "reader_chapter_sha256": "1c67b2cc9ded650a17353c97974675f51bbed041e9b113404d79a05b70caf90e"
+}
