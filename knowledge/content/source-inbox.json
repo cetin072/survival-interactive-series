@@ -13,7 +13,12 @@
       "status": "HELD",
       "decision": "HOLD",
       "role": "QUESTION_SEED",
-      "topics": ["대설", "한파", "겨울철 사전점검", "집·점포"],
+      "topics": [
+        "대설",
+        "한파",
+        "겨울철 사전점검",
+        "집·점포"
+      ],
       "question": "겨울이 오기 전 집·가게 주변에서 무엇을 미리 점검해야 하는가?",
       "note": "시의 사전 대비계획 발표. 이미 시행된 점검 결과나 피해 예방 효과로 간주하지 않으며 실제 행동요령의 독립된 근거가 아니다.",
       "rights": {
@@ -44,6 +49,113 @@
           "date": "2026-10-09",
           "decision": "HOLD",
           "note": "URL·서지정보·이용조건·독자 질문을 우선 보존. 원문·사진 복제, 자동 게시, 공개 글 수정 없음."
+        }
+      ]
+    },
+    {
+      "id": "SRC-20261011-AZUOLAS-LT72",
+      "url": "https://azuolas.mainline.inc/krepsys/",
+      "title": "Ąžuolas · 72 valandų krepšys / 72시간 대피가방 대화형 체크리스트",
+      "publisher": "Ąžuolas / mainline.inc (제3자 웹사이트; 공식기관 여부 확인되지 않음)",
+      "kind": "EXTERNAL_INTERACTIVE_TOOL",
+      "published_at": null,
+      "modified_at": null,
+      "checked_at": "2026-10-11",
+      "status": "HELD",
+      "decision": "HOLD",
+      "role": "UX_BENCHMARK",
+      "topics": [
+        "72시간 대피가방",
+        "비상용품",
+        "가족별 준비",
+        "체크리스트",
+        "기한·정기 점검",
+        "가족 비상계획"
+      ],
+      "question": "검증된 생존지식을 가족 구성에 맞춘 체크리스트와 실제 준비 행동으로 연결하려면 무엇이 필요한가?",
+      "note": "리투아니아어 민간/제3자 웹페이지. 0/39 필수품 진행률, 가족 인원 조절, 준비물별 설명, 반기 점검 안내, 가족계획 이동 링크 확인. 정부 공식 안내 https://lt72.lt/isvykimo-krepsys-5/ 를 출처로 밝힘. 실제 개인 데이터 지속 저장·오프라인·알림 방식은 미검증. 사이트의 특정 물품 수량·요오드/의료/방호 지침은 한국 행동요령으로 그대로 전용하지 않음.",
+      "rights": {
+        "label": "사이트 저작권·오픈소스/상업적 재사용 허가 미확인",
+        "checked_at": "2026-10-11",
+        "notice_url": "https://azuolas.mainline.inc/krepsys/",
+        "policy_url": null,
+        "attribution": "REVIEW_REQUIRED",
+        "commercial_use": "UNKNOWN",
+        "modification": "UNKNOWN",
+        "scope_note": "링크·자체 메타데이터·분석 메모만 보관. 사이트의 원문, 이미지, UI 코드, 전체 항목 번역·재게시 권한 확인 전 복제 불가. 공식 LT72 자료도 별도 권리 확인."
+      },
+      "related_guides": [
+        {
+          "id": "K-002",
+          "relation": "REVIEW_CANDIDATE",
+          "reason": "기존 공개 비상용품 관리 지식에서 '읽기→개인별 확인·점검'으로 이동하는 구조 제안. 원문 정보의 사실 검증 및 수정·발행 없음."
+        },
+        {
+          "id": "K-003",
+          "relation": "REVIEW_CANDIDATE",
+          "reason": "체크리스트를 끝낸 뒤 가족 연락·만남장소 계획으로 이동하는 사용자 여정 제안. 본문 수정/공개 연결은 승인 전 없음."
+        }
+      ],
+      "next_action": "공식 LT72 근거와 국내 국민재난안전포털을 분리 대조하여 안전·저작권 검토. 좋은 정보 구조만 작은 행동 전환 후보로 연구하고 기존 인간 검토·승인 게이트를 유지. 생존가방 앱 Side Track의 개발과 본 로드맵을 혼동하지 않는다.",
+      "history": [
+        {
+          "date": "2026-10-11",
+          "decision": "HOLD",
+          "note": "제3자 사례 원본 링크·구조·권리·검토 후보 보관. 안전/권리 확인 전 원문·이미지 복제나 자동 게시·지식 글 변경 없음."
+        }
+      ]
+    },
+    {
+      "id": "SRC-20261011-YOUTUBE-72H-EHQEVKWKAIE",
+      "url": "https://www.youtube.com/watch?v=ehQEvkWKAIE",
+      "title": "전쟁 터지면 가장 먼저 챙겨야 할 72시간 생존가방",
+      "publisher": "유튜브 한국어 생존가방 해설 채널 (영상 내 원천으로 리투아니아 총방위협회 언급; 채널명 검증 별도)",
+      "kind": "SECONDARY_VIDEO_EXPLAINER",
+      "published_at": null,
+      "modified_at": null,
+      "checked_at": "2026-10-11",
+      "status": "HELD",
+      "decision": "HOLD",
+      "role": "CONTEXT_AND_UPDATE_CANDIDATE",
+      "topics": [
+        "72시간 대피가방",
+        "집 비축품과 대피가방 구분",
+        "운반 가능한 가방 무게",
+        "기본 식품의 보관·조리 가능성",
+        "계절별 점검",
+        "물품 목적 설명",
+        "체크리스트"
+      ],
+      "question": "생존가방을 준비한 뒤 실제로 들고 이동하며 정기적으로 점검할 수 있게 하려면 어떤 설명과 점검 행동이 필요한가?",
+      "note": "같은 영상 ID ehQEvkWKAIE (si= 공유 파라미터만 다름). 2026-10-11 한국어 자막 제공자 결과 315 segments, 0.12~546.6s를 확인. full_content=false로 전체 커버리지/정확성 미확인. 69s 부근에서 리투아니아 총방위협회 자료 영상화라고 언급하므로 Ąžuolas/LT72 S-004와 출처를 독립 근거로 중복 합산 금지. 후보 교훈: 39s 실물 운반·계단 점검, 50s 연2회 점검, 97s 집 비축 vs 이동가방, 131s 간편식 선택, 508s 가방 무게 초과 시 우선순위. 건강·방호·지혈·식수량/중량 수치는 한국 기준 대조 전 승인 금지.",
+      "rights": {
+        "label": "YouTube 제3자 영상·자동자막: 재이용·상업적 2차 이용 허락 미확인",
+        "checked_at": "2026-10-11",
+        "notice_url": "https://www.youtube.com/watch?v=ehQEvkWKAIE",
+        "policy_url": null,
+        "attribution": "REVIEW_REQUIRED",
+        "commercial_use": "UNKNOWN",
+        "modification": "UNKNOWN",
+        "scope_note": "영상·자막 전문 저장/복제·공개 번역·이미지 재사용하지 않음. 링크·시간 구간·독립 작성 메모만 보관."
+      },
+      "related_guides": [
+        {
+          "id": "K-002",
+          "relation": "REVIEW_CANDIDATE",
+          "reason": "연2회 점검·실물 운반 테스트·식품 선택 기준을 기존 비상용품 관리 글의 보강 후보로 비교. 공개 글 현재 상태 변경 없음."
+        },
+        {
+          "id": "K-003",
+          "relation": "REVIEW_CANDIDATE",
+          "reason": "자녀 연락카드·문서 등 가족계획 설명 후보. 기존 가족 연락 글·공개 변경 없음."
+        }
+      ],
+      "next_action": "S-004 및 국내 공식 원문과 겹치는 주장은 하나로 묶고, 새롭고 실행 가능한 행동 설명만 선별. 국내 공식 검증·인간 승인 전 자동 게시·앱 강제 수량/의료기준 반영 금지.",
+      "history": [
+        {
+          "date": "2026-10-11",
+          "decision": "HOLD",
+          "note": "유튜브 링크·관련 LT72 출처 관계·자막 검증 한계·적용 후보 갈무리. 실제 영상/자막 전문 저장·게시·지식 자동 개정 없음."
         }
       ]
     }
