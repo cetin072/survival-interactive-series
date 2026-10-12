@@ -1,6 +1,8 @@
+import {registerBagPwa} from './pwa.mjs';
+import {initializeBagReminders,saveBagWithReminders,refreshBagReminders} from './reminder-ui.mjs';
 import {currentQuantity,shortage,dashboardSummary,prioritizedItems,nextAction,dayDifference,localToday} from './logic.mjs';
 import {CATEGORIES,DATE_TYPES,MAX_BACKUP_BYTES,newId,newBatch,upsertItem,removeItem,removeBatch,stockChange,dashboardBag,backupText,parseBackup,validateBag} from './personal.mjs';
-import {readBag,saveBag,readPreviousBag,readRawRecord} from './storage.mjs';
+import {readBag,readPreviousBag,readRawRecord} from './storage.mjs';
 import {GROUPS,CATALOG,targetFor,seedFor,entryStatus,catalogProgress} from './catalog.mjs';
 import {PRESETS,previewPreset,applyPreset,isDraftBatch} from './presets.mjs';
 const $=id=>document.getElementById(id);
@@ -150,7 +152,7 @@ $('editor-form').addEventListener('submit',async event=>{
   event.preventDefault();if(busy||!$('editor-form').reportValidity())return;
   busy=true;readiness();$('editor-error').hidden=true;message('기기에 저장 중입니다. 창을 닫지 마세요.');
   try{
-    const next=candidate();record=await saveBag(next,editBase.revision);
+    const next=candidate();record=await saveBagWithReminders(next,editBase.revision);
     const copy=mode==='preset'?'준비할 목록이 만들어졌어요. 실물 수량과 제품 기한을 확인하세요.':mode==='add'?'내 생존가방 관리가 시작됐어요.':mode==='order'?'주문을 기록했어요. 실제 가방 수량은 그대로입니다.':'변경 내용을 기록했어요.';
     $('editor').close();filter='all';showScreen('inventory');draw();message(record.revision===editBase.revision?'변경 사항이 없어 기존 기록을 유지했습니다.':copy+' 이 브라우저에 저장됨 · 버전 '+record.revision);
   }catch(error){$('editor-error').hidden=false;$('editor-error').textContent=error.message;message('저장하지 못했습니다. 기존 기록을 유지했습니다. '+error.message,true);}
@@ -228,4 +230,13 @@ document.querySelector('.bag-tabs').addEventListener('keydown',event=>{
   const next=event.key==='Home'?0:event.key==='End'?2:(index+(event.key==='ArrowRight'?1:-1)+3)%3;
   event.preventDefault();showScreen(tabs[next].dataset.nav);tabs[next].focus();
 });
-refresh();
+function focusNotificationItem(itemId){
+  if(!record||!record.bag.items.some(item=>item.id===itemId))return;
+  filter='all';showScreen('inventory');draw();
+  const target=$('item-'+itemId);target?.scrollIntoView({block:'center'});target?.focus({preventScroll:true});
+}
+document.addEventListener('bag-open-item',event=>focusNotificationItem(event.detail?.itemId));
+await refresh();
+focusNotificationItem(new URLSearchParams(location.search).get('item'));
+registerBagPwa().catch(()=>{$('pwa-status').textContent='오프라인 준비 실패 · 온라인 기록은 사용할 수 있습니다.';});
+initializeBagReminders().catch(()=>{$('reminder-status').textContent='알림 확인 필요 · 저장 기록은 유지됩니다.';});

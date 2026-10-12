@@ -6,6 +6,8 @@ on:
       - 'archive/scripts/lib/bag-side-*.test.mjs'
       - 'archive/scripts/check-bag-side-*.py'
       - 'archive/scripts/bag_side_remote.py'
+      - 'archive/scripts/build-bag-pwa.mjs'
+      - 'bag-mobile/src/native-adapter.mjs'
       - 'archive/web/netlify.toml'
       - 'archive/web/qa-noindex.headers'
       - '.github/workflows/bag-side-lab-check.yml'
@@ -24,7 +26,7 @@ jobs:
         run: |
           for file in archive/web/public/bag-lab/*.mjs; do node --check "$file"; done
       - name: Run original demo and personal Alpha state tests
-        run: node --test archive/scripts/lib/bag-side-lab.test.mjs archive/scripts/lib/bag-side-alpha.test.mjs archive/scripts/lib/bag-side-catalog.test.mjs archive/scripts/lib/bag-side-presets.test.mjs
+        run: node --test archive/scripts/lib/bag-side-lab.test.mjs archive/scripts/lib/bag-side-alpha.test.mjs archive/scripts/lib/bag-side-catalog.test.mjs archive/scripts/lib/bag-side-presets.test.mjs archive/scripts/lib/bag-side-reused-reminders.test.mjs archive/scripts/lib/bag-side-reminders.test.mjs
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -32,6 +34,10 @@ jobs:
         run: |
           python -m pip install playwright==1.55.0
           python -m playwright install --with-deps chromium
+      - name: Complete BAG app shell integrity manifest
+        run: node archive/scripts/build-bag-pwa.mjs --check
+      - name: PWA installability, offline cold start and atomic updates
+        run: python -u archive/scripts/check-bag-side-pwa.py
       - name: Remote host, exact SHA and deployment context guard
         run: python archive/scripts/check-bag-side-remote.py
       - name: Original demo mobile and desktop regression
@@ -63,6 +69,12 @@ jobs:
           BAG_LAB_BASE_URL: https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app
           BAG_LAB_EXPECTED_SHA: ${{ github.event.pull_request.head.sha }}
         run: python -u archive/scripts/check-bag-side-presets.py
+      - name: PWA deployed Preview with exact SHA
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          BAG_LAB_BASE_URL: https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app
+          BAG_LAB_EXPECTED_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python -u archive/scripts/check-bag-side-pwa.py
       - name: Preserve demo and explicit Alpha boundaries
         run: |
           grep -q 'name="robots" content="noindex' archive/web/public/bag-lab/index.html

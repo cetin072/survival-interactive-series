@@ -1,0 +1,11 @@
+import {cp,mkdir,readFile,writeFile,rm} from 'node:fs/promises';
+import {build} from 'esbuild';
+const root=new URL('../',import.meta.url),www=new URL('www/',root);
+await rm(www,{recursive:true,force:true});await mkdir(www,{recursive:true});
+await cp(new URL('../../archive/web/public/bag-lab/',import.meta.url),new URL('bag-lab/',www),{recursive:true});
+const html=new URL('bag-lab/alpha.html',www);
+const source=await readFile(html,'utf8');
+await writeFile(html,source.replace('<script type="module" src="./alpha.mjs"></script>','<script type="module" src="./native-bridge.mjs"></script>\n  <script type="module" src="./alpha.mjs"></script>'));
+await writeFile(new URL('index.html',www),'<html lang="ko"><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=/bag-lab/alpha.html"></head><body><a href="/bag-lab/alpha.html">나의 생존가방</a></body></html>');
+await build({entryPoints:[new URL('src/native-bridge.mjs',root).pathname],bundle:true,format:'esm',outfile:new URL('bag-lab/native-bridge.mjs',www).pathname});
+console.log('Prepared existing BAG web screen for isolated Android shell');
