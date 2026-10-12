@@ -6,9 +6,9 @@ group: documents
 slug: identity-card-copy
 title: 신분증 사본은 왜 생존가방에 필요할까?
 status: DRAFT_NEEDS_INDEPENDENT_REVIEW
-version: 0.2.0
+version: 0.2.1
 createdAt: 2026-10-12
-updatedAt: 2026-10-12
+updatedAt: 2026-10-13
 category: documents
 reviewedAt: null
 sourceReview: VERIFIED_PAGE_CONTENT_2026_10_12
@@ -88,10 +88,9 @@ relatedKnowledgeSlugs: [emergency-supplies-inventory]
 
 - [미국 적십자사 — Survival Kit Supplies](https://www.redcross.org/get-help/how-to-prepare-for-emergencies/survival-kit-supplies.html) — 여권 등 개인 문서 사본을 준비물로 제시합니다. 한국에서의 신분증 사본 효력을 정하는 자료는 아닙니다.
 - [행정안전부 — 주민등록증 분실/습득/훼손](https://www.mois.go.kr/frt/sub/a06/b06/IDCard_6/screen.do) — 분실신고 방법·재발급 안내와 신고 처리 후 실물·모바일 주민등록증 효력 정지를 설명합니다.
-- [개인정보 포털 — 유출신고 안내](https://www.privacy.go.kr/front/wcp/spl/splRptInfo.do) — 제3자가 내용을 알 수 있는 상태에 이르는 유출 개념을 설명합니다. 개인의 사본 휴대를 의무화하지 않습니다.
 
-**출처 범위:** 사본은 기재 정보 참고용으로 설명하며 법적 신분확인 효력을 보장하지 않습니다. 마스킹·보관·폐기는 편집상 개인정보 보호 권고이고 제출 요건은 해당 기관이 정합니다. 사업자 유출신고 의무를 개인에게 그대로 적용하지 않습니다.
+**출처 범위:** 사본은 기재 정보 참고용으로 설명하며 법적 신분확인 효력을 보장하지 않습니다. 마스킹·보관·폐기는 편집상 개인정보 보호 권고이고 제출 요건은 해당 기관이 정합니다.
 
 **자료·링크 확인:** 2026-10-12 원문 본문과 응답을 확인했습니다. 내부 글은 공개 URL의 200 응답과 본문, 저장소의 정적 페이지 경로를 확인했습니다. 게시 직전에는 링크를 다시 점검해야 합니다.
 
-**변경 이력:** 2026-10-12 v0.1.0 신규 초안. 같은 날 v0.2.0 지갑 분실 도입 보존, 제목 조사 수정, 사본의 한계·분실신고·마스킹과 노출 대응 보강. 독립 검수·개별 사용자 승인·게시 전이며 `DRAFT_NEEDS_INDEPENDENT_REVIEW`를 유지합니다.
+**변경 이력:** 2026-10-12 v0.1.0 신규 초안. 같은 날 v0.2.0 지갑 분실 도입 보존, 제목 조사 수정, 사본의 한계·분실신고·마스킹과 노출 대응 보강. 2026-10-13 v0.2.1 독립 검수 피드백 반영: 개인 독자에게 부적절한 신고용 근거를 제외하고 서류 준비·신분증 분실 안내를 유지함. 독립 재검수·개별 사용자 승인·게시 전이며 `DRAFT_NEEDS_INDEPENDENT_REVIEW`를 유지합니다.
