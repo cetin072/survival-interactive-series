@@ -9,7 +9,7 @@ let record=null, screen='bag', filter='all', busy=false, editBase=null, mode=nul
 let catalogGroup='food',familyCount=1; // ephemeral guidance only; NEVER modifies recorded inventory
 let presetId=null,presetToday=null;
 function drawPresets(){
-  $('preset-cards').innerHTML=PRESETS.map(p=>`<article><h3>${p.name}</h3><p>${p.note}</p><small>${p.items.length}종 · 참고 ${p.budget}kg</small><button type="button" class="quiet-button" data-preset="${p.id}" data-ready>선택</button></article>`).join('');
+  $('preset-cards').innerHTML=PRESETS.map(p=>`<article class="preset-card preset-${esc(p.id)}"><h3>${esc(p.name)}</h3><p>${esc(p.note)}</p><small>${p.items.length}종 · ${p.budget}kg 참고</small><button type="button" class="quiet-button" data-preset="${esc(p.id)}" data-ready>구성 보기 →</button></article>`).join('');
 }
 function updatePresetSummary(){
   const rows=[...$('editor-body').querySelectorAll('[data-preset-row]')];
@@ -44,15 +44,16 @@ function drawCatalog(bag){
     `<button type="button" data-guide-group="${esc(group.id)}" data-ready aria-pressed="${String(group.id===catalogGroup)}">${esc(group.label)}</button>`).join('');
   const active=GROUPS.find(group=>group.id===catalogGroup)??GROUPS[0];
   const entries=CATALOG.filter(entry=>entry.group===active.id);
-  $('catalog-group-intro').textContent=`${active.help} · 기본 ${entries.filter(entry=>entry.basic).length}종 / 선택 ${entries.filter(entry=>!entry.basic).length}종`;
+  $('catalog-group-intro').textContent=`기본 ${entries.filter(entry=>entry.basic).length}종 · 선택 ${entries.filter(entry=>!entry.basic).length}종`;
   $('catalog-items').innerHTML=entries.map(entry=>{
     const status=entryStatus(entry,bag);
-    const note=status.registered?`실제 ${status.quantity}${status.item.unit} / 내 목표 ${status.item.target}${status.item.unit} · ${status.meetsOwnTarget?'개인 목표 충족':'부족 또는 확인 필요'}`:
-      `등록할 때 참고: ${targetFor(entry,familyCount)}${entry.unit} · 실제 보유량 0부터 시작`;
+    const note=status.registered?
+      `보유 ${status.quantity}/${status.item.target}${esc(status.item.unit)} · ${status.meetsOwnTarget?'수량 충족':'보충 필요'}`:
+      `목표 예시 ${targetFor(entry,familyCount)}${esc(entry.unit)}`;
     const action=status.registered?
       `data-guide-focus="${esc(status.item.id)}" class="view-existing"`:
       `data-guide-add="${esc(entry.id)}"`;
-    return `<article class="catalog-entry"><div><h4>${esc(entry.name)}<span class="catalog-badge ${entry.basic?'':'optional'}">${entry.basic?'기본':'선택'}</span></h4><p>${esc(entry.note)}</p><p class="catalog-meta">${esc(note)}</p></div><button type="button" ${action} data-ready>${status.registered?'내 기록 보기':'등록하기 +'}</button></article>`;
+    return `<article class="catalog-entry ${status.registered?'is-owned':''}"><div><h4>${esc(entry.name)}<span class="catalog-badge ${entry.basic?'':'optional'}">${entry.basic?'기본':'선택'}</span></h4><p class="catalog-meta">${note}</p><details class="catalog-explain"><summary>왜 필요해요?</summary><p>${esc(entry.note)}</p></details></div><button type="button" ${action} data-ready>${status.registered?'내 기록':'＋ 추가'}</button></article>`;
   }).join('');
 }
 function draw(){
@@ -63,7 +64,7 @@ function draw(){
   $('next-check').textContent=totals.next?`가장 가까운 일정 · ${totals.next.item.name} · ${totals.next.task.due}`:bag.items.length?'관리 일정이 아직 없습니다. 물품별 날짜를 확인하세요.':'아직 등록한 물품이 없습니다. 내 물품부터 하나씩 기록하세요.';
   drawCatalog(record.bag);
   drawPresets();
-  $('lead-note').textContent=`표시기한 ${bag.rotationLeadDays}일 전을 교체·순환 검토일로 계산합니다. 이는 관리 설정이며 식품 안전기준이 아닙니다. 날짜만으로 섭취 가능 여부를 판단하지 마세요.`;
+  $('lead-note').textContent=`교체 검토일: 표시기한 ${bag.rotationLeadDays}일 전 · 실제 보관 상태 확인 필수`;
   $('upcoming-list').innerHTML=ordered.slice(0,4).map((item,index)=>`<button type="button" class="upcoming-row" data-focus="${esc(item.id)}"><span class="upcoming-index">${index+1}</span><span class="upcoming-copy"><strong>${esc(item.name)}</strong><small>${esc(schedule(item,bag))}</small></span><span class="upcoming-chip ${shortage(item)?'short':''}">${shortage(item)?`보충 ${shortage(item)}${esc(item.unit)}`:'물품 확인 →'}</span></button>`).join('')||'<div class="items-empty">빈 가방에서 시작합니다. 샘플 물품을 자동으로 넣지 않습니다.</div>';
   const chosen=ordered.filter(item=>filter==='short'?shortage(item)>0:filter==='soon'?(nextAction(item,bag.rotationLeadDays)&&dayDifference(nextAction(item,bag.rotationLeadDays).due,today)<=30):true);
   $('item-list').innerHTML=chosen.map(item=>{
@@ -73,7 +74,7 @@ function draw(){
     const draftDates=item.batches.filter(isDraftBatch).map(b=>b.nextInspection).filter(Boolean);
     const draftNote=draftDates.length?`<p class="item-sub draft-note">첫 점검 예정일: ${esc([...new Set(draftDates)].join(' / '))} · 자동 제안, 수정 가능</p>`:'';
     const batches=item.batches.map((b,i)=>`<div class="batch-row"><span>${isDraftBatch(b)&&b.quantity===0?'준비 초안':'묶음 '+(i+1)} · ${b.quantity}${esc(item.unit)} · ${b.markedUntil?esc(DATE_TYPES[b.dateType])+' '+b.markedUntil:'제품 표시기한: 확인 필요'}${b.nextInspection?' · '+(isDraftBatch(b)?'첫 점검 예정일: ':'점검 ')+b.nextInspection:''}</span><button type="button" class="quiet-button batch-remove" data-mode="delete-batch" data-item="${esc(item.id)}" data-batch-id="${esc(b.id)}" data-ready>이 묶음 기록 삭제</button></div>`).join('');
-    return `<article class="item personal-item" id="item-${esc(item.id)}" tabindex="-1"><div class="item-head"><div><h3>${esc(item.name)}</h3><span class="item-tag ${gap?'short':''}">${gap?`보충 ${gap}${esc(item.unit)}`:'기록상 수량 충족'}</span></div><div class="item-number"><strong>${currentQuantity(item)} <span>/ ${item.target}${esc(item.unit)}</span></strong></div></div>${missingExpiry?'<p class="expiry-warning">제품 기한 확인 필요 · 실물 표시와 보관조건을 지금 확인하세요.</p>':''}${draftNote}<p class="item-sub">${esc(schedule(item,bag))} · 주문 중 ${item.orderedQuantity}${esc(item.unit)} (가방 제외)</p><details class="batch-list"><summary>묶음 ${item.batches.length}개 · 날짜·수량 확인</summary>${batches||'<p>실물 묶음이 없습니다.</p>'}</details><div class="actions">${[['take','꺼냈어요'],['order','주문했어요'],['put','실제로 넣었어요'],['edit','수정'],['delete','삭제']].map(([action,label])=>`<button type="button" class="${action==='put'?'action confirm-action':'quiet-button'}" data-mode="${action}" data-item="${esc(item.id)}" data-ready ${action==='take'&&currentQuantity(item)===0?'data-empty disabled':''}>${label}</button>`).join('')}</div></article>`;
+    return `<article class="item personal-item" id="item-${esc(item.id)}" tabindex="-1"><div class="item-head"><div><h3>${esc(item.name)}</h3><span class="item-tag ${gap?'short':''}">${gap?`보충 ${gap}${esc(item.unit)}`:'기록상 수량 충족'}</span></div><div class="item-number"><strong>${currentQuantity(item)} <span>/ ${item.target}${esc(item.unit)}</span></strong></div></div>${missingExpiry?'<p class="expiry-warning">제품 기한 확인 필요 · 실물 표시와 보관조건을 지금 확인하세요.</p>':''}${draftNote}<p class="item-sub">${esc(schedule(item,bag))}${item.orderedQuantity?` · 주문 ${item.orderedQuantity}${esc(item.unit)} (재고 제외)`:''}</p><details class="batch-list"><summary>묶음 ${item.batches.length}개 · 날짜·수량 확인</summary>${batches||'<p>실물 묶음이 없습니다.</p>'}</details><div class="actions">${[['take','꺼냈어요'],['order','주문했어요'],['put','실제로 넣었어요'],['edit','수정'],['delete','삭제']].map(([action,label])=>`<button type="button" class="${action==='put'?'action confirm-action':'quiet-button'}" data-mode="${action}" data-item="${esc(item.id)}" data-ready ${action==='take'&&currentQuantity(item)===0?'data-empty disabled':''}>${label}</button>`).join('')}</div></article>`;
   }).join('')||'<div class="items-empty">해당하는 물품이 없습니다.</div>';
   document.querySelectorAll('.filters [data-filter]').forEach(el=>{const active=el.dataset.filter===filter;el.classList.toggle('selected',active);el.setAttribute('aria-pressed',String(active));});
   readiness();document.querySelectorAll('[data-empty]').forEach(el=>{el.disabled=true;});
@@ -97,7 +98,7 @@ function openEditor(nextMode,id=null,bag=null,base=record,seed=null,batchId=null
     presetId=id;presetToday=localToday();
     const preset=PRESETS.find(p=>p.id===id),rows=previewPreset(base.bag,id,presetToday);
     title=preset.name+' · 구성 미리보기';submit='이 구성으로 시작';
-    body=`<p>성인 1인 시작 예시 · 참고 무게 ${preset.budget}kg, 실측 아님. 선택한 물품 중 없는 항목만 추가합니다. 기존 목표·재고·날짜·주문은 유지합니다.</p><p class="form-help">점검일은 서비스의 초기 관리 설정이며 안전 수명·교체 의무·섭취 가능 기간이 아닙니다. 실물과 제품 지침 확인을 그날까지 미루지 마세요. 제품 표시기한은 모두 미확인입니다. 처방약·개인 의약품 필요는 별도로 확인하세요.</p><p id="preset-summary" role="status" aria-live="polite"></p><div class="preset-rows">${rows.map(r=>`<fieldset data-preset-row="${r.entry.id}" data-existing="${!!r.existing}"><legend><label><input type="checkbox" name="include" checked> ${esc(r.entry.name)}${r.existing?' · 기존 유지':''}</label></legend><p class="form-help">${esc(r.entry.note)}</p><div class="form-grid">${field('목표 수량 ('+r.entry.unit+')','target','number',r.existing?.target??r.target,'required min="1" max="9999" step="1"')}${field('첫 점검 예정일 · 자동 제안, 수정 가능','inspection','date',r.existing?'':r.inspection,'required min="2000-01-01" max="2099-12-31"')}</div><small>${r.existing?'기존 물품의 모든 기록과 날짜를 그대로 유지합니다.':'제품 표시기한: 확인 필요 · 기본 실제 수량 0'}</small></fieldset>`).join('')}</div><label class="confirm-check"><input type="checkbox" name="packed"> 선택한 물품을 표시된 수량만큼 실제로 담았습니다</label><p class="form-help">기본 미선택 · 확인한 경우에도 새 물품에만 실재고를 기록합니다. 제품 기한 확인은 별도로 필요합니다. 적용 직전 전체 가방은 이전 저장 복원으로 되돌릴 수 있습니다.</p>`;
+    body=`<p class="preset-dialog-lead">${preset.items.length}종 · 참고 ${preset.budget}kg</p><p id="preset-summary" role="status" aria-live="polite"></p><div class="preset-rows">${rows.map(r=>`<fieldset data-preset-row="${r.entry.id}" data-existing="${!!r.existing}" class="preset-item"><legend><label><input type="checkbox" name="include" checked> ${esc(r.entry.name)}</label> ${r.existing?'<span class="preset-existing-mark">기존 유지</span>':''}</legend><div class="preset-item-line">${field('목표 수량 ('+r.entry.unit+')','target','number',r.existing?.target??r.target,'required min="1" max="9999" step="1"')}<details class="preset-item-detail"><summary>${r.existing?'기존 기록 유지':`점검 ${esc(r.inspection)} · 수정`}</summary>${field('첫 점검 예정일 · 자동 제안, 수정 가능','inspection','date',r.existing?'':r.inspection,'required min="2000-01-01" max="2099-12-31"')}<p>${esc(r.entry.note)}</p><small>${r.existing?'기존 목표·재고·기한 유지':'제품 표시기한은 실제 제품에서 확인'}</small></details></div></fieldset>`).join('')}</div><label class="confirm-check packed-confirm"><input type="checkbox" name="packed"> 이 물품들을 실제로 모두 담았어요</label><details class="subtle-help"><summary>적용 전에 알아둘 점</summary><p>성인 1인 시작 예시입니다. 참고 무게는 실측 무게나 안전 기준이 아닙니다. 기본 적용은 목표 목록만 생성하며 실제 보유 수량은 0입니다. 위 확인을 선택하면 새 물품에만 실재고를 반영합니다.</p><p>첫 점검 예정일은 앱 관리 제안으로 제품 소비기한이 아닙니다. 실제 제품의 표시기한·보관조건은 따로 확인해야 합니다. 기존 물품의 모든 기록은 유지하며, 적용 직전 상태는 이전 저장 복원으로 되돌릴 수 있습니다.</p></details>`;
   }else if(mode==='add'||mode==='edit'){
     const draft=item??{id:newId(),...(seed??{name:'',category:'other',target:1,unit:'개'}),orderedQuantity:0,batches:[newBatch(0)]};itemId=draft.id;
     title=mode==='add'?'내 물품 등록':'물품 수정';submit=mode==='add'?'가방에 등록':'변경 저장';
