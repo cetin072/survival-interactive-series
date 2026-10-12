@@ -40,7 +40,7 @@ export function OperatorRoadmap({
     <div className="roadmap-time-track">
       <div className="roadmap-track-title"><strong>Month 01 · 돈이 생길 수 있는 엔진 찾기</strong><small>기간 {calendar.today} · 날짜 기준 진행 {calendar.monthCalendarPercent}%</small></div>
       <div className="roadmap-calendar-bar" role="progressbar" aria-label="첫 30일 달력 진행" aria-valuemin={0} aria-valuemax={30} aria-valuenow={calendar.monthDay}><span style={{width:String(calendar.monthCalendarPercent)+'%'}}/></div>
-      <p>날짜 진행률은 **목표 달성률이 아닙니다.** 검증 결과가 없으면 완료로 바뀌지 않습니다.</p>
+      <p>날짜 진행률은 목표 달성률이 아닙니다. 검증 결과가 없으면 완료로 바뀌지 않습니다.</p>
     </div>
     <ol className="roadmap-year-track" aria-label="5년 로드맵">
       {years.map(year=><li key={year.year} className={year.year===currentYear?'current':''} aria-current={year.year===currentYear?'step':undefined}>
