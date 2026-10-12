@@ -89,20 +89,9 @@ def main():
     base=os.environ.get("BAG_LAB_BASE_URL","http://127.0.0.1:8923")
     expected=os.environ.get("BAG_LAB_EXPECTED_SHA")
     http=None
-    if expected:
-        meta_url=base.rstrip("/")+"/deploy-meta.json"
-        for attempt in range(24):
-            try:
-                with urllib.request.urlopen(meta_url,timeout=8) as response:
-                    metadata=json.load(response)
-                if metadata.get("commit_ref")==expected and metadata.get("context")=="deploy-preview":
-                    print("PASS exact Preview metadata:",expected)
-                    break
-            except Exception as exc:
-                if attempt==23:raise
-            time.sleep(5)
-        else:
-            raise AssertionError("Deploy Preview exact SHA did not become ready")
+    if os.environ.get("BAG_LAB_BASE_URL"):
+        from bag_side_remote import verify_remote
+        verify_remote(base,expected)
     else:
         http=ThreadingHTTPServer(("127.0.0.1",8923),partial(QuietHTTP,directory=str(ROOT)))
         thread=Thread(target=http.serve_forever,daemon=True)

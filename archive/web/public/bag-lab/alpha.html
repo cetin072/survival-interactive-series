@@ -13,7 +13,7 @@
 <body>
   <div class="notice"><span class="notice-dot"></span><strong>개인 기록 ALPHA</strong><span>이 브라우저에만 저장 · 실제 알림 없음</span></div>
   <main class="shell">
-    <header class="top"><div class="brand"><span class="brand-symbol" aria-hidden="true">↗</span>나의 생존가방</div><a class="link" href="./">가상 시연 보기</a></header>
+    <header class="top"><div><div class="brand"><span class="brand-symbol" aria-hidden="true">↗</span>나의 생존가방</div><p class="brand-tagline">한 번 준비하고, 꾸준히 돌보는 나만의 비상가방</p></div><div class="mini-bag" aria-hidden="true"><div class="bag-handle"></div><div class="bag-body"><div class="bag-pocket"><div class="bag-pocket-line"></div></div><div class="bag-badge">READY</div></div></div></header>
     <p id="save-status" class="message" role="status" aria-live="polite">저장된 가방을 읽는 중입니다. 아직 수량을 확인하지 않았습니다.</p>
     <div id="load-error" class="error-panel" role="alert" hidden><p>저장소를 읽지 못했습니다. 샘플이나 빈 가방으로 덮어쓰지 않았습니다.</p><button id="reload" type="button" class="quiet-button">최신 기록 다시 읽기</button><button id="raw-export" type="button" class="quiet-button">저장 원본 내보내기</button></div>
     <noscript><p class="error-panel">물품 등록과 로컬 저장에는 JavaScript가 필요합니다. <a href="/knowledge/emergency-supplies-inventory/">비상용품 관리 지식 읽기</a></p></noscript>
@@ -23,6 +23,7 @@
       <button class="bag-tab" type="button" id="tab-learn" role="tab" aria-selected="false" aria-controls="panel-learn" tabindex="-1" data-nav="learn">◎ 생존 지식</button>
     </nav>
     <section id="panel-bag" class="bag-screen" role="tabpanel" aria-labelledby="tab-bag" data-screen="bag">
+      <section id="preset-panel" class="preset-panel" aria-labelledby="preset-title"><h2 id="preset-title">추천 구성으로 한 번에 시작</h2><p class="list-footnote">성인 1인의 편집 가능한 시작 예시 · 공식 완비 기준이 아닙니다.</p><div id="preset-cards" class="preset-cards"></div><p class="list-footnote">참고 무게 · 실측 아님. 적정 운반 중량이나 안전 등급이 아닙니다. 개인 체력·이동 여건에 맞게 덜어내세요. 어린이·고령자·질환자는 개별 준비가 필요합니다.</p></section>
       <section class="status-section"><div class="status-top"><div><p class="status-eyebrow">MY BAG · LOCAL ALPHA</p><h1 id="bag-name">내 가방, <em>지금 상태.</em></h1><p class="status-intro">준비한 만큼 기록하고, 꺼낸 만큼 다시 채워요.</p></div></div>
         <div class="stats">
           <button class="stat" type="button" data-filter="all" data-ready disabled><span class="stat-label">관리하는 물품 ↗</span><span class="stat-value"><span id="item-count">—</span><small>종</small></span><span class="stat-desc">직접 등록한 물품만</span></button>
@@ -40,6 +41,7 @@
     </section>
     <section id="panel-inventory" class="bag-screen" role="tabpanel" aria-labelledby="tab-inventory" data-screen="inventory" hidden>
       <div class="toolbar"><h2>내 가방 물품</h2><button class="action primary-action" type="button" data-command="add" data-ready disabled>＋ 물품 등록</button></div>
+      <button type="button" class="quiet-button" data-command="presets" data-ready disabled>추천 구성 3종으로 한 번에 시작 →</button>
       <details id="catalog-panel" class="catalog-panel" open>
         <summary>추천 준비물 · 8개 분류에서 골라 등록</summary>
         <p class="catalog-intro">재난 대비 초보자를 위한 <strong>한국형 시작 목록</strong>입니다. 기본·선택 항목을 나눠 보여주며, 선택만으로 보유 처리하지 않습니다. 필요 없는 항목은 건너뛰고 나만의 목표 수량을 정하세요.</p>

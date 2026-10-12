@@ -303,7 +303,7 @@ def faults(page,context,url):
     expect(page.locator('#item-count')).to_have_text('—')
     assert page.evaluate("async()=>(await import('./storage.mjs')).readRawRecord()")==raw
     with page.expect_download() as download_info: page.locator('#raw-export').click()
-    assert json.loads(Path(download_info.value.path()).read_text())==raw
+    assert json.loads(Path(download_info.value.path()).read_text(encoding='utf-8'))==raw
     print('PASS fault boundaries: stale tab / aborted quota transaction / concurrent write / future schema preserved / raw recovery export')
 
 def persistent_reopen(p,base,executable):
@@ -326,15 +326,8 @@ def denied_storage(browser,base):
     context.close();print('PASS denied storage: no fake empty/saved state')
 
 def verify_preview(base,expected):
-    for attempt in range(24):
-        try:
-            with urllib.request.urlopen(base.rstrip('/')+'/deploy-meta.json',timeout=8) as response: metadata=json.load(response)
-            if metadata.get('commit_ref')==expected and metadata.get('context')=='deploy-preview':
-                print('PASS exact Alpha Preview SHA:',expected);return
-        except Exception:
-            if attempt==23: raise
-        time.sleep(5)
-    raise AssertionError('Preview exact SHA did not become ready')
+    from bag_side_remote import verify_remote
+    return verify_remote(base,expected)
 
 def main():
     base=os.environ.get('BAG_LAB_BASE_URL','http://127.0.0.1:8924')

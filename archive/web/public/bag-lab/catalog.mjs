@@ -73,7 +73,7 @@ export function seedFor(entry,people=1){
   return {name:entry.name,category:entry.category,unit:entry.unit,target:targetFor(entry,people)};
 }
 export function findOwned(entry,bag){
-  return bag.items.find(item=>item.name.normalize('NFC').toLowerCase()===entry.name.normalize('NFC').toLowerCase())??null;
+  return bag.items.find(item=>item.id==='catalog-'+entry.id || item.name.normalize('NFC').toLowerCase()===entry.name.normalize('NFC').toLowerCase())??null;
 }
 export function entryStatus(entry,bag){
   const item=findOwned(entry,bag);

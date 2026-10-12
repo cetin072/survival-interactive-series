@@ -109,6 +109,21 @@ input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 
 /* BAG-SIDE-01 guided starter: no new framework, same 3 tabs and palette. */
+.top{height:auto;min-height:92px;padding:14px 0}.brand-tagline{font-size:12px;color:#526477;margin:7px 0 0;max-width:360px}
+/* Small independent version of the existing CSS bag illustration. */
+.mini-bag{position:relative;width:64px;height:72px;flex:none}
+.mini-bag .bag-handle{position:absolute;top:0;left:22px;width:24px;height:23px;border:5px solid #52677f;border-radius:12px 12px 0 0}
+.mini-bag .bag-body{position:absolute;top:17px;left:7px;width:52px;height:53px;background:linear-gradient(140deg,#385572,#142438);border:2px solid #52677f;border-radius:13px 13px 10px 10px}
+.mini-bag .bag-pocket{position:absolute;top:26px;left:8px;width:32px;height:17px;border:1px solid #98aec3;border-radius:5px}
+.mini-bag .bag-pocket-line{width:13px;height:2px;background:#ff955d;margin:5px auto}
+.mini-bag .bag-badge{position:absolute;top:7px;left:9px;font-size:6px;font-weight:900;color:#ff955d}
+.preset-panel{margin:6px 0 18px}.preset-panel h2{margin:0;font-size:19px}.preset-panel>.list-footnote{margin:6px 0 10px}
+.preset-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.preset-cards article{display:flex;flex-direction:column;min-width:0;background:#fff;border:1px solid #cad5e1;border-radius:12px;padding:12px}
+.preset-cards h3{margin:0;font-size:16px}.preset-cards p{font-size:12px;color:#526477;flex:1;margin:5px 0}.preset-cards small{font-size:11px;color:#8d431f}.preset-cards button{margin-top:8px;min-height:44px}
+.preset-rows{display:grid;gap:12px}.preset-rows fieldset{margin:0;min-width:0;padding:12px;border:1px solid #cad5e1;border-radius:12px}.preset-rows legend{font-weight:800;overflow-wrap:anywhere;max-width:100%}.preset-rows input[type=checkbox]{width:20px;height:20px;vertical-align:middle}.preset-rows small{color:#526477;font-size:12px}
+#preset-summary{position:sticky;top:-24px;z-index:1;background:#f7f9fc;border-bottom:1px solid #cad5e1;padding:10px 0;font-weight:800}
+.expiry-warning{font-size:12px;color:#873d20;background:#fff0e6;border-radius:7px;padding:7px 9px}.draft-note{color:#284b70;background:#eef3f9;padding:7px 9px;border-radius:7px}
+@media(max-width:740px){.brand-tagline{font-size:11px;max-width:225px}.mini-bag{transform:scale(.85);transform-origin:right center;width:55px}.preset-cards article{padding:9px 7px}.preset-cards h3{font-size:14px}.preset-cards p{font-size:11px}.preset-cards small{font-size:10px}#preset-summary{top:-18px}.preset-rows fieldset{padding:10px}}
 .catalog-overview{display:flex;align-items:center;justify-content:space-between;gap:20px;background:#fff;border:1px solid #cad5e1;border-radius:15px;padding:18px 20px;margin:18px 0}
 .catalog-overview>div{flex:1;min-width:0}.catalog-overview h2{font-size:19px;margin:3px 0 6px}.catalog-overview p{margin:6px 0;font-size:13px;color:#425872}
 .catalog-overview p strong{color:#142438}.catalog-overview small{display:block;font-size:11px;color:#596b80;line-height:1.65}
