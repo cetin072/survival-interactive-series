@@ -335,6 +335,9 @@ jobs:
           CREATE TABLE IF NOT EXISTS survival_ops.illustration_worker_runs(run_id text primary key);
           CREATE TABLE IF NOT EXISTS survival_ops.illustration_vault_items(job_id text primary key, source_sha256 text);
           CREATE TABLE IF NOT EXISTS survival_ops.knowledge_ex001_review_revalidations(id bigint primary key);
+          CREATE OR REPLACE FUNCTION public.archive_illustration_assert_source_fresh(text,text)
+          RETURNS void LANGUAGE plpgsql STABLE
+          AS 'BEGIN RETURN; END';
           GRANT SELECT, INSERT, UPDATE ON survival_ops.illustration_worker_runs TO service_role;
           GRANT SELECT, INSERT, UPDATE, DELETE ON survival_ops.illustration_vault_items TO service_role;
 
