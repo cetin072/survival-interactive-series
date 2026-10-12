@@ -116,10 +116,10 @@ begin
     raise exception 'second eligible recovery did not wait for slot release';
   end if;
 
-  perform public.archive_knowledge_semantic_job_update(j18,'SUBMITTED','HOLD','CI_COMPLETE','SEMANTIC');
+  perform public.archive_knowledge_semantic_job_update(j18,'SUBMITTED','FINALIZING');
 
   -- A waiting content PR never dispatches again merely because time passes.
-  perform public.archive_knowledge_semantic_job_update(j18,'HOLD','PR_OPEN',null,null,999,'knowledge/worker/ci',repeat('2',40));
+  perform public.archive_knowledge_semantic_job_update(j18,'FINALIZING','PR_OPEN',null,null,999,'knowledge/worker/ci',repeat('2',40));
   if survival_ops.dispatch_knowledge_semantic_finalizer() is not null
     or survival_ops.dispatch_knowledge_semantic_finalizer() is not null
     or (select status from survival_ops.knowledge_semantic_jobs where job_id=j18) <> 'PR_OPEN'

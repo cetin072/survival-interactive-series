@@ -66,13 +66,13 @@ begin
     end if;
   end if;
 
-  -- PR_OPEN is reconciled on GitHub state/check/code changes or explicit recovery. -- Time alone must never enqueue another identical PR reconciliation.
+  -- PR_OPEN is reconciled on GitHub state/check/code changes or explicit recovery.
+  -- Time alone must never enqueue another identical PR reconciliation.
   if not exists (
     select 1
     from survival_ops.knowledge_semantic_jobs
     where status = 'SUBMITTED'
       or (status = 'FINALIZING' and finalizing_at < pg_catalog.clock_timestamp() - interval '15 minutes')
-
   ) then
     return null;
   end if;
@@ -87,8 +87,7 @@ begin
         finalizer_dispatch_at = pg_catalog.clock_timestamp(),
         finalizer_dispatch_request_id = request_id
   where status = 'SUBMITTED'
-    or (status = 'FINALIZING' and finalizing_at < pg_catalog.clock_timestamp() - interval '15 minutes')
-;
+    or (status = 'FINALIZING' and finalizing_at < pg_catalog.clock_timestamp() - interval '15 minutes');
 
   return request_id;
 end;
