@@ -41,11 +41,11 @@ def permission_checks(browser,base):
                 identifier=session.send('Target.getTargetInfo')['targetInfo']['browserContextId']
                 session.send('Browser.setPermission',{'permission':{'name':'notifications'},'setting':'denied','origin':base,'browserContextId':identifier})
             alpha.ready(pg,alpha.address(base));controlled(pg)
-            assert pg.evaluate('Notification.permission')==permission
+            actual=pg.evaluate('Notification.permission');assert actual==permission,f'Notification permission expected {permission}, observed {actual} on {browser.version}'
             before=alpha.stored(pg)
             pg.locator('[data-nav="settings"]').click()
             expect(pg.locator('#reminder-time-label')).to_be_hidden();expect(pg.locator('#reminder-settings')).to_be_hidden()
-            pg.locator('#reminder-enabled').check()
+            pg.locator('#reminder-enabled').click()
             if permission=='denied':
                 expect(pg.locator('#reminder-permission')).to_have_text('권한 거부됨');expect(pg.locator('#reminder-enabled')).not_to_be_checked();expect(pg.locator('#reminder-test')).to_be_disabled()
             else:
@@ -76,13 +76,15 @@ def main():
         root=Path(temp)/'public';shutil.copytree(ROOT,root)
         server,local=serve(root);other,otherbase=serve(root)
         base=remote or local
-        kwargs={'headless':True,'args':['--no-sandbox']}
+        kwargs={'headless':True,'channel':'chromium','args':['--no-sandbox']}
         if os.environ.get('PLAYWRIGHT_CHROMIUM_EXECUTABLE'):kwargs['executable_path']=os.environ['PLAYWRIGHT_CHROMIUM_EXECUTABLE']
         browser=p.chromium.launch(**kwargs)
         try:
-            context=p.chromium.launch_persistent_context(str(Path(temp)/'profile'),**kwargs,viewport={'width':390,'height':844},locale='ko-KR');page=context.pages[0];errors=[]
+            context=p.chromium.launch_persistent_context(str(Path(temp)/'profile'),**kwargs,viewport={'width':390,'height':844},locale='ko-KR');page=context.pages[0];errors=[];navigations=[]
+            page.on('framenavigated',lambda frame:navigations.append(frame.url) if frame==page.main_frame else None)
             page.on('pageerror',lambda error:errors.append(str(error)))
-            alpha.ready(page,alpha.address(base));controlled(page)
+            alpha.ready(page,alpha.address(base));controlled(page);page.wait_for_timeout(300)
+            assert len(navigations)==1,navigations # Initial SW claim never reloads the first screen.
             manifest=page.evaluate('async()=>await (await fetch("/bag-lab/manifest.webmanifest")).json()')
             assert manifest['display']=='standalone' and manifest['scope']=='/bag-lab/' and manifest['start_url']=='/bag-lab/alpha.html'
             for icon in manifest['icons']:
