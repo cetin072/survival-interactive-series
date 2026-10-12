@@ -25,5 +25,23 @@
     "next_run_time": null,
     "prompt_exact_readback": true
   },
-  "collection": null
+  "collection": {
+    "status": "READY_FOR_PROVIDER_COMPLETE",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_0000000096ec82308abc6bd77d70b3b2",
+    "source_library_file_id": "libfile_c4157943b3508191ad71c50de3062b71",
+    "source_version_id": null,
+    "source_sha256": "2b9e1ba133645a0d82867341cebc56b122510792a75071476fc03fff77f766b1",
+    "source_width": 1024,
+    "source_height": 1536,
+    "source_size_bytes": 2260575,
+    "source_modified_at": "2026-10-12T20:41:46.007350Z",
+    "observed_at": "2026-10-12T21:28:07.903Z",
+    "png_verify": true,
+    "png_full_decode": true,
+    "provider_complete": {
+      "p_job_id": "illustration-char-hayoung-e370231d4ed7-20261013-38304611827",
+      "p_prompt_sha256": "c230581edc1d3d9a499a360f8581d0cb2d0e903cbda8687cd1c0da3a68407a25"
+    }
+  }
 }
