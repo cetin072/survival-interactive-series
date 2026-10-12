@@ -23,8 +23,11 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - name: Install SDK target and build tools
-        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: '13114758'
+          packages: 'platform-tools platforms;android-36 build-tools;35.0.0 build-tools;36.0.0'
+          log-accepted-android-sdk-licenses: false
       - name: Native wall-clock and missed-date policy
         run: |
           mkdir -p "$RUNNER_TEMP/bag-native-tests"
@@ -38,7 +41,12 @@ jobs:
         run: npm run sync
       - name: Build debug APK (no production signing or deploy)
         working-directory: bag-mobile/android
-        run: ./gradlew assembleDebug --no-daemon --max-workers=2
+        run: |
+          set -o pipefail
+          ./gradlew assembleDebug --no-daemon --max-workers=2 2>&1 | tee "$RUNNER_TEMP/bag-android-build.log" || {
+            python -c 'import os,pathlib; text="\n".join(pathlib.Path(os.environ["RUNNER_TEMP"],"bag-android-build.log").read_text().splitlines()[-60:]); print("::error title=BAG Android build::"+text.replace("%","%25").replace("\n","%0A"))'
+            exit 1
+          }
       - uses: actions/upload-artifact@v4
         with:
           name: bag-side-debug-${{ github.event.pull_request.head.sha || github.sha }}

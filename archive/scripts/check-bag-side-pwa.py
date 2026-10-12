@@ -114,4 +114,11 @@ def main():
                 ctx=p.chromium.launch_persistent_context(profile,**args);ctx.set_offline(True);pg=ctx.pages[0];alpha.ready(pg,alpha.address(base));assert alpha.stored(pg)==before;ctx.close()
             print('PASS browser PROCESS close + offline cold start preserves BAG record',flush=True)
         finally:browser.close();server.shutdown();other.shutdown()
-if __name__=='__main__':main()
+if __name__=='__main__':
+    try: main()
+    except Exception:
+        if os.environ.get('GITHUB_ACTIONS')=='true':
+            import traceback
+            message=traceback.format_exc().replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+            print('::error title=BAG PWA evidence::'+message,flush=True)
+        raise
