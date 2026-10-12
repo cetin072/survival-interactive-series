@@ -109,11 +109,12 @@ export function weekState(logs:RoadmapLog[]|null,week:(typeof weeks)[number]):Ev
     const stages=dayTasks.map(task=>milestoneState(logs,task))
     return stages.some(state=>state==='WORKING'||state==='DRAFT'||state==='RECORDED')?'WORKING':'NO_EVIDENCE'
   }
-  const targetPhase={
+  const phases: Record<number,string>={
     2:'WEEK_2_FIND_THE_ACTION',
     3:'WEEK_3_FIND_THE_TRAFFIC',
     4:'WEEK_4_FIND_THE_ENGINE',
-  }[week.index]
+  }
+  const targetPhase=phases[week.index]
   return logs.some(log=>log.cycle_key===ROADMAP_CYCLE&&log.phase===targetPhase)
     ?'WORKING':'NO_EVIDENCE' // Arbitrary COMPLETED log is not a verified experiment result.
 }
