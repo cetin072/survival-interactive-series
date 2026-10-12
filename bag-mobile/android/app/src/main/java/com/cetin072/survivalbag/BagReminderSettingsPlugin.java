@@ -1,6 +1,7 @@
 package com.cetin072.survivalbag;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.provider.Settings;
 import android.app.Activity;
 import androidx.activity.result.ActivityResult;
@@ -14,6 +15,17 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 
 @CapacitorPlugin(name = "BagReminderSettings")
 public class BagReminderSettingsPlugin extends Plugin {
+    @PluginMethod
+    public void openKnowledge(PluginCall call) {
+        String path = call.getString("path", "");
+        if (!path.startsWith("/knowledge/") || path.contains("..") || path.contains("\\")) {
+            call.reject("지식 경로가 올바르지 않습니다."); return;
+        }
+        try {
+            getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://survival-diary-archive.netlify.app" + path)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            call.resolve();
+        } catch (Exception error) { call.reject("지식 페이지를 열지 못했습니다.", error); }
+    }
     @PluginMethod
     public void exportJson(PluginCall call) {
         String name = call.getString("name");
