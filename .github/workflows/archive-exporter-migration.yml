@@ -338,6 +338,10 @@ jobs:
           CREATE OR REPLACE FUNCTION public.archive_illustration_assert_source_fresh(text,text)
           RETURNS void LANGUAGE plpgsql STABLE
           AS 'BEGIN RETURN; END';
+          ALTER TABLE survival_ops.illustration_render_jobs
+            ADD COLUMN IF NOT EXISTS ingest_expected_chunk_count smallint;
+          ALTER TABLE survival_ops.illustration_render_jobs
+            ADD COLUMN IF NOT EXISTS ingest_uploaded_chunk_count smallint NOT NULL DEFAULT 0;
           GRANT SELECT, INSERT, UPDATE ON survival_ops.illustration_worker_runs TO service_role;
           GRANT SELECT, INSERT, UPDATE, DELETE ON survival_ops.illustration_vault_items TO service_role;
 
