@@ -5,6 +5,7 @@ import { OperatorKnowledgeInbox } from './OperatorKnowledgeInbox'
 import { OperatorKnowledgeDetail } from './OperatorKnowledgeDetail'
 import { OperatorIllustrationVault } from './OperatorIllustrationVault'
 import { OperatorBunkerOsDashboard } from './OperatorBunkerOsDashboard'
+import type { RoadmapLog } from './operatorRoadmapModel'
 import { supabaseClient } from './supabaseClient'
 import { operatorPasswordRedirectUrl, validatePasswordChange } from './operatorPassword'
 import './operator.css'
@@ -40,6 +41,8 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
   const [confirmPassword, setConfirmPassword] = useState('')
   const [inbox, setInbox] = useState<Inbox>(emptyInbox)
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null)
+  const [roadmapLogs, setRoadmapLogs] = useState<RoadmapLog[] | null>(null)
+  const [roadmapError, setRoadmapError] = useState('')
   const [productionStatus, setProductionStatus] = useState<ProductionStatus>({ release: null, deploy: null })
   const [statusError, setStatusError] = useState('')
   const [selected, setSelected] = useState<ReviewDetail | null>(null)
@@ -52,13 +55,15 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
 
   const refresh = useCallback(async () => {
     if (!supabaseClient) return
-    setBusy(true); setRefreshing(true); setError(''); setStatusError('')
+    setBusy(true); setRefreshing(true); setError(''); setStatusError(''); setRoadmapError('')
     try {
-      const [inboxResult, systemResult, release, deploy] = await Promise.all([
+      const [inboxResult, systemResult, release, deploy, roadmapResult] = await Promise.all([
         supabaseClient.rpc('archive_operator_review_inbox'),
         supabaseClient.rpc('archive_operator_system_status'),
         readJson<ReleaseMarker>('/release/production.json'),
         readJson<DeployMeta>('/deploy-meta.json'),
+        // Existing permission-checked Bunker OS RPC, without new DB or scheduler.
+        supabaseClient.rpc('archive_operator_bunker_os_logs', { p_status: null, p_limit: 100 }),
       ])
       if (inboxResult.error) setError(rpcError(inboxResult.error))
       else setInbox((inboxResult.data ?? emptyInbox) as Inbox)
@@ -68,6 +73,14 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
       }
       else setSystemStatus(systemResult.data as SystemStatus)
       setProductionStatus({ release, deploy })
+      if (roadmapResult.error) {
+        setRoadmapLogs(null)
+        setRoadmapError('로드맵 작업 기록을 확인할 수 없습니다. 나중에 다시 조회하세요.')
+      } else {
+        const payload = roadmapResult.data as { logs?: RoadmapLog[] } | null
+        setRoadmapLogs(Array.isArray(payload?.logs) ? payload.logs : null)
+        if (!Array.isArray(payload?.logs)) setRoadmapError('작업 기록 응답을 확인하지 못했습니다.')
+      }
       setLastRefreshedAt(new Date().toISOString())
     } finally {
       setRefreshing(false)
@@ -100,7 +113,7 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
       setUser(session?.user ?? null)
       if (!session?.user) {
         initialDashboardLoaded.current = false
-        setInbox(emptyInbox); setSelected(null)
+        setInbox(emptyInbox); setSelected(null); setRoadmapLogs(null); setRoadmapError('')
       }
     })
     return () => { alive = false; listener.subscription.unsubscribe() }
@@ -205,6 +218,8 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
     error={error}
     statusError={statusError}
     inbox={inbox}
+    roadmapLogs={roadmapLogs}
+    roadmapError={roadmapError}
     systemStatus={systemStatus}
     productionStatus={productionStatus}
     selected={selected}
