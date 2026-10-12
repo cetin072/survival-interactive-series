@@ -126,6 +126,29 @@ Extractor/Reviewer/finalizer safeguards remain unchanged.
 
 ## Publication reconciliation and graph drift
 
+### Explicit single-label recovery
+
+For an exact `BLOCKED / WIKI_NEW_NAME_NOT_IN_EVIDENCE` job, the service-only
+`archive_a_wiki_native_job_correct_label(job_id, correction)` RPC may append one
+immutable nullable `label_correction` and resume `EXTRACTOR_SUBMITTED`. The version
+`a-wiki-label-correction-v1` binds the native Job ID, original DB result and prepared
+SHA, source/Graph SHA, node key, old/new label, original citation ID, GM block ID
+and explicit approval reason. Verify current main Source/Graph before calling it.
+The new label must occur continuously in the exact cited GM quote. Only a new
+character/location label is eligible; no changes to quotes, facts or relationships.
+
+The guard permits only that validated transition with all other fields unchanged.
+The original RAW, prepared job, result, timestamps and SHA remain immutable in the
+recovery. An identical replay is a no-op even after later stages; a different
+correction is rejected. It cannot retry a subsequent semantic blocker. The unique
+source/Graph contract and graph-drift-only reprepare path remain unchanged.
+
+The Program compiler overlays only the label on a clone, retains the original
+canonical result hash, and hashes the correction into the proposal/review package.
+Existing citation normalization and full semantic validation still run; independent
+Reviewer approval remains mandatory. The DB record plus proposal SHA (also bound
+by the final receipt) preserve the correction audit trail.
+
 `prepare` checks the durable job ledger **before** returning `NO_JOB`. A source
 may have been independently reviewed and merged outside the Native handoff.
 In that case the program verifies the exact source/PART, fact and receipt bytes

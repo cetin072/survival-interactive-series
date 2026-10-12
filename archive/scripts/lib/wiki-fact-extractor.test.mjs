@@ -8,7 +8,7 @@ import { discoverWikiSources, discoverWikiSource } from './wiki-semantic-jobs.mj
 import { createAppliedWikiTestSnapshot } from './test-applied-wiki-snapshot.mjs'
 import { buildWikiFactJob, buildWikiFactReviewJob, compileWikiFactProposal, extractWikiFacts, reviewWikiFactProposal, validateWikiFactReview, WIKI_RESULT_VERSION, WIKI_REVIEW_VERSION } from './wiki-fact-extractor.mjs'
 import { runWikiFactCli } from '../run-wiki-fact-extractor.mjs'
-import { normalizeWikiCitationIds } from './wiki-fact-extractor.mjs'
+import { normalizeWikiCitationIds, applyWikiLabelCorrection } from './wiki-fact-extractor.mjs'
 
 const root = resolve(import.meta.dirname, '../../..')
 const appliedSnapshot = await createAppliedWikiTestSnapshot(root)
@@ -41,6 +41,64 @@ function fixture(session = 'SESSION_008', person = '시험인물') {
 function rejection(name, edit, pattern = /WIKI_/) {
   test(name, () => { const f = fixture(); edit(f); assert.throws(() => compileWikiFactProposal(f.job, f.result), pattern) })
 }
+
+function correctionFixture() {
+  const f = fixture()
+  f.result.nodes[1].label = '요약된 작업장'
+  f.binding = { job_id: '00000000-0000-0000-0000-000000000001',
+    extractor_result_sha256: 'd'.repeat(64), prepared_job_sha256: 'e'.repeat(64) }
+  f.correction = { version: 'a-wiki-label-correction-v1', ...f.binding,
+    source_sha256: f.job.source.manifest_sha256, graph_sha256: f.job.graph_sha256,
+    node_key: 'new:place', old_label: '요약된 작업장', new_label: '시험작업장',
+    citation_id: 'q1', block_id: '001', reason: 'Explicitly approved source name.' }
+  f.options = { labelCorrection: f.correction, nativeBinding: f.binding }
+  return f
+}
+
+test('one approved label overlay preserves originals, facts and original-result hash; review binds the audit', () => {
+  const f = correctionFixture(), original = structuredClone(f)
+  assert.throws(() => compileWikiFactProposal(f.job, f.result), /WIKI_NEW_NAME_NOT_IN_EVIDENCE/)
+  const view = applyWikiLabelCorrection(f.job, f.result, f.correction, f.binding)
+  const expected = structuredClone(f.result)
+  expected.nodes[1].label = '시험작업장'
+  assert.deepEqual(view, expected)
+  const proposal = compileWikiFactProposal(f.job, f.result, f.options)
+  assert.equal(proposal.result_sha256, graphHash(f.result))
+  assert.deepEqual(proposal.label_correction, f.correction)
+  assert.deepEqual(buildWikiFactReviewJob(f.job, proposal).proposal.label_correction, f.correction)
+  assert.equal(proposal.facts.nodes[1].id, compileWikiFactProposal(f.job, expected).facts.nodes[1].id)
+  assert.equal(proposal.facts.relations[0].to, proposal.facts.nodes[1].id)
+  assert.deepEqual(compileWikiFactProposal(f.job, f.result, f.options), proposal)
+  assert.deepEqual(f, original)
+})
+
+test('label overlays reject every mismatched binding, target, quote or field', () => {
+  for (const edit of [
+    { job_id: 'other' }, { extractor_result_sha256: 'f'.repeat(64) },
+    { prepared_job_sha256: 'f'.repeat(64) }, { source_sha256: 'f'.repeat(64) },
+    { graph_sha256: 'f'.repeat(64) }, { node_key: 'new:other' }, { old_label: 'wrong' },
+    { new_label: '없는 시설' }, { citation_id: 'q2' }, { block_id: '003' },
+    { reason: '' }, { extra: 'forbidden' },
+  ]) {
+    const f = correctionFixture()
+    Object.assign(f.correction, edit)
+    assert.throws(() => compileWikiFactProposal(f.job, f.result, f.options), /WIKI_/)
+  }
+  const f = correctionFixture()
+  assert.throws(() => compileWikiFactProposal(f.job, f.result, { labelCorrection: f.correction }), /BINDING_INVALID/)
+})
+
+test('label overlay cannot excuse unrelated missing evidence, collisions or non-GM quotes', () => {
+  for (const edit of [
+    (f) => { f.result.nodes[0].evidence.summary = ['missing'] },
+    (f) => { f.result.nodes[0].label = '근거 없는 이름' },
+    (f) => { f.result.citations[0].quote += '조작' },
+    (f) => { f.result.nodes.push(structuredClone(f.result.nodes[1])) },
+  ]) {
+    const f = correctionFixture(); edit(f)
+    assert.throws(() => compileWikiFactProposal(f.job, f.result, f.options), /WIKI_/)
+  }
+})
 
 test('generic adapter accepts a previously unknown session and stable entity identities', async () => {
   for (const session of ['SESSION_008', 'SESSION_032', 'SESSION_999']) {
