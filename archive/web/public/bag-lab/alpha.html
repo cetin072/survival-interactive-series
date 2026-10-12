@@ -23,39 +23,45 @@
       <button class="bag-tab" type="button" id="tab-learn" role="tab" aria-selected="false" aria-controls="panel-learn" tabindex="-1" data-nav="learn">◎ 생존 지식</button>
     </nav>
     <section id="panel-bag" class="bag-screen" role="tabpanel" aria-labelledby="tab-bag" data-screen="bag">
-      <section id="preset-panel" class="preset-panel" aria-labelledby="preset-title"><h2 id="preset-title">추천 구성으로 한 번에 시작</h2><p class="list-footnote">성인 1인의 편집 가능한 시작 예시 · 공식 완비 기준이 아닙니다.</p><div id="preset-cards" class="preset-cards"></div><p class="list-footnote">참고 무게 · 실측 아님. 적정 운반 중량이나 안전 등급이 아닙니다. 개인 체력·이동 여건에 맞게 덜어내세요. 어린이·고령자·질환자는 개별 준비가 필요합니다.</p></section>
-      <section class="status-section"><div class="status-top"><div><p class="status-eyebrow">MY BAG · LOCAL ALPHA</p><h1 id="bag-name">내 가방, <em>지금 상태.</em></h1><p class="status-intro">준비한 만큼 기록하고, 꺼낸 만큼 다시 채워요.</p></div></div>
+      <section id="preset-panel" class="preset-panel" aria-labelledby="preset-title">
+        <h2 id="preset-title">추천 구성으로 한 번에 시작</h2>
+        <p class="preset-intro">하나 고르고, 나에게 맞게 수정하세요.</p>
+        <div id="preset-cards" class="preset-cards"></div>
+        <p class="preset-note">선택하면 <strong>준비 목록</strong>이 만들어집니다. 실제 담은 물품은 직접 확인해요.</p>
+        <details class="subtle-help"><summary>무게·추천 기준 알아보기</summary><p>10·15·18kg은 실측 무게가 아닌 참고 예산입니다. 적정 운반 중량이나 안전 등급을 뜻하지 않습니다. 성인 1인의 시작 예시이며 개인 체력·계절·이동 상황에 맞게 바꾸고, 어린이·고령자·건강상 필요는 별도로 확인하세요.</p></details>
+      </section>
+      <section class="status-section"><div class="status-top"><div><h1 id="bag-name">내 가방, <em>지금 상태.</em></h1></div></div>
         <div class="stats">
-          <button class="stat" type="button" data-filter="all" data-ready disabled><span class="stat-label">관리하는 물품 ↗</span><span class="stat-value"><span id="item-count">—</span><small>종</small></span><span class="stat-desc">직접 등록한 물품만</span></button>
-          <button class="stat stat-alert" type="button" data-filter="short" data-ready disabled><span class="stat-label">보충할 물품 ↗</span><span class="stat-value"><span id="needs-count">—</span><small>종</small></span><span class="stat-desc">실제 가방 수량 기준</span></button>
-          <button class="stat stat-near" type="button" data-filter="soon" data-ready disabled><span class="stat-label">30일 이내 관리 ↗</span><span class="stat-value"><span id="soon-count">—</span><small>종</small></span><span class="stat-desc">경과한 일정도 포함</span></button>
+          <button class="stat" type="button" data-filter="all" data-ready disabled><span class="stat-label">관리하는 물품 ↗</span><span class="stat-value"><span id="item-count">—</span><small>종</small></span></button>
+          <button class="stat stat-alert" type="button" data-filter="short" data-ready disabled><span class="stat-label">보충할 물품 ↗</span><span class="stat-value"><span id="needs-count">—</span><small>종</small></span></button>
+          <button class="stat stat-near" type="button" data-filter="soon" data-ready disabled><span class="stat-label">30일 이내 관리 ↗</span><span class="stat-value"><span id="soon-count">—</span><small>종</small></span></button>
         </div><p id="next-check" class="next-banner">저장된 기록 확인 전입니다.</p>
       </section>
       <section class="catalog-overview" aria-labelledby="catalog-overview-title">
-        <div><p class="catalog-kicker">한국형 추천 준비물 · 초기 등록 안내</p><h2 id="catalog-overview-title">무엇부터 준비할까요?</h2><p>추천 기본 항목 중 <strong id="catalog-ready-count" aria-live="polite" aria-atomic="true">0 / —</strong>종이 <strong>내가 직접 설정한 목표 수량</strong>을 충족했습니다.</p><progress id="catalog-progress" max="100" value="0" aria-label="기본 추천 항목의 개인 목표 수량 충족 비율"></progress><small>준비 완료·72시간 생존 보장이 아닙니다. 추천 물품은 직접 등록하기 전까지 내 가방에 추가되지 않습니다.</small></div>
-        <button class="action primary-action" type="button" data-command="catalog" data-ready disabled>추천 목록에서 시작 →</button>
+        <div><h2 id="catalog-overview-title">기본 항목 충족 <strong id="catalog-ready-count" aria-live="polite" aria-atomic="true">0 / —</strong></h2><progress id="catalog-progress" max="100" value="0" aria-label="기본 추천 항목 중 개인 목표 수량 충족 비율"></progress><small>실제 등록 수량 기준 · 안전 준비 완료를 뜻하지 않아요.</small></div>
+        <button class="action primary-action" type="button" data-command="catalog" data-ready disabled>하나씩 추가 →</button>
       </section>
       <div class="toolbar"><button class="action confirm-action" type="button" data-command="add" data-ready disabled>＋ 내 물품 등록</button><button class="quiet-button" type="button" data-command="backup" data-ready disabled>백업·복원</button></div>
-      <section class="priority-section"><div class="section-heading"><h2>먼저 확인할 물품</h2><small>부족분 우선 · 관리일 순</small></div><div id="upcoming-list" class="upcoming-list"></div></section>
+      <section class="priority-section"><div class="section-heading"><h2>먼저 확인할 물품</h2></div><div id="upcoming-list" class="upcoming-list"></div></section>
       <p class="schedule-hint" id="lead-note">표시기한과 점검일은 안전 보장이 아닌 관리 일정입니다.</p>
     </section>
     <section id="panel-inventory" class="bag-screen" role="tabpanel" aria-labelledby="tab-inventory" data-screen="inventory" hidden>
       <div class="toolbar"><h2>내 가방 물품</h2><button class="action primary-action" type="button" data-command="add" data-ready disabled>＋ 물품 등록</button></div>
-      <button type="button" class="quiet-button" data-command="presets" data-ready disabled>추천 구성 3종으로 한 번에 시작 →</button>
-      <details id="catalog-panel" class="catalog-panel" open>
-        <summary>추천 준비물 · 8개 분류에서 골라 등록</summary>
-        <p class="catalog-intro">재난 대비 초보자를 위한 <strong>한국형 시작 목록</strong>입니다. 기본·선택 항목을 나눠 보여주며, 선택만으로 보유 처리하지 않습니다. 필요 없는 항목은 건너뛰고 나만의 목표 수량을 정하세요.</p>
+      <button type="button" class="quiet-button preset-back-link" data-command="presets" data-ready disabled>← 구성 3종 한 번에 추가</button>
+      <details id="catalog-panel" class="catalog-panel">
+        <summary>추천 물품에서 하나씩 추가 <span class="catalog-summary-hint">49종 · 8분류</span></summary>
+        <p class="catalog-intro">물품을 고른 뒤 실제 수량·기한을 확인해 등록하세요.</p>
         <div class="catalog-family" aria-label="예시 수량 참고 인원"><span>수량 참고 인원</span><button id="family-less" type="button" aria-label="참고 인원 줄이기" data-ready disabled>−</button><output id="family-count">1명</output><button id="family-more" type="button" aria-label="참고 인원 늘리기" data-ready disabled>＋</button></div>
-        <p class="list-footnote">인원 조절은 새로 등록할 때의 <strong>예시 목표 수량</strong>에만 반영됩니다. 기존 물품·실제 재고·백업은 자동 변경되지 않습니다. 물 1L와 간편식 3개 같은 기본값은 충분한 비축량을 뜻하지 않습니다.</p>
+        <details class="subtle-help"><summary>인원·수량 안내</summary><p>인원 조절은 새 물품의 예시 수량에만 적용됩니다. 기존 재고는 변경되지 않습니다. 물 1L·간편식 3개는 충분한 비축량이 아닙니다.</p></details>
         <p class="catalog-swipe-hint">분류를 좌우로 밀어 더 볼 수 있어요 →</p>
         <nav id="catalog-groups" class="catalog-groups" aria-label="추천 물품 분류"></nav>
         <div id="catalog-group-intro" class="catalog-group-intro"></div>
         <div id="catalog-items" class="catalog-items"></div>
-        <p class="list-footnote">참고: <a href="https://www.mois.go.kr/frt/bbs/type002/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000530&amp;nttId=119828" target="_blank" rel="noopener noreferrer">행정안전부 비상시 국민행동요령</a> · <a href="https://old.safekorea.go.kr/idsiSFK/neo/main_m/chk/emergencySupplies.html" target="_blank" rel="noopener noreferrer">국민재난안전포털 비상용품</a>. 이 목록의 분류와 설명·기본/선택 구분은 BAG-SIDE-01이 작성한 시작 예시이며, 정부의 공식 완비 목록이나 안전 인증이 아닙니다.</p>
+        <details class="subtle-help catalog-sources"><summary>출처와 참고 기준</summary><p>기초 참고: <a href="https://www.mois.go.kr/frt/bbs/type002/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000530&amp;nttId=119828" target="_blank" rel="noopener noreferrer">행정안전부 비상시 국민행동요령</a> · <a href="https://old.safekorea.go.kr/idsiSFK/neo/main_m/chk/emergencySupplies.html" target="_blank" rel="noopener noreferrer">국민재난안전포털 비상용품</a>. 물품 분류와 기본·선택 표시는 앱의 시작 예시이지 공식 완비 기준이 아닙니다.</p></details>
       </details>
       <div class="filters" aria-label="상태 필터"><button type="button" data-filter="all" aria-pressed="true" class="selected">전체</button><button type="button" data-filter="short" aria-pressed="false">보충 필요</button><button type="button" data-filter="soon" aria-pressed="false">30일 이내</button></div>
       <div id="item-list" class="items"></div>
-      <p class="list-footnote">주문 수량은 가방 수량에 포함하지 않습니다. 기한이 다른 새 물품은 새 묶음으로 넣어주세요.</p>
+      <details class="subtle-help"><summary>수량·묶음 계산 기준</summary><p>주문은 실제 보유량이 아닙니다. 같은 표시기한·점검일이면 보충 수량을 합치고, 다르면 별도 묶음으로 관리합니다.</p></details>
       <details id="backup-panel" class="backup-panel"><summary>백업·복원 / 가방 설정</summary>
         <p>기록은 이 기기·브라우저·사이트 주소에만 저장됩니다. 시크릿 모드, 사이트 데이터 삭제, 기기 교체 등에 대비해 JSON 백업 파일을 보관하세요. Preview 주소와 본 사이트는 저장소가 다릅니다.</p>
         <div class="toolbar wrap"><button id="export" class="action primary-action" type="button" data-ready disabled>JSON 백업 내려받기</button><label class="file-button">JSON 백업 선택<input id="import" type="file" accept=".json,application/json" data-ready disabled></label><button id="undo" class="quiet-button" type="button" data-ready disabled>이전 저장 복원</button><button type="button" data-command="settings" class="quiet-button" data-ready disabled>가방 설정</button><button type="button" data-command="refresh" class="quiet-button" data-ready disabled>최신 기록 읽기</button></div>
