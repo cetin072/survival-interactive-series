@@ -197,7 +197,55 @@
       "width": 512,
       "height": 512,
       "mime_type": "image/png"
+    },
+    {
+      "point_id": "point-1cdda50112b4df4f34612475282667d290fcee120e54ee38b2fdff5f4767b8de",
+      "generation_key": "generation-2ff606063ff67c43e8c84b044e8cc77574877dd47b579267cc64706b95962364",
+      "subject_id": "char-hajin",
+      "source_sha256": "ec10145f88032e1737d85edcd3a12b4df15c10ac437b1ca3215d47159c3a0eb7",
+      "storage_bucket": "survival-archive-originals",
+      "storage_object_path": "AFTERFALL/point-1cdda50112b4df4f34612475282667d290fcee120e54ee38b2fdff5f4767b8de/generation-2ff606063ff67c43e8c84b044e8cc77574877dd47b579267cc64706b95962364/ec10145f88032e1737d85edcd3a12b4df15c10ac437b1ca3215d47159c3a0eb7.png",
+      "registry_asset_id": "AF-CHAR-1CDDA50112B4DF4F34612475",
+      "derivative_version": "site-png-512-v1",
+      "public_path": "/visual-assets/c7c85d8bc388fb05443f905c6f40c31e54b17c4709a56d93dedb4becb65192a9.png",
+      "sha256": "c7c85d8bc388fb05443f905c6f40c31e54b17c4709a56d93dedb4becb65192a9",
+      "bytes": 146106,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png"
+    },
+    {
+      "point_id": "point-242524d4d637616a562be08013065fa425f4105af5bf6e40ba5cc3ef2be64496",
+      "generation_key": "generation-c5ca43fdd76beae05d81152cf4e4e2d92a61df5be5b2cac9d3690d233b9fc45e",
+      "subject_id": "char-yujin",
+      "source_sha256": "fd9db012a2dbb785a769c1399bd33825d5de0d4d95a812b3e9316bc6d3f1142b",
+      "storage_bucket": "survival-archive-originals",
+      "storage_object_path": "AFTERFALL/point-242524d4d637616a562be08013065fa425f4105af5bf6e40ba5cc3ef2be64496/generation-c5ca43fdd76beae05d81152cf4e4e2d92a61df5be5b2cac9d3690d233b9fc45e/fd9db012a2dbb785a769c1399bd33825d5de0d4d95a812b3e9316bc6d3f1142b.png",
+      "registry_asset_id": "AF-CHAR-242524D4D637616A562BE080",
+      "derivative_version": "site-png-512-v1",
+      "public_path": "/visual-assets/2a123b6dc6c303b8d6bb5ab3343bb288db8f9af0ec9f60a6aafd71a9eab8aac4.png",
+      "sha256": "2a123b6dc6c303b8d6bb5ab3343bb288db8f9af0ec9f60a6aafd71a9eab8aac4",
+      "bytes": 167410,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png"
+    },
+    {
+      "point_id": "point-675f7c0752b50f0e9915ca8ff3f0d65439dd0786c26ae68cf6b9b5c37d5c15cb",
+      "generation_key": "generation-05fe09095e43683495fdfdeba4ddfa7e560407e325ed3c1c58a78410f4d20b00",
+      "subject_id": "char-minho",
+      "source_sha256": "f2ad27ff1a2ffcc873fa236ba3eb0b07d37f12593dc3cf98c8ed257b3457b19d",
+      "storage_bucket": "survival-archive-originals",
+      "storage_object_path": "AFTERFALL/point-675f7c0752b50f0e9915ca8ff3f0d65439dd0786c26ae68cf6b9b5c37d5c15cb/generation-05fe09095e43683495fdfdeba4ddfa7e560407e325ed3c1c58a78410f4d20b00/f2ad27ff1a2ffcc873fa236ba3eb0b07d37f12593dc3cf98c8ed257b3457b19d.png",
+      "registry_asset_id": "AF-CHAR-675F7C0752B50F0E9915CA8F",
+      "derivative_version": "site-png-512-v1",
+      "public_path": "/visual-assets/f3da06854e2b0708e76d22e21d352efa5441abdaede08497129174612ff1d53f.png",
+      "sha256": "f3da06854e2b0708e76d22e21d352efa5441abdaede08497129174612ff1d53f",
+      "bytes": 177126,
+      "width": 512,
+      "height": 512,
+      "mime_type": "image/png"
     }
   ],
-  "content_sha256": "94dd57f83106cd6ff3be18f22d4f4c8030618eb9402cb2a620071f478774be18"
+  "content_sha256": "b9a277de3f4fbc637e25b73e148f60d30f183851e21b1f1e5aa9067ee54f584e"
 }

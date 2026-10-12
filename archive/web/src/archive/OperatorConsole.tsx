@@ -4,6 +4,7 @@ import { OperatorVisualMetadata } from './OperatorVisualMetadata'
 import { OperatorKnowledgeInbox } from './OperatorKnowledgeInbox'
 import { OperatorKnowledgeDetail } from './OperatorKnowledgeDetail'
 import { OperatorIllustrationVault } from './OperatorIllustrationVault'
+import { OperatorBunkerOsDashboard } from './OperatorBunkerOsDashboard'
 import { supabaseClient } from './supabaseClient'
 import { operatorPasswordRedirectUrl, validatePasswordChange } from './operatorPassword'
 import './operator.css'
@@ -28,7 +29,7 @@ const readJson = async <T,>(path: string): Promise<T | null> => {
   }
 }
 
-export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: { view?: 'dashboard' | 'visuals' | 'knowledge' | 'knowledge-detail' | 'vault'; knowledgeJobId?: string }) {
+export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: { view?: 'dashboard' | 'visuals' | 'knowledge' | 'knowledge-detail' | 'vault' | 'bunker-os'; knowledgeJobId?: string }) {
   const [user, setUser] = useState<User | null>(null)
   const [ready, setReady] = useState(false)
   const [email, setEmail] = useState('')
@@ -189,6 +190,7 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
   if (view === 'knowledge') return <OperatorKnowledgeInbox email={user.email} busy={busy} onSignOut={() => void signOut()} />
   if (view === 'knowledge-detail' && knowledgeJobId) return <OperatorKnowledgeDetail jobId={knowledgeJobId} email={user.email} busy={busy} onSignOut={() => void signOut()} />
   if (view === 'vault') return <OperatorIllustrationVault email={user.email} busy={busy} onSignOut={() => void signOut()} />
+  if (view === 'bunker-os') return <OperatorBunkerOsDashboard email={user.email} busy={busy} onSignOut={() => void signOut()} />
 
   if (view === 'visuals') return <section className="operator-page">
     <header className="operator-heading"><div><p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p><h1>시각 제작 메타</h1><p>{user.email} · 이미지 제작과 운영 검수에만 사용하는 내부 메타입니다.</p></div><div className="operator-heading-actions"><a className="operator-secondary" href="/operator/">대시보드로 돌아가기</a><a className="operator-secondary" href="/operator/vault/">일러스트 보관함</a><a className="operator-secondary" href="/operator/knowledge/">Knowledge Inbox</a><button className="operator-secondary" disabled={busy} onClick={() => void signOut()}>로그아웃</button></div></header>

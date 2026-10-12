@@ -75,6 +75,13 @@ test('all existing canonical routes retain original content, SEO, sitemap, downl
     assert.ok(page.includes('data-knowledge-share'))
     assert.ok(page.includes('value="' + esc(url) + '" readonly'))
     assert.ok(page.includes('data-knowledge-share-actions hidden'))
+    assert.match(page, /<section class="knowledge-share"[^>]*data-knowledge-share>/)
+    assert.doesNotMatch(page, /class="knowledge-share-panel"|<summary>공유 옵션<\/summary>/)
+    for (const platform of ['naver', 'x', 'facebook']) {
+      assert.ok(page.includes('data-knowledge-' + platform + '-share target="_blank" rel="noopener noreferrer"'))
+    }
+    assert.ok(page.indexOf('data-knowledge-share-actions hidden') < page.indexOf('id="knowledge-share-url"'))
+
   }
 })
 
@@ -218,9 +225,27 @@ test('canonical index reuses the existing Library UI as static HTML with origina
   const added = { ...projections[0], id: 'K-fixture', slug: 'fixture-new-guide', label: '새 공개 가이드' }
   const html = renderer.renderLibrary([...projections, added])
   assert.ok(html.includes('/knowledge/fixture-new-guide/'))
-  const categoryCount = projections.filter((brief) => brief.topic_id === added.topic_id).length + 1
-  assert.ok(html.includes('<span>' + categoryCount + '개</span>'))
+  const group = renderer.groups([...projections, added]).find((group) => group.guides.some((guide) => guide.id === added.id))
+  const section = html.match(new RegExp('<section[^>]*id="knowledge-' + group.id + '"[^>]*>(.*?)</section>', 's'))[1]
+  assert.ok(section.includes('<span>' + group.guides.length + '개</span>'))
   for (const section of ['생활 대비', '연락·정보', '대피·이동', '공동 대응']) {
     assert.ok(html.includes(section))
+  }
+})
+
+test('an additional topic in a shared category increments only that category', async () => {
+  const data = await loadKnowledge()
+  const projections = (await publicBriefs(data)).map((brief) => publicBriefData(brief, data))
+  const added = { ...projections[0], id: 'K-category-fixture', slug: 'fixture-community-guide', topic_id: 'community-continuity-roles' }
+  const before = renderer.groups(projections)
+  const after = renderer.groups([...projections, added])
+  const community = after.find((group) => group.id === 'community')
+  assert.ok(new Set(community.guides.map((guide) => guide.topicId)).size > 1)
+  const html = renderer.renderLibrary([...projections, added])
+  for (const group of after) {
+    assert.equal(group.guides.length, before.find((item) => item.id === group.id).guides.length + (group.id === 'community' ? 1 : 0))
+    const section = html.match(new RegExp('<section[^>]*id="knowledge-' + group.id + '"[^>]*>(.*?)</section>', 's'))[1]
+    assert.ok(section.includes('<span>' + group.guides.length + '개</span>'))
+    assert.equal(section.includes('/knowledge/fixture-community-guide/'), group.id === 'community')
   }
 })

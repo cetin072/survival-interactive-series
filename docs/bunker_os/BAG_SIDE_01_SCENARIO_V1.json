@@ -1,0 +1,144 @@
+{
+  "schema": "bunker-os-bag-side-01-scenario-v1",
+  "synthetic_only": true,
+  "as_of": "2026-10-11",
+  "bag": {
+    "id": "sample-bag",
+    "name": "가상 생존가방",
+    "locations": 1
+  },
+  "notes": "시험수량은 정책 권고가 아닌 가상 데이터, 표시기한은 안전 보증이 아님.",
+  "items": [
+    {
+      "id": "food",
+      "name": "간편식",
+      "target_quantity": 6,
+      "unit": "개",
+      "batches": [
+        {
+          "id": "food-A",
+          "quantity": 4,
+          "label_date": "2027-04-30",
+          "label_kind": "AS_PRINTED"
+        },
+        {
+          "id": "food-B",
+          "quantity": 2,
+          "label_date": "2027-12-31",
+          "label_kind": "AS_PRINTED"
+        }
+      ]
+    },
+    {
+      "id": "water",
+      "name": "생수",
+      "target_quantity": 2,
+      "unit": "병",
+      "batches": [
+        {
+          "id": "water-A",
+          "quantity": 2,
+          "label_date": "2027-05-31",
+          "label_kind": "AS_PRINTED"
+        }
+      ]
+    },
+    {
+      "id": "flashlight",
+      "name": "손전등",
+      "target_quantity": 1,
+      "unit": "개",
+      "next_check_date": "2026-11-01",
+      "batches": [
+        {
+          "id": "light-A",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "powerbank",
+      "name": "보조배터리",
+      "target_quantity": 1,
+      "unit": "개",
+      "next_check_date": "2026-11-15",
+      "batches": [
+        {
+          "id": "power-A",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "wipes",
+      "name": "위생티슈",
+      "target_quantity": 2,
+      "unit": "개",
+      "batches": [
+        {
+          "id": "wipes-A",
+          "quantity": 2,
+          "label_date": "2027-07-01",
+          "label_kind": "AS_PRINTED"
+        }
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "remove-2",
+      "action": "REMOVE_FROM_BAG",
+      "item_id": "food",
+      "batch_id": "food-A",
+      "quantity": 2,
+      "expected_food_total": 4,
+      "expected_food_shortage": 2
+    },
+    {
+      "id": "ordered-2",
+      "action": "MARK_PURCHASED_ONLY",
+      "item_id": "food",
+      "quantity": 2,
+      "expected_food_total": 4,
+      "expected_food_shortage": 2
+    },
+    {
+      "id": "add-2",
+      "action": "PHYSICALLY_ADD_TO_BAG",
+      "item_id": "food",
+      "batch_id": "food-C",
+      "quantity": 2,
+      "label_date": "2028-03-31",
+      "expected_food_total": 6,
+      "expected_food_shortage": 0
+    },
+    {
+      "id": "snooze",
+      "action": "SNOOZE_NOTIFICATION",
+      "item_id": "food",
+      "expected_food_total": 6,
+      "expected_food_shortage": 0,
+      "preserve_label_dates": true
+    },
+    {
+      "id": "backup",
+      "action": "BACKUP_AND_RESTORE",
+      "preserve_all_state": true
+    }
+  ],
+  "invariants": [
+    "no_negative_quantity",
+    "no_double_remove",
+    "purchase_is_not_placement",
+    "label_date_is_not_safety_guarantee",
+    "preserve_original_batch_dates",
+    "backup_restore_equals_prebackup_state"
+  ],
+  "references": [
+    "https://survival-diary-archive.netlify.app/knowledge/emergency-supplies-inventory/",
+    "https://play.google.com/store/apps/details?id=cz.ember.evakuace",
+    "https://play.google.com/store/apps/details?id=com.zawasystem.moshimono"
+  ],
+  "track": "SIDE_BAG_MANAGEMENT",
+  "main_roadmap_impact": "NONE"
+}

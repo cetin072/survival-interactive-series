@@ -30,6 +30,13 @@
 - 실제 실패한 경우에만 다음 fallback으로 이동하며, 정상 경로가 성공했으면 불필요한 우회·중복 생성·추가 예약을 만들지 않습니다.
 - Production, 보안·인증, 비공개 정보, 원본 훼손, Migration, 대량 삭제 등 비가역 위험이 큰 작업은 실행보다 안전 경계와 복구 가능성을 먼저 확인합니다.
 
+## Bunker OS / 사업·사이트 전략 라우팅
+
+- 생존일기 5년 방향, 실제 벙커 여정, 생존지식 사이트 전략, 수익화, 외부 사업/전략 자료, 사용자 행동 실험을 다룰 때는 `docs/bunker_os/NORTH_STAR.md`, `STRATEGY.md`, `SOURCE_LIBRARY.md`, `DECISION_LOG.md`, `EXPERIMENT_LOG.md`를 현재 Issue와 함께 확인합니다.
+- `NORTH_STAR.md`는 장기 목적과 고정 약속, `STRATEGY.md`는 변경 가능한 현재 가설입니다. 새 자료는 Source → Decision/Experiment → Strategy 순서로 필요한 만큼만 반영합니다.
+- Bunker OS는 게임 Canon/Worldline/GM 규칙을 대체하지 않습니다. 서사 플레이는 아래 Worldline/Boot 라우팅과 각 worldline의 권위 문서가 계속 우선합니다.
+- 기존 Archive/Knowledge/Automation A·B·C의 검증된 백그라운드 운영은 Bunker OS 도입만을 이유로 중단·복제·재구축하지 않습니다.
+
 ## Worldline / Boot 라우팅 — 하드 가드
 
 - 사용자가 정확한 boot/handoff/checkpoint 파일명, worldline 이름, branch 이름, 특정 주인공의 연속 연대기를 명시하면 루트의 기본 부팅 절차보다 **그 명시적 대상이 우선**합니다.
@@ -58,6 +65,7 @@
 - 현재 Draft PR이 있으면 그 범위와 제품 결정을 존중합니다.
 - Preview 전용으로 명시된 PR을 임의로 Ready/merge/Production 배포하지 않습니다.
 - 사용자 승인 전에는 중요한 아키텍처 변경, 유료 API 비용 확대, Canon 영향 변경, main 병합, Production 배포를 하지 않습니다.
+- 사용자 검수용 고정 주소는 기존 Netlify 프로젝트의 `qa-preview` 브랜치 배포입니다. 실제 동기화 및 배포 검증 절차는 [`docs/operations/FIXED_QA_PREVIEW.md`](docs/operations/FIXED_QA_PREVIEW.md)를 따르며, PR별 Deploy Preview와 구분합니다. 브랜치 배포가 아직 활성화되지 않은 경우 사용 가능한 QA라고 보고하지 않습니다.
 
 ## Learning Loop v0 파일럿
 

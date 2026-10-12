@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
-import { humanReviewPackageAllowed, validateReservedBriefTarget, verifyBriefReservation, finalizerAction, reconcilePullRequest, runSemanticFinalizer, semanticBranchRef } from '../knowledge-semantic-finalize.mjs'
+import { assessPublicationChecks, humanReviewPackageAllowed, validateReservedBriefTarget, verifyBriefReservation, finalizerAction, reconcilePullRequest, runSemanticFinalizer, semanticBranchRef } from '../knowledge-semantic-finalize.mjs'
 
 const job = { job_id: '287c20fb-7ad2-41e4-b9be-12426675d234', source_kind: 'PUBLIC_ARCHIVE', source_ref: 'manifest', source_sha256: 'a'.repeat(64), semantic_context: { target: { brief_id: 'K-011', candidate_id: 'KC-test' }, source: { kind: 'PUBLIC_ARCHIVE' } } }
 
@@ -14,6 +14,27 @@ test('human waiting is neither polled nor reconciled by the machine finalizer', 
   const workflow = await readFile(new URL('../../../.github/workflows/knowledge-semantic-finalizer.yml', import.meta.url), 'utf8')
   assert.doesNotMatch(workflow, /\bschedule:|cron:/)
   assert.match(workflow, /workflow_dispatch:/)
+})
+
+test('PR reconciliation is driven by changed checks, head, validation code or explicit recovery', async () => {
+  const workflow = await readFile(new URL('../../../.github/workflows/knowledge-semantic-finalizer.yml', import.meta.url), 'utf8')
+  assert.match(workflow, /types: \[closed\]/)
+  assert.doesNotMatch(workflow, /types: \[synchronize/)
+  assert.match(workflow, /workflow_run:/)
+  assert.match(workflow, /types: \[completed\]/)
+  assert.match(workflow, /push:\s*\n\s+branches: \[main\]/)
+  const sql = await readFile(new URL('../../../supabase/migrations/20261012041500_knowledge_finalizer_event_reconcile.sql', import.meta.url), 'utf8')
+  const dispatch = sql.slice(sql.indexOf('-- PR_OPEN is reconciled'))
+  assert.doesNotMatch(dispatch, /status = 'PR_OPEN'/)
+  assert.match(dispatch, /status = 'SUBMITTED'/)
+  assert.match(dispatch, /status = 'FINALIZING'/)
+})
+
+test('pending checks preserve waiting, definitive failures require recheck, a new successful run clears failure', () => {
+  const failed = { name: 'prepare', status: 'completed', conclusion: 'failure' }
+  assert.deepEqual(assessPublicationChecks([failed]), { code: 'PR_CI_FAILED', recheck_required: true, failed_checks: ['prepare'] })
+  assert.deepEqual(assessPublicationChecks([{ ...failed, status: 'in_progress', conclusion: null }, failed]), { recheck_required: false, checks_pending: true })
+  assert.deepEqual(assessPublicationChecks([{ ...failed, conclusion: 'success' }, failed]), { recheck_required: false, checks_pending: false })
 })
 
 test('worker interruption before submit leaves C-PREPARED job reusable', () => {
