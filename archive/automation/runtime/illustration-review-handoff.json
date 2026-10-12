@@ -11,7 +11,7 @@
   "source_library_file_id": "file_0000000096ec82308abc6bd77d70b3b2",
   "decision": "PASS",
   "review_provider": "native_chatgpt_vision",
-  "review_summary": "Matches the bound character portrait: one Korean woman in her early thirties has a lean, firm build, distinct eyes and facial features, a shallow dimple on one cheek, and long black hair loosely tied at the nape. Rolled sleeves, practical work clothes and apron, relaxed expression and hands, simple contemporary Korean living space, cool blue-gray palette, natural light, realistic proportions, and visible painterly texture satisfy the stored brief. No extra figures, readable text, weapons, gore, fantasy elements, or invented identifying features appear.",
+  "review_summary": "Matches the bound portrait: one Korean woman in her early thirties with a lean, firm build, distinct eyes and features, a shallow cheek dimple, and long black hair loosely tied at the nape. Practical rolled-sleeve work clothes and apron, relaxed pose, simple contemporary Korean living space, cool blue-gray natural light, realistic proportions, and painterly texture match the brief. No extra figures, readable text, weapons, gore, fantasy, or invented identifying features appear.",
   "rejection_codes": [],
   "created_at": "2026-10-12T22:36:09.049Z"
 }
