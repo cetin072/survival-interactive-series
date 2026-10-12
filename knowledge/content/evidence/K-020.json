@@ -1,0 +1,72 @@
+{
+  "claims": [
+    {
+      "claim": "비상 자원의 상태와 이동을 추적·보고하는 목적에는 책임성을 확보하고 자원을 효과적으로 사용하는 일이 포함된다.",
+      "context": "FEMA의 NIMS 자원관리 교육자료는 사고 대응 자원의 추적과 보고를 자원관리 전 과정의 책임성 장치로 설명한다.",
+      "limitation": "미국 NIMS의 공식 교육 원칙을 작은 공동체의 기록 설계에 참고한 것이며, 한국의 개별 조직에 적용되는 법적 의무를 뜻하지 않는다.",
+      "source_ids": [
+        "FEMA-NIMS-RM"
+      ]
+    },
+    {
+      "claim": "승인·보관·기록·검토처럼 양립하기 어려운 책임을 나누면 한 사람이나 한 조직이 거래의 모든 핵심 단계를 통제하는 위험을 줄일 수 있다.",
+      "context": "GAO 내부통제 기준의 직무 분리 원칙을 자원 배분 거래의 역할 설계에 적용했다.",
+      "limitation": "직무 분리만으로 공모나 고의 조작을 완전히 막을 수 없고, 소규모 조직에서는 독립 검토자 지정 같은 보완 통제가 필요할 수 있다.",
+      "source_ids": [
+        "GAO-GREEN-BOOK-2025"
+      ]
+    },
+    {
+      "claim": "거래번호별 수량·금액 통제합계를 독립 출처와 비교하고, 조직 기록과 공급자 기록을 조정하면 누락·중복·설명되지 않는 차이를 찾는 데 도움이 된다.",
+      "context": "GAO 감사 지침의 독립 출처 통제합계와 공급자 기록 조정 사례를 일반적인 재난 자원 거래 대조표로 재구성했다.",
+      "limitation": "구체적인 대조 주기와 승인 한도는 공식 자료가 모든 조직에 동일하게 정하지 않으므로 거래량·위험도·현지 규정에 맞춰 정해야 한다.",
+      "source_ids": [
+        "GAO-PURCHASE-CARD-GUIDE"
+      ]
+    },
+    {
+      "claim": "같은 거래번호 아래 날짜·시각, 승인량, 실제 인도량, 인도·인수 확인, 대가를 맞추고 차이는 예외 목록으로 남기는 방식은 독립 기록 대조를 실행하기 위한 실용적 편집안이다.",
+      "context": "공식 자료의 자원 추적, 직무 분리, 독립 조정 원칙을 독자가 사용할 수 있는 최소 필드로 합성했다.",
+      "limitation": "이 필드 목록은 공식 기관이 제시한 단일 표준 양식이 아니라 근거 원칙을 바탕으로 만든 편집 제안이며, 회계·조달·개인정보·기록보존 규정을 대체하지 않는다.",
+      "source_ids": [
+        "FEMA-NIMS-RM",
+        "GAO-GREEN-BOOK-2025",
+        "GAO-PURCHASE-CARD-GUIDE"
+      ]
+    }
+  ],
+  "source": {
+    "ref": "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_002/SOURCE_MANIFEST.json",
+    "kind": "PUBLIC_ARCHIVE",
+    "refs": [
+      "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_002/PART_001.md"
+    ],
+    "hashes": [
+      "a133745d52e8cdfded1142b6b3a674f2df7b91feb2e858c3f3759ae903016903"
+    ],
+    "sha256": "085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00"
+  },
+  "brief_id": "K-020",
+  "question": "재난 자원 거래에서 독립된 두 기록을 어떻게 대조해야 할까",
+  "unknowns": [],
+  "conflicts": [],
+  "risk_notes": [
+    "일반적인 기록·대조 절차만 다루며 연료의 보관·운송·취급·연소 방법은 다루지 않는다.",
+    "현지 회계·조달·개인정보·기록보존 규정이 있으면 해당 규정과 공식 지시가 우선한다."
+  ],
+  "source_kind": "PUBLIC_ARCHIVE",
+  "source_refs": [
+    "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_002/PART_001.md"
+  ],
+  "candidate_id": "KC-source-manifest-json-f4e4214571",
+  "source_hashes": [
+    "a133745d52e8cdfded1142b6b3a674f2df7b91feb2e858c3f3759ae903016903"
+  ],
+  "policy_version": "knowledge-c3-policy-v1",
+  "copyright_status": "CLEAR",
+  "narrative_context": "허구·서사(narrative)인 《생존일기》에서 연료장 원본과 길드 거래장부를 독립적으로 유지하고 맞춰 보는 장면이 질문의 출발점이다. 작품은 현실 근거로 사용하지 않았다.",
+  "source_manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_002/SOURCE_MANIFEST.json",
+  "story_source_status": "VERIFIED_PUBLIC_ARCHIVE",
+  "narrative_limitation": "작품 속 거래 방식과 대조 주기는 허구·서사(narrative) 설정이며, 현실에서의 효과나 규정 준수를 입증하지 않는다.",
+  "source_manifest_sha256": "085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00"
+}

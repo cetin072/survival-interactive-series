@@ -1,0 +1,35 @@
+{
+  "id": "KC-source-manifest-json-f4e4214571",
+  "source": {
+    "ref": "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_002/SOURCE_MANIFEST.json",
+    "kind": "PUBLIC_ARCHIVE",
+    "refs": [
+      "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_002/PART_001.md"
+    ],
+    "hashes": [
+      "a133745d52e8cdfded1142b6b3a674f2df7b91feb2e858c3f3759ae903016903"
+    ],
+    "sha256": "085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00"
+  },
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-020",
+  "question": "재난 자원 거래에서 독립된 두 기록을 어떻게 대조해야 할까",
+  "topic_id": "community-emergency-resource-management",
+  "risk_level": "LOW",
+  "source_kind": "PUBLIC_ARCHIVE",
+  "source_refs": [
+    "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_002/PART_001.md"
+  ],
+  "risk_domains": [
+    "GENERAL_PREPAREDNESS",
+    "COMMUNICATION"
+  ],
+  "source_hashes": [
+    "a133745d52e8cdfded1142b6b3a674f2df7b91feb2e858c3f3759ae903016903"
+  ],
+  "policy_version": "knowledge-c3-policy-v1",
+  "disposition_note": "기존 K-004는 분산 비상물자의 책임·수량 기록, K-010은 조직 간 자원·비용 합의, K-016은 인수인계를 다룬다. 이 후보는 거래 당사자가 각각 독립 원기록을 유지하고 공통 거래번호·수량·대가를 조정해 불일치를 찾는 절차에 초점을 두므로 실질적으로 구별된다. 재난 자원 배분의 책임성과 이해상충 완화에 직접 쓸 수 있어 BRIEF로 진행한다.",
+  "publication_policy": "AUTO_LOW_RISK",
+  "source_manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_002/SOURCE_MANIFEST.json",
+  "source_manifest_sha256": "085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00"
+}
