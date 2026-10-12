@@ -4,8 +4,8 @@ const numeric=identifier=>{const id=Number(identifier.split('.').at(-1));if(!Num
 export function createAndroidNotificationDriver({notifications,settings,now=Date.now}){
   return {
     newId:()=>{const bytes=new Uint32Array(1);crypto.getRandomValues(bytes);return String(1+bytes[0]%2147483645);},
-    status:async()=>({supported:true,permission:(await notifications.checkPermissions()).display}),
-    permission:async()=> (await notifications.checkPermissions()).display==='granted',
+    status:async()=>{const permission=(await notifications.checkPermissions()).display;const channels=notifications.listChannels?await notifications.listChannels():{channels:[]};const channel=channels.channels.find(c=>c.id===CHANNEL);return {supported:true,permission:channel?.importance===0?'denied':permission};},
+    permission:async()=>{if((await notifications.checkPermissions()).display!=='granted')return false;const channels=notifications.listChannels?await notifications.listChannels():{channels:[]};return channels.channels.find(c=>c.id===CHANNEL)?.importance!==0;},
     requestPermission:async()=>{
       await notifications.createChannel({id:CHANNEL,name:'생존가방 점검',importance:4,description:'실제 보유 물품의 점검·교체 검토 (안전기한 아님)'});
       const current=await notifications.checkPermissions();return current.display==='granted'?current.display:(await notifications.requestPermissions()).display;

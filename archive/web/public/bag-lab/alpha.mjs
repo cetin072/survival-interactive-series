@@ -162,7 +162,8 @@ $('cancel').addEventListener('click',()=>{if(!busy)$('editor').close();});
 $('editor-body').addEventListener('change',()=>{if(mode==='preset')updatePresetSummary();});
 $('editor').addEventListener('cancel',event=>{if(busy)event.preventDefault();});
 window.addEventListener('beforeunload',event=>{if(busy){event.preventDefault();event.returnValue='';}});
-function download(content,name){
+async function download(content,name){
+  if(globalThis.BagAndroidFileExport){await globalThis.BagAndroidFileExport(content,name);return;}
   const url=URL.createObjectURL(new Blob([content],{type:'application/json;charset=utf-8'}));
   const link=document.createElement('a');link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
@@ -180,7 +181,7 @@ document.addEventListener('click',async event=>{
     if(button.id==='reload'||button.dataset.command==='refresh'){await refresh();return;}
     if(button.id==='raw-export'){
       const raw=await readRawRecord();if(raw===undefined)throw new Error('내보낼 저장 원본이 없습니다.');
-      download(JSON.stringify(raw,null,2),'bag-side-01-storage-original.json');message('저장 원본의 다운로드를 요청했습니다. 일반 백업 형식이 아니며 복구 검토용입니다.');return;
+      await download(JSON.stringify(raw,null,2),'bag-side-01-storage-original.json');message('저장 원본의 다운로드를 요청했습니다. 일반 백업 형식이 아니며 복구 검토용입니다.');return;
     }
     if(button.dataset.command==='more'){showScreen('settings');return;}
     if(!record)return;
@@ -212,7 +213,7 @@ document.addEventListener('click',async event=>{
     }
     if(button.dataset.command==='remove-draft'){button.closest('[data-batch]').remove();return;}
     if(button.id==='export'){
-      const latest=await readBag();download(backupText(latest.bag),`bag-side-01-${localToday()}.json`);record=latest;draw();message('JSON 백업 다운로드를 요청했습니다. 다운로드 폴더에 파일이 저장됐는지 확인하세요.');return;
+      const latest=await readBag();await download(backupText(latest.bag),`bag-side-01-${localToday()}.json`);record=latest;draw();message(globalThis.BagAndroidFileExport?'JSON 백업 파일을 선택한 위치에 저장했습니다.':'JSON 백업 다운로드를 요청했습니다. 다운로드 폴더에 파일이 저장됐는지 확인하세요.');return;
     }
     if(button.id==='undo'){
       const base=record,previous=await readPreviousBag();if(!previous)throw new Error('되돌릴 이전 저장 기록이 없습니다.');openEditor('undo',null,previous.bag,base);

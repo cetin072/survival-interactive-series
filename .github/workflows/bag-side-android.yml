@@ -23,7 +23,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - uses: android-actions/setup-android@v3
       - name: Install SDK target and build tools
         run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
       - name: Native wall-clock and missed-date policy

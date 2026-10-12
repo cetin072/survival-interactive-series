@@ -62,6 +62,17 @@ def main():
             cdp=context.new_cdp_session(page);cdp.send('Page.enable');details=cdp.send('Page.getInstallabilityErrors')
             assert details['installabilityErrors']==[],details
             alpha.register(page,'가상 PWA 시험품',2,'equipment',[(1,None,'2030-01-01')]);initial=alpha.stored(page);backup=alpha.backup(page)
+            page.locator('[data-nav="settings"]').click()
+            expect(page.locator('#reminder-time-label')).to_be_hidden();expect(page.locator('#reminder-settings')).to_be_hidden()
+            cdp.send('Browser.setPermission',{'permission':{'name':'notifications'},'setting':'denied','origin':base})
+            page.locator('#reminder-enabled').check();expect(page.locator('#reminder-permission')).to_have_text('권한 거부됨');expect(page.locator('#reminder-enabled')).not_to_be_checked();expect(page.locator('#reminder-test')).to_be_disabled()
+            context.grant_permissions(['notifications'],origin=base)
+            page.locator('#reminder-enabled').check();expect(page.locator('#reminder-permission')).to_have_text('권한 허용됨')
+            details=page.locator('details').filter(has=page.get_by_text('알림 문제 해결·권한 설정',exact=True));details.locator('summary').click()
+            page.locator('#reminder-test').click();expect(page.locator('#reminder-status')).to_contain_text('테스트 알림 요청됨')
+            expect(page.locator('#reminder-count')).to_contain_text('0개');assert alpha.stored(page)==initial
+            page.locator('#reminder-enabled').uncheck();page.locator('[data-nav="inventory"]').click()
+            print('PASS actual browser denied/granted/opt-in/test notification capability; no native-only controls or closed-app web reservations',flush=True)
             # Unrelated caches and root routes are neither owned nor removed.
             page.evaluate('async()=>{await (await caches.open("unrelated-existing-cache")).put("/other.txt",new Response("keep"))}')
             outside=context.new_page();outside.goto(base+'/bag-lab/../');assert outside.evaluate('navigator.serviceWorker.controller') is None
