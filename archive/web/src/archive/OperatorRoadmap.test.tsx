@@ -22,7 +22,7 @@ describe('operator roadmap first-screen display',()=>{
     expect(m.calendar.currentYear).toBe(1)
     expect(m.calendar.currentWeek).toBe(1)
     expect(m.stats).toEqual({recorded:3,draft:1,active:1})
-    expect(m.upcoming?.day).toBe(4)
+    expect(m.upcoming?.day).toBe(5)
     expect(m.weeks[0].state).toBe('WORKING')
     expect(m.weeks[1].state).toBe('NO_EVIDENCE')
   })

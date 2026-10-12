@@ -126,7 +126,10 @@ export function buildRoadmap(logs:RoadmapLog[]|null,today:string) {
     draft:days.filter(task=>task.state==='DRAFT').length,
     active:days.filter(task=>task.state==='WORKING').length,
   }
-  const upcoming=days.find(task=>task.state!=='RECORDED'&&task.state!=='REVIEWED')??null
+  // Prefer an actually active task. Keep provisional research visible as a separate status.
+  const upcoming=days.find(task=>task.state==='WORKING')
+    ??days.find(task=>task.state==='DRAFT')
+    ??days.find(task=>task.state==='NO_EVIDENCE'||task.state==='UNAVAILABLE')??null
   return {
     calendar, days, weeks:weeks.map(week=>({...week,state:weekState(logs,week)})),
     stats, upcoming,

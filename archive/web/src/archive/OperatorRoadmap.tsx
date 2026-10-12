@@ -64,9 +64,9 @@ export function OperatorRoadmap({
       </p>
       <a href={ROADMAP_ISSUE} target="_blank" rel="noreferrer noopener">할 일 원문 ↗</a>
     </div>
+    {error&&<p role="alert" className="roadmap-load-error">{error}</p>}
     <details className="roadmap-evidence-details">
       <summary>1주차 작업 7개와 완료 근거 보기</summary>
-      {error&&<p role="alert" className="roadmap-load-error">{error}</p>}
       <ol>{days.map(item=><li key={item.day}><span>Day {item.day} · {item.title}</span><strong className={'roadmap-state '+stateClass(item.state)}>{stateLabel(item.state)}</strong></li>)}</ol>
       <p>기존 Bunker OS 운영 기록을 로그인 후 읽어 자동 갱신합니다. 현재 '조사 기록'은 원고·사업성과·Production 배포까지 검증됐다는 뜻이 아닙니다.</p>
     </details>
