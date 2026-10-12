@@ -120,4 +120,4 @@ jobs:
           git config user.email archive-illustration-bot@users.noreply.github.com
           git commit -m "archive: prepare site derivative for $subject"
           git push origin "HEAD:$BRANCH"
-          gh pr create             --base main             --head "$BRANCH"             --title "archive: publish site derivative for $subject"             --body "Deterministic 512px derivative prepared from the trusted private original. Source/registry identity and Storage readback were verified before generation. Derivative SHA-256: \`$derivative_sha\`. Production remains controlled by the existing batched release gate."
+          gh pr create             --base main             --head "$BRANCH"             --title "archive: publish site derivative for $subject"             --body "Deterministic proportional derivative prepared from the trusted private original with a 512px long edge and preserved aspect ratio. Source/registry identity and Storage readback were verified before generation. Derivative SHA-256: \`$derivative_sha\`. Production remains controlled by the existing batched release gate."
