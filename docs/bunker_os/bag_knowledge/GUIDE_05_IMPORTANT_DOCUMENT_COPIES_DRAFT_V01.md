@@ -7,9 +7,9 @@ category: documents
 slug: important-document-copies
 title: 중요 서류 사본은 왜 생존가방에 필요할까?
 status: DRAFT_NEEDS_INDEPENDENT_REVIEW
-version: 0.1.0
+version: 0.1.1
 createdAt: 2026-10-12
-updatedAt: 2026-10-12
+updatedAt: 2026-10-13
 reviewedAt: null
 sourceReview: VERIFIED_PAGE_CONTENT_2026_10_12
 linkReview: VERIFIED_TWO_PUBLIC_KNOWLEDGE_PAGES_2026_10_12
@@ -89,10 +89,9 @@ relatedKnowledgeSlugs: [emergency-supplies-inventory]
 - [국민안전24 — 비상대비 국민행동요령](https://safekorea.go.kr/safekorea-kor/acts/nacts/action-guide.do?actsHeaderTitle=%EB%B9%84%EC%83%81%EB%8C%80%EB%B9%84&category=stateOfEmergency&menuSn=4) — 「생존배낭 꾸리기」에서 보험증서·계약서 등 중요 서류를, 비상물자 준비에서 환자의 최근 처방전을 언급합니다. 비상사태 문맥입니다.
 - [미국 적십자사 — Survival Kit Supplies](https://www.redcross.org/get-help/how-to-prepare-for-emergencies/survival-kit-supplies.html) — 보험·주거·의료 관련 개인 문서 사본을 비상용품으로 제시합니다.
 - [Ready.gov — Financial Preparedness](https://www.ready.gov/financial-preparedness) — 보험·의료·재정 기록 접근과 중요 문서 보관, 개인 금융정보 공유 주의를 안내합니다.
-- [개인정보 포털 — 유출신고 안내](https://www.privacy.go.kr/front/wcp/spl/splRptInfo.do) — 제3자가 내용을 알 수 있게 되는 유출 개념을 설명합니다. 가정의 서류 목록을 정하는 자료는 아닙니다.
 
-**출처 범위:** 국내 자료의 중요 서류 안내와 미국 자료의 사본 준비 권고를 구분했습니다. 마스킹·종류별 봉투·교체·폐기 방식은 편집상 권고이며 서류 효력, 보험 보상, 진료 결과를 보장하지 않습니다. 사업자 유출신고 의무를 개인에게 그대로 적용하지 않습니다.
+**출처 범위:** 국내 자료의 중요 서류 안내와 미국 자료의 사본 준비 권고를 구분했습니다. 마스킹·종류별 봉투·교체·폐기 방식은 편집상 권고이며 서류 효력, 보험 보상, 진료 결과를 보장하지 않습니다.
 
 **자료·링크 확인:** 2026-10-12 원문 본문과 응답을 확인했습니다. 내부 글은 공개 URL의 200 응답과 본문, 저장소의 정적 페이지 경로를 확인했습니다. 게시 직전에는 링크를 다시 점검해야 합니다.
 
-**변경 이력:** 2026-10-12 v0.1.0 신규 집필·출처 및 내부 연결 확인. 독립 검수·개별 사용자 승인·게시 전이며 `DRAFT_NEEDS_INDEPENDENT_REVIEW`를 유지합니다.
+**변경 이력:** 2026-10-12 v0.1.0 신규 집필·출처 및 내부 연결 확인. 2026-10-13 v0.1.1 독립 검수 피드백 반영: 개인 독자에게 부적절한 신고용 근거를 제외하고 공식 준비 안내와 편집상 개인정보 보호 권고를 구분함. 독립 재검수·개별 사용자 승인·게시 전이며 `DRAFT_NEEDS_INDEPENDENT_REVIEW`를 유지합니다.
