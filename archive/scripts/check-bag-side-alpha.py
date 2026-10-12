@@ -38,6 +38,7 @@ def confirm_save(page):
         raise
 
 def undo_previous(page):
+    page.locator('[data-nav="settings"]').click()
     page.locator('#undo').click()
     # IndexedDB read is async. A checked checkbox left inside the CLOSED dialog
     # can satisfy Playwright.check() before the new unchecked form is rendered.
@@ -68,14 +69,18 @@ def card(page,name='간편식'):
     return page.locator('.personal-item').filter(has=page.get_by_role('heading',name=name,exact=True))
 
 def backup(page):
-    page.locator('[data-nav="inventory"]').click()
+    page.locator('[data-nav="settings"]').click()
+    expect(page.locator('#panel-settings')).to_be_visible()
     page.locator('#backup-panel').evaluate('(el)=>el.open=true')
     with page.expect_download() as download_info: page.locator('#export').click()
     download=download_info.value
     assert download.failure() is None
-    return Path(download.path()).read_text(encoding='utf-8')
+    raw=Path(download.path()).read_text(encoding='utf-8')
+    page.locator('[data-nav="inventory"]').click()
+    return raw
 
 def select_backup(page,text):
+    page.locator('[data-nav="settings"]').click()
     page.locator('#backup-panel').evaluate('(el)=>el.open=true')
     page.locator('#import').set_input_files({'name':'test-backup.json','mimeType':'application/json','buffer':text.encode('utf-8')})
 
@@ -96,6 +101,39 @@ def no_overflow(page):
         print('OVERFLOW_DIAGNOSTIC',json.dumps(dimensions,ensure_ascii=False),flush=True)
     assert dimensions['scroll']<=dimensions['width']+2,'page horizontal overflow'
     assert dialog_ok,'dialog horizontal overflow'
+
+def check_more_screen(page,width):
+    """Consolidated More tab retains backup, guidance, brand and changelog without rewriting stored data."""
+    before=stored(page)
+    assert page.locator('.bag-tabs [data-nav]').count()==3,'main navigation must remain three tabs'
+    assert page.locator('.bag-tabs .ui-icon').count()==3,'all three tabs need useful icons'
+    page.locator('[data-nav="settings"]').click()
+    expect(page.locator('#panel-settings')).to_be_visible()
+    expect(page.locator('#panel-inventory')).to_be_hidden()
+    expect(page.locator('#backup-panel')).to_be_visible()
+    expect(page.locator('#export')).to_be_visible()
+    expect(page.locator('#undo')).to_be_visible()
+    expect(page.locator('.settings-brand')).to_contain_text('나는')
+    expect(page.locator('.settings-brand')).to_contain_text('THE ART OF BEING READY')
+    expect(page.locator('.settings-copyright')).to_contain_text('© 2026')
+    expect(page.locator('#settings-changes-title')).to_contain_text('업데이트 기록')
+    knowledge=page.locator('a.settings-link').first
+    expect(knowledge).to_have_attribute('href','/knowledge/emergency-supplies-inventory/')
+    assert knowledge.get_attribute('target')=='_blank','knowledge should open without losing the bag screen'
+    details=page.locator('.settings-card .settings-details').first
+    assert not details.evaluate('(el)=>el.open'),'long guidance should be folded initially'
+    details.locator('summary').click()
+    expect(details).to_contain_text('실제 보유량')
+    details.locator('summary').click()
+    assert stored(page)==before,'More screen viewing must not write a bag'
+    no_overflow(page)
+    if width==390:page.screenshot(path=str(REPORT/'alpha-settings-more-390.png'))
+    page.locator('[data-nav="bag"]').click()
+    page.locator('[data-command="backup"]').click()
+    expect(page.locator('#panel-settings')).to_be_visible()
+    expect(page.locator('#backup-panel')).to_be_visible()
+    assert stored(page)==before,'backup shortcut must not modify current inventory'
+    page.locator('[data-nav="bag"]').click()
 
 def check_guided_catalog(page,width):
     """Guidance can prefill a draft but cannot create actual inventory or change backups."""
@@ -178,6 +216,7 @@ def run(browser,width,base):
     assert stored(page)['revision']==0 and stored(page)['bag']['items']==[]
     assert page.locator('#panel-inventory').is_hidden()
     no_overflow(page)
+    check_more_screen(page,width)
     check_guided_catalog(page,width)
     register(page,'간편식',6,'food',[(4,'2027-04-30'),(2,'2027-12-31')])
     register(page,'생수',2,'water',[(2,'2027-05-31')])
@@ -248,10 +287,9 @@ def run(browser,width,base):
     page.screenshot(path=str(REPORT/f'alpha-home-{width}.png'))
     page.locator('[data-nav="bag"]').focus();page.keyboard.press('ArrowRight')
     expect(page.locator('[data-nav="inventory"]')).to_have_attribute('aria-selected','true')
-    page.locator('[data-nav="learn"]').click();expect(page.locator('#panel-learn')).to_be_visible()
+    page.locator('[data-nav="settings"]').click();expect(page.locator('#panel-settings')).to_be_visible()
     # Browser storage remains functional with the already loaded page offline.
     context.set_offline(True)
-    page.locator('[data-nav="inventory"]').click()
     page.locator('[data-command="settings"]').click()
     page.locator('#editor [name="bagName"]').fill('오프라인 시험 가방')
     page.locator('#editor [name="rotationLeadDays"]').fill('30');confirm_save(page)
