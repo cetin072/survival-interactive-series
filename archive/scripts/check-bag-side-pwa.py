@@ -116,15 +116,43 @@ def main():
                 assert page.evaluate('async()=>await caches.keys()')==caches_before
                 context.set_offline(True);page.reload(wait_until='networkidle');assert alpha.stored(page)==offline;context.set_offline(False)
                 # Healthy update activates only on consent, then reloads a whole cohort.
+                editing=context.new_page();editing_errors=[];editing_navigations=[]
+                editing.on('pageerror',lambda error:editing_errors.append(str(error)))
+                editing.on('framenavigated',lambda frame:editing_navigations.append(frame.url) if frame==editing.main_frame else None)
+                alpha.ready(editing,alpha.address(base));controlled(editing)
+                editing.locator('[data-nav="inventory"]').click()
+                alpha.card(editing,'가상 PWA 시험품').locator('[data-mode="edit"]').click()
+                editing.locator('#editor [name="target"]').fill('4')
+                editing.evaluate('window.bagTestControllerChanges=0;navigator.serviceWorker.addEventListener("controllerchange",()=>window.bagTestControllerChanges++)')
                 context.set_offline(True);atomic_text(assets,old);html=root/'bag-lab'/'alpha.html';html.write_text(html.read_text().replace('로컬 기록 Alpha','업데이트 검증 Alpha'))
                 regenerate(root,'synthetic-update-v2');context.set_offline(False);page.wait_for_function('navigator.onLine');update(page)
                 page.wait_for_function('navigator.serviceWorker.getRegistration("/bag-lab/alpha.html").then(r=>!!r.waiting)')
+                editing.wait_for_function('!document.getElementById("pwa-update").hidden')
+                # The modal prevents normal button access; also exercise the handler guard.
+                editing.locator('#pwa-update').evaluate('(button)=>button.click()')
+                expect(editing.locator('#pwa-status')).to_contain_text('먼저 저장하거나 취소')
+                expect(editing.locator('#editor [name="target"]')).to_have_value('4')
+                assert alpha.stored(editing)==offline # input is not a committed inventory write
                 page.locator('[data-nav="settings"]').click();expect(page.locator('#pwa-update')).to_be_visible()
                 page.locator('#pwa-update').click();page.wait_for_function('document.title.includes("업데이트 검증")');assert alpha.stored(page)==offline
+                editing.wait_for_function('window.bagTestControllerChanges===1')
+                expect(editing.locator('#editor')).to_be_visible()
+                expect(editing.locator('#editor [name="target"]')).to_have_value('4')
+                assert len(editing_navigations)==1 # another tab cannot reload an open editor
+                alpha.confirm_save(editing);offline=alpha.stored(editing)
+                assert offline['revision']>initial['revision']
+                assert any(item['target']==4 for item in offline['bag']['items'] if item['name']=='가상 PWA 시험품')
+                assert json.loads(alpha.backup(editing))['bag']==offline['bag']
+                # No automatic deferred reload promise: close editor/save, explicitly reload.
+                context.set_offline(True);alpha.ready(editing,alpha.address(base))
+                assert '업데이트 검증' in editing.title() and alpha.stored(editing)==offline
+                assert not editing_errors,editing_errors
+                editing.close()
                 context.set_offline(True);page.reload(wait_until='networkidle');assert '업데이트 검증' in page.title();assert alpha.stored(page)==offline
                 assert json.loads(alpha.backup(page))['bag']==offline['bag'];context.set_offline(False)
                 second=context.new_page();alpha.ready(second,alpha.address(otherbase));assert alpha.stored(second)['revision']==0;second.close()
                 print('PASS failed mixed update retains previous offline cohort; complete version update retains exact IndexedDB/backup; different origins stay separate',flush=True)
+                print('PASS two-tab synthetic update preserves open editor/unsaved values, committed inventory/JSON and offline explicit reload; integrated Stage 3/4 gate remains pending',flush=True)
             assert not errors,errors
             page.screenshot(path=str(alpha.REPORT/'pwa-reminders-390.png'),full_page=True)
             context.close()

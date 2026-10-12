@@ -76,7 +76,7 @@ npm ci
 npm run build:debug
 ```
 
-`.github/workflows/bag-side-android.yml` builds a debug APK and runs native wall-clock policy tests. It does not sign/release/deploy production or invoke billable physical tests automatically. The workflow follows Worklog's locked-build/artifact pattern, with an isolated package.
+`.github/workflows/bag-side-android.yml` builds a debug APK and runs native wall-clock policy plus simulated Android cancellation/replay regressions. It does not sign/release/deploy production or invoke billable physical tests automatically. The workflow follows Worklog's locked-build/artifact pattern, with an isolated package.
 
 **Physical QA remains an explicit Stage 2 gate.** Required synthetic-device evidence: permission denied/granted/channel blocked; future schedule/dedup; date/time edits; quantity 0; item/batch deletion; JSON restore; storage failure; reopen; ordinary task dismissal; reboot/unlock/update; clock/timezone changes; tap-to-item. Separately document force-stop, Doze and OEM restrictions. A Robo app-touch run alone is not proof of closed-app scheduled delivery or reboot recovery. Original Worklog Test Lab WIF/project/service account must not be borrowed. Repository variable/secret-list access was denied in this session, so Test Lab readiness is unconfirmed.
 
@@ -100,6 +100,8 @@ Current machine checks, CI, actual Preview SHA and device evidence are reported 
 `BagReminderRecoveryTest` runs the actual receiver and Capacitor storage/manager under Robolectric 4.17 at APIs **24, 30, 31, 35, 36**. It records the exact PendingIntent lookup flags, checks missing/repeated cancellation and unrelated-alarm isolation, future-only/idempotent boot replay, cancelled/triggered/past-date suppression, foreign-owner preservation, locked-boot/unlock and wall-clock/timezone reconciliation. Run `cd bag-mobile/android && ./gradlew testDebugUnitTest assembleDebug`; the existing BAG Android workflow now runs these host regressions and retains JUnit XML. These are simulated Android API checks, **not a physical reboot, closed-app delivery, OEM battery or force-stop result**. Stage 2 remains **PARTIAL** until the physical QA gate above is completed.
 
 ### Required Stage 3/4 integrated multi-tab PWA evidence (not yet executed)
+
+The existing `check-bag-side-pwa.py` local synthetic-cohort gate now opens a second tab with an unsaved edit, verifies the update-handler guard, activates from the first tab, checks no editor reload/value loss, commits the edit and compares IndexedDB/JSON after an explicit offline reload. This is automated evidence on the current Alpha fixture, not on merged Stage 3/4 sources. Remote Preview checks do not publish or simulate version changes on the server.
 
 Run on an isolated integration branch and an exact-head per-PR Preview, using only synthetic inventory. Do not publish fixture updates to QA or Production. Record both version SHAs, origin, Chrome/Android versions, controller changes, console errors, before/after DB revision and portable JSON exports. Compare inventory content rather than export timestamps. Include these scenarios in the 1.0 integration browser suite:
 
