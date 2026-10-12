@@ -329,3 +329,13 @@ footer{font-size:11px}
  .settings-brand h3{font-size:22px}
 }
 @media(prefers-reduced-motion:reduce){.settings-link{transition:none}}
+
+/* More: brand first, then one clear preparation action using the existing palette. */
+.settings-guide{background:#fff8f2;border-color:#ecc6a9;border-top:4px solid #f57a3e}
+.settings-guide .settings-guide-primary{background:#f57a3e;border-color:#d9662e;color:#15212f;min-height:72px}
+.settings-guide-primary strong{font-size:15px;font-weight:850}
+.settings-guide-primary small{color:#263e51}
+.settings-guide-primary:hover{background:#ff9255}
+.settings-guide-primary:focus-visible{outline:3px solid #142438;outline-offset:3px}
+#preset-panel{padding:20px;border:1px solid #c6d6e6;border-top:4px solid #f57a3e;border-radius:16px;background:#f5f9fd}
+@media(max-width:740px){#preset-panel{padding:16px 12px}.settings-guide-primary strong{font-size:14px}}

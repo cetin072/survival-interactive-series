@@ -11,6 +11,7 @@ let record=null, screen='bag', filter='all', busy=false, editBase=null, mode=nul
 let catalogGroup='food',familyCount=1; // ephemeral guidance only; NEVER modifies recorded inventory
 let presetId=null,presetToday=null;
 function drawPresets(){
+  $('preset-panel').hidden=record.bag.items.length>0;
   $('preset-cards').innerHTML=PRESETS.map(p=>`<article class="preset-card preset-${esc(p.id)}"><h3>${esc(p.name)}</h3><p>${esc(p.note)}</p><small>${p.items.length}종 · ${p.budget}kg 참고</small><button type="button" class="quiet-button" data-preset="${esc(p.id)}" data-ready>구성 보기 →</button></article>`).join('');
 }
 function updatePresetSummary(){
@@ -20,9 +21,10 @@ function updatePresetSummary(){
   $('preset-summary').textContent=`새로 추가 ${selected.length-kept}종 / 기존 유지 ${kept}종 · 선택하지 않은 기존 물품도 유지`;
   for(const row of rows)for(const input of row.querySelectorAll('[name="target"],[name="inspection"]'))input.disabled=row.dataset.existing==='true'||!row.querySelector('[name="include"]').checked;
 }
-function message(text,failed=false){$('save-status').textContent=text;$('save-status').classList.toggle('failure',failed);}
+function message(text,failed=false){$('save-status').textContent=text.replaceAll('JSON 파일','백업 파일');$('save-status').classList.toggle('failure',failed);}
 function readiness(){document.querySelectorAll('[data-ready]').forEach(el=>{el.disabled=!record||busy||(el.id==='family-less'&&familyCount===1)||(el.id==='family-more'&&familyCount===8);});$('submit').disabled=busy;$('cancel').disabled=busy;}
 function showScreen(next){
+  if(next==='bag')$('preset-panel').hidden=!record||record.bag.items.length>0;
   screen=next;
   document.querySelectorAll('[data-screen]').forEach(el=>{el.hidden=el.dataset.screen!==next;});
   document.querySelectorAll('[data-nav]').forEach(el=>{const active=el.dataset.nav===next;el.classList.toggle('active',active);el.setAttribute('aria-selected',String(active));el.tabIndex=active?0:-1;});
@@ -125,8 +127,8 @@ function openEditor(nextMode,id=null,bag=null,base=record,seed=null,batchId=null
     title=`${item.name} · 기록 삭제`;submit='확인하고 삭제';
     body=`<p>이 물품과 묶음 ${item.batches.length}개의 기록을 삭제합니다. 실물을 버리라는 뜻은 아닙니다. 삭제 직전 기록은 이전 저장 복원으로 되돌릴 수 있습니다.</p><label class="confirm-check"><input name="confirm" type="checkbox" required>이 물품의 기록을 삭제하겠습니다.</label>`;
   }else if(mode==='restore'||mode==='undo'){
-    title=mode==='restore'?'JSON 백업 복원':'이전 저장 복원';submit='확인하고 전체 교체';
-    body=`<p>현재 <strong>${base.bag.items.length}종</strong> → 복원할 가방 <strong>${bag.items.length}종</strong></p><p>가방 이름: <strong>${esc(bag.bagName)}</strong></p><p>현재 기록에 합치지 않고 전체 교체합니다. 적용 직전 기록 1개는 이 브라우저에 남깁니다. 중요한 기록은 먼저 JSON 파일로 백업하세요.</p><label class="confirm-check"><input name="confirm" type="checkbox" required>현재 가방을 위 기록으로 교체하겠습니다.</label>`;
+    title=mode==='restore'?'백업 파일 복원':'이전 저장 복원';submit='확인하고 전체 교체';
+    body=`<p>현재 <strong>${base.bag.items.length}종</strong> → 복원할 가방 <strong>${bag.items.length}종</strong></p><p>가방 이름: <strong>${esc(bag.bagName)}</strong></p><p>현재 기록에 합치지 않고 전체 교체합니다. 적용 직전 기록 1개는 이 브라우저에 남깁니다. 중요한 기록은 먼저 파일로 백업하세요.</p><label class="confirm-check"><input name="confirm" type="checkbox" required>현재 가방을 위 기록으로 교체하겠습니다.</label>`;
   }else if(mode==='settings'){
     title='가방 설정';
     body=`<div class="form-grid">${field('가방 이름','bagName','text',base.bag.bagName,'required maxlength="60"')}${field('표시기한 며칠 전부터 관리할까요?','rotationLeadDays','number',base.bag.rotationLeadDays,'required min="0" max="365" step="1"')}</div><p class="form-help">여유일은 사용자가 정하는 관리 시점입니다. 식품 안전기준이나 섭취 가능 기간이 아닙니다.</p>`;
@@ -186,7 +188,7 @@ document.addEventListener('click',async event=>{
     if(button.dataset.command==='more'){showScreen('settings');return;}
     if(!record)return;
     if(button.dataset.preset){openEditor('preset',button.dataset.preset);return;}
-    if(button.dataset.command==='presets'){showScreen('bag');$('preset-panel').scrollIntoView({block:'start'});$('preset-panel').querySelector('button')?.focus({preventScroll:true});return;}
+    if(button.dataset.command==='presets'){showScreen('bag');$('preset-panel').hidden=false;$('preset-panel').scrollIntoView({block:'start'});$('preset-panel').querySelector('button')?.focus({preventScroll:true});return;}
     if(button.dataset.command==='catalog'){showScreen('inventory');$('catalog-panel').open=true;$('catalog-panel').scrollIntoView({block:'start'});return;}
     if(button.dataset.guideGroup){catalogGroup=button.dataset.guideGroup;draw();return;}
     if(button.id==='family-less'||button.id==='family-more'){familyCount=Math.max(1,Math.min(8,familyCount+(button.id==='family-more'?1:-1)));draw();return;}
@@ -213,7 +215,7 @@ document.addEventListener('click',async event=>{
     }
     if(button.dataset.command==='remove-draft'){button.closest('[data-batch]').remove();return;}
     if(button.id==='export'){
-      const latest=await readBag();await download(backupText(latest.bag),`bag-side-01-${localToday()}.json`);record=latest;draw();message(globalThis.BagAndroidFileExport?'JSON 백업 파일을 선택한 위치에 저장했습니다.':'JSON 백업 다운로드를 요청했습니다. 다운로드 폴더에 파일이 저장됐는지 확인하세요.');return;
+      const latest=await readBag();await download(backupText(latest.bag),`bag-side-01-${localToday()}.json`);record=latest;draw();message(globalThis.BagAndroidFileExport?'백업 파일을 선택한 위치에 저장했습니다.':'백업 파일 다운로드를 요청했습니다. 다운로드 폴더에 파일이 저장됐는지 확인하세요.');return;
     }
     if(button.id==='undo'){
       const base=record,previous=await readPreviousBag();if(!previous)throw new Error('되돌릴 이전 저장 기록이 없습니다.');openEditor('undo',null,previous.bag,base);

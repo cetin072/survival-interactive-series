@@ -9,6 +9,12 @@ a=importlib.import_module('check-bag-side-alpha')
 
 def open_preset(page,id):
     page.locator('[data-nav="bag"]').click()
+    if not page.locator('#preset-panel').is_visible():
+        before=a.stored(page)
+        page.locator('[data-nav="inventory"]').click()
+        page.locator('[data-command="presets"]').click()
+        expect(page.locator('#preset-panel')).to_be_visible()
+        assert a.stored(page)==before,'preset re-entry must not write inventory'
     page.locator(f'[data-preset="{id}"]').click()
     expect(page.locator('#editor')).to_be_visible()
     expect(page.locator('[name="packed"]')).not_to_be_checked()
@@ -36,6 +42,9 @@ def run(browser,width,base):
         page.locator('#submit').evaluate('(el)=>{el.click();el.click();}')
         expect(page.locator('#editor')).not_to_be_visible()
         saved=a.stored(page);assert len(saved['bag']['items'])==count and saved['revision']==1
+        page.locator('[data-nav="bag"]').click()
+        expect(page.locator('#preset-panel')).to_be_hidden() # even zero-quantity drafts count as registered
+        page.locator('[data-nav="inventory"]').click()
         assert all(b['quantity']==0 and b['markedUntil'] is None for i in saved['bag']['items'] for b in i['batches'])
         expect(page.locator('#soon-count')).to_have_text('0')
         expect(a.card(page,'생수').locator('.expiry-warning')).to_contain_text('제품 기한 확인 필요')

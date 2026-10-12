@@ -1,6 +1,6 @@
 """Real Chromium gate for BAG-SIDE-01 personal Alpha. SYNTHETIC test data only.
 Local execution serves only archive/web/public. Optional Preview requires exact SHA.
-No Production, user database, scheduler or external write is used.
+Only public knowledge responses are read from Production; no user database, scheduler or external write is used.
 """
 from __future__ import annotations
 from functools import partial
@@ -72,8 +72,14 @@ def backup(page):
     page.locator('[data-nav="settings"]').click()
     expect(page.locator('#panel-settings')).to_be_visible()
     page.locator('#backup-panel').evaluate('(el)=>el.open=true')
-    with page.expect_download() as download_info: page.locator('#export').click()
+    page.evaluate('()=>{window.bagTestObjectURL=URL.createObjectURL;URL.createObjectURL=function(blob){window.bagTestExportType=blob.type;return window.bagTestObjectURL.call(this,blob)}}')
+    try:
+        with page.expect_download() as download_info: page.locator('#export').click()
+        assert page.evaluate('window.bagTestExportType')=='application/json;charset=utf-8'
+    finally:
+        page.evaluate('()=>{URL.createObjectURL=window.bagTestObjectURL;delete window.bagTestObjectURL}')
     download=download_info.value
+    assert download.suggested_filename.endswith('.json')
     assert download.failure() is None
     raw=Path(download.path()).read_text(encoding='utf-8')
     page.locator('[data-nav="inventory"]').click()
@@ -120,7 +126,26 @@ def check_more_screen(page,width):
     knowledge=page.locator('a.settings-link').first
     expect(knowledge).to_have_attribute('href','/knowledge/emergency-supplies-inventory/')
     assert knowledge.get_attribute('target')=='_blank','knowledge should open without losing the bag screen'
-    details=page.locator('.settings-card .settings-details').first
+    sections=page.locator('#panel-settings > section').evaluate_all('(els)=>els.map(el=>el.getAttribute("aria-labelledby"))')
+    assert sections[:2]==['settings-brand-title','settings-guide-title'],'brand and preparation guide must lead More'
+    expect(knowledge).to_contain_text('생존가방 준비법 자세히 보기')
+    expect(page.locator('a.settings-link').nth(1)).to_contain_text('생존지식 전체 둘러보기')
+    expect(page.locator('#export')).to_have_text('내 가방 백업하기')
+    expect(page.locator('.file-button')).to_contain_text('백업 파일 불러오기')
+    expect(page.locator('#import')).to_have_attribute('accept','.json,application/json')
+    assert 'JSON' not in page.locator('#panel-settings').inner_text()
+    # Public article/catalog must be real HTML responses, without leaving or writing the BAG.
+    for link in page.locator('a.settings-link').all():
+        assert link.get_attribute('target')=='_blank' and 'noopener' in link.get_attribute('rel')
+        with urllib.request.urlopen('https://survival-diary-archive.netlify.app'+link.get_attribute('href'),timeout=20) as response:
+            assert response.status==200 and 'text/html' in response.headers.get('content-type','')
+            title='비상용품 관리' if link.get_attribute('href')=='/knowledge/emergency-supplies-inventory/' else '생존 지식'
+            assert f'<title>{title} | 생존일기</title>' in response.read().decode(),'HTTP 200 must be the intended article/catalog, not a fallback page'
+        with page.expect_popup() as popup_info: link.click()
+        popup=popup_info.value;popup.wait_for_load_state('domcontentloaded')
+        assert popup.url.endswith(link.get_attribute('href'))
+        popup.close();assert stored(page)==before,'knowledge navigation must preserve BAG records'
+    details=page.locator('[aria-labelledby="settings-guide-title"] .settings-details')
     assert not details.evaluate('(el)=>el.open'),'long guidance should be folded initially'
     details.locator('summary').click()
     expect(details).to_contain_text('실제 보유량')
@@ -132,7 +157,9 @@ def check_more_screen(page,width):
     page.locator('#cancel').click()
     assert stored(page)==before,'opening bag settings must not save'
     no_overflow(page)
-    if width==390:page.screenshot(path=str(REPORT/'alpha-settings-more-390.png'))
+    if width==390:
+        page.evaluate('window.scrollTo(0,0)')
+        page.screenshot(path=str(REPORT/'alpha-settings-more-390.png'))
     page.locator('[data-nav="bag"]').click()
     page.locator('[data-command="backup"]').click()
     expect(page.locator('#panel-settings')).to_be_visible()
@@ -215,6 +242,31 @@ def check_batch_management(page):
     apply_restore(page,backup_before)
     assert stored(page)['bag']==original,'test restore failed to preserve original bag'
     print('PASS per-batch merge/split/confirmed deletion and original JSON recovery')
+
+def check_preset_visibility(browser,width,base):
+    context=browser.new_context(viewport={'width':width,'height':844},locale='ko-KR',accept_downloads=True)
+    try:
+        page=context.new_page();ready(page,address(base))
+        expect(page.locator('#preset-panel')).to_be_visible();no_overflow(page)
+        empty=backup(page);assert json.loads(empty)['formatVersion']==1
+        register(page,'가상 빈 재고 UI 시험품',1,'equipment',[(0,None,'2030-01-01')])
+        registered=stored(page)
+        page.locator('[data-nav="bag"]').click();expect(page.locator('#preset-panel')).to_be_hidden()
+        page.reload(wait_until='networkidle');expect(page.locator('#preset-panel')).to_be_hidden()
+        page.locator('[data-nav="inventory"]').click();page.locator('[data-command="presets"]').click()
+        expect(page.locator('#preset-panel')).to_be_visible();assert stored(page)==registered
+        no_overflow(page)
+        page.locator('[data-nav="bag"]').click();expect(page.locator('#preset-panel')).to_be_hidden()
+        apply_restore(page,empty);page.locator('[data-nav="bag"]').click();expect(page.locator('#preset-panel')).to_be_visible()
+        undo_previous(page);assert stored(page)['bag']==registered['bag']
+        page.locator('[data-nav="bag"]').click();expect(page.locator('#preset-panel')).to_be_hidden()
+        page.locator('[data-nav="inventory"]').click()
+        card(page,'가상 빈 재고 UI 시험품').locator('[data-mode="delete"]').click()
+        page.locator('#editor [name="confirm"]').check();confirm_save(page)
+        page.locator('[data-nav="bag"]').click();expect(page.locator('#preset-panel')).to_be_visible()
+        assert stored(page)['bag']['items']==[]
+        print(f'PASS {width}px empty/registered-zero-stock/re-entry/reload/restore/undo/last deletion preset visibility; JSON v1/download MIME preserved',flush=True)
+    finally: context.close()
 
 def run(browser,width,base):
     context=browser.new_context(viewport={'width':width,'height':844},locale='ko-KR',timezone_id='Asia/Seoul',accept_downloads=True)
@@ -392,7 +444,9 @@ def main():
             if executable: kwargs['executable_path']=executable
             browser=p.chromium.launch(**kwargs)
             try:
-                for width in (320,390,1280): run(browser,width,base)
+                for width in (320,390,1280):
+                    check_preset_visibility(browser,width,base)
+                    run(browser,width,base)
                 denied_storage(browser,base)
             finally: browser.close()
             persistent_reopen(p,base,executable)
