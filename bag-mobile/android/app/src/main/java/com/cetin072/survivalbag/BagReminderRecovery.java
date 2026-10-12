@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.UserManager;
 import android.util.Log;
 import com.getcapacitor.CapConfig;
@@ -40,7 +41,9 @@ public class BagReminderRecovery extends BroadcastReceiver {
                     long trigger = BagReminderTime.future(extra.getString("due"), extra.getString("localTime"), ZoneId.systemDefault(), System.currentTimeMillis());
                     cancelTimer(context, old.getId());
                     if (trigger < 0) { storage.deleteNotification(key); continue; }
-                    source.getJSObject("schedule").put("at", BagReminderTime.iso(trigger));
+                    JSObject schedule = source.getJSObject("schedule");
+                    schedule.put("at", BagReminderTime.iso(trigger));
+                    source.put("schedule", schedule); // getJSObject returns a copy after JSON parse.
                     extra.put("triggerAt", BagReminderTime.iso(trigger));
                     source.put("extra", extra);
                     future.add(LocalNotification.Companion.buildNotificationFromJSObject(source));
@@ -54,7 +57,10 @@ public class BagReminderRecovery extends BroadcastReceiver {
     }
     private static void cancelTimer(Context context, int id) {
         Intent timer = new Intent(context, TimedNotificationPublisher.class);
-        PendingIntent pending = PendingIntent.getBroadcast(context, id, timer, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
+        // Match Local Notifications 8.3.1 cancelTimerForNotification, including pre-S identity.
+        int flags = PendingIntent.FLAG_NO_CREATE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) flags |= PendingIntent.FLAG_MUTABLE;
+        PendingIntent pending = PendingIntent.getBroadcast(context, id, timer, flags);
         if (pending != null) { context.getSystemService(AlarmManager.class).cancel(pending); pending.cancel(); }
     }
 }

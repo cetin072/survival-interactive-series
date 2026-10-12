@@ -39,14 +39,21 @@ jobs:
       - name: Sync existing BAG web screen and Android plugins
         working-directory: bag-mobile
         run: npm run sync
-      - name: Build debug APK (no production signing or deploy)
+      - name: Android host regressions and debug APK (not physical delivery)
         working-directory: bag-mobile/android
         run: |
           set -o pipefail
-          ./gradlew assembleDebug --no-daemon --max-workers=2 2>&1 | tee "$RUNNER_TEMP/bag-android-build.log" || {
+          ./gradlew testDebugUnitTest assembleDebug --no-daemon --max-workers=2 2>&1 | tee "$RUNNER_TEMP/bag-android-build.log" || {
             python -c 'import os,pathlib; text="\n".join(pathlib.Path(os.environ["RUNNER_TEMP"],"bag-android-build.log").read_text().splitlines()[-60:]); print("::error title=BAG Android build::"+text.replace("%","%25").replace("\n","%0A"))'
             exit 1
           }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bag-side-host-tests-${{ github.event.pull_request.head.sha || github.sha }}
+          path: bag-mobile/android/app/build/test-results/testDebugUnitTest/
+          if-no-files-found: warn
+          retention-days: 7
       - uses: actions/upload-artifact@v4
         with:
           name: bag-side-debug-${{ github.event.pull_request.head.sha || github.sha }}
