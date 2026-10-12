@@ -8,9 +8,9 @@ const light=[1,2,3,7,13,15,16,19,20,22,25,26,27,39,43,44,45,46,47];
 const standard=[...light,8,9,10,21,32,33,34,35,36,37];
 const expanded=[...standard,6,11,23,28,30,31,40,41,42,48];
 export const PRESETS=Object.freeze([
-  {id:'light',name:'경량형',budget:10,note:'물·간편식·연락·조명·응급·보온',numbers:light},
-  {id:'standard',name:'표준형',budget:15,note:'경량형 + 여벌 의류·개인 위생',numbers:standard},
-  {id:'expanded',name:'확장형',budget:18,note:'표준형 + 휴식·수면·예비 물품',numbers:expanded}
+  {id:'light',name:'경량형',budget:10,note:'필수 물품 위주',numbers:light},
+  {id:'standard',name:'표준형',budget:15,note:'의류·위생 보강',numbers:standard},
+  {id:'expanded',name:'확장형',budget:18,note:'휴식·예비품 추가',numbers:expanded}
 ].map(({numbers,...preset})=>Object.freeze({...preset,items:Object.freeze(numbers.map(n=>Object.freeze({catalogId:`guide-${String(n).padStart(2,'0')}`,target:CATALOG[n-1].exampleTarget})))})));
 export function inspectionDays(entry){
   if(entry.category==='medicine')return 0;
