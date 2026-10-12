@@ -50,9 +50,10 @@
   },
   "pass_asset": {
     "format": "image/png",
-    "width": 512,
-    "height": 512,
-    "conversion": "RGB -> LANCZOS 512x512 -> 256-color quantize -> optimize; if >200000 bytes retry 128-color",
+    "max_edge": 512,
+    "preserve_aspect_ratio": true,
+    "long_edge_rule": "Scale the exact Library PNG proportionally so max(width,height)=512; never force a square crop or stretch.",
+    "conversion": "RGB -> proportional LANCZOS fit within 512x512 -> 256-color quantize -> optimize; if >200000 bytes retry 128-color",
     "max_bytes": 1000000,
     "preferred_chunk_b64_chars": 220000,
     "max_chunks": 8,
