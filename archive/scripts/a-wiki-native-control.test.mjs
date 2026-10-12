@@ -103,6 +103,114 @@ test('submitted Extractor compiles into one REVIEW_READY package', () => {
   assert.equal(compiled.reviewJob.prepared_job.source.gm_blocks.length, 1)
 })
 
+test('corrected submitted result requires current source verification and still stops at independent REVIEW_READY', async () => {
+  const { job, result } = syntheticPackage()
+  result.nodes[1].label = '요약 작업장'
+  const row = { job_id: '00000000-0000-0000-0000-000000000001', status: 'EXTRACTOR_SUBMITTED',
+    prepared_job: job, extractor_result: result, extractor_result_sha256: 'd'.repeat(64), prepared_job_sha256: 'e'.repeat(64) }
+  row.label_correction = { version: 'a-wiki-label-correction-v1', job_id: row.job_id,
+    extractor_result_sha256: row.extractor_result_sha256, prepared_job_sha256: row.prepared_job_sha256,
+    source_sha256: job.source.manifest_sha256, graph_sha256: job.graph_sha256, node_key: 'new:place',
+    old_label: '요약 작업장', new_label: '제어시험작업장', citation_id: 'q1', block_id: '001', reason: 'Approved source spelling.' }
+  const original = structuredClone(row), calls = []
+  let verified = false
+  const actual = await consumeNativeJob({
+    verifyCorrectionSource: async (value) => { assert.deepEqual(value, row); verified = true },
+    publish: () => assert.fail('Independent review must occur first'),
+    requestRpc: async (name, args) => {
+      calls.push(name)
+      if (name === 'archive_a_wiki_native_job_program_current') return row
+      assert.equal(verified, true)
+      assert.equal(args.p_status, 'REVIEW_READY')
+      assert.deepEqual(args.p_proposal.label_correction, row.label_correction)
+      assert.deepEqual(args.p_review_job.proposal, args.p_proposal)
+      return { status: 'REVIEW_READY' }
+    },
+  })
+  assert.equal(actual.status, 'REVIEW_READY')
+  assert.equal(calls.length, 2)
+  assert.deepEqual(row, original)
+  const blocked = await consumeNativeJob({
+    verifyCorrectionSource: async () => { throw Error('A_WIKI_LABEL_CORRECTION_SOURCE_CHANGED') },
+    requestRpc: async (name, args) => {
+      if (name === 'archive_a_wiki_native_job_program_current') return row
+      assert.equal(args.p_status, 'BLOCKED')
+      assert.equal(args.p_blocker_code, 'A_WIKI_LABEL_CORRECTION_SOURCE_CHANGED')
+      return { status: 'BLOCKED' }
+    },
+  })
+  assert.equal(blocked.blocker_code, 'A_WIKI_LABEL_CORRECTION_SOURCE_CHANGED')
+})
+
+test('compiler failure records an exact blocker once without replacing the stored result', async () => {
+  const { job, result } = syntheticPackage()
+  result.citations[0].id = 'BAD_ID'
+  const original = structuredClone(result), calls = []
+  let status = 'EXTRACTOR_SUBMITTED'
+  const requestRpc = async (name, args) => {
+    if (name === 'archive_a_wiki_native_job_program_current') return status === 'EXTRACTOR_SUBMITTED'
+      ? { job_id: 'db-job', status, session_id: 'SESSION_999', prepared_job: job, extractor_result: result }
+      : { status: 'NO_PROGRAM_JOB' }
+    assert.equal(name, 'archive_a_wiki_native_job_advance')
+    calls.push(args)
+    assert.equal(args.p_expected_status, 'EXTRACTOR_SUBMITTED')
+    status = args.p_status
+    return { status }
+  }
+  const outcome = await consumeNativeJob({ requestRpc, publish: () => assert.fail('Reviewer must not be bypassed') })
+  assert.equal(outcome.status, 'BLOCKED')
+  assert.equal(calls[0].p_blocker_code, 'WIKI_CITATION_ID_INVALID')
+  assert.equal(calls[0].p_proposal, null)
+  assert.deepEqual(await consumeNativeJob({ requestRpc }), { status: 'NO_PROGRAM_JOB' })
+  assert.equal(calls.length, 1)
+  assert.deepEqual(result, original)
+})
+
+test('a stored new-name grounding failure becomes BLOCKED with its original result intact', async () => {
+  const { job, result } = syntheticPackage()
+  result.nodes[1].label = '인용문에 없는 장소명'
+  const original = structuredClone(result), calls = []
+  const outcome = await consumeNativeJob({ requestRpc: async (name, args) => {
+    if (name === 'archive_a_wiki_native_job_program_current') return { job_id: 'db-job', status: 'EXTRACTOR_SUBMITTED', prepared_job: job, extractor_result: result }
+    calls.push(args)
+    return { status: args.p_status }
+  }, publish: () => assert.fail('Grounding cannot be bypassed') })
+  assert.equal(outcome.status, 'BLOCKED')
+  assert.equal(outcome.blocker_code, 'WIKI_NEW_NAME_NOT_IN_EVIDENCE')
+  assert.equal(calls[0].p_expected_status, 'EXTRACTOR_SUBMITTED')
+  assert.equal(calls[0].p_proposal, null)
+  assert.deepEqual(result, original)
+})
+
+test('recoverable stored citation spelling reaches independent review once; failed RPC is not a compile blocker', async () => {
+  const { job, result } = syntheticPackage()
+  result.citations[0].id = 'fuel_allocation'
+  for (const node of result.nodes) for (const field of Object.keys(node.evidence)) node.evidence[field] = ['fuel_allocation']
+  result.relations[0].evidence = ['fuel_allocation']
+  const original = structuredClone(result), calls = []
+  let status = 'EXTRACTOR_SUBMITTED'
+  const row = () => ({ job_id: 'db-job', status, session_id: 'SESSION_999', prepared_job: job, extractor_result: result })
+  const requestRpc = async (name, args) => {
+    if (name === 'archive_a_wiki_native_job_program_current') return status === 'EXTRACTOR_SUBMITTED' ? row() : { status: 'NO_PROGRAM_JOB' }
+    calls.push(args)
+    assert.equal(args.p_expected_status, 'EXTRACTOR_SUBMITTED')
+    assert.equal(args.p_status, 'REVIEW_READY')
+    status = args.p_status
+    return { status }
+  }
+  assert.equal((await consumeNativeJob({ requestRpc, publish: () => assert.fail('Reviewer required') })).status, 'REVIEW_READY')
+  assert.deepEqual(await consumeNativeJob({ requestRpc }), { status: 'NO_PROGRAM_JOB' })
+  assert.equal(calls.length, 1)
+  assert.deepEqual(result, original)
+  status = 'EXTRACTOR_SUBMITTED'
+  await assert.rejects(consumeNativeJob({ requestRpc: async (name) => {
+    if (name === 'archive_a_wiki_native_job_program_current') return row()
+    throw new Error('RPC_UNAVAILABLE')
+  } }), /RPC_UNAVAILABLE/)
+  await assert.rejects(consumeNativeJob({ requestRpc: async (name) => name === 'archive_a_wiki_native_job_program_current'
+    ? row() : { status: 'STATE_MISMATCH', actual_status: 'BLOCKED' } }), /A_WIKI_REVIEW_READY_NOT_CONFIRMED/)
+})
+
 test('submitted independent APPROVE review advances to publication', () => {
   const { job, result } = syntheticPackage()
   const compiled = compileSubmittedExtractor({
