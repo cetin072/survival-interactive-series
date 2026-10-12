@@ -19,7 +19,7 @@
     ],
     "sha256": "085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00"
   },
-  "status": "READY",
+  "status": "PUBLISHED",
   "sources": [
     {
       "id": "FEMA-NIMS-RM",
@@ -139,7 +139,7 @@
   "topic_id": "community-emergency-resource-management",
   "risk_level": "LOW",
   "story_refs": [],
-  "updated_at": "2026-10-10",
+  "updated_at": "2026-10-12",
   "ai_assisted": true,
   "source_kind": "PUBLIC_ARCHIVE",
   "source_refs": [
