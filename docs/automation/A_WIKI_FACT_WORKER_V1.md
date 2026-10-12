@@ -87,12 +87,12 @@ Each citation is `{id, block_id, quote}`. The quote must be a sufficiently disti
 
 Each relation is `{from, to, kind, label, evidence}`. Endpoints are existing IDs or new candidate keys. Use only `job.relation_kinds`; cite explicit relation evidence. Each deferred item is `{reason, evidence}` with citation IDs.
 
-## Independent Reviewer instructions
-
 새 인물·장소·단체의 대표 명칭은 가능한 한 GM 원문의 연속된 실제 표현을 사용한다.
 요약 표현을 새로운 정식 이름으로 확정하거나 존재하지 않는 설정을 추가하지 않는다.
 장소의 사용권 확보와 시설의 실제 개설·운영 상태는 구분한다. 사용권만 있는 부지를
 운영 중인 연료 저장시설로 표현하지 않는다.
+
+## Independent Reviewer instructions
 
 The Reviewer is a fresh second native-model call. It receives the complete prepared job (all GM blocks and existing public identities) plus the immutable proposal. It must not edit the proposal.
 

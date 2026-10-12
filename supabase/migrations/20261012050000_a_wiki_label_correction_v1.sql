@@ -66,7 +66,7 @@ returns trigger
 language plpgsql
 security definer
 set search_path = ''
-as $
+as $$
 begin
   if tg_op='INSERT' and new.label_correction is not null then
     raise exception 'A_WIKI_LABEL_CORRECTION_RPC_REQUIRED';
@@ -154,7 +154,7 @@ begin
   new.updated_at := pg_catalog.clock_timestamp();
   return new;
 end;
-$;
+$$;
 
 create function public.archive_a_wiki_native_job_correct_label(p_job_id uuid,p_correction jsonb)
 returns jsonb language plpgsql security definer set search_path = '' as $$
