@@ -59,14 +59,14 @@ def main():
                 dimension=page.evaluate('async path=>{const image=new Image();image.src=path;await image.decode();return [image.naturalWidth,image.naturalHeight]}',icon['src'])
                 assert dimension==[int(icon['sizes'].split('x')[0])]*2
             # Chrome's actual installability protocol, rather than manifest syntax alone.
-            cdp=context.new_cdp_session(page);cdp.send('Page.enable');details=cdp.send('Page.getInstallabilityErrors')
+            cdp=context.new_cdp_session(page);cdp.send('Page.enable');browser_context=cdp.send('Target.getTargetInfo')['targetInfo'].get('browserContextId');print('Chromium',cdp.send('Browser.getVersion')['product'],flush=True);details=cdp.send('Page.getInstallabilityErrors')
             assert details['installabilityErrors']==[],details
             alpha.register(page,'가상 PWA 시험품',2,'equipment',[(1,None,'2030-01-01')]);initial=alpha.stored(page);backup=alpha.backup(page)
             page.locator('[data-nav="settings"]').click()
             expect(page.locator('#reminder-time-label')).to_be_hidden();expect(page.locator('#reminder-settings')).to_be_hidden()
-            cdp.send('Browser.setPermission',{'permission':{'name':'notifications'},'setting':'denied','origin':base})
+            cdp.send('Browser.setPermission',{'permission':{'name':'notifications'},'setting':'denied','origin':base,'browserContextId':browser_context})
             page.locator('#reminder-enabled').check();expect(page.locator('#reminder-permission')).to_have_text('권한 거부됨');expect(page.locator('#reminder-enabled')).not_to_be_checked();expect(page.locator('#reminder-test')).to_be_disabled()
-            cdp.send('Browser.setPermission',{'permission':{'name':'notifications'},'setting':'granted','origin':base})
+            cdp.send('Browser.setPermission',{'permission':{'name':'notifications'},'setting':'granted','origin':base,'browserContextId':browser_context})
             page.reload(wait_until='networkidle')
             page.locator('[data-nav="settings"]').click()
             page.wait_for_function('Notification.permission==="granted"')
