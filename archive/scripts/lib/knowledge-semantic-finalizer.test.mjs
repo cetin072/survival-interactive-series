@@ -18,7 +18,8 @@ test('human waiting is neither polled nor reconciled by the machine finalizer', 
 
 test('PR reconciliation is driven by changed checks, head, validation code or explicit recovery', async () => {
   const workflow = await readFile(new URL('../../../.github/workflows/knowledge-semantic-finalizer.yml', import.meta.url), 'utf8')
-  assert.match(workflow, /types: \[synchronize, closed\]/)
+  assert.match(workflow, /types: \[closed\]/)
+  assert.doesNotMatch(workflow, /types: \[synchronize/)
   assert.match(workflow, /workflow_run:/)
   assert.match(workflow, /types: \[completed\]/)
   assert.match(workflow, /push:\s*\n\s+branches: \[main\]/)

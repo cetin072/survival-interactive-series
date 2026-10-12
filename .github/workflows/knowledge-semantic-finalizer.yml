@@ -3,7 +3,9 @@ name: Finalize Knowledge semantic job
 on:
   # PR state and completed validations are changes; elapsed time is not.
   pull_request:
-    types: [synchronize, closed]
+    # Head changes are observed after their checks complete, so publication
+    # preparation can register its new transport head before reconciliation.
+    types: [closed]
     paths: ['knowledge/**']
   workflow_run:
     workflows: ['Prepare Knowledge publication', 'Validate Knowledge exact publication head', 'Validate knowledge BRIEF pipeline']
