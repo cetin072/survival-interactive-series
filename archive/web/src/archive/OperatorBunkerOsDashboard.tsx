@@ -97,6 +97,7 @@ function BunkerOsHeader({ email, busy, onSignOut }: { email?: string | null; bus
       <p>{email} · AI 운영총괄이 한 일과 내가 확인할 일을 쉽게 나눠 봅니다.</p>
     </div>
     <div className="operator-heading-actions">
+      <a className="operator-secondary" href="/operator/#operator-roadmap">전체 로드맵</a>
       <a className="operator-secondary" href="/operator/bunker-os/">상황판</a>
       <a className="operator-secondary" href="/operator/bunker-os/logs/">작업 기록</a>
       <a className="operator-secondary" href="/operator/bunker-os/sources/">자료함</a>
