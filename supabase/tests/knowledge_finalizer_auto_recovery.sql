@@ -118,6 +118,16 @@ begin
 
   perform public.archive_knowledge_semantic_job_update(j18,'SUBMITTED','HOLD','CI_COMPLETE','SEMANTIC');
 
+  -- A waiting content PR never dispatches again merely because time passes.
+  perform public.archive_knowledge_semantic_job_update(j18,'HOLD','PR_OPEN',null,null,999,'knowledge/worker/ci',repeat('2',40));
+  if survival_ops.dispatch_knowledge_semantic_finalizer() is not null
+    or survival_ops.dispatch_knowledge_semantic_finalizer() is not null
+    or (select status from survival_ops.knowledge_semantic_jobs where job_id=j18) <> 'PR_OPEN'
+    or (select count(*) from pg_temp.dispatch_calls) <> 2 then
+    raise exception 'unchanged PR state was redispatched or failed';
+  end if;
+  perform public.archive_knowledge_semantic_job_update(j18,'PR_OPEN','HOLD','CI_COMPLETE','SEMANTIC');
+
   -- A stale blocker with a changed immutable result digest is not retried and
   -- cannot trigger the Finalizer workflow.
   insert into survival_ops.knowledge_semantic_jobs(

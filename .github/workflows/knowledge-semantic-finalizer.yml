@@ -1,6 +1,16 @@
 name: Finalize Knowledge semantic job
 
 on:
+  # PR state and completed validations are changes; elapsed time is not.
+  pull_request:
+    types: [synchronize, closed]
+    paths: ['knowledge/**']
+  workflow_run:
+    workflows: ['Prepare Knowledge publication', 'Validate Knowledge exact publication head', 'Validate knowledge BRIEF pipeline']
+    types: [completed]
+  push:
+    branches: [main]
+    paths: ['archive/scripts/*knowledge*', 'archive/scripts/lib/knowledge*', 'archive/web/render-knowledge.mjs', 'archive/web/src/archive/knowledge*', '.github/workflows/knowledge*']
   workflow_dispatch:
     inputs:
       dispatch_origin:
@@ -20,6 +30,10 @@ concurrency:
 
 jobs:
   finalize:
+    if: >-
+      github.event_name == 'workflow_dispatch' || github.event_name == 'push' ||
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.event.pull_request.head.ref, 'knowledge/worker/')) ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.head_repository.full_name == github.repository && startsWith(github.event.workflow_run.head_branch, 'knowledge/worker/'))
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
