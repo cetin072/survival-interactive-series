@@ -125,7 +125,12 @@ def check_more_screen(page,width):
     details.locator('summary').click()
     expect(details).to_contain_text('실제 보유량')
     details.locator('summary').click()
-    assert stored(page)==before,'More screen viewing must not write a bag'
+    expect(page.locator('#lead-note')).to_contain_text('교체 검토일:')
+    assert page.locator('[data-command="settings"]').count()==1,'duplicate settings action confuses users'
+    page.locator('[data-command="settings"]').click()
+    expect(page.locator('#editor-title')).to_have_text('가방 설정')
+    page.locator('#cancel').click()
+    assert stored(page)==before,'opening bag settings must not save'
     no_overflow(page)
     if width==390:page.screenshot(path=str(REPORT/'alpha-settings-more-390.png'))
     page.locator('[data-nav="bag"]').click()
@@ -133,6 +138,10 @@ def check_more_screen(page,width):
     expect(page.locator('#panel-settings')).to_be_visible()
     expect(page.locator('#backup-panel')).to_be_visible()
     assert stored(page)==before,'backup shortcut must not modify current inventory'
+    page.locator('[data-nav="bag"]').click()
+    page.locator('.footer-settings').click()
+    expect(page.locator('#panel-settings')).to_be_visible()
+    assert stored(page)==before,'footer More shortcut must not write inventory'
     page.locator('[data-nav="bag"]').click()
 
 def check_guided_catalog(page,width):
