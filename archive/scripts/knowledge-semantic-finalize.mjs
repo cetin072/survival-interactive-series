@@ -254,10 +254,26 @@ async function reconcileOpenJobs({ requestRpc = rpc, shell = run, currentRoot = 
     if (outcome.status === 'BLOCKED' && pr.state === 'open') {
       shell('gh', ['pr', 'close', String(job.final_pr_number), '--comment', `C3 finalizer closed this PR because ${outcome.code}. A new exact-head review is required.`], currentRoot)
     }
+    if (outcome.status === 'PR_OPEN') {
+      const checks = JSON.parse(shell('gh', ['api', `repos/${repository}/commits/${pr.head.sha}/check-runs?per_page=100`], currentRoot)).check_runs ?? []
+      const assessment = assessPublicationChecks(checks)
+      outcome = { ...outcome, ...assessment }
+      if ((job.blocker_code ?? null) !== (assessment.code ?? null) || (job.blocker_stage ?? null) !== (assessment.code ? 'PR_CI_RECHECK_REQUIRED' : null)) {
+        await updateJob(requestRpc, job.job_id, job.status, job.status, { blockerCode: assessment.code ?? null, blockerStage: assessment.code ? 'PR_CI_RECHECK_REQUIRED' : null })
+      }
+    }
     if (outcome.status !== job.status || outcome.registered_head_sha) await updateJob(requestRpc, job.job_id, job.status, outcome.status, { blockerCode: outcome.code ?? null, blockerStage: outcome.code ? 'PR_RECONCILE' : null, mergeSha: outcome.mergeSha ?? null, headSha: outcome.registered_head_sha ?? null })
     outcomes.push({ job_id: job.job_id, ...outcome })
   }
   return outcomes
+}
+
+export function assessPublicationChecks(checks) {
+  // GitHub returns newest runs first. An old failed attempt is not the current check.
+  const latest = [...new Map([...checks].reverse().map((check) => [check.name, check])).values()]
+  const failed = latest.filter((check) => check.status === 'completed' && ['failure', 'cancelled', 'timed_out', 'action_required', 'startup_failure'].includes(check.conclusion))
+  if (failed.length) return { code: 'PR_CI_FAILED', recheck_required: true, failed_checks: failed.map((check) => check.name).sort() }
+  return { recheck_required: false, checks_pending: latest.length === 0 || latest.some((check) => check.status !== 'completed') }
 }
 
 export async function runSemanticFinalizer({ requestRpc = rpc, shell = run, packageSemantic = runPackage, createDraft = createOrReuseDraft, enqueueReviewEntry = enqueueReview, verifyPinsFn = verifyPins, currentRoot = root, mainSha = null } = {}) {
