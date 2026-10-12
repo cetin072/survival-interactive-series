@@ -180,6 +180,7 @@ document.addEventListener('click',async event=>{
       const raw=await readRawRecord();if(raw===undefined)throw new Error('내보낼 저장 원본이 없습니다.');
       download(JSON.stringify(raw,null,2),'bag-side-01-storage-original.json');message('저장 원본의 다운로드를 요청했습니다. 일반 백업 형식이 아니며 복구 검토용입니다.');return;
     }
+    if(button.dataset.command==='more'){showScreen('settings');return;}
     if(!record)return;
     if(button.dataset.preset){openEditor('preset',button.dataset.preset);return;}
     if(button.dataset.command==='presets'){showScreen('bag');$('preset-panel').scrollIntoView({block:'start'});$('preset-panel').querySelector('button')?.focus({preventScroll:true});return;}
@@ -202,7 +203,7 @@ document.addEventListener('click',async event=>{
     if(button.dataset.mode){openEditor(button.dataset.mode,button.dataset.item,null,record,null,button.dataset.batchId??null);return;}
     if(button.dataset.command==='add'){openEditor('add');return;}
     if(button.dataset.command==='settings'){openEditor('settings');return;}
-    if(button.dataset.command==='backup'){showScreen('inventory');$('backup-panel').open=true;$('backup-panel').scrollIntoView({block:'start'});return;}
+    if(button.dataset.command==='backup'){showScreen('settings');$('backup-panel').open=true;$('backup-panel').scrollIntoView({block:'start'});$('backup-panel').querySelector('summary')?.focus({preventScroll:true});return;}
     if(button.dataset.command==='add-batch'){
       const count=$('batch-fields').children.length;if(count>=100)throw new Error('묶음은 물품당 최대 100개입니다.');
       $('batch-fields').insertAdjacentHTML('beforeend',batchFields(newBatch(),count,true));return;
