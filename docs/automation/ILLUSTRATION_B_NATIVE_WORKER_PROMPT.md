@@ -66,13 +66,15 @@ PREPARED는 Boot Router가 `ILLUSTRATION_B_RESERVATION_BRIDGE.md`의 DISPATCH/CO
 
 1. 이미 저장된 PASS 판정을 다시 판단하지 않는다.
 2. fresh lease가 없으면 `archive_illustration_render_job_lease_acquire(job_id,'archive-illustration-native-transfer',600)`로 얻는다.
-3. exact Library PNG를 512×512 사이트용 PNG로 변환한다.
+3. exact Library PNG를 **원본 종횡비를 유지한 사이트용 PNG**로 변환한다.
    - RGB
+   - 긴 변이 정확히 512px가 되도록 비례 축소/확대한다. 정사각형으로 늘이거나 자르지 않는다.
+   - 예: 1774×887 → 512×256, 1536×1024 → 약 512×341, 세로 이미지는 짧은 변이 자동 계산된다.
    - LANCZOS resize
    - 256-color quantization
    - PNG optimize
    - 결과가 200,000 bytes를 넘으면 128-color로 한 번 더 생성한다.
-   - 최종 결과는 512×512 PNG, 1,000,000 bytes 이하이어야 한다.
+   - 최종 결과는 max(width,height)=512, 두 변 모두 1~512px, PNG 1,000,000 bytes 이하이어야 한다.
 4. 최종 사이트 PNG의 SHA-256/bytes/dimensions를 계산한다.
 5. `archive_illustration_review_staging_resume`으로 existing staging을 확인한다.
    - exact matching staging이 있으면 stored_chunk_indexes 기준으로 누락 chunk만 보낸다.

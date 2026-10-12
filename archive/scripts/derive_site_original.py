@@ -8,6 +8,10 @@ from pathlib import Path
 from PIL import Image
 
 
+MAX_EDGE = 512
+DERIVATIVE_VERSION = "site-png-fit-512-v2"
+
+
 def encode_quantized_png(rgb: Image.Image, colors: int) -> bytes:
     image = rgb.quantize(colors=colors, method=Image.Quantize.MEDIANCUT)
     output = io.BytesIO()
@@ -24,7 +28,10 @@ def derive(source: bytes) -> bytes:
         if original.width > 8192 or original.height > 8192:
             raise ValueError("SOURCE_DIMENSIONS_INVALID")
         rgb = original.convert("RGB")
-    resized = rgb.resize((512, 512), Image.Resampling.LANCZOS)
+    scale = MAX_EDGE / max(rgb.width, rgb.height)
+    target_width = max(1, round(rgb.width * scale))
+    target_height = max(1, round(rgb.height * scale))
+    resized = rgb.resize((target_width, target_height), Image.Resampling.LANCZOS)
     result = encode_quantized_png(resized, 256)
     if len(result) <= 200_000:
         return result
@@ -49,7 +56,7 @@ def main() -> None:
         if (record.get('source_sha256') != hashlib.sha256(args.source.read_bytes()).hexdigest()
                 or record.get('derivative_sha256') != hashlib.sha256(committed).hexdigest()
                 or record.get('derivative_bytes') != len(committed)
-                or record.get('derivative_version') != 'site-png-512-v1'):
+                or record.get('derivative_version') != DERIVATIVE_VERSION):
             raise ValueError('DERIVATIVE_PROVENANCE_MISMATCH')
         if generated != committed:
             with Image.open(io.BytesIO(generated)) as generated_image:
