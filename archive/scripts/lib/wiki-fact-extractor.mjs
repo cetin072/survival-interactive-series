@@ -133,8 +133,35 @@ export function normalizeWikiCitationIds(result) {
   return view
 }
 
+/** An explicitly approved, source-bound single-label overlay, never a result edit. */
+export function applyWikiLabelCorrection(job, result, correction, binding) {
+  object(correction, ['version', 'job_id', 'extractor_result_sha256', 'prepared_job_sha256',
+    'source_sha256', 'graph_sha256', 'node_key', 'old_label', 'new_label', 'citation_id', 'block_id', 'reason'])
+  insist(correction.version === 'a-wiki-label-correction-v1'
+    && binding && correction.job_id === binding.job_id
+    && hashOK(correction.extractor_result_sha256)
+    && correction.extractor_result_sha256 === binding.extractor_result_sha256
+    && hashOK(correction.prepared_job_sha256)
+    && correction.prepared_job_sha256 === binding.prepared_job_sha256
+    && correction.source_sha256 === job.source.manifest_sha256
+    && correction.graph_sha256 === job.graph_sha256, 'WIKI_LABEL_CORRECTION_BINDING_INVALID')
+  text(correction.old_label, 120); text(correction.new_label, 120); text(correction.reason, 1000)
+  const targets = result.nodes.filter((node) => node.key === correction.node_key)
+  insist(targets.length === 1 && targets[0].existing_id === null
+    && ['character', 'location'].includes(targets[0].type)
+    && targets[0].label === correction.old_label && correction.old_label !== correction.new_label
+    && targets[0].evidence?.label?.includes(correction.citation_id), 'WIKI_LABEL_CORRECTION_TARGET_INVALID')
+  const citations = result.citations.filter((citation) => citation.id === correction.citation_id)
+  insist(citations.length === 1 && citations[0].block_id === correction.block_id
+    && citations[0].quote.includes(correction.new_label), 'WIKI_LABEL_CORRECTION_EVIDENCE_INVALID')
+  quoteEvidence(job, [{ block_id: correction.block_id, quote: citations[0].quote }])
+  const view = structuredClone(result)
+  view.nodes.find((node) => node.key === correction.node_key).label = correction.new_label
+  return view
+}
+
 /** Compile a model result into a reviewable proposal, never authoritative Graph. */
-export function compileWikiFactProposal(job, result) {
+export function compileWikiFactProposal(job, result, { labelCorrection = null, nativeBinding = null } = {}) {
   verifyJob(job)
   object(result, ['version', 'job_id', 'decision', 'coverage', 'nodes', 'relations', 'citations', 'deferred', 'note'])
   insist(result.version === WIKI_RESULT_VERSION && result.job_id === job.job_id, 'WIKI_RESULT_JOB_MISMATCH')
@@ -154,6 +181,7 @@ export function compileWikiFactProposal(job, result) {
   insist(Array.isArray(result.citations) && result.citations.length <= 1000, 'WIKI_CITATIONS_INVALID')
   // Proposal binding refers to the original semantic result, never the view.
   const resultSha256 = graphHash(result)
+  if (labelCorrection) result = applyWikiLabelCorrection(job, result, labelCorrection, nativeBinding)
   result = normalizeWikiCitationIds(result)
   const citations = new Map()
   for (const item of result.citations) {
@@ -251,13 +279,15 @@ export function compileWikiFactProposal(job, result) {
     review_required: true, application_status: backfill ? 'BACKFILL_REVIEW_REQUIRED' : 'SEMANTIC_REVIEW_REQUIRED',
     coverage: structuredClone(result.coverage), facts, evidence, deferred, note: result.note,
     raw_changed: false, book_changed: false, graph_changed: false, source_marked_processed: false,
+    ...(labelCorrection ? { label_correction: structuredClone(labelCorrection) } : {}),
   }
   return { ...body, proposal_sha256: graphHash(body) }
 }
 
 export function buildWikiFactReviewJob(job, proposal) {
   verifyJob(job)
-  object(proposal, ['version', 'job_id', 'source', 'expected_graph_sha256', 'result_sha256', 'status', 'review_required', 'application_status', 'coverage', 'facts', 'evidence', 'deferred', 'note', 'raw_changed', 'book_changed', 'graph_changed', 'source_marked_processed', 'proposal_sha256'])
+  const proposalFields = ['version', 'job_id', 'source', 'expected_graph_sha256', 'result_sha256', 'status', 'review_required', 'application_status', 'coverage', 'facts', 'evidence', 'deferred', 'note', 'raw_changed', 'book_changed', 'graph_changed', 'source_marked_processed', 'proposal_sha256']
+  object(proposal, [...proposalFields, 'label_correction'], proposalFields)
   const { proposal_sha256, ...proposalBody } = proposal
   insist(proposal.version === 'wiki-fact-proposal-v1' && proposal.job_id === job.job_id, 'WIKI_REVIEW_PROPOSAL_INVALID')
   insist(proposal_sha256 === graphHash(proposalBody), 'WIKI_REVIEW_PROPOSAL_HASH_INVALID')

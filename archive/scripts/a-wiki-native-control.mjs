@@ -11,6 +11,7 @@ import {
 } from './lib/wiki-fact-extractor.mjs'
 import { finalizeWikiFactProposal } from './lib/wiki-fact-finalizer.mjs'
 import { fingerprint } from './lib/publication-plan.mjs'
+import { graphHash } from './lib/publication-graph.mjs'
 import {
   compileVisualCatalog, validateVisualCatalog, visualByteHash, visualBytes,
 } from './lib/visual-compiler.mjs'
@@ -62,12 +63,26 @@ async function rpc(name, args) {
 
 export function compileSubmittedExtractor(row) {
   insist(row?.status === 'EXTRACTOR_SUBMITTED', 'A_WIKI_EXTRACTOR_ROW_INVALID')
-  const proposal = compileWikiFactProposal(row.prepared_job, row.extractor_result)
+  const proposal = compileWikiFactProposal(row.prepared_job, row.extractor_result, {
+    labelCorrection: row.label_correction ?? null, nativeBinding: row,
+  })
   if (proposal.status === 'HUMAN_REVIEW') {
     return { action: 'HUMAN_REVIEW', code: 'EXTRACTOR_HUMAN_REVIEW', proposal }
   }
   const reviewJob = buildWikiFactReviewJob(row.prepared_job, proposal)
   return { action: 'REVIEW_READY', proposal, reviewJob }
+}
+
+export async function verifyLabelCorrectionSource(row, base = root) {
+  const graph = JSON.parse(await readFile(join(base, graphRef), 'utf8'))
+  const { content_sha256, ...body } = graph
+  insist(graphHash(body) === content_sha256 && content_sha256 === row.graph_sha256,
+    'A_WIKI_LABEL_CORRECTION_GRAPH_CHANGED')
+  const source = (await discoverWikiSources(base)).find((candidate) =>
+    candidate.sourceManifestRef === row.source_ref && candidate.sourceDigest === row.source_sha256)
+  insist(source, 'A_WIKI_LABEL_CORRECTION_SOURCE_CHANGED')
+  const rebuilt = buildWikiFactJob(source, graph)
+  insist(rebuilt.job_id === row.prepared_job.job_id, 'A_WIKI_LABEL_CORRECTION_PREPARED_CHANGED')
 }
 
 export function inspectSubmittedReview(row) {
@@ -474,6 +489,7 @@ async function reprepareOnLatestMain({ requestRpc }) {
 
 export async function consumeNativeJob({
   requestRpc = rpc, publish = buildPublication, reprepare = reprepareOnLatestMain,
+  verifyCorrectionSource = verifyLabelCorrectionSource,
 } = {}) {
   const row = await requestRpc('archive_a_wiki_native_job_program_current', {})
   if (!row || row.status === 'NO_PROGRAM_JOB') return { status: 'NO_PROGRAM_JOB' }
@@ -482,6 +498,7 @@ export async function consumeNativeJob({
   if (row.status === 'EXTRACTOR_SUBMITTED') {
     let compiled
     try {
+      if (row.label_correction) await verifyCorrectionSource(row)
       compiled = compileSubmittedExtractor(row)
     } catch (error) {
       const code = /^(?:WIKI|A_WIKI)_[A-Z0-9_]+$/.test(error.message) ? error.message : 'A_WIKI_EXTRACTOR_COMPILE_FAILED'
