@@ -12,6 +12,9 @@ def open_preset(page,id):
     page.locator(f'[data-preset="{id}"]').click()
     expect(page.locator('#editor')).to_be_visible()
     expect(page.locator('[name="packed"]')).not_to_be_checked()
+    count=page.locator('[data-preset-row]').count()
+    expect(page.locator('.preset-item-detail')).to_have_count(count)
+    assert page.locator('.preset-item-detail').first.evaluate('(el)=>!el.open'),'long date/help rows should start folded'
     a.no_overflow(page)
 
 def run(browser,width,base):
@@ -19,7 +22,11 @@ def run(browser,width,base):
         ctx=browser.new_context(viewport={'width':width,'height':844},locale='ko-KR',timezone_id='Asia/Seoul',accept_downloads=True)
         page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
         a.ready(page,a.address(base));original=a.stored(page)
-        if id=='light': page.screenshot(path=str(a.REPORT/f'preset-home-{width}.png'))
+        if id=='light':
+            shades=page.locator('.preset-card').evaluate_all('(els)=>els.map(el=>getComputedStyle(el).backgroundColor)')
+            assert len(shades)==3 and len(set(shades))==3,'three preset colors must be visually distinct'
+            assert page.locator('#catalog-panel').evaluate('(el)=>!el.open'),'catalog should start folded'
+            page.screenshot(path=str(a.REPORT/f'preset-home-{width}.png'))
         open_preset(page,id)
         expect(page.locator('#preset-summary')).to_contain_text(f'새로 추가 {count}종 / 기존 유지 0종')
         page.locator('#cancel').click();assert a.stored(page)==original
@@ -56,6 +63,7 @@ def run(browser,width,base):
             newrows=page.locator('[data-preset-row][data-existing="false"]')
             newrows.nth(0).locator('[name="include"]').uncheck()
             newrows.nth(1).locator('[name="target"]').fill('2')
+            newrows.nth(1).locator('.preset-item-detail summary').click()
             newrows.nth(1).locator('[name="inspection"]').fill('2027-01-02')
             expect(page.locator('#preset-summary')).to_contain_text('새로 추가 19종')
             assert a.stored(page)['bag']==edited['bag']
