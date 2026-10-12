@@ -27,12 +27,42 @@ def controlled(page):
     page.wait_for_function('navigator.serviceWorker.controller?.scriptURL.includes("/bag-lab/sw.js")')
     registration=page.evaluate('async()=>{const r=await navigator.serviceWorker.getRegistration("/bag-lab/alpha.html");return {scope:r.scope,active:!!r.active}}')
     assert registration['scope'].endswith('/bag-lab/') and registration['active']
+def atomic_text(path,text):
+    temporary=path.with_suffix(path.suffix+'.tmp');temporary.write_text(text);temporary.replace(path)
+def permission_checks(browser,base):
+    # Permissions belong to real, explicitly created disposable contexts. Older
+    # Chromium reports a persistent default-context ID it cannot grant to via CDP.
+    for permission in ('denied','granted'):
+        ctx=browser.new_context(permissions=['notifications'] if permission=='granted' else [])
+        try:
+            pg=ctx.new_page()
+            if permission=='denied':
+                session=ctx.new_cdp_session(pg)
+                identifier=session.send('Target.getTargetInfo')['targetInfo']['browserContextId']
+                session.send('Browser.setPermission',{'permission':{'name':'notifications'},'setting':'denied','origin':base,'browserContextId':identifier})
+            alpha.ready(pg,alpha.address(base));controlled(pg)
+            assert pg.evaluate('Notification.permission')==permission
+            before=alpha.stored(pg)
+            pg.locator('[data-nav="settings"]').click()
+            expect(pg.locator('#reminder-time-label')).to_be_hidden();expect(pg.locator('#reminder-settings')).to_be_hidden()
+            pg.locator('#reminder-enabled').check()
+            if permission=='denied':
+                expect(pg.locator('#reminder-permission')).to_have_text('권한 거부됨');expect(pg.locator('#reminder-enabled')).not_to_be_checked();expect(pg.locator('#reminder-test')).to_be_disabled()
+            else:
+                expect(pg.locator('#reminder-permission')).to_have_text('권한 허용됨')
+                details=pg.locator('details').filter(has=pg.get_by_text('알림 문제 해결·권한 설정',exact=True));details.locator('summary').click()
+                pg.locator('#reminder-test').click();expect(pg.locator('#reminder-status')).to_contain_text('테스트 알림 요청됨')
+                expect(pg.locator('#reminder-count')).to_contain_text('0개')
+            assert alpha.stored(pg)==before
+        finally:ctx.close()
+    print('PASS actual browser denied/granted/opt-in/test notification capability; no native-only controls or closed-app web reservations',flush=True)
 def regenerate(root,version):
     bag=root/'bag-lab';manifest=bag/'pwa-assets.js'
     data=json.loads(manifest.read_text().split('self.BAG_PWA_BUILD=',1)[1].rstrip(';\n'))
     data['version']=version
     for asset in data['assets']: asset['sha256']=hashlib.sha256((bag/asset['path']).read_bytes()).hexdigest()
-    manifest.write_text('self.BAG_PWA_BUILD='+json.dumps(data)+';\n')
+    atomic_text(bag/'alpha-shell.txt',(bag/'alpha.html').read_text())
+    atomic_text(manifest,'self.BAG_PWA_BUILD='+json.dumps(data)+';\n')
 def update(page):
     page.evaluate('async()=>{const r=await navigator.serviceWorker.getRegistration("/bag-lab/alpha.html");await r.update()}')
 def main():
@@ -59,23 +89,10 @@ def main():
                 dimension=page.evaluate('async path=>{const image=new Image();image.src=path;await image.decode();return [image.naturalWidth,image.naturalHeight]}',icon['src'])
                 assert dimension==[int(icon['sizes'].split('x')[0])]*2
             # Chrome's actual installability protocol, rather than manifest syntax alone.
-            cdp=context.new_cdp_session(page);cdp.send('Page.enable');browser_context=cdp.send('Target.getTargetInfo')['targetInfo'].get('browserContextId');print('Chromium',cdp.send('Browser.getVersion')['product'],flush=True);details=cdp.send('Page.getInstallabilityErrors')
+            cdp=context.new_cdp_session(page);cdp.send('Page.enable');print('Chromium',cdp.send('Browser.getVersion')['product'],flush=True);details=cdp.send('Page.getInstallabilityErrors')
             assert details['installabilityErrors']==[],details
             alpha.register(page,'가상 PWA 시험품',2,'equipment',[(1,None,'2030-01-01')]);initial=alpha.stored(page);backup=alpha.backup(page)
-            page.locator('[data-nav="settings"]').click()
-            expect(page.locator('#reminder-time-label')).to_be_hidden();expect(page.locator('#reminder-settings')).to_be_hidden()
-            cdp.send('Browser.setPermission',{'permission':{'name':'notifications'},'setting':'denied','origin':base,'browserContextId':browser_context})
-            page.locator('#reminder-enabled').check();expect(page.locator('#reminder-permission')).to_have_text('권한 거부됨');expect(page.locator('#reminder-enabled')).not_to_be_checked();expect(page.locator('#reminder-test')).to_be_disabled()
-            cdp.send('Browser.setPermission',{'permission':{'name':'notifications'},'setting':'granted','origin':base,'browserContextId':browser_context})
-            page.reload(wait_until='networkidle')
-            page.locator('[data-nav="settings"]').click()
-            page.wait_for_function('Notification.permission==="granted"')
-            page.locator('#reminder-enabled').check();expect(page.locator('#reminder-permission')).to_have_text('권한 허용됨')
-            details=page.locator('details').filter(has=page.get_by_text('알림 문제 해결·권한 설정',exact=True));details.locator('summary').click()
-            page.locator('#reminder-test').click();expect(page.locator('#reminder-status')).to_contain_text('테스트 알림 요청됨')
-            expect(page.locator('#reminder-count')).to_contain_text('0개');assert alpha.stored(page)==initial
-            page.locator('#reminder-enabled').uncheck();page.locator('[data-nav="inventory"]').click()
-            print('PASS actual browser denied/granted/opt-in/test notification capability; no native-only controls or closed-app web reservations',flush=True)
+            permission_checks(browser,base)
             # Unrelated caches and root routes are neither owned nor removed.
             page.evaluate('async()=>{await (await caches.open("unrelated-existing-cache")).put("/other.txt",new Response("keep"))}')
             outside=context.new_page();outside.goto(base+'/bag-lab/../');assert outside.evaluate('navigator.serviceWorker.controller') is None
@@ -91,14 +108,14 @@ def main():
             if not remote:
                 # Partial update: manifest names a different cohort but bytes are stale.
                 caches_before=page.evaluate('async()=>await caches.keys()')
-                assets=root/'bag-lab'/'pwa-assets.js';old=assets.read_text();assets.write_text(old.replace('"version": "','"version": "broken-').replace('"sha256": "','"sha256": "f'))
+                assets=root/'bag-lab'/'pwa-assets.js';old=assets.read_text();atomic_text(assets,old.replace('"version": "','"version": "broken-').replace('"sha256": "','"sha256": "f'))
                 update(page);page.wait_for_timeout(1500)
                 assert page.evaluate('async()=>!!(await navigator.serviceWorker.getRegistration("/bag-lab/alpha.html")).waiting') is False
                 assert page.evaluate('async()=>await caches.keys()')==caches_before
                 context.set_offline(True);page.reload(wait_until='networkidle');assert alpha.stored(page)==offline;context.set_offline(False)
                 # Healthy update activates only on consent, then reloads a whole cohort.
-                assets.write_text(old);html=root/'bag-lab'/'alpha.html';html.write_text(html.read_text().replace('로컬 기록 Alpha','업데이트 검증 Alpha'))
-                regenerate(root,'synthetic-update-v2');update(page)
+                context.set_offline(True);atomic_text(assets,old);html=root/'bag-lab'/'alpha.html';html.write_text(html.read_text().replace('로컬 기록 Alpha','업데이트 검증 Alpha'))
+                regenerate(root,'synthetic-update-v2');context.set_offline(False);page.wait_for_function('navigator.onLine');update(page)
                 page.wait_for_function('navigator.serviceWorker.getRegistration("/bag-lab/alpha.html").then(r=>!!r.waiting)')
                 page.locator('[data-nav="settings"]').click();expect(page.locator('#pwa-update')).to_be_visible()
                 page.locator('#pwa-update').click();page.wait_for_function('document.title.includes("업데이트 검증")');assert alpha.stored(page)==offline

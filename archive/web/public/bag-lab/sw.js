@@ -7,12 +7,17 @@ const PREFIX='bag-side-01-shell-',BUILD=self.BAG_PWA_BUILD,CACHE=PREFIX+BUILD.ve
 const ROOT='/bag-lab/';
 self.addEventListener('install',event=>event.waitUntil((async()=>{
   // All assets must pass integrity checks BEFORE a complete cache is published.
-  const responses=await Promise.all(BUILD.assets.map(async({path,sha256})=>{
-    const response=await fetch(new Request(ROOT+path,{cache:'no-store',credentials:'same-origin'}));
+  const responses=await Promise.all(BUILD.assets.map(async({path,source,sha256})=>{
+    const response=await fetch(new Request(ROOT+(source??path),{cache:'no-store',credentials:'same-origin'}));
     if(!response.ok||response.redirected)throw new Error('Incomplete BAG shell: '+path);
     const bytes=await response.clone().arrayBuffer();
     const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
     if(digest!==sha256)throw new Error('Mixed BAG shell: '+path);
+    if(path==='alpha.html'){
+      const headers=new Headers(response.headers);headers.set('content-type','text/html; charset=utf-8');
+      headers.delete('content-encoding');headers.delete('content-length');
+      return {path,response:new Response(bytes,{status:200,headers})};
+    }
     return {path,response};
   }));
   try{const cache=await caches.open(CACHE);for(const {path,response} of responses)await cache.put(ROOT+path,response);}
