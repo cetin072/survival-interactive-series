@@ -480,7 +480,15 @@ export async function consumeNativeJob({
   const change = (expected, status, extra) => advance(row, expected, status, extra, requestRpc)
 
   if (row.status === 'EXTRACTOR_SUBMITTED') {
-    const compiled = compileSubmittedExtractor(row)
+    let compiled
+    try {
+      compiled = compileSubmittedExtractor(row)
+    } catch (error) {
+      const code = /^(?:WIKI|A_WIKI)_[A-Z0-9_]+$/.test(error.message) ? error.message : 'A_WIKI_EXTRACTOR_COMPILE_FAILED'
+      const update = await change('EXTRACTOR_SUBMITTED', 'BLOCKED', { blockerCode: code })
+      insist(update?.status === 'BLOCKED', 'A_WIKI_EXTRACTOR_BLOCK_NOT_CONFIRMED')
+      return { status: 'BLOCKED', session_id: row.session_id, blocker_code: code, update }
+    }
     if (compiled.action === 'HUMAN_REVIEW') {
       const update = await change('EXTRACTOR_SUBMITTED', 'HUMAN_REVIEW', { blockerCode: compiled.code })
       return { status: 'HUMAN_REVIEW', session_id: row.session_id, update }
@@ -489,6 +497,7 @@ export async function consumeNativeJob({
       proposal: compiled.proposal,
       reviewJob: compiled.reviewJob,
     })
+    insist(update?.status === 'REVIEW_READY', 'A_WIKI_REVIEW_READY_NOT_CONFIRMED')
     return { status: 'REVIEW_READY', session_id: row.session_id, proposal_sha256: compiled.proposal.proposal_sha256, update }
   }
 
