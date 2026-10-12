@@ -67,6 +67,8 @@ def main():
             cdp.send('Browser.setPermission',{'permission':{'name':'notifications'},'setting':'denied','origin':base})
             page.locator('#reminder-enabled').check();expect(page.locator('#reminder-permission')).to_have_text('권한 거부됨');expect(page.locator('#reminder-enabled')).not_to_be_checked();expect(page.locator('#reminder-test')).to_be_disabled()
             cdp.send('Browser.setPermission',{'permission':{'name':'notifications'},'setting':'granted','origin':base})
+            page.reload(wait_until='networkidle')
+            page.locator('[data-nav="settings"]').click()
             page.wait_for_function('Notification.permission==="granted"')
             page.locator('#reminder-enabled').check();expect(page.locator('#reminder-permission')).to_have_text('권한 허용됨')
             details=page.locator('details').filter(has=page.get_by_text('알림 문제 해결·권한 설정',exact=True));details.locator('summary').click()
