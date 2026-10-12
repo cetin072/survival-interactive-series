@@ -101,8 +101,17 @@ rejection('normalization does not permit invalid uppercase citation IDs', ({ res
 }, /WIKI_CITATION_ID_INVALID/)
 rejection('normalized citations still require exact valid quotations', ({ result }) => {
   result.citations[0].id = 'fuel_allocation'
+  for (const node of result.nodes) for (const field of Object.keys(node.evidence)) node.evidence[field] = node.evidence[field].map((id) => id === 'q1' ? 'fuel_allocation' : id)
+  result.relations[0].evidence = ['fuel_allocation']
   result.citations[0].quote = '없는_인용문'
-}, /WIKI_QUOTE_NOT_FOUND|WIKI_EVIDENCE_REQUIRED/)
+}, /WIKI_QUOTE_NOT_FOUND/)
+
+rejection('normalization keeps the exact new-place name grounding guard', ({ result }) => {
+  result.citations[0].id = 'fuel_allocation'
+  for (const node of result.nodes) for (const field of Object.keys(node.evidence)) node.evidence[field] = node.evidence[field].map((id) => id === 'q1' ? 'fuel_allocation' : id)
+  result.relations[0].evidence = ['fuel_allocation']
+  result.nodes[1].label = '새로 조합한 작업장 이름'
+}, /WIKI_NEW_NAME_NOT_IN_EVIDENCE/)
 
 test('updates preserve unrelated existing metadata and identity', () => {
   const f = fixture(), p = compileWikiFactProposal(f.job, f.result), node = p.facts.nodes.find((n) => n.id === 'char-existing')

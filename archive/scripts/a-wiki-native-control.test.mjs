@@ -127,6 +127,22 @@ test('compiler failure records an exact blocker once without replacing the store
   assert.deepEqual(result, original)
 })
 
+test('a stored new-name grounding failure becomes BLOCKED with its original result intact', async () => {
+  const { job, result } = syntheticPackage()
+  result.nodes[1].label = '인용문에 없는 장소명'
+  const original = structuredClone(result), calls = []
+  const outcome = await consumeNativeJob({ requestRpc: async (name, args) => {
+    if (name === 'archive_a_wiki_native_job_program_current') return { job_id: 'db-job', status: 'EXTRACTOR_SUBMITTED', prepared_job: job, extractor_result: result }
+    calls.push(args)
+    return { status: args.p_status }
+  }, publish: () => assert.fail('Grounding cannot be bypassed') })
+  assert.equal(outcome.status, 'BLOCKED')
+  assert.equal(outcome.blocker_code, 'WIKI_NEW_NAME_NOT_IN_EVIDENCE')
+  assert.equal(calls[0].p_expected_status, 'EXTRACTOR_SUBMITTED')
+  assert.equal(calls[0].p_proposal, null)
+  assert.deepEqual(result, original)
+})
+
 test('recoverable stored citation spelling reaches independent review once; failed RPC is not a compile blocker', async () => {
   const { job, result } = syntheticPackage()
   result.citations[0].id = 'fuel_allocation'
