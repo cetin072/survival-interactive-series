@@ -3,6 +3,7 @@ import { OperatorRoadmap } from './OperatorRoadmap'
 import type { RoadmapLog } from './operatorRoadmapModel'
 import {
   aWikiPublicationStatus,
+  aWikiOperatorGuidance,
   aWikiStatusLabel,
   blockerLabel,
   decisionLabel,
@@ -59,7 +60,8 @@ type KnowledgeSemanticJob = {
 type AWikiJob = {
   job_id?: string; status?: string; session_id?: string; season_id?: string; source_ref?: string
   completion_origin?: 'NATIVE' | 'NATIVE_REVIEWED_MERGE' | 'EXTERNAL_REVIEWED_MERGE' | null
-  blocker_code?: string | null; final_pr_number?: number | null; merge_sha?: string | null
+  blocker_code?: string | null; review_decision?: string | null; review_note?: string | null
+  final_pr_number?: number | null; merge_sha?: string | null
   dispatch_count?: number | null; dispatch_at?: string | null; age_minutes?: number | null
   created_at?: string | null; updated_at?: string | null; extractor_submitted_at?: string | null
   review_ready_at?: string | null; review_submitted_at?: string | null; finalizing_at?: string | null
@@ -81,7 +83,7 @@ export type SystemStatus = {
     retry_cron: CronStatus | null
   }
   review: { pending_count: number; automation_error_count: number }
-  a_wiki?: { job_count: number; active_count: number; published_count: number; latest_job: AWikiJob | null }
+  a_wiki?: { job_count: number; active_count: number; human_review_count?: number; published_count: number; latest_job: AWikiJob | null }
   knowledge_semantic?: {
     active_count: number
     latest_job: KnowledgeSemanticJob | null
@@ -142,14 +144,16 @@ export function OperatorDashboard({
 
   const aWikiLatest = systemStatus?.a_wiki?.latest_job ?? null
   const aWikiBlocker = aWikiLatest?.blocker_code ?? null
+  const aWikiGuidance = aWikiOperatorGuidance(aWikiLatest)
+  const aWikiHumanReview = aWikiLatest?.status === 'HUMAN_REVIEW'
+  const aWikiHumanCount = systemStatus?.a_wiki?.human_review_count ?? (aWikiHumanReview ? 1 : 0)
   const aWikiPublication = aWikiPublicationStatus(aWikiLatest, productionStatus)
-  const aWikiBadgeClass = aWikiBlocker ? 'warning'
+  const aWikiBadgeClass = aWikiGuidance.badge ? 'warning'
     : aWikiLatest?.status === 'PUBLISHED' ? aWikiPublication.deploymentVerified ? 'ok' : 'neutral'
     : visualStatusTone(aWikiLatest?.status)
   const aWikiBadge = !systemStatus?.a_wiki ? '상태 조회 필요'
-    : aWikiBlocker ? '확인 필요'
-    : aWikiLatest?.status === 'PUBLISHED' ? aWikiPublication.deployment
-    : aWikiLatest?.status ? aWikiStatusLabel(aWikiLatest.status) : '실행 이력 없음'
+    : aWikiGuidance.badge ?? (aWikiLatest?.status === 'PUBLISHED' ? aWikiPublication.deployment
+      : aWikiLatest?.status ? aWikiStatusLabel(aWikiLatest.status) : '실행 이력 없음')
 
   const visualLatest = systemStatus?.visual.latest_job ?? null
   const visualPrepHealthy = systemStatus?.visual.prep_cron?.active === true
@@ -243,15 +247,22 @@ export function OperatorDashboard({
           </div>
           <dl>
             <div><dt>최근 작업</dt><dd>{aWikiLatest?.season_id ? `${aWikiLatest.season_id} · ` : ''}{sessionLabel(aWikiLatest?.session_id)}</dd></div>
-            <div><dt>작업 수</dt><dd>{systemStatus?.a_wiki ? `진행 ${systemStatus.a_wiki.active_count}건 · 저장소 반영 ${systemStatus.a_wiki.published_count}건` : '조회 필요'}</dd></div>
+            <div><dt>작업 수</dt><dd>{systemStatus?.a_wiki ? `처리 중 ${systemStatus.a_wiki.active_count}건 · 검수 보류 ${aWikiHumanCount}건 · 저장소 반영 ${systemStatus.a_wiki.published_count}건` : '조회 필요'}</dd></div>
+            <div><dt>현 상태</dt><dd>{systemStatus?.a_wiki ? aWikiGuidance.category : '조회 필요'}</dd></div>
             <div><dt>내용 검수</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.review : '조회 필요'}</dd></div>
             <div><dt>저장소 반영</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.repository : '조회 필요'}</dd></div>
             <div><dt>공개 사이트</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.deployment : '조회 필요'}</dd></div>
-            <div><dt>다음 작업</dt><dd>{!systemStatus?.a_wiki ? '조회 필요' : aWikiBlocker ? '현재 작업 확인 필요' : systemStatus.a_wiki.active_count > 0 ? '현재 기록 처리 중' : '다음 공개 원문 처리 대기'}</dd></div>
+            <div><dt>다음 작업</dt><dd>{!systemStatus?.a_wiki ? '조회 필요' : aWikiGuidance.next ?? (systemStatus.a_wiki.active_count > 0 ? '현재 기록 처리 중' : '다음 공개 원문 처리 대기')}</dd></div>
             <div><dt>최근 갱신</dt><dd>{formatOperatorTime(aWikiLatest?.published_at ?? aWikiLatest?.updated_at ?? aWikiLatest?.created_at)}</dd></div>
-            <div><dt>막힌 이유</dt><dd>{!systemStatus?.a_wiki ? '조회 필요' : aWikiBlocker ? blockerLabel(aWikiBlocker) : '없음'}</dd></div>
+            <div><dt>막힌 이유</dt><dd>{!systemStatus?.a_wiki ? '조회 필요' : aWikiHumanReview ? blockerLabel('REVIEWER_HUMAN_REVIEW') : aWikiBlocker ? blockerLabel(aWikiBlocker) : '없음'}</dd></div>
           </dl>
-          <p className="operator-status-help">{systemStatus?.a_wiki ? aWikiPublication.deploymentDetail : '위키 실행 상태를 불러오지 못했습니다. 상태를 새로고침해 주세요.'}</p>
+          {aWikiHumanReview && <section className="operator-wiki-review-guidance" aria-label="A-Wiki 독립 검수 결과">
+            <strong>검수자가 지적한 내용</strong>
+            <p>{aWikiLatest?.review_note?.trim() || aWikiGuidance.reason}</p>
+            <p>이 작업은 검수 때문에 게시 전 대기 중입니다. 자동화가 꺼졌다는 뜻은 아닙니다. 원문에 맞게 수정하고 독립 검수를 다시 통과해야 합니다.</p>
+          </section>}
+          <p className="operator-status-help">{systemStatus?.a_wiki ? aWikiGuidance.schedule : '위키 실행 상태를 불러오지 못했습니다. 상태를 새로고침해 주세요.'}</p>
+          <p className="operator-status-help">{systemStatus?.a_wiki ? aWikiPublication.deploymentDetail : '위키 실행 상태를 불러오지 못했습니다.'}</p>
           <details className="operator-tech-details">
             <summary>기술 상세</summary>
             <dl>
