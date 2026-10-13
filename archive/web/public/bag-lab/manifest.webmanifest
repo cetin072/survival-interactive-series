@@ -1,0 +1,16 @@
+{
+  "id": "/bag-lab/alpha.html",
+  "name": "나의 생존가방",
+  "short_name": "생존가방",
+  "lang": "ko-KR",
+  "start_url": "/bag-lab/alpha.html",
+  "scope": "/bag-lab/",
+  "display": "standalone",
+  "background_color": "#f5f7fa",
+  "theme_color": "#142234",
+  "icons": [
+    {"src": "/bag-lab/icons/bag-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "/bag-lab/icons/bag-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "/bag-lab/icons/bag-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

@@ -1,0 +1,62 @@
+name: BAG Android shell build (device delivery remains experimental)
+on:
+  pull_request:
+    paths:
+      - 'bag-mobile/**'
+      - 'archive/web/public/bag-lab/**'
+      - '.github/workflows/bag-side-android.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  android-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: bag-mobile/package-lock.json
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: '13114758'
+          packages: 'platform-tools platforms;android-36 build-tools;35.0.0 build-tools;36.0.0'
+          log-accepted-android-sdk-licenses: false
+      - name: Native wall-clock and missed-date policy
+        run: |
+          mkdir -p "$RUNNER_TEMP/bag-native-tests"
+          javac -d "$RUNNER_TEMP/bag-native-tests" bag-mobile/android/app/src/main/java/com/cetin072/survivalbag/BagReminderTime.java bag-mobile/qa/BagReminderTimeTest.java
+          java -cp "$RUNNER_TEMP/bag-native-tests" com.cetin072.survivalbag.BagReminderTimeTest
+      - name: Install locked standalone shell dependencies
+        working-directory: bag-mobile
+        run: npm ci --no-audit --no-fund
+      - name: Sync existing BAG web screen and Android plugins
+        working-directory: bag-mobile
+        run: npm run sync
+      - name: Android host regressions and debug APK (not physical delivery)
+        working-directory: bag-mobile/android
+        run: |
+          set -o pipefail
+          ./gradlew testDebugUnitTest assembleDebug --no-daemon --max-workers=2 2>&1 | tee "$RUNNER_TEMP/bag-android-build.log" || {
+            python -c 'import os,pathlib; text="\n".join(pathlib.Path(os.environ["RUNNER_TEMP"],"bag-android-build.log").read_text().splitlines()[-60:]); print("::error title=BAG Android build::"+text.replace("%","%25").replace("\n","%0A"))'
+            exit 1
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bag-side-host-tests-${{ github.event.pull_request.head.sha || github.sha }}
+          path: bag-mobile/android/app/build/test-results/testDebugUnitTest/
+          if-no-files-found: warn
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bag-side-debug-${{ github.event.pull_request.head.sha || github.sha }}
+          path: bag-mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7

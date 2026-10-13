@@ -1,0 +1,7 @@
+{
+  "appId": "com.cetin072.survivalbag",
+  "appName": "나의 생존가방",
+  "webDir": "www",
+  "server": {"hostname": "bag.local", "androidScheme": "https"},
+  "plugins": {"LocalNotifications": {"smallIcon": "ic_stat_bag", "iconColor": "#142234"}}
+}

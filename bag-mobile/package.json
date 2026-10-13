@@ -1,0 +1,19 @@
+{
+  "name": "bag-side-android-shell",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync": "node scripts/prepare-web.mjs && cap sync android",
+    "build:debug": "npm run sync && cd android && ./gradlew assembleDebug --no-daemon"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/local-notifications": "8.3.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3",
+    "esbuild": "0.27.0"
+  }
+}

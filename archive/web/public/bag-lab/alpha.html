@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#142234">
+  <title>나의 생존가방 · 1.0 RC</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/bag-192.png">
+  <link rel="apple-touch-icon" href="./icons/bag-192.png">
+  <link rel="stylesheet" href="./alpha.css">
+  <script type="module" src="./alpha.mjs"></script>
+</head>
+<body>
+  <svg class="icon-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="ic-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1 13H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M9 13h6m-3-3v6"/></symbol>
+    <symbol id="ic-box" viewBox="0 0 24 24"><path d="m3 7 9-4 9 4v10l-9 4-9-4V7Z"/><path d="m3 7 9 4 9-4m-9 4v10"/></symbol>
+    <symbol id="ic-settings" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2" fill="var(--icon-bg,#fff)"/><circle cx="15" cy="12" r="2" fill="var(--icon-bg,#fff)"/><circle cx="9" cy="18" r="2" fill="var(--icon-bg,#fff)"/></symbol>
+    <symbol id="ic-save" viewBox="0 0 24 24"><path d="M5 3h12l4 4v14H3V3h2Z"/><path d="M7 3v7h10V3M7 21v-8h10v8"/></symbol>
+    <symbol id="ic-book" viewBox="0 0 24 24"><path d="M12 6c-3-2-6-2-9-1v14c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1ZM12 6v14"/></symbol>
+    <symbol id="ic-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></symbol>
+    <symbol id="ic-history" viewBox="0 0 24 24"><path d="M3 11a9 9 0 1 1 2 6M3 5v6h6M12 7v5l4 2"/></symbol>
+    <symbol id="ic-external" viewBox="0 0 24 24"><path d="M12 5H5v14h14v-7M13 4h7v7M20 4l-9 9"/></symbol>
+  </svg>
+  <div class="notice"><span class="notice-dot"></span><strong>1.0 출시 후보</strong><span>기기 로컬 기록 · 알림·점검은 더보기</span></div>
+  <main class="shell">
+    <header class="top"><div><div class="brand"><span class="brand-symbol" aria-hidden="true"><svg class="ui-icon" focusable="false"><use href="#ic-bag"></use></svg></span>나의 생존가방</div><p class="brand-tagline">한 번 준비하고, 꾸준히 돌보는 나만의 비상가방</p></div><div class="mini-bag" aria-hidden="true"><div class="bag-handle"></div><div class="bag-body"><div class="bag-pocket"><div class="bag-pocket-line"></div></div><div class="bag-badge">READY</div></div></div></header>
+    <p id="save-status" class="message" role="status" aria-live="polite">저장된 가방을 읽는 중입니다. 아직 수량을 확인하지 않았습니다.</p>
+    <div id="load-error" class="error-panel" role="alert" hidden><p>저장소를 읽지 못했습니다. 샘플이나 빈 가방으로 덮어쓰지 않았습니다.</p><button id="reload" type="button" class="quiet-button">최신 기록 다시 읽기</button><button id="raw-export" type="button" class="quiet-button">저장 원본 내보내기</button></div>
+    <noscript><p class="error-panel">물품 등록과 로컬 저장에는 JavaScript가 필요합니다. <a href="/knowledge/emergency-supplies-inventory/">비상용품 관리 지식 읽기</a></p></noscript>
+    <nav class="bag-tabs" role="tablist" aria-label="나의 생존가방 주요 메뉴">
+      <button class="bag-tab active" type="button" id="tab-bag" role="tab" aria-selected="true" aria-controls="panel-bag" tabindex="0" data-nav="bag"><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-bag"></use></svg><span>내 가방</span></button>
+      <button class="bag-tab" type="button" id="tab-inventory" role="tab" aria-selected="false" aria-controls="panel-inventory" tabindex="-1" data-nav="inventory"><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-box"></use></svg><span>물품 관리</span></button>
+      <button class="bag-tab" type="button" id="tab-settings" role="tab" aria-selected="false" aria-controls="panel-settings" tabindex="-1" data-nav="settings"><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-settings"></use></svg><span>더보기</span></button>
+    </nav>
+    <section id="panel-bag" class="bag-screen" role="tabpanel" aria-labelledby="tab-bag" data-screen="bag">
+      <section id="preset-panel" class="preset-panel" hidden aria-labelledby="preset-title">
+        <h2 id="preset-title">추천 구성으로 한 번에 시작</h2>
+        <p class="preset-intro">하나 고르고, 나에게 맞게 수정하세요.</p>
+        <div id="preset-cards" class="preset-cards"></div>
+        <p class="preset-note">추천 구성은 준비 목록입니다. 실제 보유 수량은 따로 확인하세요.</p>
+  
+      </section>
+      <section class="status-section"><div class="status-top"><div><h1 id="bag-name">내 가방, <em>지금 상태.</em></h1></div></div>
+        <div class="stats">
+          <button class="stat" type="button" data-filter="all" data-ready disabled><span class="stat-label">관리하는 물품 ↗</span><span class="stat-value"><span id="item-count">—</span><small>종</small></span></button>
+          <button class="stat stat-alert" type="button" data-filter="short" data-ready disabled><span class="stat-label">보충할 물품 ↗</span><span class="stat-value"><span id="needs-count">—</span><small>종</small></span></button>
+          <button class="stat stat-near" type="button" data-filter="soon" data-ready disabled><span class="stat-label">30일 이내 관리 ↗</span><span class="stat-value"><span id="soon-count">—</span><small>종</small></span></button>
+        </div><p id="next-check" class="next-banner">저장된 기록 확인 전입니다.</p>
+      </section>
+      <section class="catalog-overview" aria-labelledby="catalog-overview-title">
+        <div><h2 id="catalog-overview-title">기본 항목 충족 <strong id="catalog-ready-count" aria-live="polite" aria-atomic="true">0 / —</strong></h2><progress id="catalog-progress" max="100" value="0" aria-label="기본 추천 항목 중 개인 목표 수량 충족 비율"></progress><small>실제 등록 수량 기준 · 안전 준비 완료를 뜻하지 않아요.</small></div>
+        <button class="action primary-action" type="button" data-command="catalog" data-ready disabled>하나씩 추가 →</button>
+      </section>
+      <div class="toolbar"><button class="action confirm-action" type="button" data-command="add" data-ready disabled>＋ 내 물품 등록</button><button class="quiet-button" type="button" data-command="backup" data-ready disabled><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-save"></use></svg> 백업·설정</button></div>
+      <section class="priority-section"><div class="section-heading"><h2>먼저 확인할 물품</h2></div><div id="upcoming-list" class="upcoming-list"></div></section>
+    </section>
+    <section id="panel-inventory" class="bag-screen" role="tabpanel" aria-labelledby="tab-inventory" data-screen="inventory" hidden>
+      <div class="toolbar"><h2>내 가방 물품</h2><button class="action primary-action" type="button" data-command="add" data-ready disabled>＋ 물품 등록</button></div>
+      <button type="button" class="quiet-button preset-back-link" data-command="presets" data-ready disabled>← 구성 3종 한 번에 추가</button>
+      <details id="catalog-panel" class="catalog-panel">
+        <summary>추천 물품에서 하나씩 추가 <span class="catalog-summary-hint">49종 · 8분류</span></summary>
+        <p class="catalog-intro">물품을 고른 뒤 실제 수량·기한을 확인해 등록하세요.</p>
+        <div class="catalog-family" aria-label="예시 수량 참고 인원"><span>수량 참고 인원</span><button id="family-less" type="button" aria-label="참고 인원 줄이기" data-ready disabled>−</button><output id="family-count">1명</output><button id="family-more" type="button" aria-label="참고 인원 늘리기" data-ready disabled>＋</button></div>
+
+        <p class="catalog-swipe-hint">분류를 좌우로 밀어 더 볼 수 있어요 →</p>
+        <nav id="catalog-groups" class="catalog-groups" aria-label="추천 물품 분류"></nav>
+        <div id="catalog-group-intro" class="catalog-group-intro"></div>
+        <div id="catalog-items" class="catalog-items"></div>
+
+      </details>
+      <div class="filters" aria-label="상태 필터"><button type="button" data-filter="all" aria-pressed="true" class="selected">전체</button><button type="button" data-filter="short" aria-pressed="false">보충 필요</button><button type="button" data-filter="soon" aria-pressed="false">30일 이내</button></div>
+      <div id="item-list" class="items"></div>
+
+    </section>
+    <section id="panel-settings" class="bag-screen settings-screen" role="tabpanel" aria-labelledby="tab-settings" data-screen="settings" hidden>
+      <div class="settings-heading">
+        <h1><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-settings"></use></svg> 더보기</h1>
+        <p>기록 관리, 설명과 업데이트는 여기서 확인하세요.</p>
+      </div>
+      <section class="settings-card settings-brand" aria-labelledby="settings-brand-title">
+        <h2 id="settings-brand-title"><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-bag"></use></svg> 서비스 소개</h2>
+        <p class="settings-overline">THE ART OF BEING READY</p>
+        <h3>나는 <em>준비하는 사람.</em></h3>
+        <p class="brand-lead">걱정을 쌓아두기보다, 하나씩 준비하는 습관.</p>
+        <p class="brand-manifesto">한 번 준비하고, 꾸준히 돌보는 나만의 비상가방.</p>
+        <p class="settings-overline">ONE BAG · ONE HABIT</p>
+        <details class="settings-details">
+          <summary>브랜드 이야기·제작 취지</summary>
+          <p>작은 준비도 분명한 시작입니다. 무엇을 챙겼는지 기록하고, 꺼낸 만큼 다시 채우며, 다음 점검을 잊지 않도록 돕는 생활 도구를 만듭니다.</p>
+          <p>생존일기의 현실 생존지식과 연결되는 비상가방 관리 도구입니다. 준비 완료나 생존을 보장하는 앱은 아닙니다.</p>
+        </details>
+        <p class="settings-copyright">© 2026 생존일기 · 나의 생존가방</p>
+      </section>
+      <section class="settings-card settings-guide" aria-labelledby="settings-guide-title">
+        <h2 id="settings-guide-title"><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-book"></use></svg> 준비 방법 · 생존지식</h2>
+        <a class="settings-link settings-guide-primary" href="/knowledge/emergency-supplies-inventory/" target="_blank" rel="noopener noreferrer"><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-book"></use></svg> <span><strong>생존가방 준비법 자세히 보기</strong><small>무엇을 준비하고 어떻게 점검할지 알아보세요</small></span><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-external"></use></svg></a>
+        <a class="settings-link" href="/knowledge/" target="_blank" rel="noopener noreferrer"><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-external"></use></svg> <span><strong>생존지식 전체 둘러보기</strong><small>준비·점검·대피 관련 글</small></span><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-external"></use></svg></a>
+        <details class="settings-details">
+          <summary>기한·수량·무게 관리 기준</summary>
+          <p>준비 목록은 실제 보유량이 아닙니다. 주문한 물품도 실제 가방에 넣기 전까지 재고로 계산하지 않습니다. 표시기한·점검일이 같은 물품은 수량을 합치고, 조건이 다르면 묶음을 분리합니다.</p>
+          <p>10·15·18kg은 제품의 실제 무게가 아니라 구성 선택을 돕는 참고값입니다. 추천 구성은 성인 1인용 시작 예시이며 개인 상태에 따라 수정해야 합니다.</p>
+          <p>첫 점검일은 앱의 관리 제안이며 실제 소비기한이나 식품 안전기준이 아닙니다. 식품·의약품은 제품에 표시된 날짜와 보관조건을 직접 확인하세요. 웹은 테스트 알림과 앱 내 점검을 지원하며 Android 예약 알림은 시험 중입니다.</p>
+          <p>추천 목록의 인원 조절은 새 물품 목표 예시만 바꿉니다. 이미 기록된 재고·목표는 바뀌지 않습니다.</p>
+          <p>공식 참고: <a href="https://www.mois.go.kr/frt/bbs/type002/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000530&amp;nttId=119828" target="_blank" rel="noopener noreferrer">행정안전부 비상시 국민행동요령</a> · <a href="https://old.safekorea.go.kr/idsiSFK/neo/main_m/chk/emergencySupplies.html" target="_blank" rel="noopener noreferrer">국민재난안전포털 비상용품</a>. 분류와 기본·선택 등급은 앱의 편집 가능한 예시이며 정부 인증이 아닙니다.</p>
+        </details>
+      </section>
+      <section class="settings-card settings-storage" aria-labelledby="settings-storage-title">
+        <h2 id="settings-storage-title"><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-save"></use></svg> 내 기록·설정</h2>
+        <div class="toolbar settings-actions"><button type="button" data-command="settings" class="action primary-action" data-ready disabled>가방 이름 · 교체 기준</button></div>
+        <p id="lead-note" class="settings-caption">교체 검토일을 불러오는 중입니다.</p>
+        <details id="backup-panel" class="backup-panel" open><summary>기록 백업·복원</summary>
+        <p class="settings-caption">저장은 이 브라우저에만 됩니다. 휴대전화 교체 전에 기록을 파일로 백업하세요.</p>
+        <div class="toolbar wrap"><button id="export" class="action primary-action" type="button" data-ready disabled>내 가방 백업하기</button><label class="file-button">백업 파일 불러오기<input id="import" type="file" accept=".json,application/json" data-ready disabled></label><button id="undo" class="quiet-button" type="button" data-ready disabled>이전 저장 복원</button><button type="button" data-command="refresh" class="quiet-button" data-ready disabled>최신 기록 읽기</button></div>
+        <details class="subtle-help"><summary>백업·복원 주의사항</summary><p>백업은 암호화되지 않은 기록 파일입니다. 공유 기기와 공개 저장소를 피하세요. 복원은 현재 가방 전체를 교체하며, 기존 기록 1개는 복구용으로 보관합니다. 다운로드가 실제로 완료됐는지 확인하세요. QA와 정식 사이트는 저장 공간이 다릅니다. 옮길 때 JSON 백업·복원을 사용하세요.</p></details>
+      </details>
+      </section>
+      <section class="settings-card" aria-labelledby="settings-reminder-title">
+        <h2 id="settings-reminder-title">알림·점검</h2>
+        <p id="pwa-status" class="settings-caption" role="status">오프라인 앱 준비 확인 중</p>
+        <button id="pwa-update" class="quiet-button" type="button" hidden>새 버전으로 전환 (기록 유지)</button>
+        <p id="reminder-platform" class="settings-caption">실행 환경 확인 중</p>
+        <label class="confirm-check"><input id="reminder-enabled" type="checkbox" disabled> 알림 사용</label>
+        <p>알림 권한: <strong id="reminder-permission">확인 중</strong></p>
+        <label id="reminder-time-label" class="field" hidden>기본 알림 시간 · 기기 로컬 시간<input id="reminder-time" type="time" value="09:00"></label>
+        <p id="reminder-count" class="settings-caption">예약 상태 확인 중</p>
+        <p id="reminder-status" class="settings-caption" role="status" aria-live="polite">확인 중</p>
+        <div id="reminder-attention" class="toolbar wrap" aria-label="점검 확인 필요"></div>
+        <details class="subtle-help"><summary>알림 문제 해결·권한 설정</summary>
+          <div class="toolbar wrap"><button id="reminder-test" class="quiet-button" type="button" disabled>테스트 알림</button><button id="reminder-refresh" class="quiet-button" type="button">상태 다시 확인</button><button id="reminder-settings" class="quiet-button" type="button" hidden>Android 알림 설정 열기</button></div>
+          <p>웹/PWA에서는 앱을 열 때 점검할 물품을 보여주고 테스트 알림을 보냅니다. 브라우저 권한은 수개월 뒤 OS 알림 예약이 아닙니다.</p>
+          <p>Android 앱의 종료 후 알림은 시험 중입니다. 일반 앱 종료와 OS 강제 중지는 다르며, 강제 중지·절전·알림 채널 설정으로 알림이 늦거나 표시되지 않을 수 있습니다. 모든 기기에서 정확한 시각을 보장하지 않습니다.</p>
+          <p>알림 시각과 교체 검토일은 관리 설정이며 소비기한이나 안전기준이 아닙니다. 지난 점검 날짜는 자동으로 미래로 바꾸지 않습니다. 설치 업데이트는 앱 캐시만 교체하고 물품 기록·백업 파일을 초기화하지 않습니다.</p>
+          <p>미리보기·시험용·정식 사이트 및 Android 앱은 서로 다른 저장 공간입니다. 옮길 때 백업 파일을 사용하세요. 브라우저의 사이트 데이터 삭제 또는 앱 삭제 전에는 반드시 백업하세요.</p>
+        </details>
+      </section>
+      <section class="settings-card" aria-labelledby="settings-changes-title">
+        <h2 id="settings-changes-title"><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-history"></use></svg> 업데이트 기록</h2>
+        <p class="settings-caption">현재 버전 · 1.0 출시 후보</p>
+        <details class="settings-details" open>
+          <summary>2026.10 · 최근 변경사항</summary>
+          <ul>
+            <li>경량·표준·확장 추천 구성 3종, 기본 목록 일괄 등록</li>
+            <li>물품 수량·날짜 묶음 관리, 개별 삭제 및 보충 합산</li>
+            <li>기기 저장과 기록 백업·복원</li>
+            <li>설정·생존지식·브랜드·업데이트 화면 통합</li>
+          </ul>
+        </details>
+        <p class="settings-caption">정식 출시 전에는 기능과 화면이 변경될 수 있습니다.</p>
+      </section>
+    </section>
+    <footer><span>© 2026 생존일기 · 나의 생존가방</span><span>1.0 출시 후보 · 웹 종료 후 날짜 알림·클라우드 동기화 없음</span><p>설명·백업·업데이트는 <button type="button" class="footer-settings" data-command="more">더보기</button>에서 확인하세요.</p></footer>
+  </main>
+  <dialog id="editor" aria-labelledby="editor-title"><form id="editor-form"><h2 id="editor-title"></h2><div id="editor-body"></div><p id="editor-error" class="error-panel" role="alert" hidden></p><div class="dialog-actions"><button id="cancel" class="quiet-button" type="button">취소</button><button id="submit" class="action primary-action" type="submit">저장</button></div></form></dialog>
+</body>
+</html>
