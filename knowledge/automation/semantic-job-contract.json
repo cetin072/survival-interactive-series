@@ -16,10 +16,11 @@
     "evidence": { "type": "object" },
     "brief": {
       "type": "object",
-      "required": ["content_type", "status"],
+      "required": ["content_type", "status", "story_refs"],
       "properties": {
         "content_type": { "const": "BRIEF" },
-        "status": { "const": "READY" }
+        "status": { "const": "READY" },
+        "story_refs": { "type": "array", "description": "Actual knowledge/content/stories.json story.id only; no provenance paths or URLs. No explicit registry mapping means [].", "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" } }
       }
     },
     "topic": { "type": "object" },

@@ -1,3 +1,4 @@
+import { validateStoryRefs, projectReaderStoryRefs } from './knowledge-story-refs.mjs'
 import { createHash } from 'node:crypto'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -108,6 +109,8 @@ export function buildSemanticContext({ jobType, source, target, existingKnowledg
       excerpt: excerpt.slice(0, 5000),
     },
     existing_knowledge: { questions, briefs },
+    story_registry_ids: (existingKnowledge.stories ?? []).map(({ id }) => id),
+    story_refs_policy: 'brief.story_refs contains only explicit story_registry_ids. Never copy BOOK/chapter/source_refs/raw paths or URLs. No explicit mapping means []. Preserve narrative provenance in candidate.reader_* and source_refs/source_hashes.',
     topics: existingKnowledge.topics.map(({ id, title }) => ({ id, title })),
     policy: {
       worker_policy_version: policy.version,
@@ -190,11 +193,13 @@ export function validateSemanticResult(job, result) {
   return { decision: result.decision, briefId: brief.id, candidateId: candidate.id, topicId: brief.topic_id }
 }
 
-export async function applySemanticPackage({ root, job, result, now = new Date().toISOString() }) {
+export async function applySemanticPackage({ root, job, result, reservation = null, now = new Date().toISOString() }) {
   validateSemanticResult(job, result)
   fail(['BRIEF_READY', 'HUMAN_REVIEW'].includes(result.decision), 'SEMANTIC_PACKAGE_DECISION_REQUIRED')
   const data = await loadKnowledge(root)
-  const { candidate, evidence, brief, topic } = result
+  const projection = projectReaderStoryRefs({ job, result, stories: data.stories, reservation })
+  validateStoryRefs(projection.result.brief.story_refs, data.stories)
+  const { candidate, evidence, brief, topic } = projection.result
   fail(!data.briefs.some((item) => item.id === brief.id), 'SEMANTIC_BRIEF_ID_ALREADY_EXISTS')
   const priorCandidate = data.candidates.find((item) => item.id === candidate.id)
   if (priorCandidate) {
@@ -254,7 +259,7 @@ export async function applySemanticPackage({ root, job, result, now = new Date()
 
   const completed = await loadKnowledge(root)
   await validateKnowledge(completed)
-  return { brief_id: brief.id, candidate_id: candidate.id, changed_files: [
+  return { publication_projection: projection.receipt, brief_id: brief.id, candidate_id: candidate.id, changed_files: [
     `knowledge/content/topics.json`, `knowledge/content/candidates/${candidate.id}.json`,
     `knowledge/content/evidence/${brief.id}.json`, `knowledge/content/briefs/${brief.id}.json`,
     ...(job.source_kind === 'PUBLIC_ARCHIVE' ? ['knowledge/automation/state.json'] : job.source_kind === 'PUBLIC_READER' ? ['knowledge/automation/runtime-state.json'] : []),

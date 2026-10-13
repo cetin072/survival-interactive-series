@@ -141,6 +141,8 @@ export function validateReservedBriefTarget(job, result, briefs = []) {
 
 export async function verifyBriefReservation(job, result, { requestRpc = rpc } = {}) {
   const briefId = validateReservedBriefTarget(job, result)
+  if (job.semantic_result && JSON.stringify(result) !== JSON.stringify(job.semantic_result))
+    throw new Error('SEMANTIC_RESULT_IDENTITY_CHANGED')
   const verified = await requestRpc('archive_knowledge_semantic_job_verify_reservation', {
     p_job_id: job.job_id, p_brief_id: briefId,
     p_source_ref: job.source_ref, p_source_sha256: job.source_sha256,
@@ -165,9 +167,11 @@ export async function runPackage(job, result, { currentMainSha, headRef, current
     const initial = await loadKnowledge(temp)
     await validateKnowledge(initial)
     validateReservedBriefTarget(job, result, initial.briefs)
-    await verifyBriefReservation(job, result, { requestRpc })
+    const reservation = await verifyBriefReservation(job, result, { requestRpc })
     await verifyPins(job, temp)
-    const applied = await applySemanticPackage({ root: temp, job, result, now: new Date(job.submitted_at ?? job.prepared_at).toISOString() })
+    const applied = await applySemanticPackage({ root: temp, job, result, reservation, now: new Date(job.submitted_at ?? job.prepared_at).toISOString() })
+
+    if (applied.publication_projection) console.log(JSON.stringify({ publication_projection: applied.publication_projection }))
 
     runCommand('npm', ['ci'], join(temp, 'archive/web'))
     runCommand('npm', ['run', 'knowledge:test'], join(temp, 'archive/web'))
