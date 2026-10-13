@@ -32,6 +32,15 @@ function GuideBlock({ block, guide }: { block: KnowledgeGuideBlock; guide: Knowl
 
 export function KnowledgeGuidePage({ guide, showTopbar = true }: { guide: KnowledgeGuide; showTopbar?: boolean }) {
   const review = knowledgeReviewState(guide.detail)
+  const originHeading = /^(《생존일기》에서 시작한 질문|이 질문이 생긴 실제 경험)$/
+  const originIndex = guide.sections.length - 1
+  const hasOrigin = originHeading.test(guide.sections[originIndex]?.heading ?? '')
+  const mainSections = hasOrigin ? guide.sections.slice(0, -1) : guide.sections
+  const renderSection = (section: KnowledgeGuide['sections'][number], index: number, origin = false) =>
+    <section id={'guide-section-' + (index + 1)} key={section.heading} className={origin ? 'knowledge-guide-origin' : undefined}>
+      <h2><span aria-hidden="true">{origin ? '질문 출처' : String(index + 1).padStart(2, '0')}</span>{section.heading}</h2>
+      {section.blocks.map((block, blockIndex) => <GuideBlock key={blockIndex} block={block} guide={guide} />)}
+    </section>
   return <main className="wiki-shell knowledge-guide-shell">
     {showTopbar && <WikiTopbar />}
 
@@ -55,8 +64,10 @@ export function KnowledgeGuidePage({ guide, showTopbar = true }: { guide: Knowle
             <span>공개 상태 · {review.approved ? '공개 승인 완료' : '공개 승인 전'}</span>
             <span>범위 · {guide.scope}</span>
             <span>자료 확인 · {guide.sourceCheckedAt}</span>
-            <span>게시 · <time dateTime={guide.publishedAt}>{guide.publishedAt}</time></span>
-            {guide.detail.updated_at !== guide.publishedAt && <span>수정 · <time dateTime={guide.detail.updated_at}>{guide.detail.updated_at}</time></span>}
+            {guide.status === 'PUBLISHED'
+              ? <span>게시 · <time dateTime={guide.publishedAt}>{guide.publishedAt}</time></span>
+              : <span>게시 · 미게시 원고</span>}
+            {guide.status === 'PUBLISHED' && guide.detail.updated_at !== guide.publishedAt && <span>수정 · <time dateTime={guide.detail.updated_at}>{guide.detail.updated_at}</time></span>}
           </div>
         </header>
 
@@ -75,10 +86,7 @@ export function KnowledgeGuidePage({ guide, showTopbar = true }: { guide: Knowle
         </nav>
 
         <div className="knowledge-guide-body">
-          {guide.sections.map((section, sectionIndex) => <section id={'guide-section-' + (sectionIndex + 1)} key={section.heading}>
-            <h2><span>{sectionIndex + 1}.</span> {section.heading}</h2>
-            {section.blocks.map((block, blockIndex) => <GuideBlock key={blockIndex} block={block} guide={guide} />)}
-          </section>)}
+          {mainSections.map((section, sectionIndex) => renderSection(section, sectionIndex))}
         </div>
 
         <section className="knowledge-guide-sources" aria-labelledby="guide-sources-title">
@@ -91,6 +99,10 @@ export function KnowledgeGuidePage({ guide, showTopbar = true }: { guide: Knowle
             </article>)}
           </div>
         </section>
+
+        {hasOrigin && <div className="knowledge-guide-body knowledge-guide-provenance">
+          {renderSection(guide.sections[originIndex], originIndex, true)}
+        </div>}
 
         {!!guide.detail.related_briefs.length && <section className="knowledge-guide-related"><h2>관련 글</h2>{guide.detail.related_briefs.map((item) => <p key={item.id}><a href={knowledgeHref(item)}><strong>{item.label} →</strong><small className="related-question">{item.title}</small></a></p>)}</section>}
         {guide.detail.related_guide && <section className="knowledge-guide-related"><h2>더 깊게 알아보기</h2><p><a href={'/knowledge/guides/' + guide.detail.related_guide.slug + '/'}>전문 가이드 보기 →</a></p></section>}
@@ -110,7 +122,7 @@ export function KnowledgeGuidePage({ guide, showTopbar = true }: { guide: Knowle
         </section>}
         <footer className="knowledge-guide-footer">
           <p>{guide.footer}</p>
-          <p>{review.completed ? '사람의 편집 검토와 공개 승인을 거친 글입니다.' : 'AI 보조 작성 · 자동 게시 기준을 충족한 글입니다.'}</p>
+          <p>{review.completed ? '사람의 편집 검토와 공개 승인을 거친 글입니다.' : review.required ? '사람의 편집 검토와 공개 승인을 기다리는 원고입니다.' : 'AI 보조 작성 · 자동 게시 기준을 충족한 글입니다.'}</p>
         </footer>
       </article>
     </div>

@@ -1,6 +1,6 @@
 {
   "id": "K-020",
-  "lead": "한 장부를 복사해 두 군데 보관하는 것만으로는 서로를 점검하기 어렵습니다. 자원 보유자와 거래 담당자가 각자 책임 범위의 원기록을 남기고 공통 거래번호로 대조해야 누락이나 차이를 발견하기 쉬워집니다. 이 글은 공식 재난 자원관리와 내부통제 자료를 바탕으로 최소한의 대조 구조를 설명합니다.",
+  "lead": "독립된 두 기록은 같은 거래번호 아래 자원 인도량·인수량, 시점, 담당자와 대가를 각각 남긴 뒤 차이를 대조하세요. 한 장부의 사본 두 개를 비교해서는 원기록의 누락이나 오류를 발견하기 어렵습니다.",
   "slug": "reconcile-independent-resource-records",
   "basis": "FEMA의 비상 자원 추적·보고 원칙과 GAO의 직무 분리, 독립 출처 통제합계, 공급자 기록 조정 지침을 교차해 구성했습니다. 허구 작품은 질문이 생긴 서사적 출처일 뿐 현실 근거가 아닙니다.",
   "label": "독립 장부 대조",
@@ -139,7 +139,7 @@
   "topic_id": "community-emergency-resource-management",
   "risk_level": "LOW",
   "story_refs": [],
-  "updated_at": "2026-10-12",
+  "updated_at": "2026-10-13",
   "ai_assisted": true,
   "source_kind": "PUBLIC_ARCHIVE",
   "source_refs": [
@@ -155,7 +155,7 @@
   "source_hashes": [
     "a133745d52e8cdfded1142b6b3a674f2df7b91feb2e858c3f3759ae903016903"
   ],
-  "editorial_note": "허구·서사(narrative)는 질문 provenance로만 사용하고, 현실 주장은 공식 자료와 각각의 한계에 연결했습니다. 연료 취급이나 회계·법률 판단으로 범위를 넓히지 않았습니다.",
+  "editorial_note": "허구·서사(narrative)는 질문 provenance로만 사용하고, 현실 주장은 공식 자료와 각각의 한계에 연결했습니다. 연료 취급이나 회계·법률 판단으로 범위를 넓히지 않았습니다. 2026-10-13 Editorial V2: 첫 문장 즉답과 독립적인 현실 맥락을 검수하고, 기존 Evidence 범위 안에서 문장을 정리함. ID·slug·risk·publication policy는 유지.",
   "policy_version": "knowledge-c3-policy-v1",
   "meta_description": "재난 자원 거래의 두 독립 장부를 공통 거래번호와 통제합계로 대조해 누락·중복·설명되지 않는 차이를 찾는 근거 기반 기록 원칙입니다.",
   "related_brief_ids": [

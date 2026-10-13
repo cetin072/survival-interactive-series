@@ -111,6 +111,7 @@ export function buildSemanticContext({ jobType, source, target, existingKnowledg
     existing_knowledge: { questions, briefs },
     story_registry_ids: (existingKnowledge.stories ?? []).map(({ id }) => id),
     story_refs_policy: 'brief.story_refs contains only explicit story_registry_ids. Never copy BOOK/chapter/source_refs/raw paths or URLs. No explicit mapping means []. Preserve narrative provenance in candidate.reader_* and source_refs/source_hashes.',
+    editorial_contract: { version: 'V2', spec_ref: 'docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V2.md' },
     topics: existingKnowledge.topics.map(({ id, title }) => ({ id, title })),
     policy: {
       worker_policy_version: policy.version,
@@ -160,6 +161,14 @@ export function validateSemanticResult(job, result) {
   // to the existing Operator Inbox after this package opens as a Draft PR.
   fail(candidate.status === 'BRIEF_PROPOSED', 'SEMANTIC_CANDIDATE_STATUS_INVALID')
   fail(brief.content_type === 'BRIEF' && brief.status === 'READY', 'SEMANTIC_BRIEF_STATUS_INVALID')
+  if (job.semantic_context?.editorial_contract?.version === 'V2') {
+    fail(job.semantic_context.editorial_contract.spec_ref === 'docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V2.md', 'SEMANTIC_EDITORIAL_SPEC_INVALID')
+    fail(typeof brief.lead === 'string' && brief.lead.trim().split(/[.!?]/)[0].trim().length >= 20, 'SEMANTIC_EDITORIAL_LEAD_REQUIRED')
+    const lastHeading = brief.sections?.at(-1)?.heading
+    const expectedHeading = source.kind === 'USER_REPORTED_EXPERIENCE'
+      ? '이 질문이 생긴 실제 경험' : '《생존일기》에서 시작한 질문'
+    fail(lastHeading === expectedHeading && brief.sections.length >= 2, 'SEMANTIC_EDITORIAL_ORIGIN_LAST')
+  }
   if (result.decision === 'BRIEF_READY') {
     fail(!Object.hasOwn(result, 'code') && !Object.hasOwn(result, 'note'), 'SEMANTIC_AUTO_DISPOSITION_FORBIDDEN')
     fail(brief.risk_level === 'LOW' && brief.publication_policy === 'AUTO_LOW_RISK', 'SEMANTIC_AUTO_POLICY_INVALID')
