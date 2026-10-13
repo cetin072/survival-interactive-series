@@ -77,3 +77,31 @@
 - Success: 월말까지 시장/수익/유통 지도, Winning Theory V1, 행동 기준선, 외부 유통 실험, 수익 후보 TOP 3와 다음 60일 돈 실험 후보 1개.
 - Guard: 준비라는 이름으로 정체하지 않는다. 학습 또는 자산이 누적되지 않은 달은 실패로 본다.
 - Linked: Issue #501
+
+## D-012 — Day 5 유통 우선순위 검토안
+- Date: 2026-10-14 (근거 조회: 2026-10-13)
+- Status: PROPOSED_FOR_DAY7_REVIEW (운영 적용·사람 승인 아님)
+- Decision proposal: 검색을 장기 우선 후보, 기존 공유/링크 복사를 보조 후보로 유지. Week 2는 내부 동선의 준비 과업을 먼저 보고 Week 3 외부 유통은 한 경로만 별도 선정한다.
+- Why: 기존 Day 5 1차 판단과 공식 검색/YouTube 정책을 재대조했으나 우리 사이트의 채널별 유효 행동 실측이 없어 순위를 확정할 근거는 없음.
+- Revisit when: 검색 계정 실데이터·같은 모집단/기간의 행동 관측·운영노동 자료 또는 플랫폼 정책 변화가 생길 때.
+- Guard: 채널 조회/노출/공유 요청을 준비 완료로 대체하지 않음. 추가 비용 0원, 공개 전략에 개인 사업수치·벙커 위치를 추가하지 않음.
+- Linked: S-003, S-007, [Distribution Map V1](DISTRIBUTION_MAP_V1.md), Issue #501
+
+## D-013 — E-002 첫 시험은 기존 K-002 관리표 한 행 작성
+- Date: 2026-10-14
+- Status: PROPOSED_FOR_DAY7_REVIEW
+- Decision proposal: 주 실험은 K-002를 읽고 실물 1종을 확인해 기존 XLSX에 한 행 작성하는 과업 하나. 보조 실험 0개, E-001은 동의한 시험의 최소 수기 측정만 사용한다.
+- Why: 현재 공개 자산으로 실행 가능성을 먼저 물을 수 있고, 새 서비스/DB·가방 앱·민감한 가족연락처 수집을 선행할 필요가 없다. 자동 계측이 없어도 정해진 표본의 시작·중단·완료 보고를 분리할 수 있다.
+- Evidence limit: 기준선/실제 참가·행동은 미수집. 자기보고 완료는 실물 독립 검증·행동 증가·자연 방문자 전환율·성장 엔진 증거가 아님.
+- Revisit when: Day 7 감독 검토, 로컬 XLSX 사전 점검, 대상 모집 가능성 또는 파일 접근/기록 장벽을 확인할 때. 실패하면 동의 없이 앱·분석 시스템 개발로 확대하지 않음.
+- Guard: E-001 RESEARCH / E-002 PLANNED / E-003 RESEARCH 유지. DB 일지/검수 receipt 수정 없음, BAG-SIDE-01 성과와 분리.
+- Linked: [Experiment Brief V1](EXPERIMENT_BRIEF_V1.md), E-001/E-002/E-003, Issue #501
+
+## D-014 — E-002의 8명 모집·실제 실험은 당분간 보류
+- Date: 2026-10-14
+- Status: APPROVED_EXECUTION_DEFERRAL (감독자 명시 결정; 실험 성공/Week 2 Freeze 승인 아님)
+- Decision: PR #549의 Week 1 조사·설계·기술 QA 문서는 main에 병합한다. 다만 K-002+XLSX 첫 사용자 시험의 **실제 8명 모집 및 실행은 당분간 진행하지 않는다**. 신규 모집·연락·수기 개인정보 기록·참가자 측정·자체 PASS/FAIL 결론을 만들지 않는다.
+- Why: 지금은 참가자 모집이 어렵다. 사람 모집에 의존하지 않는 생존지식 SEO·Google/네이버 검색 등록, 콘텐츠 품질, 기존 시스템 안전 검증을 우선한다.
+- Guard: E-002는 기존 상태 PLANNED(실행 보류)로 유지하고 Week 2 Freeze·실제 이용자 결과·VERIFIED 마일스톤을 만들지 않는다. 기존 8명·10분·판정기준·동의/철회/삭제 규칙은 설계 이력으로 보존하되 실행 일정이나 모집 의무로 취급하지 않는다. 외부 유입·색인·다운로드는 실제 준비행동 성공으로 대체하지 않는다.
+- Revisit when: 감독자가 모집 가능하다고 새로 말하고 명시적으로 재개를 승인할 때. 그때 표본·환경·소요시간·기존 QA 유효성을 재점검한다.
+- Linked: PR #549, [Experiment Brief V1](EXPERIMENT_BRIEF_V1.md), [Week 1 Review V1](WEEK1_REVIEW_V1.md), Issue #501, SEO Issue #491

@@ -1,11 +1,11 @@
 {
   "id": "K-011",
-  "lead": "평소 가장 빠른 길이 비상시에도 항상 가장 좋은 길은 아닙니다. 도로가 막히거나 통행조건이 바뀌거나 혼잡이 심해지면 한 경로에 의존한 보급과 업무 이동은 바로 멈출 수 있습니다. 중요한 것은 무조건 우회하는 것이 아니라, 평소부터 어떤 대체경로가 있고 어떤 조건에서 바꿀지를 알고 있는 것입니다.",
+  "lead": "비상시 이동을 한 길에 의존하지 않으려면 주 경로와 대체경로, 추가시간, 통과 제약, 다른 이동수단과 경로를 바꿀 조건을 미리 적어두세요. 실제 출발 전에는 공식 통제정보와 현재 통행 가능 여부를 다시 확인해야 합니다.",
   "slug": "emergency-route-redundancy",
   "basis": "FEMA Supply Chain Resilience Guide + FEMA Distribution Management Plan Guide + FHWA Emergency Transportation Operations + 검증된 PUBLIC_READER 장면",
   "label": "비상 이동경로 이중화",
   "scope": "소규모 조직·공동체가 반복적인 보급·업무 이동의 주 경로와 대체경로, 예상 추가시간, 제약조건, 다른 이동수단과 전환기준을 기록하는 저위험 재난대비 방법",
-  "title": "비상시 물류·정기이동 경로를 한 길에만 의존하지 않으려면 무엇을 미리 확인하고 기록해야 할까",
+  "title": "비상 이동 경로를 한 길에만 의존하지 않으려면 무엇을 준비할까",
   "tools": [],
   "footer": "이 글은 일반적인 재난대비 이동·물류계획 정보입니다. 실제 재난 시 도로 폐쇄, 출입제한, 대피명령과 교통통제는 관할기관의 최신 공식지시를 우선하고 위험하거나 통제된 구간에 임의로 진입하지 마세요.",
   "status": "PUBLISHED",
@@ -45,7 +45,7 @@
     {
       "blocks": [
         {
-          "text": "FEMA Supply Chain Resilience Guide는 공급망 물류계획에서 정상 운송경로를 검토한 뒤 주 공급경로와 대체경로를 함께 식별하도록 안내합니다. 가장 자주 쓰는 길 하나만 기억하는 대신, 같은 목적지에 도달할 수 있는 두 번째 경로가 있는지 평소에 확인해두면 주 경로가 불안정해졌을 때 선택지가 생깁니다.",
+          "text": "평소 쓰는 길과 목적지가 같은 대체경로를 한 쌍으로 적어둡니다. 한 경로가 불안정해졌을 때 사용할 대안이 있어야 반복 이동을 이어갈 수 있습니다. FEMA의 공급망 회복력 자료도 주 공급경로와 대체경로를 함께 식별하도록 안내합니다.",
           "type": "prose"
         }
       ],
@@ -96,7 +96,7 @@
     {
       "blocks": [
         {
-          "text": "FEMA와 FHWA 자료는 대체경로의 용량과 제한조건도 함께 검토하도록 합니다. 한 길이 막혔을 때 모두가 같은 우회로로 몰리면 그 경로도 새로운 병목이 될 수 있고, 도로 폭·잔해·교량·통제조건 때문에 특정 이동수단은 지나가지 못할 수도 있습니다. 대체경로라는 이름만 적지 말고 실제 사용조건을 같이 기록해야 합니다.",
+          "text": "한 길이 막히면 다른 사람도 같은 우회로로 몰릴 수 있습니다. 도로 폭·교량·잔해·공식 통제 때문에 특정 이동수단은 지나가지 못할 수도 있으므로 대체경로의 조건을 함께 적습니다. FEMA와 FHWA 자료도 대체경로의 용량과 제한조건을 검토합니다.",
           "type": "prose"
         }
       ],
@@ -105,7 +105,7 @@
     {
       "blocks": [
         {
-          "text": "FEMA Supply Chain Resilience Guide는 도로뿐 아니라 철도·해상·항공처럼 운송수단 자체를 바꾸는 선택지도 검토하도록 합니다. 소규모 조직에서는 거창한 운송망보다 차량이 어려울 때 도보나 자전거처럼 실제 보유한 다른 수단으로 같은 이동을 수행할 수 있는지를 확인하는 식으로 적용할 수 있습니다.",
+          "text": "차량으로 이동할 수 없을 때 실제 보유한 다른 수단이 있는지도 확인합니다. 소규모 조직에서는 도보나 자전거처럼 가능한 범위를 살피는 것이 먼저입니다. FEMA의 공급망 회복력 자료는 큰 물류망에서 철도·해상·항공 등 운송수단 전환까지 검토하도록 설명합니다.",
           "type": "prose"
         }
       ],
@@ -143,14 +143,14 @@
   "topic_id": "emergency-route-redundancy",
   "risk_level": "LOW",
   "story_refs": [],
-  "updated_at": "2026-10-01",
+  "updated_at": "2026-10-13",
   "ai_assisted": true,
   "content_type": "BRIEF",
   "published_at": "2026-10-01",
   "risk_domains": [
     "GENERAL_PREPAREDNESS"
   ],
-  "editorial_note": "검증된 PUBLIC_READER 장면에서 질문만 가져오고 현실 내용은 FEMA Supply Chain Resilience Guide, FEMA Distribution Management Plan Guide, FHWA Emergency Transportation Operations 공식자료를 Evidence로 먼저 교차검토했습니다. 도로통제 우회·대치·위험지역 진입 같은 실행지침은 제외했습니다.",
+  "editorial_note": "검증된 PUBLIC_READER 장면에서 질문만 가져오고 현실 내용은 FEMA Supply Chain Resilience Guide, FEMA Distribution Management Plan Guide, FHWA Emergency Transportation Operations 공식자료를 Evidence로 먼저 교차검토했습니다. 도로통제 우회·대치·위험지역 진입 같은 실행지침은 제외했습니다. 2026-10-13 Editorial V2: 첫 문장 즉답과 독립적인 현실 맥락을 검수하고, 기존 Evidence 범위 안에서 문장을 정리함. ID·slug·risk·publication policy는 유지.",
   "meta_description": "FEMA·FHWA 공식자료를 바탕으로 비상시 물류·정기이동의 주 경로와 대체경로, 제약조건, 추가시간, 이동수단과 전환 기준을 관리하는 방법을 설명합니다.",
   "related_brief_ids": [
     "K-006",

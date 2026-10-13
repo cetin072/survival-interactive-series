@@ -45,7 +45,12 @@ def main():
             body=page.locator('body').inner_text()
             assert not re.search(r'DRAFT|reviewedAt|guide-\d|게시 후 연결|Automation C|앱 연결|변경 이력|자료·링크 확인|발행 승인 대기',body),item
             assert page.locator('section').filter(has=page.get_by_text('근거 자료',exact=True)).count()>=1
-            assert page.locator('.bag-article-cta>a[href^="/bag-lab/alpha.html?catalog=guide-"]').count()==1
+            from urllib.parse import urlsplit,parse_qs
+            link=page.locator('.bag-article-cta a[href*="catalog=guide-"]')
+            assert link.count()==1,item
+            destination=urlsplit(link.get_attribute('href') or '')
+            assert destination.path in ('/bag-lab/alpha.html','/bag-lab/alpha'),destination
+            assert parse_qs(destination.query).get('catalog')==[item['id']],destination
             assert page.locator('a[href^="/knowledge/"]').count()>=2
             landing.overflow(page)
             if width==390:page.screenshot(path=str(report/(item['id']+'.png')),full_page=True)

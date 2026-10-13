@@ -84,6 +84,6 @@ export function articlePage(article,{published=false}={}){
        +'<a data-knowledge-x-share target="_blank" rel="noopener noreferrer">X</a>'
        +'<a data-knowledge-facebook-share target="_blank" rel="noopener noreferrer">Facebook</a></div>'
        +'<label for="knowledge-share-url">공식 글 주소</label><input id="knowledge-share-url" type="url" readonly spellcheck="false" value="'+esc(canonical)+'">'
-       +'<p class="knowledge-share-status" role="status" aria-live="polite"></p></section>':'')
+       +'<p class="knowledge-share-status" role="status" aria-live="polite" data-knowledge-share-status></p></section>':'')
     +'</div>'+(published?'<script defer src="/knowledge/share.js"></script>':'')+'</body></html>';
 }

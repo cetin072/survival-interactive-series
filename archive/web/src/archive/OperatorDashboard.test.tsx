@@ -87,11 +87,63 @@ describe('Operator dashboard structure', () => {
     expect(card).toContain('<dt>공개 사이트</dt><dd>배포 미확인')
     expect(card).not.toContain('게시 완료')
     expect(card).not.toContain('공개 반영 확인')
-    expect(card).toContain('진행 0건 · 저장소 반영 3건')
+    expect(card).toContain('처리 중 0건 · 검수 보류 0건 · 저장소 반영 3건')
     expect(card).toContain('다음 공개 원문 처리 대기')
     expect(card).not.toContain('새 원문 없음')
     expect(card).toContain('외부 검수·병합 결과 확인')
     expect(card).toContain('<details class="operator-tech-details">')
+  })
+
+  it('explains genuine independent human review without implying a disabled worker', () => {
+    const reviewNote = '장태훈 관계의 경유 규격·품질 확인은 완료된 검사처럼 보일 수 있으나 원문은 일부 시료만 확인했다고 말합니다.'
+    const card = wikiCard({ systemStatus: {
+      ...systemStatus,
+      a_wiki: {
+        job_count: 4, active_count: 0, human_review_count: 1, published_count: 3,
+        latest_job: {
+          status: 'HUMAN_REVIEW', season_id: 'S04', session_id: 'SESSION_002',
+          blocker_code: 'REVIEWER_HUMAN_REVIEW', review_decision: 'HUMAN_REVIEW',
+          review_note: reviewNote,
+        },
+      },
+    } })
+    const wholeDashboard = renderDashboard({ systemStatus: {
+      ...systemStatus,
+      a_wiki: { job_count: 4, active_count: 0, human_review_count: 1, published_count: 3,
+        latest_job: { status: 'HUMAN_REVIEW', blocker_code: 'REVIEWER_HUMAN_REVIEW' } },
+    } })
+    expect(wholeDashboard).toContain('<span>사람이 확인할 항목</span><strong>1</strong>')
+    expect(card).toContain('내용 검수 보류')
+    expect(card).toContain('처리 중 0건 · 검수 보류 1건 · 저장소 반영 3건')
+    expect(card).toContain('콘텐츠 사실 확인 · 자동화 장애와 다름')
+    expect(card).toContain('<dt>내용 검수</dt><dd>사람 검토 필요')
+    expect(card).toContain('원문에 맞게 수정하고 독립 검수를 다시 통과')
+    expect(card).toContain(reviewNote)
+    expect(card).toContain('예약 ON/OFF는 이 화면에서 직접 확인할 수 없습니다')
+    expect(card).toContain('표현 정정 후 독립 재검수')
+    expect(card).not.toContain('현재 작업 확인 필요')
+    expect(card).not.toContain('진행 0건 · 저장소 반영 3건')
+    expect(card).not.toContain('자동화 꺼짐')
+  })
+
+  it('provides a safe fallback when the legacy operator API lacks reviewer details', () => {
+    const card = wikiCard({ systemStatus: { ...systemStatus,
+      a_wiki: { job_count: 4, active_count: 0, published_count: 3,
+        latest_job: { status: 'HUMAN_REVIEW', blocker_code: 'REVIEWER_HUMAN_REVIEW' } },
+    } })
+    expect(card).toContain('검수 보류 1건')
+    expect(card).toContain('독립 검수에서 원문보다 강하게 확정한 사실 표현')
+    expect(card).toContain('자동화가 꺼졌다는 뜻은 아닙니다')
+  })
+
+  it('distinguishes program-level errors from content-review holds', () => {
+    const card = wikiCard({ systemStatus: { ...systemStatus,
+      a_wiki: { job_count: 2, active_count: 1, human_review_count: 0, published_count: 1,
+        latest_job: { status: 'BLOCKED', blocker_code: 'A_WIKI_COMMAND_GH_1' } },
+    } })
+    expect(card).toContain('작업 장애 확인')
+    expect(card).toContain('시스템 처리 오류 또는 검증 차단')
+    expect(card).not.toContain('검수자가 지적한 내용')
   })
 
   it('reports unavailable wiki status without inventing zero jobs or a source waiting state', () => {
@@ -130,5 +182,60 @@ describe('Operator dashboard structure', () => {
     })
     expect(card).toContain('<dt>공개 사이트</dt><dd>공개 반영 확인')
     expect(card).toContain('현재 사이트의 배포 원본이 이 위키의 저장소 반영 버전과 일치합니다.')
+  })
+})
+
+function knowledgeCard(c: NonNullable<SystemStatus['knowledge_semantic']>) {
+  return renderDashboard({ systemStatus: { ...systemStatus, knowledge_semantic: c } })
+    .split('C · 생존 지식')[1].split('</article>')[0]
+}
+const healthyC = { active_count: 0, machine_active_count: 0, human_review_count: 0,
+  unresolved_blocked_count: 0, machine_stalled_count: 0, latest_job: null, prep: null }
+describe('C live runtime contract', () => {
+  it('does not report normal or infer machine activity from a legacy DB contract', () => {
+    const card = knowledgeCard({ active_count: 2, latest_job: { status: 'HOLD' }, prep: null })
+    expect(card).toContain('상태 조회 필요')
+    expect(card).toContain('<dt>진행 중</dt><dd>조회 필요')
+    expect(card).toContain('<dt>오류</dt><dd>조회 필요')
+  })
+
+  it('two human reviews occupy no machine slot and are not stalled even when old', () => {
+    const card = knowledgeCard({ ...healthyC, human_review_count: 2,
+      latest_job: { status: 'HUMAN_REVIEW', brief_id: 'K-018', stalled_code: 'KNOWLEDGE_PR_STALLED' } })
+    expect(card).toContain('검토 필요')
+    expect(card).toContain('<dt>진행 중</dt><dd>0건')
+    expect(card).toContain('<dt>사람 검토 대기</dt><dd>2건')
+    expect(card).toContain('<dt>오류</dt><dd>0건')
+    expect(card).toContain('사람 검토 대기')
+    expect(card).not.toContain('확인 필요')
+    expect(card).not.toContain('KNOWLEDGE_PR_STALLED')
+  })
+  it('normal duplicate HOLD uses live K-024 instead of static K-010', () => {
+    const card = knowledgeCard({ ...healthyC,
+      latest_job: { status: 'HOLD', brief_id: 'K-024', blocker_code: 'SEMANTIC_DUPLICATE' },
+      latest_published_job: { brief_id: 'K-021', status: 'PUBLISHED' } })
+    expect(card).toContain('K-024 · 중복으로 보류')
+    expect(card).toContain('<dt>최근 게시</dt><dd>K-021')
+    expect(card).toContain('<dt>막힌 이유</dt><dd>없음')
+    expect(card).not.toContain('K-010')
+    expect(card).not.toContain('확인 필요')
+    expect(card).not.toContain('기술 상세 확인이 필요합니다.')
+  })
+  it('latest HOLD cannot hide two actionable Finalizer errors', () => {
+    const card = knowledgeCard({ ...healthyC, human_review_count: 2, unresolved_blocked_count: 2,
+      latest_job: { brief_id: 'K-024', status: 'HOLD', disposition_code: 'SEMANTIC_DUPLICATE' },
+      latest_blocked_job: { brief_id: 'K-023', status: 'BLOCKED', blocker_code: 'KNOWLEDGE_CONTRACT', blocker_stage: 'FINALIZER' } })
+    expect(card).toContain('확인 필요')
+    expect(card).toContain('<dt>오류</dt><dd>2건')
+    expect(card).toContain('<dt>최근 오류</dt><dd>K-023')
+    expect(card).toContain('지식 글 형식 검증에서 문제가 발견됐습니다.')
+    expect(card).toContain('FINALIZER')
+  })
+  it('machine stall outranks human review and latest normal HOLD', () => {
+    const card = knowledgeCard({ ...healthyC, machine_active_count: 1, human_review_count: 2, machine_stalled_count: 1,
+      latest_job: { brief_id: 'K-024', status: 'HOLD' },
+      latest_stalled_job: { brief_id: 'K-022', status: 'PR_OPEN', stalled_code: 'KNOWLEDGE_PR_STALLED' } })
+    expect(card).toContain('확인 필요')
+    expect(card).toContain('<dt>오류</dt><dd>1건')
   })
 })

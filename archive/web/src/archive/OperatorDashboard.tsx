@@ -3,6 +3,7 @@ import { OperatorRoadmap } from './OperatorRoadmap'
 import type { RoadmapLog } from './operatorRoadmapModel'
 import {
   aWikiPublicationStatus,
+  aWikiOperatorGuidance,
   aWikiStatusLabel,
   blockerLabel,
   decisionLabel,
@@ -51,15 +52,16 @@ type VisualJob = {
   reviewed_at?: string | null; finalized_at?: string | null
 }
 type KnowledgeSemanticJob = {
-  job_id?: string; job_type?: string; status?: string; source_kind?: string; source_ref?: string
+  brief_id?: string | null; job_id?: string; job_type?: string; status?: string; source_kind?: string; source_ref?: string
   prepared_at?: string | null; submitted_at?: string | null; age_minutes?: number | null
-  stalled_code?: string | null; result_decision?: string | null; final_pr_number?: number | null
+  disposition_code?: string | null; stalled_code?: string | null; result_decision?: string | null; final_pr_number?: number | null
   final_head_sha?: string | null; merge_sha?: string | null; blocker_code?: string | null; blocker_stage?: string | null
 }
 type AWikiJob = {
   job_id?: string; status?: string; session_id?: string; season_id?: string; source_ref?: string
   completion_origin?: 'NATIVE' | 'NATIVE_REVIEWED_MERGE' | 'EXTERNAL_REVIEWED_MERGE' | null
-  blocker_code?: string | null; final_pr_number?: number | null; merge_sha?: string | null
+  blocker_code?: string | null; review_decision?: string | null; review_note?: string | null
+  final_pr_number?: number | null; merge_sha?: string | null
   dispatch_count?: number | null; dispatch_at?: string | null; age_minutes?: number | null
   created_at?: string | null; updated_at?: string | null; extractor_submitted_at?: string | null
   review_ready_at?: string | null; review_submitted_at?: string | null; finalizing_at?: string | null
@@ -81,9 +83,17 @@ export type SystemStatus = {
     retry_cron: CronStatus | null
   }
   review: { pending_count: number; automation_error_count: number }
-  a_wiki?: { job_count: number; active_count: number; published_count: number; latest_job: AWikiJob | null }
+  a_wiki?: { job_count: number; active_count: number; human_review_count?: number; published_count: number; latest_job: AWikiJob | null }
   knowledge_semantic?: {
     active_count: number
+    machine_active_count?: number
+    human_review_count?: number
+    unresolved_blocked_count?: number
+    machine_stalled_count?: number
+    latest_published_job?: KnowledgeSemanticJob | null
+    latest_blocked_job?: KnowledgeSemanticJob | null
+    latest_machine_job?: KnowledgeSemanticJob | null
+    latest_stalled_job?: KnowledgeSemanticJob | null
     latest_job: KnowledgeSemanticJob | null
     prep: { last_status?: string; last_stage?: string; blocker_code?: string | null; checked_at?: string | null } | null
   }
@@ -142,14 +152,16 @@ export function OperatorDashboard({
 
   const aWikiLatest = systemStatus?.a_wiki?.latest_job ?? null
   const aWikiBlocker = aWikiLatest?.blocker_code ?? null
+  const aWikiGuidance = aWikiOperatorGuidance(aWikiLatest)
+  const aWikiHumanReview = aWikiLatest?.status === 'HUMAN_REVIEW'
+  const aWikiHumanCount = systemStatus?.a_wiki?.human_review_count ?? (aWikiHumanReview ? 1 : 0)
   const aWikiPublication = aWikiPublicationStatus(aWikiLatest, productionStatus)
-  const aWikiBadgeClass = aWikiBlocker ? 'warning'
+  const aWikiBadgeClass = aWikiGuidance.badge ? 'warning'
     : aWikiLatest?.status === 'PUBLISHED' ? aWikiPublication.deploymentVerified ? 'ok' : 'neutral'
     : visualStatusTone(aWikiLatest?.status)
   const aWikiBadge = !systemStatus?.a_wiki ? '상태 조회 필요'
-    : aWikiBlocker ? '확인 필요'
-    : aWikiLatest?.status === 'PUBLISHED' ? aWikiPublication.deployment
-    : aWikiLatest?.status ? aWikiStatusLabel(aWikiLatest.status) : '실행 이력 없음'
+    : aWikiGuidance.badge ?? (aWikiLatest?.status === 'PUBLISHED' ? aWikiPublication.deployment
+      : aWikiLatest?.status ? aWikiStatusLabel(aWikiLatest.status) : '실행 이력 없음')
 
   const visualLatest = systemStatus?.visual.latest_job ?? null
   const visualPrepHealthy = systemStatus?.visual.prep_cron?.active === true
@@ -159,15 +171,33 @@ export function OperatorDashboard({
   const visualBlocker = visualLatest?.stalled_code ?? visualLatest?.blocker_code ?? visualLatest?.last_error_code ?? null
   const visualBadgeClass = visualBlocker ? 'warning' : visualStatusTone(visualLatest?.status)
 
-  const semanticLatest = systemStatus?.knowledge_semantic?.latest_job ?? null
-  const semanticBlocker = semanticLatest?.stalled_code ?? semanticLatest?.blocker_code ?? systemStatus?.knowledge_semantic?.prep?.blocker_code ?? null
-  const knowledgeLatestBrief = operatorStaticStatus.knowledge.latestBriefIds.at(-1) ?? '없음'
-  const knowledgeNeedsReview = inbox.pending_count > 0
-  const knowledgeBadgeClass = semanticBlocker || knowledgeNeedsReview
-    ? 'warning'
-    : semanticLatest?.status === 'PUBLISHED'
-      ? 'ok'
-      : operatorStaticStatus.knowledge.workerEnabled ? 'neutral' : 'warning'
+  const semantic = systemStatus?.knowledge_semantic
+  const hasLiveContract = semantic?.machine_active_count !== undefined
+    && semantic?.human_review_count !== undefined && semantic?.unresolved_blocked_count !== undefined
+  const semanticLatest = semantic?.latest_job ?? null
+  const machineStatuses = ['PREPARED', 'SUBMITTED', 'FINALIZING', 'PR_OPEN']
+  const machineCount = semantic?.machine_active_count ?? 0
+  const humanCount = semantic?.human_review_count ?? 0
+  const blockedCount = semantic?.unresolved_blocked_count ?? (semanticLatest?.status === 'BLOCKED' ? 1 : 0)
+  const stalledJob = semantic?.latest_stalled_job
+    ?? (machineStatuses.includes(semanticLatest?.status ?? '') && semanticLatest?.stalled_code ? semanticLatest : null)
+  const blockedJob = semantic?.latest_blocked_job ?? (semanticLatest?.status === 'BLOCKED' ? semanticLatest : null)
+  const prepFailed = ['BLOCKED', 'FAILED', 'ERROR'].includes(semantic?.prep?.last_status ?? '')
+  const semanticBlocker = blockedJob?.blocker_code ?? stalledJob?.stalled_code
+    ?? (prepFailed ? semantic?.prep?.blocker_code : null) ?? null
+  const knowledgeErrorCount = blockedCount + (semantic?.machine_stalled_count ?? (stalledJob ? 1 : 0))
+  const knowledgeLatestBrief = semanticLatest?.brief_id ?? (semanticLatest ? '조회 필요' : '없음')
+  const knowledgeNeedsReview = humanCount > 0
+  const knowledgeNeedsAttention = knowledgeErrorCount > 0 || prepFailed
+  const knowledgeBadge = !hasLiveContract ? '상태 조회 필요'
+    : knowledgeNeedsAttention ? '확인 필요'
+    : knowledgeNeedsReview ? '검토 필요'
+    : machineCount > 0 ? statusLabel(semantic.latest_machine_job?.status ?? semanticLatest?.status)
+    : '정상'
+  const knowledgeBadgeClass = !hasLiveContract ? 'neutral' : knowledgeNeedsAttention || knowledgeNeedsReview ? 'warning'
+    : machineCount > 0 ? 'neutral' : 'ok'
+  const latestProcessing = semanticLatest?.status === 'HOLD' && (semanticLatest.disposition_code ?? semanticLatest.blocker_code) === 'SEMANTIC_DUPLICATE'
+    ? '중복으로 보류' : statusLabel(semanticLatest?.status)
 
   const productionContext = productionStatus.deploy?.context ?? null
 
@@ -193,7 +223,7 @@ export function OperatorDashboard({
     <OperatorRoadmap logs={roadmapLogs ?? null} error={roadmapError ?? ""} />
 
     <div className="operator-counts">
-      <article><span>사람이 확인할 항목</span><strong>{inbox.pending_count}</strong></article>
+      <article><span>사람이 확인할 항목</span><strong>{inbox.pending_count + aWikiHumanCount}</strong></article>
       <article><span>자동화 문제</span><strong>{inbox.automation_error_count}</strong></article>
       <article><span>보안 알림</span><strong className="operator-unwired">미연결</strong></article>
       <article><span>비용 알림</span><strong className="operator-unwired">미연결</strong></article>
@@ -243,15 +273,22 @@ export function OperatorDashboard({
           </div>
           <dl>
             <div><dt>최근 작업</dt><dd>{aWikiLatest?.season_id ? `${aWikiLatest.season_id} · ` : ''}{sessionLabel(aWikiLatest?.session_id)}</dd></div>
-            <div><dt>작업 수</dt><dd>{systemStatus?.a_wiki ? `진행 ${systemStatus.a_wiki.active_count}건 · 저장소 반영 ${systemStatus.a_wiki.published_count}건` : '조회 필요'}</dd></div>
+            <div><dt>작업 수</dt><dd>{systemStatus?.a_wiki ? `처리 중 ${systemStatus.a_wiki.active_count}건 · 검수 보류 ${aWikiHumanCount}건 · 저장소 반영 ${systemStatus.a_wiki.published_count}건` : '조회 필요'}</dd></div>
+            <div><dt>현 상태</dt><dd>{systemStatus?.a_wiki ? aWikiGuidance.category : '조회 필요'}</dd></div>
             <div><dt>내용 검수</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.review : '조회 필요'}</dd></div>
             <div><dt>저장소 반영</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.repository : '조회 필요'}</dd></div>
             <div><dt>공개 사이트</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.deployment : '조회 필요'}</dd></div>
-            <div><dt>다음 작업</dt><dd>{!systemStatus?.a_wiki ? '조회 필요' : aWikiBlocker ? '현재 작업 확인 필요' : systemStatus.a_wiki.active_count > 0 ? '현재 기록 처리 중' : '다음 공개 원문 처리 대기'}</dd></div>
+            <div><dt>다음 작업</dt><dd>{!systemStatus?.a_wiki ? '조회 필요' : aWikiGuidance.next ?? (systemStatus.a_wiki.active_count > 0 ? '현재 기록 처리 중' : '다음 공개 원문 처리 대기')}</dd></div>
             <div><dt>최근 갱신</dt><dd>{formatOperatorTime(aWikiLatest?.published_at ?? aWikiLatest?.updated_at ?? aWikiLatest?.created_at)}</dd></div>
-            <div><dt>막힌 이유</dt><dd>{!systemStatus?.a_wiki ? '조회 필요' : aWikiBlocker ? blockerLabel(aWikiBlocker) : '없음'}</dd></div>
+            <div><dt>막힌 이유</dt><dd>{!systemStatus?.a_wiki ? '조회 필요' : aWikiHumanReview ? blockerLabel('REVIEWER_HUMAN_REVIEW') : aWikiBlocker ? blockerLabel(aWikiBlocker) : '없음'}</dd></div>
           </dl>
-          <p className="operator-status-help">{systemStatus?.a_wiki ? aWikiPublication.deploymentDetail : '위키 실행 상태를 불러오지 못했습니다. 상태를 새로고침해 주세요.'}</p>
+          {aWikiHumanReview && <section className="operator-wiki-review-guidance" aria-label="A-Wiki 독립 검수 결과">
+            <strong>검수자가 지적한 내용</strong>
+            <p>{aWikiLatest?.review_note?.trim() || aWikiGuidance.reason}</p>
+            <p>이 작업은 검수 때문에 게시 전 대기 중입니다. 자동화가 꺼졌다는 뜻은 아닙니다. 원문에 맞게 수정하고 독립 검수를 다시 통과해야 합니다.</p>
+          </section>}
+          <p className="operator-status-help">{systemStatus?.a_wiki ? aWikiGuidance.schedule : '위키 실행 상태를 불러오지 못했습니다. 상태를 새로고침해 주세요.'}</p>
+          <p className="operator-status-help">{systemStatus?.a_wiki ? aWikiPublication.deploymentDetail : '위키 실행 상태를 불러오지 못했습니다.'}</p>
           <details className="operator-tech-details">
             <summary>기술 상세</summary>
             <dl>
@@ -302,15 +339,18 @@ export function OperatorDashboard({
         <article className="operator-system-card">
           <div className="operator-system-title">
             <h3>C · 생존 지식 <small>지식 글 자동 제작</small></h3>
-            <span className={`operator-status-badge ${knowledgeBadgeClass}`}>{semanticBlocker ? '확인 필요' : knowledgeNeedsReview ? '검토 필요' : semanticLatest?.status ? statusLabel(semanticLatest.status) : operatorStaticStatus.knowledge.workerEnabled ? '대기 중' : '중지됨'}</span>
+            <span className={`operator-status-badge ${knowledgeBadgeClass}`}>{knowledgeBadge}</span>
           </div>
           <dl>
-            <div><dt>진행 중</dt><dd>{systemStatus?.knowledge_semantic?.active_count ?? 0}건</dd></div>
-            <div><dt>최근 글</dt><dd>{knowledgeLatestBrief} · {decisionLabel(semanticLatest?.result_decision)}</dd></div>
+            <div><dt>진행 중</dt><dd>{semantic?.machine_active_count === undefined ? '조회 필요' : `${machineCount}건`}</dd></div>
+            <div><dt>최근 처리</dt><dd>{knowledgeLatestBrief} · {latestProcessing}</dd></div>
+            <div><dt>최근 게시</dt><dd>{hasLiveContract ? semantic?.latest_published_job?.brief_id ?? '없음' : '조회 필요'}</dd></div>
+            <div><dt>오류</dt><dd>{hasLiveContract ? `${knowledgeErrorCount}건` : '조회 필요'}</dd></div>
+            <div><dt>최근 오류</dt><dd>{blockedJob?.brief_id ?? stalledJob?.brief_id ?? '없음'}</dd></div>
             <div><dt>원본</dt><dd>{sourceKindLabel(semanticLatest?.source_kind)}</dd></div>
             <div><dt>작업 시작 / 제출</dt><dd>{formatOperatorTime(semanticLatest?.prepared_at)} / {formatOperatorTime(semanticLatest?.submitted_at)}</dd></div>
-            <div><dt>사람 검토 대기</dt><dd>{inbox.pending_count}건</dd></div>
-            <div><dt>게시 상태</dt><dd>{statusLabel(semanticLatest?.status)}</dd></div>
+            <div><dt>사람 검토 대기</dt><dd>{semantic?.human_review_count === undefined ? '조회 필요' : `${humanCount}건`}</dd></div>
+            <div><dt>게시 상태</dt><dd>{latestProcessing}</dd></div>
             <div><dt>막힌 이유</dt><dd>{semanticBlocker ? blockerLabel(semanticBlocker) : '없음'}</dd></div>
             <div><dt>자동 실행 주기</dt><dd>{operatorStaticStatus.knowledge.triggerIntervalHours}시간 · {timezoneLabel(operatorStaticStatus.knowledge.timezone)}</dd></div>
           </dl>
@@ -323,7 +363,7 @@ export function OperatorDashboard({
               <div><dt>게시 검증</dt><dd>{semanticLatest?.final_pr_number ? `#${semanticLatest.final_pr_number}` : '없음'}</dd></div>
               <div><dt>상태 코드</dt><dd><code>{semanticLatest?.status ?? '없음'}</code></dd></div>
               <div><dt>문제 코드</dt><dd><code>{semanticBlocker ?? '없음'}</code></dd></div>
-              <div><dt>문제 단계</dt><dd><code>{semanticLatest?.blocker_stage ?? '없음'}</code></dd></div>
+              <div><dt>문제 단계</dt><dd><code>{blockedJob?.blocker_stage ?? (stalledJob ? 'MACHINE' : '없음')}</code></dd></div>
             </dl>
           </details>
         </article>

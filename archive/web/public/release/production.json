@@ -1,9 +1,9 @@
 {
   "version": "production-release-v1",
   "site": "survival-diary-archive",
-  "source_main_sha": "ea109411a2dd528f03db350fd8e7262874d43c74",
-  "released_on_kst": "2026-10-12",
+  "source_main_sha": "0e99a39656c0b35c57e8e785975d23fd1850afa5",
+  "released_on_kst": "2026-10-14",
   "interval_days": 2,
-  "release_attempt": 15,
+  "release_attempt": 16,
   "policy": "BATCHED_PRODUCTION"
 }

@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { createElement } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { KnowledgeGuidePage } from './KnowledgeGuidePage'
 import {
   buildKnowledgeGuide,
   knowledgeRiskLabel,
@@ -25,7 +28,7 @@ describe('KnowledgeGuide adapter', () => {
     expect(map.get('K-012')?.label).toBe('재난 지도 정보공개 범위')
     expect(map.get('K-012')?.title).toContain('재난 대응 지도')
     expect(map.get('K-013')?.label).toBe('외부 대응 인력 자격·체크인')
-    expect(map.get('K-013')?.title).toContain('재난 대응에 외부 인력')
+    expect(map.get('K-013')?.title).toContain('외부 대응 인력')
   })
 
   it('compiles every currently published brief with only supported block types', () => {
@@ -62,5 +65,14 @@ describe('KnowledgeGuide adapter', () => {
   it('uses Korean risk labels rather than raw developer codes in the public guide', () => {
     expect(knowledgeRiskLabel('LOW')).toBe('일반 준비 정보')
     expect(knowledgeRiskLabel('HIGH')).toContain('고위험')
+  })
+
+  it('numbers mobile-readable sections and places sources before final provenance', () => {
+    const guide = buildKnowledgeGuide('K-002')
+    const html = renderToStaticMarkup(createElement(KnowledgeGuidePage, { guide, showTopbar: false }))
+    expect(html).toContain('aria-hidden="true">01</span>')
+    expect(html).toContain('aria-hidden="true">02</span>')
+    expect(html).toContain('class="knowledge-guide-body knowledge-guide-provenance"')
+    expect(html.indexOf('id="guide-sources-title"')).toBeLessThan(html.indexOf('class="knowledge-guide-body knowledge-guide-provenance"'))
   })
 })

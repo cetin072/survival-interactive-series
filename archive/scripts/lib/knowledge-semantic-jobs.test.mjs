@@ -31,6 +31,21 @@ const packageResult = (decision = 'BRIEF_READY') => ({
   brief: { id: 'K-011', title: '짧고 분명한 생존 질문은 무엇일까?', topic_id: 'T-PREP', content_type: 'BRIEF', status: 'READY', risk_level: decision === 'HUMAN_REVIEW' ? 'HIGH' : 'LOW', publication_policy: decision === 'HUMAN_REVIEW' ? 'HUMAN_APPROVED' : 'AUTO_LOW_RISK', semantic_qa_status: decision === 'HUMAN_REVIEW' ? 'REVIEW' : 'PASS' },
 })
 
+test('new V2 contexts require a usable lead and final provenance without changing legacy jobs', () => {
+  const old = packageResult()
+  assert.equal(validateSemanticResult(baseJob, old).decision, 'BRIEF_READY')
+  const job = { ...baseJob, semantic_context: { ...baseJob.semantic_context,
+    editorial_contract: { version: 'V2', spec_ref: 'docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V2.md' } } }
+  assert.throws(() => validateSemanticResult(job, old), /SEMANTIC_EDITORIAL_LEAD_REQUIRED/)
+  const revised = { ...old, brief: { ...old.brief,
+    lead: '비상연락 계획은 연락처와 만남 장소, 역할을 함께 정해 두면 됩니다.',
+    sections: [{ heading: '연락처와 만남 장소', blocks: [{ type: 'prose', text: '현실 준비.' }] },
+      { heading: '《생존일기》에서 시작한 질문', blocks: [{ type: 'prose', text: '질문 출처.' }] }] } }
+  assert.equal(validateSemanticResult(job, revised).decision, 'BRIEF_READY')
+  assert.throws(() => validateSemanticResult(job, { ...revised, brief: { ...revised.brief,
+    sections: revised.brief.sections.toReversed() } }), /SEMANTIC_EDITORIAL_ORIGIN_LAST/)
+})
+
 test('Knowledge operational date follows Asia/Seoul across the UTC midnight boundary', () => {
   assert.equal(knowledgeOperationalDate('2026-10-03T14:59:59.000Z'), '2026-10-03')
   assert.equal(knowledgeOperationalDate('2026-10-03T15:00:00.000Z'), '2026-10-04')

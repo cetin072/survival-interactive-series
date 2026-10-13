@@ -129,6 +129,44 @@ export function aWikiPublicationStatus(job: AWikiPublicationJob | null, producti
   }
 }
 
+export type AWikiOperatorState = {
+  status?: string | null
+  blocker_code?: string | null
+  review_note?: string | null
+}
+
+export function aWikiOperatorGuidance(job?: AWikiOperatorState | null) {
+  const status = job?.status?.toUpperCase() ?? ''
+  if (status === 'HUMAN_REVIEW') return {
+    badge: '내용 검수 보류',
+    category: '콘텐츠 사실 확인 · 자동화 장애와 다름',
+    next: '표현 정정 후 독립 재검수 · 검수 전 게시 금지',
+    reason: 'AI 독립 검수에서 원문보다 강하게 확정한 사실 표현을 발견했습니다.',
+    schedule: '이번 보류는 예약 OFF를 뜻하지 않습니다. 예약 ON/OFF는 이 화면에서 직접 확인할 수 없습니다.',
+  }
+  if (status === 'REJECT') return {
+    badge: '검수 반려',
+    category: '콘텐츠 검수에서 반려됨',
+    next: '원문과 추출 내용을 재점검한 뒤 새로운 검수 필요',
+    reason: '독립 검수에서 반려된 콘텐츠입니다.',
+    schedule: '이 결과로는 예약 ON/OFF를 판단할 수 없습니다.',
+  }
+  if (status === 'BLOCKED' || job?.blocker_code) return {
+    badge: '작업 장애 확인',
+    category: '시스템 처리 오류 또는 검증 차단',
+    next: '상세 문제 코드를 확인하고 안전한 복구 절차 수행',
+    reason: '자동 처리 경로의 오류가 기록됐습니다.',
+    schedule: 'DB 작업 오류와 ChatGPT 예약 ON/OFF는 서로 다른 상태입니다.',
+  }
+  return {
+    badge: null,
+    category: 'DB 작업 진행 상태 · 예약 상태와 별개',
+    next: null,
+    reason: null,
+    schedule: '이 화면은 DB 처리 현황이며 ChatGPT 예약의 ON/OFF는 직접 조회하지 않습니다.',
+  }
+}
+
 export function aWikiStatusLabel(value?: string | null) {
   if (value?.toUpperCase() === 'PUBLISHED') return '저장소 반영 완료'
   if (value?.toUpperCase() === 'FINALIZING') return '저장소 반영 중'
@@ -157,7 +195,7 @@ const statusKorean: Record<string, string> = {
   FINALIZE_QUEUED: '게시 준비',
   FINALIZING: '게시 반영 중',
   REVIEW_REJECTED: '품질 검수 재시도',
-  HUMAN_REVIEW: '사람 검토 필요',
+  HUMAN_REVIEW: '사람 검토 대기',
   SUPERSEDED: '새 승인 결과로 대체됨',
   HOLD: '보류',
   SUBMITTED: '제출 완료',
@@ -175,6 +213,7 @@ const blockerKorean: Record<string, string> = {
   QUALITY_GATE: '품질 검수 단계',
   PROVIDER_NOT_ACTIVE: '작업 제공 기능이 비활성화됨',
   HUMAN_REVIEW_REQUIRED: '사람의 검토가 필요함',
+  REVIEWER_HUMAN_REVIEW: '세계관 사실 표현에 대한 독립 검수 보류 · 원문과 비교하여 정정이 필요합니다.',
   RENDERER_NOT_CONSUMED: '이미지 생성 작업이 오래 시작되지 않았습니다.',
   REVIEWER_NOT_CONSUMED: '이미지 검수 작업이 오래 시작되지 않았습니다.',
   REVIEWER_NOT_COMPLETED: '이미지 검수가 오래 끝나지 않고 있습니다.',
@@ -184,6 +223,10 @@ const blockerKorean: Record<string, string> = {
   A_WIKI_PUBLICATION_SCOPE_INVALID: '위키 게시 변경 범위를 확인해야 합니다.',
   NO_DISTINCT_LOW_RISK_QUESTION: '새로 만들 만한 안전한 지식 주제를 찾지 못했습니다.',
   SEMANTIC_OVERLAP_NO_DISTINCT_LOW_RISK_QUESTION: '기존 글과 겹치지 않는 새 지식 주제를 찾지 못했습니다.',
+  KNOWLEDGE_PR_STALLED: '게시 전 기계 검증이 오래 끝나지 않고 있습니다.',
+  FINALIZER_STALLED: '게시 반영 작업이 오래 끝나지 않고 있습니다.',
+  SEMANTIC_WORKER_NOT_CONSUMED: '준비된 지식 작업이 오래 시작되지 않았습니다.',
+  SEMANTIC_DUPLICATE: '기존 글과 내용이 겹쳐 새 글을 만들지 않았습니다.',
   KNOWLEDGE_CONTRACT: '지식 글 형식 검증에서 문제가 발견됐습니다.',
   DEFERRED_FRESH_CHARACTER_PRIORITY: '새 인물 삽화를 우선하기 위해 이번 작업을 미뤘습니다.',
 }
