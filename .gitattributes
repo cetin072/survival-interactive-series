@@ -1,0 +1,9 @@
+# BAG cache cohorts hash canonical bytes across Windows and Linux checkouts.
+# Keep this narrow: RAW/transcript and all binary assets are untouched.
+archive/web/public/bag-lab/*.html text eol=lf
+archive/web/public/bag-lab/*.css text eol=lf
+archive/web/public/bag-lab/**/*.mjs text eol=lf
+archive/web/public/bag-lab/*.mjs text eol=lf
+archive/web/public/bag-lab/*.js text eol=lf
+archive/web/public/bag-lab/*.txt text eol=lf
+archive/web/public/bag-lab/*.webmanifest text eol=lf

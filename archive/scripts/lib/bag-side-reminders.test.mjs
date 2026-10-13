@@ -42,7 +42,7 @@ test('dedup, date/time edits cancel old reservations BEFORE replacements',async(
  const h=harness();await h.coordinator.synchronize();await h.coordinator.synchronize();assert.equal(h.os.size,1);assert.equal(h.calls.filter(c=>c[0]==='schedule').length,1);
  const b=bag();b.items[0].batches[0].nextInspection='2030-01-04';h.setBag(b);h.calls.length=0;
  await h.coordinator.synchronize();assert.equal(h.os.size,1);assert.equal(h.calls.filter(c=>c[0]==='cancel'||c[0]==='schedule')[0][0],'cancel');
- h.settings({enabled:true,time:'10:30'});await h.coordinator.synchronize();assert.equal(h.os.size,1);assert.match([...h.os.values()][0].content.data.triggerAt,/T10:30:00/);
+ h.settings({enabled:true,time:'10:30'});await h.coordinator.synchronize();assert.equal(h.os.size,1);const trigger=new Date([...h.os.values()][0].content.data.triggerAt);assert.equal(trigger.getHours(),10);assert.equal(trigger.getMinutes(),30);
 });
 test('zero stock, batch/item deletion, JSON restore and disable remove obsolete reservations',async()=>{
  for(const mutate of [b=>b.items[0].batches[0].quantity=0,b=>b.items[0].batches=[],b=>b.items=[]]){

@@ -68,7 +68,7 @@ def update(page):
 def main():
     remote=os.environ.get('BAG_LAB_BASE_URL');expected=os.environ.get('BAG_LAB_EXPECTED_SHA')
     if remote:
-        assert re.fullmatch(r'https://deploy-preview-[1-9][0-9]*--survival-diary-archive\.netlify\.app',remote.rstrip('/')),'Only per-PR Preview is permitted'
+        # Shared guard permits only exact PR Preview or dedicated BAG branch QA.
         from bag_side_remote import verify_remote
         verify_remote(remote,expected)
     alpha.REPORT.mkdir(parents=True,exist_ok=True)
@@ -98,6 +98,7 @@ def main():
             # Unrelated caches and root routes are neither owned nor removed.
             page.evaluate('async()=>{await (await caches.open("unrelated-existing-cache")).put("/other.txt",new Response("keep"))}')
             outside=context.new_page();outside.goto(base+'/bag-lab/../');assert outside.evaluate('navigator.serviceWorker.controller') is None
+            outside.goto(base+'/bag/');assert outside.evaluate('navigator.serviceWorker.controller') is None
             outside.goto(base+'/knowledge/');assert outside.evaluate('navigator.serviceWorker.controller') is None;outside.close()
             context.set_offline(True);page.reload(wait_until='networkidle');expect(page.locator('[data-command="add"]').first).to_be_enabled();assert alpha.stored(page)==initial
             page.locator('[data-nav="inventory"]').click();card=alpha.card(page,'가상 PWA 시험품');card.locator('[data-mode="edit"]').click();page.locator('#editor [name="target"]').fill('3');alpha.confirm_save(page)
@@ -109,11 +110,17 @@ def main():
             print('PASS manifest/icons/Chrome installability/SW scope/online/offline registration+edit/reload/backup/origin path isolation',flush=True)
             if not remote:
                 # Partial update: manifest names a different cohort but bytes are stale.
+                page.locator('[data-nav="inventory"]').click()
+                alpha.card(page,'가상 PWA 시험품').locator('[data-mode="edit"]').click()
+                page.locator('#editor [name="target"]').fill('5')
                 caches_before=page.evaluate('async()=>await caches.keys()')
                 assets=root/'bag-lab'/'pwa-assets.js';old=assets.read_text();atomic_text(assets,old.replace('"version": "','"version": "broken-').replace('"sha256": "','"sha256": "f'))
                 update(page);page.wait_for_timeout(1500)
                 assert page.evaluate('async()=>!!(await navigator.serviceWorker.getRegistration("/bag-lab/alpha.html")).waiting') is False
                 assert page.evaluate('async()=>await caches.keys()')==caches_before
+                expect(page.locator('#editor [name="target"]')).to_have_value('5')
+                context.set_offline(True);alpha.confirm_save(page);offline=alpha.stored(page)
+                assert any(item['target']==5 for item in offline['bag']['items'] if item['name']=='가상 PWA 시험품')
                 context.set_offline(True);page.reload(wait_until='networkidle');assert alpha.stored(page)==offline;context.set_offline(False)
                 # Healthy update activates only on consent, then reloads a whole cohort.
                 editing=context.new_page();editing_errors=[];editing_navigations=[]
@@ -124,7 +131,7 @@ def main():
                 alpha.card(editing,'가상 PWA 시험품').locator('[data-mode="edit"]').click()
                 editing.locator('#editor [name="target"]').fill('4')
                 editing.evaluate('window.bagTestControllerChanges=0;navigator.serviceWorker.addEventListener("controllerchange",()=>window.bagTestControllerChanges++)')
-                context.set_offline(True);atomic_text(assets,old);html=root/'bag-lab'/'alpha.html';html.write_text(html.read_text().replace('로컬 기록 Alpha','업데이트 검증 Alpha'))
+                context.set_offline(True);atomic_text(assets,old);html=root/'bag-lab'/'alpha.html';html.write_text(html.read_text().replace('1.0 RC','업데이트 검증 1.0 RC'))
                 regenerate(root,'synthetic-update-v2');context.set_offline(False);page.wait_for_function('navigator.onLine');update(page)
                 page.wait_for_function('navigator.serviceWorker.getRegistration("/bag-lab/alpha.html").then(r=>!!r.waiting)')
                 editing.wait_for_function('!document.getElementById("pwa-update").hidden')
@@ -133,13 +140,26 @@ def main():
                 expect(editing.locator('#pwa-status')).to_contain_text('먼저 저장하거나 취소')
                 expect(editing.locator('#editor [name="target"]')).to_have_value('4')
                 assert alpha.stored(editing)==offline # input is not a committed inventory write
+                # Another tab saves while the old cohort editor remains open.
+                page.locator('[data-nav="inventory"]').click()
+                alpha.card(page,'가상 PWA 시험품').locator('[data-mode="edit"]').click()
+                page.locator('#editor [name="target"]').fill('6');alpha.confirm_save(page);offline=alpha.stored(page)
                 page.locator('[data-nav="settings"]').click();expect(page.locator('#pwa-update')).to_be_visible()
                 page.locator('#pwa-update').click();page.wait_for_function('document.title.includes("업데이트 검증")');assert alpha.stored(page)==offline
                 editing.wait_for_function('window.bagTestControllerChanges===1')
                 expect(editing.locator('#editor')).to_be_visible()
                 expect(editing.locator('#editor [name="target"]')).to_have_value('4')
                 assert len(editing_navigations)==1 # another tab cannot reload an open editor
-                alpha.confirm_save(editing);offline=alpha.stored(editing)
+                editing.locator('#submit').click();expect(editing.locator('#editor-error')).to_contain_text('다른 탭')
+                assert alpha.stored(editing)==offline
+                expect(editing.locator('#editor [name="target"]')).to_have_value('4')
+                editing.locator('#cancel').click()
+                editing.locator('[data-nav="settings"]').click()
+                if not editing.locator('#backup-panel').evaluate('(el)=>el.open'):editing.locator('#backup-panel>summary').click()
+                editing.locator('[data-command="refresh"]').click()
+                expect(editing.locator('#save-status')).to_contain_text('버전 '+str(offline['revision']))
+                editing.locator('[data-nav="inventory"]').click();alpha.card(editing,'가상 PWA 시험품').locator('[data-mode="edit"]').click()
+                editing.locator('#editor [name="target"]').fill('4');alpha.confirm_save(editing);offline=alpha.stored(editing)
                 assert offline['revision']>initial['revision']
                 assert any(item['target']==4 for item in offline['bag']['items'] if item['name']=='가상 PWA 시험품')
                 assert json.loads(alpha.backup(editing))['bag']==offline['bag']
@@ -152,7 +172,7 @@ def main():
                 assert json.loads(alpha.backup(page))['bag']==offline['bag'];context.set_offline(False)
                 second=context.new_page();alpha.ready(second,alpha.address(otherbase));assert alpha.stored(second)['revision']==0;second.close()
                 print('PASS failed mixed update retains previous offline cohort; complete version update retains exact IndexedDB/backup; different origins stay separate',flush=True)
-                print('PASS two-tab synthetic update preserves open editor/unsaved values, committed inventory/JSON and offline explicit reload; integrated Stage 3/4 gate remains pending',flush=True)
+                print('PASS two-tab synthetic update preserves open editor/unsaved values, committed inventory/JSON and offline explicit reload; integrated cohort validated',flush=True)
             assert not errors,errors
             page.screenshot(path=str(alpha.REPORT/'pwa-reminders-390.png'),full_page=True)
             context.close()

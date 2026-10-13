@@ -5,6 +5,7 @@ import {CATEGORIES,DATE_TYPES,MAX_BACKUP_BYTES,newId,newBatch,upsertItem,removeI
 import {readBag,readPreviousBag,readRawRecord} from './storage.mjs';
 import {GROUPS,CATALOG,targetFor,seedFor,entryStatus,catalogProgress} from './catalog.mjs';
 import {PRESETS,previewPreset,applyPreset,isDraftBatch} from './presets.mjs';
+import {knowledgeFor} from './knowledge-links.mjs';
 const $=id=>document.getElementById(id);
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let record=null, screen='bag', filter='all', busy=false, editBase=null, mode=null, itemId=null, activeBatchId=null, replacement=null;
@@ -57,7 +58,7 @@ function drawCatalog(bag){
     const action=status.registered?
       `data-guide-focus="${esc(status.item.id)}" class="view-existing"`:
       `data-guide-add="${esc(entry.id)}"`;
-    return `<article class="catalog-entry ${status.registered?'is-owned':''}"><div><h4>${esc(entry.name)}<span class="catalog-badge ${entry.basic?'':'optional'}">${entry.basic?'기본':'선택'}</span></h4><p class="catalog-meta">${note}</p><details class="catalog-explain"><summary>왜 필요해요?</summary><p>${esc(entry.note)}</p></details></div><button type="button" ${action} data-ready>${status.registered?'내 기록':'＋ 추가'}</button></article>`;
+    return `<article class="catalog-entry ${status.registered?'is-owned':''}"><div><h4>${esc(entry.name)}<span class="catalog-badge ${entry.basic?'':'optional'}">${entry.basic?'기본':'선택'}</span></h4><p class="catalog-meta">${note}</p><details class="catalog-explain"><summary>왜 필요해요?</summary><p>${esc(entry.note)}</p><a href="${esc(knowledgeFor(entry))}" target="_blank" rel="noopener noreferrer" data-item-knowledge="${esc(entry.id)}">준비·관리 지식 읽기 ↗</a></details></div><button type="button" ${action} data-ready>${status.registered?'내 기록':'＋ 추가'}</button></article>`;
   }).join('');
 }
 function draw(){
@@ -241,5 +242,14 @@ function focusNotificationItem(itemId){
 document.addEventListener('bag-open-item',event=>focusNotificationItem(event.detail?.itemId));
 await refresh();
 focusNotificationItem(new URLSearchParams(location.search).get('item'));
+// Landing selects a preview only. URL parameters never save or add inventory.
+const launch=new URLSearchParams(location.search),requestedPreset=launch.get('preset'),requestedCatalog=launch.get('catalog');
+if(record&&PRESETS.some(p=>p.id===requestedPreset)){
+  showScreen('bag');$('preset-panel').hidden=false;openEditor('preset',requestedPreset);
+}else if(record&&CATALOG.some(e=>e.id===requestedCatalog)){
+  const entry=CATALOG.find(e=>e.id===requestedCatalog),status=entryStatus(entry,record.bag);
+  if(status.registered)focusNotificationItem(status.item.id);
+  else {catalogGroup=entry.group;showScreen('inventory');draw();$('catalog-panel').open=true;}
+}
 registerBagPwa().catch(()=>{$('pwa-status').textContent='오프라인 준비 실패 · 온라인 기록은 사용할 수 있습니다.';});
 initializeBagReminders().catch(()=>{$('reminder-status').textContent='알림 확인 필요 · 저장 기록은 유지됩니다.';});

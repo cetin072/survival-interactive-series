@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta name="referrer" content="no-referrer">
   <meta name="theme-color" content="#142234">
-  <title>나의 생존가방 · 로컬 기록 Alpha</title>
+  <title>나의 생존가방 · 1.0 RC</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/bag-192.png">
   <link rel="apple-touch-icon" href="./icons/bag-192.png">
@@ -24,7 +24,7 @@
     <symbol id="ic-history" viewBox="0 0 24 24"><path d="M3 11a9 9 0 1 1 2 6M3 5v6h6M12 7v5l4 2"/></symbol>
     <symbol id="ic-external" viewBox="0 0 24 24"><path d="M12 5H5v14h14v-7M13 4h7v7M20 4l-9 9"/></symbol>
   </svg>
-  <div class="notice"><span class="notice-dot"></span><strong>개인 기록 ALPHA</strong><span>기기 로컬 기록 · 알림·점검은 더보기</span></div>
+  <div class="notice"><span class="notice-dot"></span><strong>1.0 출시 후보</strong><span>기기 로컬 기록 · 알림·점검은 더보기</span></div>
   <main class="shell">
     <header class="top"><div><div class="brand"><span class="brand-symbol" aria-hidden="true"><svg class="ui-icon" focusable="false"><use href="#ic-bag"></use></svg></span>나의 생존가방</div><p class="brand-tagline">한 번 준비하고, 꾸준히 돌보는 나만의 비상가방</p></div><div class="mini-bag" aria-hidden="true"><div class="bag-handle"></div><div class="bag-body"><div class="bag-pocket"><div class="bag-pocket-line"></div></div><div class="bag-badge">READY</div></div></div></header>
     <p id="save-status" class="message" role="status" aria-live="polite">저장된 가방을 읽는 중입니다. 아직 수량을 확인하지 않았습니다.</p>
@@ -90,9 +90,9 @@
         <details class="settings-details">
           <summary>브랜드 이야기·제작 취지</summary>
           <p>작은 준비도 분명한 시작입니다. 무엇을 챙겼는지 기록하고, 꺼낸 만큼 다시 채우며, 다음 점검을 잊지 않도록 돕는 생활 도구를 만듭니다.</p>
-          <p>생존일기의 현실 생존지식과 연결되는 별도 실용 도구 BAG-SIDE-01입니다. 준비 완료나 생존을 보장하는 앱은 아닙니다.</p>
+          <p>생존일기의 현실 생존지식과 연결되는 비상가방 관리 도구입니다. 준비 완료나 생존을 보장하는 앱은 아닙니다.</p>
         </details>
-        <p class="settings-copyright">© 2026 생존일기 · BAG-SIDE-01</p>
+        <p class="settings-copyright">© 2026 생존일기 · 나의 생존가방</p>
       </section>
       <section class="settings-card settings-guide" aria-labelledby="settings-guide-title">
         <h2 id="settings-guide-title"><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-book"></use></svg> 준비 방법 · 생존지식</h2>
@@ -114,7 +114,7 @@
         <details id="backup-panel" class="backup-panel" open><summary>기록 백업·복원</summary>
         <p class="settings-caption">저장은 이 브라우저에만 됩니다. 휴대전화 교체 전에 기록을 파일로 백업하세요.</p>
         <div class="toolbar wrap"><button id="export" class="action primary-action" type="button" data-ready disabled>내 가방 백업하기</button><label class="file-button">백업 파일 불러오기<input id="import" type="file" accept=".json,application/json" data-ready disabled></label><button id="undo" class="quiet-button" type="button" data-ready disabled>이전 저장 복원</button><button type="button" data-command="refresh" class="quiet-button" data-ready disabled>최신 기록 읽기</button></div>
-        <details class="subtle-help"><summary>백업·복원 주의사항</summary><p>백업은 암호화되지 않은 기록 파일입니다. 공유 기기와 공개 저장소를 피하세요. 복원은 현재 가방 전체를 교체하며, 기존 기록 1개는 복구용으로 보관합니다. 다운로드가 실제로 완료됐는지 확인하세요. 시험용 사이트와 정식 사이트는 저장 공간이 다릅니다.</p></details>
+        <details class="subtle-help"><summary>백업·복원 주의사항</summary><p>백업은 암호화되지 않은 기록 파일입니다. 공유 기기와 공개 저장소를 피하세요. 복원은 현재 가방 전체를 교체하며, 기존 기록 1개는 복구용으로 보관합니다. 다운로드가 실제로 완료됐는지 확인하세요. QA와 정식 사이트는 저장 공간이 다릅니다. 옮길 때 JSON 백업·복원을 사용하세요.</p></details>
       </details>
       </section>
       <section class="settings-card" aria-labelledby="settings-reminder-title">
@@ -138,7 +138,7 @@
       </section>
       <section class="settings-card" aria-labelledby="settings-changes-title">
         <h2 id="settings-changes-title"><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-history"></use></svg> 업데이트 기록</h2>
-        <p class="settings-caption">현재 버전 · 개인 기록 Alpha (테스트용)</p>
+        <p class="settings-caption">현재 버전 · 1.0 출시 후보</p>
         <details class="settings-details" open>
           <summary>2026.10 · 최근 변경사항</summary>
           <ul>
@@ -151,7 +151,7 @@
         <p class="settings-caption">정식 출시 전에는 기능과 화면이 변경될 수 있습니다.</p>
       </section>
     </section>
-    <footer><span>© 2026 생존일기 · BAG-SIDE-01</span><span>개인 기록 Alpha · 웹 종료 후 날짜 알림·클라우드 동기화 없음</span><p>설명·백업·업데이트는 <button type="button" class="footer-settings" data-command="more">더보기</button>에서 확인하세요.</p></footer>
+    <footer><span>© 2026 생존일기 · 나의 생존가방</span><span>1.0 출시 후보 · 웹 종료 후 날짜 알림·클라우드 동기화 없음</span><p>설명·백업·업데이트는 <button type="button" class="footer-settings" data-command="more">더보기</button>에서 확인하세요.</p></footer>
   </main>
   <dialog id="editor" aria-labelledby="editor-title"><form id="editor-form"><h2 id="editor-title"></h2><div id="editor-body"></div><p id="editor-error" class="error-panel" role="alert" hidden></p><div class="dialog-actions"><button id="cancel" class="quiet-button" type="button">취소</button><button id="submit" class="action primary-action" type="submit">저장</button></div></form></dialog>
 </body>

@@ -1,0 +1,71 @@
+name: BAG Stage 4 landing acceptance
+on:
+  pull_request:
+    paths:
+      - 'archive/web/public/bag/**'
+      - 'archive/web/src/archive/WikiHomePreview.tsx'
+      - 'archive/scripts/check-bag-landing.py'
+      - 'archive/scripts/lib/bag-landing.test.mjs'
+      - 'archive/scripts/check-bag-knowledge.py'
+      - 'archive/scripts/build-bag-knowledge-preview.mjs'
+      - 'archive/scripts/lib/bag-item-article.mjs'
+      - 'docs/bunker_os/bag_knowledge/**'
+      - '.github/workflows/bag-landing-check.yml'
+permissions:
+  contents: read
+jobs:
+  landing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install existing web and browser dependencies
+        run: |
+          npm ci --prefix archive/web
+          python -m pip install playwright==1.55.0
+          python -m playwright install --with-deps chromium
+      - name: Landing contract and unchanged Alpha models
+        run: node --test archive/scripts/lib/bag-landing.test.mjs archive/scripts/lib/bag-side-*.test.mjs
+      - name: Build real before snapshot at Stage 4 source SHA
+        run: |
+          git worktree add --detach /tmp/bag-landing-before 7837b3deca5e2db29775fcc327ff6864a7145b6f
+          ln -s "$GITHUB_WORKSPACE/archive/web/node_modules" /tmp/bag-landing-before/archive/web/node_modules
+          cd /tmp/bag-landing-before/archive/web
+          npm run build:verified
+      - name: Build current landing and public home
+        working-directory: archive/web
+        env:
+          BAG_KNOWLEDGE_PREVIEW: '1'
+        run: npm run build:verified
+      - name: Before-after screenshots, local landing and existing app regression
+        env:
+          BAG_LANDING_BEFORE_ROOT: /tmp/bag-landing-before/archive/web/dist
+        run: |
+          python archive/scripts/check-bag-landing.py
+          python archive/scripts/check-bag-knowledge.py
+          python archive/scripts/check-bag-side-demo.py
+          python archive/scripts/check-bag-side-alpha.py
+          python archive/scripts/check-bag-side-presets.py
+      - name: Exact-head Deploy Preview acceptance
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          BAG_LANDING_BASE_URL: https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app
+          BAG_LANDING_EXPECTED_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python archive/scripts/check-bag-landing.py
+          python archive/scripts/check-bag-knowledge.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bag-stage4-review-${{ github.event.pull_request.head.sha }}
+          path: archive/reports/
+          retention-days: 14
