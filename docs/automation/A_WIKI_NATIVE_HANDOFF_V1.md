@@ -70,6 +70,44 @@ native judgment -> durable submit -> program finalizer -> GitHub
 
 The old `automation/a-wiki-native` branch is legacy evidence only and is not an authority.
 
+## Human-approved Reviewer overstatement correction (relation label only)
+
+A completed independent Reviewer's `HUMAN_REVIEW` decision is **terminal** and
+must never be converted into APPROVE, edited, deleted or silently bypassed.
+A human-approved, source-bound *relation label* correction has an explicit
+service-only revision procedure:
+
+1. Read the exact prior `HUMAN_REVIEW / REVIEWER_HUMAN_REVIEW` job, its
+   immutable Extractor result, fixed proposal, independent Reviewer result,
+   source and Graph hashes.
+2. The operator-approved correction specifies **exactly one relation** using
+   `from`, `to`, and the original label. The new label may only describe
+   facts supported by the existing original GM citation evidence.
+3. `archive_a_wiki_native_job_revise_human_relation(job_id,correction)` validates
+   exact result/review/source/graph SHA hashes; only service_role can execute.
+   An invalid or conflicting correction returns REJECTED without mutation.
+4. On success, the original job becomes `SUPERSEDED` with every other column
+   unchanged, including its original `HUMAN_REVIEW` decision/reason, complete
+   Extractor/result, fixed proposal, timestamps, and input bindings. The
+   transaction inserts one `EXTRACTOR_SUBMITTED` job with a new ledger UUID,
+   `supersedes_job_id`, incremented `review_revision`, and exactly that
+   corrected relation label. The immutable revision audit links both rows and
+   all prior and revised SHA hashes. It creates **no** approval or review result.
+5. The ordinary Program consumer recompiles a new proposal/review job and
+   advances to `REVIEW_READY`. The **next independent native Reviewer
+   execution** rereads the complete source and the revised proposal. APPROVE
+   triggers the existing Finalizer and GitHub CI/PR/merge. HUMAN_REVIEW/REJECT
+   again fails closed without publishing.
+6. Source RAW/Reader/Canon and the ordinary schedule are unchanged. Replaying
+   the exact correction returns ALREADY_REVISED; competing or changed
+   corrections are rejected. No deletion or force-deployment.
+
+This revision route does not silently unlock every HUMAN_REVIEW. It requires
+an explicit human-approved source-bound correction, and only fixes an
+overstated relation label, not unrelated facts. The previous source/Graph
+uniqueness contract now includes `review_revision` while preserving all
+original revision-zero job identities and the one-active-job gate.
+
 ## Durable job
 
 Table: `survival_ops.a_wiki_native_jobs`
