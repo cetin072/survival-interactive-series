@@ -172,6 +172,8 @@ export function OperatorDashboard({
   const visualBadgeClass = visualBlocker ? 'warning' : visualStatusTone(visualLatest?.status)
 
   const semantic = systemStatus?.knowledge_semantic
+  const hasLiveContract = semantic?.machine_active_count !== undefined
+    && semantic?.human_review_count !== undefined && semantic?.unresolved_blocked_count !== undefined
   const semanticLatest = semantic?.latest_job ?? null
   const machineStatuses = ['PREPARED', 'SUBMITTED', 'FINALIZING', 'PR_OPEN']
   const machineCount = semantic?.machine_active_count ?? 0
@@ -184,15 +186,15 @@ export function OperatorDashboard({
   const semanticBlocker = blockedJob?.blocker_code ?? stalledJob?.stalled_code
     ?? (prepFailed ? semantic?.prep?.blocker_code : null) ?? null
   const knowledgeErrorCount = blockedCount + (semantic?.machine_stalled_count ?? (stalledJob ? 1 : 0))
-  const knowledgeLatestBrief = semanticLatest?.brief_id ?? '없음'
+  const knowledgeLatestBrief = semanticLatest?.brief_id ?? (semanticLatest ? '조회 필요' : '없음')
   const knowledgeNeedsReview = humanCount > 0
   const knowledgeNeedsAttention = knowledgeErrorCount > 0 || prepFailed
-  const knowledgeBadge = !semantic ? '상태 조회 필요'
+  const knowledgeBadge = !hasLiveContract ? '상태 조회 필요'
     : knowledgeNeedsAttention ? '확인 필요'
     : knowledgeNeedsReview ? '검토 필요'
     : machineCount > 0 ? statusLabel(semantic.latest_machine_job?.status ?? semanticLatest?.status)
     : '정상'
-  const knowledgeBadgeClass = knowledgeNeedsAttention || knowledgeNeedsReview ? 'warning'
+  const knowledgeBadgeClass = !hasLiveContract ? 'neutral' : knowledgeNeedsAttention || knowledgeNeedsReview ? 'warning'
     : machineCount > 0 ? 'neutral' : 'ok'
   const latestProcessing = semanticLatest?.status === 'HOLD' && (semanticLatest.disposition_code ?? semanticLatest.blocker_code) === 'SEMANTIC_DUPLICATE'
     ? '중복으로 보류' : statusLabel(semanticLatest?.status)
@@ -342,8 +344,8 @@ export function OperatorDashboard({
           <dl>
             <div><dt>진행 중</dt><dd>{semantic?.machine_active_count === undefined ? '조회 필요' : `${machineCount}건`}</dd></div>
             <div><dt>최근 처리</dt><dd>{knowledgeLatestBrief} · {latestProcessing}</dd></div>
-            <div><dt>최근 게시</dt><dd>{semantic?.latest_published_job?.brief_id ?? '없음'}</dd></div>
-            <div><dt>오류</dt><dd>{knowledgeErrorCount}건</dd></div>
+            <div><dt>최근 게시</dt><dd>{hasLiveContract ? semantic?.latest_published_job?.brief_id ?? '없음' : '조회 필요'}</dd></div>
+            <div><dt>오류</dt><dd>{hasLiveContract ? `${knowledgeErrorCount}건` : '조회 필요'}</dd></div>
             <div><dt>최근 오류</dt><dd>{blockedJob?.brief_id ?? stalledJob?.brief_id ?? '없음'}</dd></div>
             <div><dt>원본</dt><dd>{sourceKindLabel(semanticLatest?.source_kind)}</dd></div>
             <div><dt>작업 시작 / 제출</dt><dd>{formatOperatorTime(semanticLatest?.prepared_at)} / {formatOperatorTime(semanticLatest?.submitted_at)}</dd></div>

@@ -192,6 +192,13 @@ function knowledgeCard(c: NonNullable<SystemStatus['knowledge_semantic']>) {
 const healthyC = { active_count: 0, machine_active_count: 0, human_review_count: 0,
   unresolved_blocked_count: 0, machine_stalled_count: 0, latest_job: null, prep: null }
 describe('C live runtime contract', () => {
+  it('does not report normal or infer machine activity from a legacy DB contract', () => {
+    const card = knowledgeCard({ active_count: 2, latest_job: { status: 'HOLD' }, prep: null })
+    expect(card).toContain('상태 조회 필요')
+    expect(card).toContain('<dt>진행 중</dt><dd>조회 필요')
+    expect(card).toContain('<dt>오류</dt><dd>조회 필요')
+  })
+
   it('two human reviews occupy no machine slot and are not stalled even when old', () => {
     const card = knowledgeCard({ ...healthyC, human_review_count: 2,
       latest_job: { status: 'HUMAN_REVIEW', brief_id: 'K-018', stalled_code: 'KNOWLEDGE_PR_STALLED' } })
