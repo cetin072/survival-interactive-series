@@ -1,0 +1,19 @@
+{
+  "id": "KC-c03-afterfall-chapter-12-f09156fd1a",
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-023",
+  "question": "비상운영 계획은 어떻게 시험하고 고칠까",
+  "topic_id": "community-continuity-roles",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_004.md"
+  ],
+  "source_hashes": [
+    "e63f8225d1f75c59a2637a63c805ee683700404111ff4265796f56ab864d2868"
+  ],
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "disposition_note": "공개 Reader의 허구 서사에서 겨울 운영계획을 실제 밤 동안 시험하고 손실·유지·약점을 다시 기록하는 장면이 질문의 계기가 됐다. 기존 K-009는 역할과 승인 권한의 분산을 다루지만, 이 후보는 계획을 안전한 연습으로 검증하고 발견사항을 개선조치로 연결하는 반복 절차에 초점을 두므로 실질적으로 중복되지 않는다.",
+  "reader_chapter_id": "c03-afterfall-chapter-12",
+  "reader_book_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b",
+  "reader_chapter_sha256": "28779bd59ef2328437c1fd980aae8e55f0975f0d4b5c050e70151fba08af87e6"
+}
