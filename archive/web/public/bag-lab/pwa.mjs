@@ -14,24 +14,22 @@ function initializeInstallShare(){
   const copy=panel.querySelector('[data-bag-copy]');
   const native=Boolean(globalThis.Capacitor?.isNativePlatform?.());
   input.value=BAG_PUBLIC_SHARE.url;
-  const preview=panel.querySelector('[data-bag-share-preview]');
-  if(preview)preview.hidden=location.origin==='https://survival-diary-archive.netlify.app'||native;
   const manual=()=>{
     input.focus();input.select();
-    status.textContent='소개 페이지 주소를 선택했습니다. 직접 복사해 주세요.';
+    status.textContent='소개 링크를 선택했어요. 직접 복사해서 친구에게 보내세요.';
   };
   share.addEventListener('click',async()=>{
     // The existing Android shell has no Native Share plugin. Copy the public
     // URL instead of navigating the WebView or pretending an OS share worked.
     if(native||typeof navigator.share!=='function'){
-      status.textContent='이 환경에서는 링크 복사를 이용해 주세요.';return;
+      status.textContent='공유 메뉴 대신 링크 복사를 이용해 주세요. 카카오톡이나 문자로 보낼 수 있어요.';return;
     }
     share.disabled=true;
     try{
       await navigator.share({...BAG_PUBLIC_SHARE});
-      status.textContent='공유 요청을 마쳤습니다.';
+      status.textContent='선택한 앱에서 링크 전송 여부를 확인해 주세요.';
     }catch(error){
-      status.textContent=error?.name==='AbortError'?'공유를 취소했습니다.':'공유하지 못했습니다. 링크 복사를 이용해 주세요.';
+      status.textContent=error?.name==='AbortError'?'공유를 취소했어요.':'공유 창을 열지 못했어요. 링크 복사를 이용해 주세요.';
     }finally{share.disabled=false;}
   });
   copy.addEventListener('click',async()=>{
@@ -39,7 +37,7 @@ function initializeInstallShare(){
     try{
       if(typeof navigator.clipboard?.writeText!=='function')throw new Error('CLIPBOARD_UNAVAILABLE');
       await navigator.clipboard.writeText(BAG_PUBLIC_SHARE.url);
-      status.textContent='소개 페이지 링크를 복사했습니다.';
+      status.textContent='링크를 복사했어요. 카카오톡이나 문자에 붙여 넣어 보내세요.';
     }catch{manual();}finally{copy.disabled=false;}
   });
 
@@ -55,7 +53,7 @@ function initializeInstallShare(){
   window.addEventListener('beforeinstallprompt',event=>{
     if(standalone())return;
     event.preventDefault();pending=event;install.hidden=false;
-    installStatus.textContent='이 브라우저에서 앱 설치를 요청할 수 있습니다.';
+    installStatus.textContent='홈 화면에 생존가방을 추가할 수 있어요.';
   });
   install.addEventListener('click',async()=>{
     if(!pending)return;
@@ -63,11 +61,11 @@ function initializeInstallShare(){
     try{
       const result=await prompt.prompt();
       const choice=result||await prompt.userChoice;
-      installStatus.textContent=choice?.outcome==='accepted'?'설치를 요청했습니다. 홈 화면 아이콘을 확인해 주세요.':'설치를 취소했습니다. 아래 방법으로 나중에 설치할 수 있습니다.';
-    }catch{installStatus.textContent='설치 창을 열지 못했습니다. 아래 브라우저 메뉴 안내를 이용해 주세요.';}
+      installStatus.textContent=choice?.outcome==='accepted'?'설치 안내를 진행했어요. 홈 화면에 아이콘이 생겼는지 확인해 주세요.':'설치를 취소했어요. 필요할 때 브라우저 메뉴로 설치할 수 있어요.';
+    }catch{installStatus.textContent='설치 창을 열지 못했어요. 브라우저 메뉴에서 홈 화면에 추가해 주세요.';}
   });
   window.addEventListener('appinstalled',()=>{
-    pending=null;install.hidden=true;installStatus.textContent='브라우저에서 앱 설치를 확인했습니다.';
+    pending=null;install.hidden=true;installStatus.textContent='생존가방이 홈 화면에 추가됐어요.';
   });
 }
 
@@ -90,7 +88,7 @@ export async function registerBagPwa(){
   });
   window.addEventListener('online',()=>registration.update().catch(()=>{}));
   await registration.update().catch(()=>{});
-  if(!registration.waiting)status.textContent=registration.active?'오프라인 앱 준비됨':'오프라인 앱 설치 중';
+  if(!registration.waiting)status.textContent=registration.active?'오프라인 사용 준비됨':'오프라인 사용 준비 중';
   return registration;
 }
 

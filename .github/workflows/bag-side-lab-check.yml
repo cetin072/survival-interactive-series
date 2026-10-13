@@ -80,7 +80,7 @@ jobs:
           grep -q 'name="robots" content="noindex' archive/web/public/bag-lab/index.html
           grep -q '가상 데이터 · 저장/알림 없음' archive/web/public/bag-lab/index.html
           grep -q 'name="robots" content="noindex' archive/web/public/bag-lab/alpha.html
-          grep -q '알림·클라우드 동기화 없음' archive/web/public/bag-lab/alpha.html
+          grep -q '앱을 닫은 뒤 날짜별 자동 알림은 보내지 않습니다.' archive/web/public/bag-lab/alpha.html
       - name: QA branch context retains noindex without production override
         run: |
           grep -q '^\[context.qa-bag-side\]' archive/web/netlify.toml

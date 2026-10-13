@@ -73,7 +73,9 @@ def checks(browser,base,width,agent,mode='success',native=False,standalone=False
         panel=page.locator('[data-bag-install-share]')
         expect(panel.get_by_text('Android / Chrome',exact=True)).to_be_visible()
         expect(panel.get_by_text('iPhone / Safari',exact=True)).to_be_visible()
-        expect(panel.locator('[data-bag-share-preview]')).to_be_hidden() if native else expect(panel.locator('[data-bag-share-preview]')).to_be_visible()
+        assert panel.locator('[data-bag-share-preview]').count()==0
+        assert '출시 후보' not in page.locator('body').inner_text()
+        assert '검수 화면' not in panel.inner_text()
         assert page.evaluate('__bagCalls')=={'share':[],'copy':[],'prompt':[]},'no automatic API/permission request'
         page.locator('[data-bag-share]').click()
         status=panel.locator('[data-bag-share-status]')
@@ -81,7 +83,7 @@ def checks(browser,base,width,agent,mode='success',native=False,standalone=False
             expect(status).to_contain_text('링크 복사')
             assert page.evaluate('__bagCalls.share')==[]
         else:
-            expect(status).to_contain_text({'success':'공유 요청을 마쳤습니다','cancel':'공유를 취소했습니다','failure':'공유하지 못했습니다'}[mode])
+            expect(status).to_contain_text({'success':'선택한 앱에서 링크 전송 여부를 확인해 주세요.','cancel':'공유를 취소했어요.','failure':'공유 창을 열지 못했어요.'}[mode])
             calls=page.evaluate('__bagCalls.share');assert calls==[{'payload':PAYLOAD,'gesture':True}],calls
             assert not any(word in json.dumps(calls,ensure_ascii=False) for word in ['비공개','deploy-preview','qa-bag-side','formatVersion','items','files'])
         page.locator('[data-bag-copy]').click()
@@ -89,7 +91,7 @@ def checks(browser,base,width,agent,mode='success',native=False,standalone=False
             expect(status).to_contain_text('직접 복사')
             assert page.locator('[data-bag-share-url]').evaluate('(el)=>document.activeElement===el&&el.selectionStart===0&&el.selectionEnd===el.value.length')
         else:
-            expect(status).to_contain_text('링크를 복사했습니다')
+            expect(status).to_contain_text('링크를 복사했어요')
         if mode!='unsupported':assert page.evaluate('__bagCalls.copy')==[{'url':PUBLIC,'gesture':True}]
         assert panel.locator('[data-bag-share-url]').input_value()==PUBLIC
         if target=='landing':
@@ -110,12 +112,12 @@ def checks(browser,base,width,agent,mode='success',native=False,standalone=False
                     assert page.evaluate('__bagInstall',outcome)
                     expect(button).to_be_visible();assert page.evaluate('__bagCalls.prompt')==[]
                     button.click();expect(button).to_be_hidden()
-                    expect(panel.locator('[data-bag-install-status]')).to_contain_text({'dismissed':'설치를 취소','failure':'설치 창을 열지 못','accepted':'설치를 요청'}[outcome])
+                    expect(panel.locator('[data-bag-install-status]')).to_contain_text({'dismissed':'설치를 취소','failure':'설치 창을 열지 못','accepted':'설치 안내를 진행'}[outcome])
                     assert '설치 완료' not in panel.inner_text()
                     assert page.evaluate('__bagCalls.prompt')==[True]
                     page.evaluate('__bagCalls.prompt=[]')
                 page.evaluate('window.dispatchEvent(new Event("appinstalled"))')
-                expect(panel.locator('[data-bag-install-status]')).to_have_text('브라우저에서 앱 설치를 확인했습니다.')
+                expect(panel.locator('[data-bag-install-status]')).to_have_text('생존가방이 홈 화면에 추가됐어요.')
             viewport(page)
             if mode=='success' and not native and not standalone:
                 panel.scroll_into_view_if_needed();page.screenshot(path=str(REPORT/f'app-{width}-{"iphone" if agent==IPHONE else "android"}.png'))

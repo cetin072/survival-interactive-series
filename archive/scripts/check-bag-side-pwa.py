@@ -147,7 +147,7 @@ def main():
                 alpha.card(editing,'가상 PWA 시험품').locator('[data-mode="edit"]').click()
                 editing.locator('#editor [name="target"]').fill('4')
                 editing.evaluate('window.bagTestControllerChanges=0;navigator.serviceWorker.addEventListener("controllerchange",()=>window.bagTestControllerChanges++)')
-                context.set_offline(True);atomic_text(assets,old);html=root/'bag-lab'/'alpha.html';html.write_text(html.read_text().replace('1.0 RC','업데이트 검증 1.0 RC'))
+                context.set_offline(True);atomic_text(assets,old);html=root/'bag-lab'/'alpha.html';html.write_text(html.read_text().replace('나의 생존가방 · 웹 1.0','나의 생존가방 · 업데이트 검증'))
                 regenerate(root,'synthetic-update-v2');context.set_offline(False);wait_condition(page,'navigator.onLine');update(page)
                 wait_condition(page,'navigator.serviceWorker.getRegistration("/bag-lab/alpha.html").then(r=>!!r.waiting)')
                 wait_condition(editing,'!document.getElementById("pwa-update").hidden')

@@ -12,7 +12,7 @@
 - 설치 버튼은 앱에서 실제 `beforeinstallprompt` 이벤트를 받은 때만 표시한다. 클릭에서만 일회성 prompt를 호출한다. accepted는 ‘설치 요청’, `appinstalled`를 받았을 때만 ‘브라우저에서 설치 확인’이다. 미지원/취소/실패 환경은 메뉴 안내로 이어진다.
 - 공유 payload는 고정 title/text/정식 `/bag/` URL 세 필드뿐이다. inventory/backup/settings/현재 location을 payload로 읽지 않는다. Share 미지원은 복사 안내, Clipboard 미지원·실패는 readonly URL 선택·수동 복사. 자동 API/권한 요청 없음.
 - 기존 Capacitor 셸은 Native Share 플러그인이 없으므로 WebView의 공유를 호출하지 않고 공개 링크 복사 안내를 사용한다. 플러그인/네이티브 코드 변경 없음.
-- QA/로컬에서는 정식 배포 전 주소 안내를 표시한다. QA 주소를 공유하지 않는다.
+- QA·Preview 구분은 HTTP noindex·배포 메타데이터로 검증하며 소비자 화면에는 검수/정식 배포 전 안내를 표시하지 않는다. 공유 URL은 항상 공개 canonical 주소로 고정하고 QA 주소·개인 기록을 전송하지 않는다.
 - 기존 네이비·오렌지/CSS 가방 그림으로 `bag/share.png` (1200×630)를 생성했다. `build-bag-share-image.py`는 기존 Playwright와 로컬 CSS만 사용하며 네트워크 자산이 없다. OG는 이 파일의 정식 HTTPS 주소만 참조한다.
 
 ## 보호 계약
@@ -35,5 +35,11 @@ Production release-marker/2일 정책/23:30 KST 예약·Netlify 설정·운영 D
 
 기존 `qa-bag-side`는 #536의 원래 HEAD 계보이고 main은 squash 계보다. 작업 시작 시 QA→새 HEAD는 fast-forward 불가였다. force/reset/혼합 merge로 QA를 바꾸지 않고 PR별 Preview를 사용한다.
 
-최종 사용자 검수·main 병합 승인 대기. 정기 출시 목표는 2026-10-14 23:30 KST 검사이며 일정 때문에 검증을 생략하지 않는다.
+사용자가 2026-10-13 설치·공유 소비자 문구 보완 및 main 병합을 승인했다. 정기 출시 목표는 2026-10-14 23:30 KST 검사이며 일정 때문에 검증을 생략하지 않는다.
 병합 승인 후 당시 main 누적 diff와 exact HEAD CI를 다시 확인한다. 출시 후 실제 휴대전화 홈 설치·카카오톡 공유/미리보기·OG 정식 URL 응답을 확인한다.
+
+## 사용자 승인에 따른 출시용 문구 정리
+- 랜딩·앱·업데이트 화면에서 `검수 화면`, `정식 배포 전`, `1.0 RC`, `출시 후보`, `정식 출시 전` 등 개발 중 안내를 제거하고 정식 웹 1.0 제품 표현으로 변경.
+- 공유 API 성공은 친구가 메시지를 실제 수신했다는 뜻이 아니므로 '선택한 앱에서 링크 전송 여부를 확인해 주세요'로 안내. 취소·오류·링크 복사 fallback은 실제 상태를 전달.
+- PWA·오프라인·IndexedDB/백업의 안전 계약과 설치/공유 API 진입 동작은 변경하지 않으며, 앱 종료 후 날짜별 웹 알림 미지원 및 Android 기기 알림 제한은 과장 없이 명시.
+- HTML/JS와 알림 안내 변경에 맞춰 `alpha-shell.txt`와 20자산 PWA cohort를 최신 SHA-256 값으로 갱신하고, exact-head CI/Preview·원본 current/previous 재고 보존을 재검수한다.

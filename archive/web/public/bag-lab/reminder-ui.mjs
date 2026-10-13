@@ -24,7 +24,7 @@ export async function refreshBagReminders(){
     if(driver){
       const result=await coordinator.synchronize();
       $('reminder-count').textContent=result.permission?`예약된 점검 알림 ${result.scheduled}개`:'권한 없음 · 실제 전달 불가';
-      $('reminder-status').textContent=result.recovery.failed||result.pending||result.cleanupPending?'확인 필요 · 예약 또는 취소가 남아 있습니다.':'Android 종료 후 알림 · 시험 중 (실기기 검증 전)';
+      $('reminder-status').textContent=result.recovery.failed||result.pending||result.cleanupPending?'확인 필요 · 예약 또는 취소가 남아 있습니다.':'Android 알림을 확인했어요. 기기 설정에 따라 표시가 늦어질 수 있습니다.';
     }else{
       $('reminder-count').textContent='예약된 점검 알림 0개 · 웹은 앱 종료 후 날짜 예약을 지원하지 않습니다.';
       $('reminder-status').textContent=permission.permission==='granted'&&settings.enabled?'웹 테스트 알림 사용 · 점검은 앱을 열 때 확인하세요.':'알림 사용 안 함 · 앱 안에서 점검할 물품은 계속 표시합니다.';
@@ -42,7 +42,7 @@ export async function initializeBagReminders(){
   driver=globalThis.BagAndroidNotificationDriver??null;
   if(driver){
     coordinator=createBagReminderCoordinator({storage:reminderStorage,driver,readBag,readSettings:readReminderSettings,newId:driver.newId,lock:browserReminderLock});
-    $('reminder-platform').textContent='Android 로컬 알림 · 시험 중';
+    $('reminder-platform').textContent='Android · 기기 알림';
     $('reminder-time-label').hidden=false;$('reminder-settings').hidden=false;
     driver.onClick(itemId=>document.dispatchEvent(new CustomEvent('bag-open-item',{detail:{itemId}})));
   }else $('reminder-platform').textContent='웹/PWA · 앱 내 점검 및 테스트 알림';
@@ -60,7 +60,7 @@ export async function initializeBagReminders(){
     try{await browserReminderLock(async()=>saveReminderSettings({...await readReminderSettings(),time:$('reminder-time').value}));await refreshBagReminders();}catch(error){fault(error);}
   });
   $('reminder-test').addEventListener('click',async()=>{
-    try{if(driver)await driver.test();else await testWebNotification();$('reminder-status').textContent=driver?'시험 알림을 10초 뒤로 예약했습니다. 앱을 닫고 실제 표시를 확인하세요. · 시험 중':'테스트 알림 요청됨 · 실제 표시 여부를 확인하세요. 종료 후 날짜 예약은 아닙니다.';}catch(error){fault(error);}
+    try{if(driver)await driver.test();else await testWebNotification();$('reminder-status').textContent=driver?'10초 뒤 테스트 알림을 예약했어요. 기기에서 표시되는지 확인해 주세요.':'테스트 알림을 확인해 주세요. 웹앱을 닫은 뒤 날짜별 자동 알림은 아닙니다.';}catch(error){fault(error);}
   });
   $('reminder-refresh').addEventListener('click',()=>refreshBagReminders());
   $('reminder-settings').addEventListener('click',()=>driver?.openSettings().catch(fault));
