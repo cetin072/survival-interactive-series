@@ -39,8 +39,22 @@ command = "npm run build:verified"
     X-Frame-Options = "DENY"
 
 [[redirects]]
+  from = "/"
+  to = "/client.html"
+  status = 200
+  force = true
+  query = { view = ":view" }
+
+[[redirects]]
+  from = "/index.html"
+  to = "/client.html"
+  status = 200
+  force = true
+  query = { view = ":view" }
+
+[[redirects]]
   from = "/operator"
-  to = "/index.html"
+  to = "/client.html"
   status = 200
   force = true
 
@@ -54,7 +68,7 @@ command = "npm run build:verified"
 
 [[redirects]]
   from = "/operator/*"
-  to = "/index.html"
+  to = "/client.html"
   status = 200
   force = true
 
@@ -63,6 +77,12 @@ command = "npm run build:verified"
 
   [headers.values]
     X-Robots-Tag = "noindex, nofollow, noarchive"
+
+[[headers]]
+  for = "/client.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-cache"
 
 [[headers]]
   for = "/index.html"

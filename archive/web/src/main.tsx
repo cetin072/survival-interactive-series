@@ -1,10 +1,22 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import { StrictMode, useLayoutEffect } from 'react'
+import { createRoot, hydrateRoot } from 'react-dom/client'
 import App from './App'
 import './styles.css'
 
-createRoot(document.getElementById('root')!).render(
+function ReadyApp() {
+  useLayoutEffect(() => { delete document.documentElement.dataset.archiveClientRoute }, [])
+  return <App />
+}
+
+const root = document.getElementById('root')!
+const app = (
   <StrictMode>
-    <App />
-  </StrictMode>,
+    <ReadyApp />
+  </StrictMode>
 )
+if (root.dataset.prerenderedHome && !document.documentElement.dataset.archiveClientRoute) {
+  hydrateRoot(root, app)
+} else {
+  root.replaceChildren()
+  createRoot(root).render(app)
+}
