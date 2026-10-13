@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { assessRoadmapBuild, type RoadmapDeployMeta, type RoadmapRelease } from './operatorRoadmapEvidence'
 import { buildRoadmap, kstCalendarDate, years, ROADMAP_ISSUE, ROADMAP_STRATEGY, type EvidenceState, type RoadmapLog } from './operatorRoadmapModel'
 import './operatorRoadmap.css'
 
@@ -17,13 +18,16 @@ function RoadmapTile({eyebrow,value,help}: {eyebrow:string;value:ReactNode;help:
 
 export function OperatorRoadmap({
   logs, error='', today=kstCalendarDate(new Date()),
+  buildEvidence=null, deployMeta=null, releaseMeta=null, hostname='', evidenceError='',
 }: {
   logs?:RoadmapLog[]|null; error?:string; today?:string
+  buildEvidence?:unknown; deployMeta?:RoadmapDeployMeta|null; releaseMeta?:RoadmapRelease|null; hostname?:string; evidenceError?:string
 }) {
   const roadmap=buildRoadmap(logs??null,today)
   const {calendar,days,stats}=roadmap
   const currentYear=calendar.currentYear
   const currentWeek=calendar.currentWeek
+  const artifactProof=assessRoadmapBuild(buildEvidence,deployMeta,releaseMeta,hostname)
   return <section className="operator-roadmap" id="operator-roadmap" aria-labelledby="operator-roadmap-title">
     <div className="roadmap-header">
       <div><p className="roadmap-kicker">생존일기 · 전체 로드맵</p>
@@ -64,6 +68,29 @@ export function OperatorRoadmap({
       </p>
       <a href={ROADMAP_ISSUE} target="_blank" rel="noreferrer noopener">할 일 원문 ↗</a>
     </div>
+    <section className="roadmap-build-evidence" aria-labelledby="roadmap-build-heading">
+      <div className="roadmap-build-head">
+        <h3 id="roadmap-build-heading">사이트 산출물 자동 확인</h3>
+        <span className={'roadmap-delivery-status '+(artifactProof.surface==='PRODUCTION_BUILD'?'verified':artifactProof.surface==='PREVIEW_BUILD'?'preview':'unknown')}>{artifactProof.label}</span>
+      </div>
+      <div className="roadmap-build-grid">
+        {artifactProof.artifacts.map(artifact=><article key={artifact.id}>
+          <span>{artifact.title}</span>
+          <strong>{artifact.state==='UNKNOWN'?'확인 필요':
+            artifact.count!==null?artifact.count+'개 · '+(artifact.present?'파일 확인':'빌드에 없음'):
+            artifact.present?'파일 확인':'빌드에 없음'}</strong>
+        </article>)}
+      </div>
+      <p className="roadmap-engagement-state">실제 준비 행동은 별도 계측 대기 · 설치·클릭·완료·재방문을 혼동하지 않습니다.</p>
+      {evidenceError && <p className="roadmap-load-error" role="alert">{evidenceError}</p>}
+      <details className="roadmap-build-info">
+        <summary>출처·배포 검증 범위</summary>
+        <p>{artifactProof.explanation}</p>
+        <p>증거 원본: 동일 배포의 출력 파일 · GitHub PR/CI/merge는 별도 검증 대상</p>
+        {artifactProof.commitRef && <p>사이트 빌드 커밋: <code>{artifactProof.commitRef.slice(0,12)}</code></p>}
+        <p>연결된 공개 글의 수만 보여주며 초안, 검색엔진 색인, 품목별 독립 검수 통과율은 추정하지 않습니다.</p>
+      </details>
+    </section>
     {error&&<p role="alert" className="roadmap-load-error">{error}</p>}
     <details className="roadmap-evidence-details">
       <summary>1주차 작업 7개와 완료 근거 보기</summary>
