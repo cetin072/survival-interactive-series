@@ -5,6 +5,7 @@ import { KnowledgeGuideLibraryPreview } from './KnowledgeGuideLibraryPreview'
 import { KnowledgeGuidePage } from './KnowledgeGuidePage'
 import { KnowledgeGuidePreview } from './KnowledgeGuidePreview'
 import { publishedKnowledgeGuides } from './knowledgeGuide'
+import { selectHomeKnowledge } from './knowledgeHome'
 import { archiveRouteUrl, parseArchiveRoute } from './readerNavigation'
 import { WikiHomePreview } from './WikiHomePreview'
 import { searchPublicArchive } from './wikiSearch'
@@ -38,7 +39,8 @@ describe('Knowledge practical guide rollout', () => {
   })
 
   it('links home cards, search results, library and related knowledge to canonical paths', () => {
-    const home = renderToStaticMarkup(createElement(WikiHomePreview))
+    const homeSelection = selectHomeKnowledge()
+    const home = renderToStaticMarkup(createElement(WikiHomePreview, { knowledge: homeSelection }))
     const library = renderToStaticMarkup(createElement(KnowledgeGuideLibraryPreview))
     for (const guide of publishedKnowledgeGuides) {
       const href = '/knowledge/' + guide.slug + '/'
@@ -48,7 +50,11 @@ describe('Knowledge practical guide rollout', () => {
       for (const related of guide.detail.related_briefs) expect(page).toContain('href="/knowledge/' + related.slug + '/"')
       expect(page).not.toContain('knowledge-preview')
     }
-    for (const guide of publishedKnowledgeGuides.slice(0, 5)) expect(home).toContain('href="/knowledge/' + guide.slug + '/"')
+    // New Automation C articles alter which guides are featured/recent.
+    // Assert the actual approved home selection, not a stale catalog slice.
+    for (const guide of [...homeSelection.featured, ...homeSelection.recent]) {
+      expect(home).toContain('href="/knowledge/' + guide.slug + '/"')
+    }
     expect(home).not.toContain('knowledge-preview')
     expect(library).not.toContain('knowledge-preview')
   })

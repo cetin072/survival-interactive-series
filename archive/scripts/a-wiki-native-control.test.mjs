@@ -103,6 +103,34 @@ test('submitted Extractor compiles into one REVIEW_READY package', () => {
   assert.equal(compiled.reviewJob.prepared_job.source.gm_blocks.length, 1)
 })
 
+test('human-approved correction recompiles as fresh Reviewer package without recycling prior HUMAN_REVIEW', () => {
+  const { job, result } = syntheticPackage()
+  const original = structuredClone(result)
+  const originalRelation = result.relations[0]
+  result.relations[0] = {
+    ...originalRelation,
+    label: '제어시험인물의 작업장 확인 범위는 추가 확인 필요',
+  }
+  const compiled = compileSubmittedExtractor({
+    status: 'EXTRACTOR_SUBMITTED',
+    prepared_job: job,
+    extractor_result: result,
+    supersedes_job_id: '00000000-0000-0000-0000-000000000001',
+    review_revision: 1,
+    review_job: null,
+    review_result: null,
+  })
+  assert.equal(compiled.action, 'REVIEW_READY')
+  assert.equal(compiled.proposal.version, 'wiki-fact-proposal-v1')
+  assert.equal(compiled.reviewJob.version, 'wiki-fact-review-job-v1')
+  assert.equal(compiled.reviewJob.proposal.proposal_sha256, compiled.proposal.proposal_sha256)
+  assert.notEqual(result.relations[0].label, original.relations[0].label)
+  assert.deepEqual(result.nodes, original.nodes)
+  assert.deepEqual(result.citations, original.citations)
+  assert.deepEqual(result.coverage, original.coverage)
+  assert.equal(compiled.reviewJob.prepared_job.source.manifest_sha256, job.source.manifest_sha256)
+})
+
 test('corrected submitted result requires current source verification and still stops at independent REVIEW_READY', async () => {
   const { job, result } = syntheticPackage()
   result.nodes[1].label = '요약 작업장'
