@@ -60,6 +60,7 @@ V1은 Markdown으로 시작한다. 규모가 커져 실제 조회/중복 관리 
 - Status: REVIEWED
 - Linked: S-001, Issue #500
 - Use rule: 채널 전체를 무차별 수집하지 않고, 우리 전략/실험에 영향을 줄 가능성이 큰 영상만 선별해 개별 Source로 승격한다.
+- Identity readback (2026-10-13): 공식 채널 페이지의 이름/정규 channel URL과 S-001 영상(3ao8RY0otEk)의 공식 YouTube oEmbed author_url이 @Ladder_Game으로 일치. 제목은 ‘진짜 ‘사업 전략’은 이래야 합니다’. 동일성은 메타데이터 확인이며 영상 음성·전체 자막·주장 재검증은 아님. [확인 범위와 미완료 사항](DISTRIBUTION_MAP_V1.md#5-사다리게임-식별-결과).
 
 
 ### S-004 — Ąžuolas: 72시간 대피가방 대화형 체크리스트 (리투아니아)
@@ -108,3 +109,13 @@ V1은 Markdown으로 시작한다. 규모가 커져 실제 조회/중복 관리 
 - 모든 링크를 무조건 영구 보존하지 않는다. 프로젝트의 전략·생존지식·벙커·수익 실험에 실제 가치가 있는 자료를 남긴다.
 - 같은 주장이나 같은 보도자료를 반복한 여러 링크는 독립 증거 여러 개로 세지 않는다.
 - 안전·의학·건축·법·재난 대응처럼 고위험 판단은 원전·공식자료·전문가 검증을 별도로 확인한다.
+
+### S-007 — 검색·영상 유통 공식 정책 재확인
+- Source: [Google 재크롤](https://developers.google.com/search/docs/crawling-indexing/ask-google-to-recrawl), [Search Console 실적](https://support.google.com/webmasters/answer/7576553?hl=ko), [Google 사람 중심 콘텐츠](https://developers.google.com/search/docs/fundamentals/creating-helpful-content), [네이버 사이트 진단](https://searchadvisor.naver.com/guide/report-diagnosis), [네이버 노출·클릭](https://searchadvisor.naver.com/guide/report-expose-ctr), [YouTube 링크 공유](https://support.google.com/youtube/answer/13748639?hl=en)
+- Area: 유통 / 정책 / 측정 경계
+- Why it matters: Day 5 1차 정책 조사를 재사용하고 색인·노출·클릭·공유 요청·실제 준비 행동을 구분하는 근거. Shorts의 일반 URL 비클릭과 롱폼 링크 조건을 실험 순위에 반영.
+- Reliability: 2026-10-13 공식 문서/검색 결과 재확인. **우리 계정의 검색·YouTube 실적 데이터는 없음**. 정책은 실행 시 다시 확인하며 검색 포함·유입·성공을 보장하지 않음.
+- Rights: 원문 링크와 자체 요약만 보관. 문서·이미지·영상 전문 복제 없음.
+- Impact: MEDIUM (유통 경로·측정 정의), 시장성/수익성 증거 NONE
+- Status: REVIEWED (자료 내용/정책 경계에 한정, 사람 승인 receipt 아님)
+- Linked: [Distribution Map V1](DISTRIBUTION_MAP_V1.md), [Experiment Brief V1](EXPERIMENT_BRIEF_V1.md), D-012/D-013, Issue #501
