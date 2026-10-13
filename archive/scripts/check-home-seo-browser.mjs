@@ -31,8 +31,13 @@ try {
     const context = await browser.newContext({ viewport: { width, height: 844 }, isMobile: width < 700, hasTouch: width < 700 })
     const page = await context.newPage()
     const errors = []
+    const previewToolbarWarnings = []
     page.on('pageerror', e => errors.push(e.message))
-    page.on('console', e => { if (e.type() === 'error' && !e.text().startsWith('Failed to load resource:')) errors.push(e.text()) })
+    page.on('console', e => {
+      if (e.type() !== 'error' || e.text().startsWith('Failed to load resource:')) return
+      if (e.text().startsWith("Framing 'https://app.netlify.com/' violates")) previewToolbarWarnings.push(e.text())
+      else errors.push(e.text())
+    })
     page.on('response', response => { if (response.status() >= 400 && new URL(response.url()).pathname !== '/favicon.ico') errors.push(`${response.status()} ${response.url()}`) })
     const response = await page.goto(base + '/')
     const source = await response.text()
@@ -62,7 +67,7 @@ try {
     assert.ok(await page.locator('meta[name="robots"]').getAttribute('content').then(x => x.includes('noindex')))
     assert.deepEqual(errors, [])
     await context.close()
-    console.log(JSON.stringify({ status: 'PASS', width, homeHydration: true, readerWikiOperator: true }))
+    console.log(JSON.stringify({ status: 'PASS', width, homeHydration: true, readerWikiOperator: true, previewToolbarBlockedByExistingCsp: previewToolbarWarnings.length }))
   }
   const noJs = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } })
   const page = await noJs.newPage()

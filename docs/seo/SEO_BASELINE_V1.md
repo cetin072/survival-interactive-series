@@ -46,12 +46,13 @@ Production 대표 3편은 기존 승인된 본문을 제공한다. 전체 Produc
 
 ## 검증
 
-- 초기 React 210/210, Knowledge 65/65 PASS.
+- React 210/210, 최종 Knowledge 67/67 PASS (새 홈 SEO 2개 포함).
 - 추가 홈 SEO 2/2 PASS: 승인 투영의 실제 링크, 결정적 렌더, 쿼리/운영자 bootstrap.
 - `build:verified` PASS: Reader, Knowledge 생성 일치, TypeScript, Vite, 공개 경계 scanner.
 - `check-home-seo-browser.mjs`: 모바일 390px / 데스크톱 1440px / JS 비활성 / hydration·중복 H1·overflow·대표 링크·Reader/Wiki·operator 진입을 검사한다. 실행 결과는 PR에 기록.
 - 실제 계정 로그인 완료/권한별 데이터 접근은 미실행. 로컬은 인증 환경변수 부재의 설정 필요 화면까지 검증. 기존 인증·RLS 변경 없음.
-- Netlify Preview: PR 생성 후 exact-head HTTP·브라우저 검사 결과를 추가한다. Production 강제 배포 없음.
+- Draft PR #551의 첫 구현 HEAD `5c1542bd887eee169a1cb69ef138facb3d3b3724`, Preview deploy `6ace4adbe2a084eb76efb234` READY. 실제 홈·대표 지식 3편·서가·sitemap·robots·operator HTTP 200. 홈 H1/정적 본문/canonical, query URL의 홈 canonical/본문 부재, 모든 Preview 응답의 noindex 확인. 기존 CI build/browser/knowledge/metadata/discovery/validate/model-test PASS. 최종 HEAD 검수 결과는 PR 댓글에 추가한다.
+- Preview의 Netlify 도구막대 iframe은 기존 CSP에 차단되므로 경고를 별도 집계한다. 앱 런타임 오류/하이드레이션 오류/정상 앱 자산 HTTP 오류는 실패로 처리한다. CSP 완화 없음. 보조 survival-zero-ai-test Preview는 CANCELED이며 성공으로 집계하지 않는다.
 
 ## USER_ACTION_REQUIRED — Google
 
