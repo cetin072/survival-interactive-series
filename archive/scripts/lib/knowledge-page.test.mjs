@@ -166,7 +166,7 @@ test('robots and sitemap discover exactly the approved public pages without bloc
   assert.doesNotMatch(robots, /noindex|Disallow:/i)
   const sitemap = await readFile(join(root, 'archive/web/public/sitemap.xml'), 'utf8')
   const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((item) => item[1])
-  assert.deepEqual(urls, ['/', '/knowledge/', ...published.map(knowledgeHref)].map((path) => origin + path))
+  assert.deepEqual(urls, ['/', '/knowledge/', '/bag/', ...published.map(knowledgeHref)].map((path) => origin + path))
   assert.equal(new Set(urls).size, urls.length)
   assert.doesNotMatch(sitemap, /operator|knowledge-preview|deploy-preview|lastmod|priority|changefreq/)
   const index = await readFile(join(root, 'archive/web/public/knowledge/index.html'), 'utf8')
