@@ -30,17 +30,18 @@
       "file": "GUIDE_06_SPARE_KEYS_DRAFT_V01.md"
     },
     "guide-43": {
-      "state": "PENDING_INDEPENDENT_REVIEW",
+      "state": "LIGHT_REVIEW_PASS_USER_PENDING",
       "file": "GUIDE_43_FLASHLIGHT_DRAFT_V01.md"
     },
     "guide-07": {
-      "state": "PENDING_INDEPENDENT_REVIEW",
+      "state": "LIGHT_REVIEW_PASS_USER_PENDING",
       "file": "GUIDE_07_DRAFT_V01.md"
     }
   },
   "reviewEvidence": {
     "guide-01_to_guide-06": "https://github.com/cetin072/survival-interactive-series/pull/525#issuecomment-6134230795",
-    "guide-01_note": "A reviewer-approved wording received only a spacing correction in commit 45d4adfc560b06296593c9f82e1d0d264a9fedf7."
+    "guide-01_note": "A reviewer-approved wording received only a spacing correction in commit 45d4adfc560b06296593c9f82e1d0d264a9fedf7.",
+    "guide-07_and_guide-43_light": "https://github.com/cetin072/survival-interactive-series/pull/525#issuecomment-6138009925"
   },
   "writingPolicy": {
     "oneArticlePerRun": true,
