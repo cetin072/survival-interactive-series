@@ -136,6 +136,22 @@
           <p>미리보기·시험용·정식 사이트 및 Android 앱은 서로 다른 저장 공간입니다. 옮길 때 백업 파일을 사용하세요. 브라우저의 사이트 데이터 삭제 또는 앱 삭제 전에는 반드시 백업하세요.</p>
         </details>
       </section>
+      <section class="settings-card settings-install-share" data-bag-install-share aria-labelledby="settings-install-share-title">
+        <h2 id="settings-install-share-title">앱 설치·친구 공유</h2>
+        <p class="settings-caption" data-bag-install-status role="status" aria-live="polite">설치 버튼이 보이지 않으면 브라우저 메뉴에서 홈 화면에 추가하세요.</p>
+        <button class="action primary-action" type="button" data-bag-install hidden>홈 화면에 앱 설치</button>
+        <details class="settings-details">
+          <summary>휴대전화 홈 화면 설치 방법</summary>
+          <h3>Android / Chrome</h3><ol><li>생존가방 앱 열기</li><li>브라우저 메뉴(⋮)</li><li>앱 설치 또는 홈 화면에 추가</li><li>홈 화면 아이콘으로 실행</li></ol>
+          <h3>iPhone / Safari</h3><ol><li>Safari에서 생존가방 앱 열기</li><li>공유 메뉴</li><li>홈 화면에 추가</li><li>추가 후 아이콘으로 실행</li></ol>
+          <p>브라우저와 OS 버전에 따라 메뉴 이름이 다를 수 있습니다. iPhone에서는 Safari에서 열어 주세요.</p>
+        </details>
+        <p class="settings-caption">개인 물품 기록이나 백업 파일 없이, 공개 소개 페이지 주소만 공유합니다.</p>
+        <div class="toolbar wrap"><button class="action primary-action" type="button" data-bag-share>친구에게 공유하기</button><button class="quiet-button" type="button" data-bag-copy>소개 페이지 링크 복사</button></div>
+        <label class="share-url-label">공유할 소개 페이지<input data-bag-share-url type="url" readonly value="https://survival-diary-archive.netlify.app/bag/" aria-label="공유할 소개 페이지 주소"></label>
+        <p class="settings-caption" data-bag-share-preview hidden>지금은 검수 화면입니다. 공유 주소는 정식 배포 전 주소이며, 친구가 바로 열 수 있는지는 정식 배포 후 확인해 주세요.</p>
+        <p class="settings-caption" role="status" aria-live="polite" data-bag-share-status>공유 메뉴를 지원하지 않으면 링크를 복사해 주세요.</p>
+      </section>
       <section class="settings-card" aria-labelledby="settings-changes-title">
         <h2 id="settings-changes-title"><svg class="ui-icon" focusable="false" aria-hidden="true"><use href="#ic-history"></use></svg> 업데이트 기록</h2>
         <p class="settings-caption">현재 버전 · 1.0 출시 후보</p>

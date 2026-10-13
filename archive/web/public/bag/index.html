@@ -15,7 +15,13 @@
   <meta property="og:title" content="나의 생존가방 1.0 · 준비는 한 번, 관리는 계속.">
   <meta property="og:description" content="필요한 물품을 고르고 실제 수량과 점검일을 관리하는 나만의 생존가방.">
   <meta property="og:url" content="https://survival-diary-archive.netlify.app/bag/">
+  <meta property="og:image" content="https://survival-diary-archive.netlify.app/bag/share.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="나의 생존가방 · 준비는 한 번, 관리는 계속. 네이비와 오렌지 가방 그림">
   <link rel="stylesheet" href="/bag/bag.css">
+  <script type="module" src="/bag-lab/pwa.mjs"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">본문으로 바로가기</a>
@@ -77,6 +83,22 @@
     <section class="knowledge section wrap" aria-labelledby="knowledge-title">
       <div class="knowledge-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ic-book"></use></svg></div>
       <div><p class="eyebrow">FROM KNOWLEDGE TO HABIT</p><h2 id="knowledge-title">준비의 이유도 함께.</h2><p>무엇을 챙길지 막막하다면,<br>생존일기의 공개 생존지식에서 시작하세요.</p><div class="knowledge-actions"><a class="text-link" href="/knowledge/emergency-supplies-inventory/">비상용품 관리 읽기 <span aria-hidden="true">↗</span></a><a class="text-link" href="/knowledge/">생존지식 전체 보기 <span aria-hidden="true">↗</span></a></div></div>
+    </section>
+    <section class="install-share section wrap" data-bag-install-share aria-labelledby="install-title">
+      <div class="section-heading"><p class="eyebrow">KEEP IT CLOSE · PASS IT ON</p><h2 id="install-title">휴대전화에 생존가방 설치하기</h2><p>홈 화면에서 바로 열고, 준비하는 습관을 함께 나눠요.</p></div>
+      <div class="install-grid">
+        <div><h3>Android / Chrome</h3><ol><li>생존가방 앱 열기</li><li>브라우저 메뉴(⋮)</li><li>앱 설치 또는 홈 화면에 추가</li><li>홈 화면 아이콘으로 실행</li></ol></div>
+        <div><h3>iPhone / Safari</h3><ol><li>Safari에서 생존가방 앱 열기</li><li>공유 메뉴</li><li>홈 화면에 추가</li><li>추가 후 아이콘으로 실행</li></ol></div>
+      </div>
+      <p class="small-note">브라우저와 OS 버전에 따라 메뉴 이름이 다를 수 있습니다. 설치 버튼을 지원하지 않는 환경에서는 브라우저 메뉴를 이용하세요.</p>
+      <a class="button primary install-open" href="/bag-lab/alpha.html">앱 열고 설치하기 <span aria-hidden="true">→</span></a>
+      <div class="share-panel">
+        <h3>친구에게 소개하기</h3><p>개인 물품 기록이나 백업 파일 없이, 공개 소개 페이지 주소만 공유합니다.</p>
+        <div class="share-actions"><button type="button" class="button primary" data-bag-share>친구에게 공유하기</button><button type="button" class="button copy-button" data-bag-copy>링크 복사</button></div>
+        <label class="share-url-label">공유할 소개 페이지<input data-bag-share-url type="url" readonly value="https://survival-diary-archive.netlify.app/bag/" aria-label="공유할 소개 페이지 주소"></label>
+        <p class="small-note" data-bag-share-preview hidden>지금은 검수 화면입니다. 공유 주소는 정식 배포 전 주소이며, 친구가 바로 열 수 있는지는 정식 배포 후 확인해 주세요.</p>
+        <p class="small-note" role="status" aria-live="polite" data-bag-share-status>공유 메뉴를 지원하지 않으면 링크를 복사해 주세요.</p>
+      </div>
     </section>
     <section class="faq section wrap" aria-labelledby="faq-title">
       <div class="section-heading"><p class="eyebrow">BEFORE YOU START</p><h2 id="faq-title">궁금한 것, 세 가지.</h2></div>
