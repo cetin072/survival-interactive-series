@@ -49,3 +49,18 @@
 - 실패한 실험을 숨기지 않는다.
 - 숫자가 좋더라도 NORTH_STAR와 충돌하면 확대하지 않는다.
 - 실험 결과가 전략을 바꿀 정도면 DECISION_LOG와 STRATEGY를 함께 갱신한다.
+
+## Month 01 Week 1 closeout 설계 연결 — 2026-10-14
+
+- 상태: **Day 5 조사 문서 + Day 6 실험 설계 작성, Day 7 감독 검토 대기**. 문서 작성·PR·CI는 실험 결과나 사람 승인 receipt가 아니다.
+- 근거: [Distribution Map V1](DISTRIBUTION_MAP_V1.md), [Experiment Brief V1](EXPERIMENT_BRIEF_V1.md), D-012/D-013 검토안, S-003/S-007.
+- 2026-10-13 조사·10-14 최종 DB SELECT 재확인: Month 01 본 조사 Day 1~3 기록 있음, Day 4 잠정, Day 5 RUNNING, Day 6~7 본 실험/gate 완료 기록 미조회. 기존 RAW·일지·검수 이력 수정 없음. BAG-SIDE-01 등의 COMPLETED를 본 실험에 합산하지 않음.
+
+| 기존 실험 | 이번 설계 연결 | 유지 상태·미확인 결과 |
+|---|---|---|
+| E-001 | 동의한 시험의 trial_start / tool_download(요청) / tool_open_report / prep_row_self_report 수기 관찰. 중복·분모·철회·QA 제외 기준은 brief 6~7절. 새 계측 서비스/테이블/엔드포인트 없음 | **RESEARCH** 유지. 수집 안정성/실제 기준선 미확보 |
+| E-002 | **추천 주 실험 1개: K-002 → 실물 1종 확인 → 기존 XLSX 한 행 작성**. 첫 시작자 8명, 10분 과업, 7일/4시간/추가 0원 상한. 자기보고 완료 C/N, 사전 제안 PASS C≥6/8 / FAIL C≤2/8 / 나머지 판단 보류 | **PLANNED** 유지. 수치는 사전 목표이며 실제 관측값 없음. 증가 효과·시장 검증·앱 성공 주장 없음 |
+| E-003 | 검색 우선·공유 보조는 잠정 유통 판단. Week 3에 외부 한 경로를 별도 freeze. Week 2 보조 실험 0개 | **RESEARCH** 유지. 게시/모집 메시지 발송/외부 유통 실행 없음 |
+| E-004 | 기존 Bunker Journey 후보 유지, 이번 시험의 병렬 과제로 추가하지 않음 | **RESEARCH** 유지. 실제 벙커/보안 정보 공개 없음 |
+
+다음: Day 7에서 대상·과업·측정/삭제 규칙·사전 판정·시간 한도를 검토하고 Week 2 freeze 여부 결정. 이후 승인된 사전 호환성/수기 측정 QA를 거쳐 실행한다. 실제 데이터가 생기기 전에는 기존 Result ‘아직 없음’을 바꾸지 않는다.
