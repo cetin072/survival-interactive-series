@@ -5,7 +5,7 @@ from threading import Thread
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import hashlib, json, os, shutil, re, time
-from playwright.sync_api import sync_playwright, expect
+from playwright.sync_api import sync_playwright, expect, Error as PlaywrightError
 import importlib.util
 spec=importlib.util.spec_from_file_location('bag_alpha',Path(__file__).with_name('check-bag-side-alpha.py'))
 alpha=importlib.util.module_from_spec(spec);spec.loader.exec_module(alpha)
@@ -23,8 +23,21 @@ def serve(root):
     server=ThreadingHTTPServer(('127.0.0.1',0),partial(Quiet,directory=str(root)))
     Thread(target=server.serve_forever,daemon=True).start()
     return server,'http://127.0.0.1:'+str(server.server_port)
+def wait_condition(page,expression,timeout=30000):
+    # Playwright's in-page waitForFunction loop reevaluates a string after a
+    # timer, which strict branch QA CSP correctly rejects. Poll the SAME read
+    # through the automation protocol; never bypass or loosen the site's CSP.
+    deadline=time.monotonic()+timeout/1000
+    while time.monotonic()<deadline:
+        try:
+            if page.evaluate('() => ('+expression+')'):return
+        except PlaywrightError as error:
+            if 'Execution context was destroyed' not in str(error) and 'Cannot find context' not in str(error):raise
+        page.wait_for_timeout(100)
+    raise AssertionError('Timed out waiting for browser condition: '+expression)
+
 def controlled(page):
-    page.wait_for_function('navigator.serviceWorker.controller?.scriptURL.includes("/bag-lab/sw.js")')
+    wait_condition(page,'navigator.serviceWorker.controller?.scriptURL.includes("/bag-lab/sw.js")')
     registration=page.evaluate('async()=>{const r=await navigator.serviceWorker.getRegistration("/bag-lab/alpha.html");return {scope:r.scope,active:!!r.active}}')
     assert registration['scope'].endswith('/bag-lab/') and registration['active']
 def atomic_text(path,text):
@@ -84,6 +97,9 @@ def main():
             page.on('framenavigated',lambda frame:navigations.append(frame.url) if frame==page.main_frame else None)
             page.on('pageerror',lambda error:errors.append(str(error)))
             alpha.ready(page,alpha.address(base));controlled(page);page.wait_for_timeout(300)
+            try:wait_condition(page,'false',timeout=10)
+            except AssertionError:pass
+            else:raise AssertionError('Condition waiter accepted a false predicate')
             assert len(navigations)==1,navigations # Initial SW claim never reloads the first screen.
             manifest=page.evaluate('async()=>await (await fetch("/bag-lab/manifest.webmanifest")).json()')
             assert manifest['display']=='standalone' and manifest['scope']=='/bag-lab/' and manifest['start_url']=='/bag-lab/alpha.html'
@@ -132,9 +148,9 @@ def main():
                 editing.locator('#editor [name="target"]').fill('4')
                 editing.evaluate('window.bagTestControllerChanges=0;navigator.serviceWorker.addEventListener("controllerchange",()=>window.bagTestControllerChanges++)')
                 context.set_offline(True);atomic_text(assets,old);html=root/'bag-lab'/'alpha.html';html.write_text(html.read_text().replace('1.0 RC','업데이트 검증 1.0 RC'))
-                regenerate(root,'synthetic-update-v2');context.set_offline(False);page.wait_for_function('navigator.onLine');update(page)
-                page.wait_for_function('navigator.serviceWorker.getRegistration("/bag-lab/alpha.html").then(r=>!!r.waiting)')
-                editing.wait_for_function('!document.getElementById("pwa-update").hidden')
+                regenerate(root,'synthetic-update-v2');context.set_offline(False);wait_condition(page,'navigator.onLine');update(page)
+                wait_condition(page,'navigator.serviceWorker.getRegistration("/bag-lab/alpha.html").then(r=>!!r.waiting)')
+                wait_condition(editing,'!document.getElementById("pwa-update").hidden')
                 # The modal prevents normal button access; also exercise the handler guard.
                 editing.locator('#pwa-update').evaluate('(button)=>button.click()')
                 expect(editing.locator('#pwa-status')).to_contain_text('먼저 저장하거나 취소')
@@ -145,8 +161,8 @@ def main():
                 alpha.card(page,'가상 PWA 시험품').locator('[data-mode="edit"]').click()
                 page.locator('#editor [name="target"]').fill('6');alpha.confirm_save(page);offline=alpha.stored(page)
                 page.locator('[data-nav="settings"]').click();expect(page.locator('#pwa-update')).to_be_visible()
-                page.locator('#pwa-update').click();page.wait_for_function('document.title.includes("업데이트 검증")');assert alpha.stored(page)==offline
-                editing.wait_for_function('window.bagTestControllerChanges===1')
+                page.locator('#pwa-update').click();wait_condition(page,'document.title.includes("업데이트 검증")');assert alpha.stored(page)==offline
+                wait_condition(editing,'window.bagTestControllerChanges===1')
                 expect(editing.locator('#editor')).to_be_visible()
                 expect(editing.locator('#editor [name="target"]')).to_have_value('4')
                 assert len(editing_navigations)==1 # another tab cannot reload an open editor

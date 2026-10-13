@@ -69,6 +69,7 @@ Production에서 위 로컬 플래그를 넣어도 생성하지 않는다. 기�
 미저장 editor를 둔 불완전 업데이트 거절, 다른 탭에서 정상 activation해도 입력 보존, 오래된 revision 저장 차단,
 입력자가 명시적으로 최신 기록을 읽고 재저장한 뒤 오프라인 재로드/JSON 정확 일치, 별도 origin 격리.
 다른 탭 activation 후 자동 지연 재로드를 보장하지 않으며 저장 후 명시적 재로드 경로를 검사한다.
+고정 QA의 엄격한 CSP는 Playwright waitForFunction의 타이머 안 string eval을 차단한다. 검증기는 동일한 조건·30초 제한을 automation protocol에서 읽는 방식으로 대기하며 false 조건의 timeout도 검사한다. CSP/bypass 설정·제품 코드·검증 조건을 완화하지 않는다. 로컬 업데이트 및 고정 QA PWA cold start로 이 경로를 확인했다.
 
 Android는 기존 Capacitor 앱·package/hostname/channel/native recovery 코드 그대로다.
 Windows sync에서 URL.pathname의 /C:/ 경로 오류가 실제 발생하여 표준 fileURLToPath로만 보정했다.
