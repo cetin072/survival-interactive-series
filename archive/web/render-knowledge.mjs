@@ -1,7 +1,7 @@
 // Build-only bridge to the existing KnowledgeGuidePage, not a second renderer.
 import { createServer } from 'vite'
 import { createElement } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup, renderToString } from 'react-dom/server'
 import { fileURLToPath } from 'node:url'
 
 export async function createKnowledgePageRenderer() {
@@ -12,8 +12,10 @@ export async function createKnowledgePageRenderer() {
     const { KnowledgeGuideLibraryPreview } = await server.ssrLoadModule('/src/archive/KnowledgeGuideLibraryPreview.tsx')
     const { publicNavigation } = await server.ssrLoadModule('/src/archive/publicNavigation.ts')
     const { groupKnowledge } = await server.ssrLoadModule('/src/archive/knowledgeCategories.ts')
+    const { WikiHomePreview } = await server.ssrLoadModule('/src/archive/WikiHomePreview.tsx')
     return {
       navigation: publicNavigation,
+      renderHome: () => renderToString(createElement(WikiHomePreview)),
       groups: (briefs) => groupKnowledge(briefs.map(adaptKnowledgeBrief)),
       render: (brief) => renderToStaticMarkup(createElement(KnowledgeGuidePage, { guide: adaptKnowledgeBrief(brief), showTopbar: false })),
       renderLibrary: (briefs) => renderToStaticMarkup(createElement(KnowledgeGuideLibraryPreview, { guides: briefs.map(adaptKnowledgeBrief), showTopbar: false })),

@@ -4,3 +4,4 @@ body { margin: 0; background: #f7f7f8; }
 button, input { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 a { color: inherit; }
+html[data-archive-client-route] #root { visibility: hidden; }
