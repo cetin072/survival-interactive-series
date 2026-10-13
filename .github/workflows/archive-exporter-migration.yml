@@ -237,6 +237,7 @@ jobs:
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261008234315_knowledge_brief_reservation_contract.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_brief_reservation_contract.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261009011500_knowledge_finalizer_auto_recovery_v1.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261012041500_knowledge_finalizer_event_reconcile.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_finalizer_auto_recovery.sql
 
   illustration-db-contract:
@@ -332,8 +333,15 @@ jobs:
         run: |
           psql -v ON_ERROR_STOP=1 <<'SQL'
           CREATE TABLE IF NOT EXISTS survival_ops.illustration_worker_runs(run_id text primary key);
-          CREATE TABLE IF NOT EXISTS survival_ops.illustration_vault_items(job_id text primary key);
+          CREATE TABLE IF NOT EXISTS survival_ops.illustration_vault_items(job_id text primary key, source_sha256 text);
           CREATE TABLE IF NOT EXISTS survival_ops.knowledge_ex001_review_revalidations(id bigint primary key);
+          CREATE OR REPLACE FUNCTION public.archive_illustration_assert_source_fresh(text,text)
+          RETURNS void LANGUAGE plpgsql STABLE
+          AS 'BEGIN RETURN; END';
+          ALTER TABLE survival_ops.illustration_render_jobs
+            ADD COLUMN IF NOT EXISTS ingest_expected_chunk_count smallint;
+          ALTER TABLE survival_ops.illustration_render_jobs
+            ADD COLUMN IF NOT EXISTS ingest_uploaded_chunk_count smallint NOT NULL DEFAULT 0;
           GRANT SELECT, INSERT, UPDATE ON survival_ops.illustration_worker_runs TO service_role;
           GRANT SELECT, INSERT, UPDATE, DELETE ON survival_ops.illustration_vault_items TO service_role;
 
@@ -357,3 +365,7 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261010143914_harden_automation_b_survival_ops_rls.sql
       - name: Verify Automation B survival_ops RLS hardening
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_survival_ops_rls_hardening.sql
+      - name: Apply Automation B aspect-ratio transport v2
+        run: psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261013005000_illustration_preserve_aspect_ratio_v2.sql
+      - name: Verify Automation B proportional transfer contract
+        run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_preserve_aspect_ratio_v2_verification.sql

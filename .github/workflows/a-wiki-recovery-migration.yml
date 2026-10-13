@@ -54,5 +54,8 @@ jobs:
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261004053216_a_wiki_review_proposal_sha_contract_v2.sql
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261004053526_a_wiki_blocked_retry_v1.sql
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261005101808_a_wiki_native_jobs_recovery_v1.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261012050000_a_wiki_label_correction_v1.sql
       - name: Verify publication evidence, supersession, and operator readback
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/a_wiki_native_jobs_recovery_verification.sql
+      - name: Verify immutable one-time label correction and existing transition guards
+        run: psql -v ON_ERROR_STOP=1 --file supabase/tests/a_wiki_native_jobs_label_correction.sql

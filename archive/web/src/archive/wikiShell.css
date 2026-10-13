@@ -182,9 +182,8 @@
 .wiki-infobox-cover.has-image img {
   display: block;
   width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  height: 100%;
+  object-fit: fill;
 }
 .wiki-lead {
   color: #24262b !important;
@@ -281,15 +280,21 @@
   line-height: 1.45;
 }
 .wiki-main-visual {
-  max-width: 560px;
+  width: fit-content;
+  max-width: 100%;
   margin: 12px 0 24px;
   border: 1px solid #d9dbde;
   background: #fff;
 }
-.wiki-main-visual img {
+.wiki-main-visual-frame {
+  width: 100%;
+  overflow: hidden;
+}
+.wiki-main-visual-frame img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: fill;
 }
 .wiki-main-visual figcaption {
   padding: 9px 11px;

@@ -1,6 +1,6 @@
 import { chronicleBooks, chaptersForChronicle } from './storyData'
 import { getChronicle } from './chronicleRegistry'
-import { siteVisualsFor } from './siteVisual'
+import { siteVisualDisplaySize, siteVisualsFor } from './siteVisual'
 import { chronicleHasGraph } from './chronicleGraphRegistry'
 import type { ArchiveNodeType } from './archiveData'
 import publicGraph from '../../../content/graphs/C03-AFTERFALL/GRAPH.json'
@@ -48,7 +48,15 @@ export function ChronicleRoom({ chronicleId, section, onSection, onRead, onExplo
       ? <section className="chronicle-feature"><div className="chronicle-feature-heading"><p className="archive-eyebrow">{chronicle.label} · 세계 기록</p><h2>{sections.find((item) => item.id === section)?.label}</h2></div><button className="primary" onClick={onExplore}>Graph Explorer 열기</button></section>
       : <section className="archive-panel chronicle-empty"><p className="archive-eyebrow">{sections.find((item) => item.id === section)?.label.toUpperCase()}</p><h2>아직 기록 없음</h2><p>이 Chronicle에는 공개된 Graph 자료가 없습니다. 다른 Chronicle의 기록은 여기에 섞이지 않습니다.</p></section>)}
     {section === 'map' && <section className="archive-panel chronicle-empty"><p className="archive-eyebrow">MAP</p><h2>아직 기록 없음</h2><p>공개 지도 projection이 준비되면 이 Chronicle 안에서 표시합니다.</p></section>}
-    {section === 'visuals' && <section className="chronicle-visuals"><div className="chronicle-feature-heading"><p className="archive-eyebrow">PUBLIC VISUAL ARCHIVE · {chronicle.label}</p><h2>공개 Visual 자료</h2></div>{visuals.length ? <div className="visual-grid">{visuals.map((asset) => <figure className="archive-panel" key={asset.subject_id}><img src={asset.public_path} alt={asset.subject_id} loading="lazy" /><figcaption>{asset.subject_id}</figcaption></figure>)}</div> : <div className="archive-panel chronicle-empty"><h2>아직 기록 없음</h2><p>공개 허용된 이미지가 등록되면 표시합니다.</p></div>}</section>}
+    {section === 'visuals' && <section className="chronicle-visuals"><div className="chronicle-feature-heading"><p className="archive-eyebrow">PUBLIC VISUAL ARCHIVE · {chronicle.label}</p><h2>공개 Visual 자료</h2></div>{visuals.length ? <div className="visual-grid">{visuals.map((asset) => {
+      const display = siteVisualDisplaySize(asset)
+      return <figure className={'archive-panel' + (display.corrected ? ' legacy-aspect-corrected' : '')} key={asset.subject_id}>
+        <div className="visual-grid-image-frame" style={{ aspectRatio: `${display.width} / ${display.height}` }}>
+          <img src={asset.public_path} width={display.width} height={display.height} alt={asset.subject_id} loading="lazy" />
+        </div>
+        <figcaption>{asset.subject_id}</figcaption>
+      </figure>
+    })}</div> : <div className="archive-panel chronicle-empty"><h2>아직 기록 없음</h2><p>공개 허용된 이미지가 등록되면 표시합니다.</p></div>}</section>}
     {section === 'raw' && <section className="archive-panel chronicle-empty"><p className="archive-eyebrow">RAW TRANSCRIPT</p><h2>공개 원문 보관소</h2><p>확인 가능한 원문을 기존 RAW Reader에서 엽니다.</p><button className="primary" onClick={onRaw}>RAW Reader 열기</button></section>}
   </section>
 }

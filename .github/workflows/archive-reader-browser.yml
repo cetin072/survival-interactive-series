@@ -71,7 +71,7 @@ jobs:
         run: python -m unittest discover -s archive/scripts -p "test_reader_deploy_identity.py"
       - name: Verify tested assets and navigation on Deploy Preview
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        run: python ../scripts/check-reader-browser.py --url https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app --wait-assets --world-wiki --screenshots "$RUNNER_TEMP/archive-browser/preview"
+        run: python ../scripts/check-reader-browser.py --url https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app --wait-assets --allow-ancestor-equivalent --world-wiki --screenshots "$RUNNER_TEMP/archive-browser/preview"
       - name: Detect a batched Production release commit
         id: production_release
         if: github.event_name == 'push'

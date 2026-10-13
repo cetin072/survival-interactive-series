@@ -1,4 +1,6 @@
 import { chronicleRegistry } from './chronicleRegistry'
+import { OperatorRoadmap } from './OperatorRoadmap'
+import type { RoadmapLog } from './operatorRoadmapModel'
 import {
   aWikiPublicationStatus,
   aWikiStatusLabel,
@@ -103,6 +105,8 @@ export function OperatorDashboard({
   error,
   statusError,
   inbox,
+  roadmapLogs,
+  roadmapError,
   systemStatus,
   productionStatus,
   selected,
@@ -120,6 +124,8 @@ export function OperatorDashboard({
   error: string
   statusError: string
   inbox: Inbox
+  roadmapLogs?: RoadmapLog[] | null
+  roadmapError?: string
   systemStatus: SystemStatus | null
   productionStatus: ProductionStatus
   selected: ReviewDetail | null
@@ -183,6 +189,8 @@ export function OperatorDashboard({
 
     {error && <p className="operator-error" role="alert">{error}</p>}
     {statusError && <p className="operator-error" role="alert">{statusError}</p>}
+
+    <OperatorRoadmap logs={roadmapLogs ?? null} error={roadmapError ?? ""} />
 
     <div className="operator-counts">
       <article><span>사람이 확인할 항목</span><strong>{inbox.pending_count}</strong></article>

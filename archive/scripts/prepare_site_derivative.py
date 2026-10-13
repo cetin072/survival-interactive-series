@@ -8,7 +8,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from derive_site_original import derive
+from derive_site_original import DERIVATIVE_VERSION, MAX_EDGE, derive
 import illustration_storage_handoff as handoff
 
 
@@ -100,6 +100,15 @@ def validate_original(source, record):
 
 def build_site_asset(record, registry_row, object_path, derivative):
     derivative_sha = digest(derivative)
+    with Image.open(io.BytesIO(derivative)) as image:
+        width, height = image.size
+        demand(
+            image.format == "PNG"
+            and width > 0
+            and height > 0
+            and max(width, height) == MAX_EDGE,
+            "SITE_DERIVATIVE_DIMENSIONS_INVALID",
+        )
     return {
         "point_id": record["point_id"],
         "generation_key": record["generation_key"],
@@ -108,12 +117,12 @@ def build_site_asset(record, registry_row, object_path, derivative):
         "storage_bucket": handoff.storage_provider().bucket,
         "storage_object_path": object_path,
         "registry_asset_id": registry_row["asset_id"],
-        "derivative_version": "site-png-512-v1",
+        "derivative_version": DERIVATIVE_VERSION,
         "public_path": f"/visual-assets/{derivative_sha}.png",
         "sha256": derivative_sha,
         "bytes": len(derivative),
-        "width": 512,
-        "height": 512,
+        "width": width,
+        "height": height,
         "mime_type": "image/png",
     }
 
@@ -132,9 +141,27 @@ def desired_manifest(existing, catalog_sha, asset):
         or item.get("subject_id") == asset["subject_id"]
     ]
     if matches:
-        demand(len(matches) == 1 and matches[0] == asset,
-               "SITE_ASSET_EXISTING_CONFLICT")
-        assets = existing["assets"]
+        demand(len(matches) == 1, "SITE_ASSET_EXISTING_CONFLICT")
+        current = matches[0]
+        if current == asset:
+            assets = existing["assets"]
+        else:
+            same_identity = (
+                current.get("point_id") == asset["point_id"]
+                and current.get("generation_key") == asset["generation_key"]
+                and current.get("subject_id") == asset["subject_id"]
+                and current.get("source_sha256") == asset["source_sha256"]
+            )
+            upgrade = (
+                same_identity
+                and current.get("derivative_version") == "site-png-512-v1"
+                and asset["derivative_version"] == DERIVATIVE_VERSION
+            )
+            demand(upgrade, "SITE_ASSET_EXISTING_CONFLICT")
+            assets = [
+                asset if item is current else item
+                for item in existing["assets"]
+            ]
     else:
         assets = [*existing["assets"], asset]
     body = {
@@ -145,7 +172,8 @@ def desired_manifest(existing, catalog_sha, asset):
         "visual_catalog_sha256": catalog_sha,
         "assets": assets,
     }
-    return {**body, "content_sha256": canonical_manifest_hash(body)}, bool(matches)
+    already_present = bool(matches) and matches[0] == asset
+    return {**body, "content_sha256": canonical_manifest_hash(body)}, already_present
 
 
 def prepare(request_path):
@@ -202,8 +230,8 @@ def prepare(request_path):
         "registry_asset_id": registry_row["asset_id"],
         "derivative_sha256": asset["sha256"],
         "derivative_bytes": asset["bytes"],
-        "derivative_width": 512,
-        "derivative_height": 512,
+        "derivative_width": asset["width"],
+        "derivative_height": asset["height"],
         "public_path": asset["public_path"],
         "manifest_path": MANIFEST.relative_to(ROOT).as_posix(),
         "derivative_path": public_file.relative_to(ROOT).as_posix(),

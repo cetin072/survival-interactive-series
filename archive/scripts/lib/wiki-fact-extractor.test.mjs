@@ -8,6 +8,7 @@ import { discoverWikiSources, discoverWikiSource } from './wiki-semantic-jobs.mj
 import { createAppliedWikiTestSnapshot } from './test-applied-wiki-snapshot.mjs'
 import { buildWikiFactJob, buildWikiFactReviewJob, compileWikiFactProposal, extractWikiFacts, reviewWikiFactProposal, validateWikiFactReview, WIKI_RESULT_VERSION, WIKI_REVIEW_VERSION } from './wiki-fact-extractor.mjs'
 import { runWikiFactCli } from '../run-wiki-fact-extractor.mjs'
+import { normalizeWikiCitationIds, applyWikiLabelCorrection } from './wiki-fact-extractor.mjs'
 
 const root = resolve(import.meta.dirname, '../../..')
 const appliedSnapshot = await createAppliedWikiTestSnapshot(root)
@@ -41,6 +42,64 @@ function rejection(name, edit, pattern = /WIKI_/) {
   test(name, () => { const f = fixture(); edit(f); assert.throws(() => compileWikiFactProposal(f.job, f.result), pattern) })
 }
 
+function correctionFixture() {
+  const f = fixture()
+  f.result.nodes[1].label = '요약된 작업장'
+  f.binding = { job_id: '00000000-0000-0000-0000-000000000001',
+    extractor_result_sha256: 'd'.repeat(64), prepared_job_sha256: 'e'.repeat(64) }
+  f.correction = { version: 'a-wiki-label-correction-v1', ...f.binding,
+    source_sha256: f.job.source.manifest_sha256, graph_sha256: f.job.graph_sha256,
+    node_key: 'new:place', old_label: '요약된 작업장', new_label: '시험작업장',
+    citation_id: 'q1', block_id: '001', reason: 'Explicitly approved source name.' }
+  f.options = { labelCorrection: f.correction, nativeBinding: f.binding }
+  return f
+}
+
+test('one approved label overlay preserves originals, facts and original-result hash; review binds the audit', () => {
+  const f = correctionFixture(), original = structuredClone(f)
+  assert.throws(() => compileWikiFactProposal(f.job, f.result), /WIKI_NEW_NAME_NOT_IN_EVIDENCE/)
+  const view = applyWikiLabelCorrection(f.job, f.result, f.correction, f.binding)
+  const expected = structuredClone(f.result)
+  expected.nodes[1].label = '시험작업장'
+  assert.deepEqual(view, expected)
+  const proposal = compileWikiFactProposal(f.job, f.result, f.options)
+  assert.equal(proposal.result_sha256, graphHash(f.result))
+  assert.deepEqual(proposal.label_correction, f.correction)
+  assert.deepEqual(buildWikiFactReviewJob(f.job, proposal).proposal.label_correction, f.correction)
+  assert.equal(proposal.facts.nodes[1].id, compileWikiFactProposal(f.job, expected).facts.nodes[1].id)
+  assert.equal(proposal.facts.relations[0].to, proposal.facts.nodes[1].id)
+  assert.deepEqual(compileWikiFactProposal(f.job, f.result, f.options), proposal)
+  assert.deepEqual(f, original)
+})
+
+test('label overlays reject every mismatched binding, target, quote or field', () => {
+  for (const edit of [
+    { job_id: 'other' }, { extractor_result_sha256: 'f'.repeat(64) },
+    { prepared_job_sha256: 'f'.repeat(64) }, { source_sha256: 'f'.repeat(64) },
+    { graph_sha256: 'f'.repeat(64) }, { node_key: 'new:other' }, { old_label: 'wrong' },
+    { new_label: '없는 시설' }, { citation_id: 'q2' }, { block_id: '003' },
+    { reason: '' }, { extra: 'forbidden' },
+  ]) {
+    const f = correctionFixture()
+    Object.assign(f.correction, edit)
+    assert.throws(() => compileWikiFactProposal(f.job, f.result, f.options), /WIKI_/)
+  }
+  const f = correctionFixture()
+  assert.throws(() => compileWikiFactProposal(f.job, f.result, { labelCorrection: f.correction }), /BINDING_INVALID/)
+})
+
+test('label overlay cannot excuse unrelated missing evidence, collisions or non-GM quotes', () => {
+  for (const edit of [
+    (f) => { f.result.nodes[0].evidence.summary = ['missing'] },
+    (f) => { f.result.nodes[0].label = '근거 없는 이름' },
+    (f) => { f.result.citations[0].quote += '조작' },
+    (f) => { f.result.nodes.push(structuredClone(f.result.nodes[1])) },
+  ]) {
+    const f = correctionFixture(); edit(f)
+    assert.throws(() => compileWikiFactProposal(f.job, f.result, f.options), /WIKI_/)
+  }
+})
+
 test('generic adapter accepts a previously unknown session and stable entity identities', async () => {
   for (const session of ['SESSION_008', 'SESSION_032', 'SESSION_999']) {
     const f = fixture(session, '다른시험인물')
@@ -59,6 +118,59 @@ test('repeat compilation is byte-identical and caller-owned objects are not muta
   assert.deepEqual(compileWikiFactProposal(f.job, f.result), compileWikiFactProposal(f.job, f.result))
   assert.deepEqual(f, original)
 })
+test('citation spelling normalization preserves original hashes, quotes and all structured evidence', () => {
+  const f = fixture('SESSION_008', '시험_인물')
+  const ids = { q1: 'fuel_allocation', q2: 'three_days' }
+  f.result.citations.forEach((item) => { item.id = ids[item.id] })
+  for (const node of f.result.nodes) for (const field of Object.keys(node.evidence)) node.evidence[field] = node.evidence[field].map((id) => ids[id])
+  f.result.relations[0].evidence = ['fuel_allocation']
+  f.result.deferred = [{ reason: '보류_사유', evidence: ['three_days'] }]
+  f.result.note = '원본_보존'
+  const original = structuredClone(f), originalHash = graphHash(f.result)
+  const view = normalizeWikiCitationIds(f.result)
+  assert.deepEqual(view.citations.map((item) => item.id), ['fuel-allocation', 'three-days'])
+  assert.deepEqual(view.nodes[2].evidence['meta.새역할'], ['three-days'])
+  assert.deepEqual(view.relations[0].evidence, ['fuel-allocation'])
+  assert.deepEqual(view.deferred[0].evidence, ['three-days'])
+  assert.deepEqual(normalizeWikiCitationIds(view), view)
+  assert.deepEqual(view.nodes.map((node) => node.changes), f.result.nodes.map((node) => node.changes))
+  assert.deepEqual(view.citations.map(({ block_id, quote }) => ({ block_id, quote })), f.result.citations.map(({ block_id, quote }) => ({ block_id, quote })))
+  const proposal = compileWikiFactProposal(f.job, f.result)
+  assert.equal(proposal.result_sha256, originalHash)
+  assert.notEqual(originalHash, graphHash(view))
+  assert.equal(proposal.facts.nodes[0].label, '시험_인물')
+  assert.equal(proposal.deferred[0].reason, '보류_사유')
+  assert.equal(proposal.note, '원본_보존')
+  assert.deepEqual(f, original)
+  assert.deepEqual(compileWikiFactProposal(f.job, f.result), proposal)
+  assert.equal(buildWikiFactReviewJob(f.job, proposal).proposal.result_sha256, originalHash)
+})
+
+rejection('normalized ID collisions fail closed', ({ result }) => {
+  result.citations[0].id = 'fuel_allocation'
+  result.citations[1].id = 'fuel-allocation'
+}, /WIKI_CITATION_ID_COLLISION/)
+rejection('normalized spelling never resolves an originally missing reference', ({ result }) => {
+  result.citations[0].id = 'fuel_allocation'
+  result.nodes[0].evidence.type = ['fuel-allocation']
+}, /WIKI_EVIDENCE_REQUIRED/)
+rejection('normalization does not permit invalid uppercase citation IDs', ({ result }) => {
+  result.citations[0].id = 'Fuel_allocation'
+}, /WIKI_CITATION_ID_INVALID/)
+rejection('normalized citations still require exact valid quotations', ({ result }) => {
+  result.citations[0].id = 'fuel_allocation'
+  for (const node of result.nodes) for (const field of Object.keys(node.evidence)) node.evidence[field] = node.evidence[field].map((id) => id === 'q1' ? 'fuel_allocation' : id)
+  result.relations[0].evidence = ['fuel_allocation']
+  result.citations[0].quote = '없는_인용문'
+}, /WIKI_QUOTE_NOT_FOUND/)
+
+rejection('normalization keeps the exact new-place name grounding guard', ({ result }) => {
+  result.citations[0].id = 'fuel_allocation'
+  for (const node of result.nodes) for (const field of Object.keys(node.evidence)) node.evidence[field] = node.evidence[field].map((id) => id === 'q1' ? 'fuel_allocation' : id)
+  result.relations[0].evidence = ['fuel_allocation']
+  result.nodes[1].label = '새로 조합한 작업장 이름'
+}, /WIKI_NEW_NAME_NOT_IN_EVIDENCE/)
+
 test('updates preserve unrelated existing metadata and identity', () => {
   const f = fixture(), p = compileWikiFactProposal(f.job, f.result), node = p.facts.nodes.find((n) => n.id === 'char-existing')
   assert.equal(node.meta.보존항목, '그대로'); assert.equal(node.meta.새역할, '새 기록 담당')

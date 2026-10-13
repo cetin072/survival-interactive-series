@@ -1,5 +1,6 @@
 import generatedManifest from '../../../content/visuals/C03-AFTERFALL/SITE_ASSETS.json'
 import manualManifest from '../../../content/visuals/C03-AFTERFALL/MANUAL_SITE_ASSETS.json'
+import legacyAspectManifest from '../../../content/visuals/C03-AFTERFALL/LEGACY_SITE_ASPECTS.json'
 
 export type SiteAsset = {
   subject_id: string
@@ -11,6 +12,47 @@ export type SiteAsset = {
   caption?: string
   source_kind?: string
   canon_status?: string
+  source_sha256?: string
+  derivative_version?: string
+}
+
+
+type LegacyAspectEntry = {
+  subject_id: string
+  site_source_sha256: string
+  original_width: number
+  original_height: number
+}
+
+export type SiteVisualDisplaySize = {
+  width: number
+  height: number
+  corrected: boolean
+}
+
+const legacyAspectBySubject = new Map(
+  (legacyAspectManifest.entries as LegacyAspectEntry[]).map((entry) => [entry.subject_id, entry]),
+)
+
+export function siteVisualDisplaySize(asset: SiteAsset): SiteVisualDisplaySize {
+  const entry = legacyAspectBySubject.get(asset.subject_id)
+  if (!entry
+      || asset.derivative_version !== 'site-png-512-v1'
+      || asset.source_sha256 !== entry.site_source_sha256
+      || !Number.isInteger(entry.original_width)
+      || !Number.isInteger(entry.original_height)
+      || entry.original_width <= 0
+      || entry.original_height <= 0) {
+    return { width: asset.width, height: asset.height, corrected: false }
+  }
+
+  const maxEdge = Math.max(asset.width, asset.height)
+  const sourceMaxEdge = Math.max(entry.original_width, entry.original_height)
+  return {
+    width: Math.max(1, Math.round(entry.original_width * maxEdge / sourceMaxEdge)),
+    height: Math.max(1, Math.round(entry.original_height * maxEdge / sourceMaxEdge)),
+    corrected: true,
+  }
 }
 
 const generatedAssets = generatedManifest.assets as SiteAsset[]
