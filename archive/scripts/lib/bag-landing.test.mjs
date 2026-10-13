@@ -16,8 +16,9 @@ test('Landing references the current Alpha preset contract without applying inve
   assert.equal((html.match(/<script\b/g)||[]).length,0);
   assert.ok(html.includes('실측값이나 권장 운반 중량이 아닙니다'));
 });
-test('Alpha and sample demo remain distinct; prerelease SEO stays noindex',()=>{
-  assert.ok(html.includes('name="robots" content="noindex,nofollow,noarchive"'));
+test('Public landing is indexable while personal inventory and unapproved drafts stay private to published content',()=>{
+  assert.ok(html.includes('name="robots" content="index,follow"'));
+  assert.ok(!html.includes('href="/bag-review/"'));
   assert.ok(html.includes('<html lang="ko">'));
   assert.equal((html.match(/<h1\b/g)||[]).length,1);
   assert.equal((html.match(/<details>/g)||[]).length,3);
