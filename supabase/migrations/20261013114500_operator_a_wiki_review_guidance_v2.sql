@@ -33,16 +33,16 @@ begin
       then pg_catalog.left(j.review_result->>'note',2000) else null end,
     'final_pr_number',j.final_pr_number, 'merge_sha',j.merge_sha,
     'completion_origin',case when j.status='PUBLISHED'
-      then pg_catalog.coalesce(j.completion_origin,'NATIVE_REVIEWED_MERGE') else null end,
+      then coalesce(j.completion_origin,'NATIVE_REVIEWED_MERGE') else null end,
     'supersedes_job_id',j.supersedes_job_id,
     'dispatch_count',j.dispatch_count, 'dispatch_at',j.dispatch_at,
     'created_at',j.created_at, 'updated_at',j.updated_at,
     'extractor_submitted_at',j.extractor_submitted_at,
     'review_ready_at',j.review_ready_at, 'review_submitted_at',j.review_submitted_at,
     'finalizing_at',j.finalizing_at, 'published_at',j.published_at,
-    'age_minutes',pg_catalog.greatest(0,pg_catalog.floor(
-      pg_catalog.extract(epoch from (
-        pg_catalog.clock_timestamp()-pg_catalog.coalesce(j.published_at,j.finalizing_at,
+    'age_minutes',greatest(0,pg_catalog.floor(
+      extract(epoch from (
+        pg_catalog.clock_timestamp()-coalesce(j.published_at,j.finalizing_at,
         j.review_submitted_at,j.review_ready_at,j.extractor_submitted_at,
         j.updated_at,j.created_at)))/60))
   ) into latest_job
