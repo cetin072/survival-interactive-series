@@ -59,7 +59,11 @@ test('real Git main drift fixture reapplies approved immutable data on new main;
     for (const ref of source.refs) {
       try { await readFile(join(base,ref)) } catch {
         await mkdir(join(base,ref,'..'),{recursive:true})
-        await writeFile(join(base,ref),execFileSync('git',['show',`origin/worldline/afterfall-rpg:${ref}`],{cwd:root}))
+        // The canonical worldline branch can move old raw files into an archive.
+        // Keep this fixture bound to the last tracked version of its exact ref.
+        const historicalCommit=execFileSync('git',['log','--all','--format=%H','--',ref],{cwd:root,encoding:'utf8'}).trim().split('\n')[0]
+        assert.ok(historicalCommit,`missing historical Reader ref: ${ref}`)
+        await writeFile(join(base,ref),execFileSync('git',['show',`${historicalCommit}:${ref}`],{cwd:root}))
       }
     }
     const job={job_id:'11111111-1111-4111-8111-111111111111',status:'HUMAN_REVIEW',source_kind:'PUBLIC_READER',source_ref:source.ref,source_sha256:source.sha256,
