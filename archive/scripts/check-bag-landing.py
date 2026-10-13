@@ -51,7 +51,7 @@ def landing(browser,base,width,height,label):
     assert response.status==200
     assert page.locator('html').get_attribute('lang')=='ko'
     assert page.locator('h1').count()==1
-    assert 'noindex' in page.locator('meta[name="robots"]').get_attribute('content')
+    assert page.locator('meta[name="robots"]').get_attribute('content')=='index,follow'
     if label=='preview':assert 'noindex' in response.headers.get('x-robots-tag','').lower()
     assert page.locator('meta[name="description"]').get_attribute('content')
     assert page.locator('link[rel="canonical"]').get_attribute('href')=='https://survival-diary-archive.netlify.app/bag/'
