@@ -184,3 +184,58 @@ describe('Operator dashboard structure', () => {
     expect(card).toContain('현재 사이트의 배포 원본이 이 위키의 저장소 반영 버전과 일치합니다.')
   })
 })
+
+function knowledgeCard(c: NonNullable<SystemStatus['knowledge_semantic']>) {
+  return renderDashboard({ systemStatus: { ...systemStatus, knowledge_semantic: c } })
+    .split('C · 생존 지식')[1].split('</article>')[0]
+}
+const healthyC = { active_count: 0, machine_active_count: 0, human_review_count: 0,
+  unresolved_blocked_count: 0, machine_stalled_count: 0, latest_job: null, prep: null }
+describe('C live runtime contract', () => {
+  it('does not report normal or infer machine activity from a legacy DB contract', () => {
+    const card = knowledgeCard({ active_count: 2, latest_job: { status: 'HOLD' }, prep: null })
+    expect(card).toContain('상태 조회 필요')
+    expect(card).toContain('<dt>진행 중</dt><dd>조회 필요')
+    expect(card).toContain('<dt>오류</dt><dd>조회 필요')
+  })
+
+  it('two human reviews occupy no machine slot and are not stalled even when old', () => {
+    const card = knowledgeCard({ ...healthyC, human_review_count: 2,
+      latest_job: { status: 'HUMAN_REVIEW', brief_id: 'K-018', stalled_code: 'KNOWLEDGE_PR_STALLED' } })
+    expect(card).toContain('검토 필요')
+    expect(card).toContain('<dt>진행 중</dt><dd>0건')
+    expect(card).toContain('<dt>사람 검토 대기</dt><dd>2건')
+    expect(card).toContain('<dt>오류</dt><dd>0건')
+    expect(card).toContain('사람 검토 대기')
+    expect(card).not.toContain('확인 필요')
+    expect(card).not.toContain('KNOWLEDGE_PR_STALLED')
+  })
+  it('normal duplicate HOLD uses live K-024 instead of static K-010', () => {
+    const card = knowledgeCard({ ...healthyC,
+      latest_job: { status: 'HOLD', brief_id: 'K-024', blocker_code: 'SEMANTIC_DUPLICATE' },
+      latest_published_job: { brief_id: 'K-021', status: 'PUBLISHED' } })
+    expect(card).toContain('K-024 · 중복으로 보류')
+    expect(card).toContain('<dt>최근 게시</dt><dd>K-021')
+    expect(card).toContain('<dt>막힌 이유</dt><dd>없음')
+    expect(card).not.toContain('K-010')
+    expect(card).not.toContain('확인 필요')
+    expect(card).not.toContain('기술 상세 확인이 필요합니다.')
+  })
+  it('latest HOLD cannot hide two actionable Finalizer errors', () => {
+    const card = knowledgeCard({ ...healthyC, human_review_count: 2, unresolved_blocked_count: 2,
+      latest_job: { brief_id: 'K-024', status: 'HOLD', disposition_code: 'SEMANTIC_DUPLICATE' },
+      latest_blocked_job: { brief_id: 'K-023', status: 'BLOCKED', blocker_code: 'KNOWLEDGE_CONTRACT', blocker_stage: 'FINALIZER' } })
+    expect(card).toContain('확인 필요')
+    expect(card).toContain('<dt>오류</dt><dd>2건')
+    expect(card).toContain('<dt>최근 오류</dt><dd>K-023')
+    expect(card).toContain('지식 글 형식 검증에서 문제가 발견됐습니다.')
+    expect(card).toContain('FINALIZER')
+  })
+  it('machine stall outranks human review and latest normal HOLD', () => {
+    const card = knowledgeCard({ ...healthyC, machine_active_count: 1, human_review_count: 2, machine_stalled_count: 1,
+      latest_job: { brief_id: 'K-024', status: 'HOLD' },
+      latest_stalled_job: { brief_id: 'K-022', status: 'PR_OPEN', stalled_code: 'KNOWLEDGE_PR_STALLED' } })
+    expect(card).toContain('확인 필요')
+    expect(card).toContain('<dt>오류</dt><dd>1건')
+  })
+})
