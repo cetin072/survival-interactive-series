@@ -73,7 +73,7 @@ try {
     return shell(searchTitle(brief), brief.meta_description, path, renderer.render(publicBriefData(brief, data)), breadcrumb + structured, true)
   }
   const index = shell('생존 지식 | 생존일기', '게임과 이야기에서 시작한 질문을 현실의 공식 자료와 검토 가능한 근거로 정리하는 생존 지식 아카이브.', '/knowledge/', renderer.renderLibrary(published.map((brief) => publicBriefData(brief, data))), '', false, true)
-  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${['/', '/knowledge/', ...published.map((brief) => `/knowledge/${brief.slug}/`)].map((path) => `  <url><loc>${esc(site + path)}</loc></url>`).join('\n')}\n</urlset>\n`
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${['/', '/knowledge/', '/bag/', ...published.map((brief) => `/knowledge/${brief.slug}/`)].map((path) => `  <url><loc>${esc(site + path)}</loc></url>`).join('\n')}\n</urlset>\n`
   const styles = await Promise.all(['wikiShell.css', 'survivalDesignLanguage.css'].map(async (name) => [join(root, 'archive/web/public/knowledge', name), (await readFile(join(root, 'archive/web/src/archive', name), 'utf8')).replace(/\r\n/g, '\n')]))
   const outputs = new Map([
     ...styles,
