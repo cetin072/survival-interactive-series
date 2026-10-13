@@ -8,6 +8,13 @@ import { articleFromDraft, articlePage, previewBuildAllowed } from './lib/bag-it
 const root = new URL('../../', import.meta.url);
 export const manuscript = new URL('docs/bunker_os/bag_knowledge/GUIDE_01_WATERPROOF_DOCUMENT_POUCH_DRAFT_V01.md', root);
 export const sourceDigest = '6f33dd7d5b8d0bc613318ae8ef98eae60f3aaf68c2de15944b8340c6853f72d4';
+export function projectP1Article(raw) {
+  raw = raw.replaceAll('\r\n', '\n');
+  if (createHash('sha256').update(raw).digest('hex') !== sourceDigest) throw new Error('P1 manuscript changed; review exact source again');
+  const article = articleFromDraft(raw, 'guide-01');
+  if (article.slug !== 'waterproof-document-pouch') throw new Error('P1 slug mismatch');
+  return article;
+}
 export async function buildPreview({ env = process.env, dist = new URL('archive/web/dist/', root) } = {}) {
   const output = new URL('knowledge/bag/', dist);
   // Fixed generated subtree only: remove stale Preview pages on reused builds.
@@ -16,10 +23,7 @@ export async function buildPreview({ env = process.env, dist = new URL('archive/
   const publicPath = new URL('archive/web/public/knowledge/bag/', root);
   if (await access(publicPath).then(() => true, () => false)) throw new Error('Bag pages must not live in public/');
   if (!previewBuildAllowed(env)) return { pages: 0, status: 'UNAPPROVED_PRODUCTION_EXCLUDED' };
-  const raw = (await readFile(manuscript, 'utf8')).replaceAll('\r\n', '\n');
-  if (createHash('sha256').update(raw).digest('hex') !== sourceDigest) throw new Error('P1 manuscript changed; review exact source again');
-  const article = articleFromDraft(raw, 'guide-01');
-  if (article.slug !== 'waterproof-document-pouch') throw new Error('P1 slug mismatch');
+  const article = projectP1Article(await readFile(manuscript, 'utf8'));
   for (const link of article.internal) await access(new URL(link.url.slice(1) + 'index.html', dist));
   const target = new URL(article.slug + '/', output);
   await mkdir(target, { recursive: true });

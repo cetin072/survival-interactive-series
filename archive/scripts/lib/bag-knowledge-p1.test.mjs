@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { articleFromDraft, articlePage, safeLink, previewBuildAllowed } from './bag-item-article.mjs';
-import { buildPreview, manuscript } from '../build-bag-knowledge-preview.mjs';
+import { buildPreview, manuscript, projectP1Article } from '../build-bag-knowledge-preview.mjs';
 
 test('P1 projects reader content, safety and sources without any editorial fields or app links', async () => {
   const raw = await readFile(manuscript, 'utf8');
@@ -21,6 +21,8 @@ test('P1 projects reader content, safety and sources without any editorial field
   assert.doesNotMatch(html, /DRAFT|catalogId|reviewedAt|sourceReview|linkReview|guide-\d|Automation C|변경 이력|검수|bag-lab|돌아가기|guide-03|guide-05/);
   assert.throws(() => articleFromDraft(raw.replace('놓치기 쉬운 점', '바뀐 섹션'), 'guide-01'));
   assert.throws(() => articleFromDraft(raw, 'guide-02'));
+  assert.equal(projectP1Article(raw).id, 'guide-01');
+  assert.throws(() => projectP1Article(raw + '\nChanged after review'), /manuscript changed/);
 });
 
 test('production and unknown contexts cannot opt in; stale Preview is removed', async () => {

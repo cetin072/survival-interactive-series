@@ -49,4 +49,3 @@ export function articleFromDraft(raw,id){
 export function articlePage(article){
   return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title>${esc(article.title)} | 생존일기</title><link rel="stylesheet" href="/knowledge/knowledge.css"></head><body><div class="knowledge-shell"><header class="knowledge-header"><a class="knowledge-brand" href="/">생존일기</a><nav class="knowledge-nav"><a href="/knowledge/">생존 지식</a></nav></header><main class="article-shell"><p class="article-note">미공개 미리보기 · 정식 발행 전 화면입니다. 이 주소는 인터넷에서 열릴 수 있습니다.</p><header class="article-header"><h1>${esc(article.title)}</h1></header>${article.content}<footer class="knowledge-footer">자료 확인일: 2026-10-12</footer></main></div></body></html>`;
 }
-

@@ -29,6 +29,28 @@ const results = [];
 let browser;
 try {
   browser = await chromium.launch({ headless: true, ...(process.env.PLAYWRIGHT_CHANNEL ? { channel: process.env.PLAYWRIGHT_CHANNEL } : {}) });
+  const auditContext = await browser.newContext();
+  let deploy;
+  if (process.env.BAG_P1_BASE_URL) {
+    assert.match(process.env.BAG_P1_EXPECTED_SHA || '', /^[a-f0-9]{40}$/);
+    const meta = await auditContext.request.get(base + '/deploy-meta.json');
+    assert.equal(meta.status(), 200);
+    deploy = await meta.json();
+    assert.equal(deploy.provider, 'netlify');
+    assert.equal(deploy.context, 'deploy-preview');
+    assert.equal(deploy.commit_ref, process.env.BAG_P1_EXPECTED_SHA);
+  }
+  const sitemap = await readFile(resolve(import.meta.dirname, '../web/public/sitemap.xml'), 'utf8');
+  const publishedPaths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => new URL(m[1]).pathname).filter(p => p.startsWith('/knowledge/') && p !== '/knowledge/');
+  assert.equal(publishedPaths.length, 13);
+  for (const published of publishedPaths) {
+    const response = await auditContext.request.get(base + published);
+    assert.equal(response.status(), 200, published);
+    const original = await readFile(resolve(import.meta.dirname, '../web/public', '.' + published, 'index.html'), 'utf8');
+    const title = original.match(/<title>([^<]+)<\/title>/)[1];
+    assert.ok((await response.text()).includes(`<title>${title}</title>`), published);
+  }
+  await auditContext.close();
   for (const width of [320, 390, 1280]) {
     const context = await browser.newContext({ viewport: { width, height: 900 }, locale: 'ko-KR' });
     const page = await context.newPage();
@@ -69,6 +91,6 @@ try {
     results.push({ width, status: 'PASS', overflow: false, relatedLinkAndBack: true, syntheticStoragePreserved: true });
     await context.close();
   }
-  console.log(JSON.stringify({ base, results }));
-  await writeFile(resolve(report, 'browser.json'), JSON.stringify({ base, results }, null, 2));
+  console.log(JSON.stringify({ base, deploy, publishedRegression: publishedPaths.length, results }));
+  await writeFile(resolve(report, 'browser.json'), JSON.stringify({ base, deploy, publishedRegression: publishedPaths.length, results }, null, 2));
 } finally { await browser?.close(); server?.close(); }
