@@ -3,7 +3,7 @@
   "project": "bag-side-item-knowledge",
   "catalogTotal": 49,
   "maxPendingIndependentReview": 6,
-  "nextCandidate": "guide-07",
+  "nextCandidate": "guide-08",
   "articles": {
     "guide-01": {
       "state": "INDEPENDENT_PASS_USER_PENDING",
@@ -32,6 +32,10 @@
     "guide-43": {
       "state": "PENDING_INDEPENDENT_REVIEW",
       "file": "GUIDE_43_FLASHLIGHT_DRAFT_V01.md"
+    },
+    "guide-07": {
+      "state": "PENDING_INDEPENDENT_REVIEW",
+      "file": "GUIDE_07_DRAFT_V01.md"
     }
   },
   "reviewEvidence": {
