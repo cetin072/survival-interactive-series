@@ -107,6 +107,12 @@ describe('Operator dashboard structure', () => {
         },
       },
     } })
+    const wholeDashboard = renderDashboard({ systemStatus: {
+      ...systemStatus,
+      a_wiki: { job_count: 4, active_count: 0, human_review_count: 1, published_count: 3,
+        latest_job: { status: 'HUMAN_REVIEW', blocker_code: 'REVIEWER_HUMAN_REVIEW' } },
+    } })
+    expect(wholeDashboard).toContain('<span>사람이 확인할 항목</span><strong>1</strong>')
     expect(card).toContain('내용 검수 보류')
     expect(card).toContain('처리 중 0건 · 검수 보류 1건 · 저장소 반영 3건')
     expect(card).toContain('콘텐츠 사실 확인 · 자동화 장애와 다름')
