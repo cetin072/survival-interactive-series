@@ -1,3 +1,4 @@
+import bagArticles from 'virtual:bag-knowledge-public'
 import { groupKnowledge } from './knowledgeCategories'
 import { publishedKnowledgeGuides } from './knowledgeGuide'
 import { chronicleRegistry, type Chronicle } from './chronicleRegistry'
@@ -10,6 +11,8 @@ import { publicNavigation } from './publicNavigation'
 import { WikiTopbar } from './WikiTopbar'
 import './wikiShell.css'
 import './survivalDesignLanguage.css'
+
+const publicBagArticles = bagArticles as Array<{id:string;title:string;summary:string;href:string}>
 
 const storyHref = (id: string) => {
   const url = archiveRouteUrl({ view: 'book', chronicleId: id }, 'https://archive.invalid/')
@@ -62,6 +65,19 @@ export function WikiHomePreview({ knowledge = selectHomeKnowledge(), chronicles 
           {knowledge.recent.map((guide) => <KnowledgeCard key={guide.id} guide={guide} dated />)}
         </div> : <p>새로 공개한 지식이 생기면 이곳에 표시합니다.</p>}
       </section>
+
+      {publicBagArticles.length > 0 && <section className="wiki-home-section" aria-labelledby="wiki-home-bag-knowledge-title">
+        <div className="wiki-section-heading">
+          <h2 id="wiki-home-bag-knowledge-title">물품별 생존지식</h2>
+          <a href="/knowledge/#knowledge-bag-items">전체 {publicBagArticles.length}편 →</a>
+        </div>
+        <p>비상시에 필요한 물품의 선택 기준과 실제 사용·점검 방법을 글로 확인하세요.</p>
+        <div className="wiki-home-knowledge-grid">
+          {publicBagArticles.slice(0, 4).map(item => <a className="wiki-home-knowledge-card" key={item.id} href={item.href}>
+            <h3>{item.title}</h3><p>{item.summary}</p>
+          </a>)}
+        </div>
+      </section>}
 
       {knowledge.resource && <section className="wiki-home-section" aria-labelledby="wiki-resource-title">
         <div className="wiki-section-heading"><h2 id="wiki-resource-title">바로 쓰는 자료</h2><a href="/?view=tools">자료실 전체 보기 →</a></div>

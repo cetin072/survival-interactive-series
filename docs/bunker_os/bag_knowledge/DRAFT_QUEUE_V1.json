@@ -6,36 +6,52 @@
   "nextCandidate": "guide-08",
   "articles": {
     "guide-01": {
-      "state": "INDEPENDENT_PASS_USER_PENDING",
-      "file": "GUIDE_01_WATERPROOF_DOCUMENT_POUCH_DRAFT_V01.md"
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_01_WATERPROOF_DOCUMENT_POUCH_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
     },
     "guide-02": {
-      "state": "INDEPENDENT_PASS_USER_PENDING",
-      "file": "GUIDE_02_IDENTITY_CARD_COPY_DRAFT_V01.md"
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_02_IDENTITY_CARD_COPY_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
     },
     "guide-03": {
-      "state": "INDEPENDENT_PASS_USER_PENDING",
-      "file": "GUIDE_03_FAMILY_EMERGENCY_CONTACT_NOTE_DRAFT_V01.md"
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_03_FAMILY_EMERGENCY_CONTACT_NOTE_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
     },
     "guide-04": {
-      "state": "INDEPENDENT_PASS_USER_PENDING",
-      "file": "GUIDE_04_SMALL_DENOMINATION_CASH_DRAFT_V01.md"
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_04_SMALL_DENOMINATION_CASH_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
     },
     "guide-05": {
-      "state": "INDEPENDENT_PASS_USER_PENDING",
-      "file": "GUIDE_05_IMPORTANT_DOCUMENT_COPIES_DRAFT_V01.md"
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_05_IMPORTANT_DOCUMENT_COPIES_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
     },
     "guide-06": {
-      "state": "INDEPENDENT_PASS_USER_PENDING",
-      "file": "GUIDE_06_SPARE_KEYS_DRAFT_V01.md"
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_06_SPARE_KEYS_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
     },
     "guide-43": {
-      "state": "LIGHT_REVIEW_PASS_USER_PENDING",
-      "file": "GUIDE_43_FLASHLIGHT_DRAFT_V01.md"
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_43_FLASHLIGHT_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
     },
     "guide-07": {
-      "state": "LIGHT_REVIEW_PASS_USER_PENDING",
-      "file": "GUIDE_07_DRAFT_V01.md"
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_07_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
     }
   },
   "reviewEvidence": {

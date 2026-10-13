@@ -1,1 +1,7 @@
 .bag-article{max-width:760px;margin:32px auto;padding:0 22px 48px;color:#142234;line-height:1.85;overflow-wrap:anywhere}.bag-article h1{font-size:clamp(26px,5vw,38px);line-height:1.4;letter-spacing:-.04em}.bag-article h2{font-size:22px;margin-top:34px}.bag-article a{color:#a94c21;text-underline-offset:3px}.bag-article li{margin:8px 0}.bag-article section{margin:24px 0}.bag-article strong{font-weight:750}.knowledge-header{display:flex;justify-content:space-between;gap:12px;padding:18px 22px}.knowledge-header a{color:#142234}.bag-article a:focus-visible{outline:3px solid #f5783c;outline-offset:3px}
+
+.bag-article-crumb{font-size:13px;margin:0 0 18px;color:#58708b}
+.bag-article-cta{margin:48px 0 8px;padding:18px 20px;border:1px solid #d7e3ef;border-radius:14px;background:#f4f8fc}
+.bag-article-cta h2{font-size:20px;margin:0 0 8px}.bag-article-cta p{margin:0 0 12px;font-size:14px}
+.bag-article-cta>a{display:inline-block;padding:10px 14px;border-radius:10px;background:#163149;color:#fff;font-size:14px;font-weight:750;text-decoration:none}
+.bag-article-cta>a:focus-visible{outline:3px solid #ff955d;outline-offset:2px}

@@ -6,6 +6,9 @@ import { publicKnowledgeModule } from '../scripts/lib/knowledge-public.mjs'
 // @ts-expect-error Build-only Node module; never shipped to the browser.
 import { loadPublicWikiData } from '../scripts/lib/wiki-public-sources.mjs'
 
+// @ts-expect-error Build-only source mapping.
+import {approvedBagArticles,publicationFiles} from '../scripts/lib/bag-item-publication.mjs'
+
 // @ts-expect-error Build-only validation.
 import { loadReaderWikiSeeds, readerWikiProjection } from '../scripts/lib/reader-wiki-seed.mjs'
 
@@ -45,6 +48,16 @@ export default defineConfig({
         this.addWatchFile('../content/stories/' + seed.chronicleId + '/BOOK.json')
       }
       return 'export default ' + JSON.stringify(readerWikiProjection(seeds))
+    },
+  }, {
+    name: 'bag-item-public-search',
+    resolveId(id) { if (id === 'virtual:bag-knowledge-public') return '\0bag-knowledge-public' },
+    async load(id) {
+      if (id !== '\0bag-knowledge-public') return
+      const approved = await approvedBagArticles()
+      for (const file of publicationFiles) this.addWatchFile(file.pathname)
+      for (const item of approved) this.addWatchFile(item.source)
+      return 'export default ' + JSON.stringify(approved.map(({ id, title, summary, href, keyword, publishedAt }) => ({ id, title, summary, href, keyword, publishedAt })))
     },
   }, {
     name: 'archive-build-ref',
