@@ -129,6 +129,44 @@ export function aWikiPublicationStatus(job: AWikiPublicationJob | null, producti
   }
 }
 
+export type AWikiOperatorState = {
+  status?: string | null
+  blocker_code?: string | null
+  review_note?: string | null
+}
+
+export function aWikiOperatorGuidance(job?: AWikiOperatorState | null) {
+  const status = job?.status?.toUpperCase() ?? ''
+  if (status === 'HUMAN_REVIEW') return {
+    badge: '내용 검수 보류',
+    category: '콘텐츠 사실 확인 · 자동화 장애와 다름',
+    next: '표현 정정 후 독립 재검수 · 검수 전 게시 금지',
+    reason: 'AI 독립 검수에서 원문보다 강하게 확정한 사실 표현을 발견했습니다.',
+    schedule: '이번 보류는 예약 OFF를 뜻하지 않습니다. 예약 ON/OFF는 이 화면에서 직접 확인할 수 없습니다.',
+  }
+  if (status === 'REJECT') return {
+    badge: '검수 반려',
+    category: '콘텐츠 검수에서 반려됨',
+    next: '원문과 추출 내용을 재점검한 뒤 새로운 검수 필요',
+    reason: '독립 검수에서 반려된 콘텐츠입니다.',
+    schedule: '이 결과로는 예약 ON/OFF를 판단할 수 없습니다.',
+  }
+  if (status === 'BLOCKED' || job?.blocker_code) return {
+    badge: '작업 장애 확인',
+    category: '시스템 처리 오류 또는 검증 차단',
+    next: '상세 문제 코드를 확인하고 안전한 복구 절차 수행',
+    reason: '자동 처리 경로의 오류가 기록됐습니다.',
+    schedule: 'DB 작업 오류와 ChatGPT 예약 ON/OFF는 서로 다른 상태입니다.',
+  }
+  return {
+    badge: null,
+    category: 'DB 작업 진행 상태 · 예약 상태와 별개',
+    next: null,
+    reason: null,
+    schedule: '이 화면은 DB 처리 현황이며 ChatGPT 예약의 ON/OFF는 직접 조회하지 않습니다.',
+  }
+}
+
 export function aWikiStatusLabel(value?: string | null) {
   if (value?.toUpperCase() === 'PUBLISHED') return '저장소 반영 완료'
   if (value?.toUpperCase() === 'FINALIZING') return '저장소 반영 중'
@@ -175,6 +213,7 @@ const blockerKorean: Record<string, string> = {
   QUALITY_GATE: '품질 검수 단계',
   PROVIDER_NOT_ACTIVE: '작업 제공 기능이 비활성화됨',
   HUMAN_REVIEW_REQUIRED: '사람의 검토가 필요함',
+  REVIEWER_HUMAN_REVIEW: '세계관 사실 표현에 대한 독립 검수 보류 · 원문과 비교하여 정정이 필요합니다.',
   RENDERER_NOT_CONSUMED: '이미지 생성 작업이 오래 시작되지 않았습니다.',
   REVIEWER_NOT_CONSUMED: '이미지 검수 작업이 오래 시작되지 않았습니다.',
   REVIEWER_NOT_COMPLETED: '이미지 검수가 오래 끝나지 않고 있습니다.',

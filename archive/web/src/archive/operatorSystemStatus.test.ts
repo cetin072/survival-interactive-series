@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   aWikiPublicationStatus,
+  aWikiOperatorGuidance,
   aWikiStatusLabel,
   formatOperatorRefreshTime,
   formatOperatorTime,
@@ -104,6 +105,14 @@ describe('Operator system status helpers', () => {
     expect(explainMachineCode('A_WIKI_COMMAND_GH_1')).toBe('위키 게시 반영 작업에 실패했습니다. 재시도가 필요합니다.')
     expect(subjectWithKorean('char-taehoon')).toBe('장태훈 · char-taehoon')
     expect(timezoneWithKorean('Asia/Seoul')).toBe('한국시간 · Asia/Seoul')
+  })
+
+  it('distinguishes A-Wiki content review from automation breakdown without guessing reservation state', () => {
+    expect(aWikiOperatorGuidance({ status: 'HUMAN_REVIEW', blocker_code: 'REVIEWER_HUMAN_REVIEW' }).badge).toBe('내용 검수 보류')
+    expect(aWikiOperatorGuidance({ status: 'HUMAN_REVIEW' }).schedule).toContain('예약 OFF를 뜻하지 않습니다')
+    expect(aWikiOperatorGuidance({ status: 'BLOCKED' }).badge).toBe('작업 장애 확인')
+    expect(aWikiOperatorGuidance({ status: 'PUBLISHED' }).badge).toBeNull()
+    expect(blockerLabel('REVIEWER_HUMAN_REVIEW')).toContain('독립 검수 보류')
   })
 
   it('provides plain-language labels for the dashboard', () => {

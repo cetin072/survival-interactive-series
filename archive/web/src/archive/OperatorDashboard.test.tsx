@@ -87,11 +87,57 @@ describe('Operator dashboard structure', () => {
     expect(card).toContain('<dt>공개 사이트</dt><dd>배포 미확인')
     expect(card).not.toContain('게시 완료')
     expect(card).not.toContain('공개 반영 확인')
-    expect(card).toContain('진행 0건 · 저장소 반영 3건')
+    expect(card).toContain('처리 중 0건 · 검수 보류 0건 · 저장소 반영 3건')
     expect(card).toContain('다음 공개 원문 처리 대기')
     expect(card).not.toContain('새 원문 없음')
     expect(card).toContain('외부 검수·병합 결과 확인')
     expect(card).toContain('<details class="operator-tech-details">')
+  })
+
+  it('explains genuine independent human review without implying a disabled worker', () => {
+    const reviewNote = '장태훈 관계의 경유 규격·품질 확인은 완료된 검사처럼 보일 수 있으나 원문은 일부 시료만 확인했다고 말합니다.'
+    const card = wikiCard({ systemStatus: {
+      ...systemStatus,
+      a_wiki: {
+        job_count: 4, active_count: 0, human_review_count: 1, published_count: 3,
+        latest_job: {
+          status: 'HUMAN_REVIEW', season_id: 'S04', session_id: 'SESSION_002',
+          blocker_code: 'REVIEWER_HUMAN_REVIEW', review_decision: 'HUMAN_REVIEW',
+          review_note: reviewNote,
+        },
+      },
+    } })
+    expect(card).toContain('내용 검수 보류')
+    expect(card).toContain('처리 중 0건 · 검수 보류 1건 · 저장소 반영 3건')
+    expect(card).toContain('콘텐츠 사실 확인 · 자동화 장애와 다름')
+    expect(card).toContain('<dt>내용 검수</dt><dd>사람 검토 필요')
+    expect(card).toContain('원문에 맞게 수정하고 독립 검수를 다시 통과')
+    expect(card).toContain(reviewNote)
+    expect(card).toContain('예약 ON/OFF는 이 화면에서 직접 확인할 수 없습니다')
+    expect(card).toContain('표현 정정 후 독립 재검수')
+    expect(card).not.toContain('현재 작업 확인 필요')
+    expect(card).not.toContain('진행 0건 · 저장소 반영 3건')
+    expect(card).not.toContain('자동화 꺼짐')
+  })
+
+  it('provides a safe fallback when the legacy operator API lacks reviewer details', () => {
+    const card = wikiCard({ systemStatus: { ...systemStatus,
+      a_wiki: { job_count: 4, active_count: 0, published_count: 3,
+        latest_job: { status: 'HUMAN_REVIEW', blocker_code: 'REVIEWER_HUMAN_REVIEW' } },
+    } })
+    expect(card).toContain('검수 보류 1건')
+    expect(card).toContain('독립 검수에서 원문보다 강하게 확정한 사실 표현')
+    expect(card).toContain('자동화가 꺼졌다는 뜻은 아닙니다')
+  })
+
+  it('distinguishes program-level errors from content-review holds', () => {
+    const card = wikiCard({ systemStatus: { ...systemStatus,
+      a_wiki: { job_count: 2, active_count: 1, human_review_count: 0, published_count: 1,
+        latest_job: { status: 'BLOCKED', blocker_code: 'A_WIKI_COMMAND_GH_1' } },
+    } })
+    expect(card).toContain('작업 장애 확인')
+    expect(card).toContain('시스템 처리 오류 또는 검증 차단')
+    expect(card).not.toContain('검수자가 지적한 내용')
   })
 
   it('reports unavailable wiki status without inventing zero jobs or a source waiting state', () => {
