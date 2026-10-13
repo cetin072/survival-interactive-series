@@ -1,11 +1,11 @@
 {
   "id": "K-013",
-  "lead": "외부 기술자나 지원 인력이 필요한 상황에서는 ‘기술이 있어 보인다’는 이유만으로 곧바로 중요한 공간이나 업무에 투입하기 어렵습니다. 신원과 자격, 실제 투입 승인, 현장 체크인을 서로 다른 확인 단계로 나누면 책임과 접근범위를 더 명확하게 관리할 수 있습니다.",
+  "lead": "외부 인력을 투입할 때는 신원, 업무에 필요한 자격, 이번 업무의 승인, 현장 체크인과 접근 범위를 각각 확인하세요. 자격이 있다는 사실만으로 모든 공간에 들어가거나 모든 일을 맡을 권한이 생기지는 않습니다.",
   "slug": "emergency-external-personnel-credentialing",
   "basis": "FEMA NIMS credentialing + National Qualification System + ICS 211 Incident Check-In List + 검증된 PUBLIC_READER",
   "label": "외부 대응 인력 자격·체크인",
   "scope": "소규모 조직·공동체가 재난 대응에 외부 기술자·지원 인력을 받아들일 때 적용할 수 있는 저위험 인력 확인·투입 승인·체크인 기록 원칙",
-  "title": "재난 대응에 외부 인력이나 기술자를 투입할 때 신원·자격·투입 승인·체크인 기록을 어떻게 확인해야 할까",
+  "title": "외부 대응 인력의 신원·자격·투입 승인은 어떻게 확인할까",
   "tools": [],
   "footer": "일반적인 재난 인력관리 원칙입니다. 실제 자격 확인, 개인정보 처리, 고용·계약, 시설 출입통제는 관할 법률과 조직·시설의 공식 규정을 우선하세요.",
   "status": "PUBLISHED",
@@ -45,7 +45,7 @@
     {
       "blocks": [
         {
-          "text": "FEMA의 NIMS credentialing은 신원과 자격을 확인하는 절차를 강조하고, NQS는 자격을 확인했다고 해서 현장 접근권이 자동으로 생기는 것은 아니라고 구분합니다. 따라서 외부 인력을 받을 때는 ‘누구인가’, ‘무엇을 할 자격이 있는가’, ‘이번 업무에 실제로 투입하도록 승인됐는가’를 별도로 확인하는 편이 명확합니다.",
+          "text": "신원을 확인한 뒤 이번 업무에 필요한 자격과 실제 투입 승인을 각각 확인합니다. 자격이 있어도 현장 접근권이 자동으로 생기지는 않습니다. FEMA의 NIMS 자격 확인과 NQS 자료도 이 단계를 구분합니다.",
           "type": "prose"
         }
       ],
@@ -78,7 +78,7 @@
     {
       "blocks": [
         {
-          "text": "ICS 211은 도착 시각, 초기 위치, 소속, 연락정보, 배정 역할 등을 기록해 현장 자원 상황을 파악하도록 합니다. 소규모 조직에서는 전체 서식을 복제하기보다 누가 언제 들어와 어디에서 무슨 역할을 맡았는지 확인할 수 있을 정도의 최소 기록부터 시작할 수 있습니다.",
+          "text": "도착한 사람의 시각, 위치, 소속, 연락방법과 배정 역할을 적어두면 현재 누가 어디서 일하는지 확인할 수 있습니다. FEMA의 ICS 211도 이런 정보를 현장 체크인 목록에 기록합니다. 소규모 조직은 전체 서식을 복제하기보다 필요한 최소 항목부터 시작할 수 있습니다.",
           "type": "prose"
         }
       ],
@@ -97,7 +97,7 @@
   "topic_id": "emergency-personnel-credentialing",
   "risk_level": "LOW",
   "story_refs": [],
-  "updated_at": "2026-10-04",
+  "updated_at": "2026-10-13",
   "ai_assisted": true,
   "content_type": "BRIEF",
   "published_at": "2026-10-04",
@@ -105,7 +105,7 @@
     "GENERAL_PREPAREDNESS",
     "COMMUNICATION"
   ],
-  "editorial_note": "Reader에서 질문만 가져오고 현실 설명은 FEMA의 NIMS credentialing, NQS, ICS 211 공식자료를 Evidence-first로 확인했습니다.",
+  "editorial_note": "Reader에서 질문만 가져오고 현실 설명은 FEMA의 NIMS credentialing, NQS, ICS 211 공식자료를 Evidence-first로 확인했습니다. 2026-10-13 Editorial V2: 첫 문장 즉답과 독립적인 현실 맥락을 검수하고, 기존 Evidence 범위 안에서 문장을 정리함. ID·slug·risk·publication policy는 유지.",
   "meta_description": "FEMA NIMS·NQS와 ICS 211을 바탕으로 외부 대응 인력의 신원·자격·투입 승인·현장 체크인을 구분해 관리하는 방법을 설명합니다.",
   "related_brief_ids": [
     "K-009",

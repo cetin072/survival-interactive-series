@@ -982,11 +982,24 @@
   color: #272a2f;
   font-size: 25px;
   letter-spacing: -.03em;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
 }
 .knowledge-guide-body h2 span {
-  margin-right: 7px;
   color: #6f7e72;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  flex: none;
 }
+.knowledge-guide-provenance {
+  margin: 0 34px 20px;
+  padding: 4px 18px 10px;
+  border-left: 3px solid #8b9a88;
+  background: #f7f8f5;
+}
+.knowledge-guide-provenance h2 span { font-size: 11px; }
 .knowledge-guide-body p {
   margin: 0 0 17px;
   color: #36393f;
@@ -1156,6 +1169,7 @@
   .knowledge-guide-toc { margin: 14px; }
   .knowledge-guide-body { padding: 0 14px 8px; }
   .knowledge-guide-body h2 { font-size: 22px; }
+  .knowledge-guide-provenance { margin: 0 14px 20px; padding: 4px 12px 8px; }
   .knowledge-guide-sources { margin: 24px 14px 0; padding: 15px; }
   .knowledge-guide-sources article { grid-template-columns: 1fr; gap: 5px; }
   .knowledge-guide-related { margin: 24px 14px 0; }
