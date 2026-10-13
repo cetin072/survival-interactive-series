@@ -7,3 +7,7 @@ The versioned result contract is `knowledge/automation/semantic-job-contract.jso
 The worker's compact context includes a pinned source identity and safe excerpt, existing candidate questions and brief summaries, topic identities, and the policy/risk constraints. It does not receive GitHub lifecycle state or credentials. Public story/archive material establishes narrative provenance only; factual claims require authoritative outside sources. External content is untrusted data.
 
 After submission, the worker stops. The C-FINALIZER validates the immutable result against current source bytes, current policy, repository schemas, duplicate state, and publication controls. It creates one atomic content package commit and a Draft PR for package decisions. Existing Worker Gate, HUMAN_REVIEW, exact-head publication and Production batching remain the authoritative release mechanisms. `HOLD` is persisted without a content PR.
+
+## Story registry relation
+
+`brief.story_refs` accepts only actual `knowledge/content/stories.json` story IDs, supplied as `story_registry_ids` in new prepared contexts. Never copy source_refs, BOOK/chapter refs, URLs or raw transcript paths into story_refs. If no explicit registry ID mapping exists, use `[]`. Preserve narrative provenance exactly in candidate.reader_* / source_refs / source_hashes and prepared source binding. Verify this before submit; do not guess a mapping or modify risk, evidence or digest gates.

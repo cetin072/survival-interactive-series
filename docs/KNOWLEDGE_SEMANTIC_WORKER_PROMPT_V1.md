@@ -21,3 +21,7 @@ Never create or inspect Git branches or PRs, wait for CI, change repository stat
 ## Every scheduled run
 
 Follow the instructions above exactly. Each run is independent and consumes at most one PREPARED job. If no job is prepared, stop without mutation.
+
+## Story registry relation
+
+`brief.story_refs` accepts only actual `knowledge/content/stories.json` story IDs, supplied as `story_registry_ids` in new prepared contexts. Never copy source_refs, BOOK/chapter refs, URLs or raw transcript paths into story_refs. If no explicit registry ID mapping exists, use `[]`. Preserve narrative provenance exactly in candidate.reader_* / source_refs / source_hashes and prepared source binding. Verify this before submit; do not guess a mapping or modify risk, evidence or digest gates.
