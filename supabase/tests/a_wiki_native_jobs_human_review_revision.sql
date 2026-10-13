@@ -158,9 +158,9 @@ begin
   if v_revised->>'status'<>'EXTRACTOR_SUBMITTED'
     or v_revised->>'supersedes_job_id'<>v_original_id::text
     or v_revised->>'review_revision'<>'1'
-    or v_revised->'review_result' is not null
-    or v_revised->'review_job' is not null
-    or v_revised->'proposal' is not null
+    or v_revised->>'review_result' is not null
+    or v_revised->>'review_job' is not null
+    or v_revised->>'proposal' is not null
     or v_revised->'prepared_job' is distinct from v_before->'prepared_job'
     or v_revised->>'extractor_result_sha256'<>v_revision_sha then
     raise exception 'revision copied stale approval or changed source binding';
