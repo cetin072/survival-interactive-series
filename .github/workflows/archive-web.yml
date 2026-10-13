@@ -41,6 +41,8 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: archive/web/package-lock.json
+      - name: Test bag knowledge Preview projection and production exclusion
+        run: node --test ../scripts/lib/bag-knowledge-p1.test.mjs
       - name: Test offline publication planning
         run: node --test ../scripts/lib/publication-plan.test.mjs
       - name: Test illustration worker controls
