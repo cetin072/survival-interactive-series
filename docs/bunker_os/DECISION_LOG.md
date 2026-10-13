@@ -96,3 +96,12 @@
 - Revisit when: Day 7 감독 검토, 로컬 XLSX 사전 점검, 대상 모집 가능성 또는 파일 접근/기록 장벽을 확인할 때. 실패하면 동의 없이 앱·분석 시스템 개발로 확대하지 않음.
 - Guard: E-001 RESEARCH / E-002 PLANNED / E-003 RESEARCH 유지. DB 일지/검수 receipt 수정 없음, BAG-SIDE-01 성과와 분리.
 - Linked: [Experiment Brief V1](EXPERIMENT_BRIEF_V1.md), E-001/E-002/E-003, Issue #501
+
+## D-014 — E-002의 8명 모집·실제 실험은 당분간 보류
+- Date: 2026-10-14
+- Status: APPROVED_EXECUTION_DEFERRAL (감독자 명시 결정; 실험 성공/Week 2 Freeze 승인 아님)
+- Decision: PR #549의 Week 1 조사·설계·기술 QA 문서는 main에 병합한다. 다만 K-002+XLSX 첫 사용자 시험의 **실제 8명 모집 및 실행은 당분간 진행하지 않는다**. 신규 모집·연락·수기 개인정보 기록·참가자 측정·자체 PASS/FAIL 결론을 만들지 않는다.
+- Why: 지금은 참가자 모집이 어렵다. 사람 모집에 의존하지 않는 생존지식 SEO·Google/네이버 검색 등록, 콘텐츠 품질, 기존 시스템 안전 검증을 우선한다.
+- Guard: E-002는 기존 상태 PLANNED(실행 보류)로 유지하고 Week 2 Freeze·실제 이용자 결과·VERIFIED 마일스톤을 만들지 않는다. 기존 8명·10분·판정기준·동의/철회/삭제 규칙은 설계 이력으로 보존하되 실행 일정이나 모집 의무로 취급하지 않는다. 외부 유입·색인·다운로드는 실제 준비행동 성공으로 대체하지 않는다.
+- Revisit when: 감독자가 모집 가능하다고 새로 말하고 명시적으로 재개를 승인할 때. 그때 표본·환경·소요시간·기존 QA 유효성을 재점검한다.
+- Linked: PR #549, [Experiment Brief V1](EXPERIMENT_BRIEF_V1.md), [Week 1 Review V1](WEEK1_REVIEW_V1.md), Issue #501, SEO Issue #491
