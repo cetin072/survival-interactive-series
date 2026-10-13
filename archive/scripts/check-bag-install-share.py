@@ -40,18 +40,26 @@ ADAPTER='''({mode,native,standalone})=>{
 def viewport(page):
     assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'),'horizontal overflow'
 
+def stored_records(page):
+    return page.evaluate('''async()=>{
+      const {readRawRecord}=await import('/bag-lab/storage.mjs');
+      return {current:await readRawRecord(),previous:await readRawRecord('previous')};
+    }''')
+
 def checks(browser,base,width,agent,mode='success',native=False,standalone=False):
     ctx=browser.new_context(viewport={'width':width,'height':844},user_agent=agent,locale='ko-KR')
     ctx.add_init_script('('+ADAPTER+')('+json.dumps({'mode':mode,'native':native,'standalone':standalone})+')')
     page=ctx.new_page();errors=[];page.on('pageerror',lambda error:errors.append(str(error)))
     # Positive current+previous V1 records survive both landing and app actions.
     pwa.alpha.ready(page,pwa.alpha.address(base))
-    before=page.evaluate('''async()=>{
+    page.evaluate('''async()=>{
       const {emptyBag,newBatch}=await import('/bag-lab/personal.mjs');const {saveBag,readBag}=await import('/bag-lab/storage.mjs');
       const bag=emptyBag();bag.bagName='가상 비공개 이름 공유 금지';
       bag.items=[{id:'install-share-synthetic',name:'비공개 가상 재고',category:'equipment',unit:'개',target:2,orderedQuantity:1,batches:[{...newBatch(1),nextInspection:'2027-01-01'}]}];
-      await saveBag(bag,0);bag.items[0].target=3;await saveBag(bag,1);return readBag();
+      await saveBag(bag,0);bag.items[0].target=3;await saveBag(bag,1);
     }''')
+    before=stored_records(page)
+    assert before['current']['revision']==2 and before['previous']['revision']==1
     for target in ['landing','app']:
         path='/bag/' if target=='landing' else '/bag-lab/alpha.html'
         response=page.goto(base+path+'?ntl-drawer-state=hidden',wait_until='networkidle')
@@ -111,7 +119,7 @@ def checks(browser,base,width,agent,mode='success',native=False,standalone=False
             viewport(page)
             if mode=='success' and not native and not standalone:
                 panel.scroll_into_view_if_needed();page.screenshot(path=str(REPORT/f'app-{width}-{"iphone" if agent==IPHONE else "android"}.png'))
-        assert pwa.alpha.stored(page)==before,'install/share changed current or previous inventory'
+        assert stored_records(page)==before,'install/share changed current or previous inventory'
         viewport(page)
         if target=='landing' and mode=='success' and not native and not standalone:
             page.goto(base+'/bag/?ntl-drawer-state=hidden');page.locator('[data-bag-install-share]').scroll_into_view_if_needed()
