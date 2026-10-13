@@ -67,12 +67,14 @@ export function assessRoadmapBuild(
     return {...defaultAssessment(),explanation:'빌드 목록과 배포 원본이 서로 다릅니다. 확인 전에는 상태를 인정하지 않습니다.'}
   }
   const production=(hostname==='survival-diary-archive.netlify.app'
-    &&deploy.context==='production'&&manifest.provider==='netlify'
+    &&deploy.context==='production'&&manifest.provider==='netlify'&&deploy.provider==='netlify'
+    &&sha40.test(manifest.commit_ref)
     &&release?.policy==='BATCHED_PRODUCTION'
     &&typeof release.source_main_sha==='string'&&sha40.test(release.source_main_sha)
-    &&typeof release.released_on_kst==='string')
+    &&typeof release.released_on_kst==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(release.released_on_kst))
   const preview=(previewHost.test(hostname)
-    &&manifest.provider==='netlify'
+    &&manifest.provider==='netlify'&&deploy.provider==='netlify'
+    &&sha40.test(manifest.commit_ref)
     &&['deploy-preview','branch-deploy'].includes(deploy.context??''))
   // A build observed from a dev/local/untrusted origin cannot establish publish status.
   if(!production&&!preview){
