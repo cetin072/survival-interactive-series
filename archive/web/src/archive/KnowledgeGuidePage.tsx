@@ -64,8 +64,10 @@ export function KnowledgeGuidePage({ guide, showTopbar = true }: { guide: Knowle
             <span>공개 상태 · {review.approved ? '공개 승인 완료' : '공개 승인 전'}</span>
             <span>범위 · {guide.scope}</span>
             <span>자료 확인 · {guide.sourceCheckedAt}</span>
-            <span>게시 · <time dateTime={guide.publishedAt}>{guide.publishedAt}</time></span>
-            {guide.detail.updated_at !== guide.publishedAt && <span>수정 · <time dateTime={guide.detail.updated_at}>{guide.detail.updated_at}</time></span>}
+            {guide.status === 'PUBLISHED'
+              ? <span>게시 · <time dateTime={guide.publishedAt}>{guide.publishedAt}</time></span>
+              : <span>게시 · 미게시 원고</span>}
+            {guide.status === 'PUBLISHED' && guide.detail.updated_at !== guide.publishedAt && <span>수정 · <time dateTime={guide.detail.updated_at}>{guide.detail.updated_at}</time></span>}
           </div>
         </header>
 
@@ -120,7 +122,7 @@ export function KnowledgeGuidePage({ guide, showTopbar = true }: { guide: Knowle
         </section>}
         <footer className="knowledge-guide-footer">
           <p>{guide.footer}</p>
-          <p>{review.completed ? '사람의 편집 검토와 공개 승인을 거친 글입니다.' : 'AI 보조 작성 · 자동 게시 기준을 충족한 글입니다.'}</p>
+          <p>{review.completed ? '사람의 편집 검토와 공개 승인을 거친 글입니다.' : review.required ? '사람의 편집 검토와 공개 승인을 기다리는 원고입니다.' : 'AI 보조 작성 · 자동 게시 기준을 충족한 글입니다.'}</p>
         </footer>
       </article>
     </div>
