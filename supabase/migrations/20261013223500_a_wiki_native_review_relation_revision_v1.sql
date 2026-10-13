@@ -139,8 +139,7 @@ begin
   new.updated_at := pg_catalog.clock_timestamp();
   return new;
 end;
-$function$
-
+$function$;
 
 create or replace function public.archive_a_wiki_native_job_revise_human_relation(
   p_job_id uuid,p_correction jsonb
