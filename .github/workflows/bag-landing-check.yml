@@ -5,6 +5,8 @@ on:
       - 'archive/web/public/bag/**'
       - 'archive/web/src/archive/WikiHomePreview.tsx'
       - 'archive/scripts/check-bag-landing.py'
+      - 'archive/scripts/check-bag-install-share.py'
+      - 'archive/web/public/bag-lab/pwa.mjs'
       - 'archive/scripts/lib/bag-landing.test.mjs'
       - 'archive/scripts/check-bag-knowledge.py'
       - 'archive/scripts/build-bag-knowledge-preview.mjs'
@@ -51,6 +53,7 @@ jobs:
           BAG_LANDING_BEFORE_ROOT: /tmp/bag-landing-before/archive/web/dist
         run: |
           python archive/scripts/check-bag-landing.py
+          python archive/scripts/check-bag-install-share.py
           python archive/scripts/check-bag-knowledge.py
           python archive/scripts/check-bag-side-demo.py
           python archive/scripts/check-bag-side-alpha.py
@@ -62,6 +65,7 @@ jobs:
           BAG_LANDING_EXPECTED_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           python archive/scripts/check-bag-landing.py
+          python archive/scripts/check-bag-install-share.py
           python archive/scripts/check-bag-knowledge.py
       - uses: actions/upload-artifact@v4
         if: always()

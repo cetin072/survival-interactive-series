@@ -55,8 +55,12 @@ def landing(browser,base,width,height,label):
     if label=='preview':assert 'noindex' in response.headers.get('x-robots-tag','').lower()
     assert page.locator('meta[name="description"]').get_attribute('content')
     assert page.locator('link[rel="canonical"]').get_attribute('href')=='https://survival-diary-archive.netlify.app/bag/'
-    assert page.locator('meta[property="og:image"]').count()==0
-    for name in ['og:title','og:description','og:url','og:locale','og:type']:
+    assert page.locator('meta[property="og:image"]').get_attribute('content')=='https://survival-diary-archive.netlify.app/bag/share.png'
+    image=ctx.request.get(base+'/bag/share.png')
+    assert image.status==200 and image.headers.get('content-type','').startswith('image/png')
+    png=image.body()
+    assert png[:8]==b'\x89PNG\r\n\x1a\n' and int.from_bytes(png[16:20],'big')==1200 and int.from_bytes(png[20:24],'big')==630
+    for name in ['og:title','og:description','og:url','og:locale','og:type','og:site_name']:
         assert page.locator(f'meta[property="{name}"]').get_attribute('content')
     assert page.locator('.hero .primary').bounding_box()['y']+page.locator('.hero .primary').bounding_box()['height']<=height,'CTA must be above fold'
     assert page.locator('.hero-description').bounding_box()['y']<height

@@ -64,7 +64,7 @@ def permission_checks(browser,base):
             else:
                 expect(pg.locator('#reminder-permission')).to_have_text('권한 허용됨')
                 details=pg.locator('details').filter(has=pg.get_by_text('알림 문제 해결·권한 설정',exact=True));details.locator('summary').click()
-                pg.locator('#reminder-test').click();expect(pg.locator('#reminder-status')).to_contain_text('테스트 알림 요청됨')
+                pg.locator('#reminder-test').click();expect(pg.locator('#reminder-status')).to_contain_text('테스트 알림을 확인해 주세요.')
                 expect(pg.locator('#reminder-count')).to_contain_text('0개')
             assert alpha.stored(pg)==before
         finally:ctx.close()
@@ -147,7 +147,7 @@ def main():
                 alpha.card(editing,'가상 PWA 시험품').locator('[data-mode="edit"]').click()
                 editing.locator('#editor [name="target"]').fill('4')
                 editing.evaluate('window.bagTestControllerChanges=0;navigator.serviceWorker.addEventListener("controllerchange",()=>window.bagTestControllerChanges++)')
-                context.set_offline(True);atomic_text(assets,old);html=root/'bag-lab'/'alpha.html';html.write_text(html.read_text().replace('1.0 RC','업데이트 검증 1.0 RC'))
+                context.set_offline(True);atomic_text(assets,old);html=root/'bag-lab'/'alpha.html';html.write_text(html.read_text().replace('나의 생존가방 · 웹 1.0','나의 생존가방 · 업데이트 검증'))
                 regenerate(root,'synthetic-update-v2');context.set_offline(False);wait_condition(page,'navigator.onLine');update(page)
                 wait_condition(page,'navigator.serviceWorker.getRegistration("/bag-lab/alpha.html").then(r=>!!r.waiting)')
                 wait_condition(editing,'!document.getElementById("pwa-update").hidden')
