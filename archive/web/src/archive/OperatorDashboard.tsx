@@ -221,7 +221,7 @@ export function OperatorDashboard({
     <OperatorRoadmap logs={roadmapLogs ?? null} error={roadmapError ?? ""} />
 
     <div className="operator-counts">
-      <article><span>사람이 확인할 항목</span><strong>{inbox.pending_count}</strong></article>
+      <article><span>사람이 확인할 항목</span><strong>{inbox.pending_count + aWikiHumanCount}</strong></article>
       <article><span>자동화 문제</span><strong>{inbox.automation_error_count}</strong></article>
       <article><span>보안 알림</span><strong className="operator-unwired">미연결</strong></article>
       <article><span>비용 알림</span><strong className="operator-unwired">미연결</strong></article>
