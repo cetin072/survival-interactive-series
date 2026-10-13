@@ -106,6 +106,8 @@ jobs:
         run: npm ci
       - name: Test
         run: npm test
+      - name: Test operator roadmap build evidence
+        run: node --test ../scripts/lib/operator-roadmap-evidence.test.mjs
       - name: Fetch AFTERFALL source for RAW integrity comparison
         run: git fetch origin worldline/afterfall-rpg:refs/remotes/origin/worldline/afterfall-rpg
       - name: Verify Reader publication
