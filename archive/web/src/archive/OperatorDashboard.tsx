@@ -117,6 +117,8 @@ export function OperatorDashboard({
   inbox,
   roadmapLogs,
   roadmapError,
+  roadmapBuildEvidence,
+  roadmapBuildError,
   systemStatus,
   productionStatus,
   selected,
@@ -136,6 +138,8 @@ export function OperatorDashboard({
   inbox: Inbox
   roadmapLogs?: RoadmapLog[] | null
   roadmapError?: string
+  roadmapBuildEvidence?: unknown
+  roadmapBuildError?: string
   systemStatus: SystemStatus | null
   productionStatus: ProductionStatus
   selected: ReviewDetail | null
@@ -220,7 +224,10 @@ export function OperatorDashboard({
     {error && <p className="operator-error" role="alert">{error}</p>}
     {statusError && <p className="operator-error" role="alert">{statusError}</p>}
 
-    <OperatorRoadmap logs={roadmapLogs ?? null} error={roadmapError ?? ""} />
+    <OperatorRoadmap logs={roadmapLogs ?? null} error={roadmapError ?? ''}
+      buildEvidence={roadmapBuildEvidence} evidenceError={roadmapBuildError ?? ''}
+      deployMeta={productionStatus.deploy} releaseMeta={productionStatus.release}
+      hostname={typeof window === 'undefined' ? '' : window.location.hostname} />
 
     <div className="operator-counts">
       <article><span>사람이 확인할 항목</span><strong>{inbox.pending_count + aWikiHumanCount}</strong></article>

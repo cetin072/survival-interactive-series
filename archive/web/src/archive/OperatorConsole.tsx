@@ -43,6 +43,8 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null)
   const [roadmapLogs, setRoadmapLogs] = useState<RoadmapLog[] | null>(null)
   const [roadmapError, setRoadmapError] = useState('')
+  const [roadmapBuildEvidence, setRoadmapBuildEvidence] = useState<unknown>(null)
+  const [roadmapBuildError, setRoadmapBuildError] = useState('')
   const [productionStatus, setProductionStatus] = useState<ProductionStatus>({ release: null, deploy: null })
   const [statusError, setStatusError] = useState('')
   const [selected, setSelected] = useState<ReviewDetail | null>(null)
@@ -55,15 +57,16 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
 
   const refresh = useCallback(async () => {
     if (!supabaseClient) return
-    setBusy(true); setRefreshing(true); setError(''); setStatusError(''); setRoadmapError('')
+    setBusy(true); setRefreshing(true); setError(''); setStatusError(''); setRoadmapError(''); setRoadmapBuildError('')
     try {
-      const [inboxResult, systemResult, release, deploy, roadmapResult] = await Promise.all([
+      const [inboxResult, systemResult, release, deploy, roadmapResult, buildEvidence] = await Promise.all([
         supabaseClient.rpc('archive_operator_review_inbox'),
         supabaseClient.rpc('archive_operator_system_status'),
         readJson<ReleaseMarker>('/release/production.json'),
         readJson<DeployMeta>('/deploy-meta.json'),
         // Existing permission-checked Bunker OS RPC, without new DB or scheduler.
         supabaseClient.rpc('archive_operator_bunker_os_logs', { p_status: null, p_limit: 100 }),
+        readJson<unknown>('/operator-roadmap-evidence.json'),
       ])
       if (inboxResult.error) setError(rpcError(inboxResult.error))
       else setInbox((inboxResult.data ?? emptyInbox) as Inbox)
@@ -73,6 +76,8 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
       }
       else setSystemStatus(systemResult.data as SystemStatus)
       setProductionStatus({ release, deploy })
+      setRoadmapBuildEvidence(buildEvidence)
+      if (!buildEvidence) setRoadmapBuildError('사이트 산출물 검증 파일을 불러오지 못했습니다.')
       if (roadmapResult.error) {
         setRoadmapLogs(null)
         setRoadmapError('로드맵 작업 기록을 확인할 수 없습니다. 나중에 다시 조회하세요.')
@@ -113,7 +118,7 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
       setUser(session?.user ?? null)
       if (!session?.user) {
         initialDashboardLoaded.current = false
-        setInbox(emptyInbox); setSelected(null); setRoadmapLogs(null); setRoadmapError('')
+        setInbox(emptyInbox); setSelected(null); setRoadmapLogs(null); setRoadmapError(''); setRoadmapBuildEvidence(null); setRoadmapBuildError('')
       }
     })
     return () => { alive = false; listener.subscription.unsubscribe() }
@@ -220,6 +225,8 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
     inbox={inbox}
     roadmapLogs={roadmapLogs}
     roadmapError={roadmapError}
+    roadmapBuildEvidence={roadmapBuildEvidence}
+    roadmapBuildError={roadmapBuildError}
     systemStatus={systemStatus}
     productionStatus={productionStatus}
     selected={selected}

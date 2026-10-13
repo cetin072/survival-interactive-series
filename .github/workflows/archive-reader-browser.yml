@@ -72,6 +72,13 @@ jobs:
       - name: Verify tested assets and navigation on Deploy Preview
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         run: python ../scripts/check-reader-browser.py --url https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app --wait-assets --allow-ancestor-equivalent --world-wiki --screenshots "$RUNNER_TEMP/archive-browser/preview"
+      - name: Verify exact deployed Operator roadmap evidence on PR Preview
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          python ../scripts/check-operator-roadmap-evidence.py \
+            --base-url https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app \
+            --expected-sha ${{ github.event.pull_request.head.sha }} \
+            --expected-context deploy-preview
       - name: Detect a batched Production release commit
         id: production_release
         if: github.event_name == 'push'
@@ -88,6 +95,13 @@ jobs:
       - name: Verify tested assets and navigation on Production
         if: github.event_name == 'push' && steps.production_release.outputs.changed == 'true'
         run: python ../scripts/check-reader-browser.py --url https://survival-diary-archive.netlify.app --wait-assets
+      - name: Verify exact Operator roadmap evidence on Production release
+        if: github.event_name == 'push' && steps.production_release.outputs.changed == 'true'
+        run: |
+          python ../scripts/check-operator-roadmap-evidence.py \
+            --base-url https://survival-diary-archive.netlify.app \
+            --expected-sha ${{ github.sha }} \
+            --expected-context production
       - name: Upload browser review captures and audit results
         if: always()
         uses: actions/upload-artifact@v4
