@@ -87,7 +87,7 @@ describe('Operator dashboard structure', () => {
     expect(card).toContain('<dt>공개 사이트</dt><dd>배포 미확인')
     expect(card).not.toContain('게시 완료')
     expect(card).not.toContain('공개 반영 확인')
-    expect(card).toContain('진행 0건 · 저장소 반영 3건')
+    expect(card).toContain('처리 중 0건 · 검수 보류 0건 · 저장소 반영 3건')
     expect(card).toContain('다음 공개 원문 처리 대기')
     expect(card).not.toContain('새 원문 없음')
     expect(card).toContain('외부 검수·병합 결과 확인')
