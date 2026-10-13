@@ -1,0 +1,135 @@
+{
+  "id": "K-023",
+  "lead": "계획표가 있다고 해서 실제 상황에서 그대로 작동하는 것은 아닙니다. 비상 전에 범위를 좁힌 연습을 해보면 연락망, 역할, 자원 위치, 인계 순서에서 막히는 지점을 비교적 안전하게 찾을 수 있습니다. 핵심은 연습 자체보다 발견한 문제를 수정하고 다시 확인하는 데 있습니다.",
+  "slug": "test-and-improve-emergency-operations-plan",
+  "basis": "FEMA의 HSEEP 연습·평가·개선계획 자료와 Ready.gov의 사업 대비·연속성 안내를 현실 근거로 사용했다. 《생존일기》 공개 Reader의 허구 서사는 질문이 생긴 맥락일 뿐 현실 근거로 사용하지 않았다.",
+  "label": "비상계획 시험과 개선",
+  "scope": "소규모 조직이나 공동체가 비상운영 계획을 탁상연습·안전한 기능 점검으로 검증하고 개선조치를 추적하는 방법",
+  "title": "비상운영 계획은 어떻게 시험하고 고칠까",
+  "tools": [],
+  "footer": "이 글은 일반적인 계획 검토와 연습 설계 정보입니다. 실제 위험을 만들거나 시설·비상서비스 운영에 영향을 줄 수 있는 시험은 실시하지 말고, 관할기관과 시설관리자 및 전문 대응기관의 규정과 지시를 우선하세요.",
+  "status": "READY",
+  "sources": [
+    {
+      "id": "fema-hseep",
+      "url": "https://www.fema.gov/emergency-managers/national-preparedness/exercises/hseep",
+      "note": "연습을 통해 계획과 역량을 검증하고 강점·개선영역·시정조치를 평가하는 공통 접근법을 확인했다.",
+      "title": "Homeland Security Exercise and Evaluation Program",
+      "checked_at": "2026-10-13"
+    },
+    {
+      "id": "fema-hseep-doctrine",
+      "url": "https://www.fema.gov/sites/default/files/2020-04/Homeland-Security-Exercise-and-Evaluation-Program-Doctrine-2020-Revision-2-2-25.pdf",
+      "note": "목표 설정, 설계·수행·평가·개선계획으로 이어지는 연습 주기를 확인했다.",
+      "title": "Homeland Security Exercise and Evaluation Program Doctrine",
+      "checked_at": "2026-10-13"
+    },
+    {
+      "id": "fema-hseep-improvement",
+      "url": "https://preptoolkit.fema.gov/web/hseep-resources/improvement-planning",
+      "note": "사후보고서·개선계획과 시정조치의 지속적 모니터링 원칙을 확인했다.",
+      "title": "HSEEP Improvement Planning",
+      "checked_at": "2026-10-13"
+    },
+    {
+      "id": "ready-business",
+      "url": "https://www.ready.gov/business",
+      "note": "훈련·시험·연습이 대비와 연속성 계획의 필수 구성요소임을 확인했다.",
+      "title": "Ready Business",
+      "checked_at": "2026-10-13"
+    }
+  ],
+  "summary": "비상운영 계획을 작은 탁상연습이나 안전한 기능 점검으로 시험하고, 발견사항을 담당자·기한이 있는 개선조치로 바꾸는 기본 절차를 정리합니다.",
+  "sections": [
+    {
+      "blocks": [
+        {
+          "text": "비상계획 시험은 큰 모의훈련부터 시작할 필요가 없다. 연락망 확인, 역할 인계, 대체 장소로의 업무 전환처럼 한 가지 기능을 정해 탁상에서 순서를 따라가거나 안전한 범위에서 점검한다. 연습 전에는 무엇을 확인할지, 언제 중단할지, 어떤 상태를 성공으로 볼지 정하고, 연습 뒤에는 결과를 개선조치로 남긴다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "계획은 작게 시험하고 바로 고친다"
+    },
+    {
+      "blocks": [
+        {
+          "type": "ordered_list",
+          "items": [
+            "시험할 기능을 하나 고른다. 예: 연락망, 담당자 교체, 필수기록 접근, 대체 업무장소 전환.",
+            "연습 목표와 관찰 기준을 적는다. 예: 연락 완료 여부, 걸린 시간, 누락된 정보.",
+            "참가자·관찰자·기록자를 정하고 실제 비상상황과 혼동되지 않도록 연습임을 알린다.",
+            "위험설비를 조작하지 않는 탁상연습이나 안전한 기능 점검부터 시작한다.",
+            "계획대로 된 점, 막힌 점, 예상과 달랐던 점을 사실 중심으로 기록한다.",
+            "개선조치의 담당자와 완료기한, 다시 확인할 방법을 정한다."
+          ]
+        }
+      ],
+      "heading": "한 번의 연습을 준비하는 순서"
+    },
+    {
+      "blocks": [
+        {
+          "text": "훈련 기록은 무엇이 실제로 일어났는지를 남긴다. 개선계획은 그 결과를 바탕으로 무엇을 바꿀지 정한다. ‘연락이 늦었다’는 관찰만 남기지 말고, 연락처 갱신 담당자, 완료기한, 다음 확인일처럼 닫을 수 있는 조치로 바꿔야 한다.",
+          "type": "prose"
+        },
+        {
+          "type": "unordered_list",
+          "items": [
+            "관찰: 실제 수행 결과와 걸린 시간",
+            "원인: 절차 누락, 정보 오류, 역할 불명확 등 확인된 이유",
+            "조치: 수정할 문서·교육·자원·연락망",
+            "책임: 조치 담당자와 승인 또는 확인 담당자",
+            "기한: 완료 예정일과 재시험 날짜",
+            "종료 기준: 수정사항이 실제로 작동했다고 볼 조건"
+          ]
+        }
+      ],
+      "heading": "훈련 기록과 개선계획은 구분한다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "계획 검증을 위해 일부러 난방을 끄거나, 배관을 얼리거나, 발전기·전기·연소장치를 무리하게 조작할 필요는 없다. 위험이 있는 기능은 문서 검토, 모의 상황, 자격 있는 담당자의 정기 점검 기록으로 확인하고 필요하면 관할기관이나 전문가와 별도 훈련을 설계한다. 연습은 대비 수준을 높이기 위한 것이지 새로운 사고를 만드는 과정이 아니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "실제 위험을 만드는 시험은 하지 않는다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "FEMA HSEEP는 정부·기관의 공식 연습 프로그램까지 포괄하는 체계다. 이 글은 그중 목표 설정, 수행, 평가, 개선조치라는 핵심 흐름을 작은 조직에 맞게 단순화했다. 관할 법규, 업종별 훈련 의무, 시설 안전규정이 있으면 해당 기준이 우선한다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "한계와 적용 범위"
+    },
+    {
+      "blocks": [
+        {
+          "text": "공개 Reader의 허구 서사에서는 겨울 운영계획을 실제 밤 동안 시험한 뒤 연료 사용, 시설 상태, 남은 약점을 다시 정리한다. 이 장면은 질문의 서사적 출처일 뿐이며, 위의 현실 주장은 FEMA와 Ready.gov의 공식 훈련·연속성 자료를 근거로 정리했다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "《생존일기》에서 시작한 질문"
+    }
+  ],
+  "topic_id": "community-continuity-roles",
+  "risk_level": "LOW",
+  "story_refs": [],
+  "updated_at": "2026-10-13",
+  "ai_assisted": true,
+  "content_type": "BRIEF",
+  "published_at": "2026-10-13",
+  "risk_domains": [
+    "GENERAL_PREPAREDNESS"
+  ],
+  "editorial_note": "공개 Reader의 허구 서사에서 질문을 추출했으며 현실 주장은 공식 자료로 별도 검증했다. 역할 분산을 다루는 K-009와 구분해 계획 시험, 관찰, 개선조치 추적에만 초점을 맞췄다.",
+  "meta_description": "비상운영 계획의 목표 설정, 안전한 연습, 관찰 기록, 사후검토와 개선조치 추적 방법을 공식 훈련 지침을 바탕으로 설명합니다.",
+  "related_brief_ids": [
+    "K-009"
+  ],
+  "source_checked_at": "2026-10-13",
+  "publication_policy": "AUTO_LOW_RISK",
+  "semantic_qa_status": "PASS"
+}
