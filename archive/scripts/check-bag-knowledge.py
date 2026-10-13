@@ -77,6 +77,8 @@ def main():
           popup=opened.value;popup.wait_for_load_state('networkidle')
           expect(popup.locator('h1')).to_contain_text('손전등')
           popup.close()
+          page.locator('#catalog-panel>summary').click()
+          expect(page.locator('[data-guide-group="documents"]')).to_be_visible()
           page.locator('[data-guide-group="documents"]').click()
           page.locator('.catalog-explain').first.locator('summary').click()
           with page.expect_popup() as opened:page.locator('[data-item-knowledge="guide-01"]').first.click()
