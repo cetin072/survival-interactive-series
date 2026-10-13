@@ -5,7 +5,7 @@ import {CATEGORIES,DATE_TYPES,MAX_BACKUP_BYTES,newId,newBatch,upsertItem,removeI
 import {readBag,readPreviousBag,readRawRecord} from './storage.mjs';
 import {GROUPS,CATALOG,targetFor,seedFor,entryStatus,catalogProgress} from './catalog.mjs';
 import {PRESETS,previewPreset,applyPreset,isDraftBatch} from './presets.mjs';
-import {knowledgeFor} from './knowledge-links.mjs';
+import {knowledgeFor,publishedKnowledgeForItem,PUBLISHED_ITEMS} from './knowledge-links.mjs';
 const $=id=>document.getElementById(id);
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let record=null, screen='bag', filter='all', busy=false, editBase=null, mode=null, itemId=null, activeBatchId=null, replacement=null;
@@ -58,7 +58,7 @@ function drawCatalog(bag){
     const action=status.registered?
       `data-guide-focus="${esc(status.item.id)}" class="view-existing"`:
       `data-guide-add="${esc(entry.id)}"`;
-    return `<article class="catalog-entry ${status.registered?'is-owned':''}"><div><h4>${esc(entry.name)}<span class="catalog-badge ${entry.basic?'':'optional'}">${entry.basic?'기본':'선택'}</span></h4><p class="catalog-meta">${note}</p><details class="catalog-explain"><summary>왜 필요해요?</summary><p>${esc(entry.note)}</p><a href="${esc(knowledgeFor(entry))}" target="_blank" rel="noopener noreferrer" data-item-knowledge="${esc(entry.id)}">준비·관리 지식 읽기 ↗</a></details></div><button type="button" ${action} data-ready>${status.registered?'내 기록':'＋ 추가'}</button></article>`;
+    return `<article class="catalog-entry ${status.registered?'is-owned':''}"><div><h4>${esc(entry.name)}<span class="catalog-badge ${entry.basic?'':'optional'}">${entry.basic?'기본':'선택'}</span></h4><p class="catalog-meta">${note}</p><details class="catalog-explain"><summary>왜 필요해요?</summary><p>${esc(entry.note)}</p><a href="${esc(knowledgeFor(entry))}" target="_blank" rel="noopener noreferrer" data-item-knowledge="${esc(entry.id)}">${PUBLISHED_ITEMS[entry.id]?"왜 필요한지 자세히 알아보기 ↗":"준비·관리 지식 읽기 ↗"}</a></details></div><button type="button" ${action} data-ready>${status.registered?'내 기록':'＋ 추가'}</button></article>`;
   }).join('');
 }
 function draw(){
@@ -74,12 +74,13 @@ function draw(){
   const chosen=ordered.filter(item=>filter==='short'?shortage(item)>0:filter==='soon'?(nextAction(item,bag.rotationLeadDays)&&dayDifference(nextAction(item,bag.rotationLeadDays).due,today)<=30):true);
   $('item-list').innerHTML=chosen.map(item=>{
     const gap=shortage(item);
+    const detailedGuide=publishedKnowledgeForItem(item);
     const physical=item.batches.filter(b=>b.quantity>0),expiryBatches=physical.length?physical:item.batches;
     const missingExpiry=['food','water','medicine'].includes(item.category)&&(!expiryBatches.length||expiryBatches.some(b=>!b.markedUntil));
     const draftDates=item.batches.filter(isDraftBatch).map(b=>b.nextInspection).filter(Boolean);
     const draftNote=draftDates.length?`<p class="item-sub draft-note">첫 점검 예정일: ${esc([...new Set(draftDates)].join(' / '))} · 자동 제안, 수정 가능</p>`:'';
     const batches=item.batches.map((b,i)=>`<div class="batch-row"><span>${isDraftBatch(b)&&b.quantity===0?'준비 초안':'묶음 '+(i+1)} · ${b.quantity}${esc(item.unit)} · ${b.markedUntil?esc(DATE_TYPES[b.dateType])+' '+b.markedUntil:'제품 표시기한: 확인 필요'}${b.nextInspection?' · '+(isDraftBatch(b)?'첫 점검 예정일: ':'점검 ')+b.nextInspection:''}</span><button type="button" class="quiet-button batch-remove" data-mode="delete-batch" data-item="${esc(item.id)}" data-batch-id="${esc(b.id)}" data-ready>이 묶음 기록 삭제</button></div>`).join('');
-    return `<article class="item personal-item" id="item-${esc(item.id)}" tabindex="-1"><div class="item-head"><div><h3>${esc(item.name)}</h3><span class="item-tag ${gap?'short':''}">${gap?`보충 ${gap}${esc(item.unit)}`:'기록상 수량 충족'}</span></div><div class="item-number"><strong>${currentQuantity(item)} <span>/ ${item.target}${esc(item.unit)}</span></strong></div></div>${missingExpiry?'<p class="expiry-warning">제품 기한 확인 필요 · 실물 표시와 보관조건을 지금 확인하세요.</p>':''}${draftNote}<p class="item-sub">${esc(schedule(item,bag))}${item.orderedQuantity?` · 주문 ${item.orderedQuantity}${esc(item.unit)} (재고 제외)`:''}</p><details class="batch-list"><summary>묶음 ${item.batches.length}개 · 날짜·수량 확인</summary>${batches||'<p>실물 묶음이 없습니다.</p>'}</details><div class="actions">${[['take','꺼냈어요'],['order','주문했어요'],['put','실제로 넣었어요'],['edit','수정'],['delete','삭제']].map(([action,label])=>`<button type="button" class="${action==='put'?'action confirm-action':'quiet-button'}" data-mode="${action}" data-item="${esc(item.id)}" data-ready ${action==='take'&&currentQuantity(item)===0?'data-empty disabled':''}>${label}</button>`).join('')}</div></article>`;
+    return `<article class="item personal-item" id="item-${esc(item.id)}" tabindex="-1"><div class="item-head"><div><h3>${esc(item.name)}</h3><span class="item-tag ${gap?'short':''}">${gap?`보충 ${gap}${esc(item.unit)}`:'기록상 수량 충족'}</span></div><div class="item-number"><strong>${currentQuantity(item)} <span>/ ${item.target}${esc(item.unit)}</span></strong></div></div>${missingExpiry?'<p class="expiry-warning">제품 기한 확인 필요 · 실물 표시와 보관조건을 지금 확인하세요.</p>':''}${draftNote}<p class="item-sub">${esc(schedule(item,bag))}${item.orderedQuantity?` · 주문 ${item.orderedQuantity}${esc(item.unit)} (재고 제외)`:''}</p><details class="batch-list"><summary>묶음 ${item.batches.length}개 · 날짜·수량 확인</summary>${batches||'<p>실물 묶음이 없습니다.</p>'}</details>${detailedGuide?`<div class="item-knowledge-wrap"><a class="item-knowledge-link" data-owned-knowledge="${esc(item.id)}" href="${esc(detailedGuide)}" target="_blank" rel="noopener noreferrer">왜 필요한지 자세히 알아보기 ↗</a></div>`:""}<div class="actions">${[['take','꺼냈어요'],['order','주문했어요'],['put','실제로 넣었어요'],['edit','수정'],['delete','삭제']].map(([action,label])=>`<button type="button" class="${action==='put'?'action confirm-action':'quiet-button'}" data-mode="${action}" data-item="${esc(item.id)}" data-ready ${action==='take'&&currentQuantity(item)===0?'data-empty disabled':''}>${label}</button>`).join('')}</div></article>`;
   }).join('')||'<div class="items-empty">해당하는 물품이 없습니다.</div>';
   document.querySelectorAll('.filters [data-filter]').forEach(el=>{const active=el.dataset.filter===filter;el.classList.toggle('selected',active);el.setAttribute('aria-pressed',String(active));});
   readiness();document.querySelectorAll('[data-empty]').forEach(el=>{el.disabled=true;});

@@ -1,4 +1,5 @@
 import publicBriefFiles from 'virtual:knowledge-public'
+import publicBagItemFiles from 'virtual:bag-knowledge-public'
 import { selectKnowledgeResources } from './knowledgeResources'
 import { isWikiSupportedNodeId, requireWikiNode, wikiNodeIndex } from './wikiDocument'
 import { siteVisualsFor } from './siteVisual'
@@ -84,6 +85,17 @@ export const publishedKnowledgeEntries: (PublicSearchEntry & { publishedAt?: str
   }))
   .sort((a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? '') || a.title.localeCompare(b.title, 'ko'))
 
+const bagItemEntries: PublicSearchEntry[] = (publicBagItemFiles as Array<{id:string;title:string;summary:string;href:string;keyword:string;publishedAt:string}>).map(item => ({
+  id: 'knowledge:bag:' + item.id,
+  kind: 'knowledge',
+  kindLabel: '물품별 생존지식',
+  title: item.title,
+  subtitle: item.keyword + ' · 필요성과 사용·관리 방법',
+  summary: item.summary,
+  href: item.href,
+  terms: [item.keyword, item.title, item.summary, '재난', '비상사태', '비상용품', '대피', '정전', '생존 지식'],
+}))
+
 const resourceEntries: PublicSearchEntry[] = selectKnowledgeResources().map(({ guide, tool }) => ({
   id: 'resource:tool:' + tool.path,
   kind: 'resource',
@@ -116,6 +128,7 @@ export const publicSearchIndex: PublicSearchEntry[] = [
   ...wikiEntries,
   ...readerWikiSearchEntries(allReaderWikiDocuments),
   ...publishedKnowledgeEntries,
+  ...bagItemEntries,
   ...resourceEntries,
   ...visualEntries,
 ]

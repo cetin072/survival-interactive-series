@@ -1,8 +1,11 @@
+import bagArticles from 'virtual:bag-knowledge-public'
 import { groupKnowledge } from './knowledgeCategories'
 import { knowledgeHref, knowledgeRiskLabel, publishedKnowledgeGuides, type KnowledgeGuide } from './knowledgeGuide'
 import { WikiTopbar } from './WikiTopbar'
 import './wikiShell.css'
 import './survivalDesignLanguage.css'
+
+const publicBagArticles = bagArticles as Array<{id:string;title:string;summary:string;href:string}>
 
 export function KnowledgeGuideLibraryPreview({ notice, showTopbar = true, guides = publishedKnowledgeGuides }: { notice?: string; showTopbar?: boolean; guides?: readonly KnowledgeGuide[] }) {
   const groups = groupKnowledge(guides)
@@ -22,9 +25,20 @@ export function KnowledgeGuideLibraryPreview({ notice, showTopbar = true, guides
 
       <nav className="wiki-home-actions knowledge-category-nav" aria-label="생존 지식 주제">
         {groups.map((group) => <a key={group.id} data-knowledge-category={group.id} href={'#knowledge-' + group.id}>{group.label} {group.guides.length}</a>)}
+        {publicBagArticles.length > 0 && <a data-knowledge-category="bag-items" href="#knowledge-bag-items">물품별 생존지식 {publicBagArticles.length}</a>}
       </nav>
 
       {notice && <p className="knowledge-library-notice" role="status">{notice}</p>}
+
+      {publicBagArticles.length > 0 && <section id="knowledge-bag-items" data-knowledge-category="bag-items" className="knowledge-library-list" aria-label="물품별 생존지식">
+        <div className="wiki-section-heading"><h2>물품별 생존지식</h2><span>{publicBagArticles.length}편</span></div>
+        <div>{publicBagArticles.map(item => <article key={item.id}>
+          <div className="knowledge-library-meta"><span>물품별 생존지식</span></div>
+          <h3><a href={item.href}>{item.title}</a></h3>
+          <p>{item.summary}</p>
+          <div className="knowledge-library-footer"><span>생활 속 비상대비 물품</span><a href={item.href}>글 읽기 →</a></div>
+        </article>)}</div>
+      </section>}
 
       {groups.map((group) => <section key={group.id} id={"knowledge-" + group.id} data-knowledge-category={group.id} className="knowledge-library-list" aria-label={group.label}>
         <div className="wiki-section-heading">

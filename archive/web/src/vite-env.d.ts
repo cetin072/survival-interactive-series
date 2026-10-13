@@ -19,3 +19,8 @@ declare module 'virtual:reader-wiki-seeds' {
   const seeds: unknown
   export default seeds
 }
+
+declare module 'virtual:bag-knowledge-public' {
+  const articles: unknown
+  export default articles
+}

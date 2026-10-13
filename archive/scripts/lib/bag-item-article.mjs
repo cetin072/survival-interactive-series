@@ -45,6 +45,45 @@ export function articleFromDraft(raw,id){
   if(/DRAFT|reviewedAt|guide-\d|게시 후 연결|Automation C|앱 연결|변경 이력|자료·링크 확인/.test(content))throw new Error('Editorial metadata escaped projection');
   return {id,slug,title,content,internal,sources};
 }
-export function articlePage(article){
-  return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title>${esc(article.title)} | 생존일기</title><link rel="stylesheet" href="/knowledge/knowledge.css"><link rel="stylesheet" href="/bag/article.css"></head><body><div class="knowledge-shell"><header class="knowledge-header"><a class="knowledge-brand" href="/">생존일기</a><nav><a href="/bag/">나의 생존가방</a> · <a href="/knowledge/">생존 지식</a></nav></header><main class="bag-article"><h1>${esc(article.title)}</h1>${article.content}<p><a href="/bag-lab/alpha.html?catalog=${article.id}">내 생존가방으로 돌아가기 →</a></p></main></div></body></html>`;
+export function articlePage(article,{published=false}={}){
+  const path='/knowledge/bag/'+article.slug+'/';
+  const canonical='https://survival-diary-archive.netlify.app'+path;
+  const description=article.title+' 준비와 선택, 보관·관리, 30초 점검을 확인하세요.';
+  const seo=published?[
+    '<link rel="canonical" href="'+esc(canonical)+'">',
+    '<meta name="description" content="'+esc(description)+'">',
+    '<meta property="og:type" content="article">',
+    '<meta property="og:locale" content="ko_KR">',
+    '<meta property="og:title" content="'+esc(article.title+' | 생존일기')+'">',
+    '<meta property="og:description" content="'+esc(description)+'">',
+    '<meta property="og:url" content="'+esc(canonical)+'">',
+    '<meta property="og:site_name" content="생존일기">',
+    '<script type="application/ld+json">'+JSON.stringify({'@context':'https://schema.org','@type':'Article',headline:article.title,description,mainEntityOfPage:canonical,inLanguage:'ko',author:{'@type':'Organization',name:'생존일기'}}).replace(/</g,'\\u003c')+'</script>'
+  ].join('\n'):'';
+  return '<!doctype html><html lang="ko"><head><meta charset="utf-8">'
+    +'<meta name="viewport" content="width=device-width,initial-scale=1">'
+    +'<meta name="robots" content="'+(published?'index,follow':'noindex,nofollow,noarchive')+'">'
+    +'<title>'+esc(article.title)+' | 생존일기</title>'
+    +seo
+    +'<link rel="stylesheet" href="/knowledge/knowledge.css">'
+    +'<link rel="stylesheet" href="/bag/article.css"></head><body>'
+    +'<div class="knowledge-shell"><header class="knowledge-header">'
+    +'<a class="knowledge-brand" href="/">생존일기</a>'
+    +'<nav><a href="/knowledge/">생존 지식</a> · <a href="/knowledge/bag/">물품별 가이드</a></nav></header>'
+    +'<main class="bag-article"><nav class="bag-article-crumb" aria-label="현재 위치"><a href="/knowledge/">생존 지식</a> › <a href="/knowledge/bag/">물품별 생존지식</a></nav>'
+    +'<h1>'+esc(article.title)+'</h1>'+article.content
+    +'<section class="bag-article-cta" aria-labelledby="bag-item-cta"><h2 id="bag-item-cta">이 물품을 직접 준비하고 관리하려면?</h2>'
+    +'<p>《나의 생존가방》에서 '+esc(CATALOG.find(entry=>entry.id===article.id)?.name??'이 물품')+'의 준비 여부와 수량, 점검일을 기록할 수 있습니다.</p>'
+    +'<a href="/bag-lab/alpha.html?catalog='+article.id+'">생존가방에서 이 물품 확인하기 →</a></section>'
+    +'</main>'
+    +(published?'<section class="knowledge-share" aria-labelledby="knowledge-share-heading" data-knowledge-share>'
+       +'<h2 id="knowledge-share-heading">이 글 공유하기</h2><p>가이드를 링크로 공유할 수 있습니다.</p>'
+       +'<div class="knowledge-share-actions" data-knowledge-share-actions hidden>'
+       +'<button type="button" data-knowledge-native-share hidden>기기 공유</button><button type="button" class="knowledge-share-copy" data-knowledge-copy>링크 복사</button>'
+       +'<a data-knowledge-naver-share target="_blank" rel="noopener noreferrer">네이버</a>'
+       +'<a data-knowledge-x-share target="_blank" rel="noopener noreferrer">X</a>'
+       +'<a data-knowledge-facebook-share target="_blank" rel="noopener noreferrer">Facebook</a></div>'
+       +'<label for="knowledge-share-url">공식 글 주소</label><input id="knowledge-share-url" type="url" readonly spellcheck="false" value="'+esc(canonical)+'">'
+       +'<p class="knowledge-share-status" role="status" aria-live="polite"></p></section>':'')
+    +'</div>'+(published?'<script defer src="/knowledge/share.js"></script>':'')+'</body></html>';
 }

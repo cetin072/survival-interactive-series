@@ -340,3 +340,8 @@ footer{font-size:11px}
 .settings-guide-primary:focus-visible{outline:3px solid #142438;outline-offset:3px}
 #preset-panel{padding:20px;border:1px solid #c6d6e6;border-top:4px solid #f57a3e;border-radius:16px;background:#f5f9fd}
 @media(max-width:740px){#preset-panel{padding:16px 12px}.settings-guide-primary strong{font-size:14px}}
+
+/* Published item knowledge appears on already-registered personal stock cards. */
+.item-knowledge-wrap{margin-top:12px}
+.item-knowledge-link{display:inline-flex;align-items:center;min-height:44px;padding:10px 12px;border-radius:10px;border:1px solid #b4cadc;background:#eef5fb;color:#234e7c;font-size:13px;font-weight:750;text-decoration:none}
+.item-knowledge-link:focus-visible{outline:3px solid #ff955d;outline-offset:2px}

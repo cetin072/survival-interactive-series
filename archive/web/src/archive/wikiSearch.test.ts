@@ -57,3 +57,15 @@ it('scopes actual same-node names, work labels and all Wiki result destinations'
   expect(publicSearchIndex.filter(entry=>entry.kindLabel==='작품 삽화').every(entry=>entry.chronicleId==='C03-AFTERFALL')).toBe(true);
   expect(publicSearchIndex.some(entry=>entry.chronicleId?.startsWith('C04') || entry.chronicleId?.startsWith('C05'))).toBe(false);
 });
+
+describe('approved independent bag-item knowledge discovery',()=>{
+  it('indexes each published item as a standalone Knowledge search result, not a bag-only resource',()=>{
+    const results=publicSearchIndex.filter(item=>item.id.startsWith('knowledge:bag:'))
+    expect(results).toHaveLength(8)
+    expect(results.every(item=>item.kind==='knowledge'&&item.href.startsWith('/knowledge/bag/'))).toBe(true)
+    expect(searchPublicArchive('손전등 비상사태').some(item=>item.href==='/knowledge/bag/flashlight/')).toBe(true)
+    expect(searchPublicArchive('우의').some(item=>item.href==='/knowledge/bag/raincoat/')).toBe(true)
+    expect(searchPublicArchive('여분 열쇠').some(item=>item.href==='/knowledge/bag/spare-keys/')).toBe(true)
+    expect(publicSearchIndex.some(item=>item.href.includes('bag-review'))).toBe(false)
+  })
+})
