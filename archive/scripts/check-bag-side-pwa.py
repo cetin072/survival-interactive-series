@@ -64,7 +64,7 @@ def permission_checks(browser,base):
             else:
                 expect(pg.locator('#reminder-permission')).to_have_text('권한 허용됨')
                 details=pg.locator('details').filter(has=pg.get_by_text('알림 문제 해결·권한 설정',exact=True));details.locator('summary').click()
-                pg.locator('#reminder-test').click();expect(pg.locator('#reminder-status')).to_contain_text('테스트 알림 요청됨')
+                pg.locator('#reminder-test').click();expect(pg.locator('#reminder-status')).to_contain_text('테스트 알림을 확인해 주세요.')
                 expect(pg.locator('#reminder-count')).to_contain_text('0개')
             assert alpha.stored(pg)==before
         finally:ctx.close()
