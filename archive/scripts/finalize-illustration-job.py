@@ -330,19 +330,14 @@ def validate_check_timeout_recovery_pr(job):
         or view.get("baseRefName") != "main"
         or view.get("mergeable") != "MERGEABLE"):
         fail("FINALIZER_RECOVERY_PR_STATE_INVALID")
-    checks = view.get("statusCheckRollup") or []
+    checks = relevant_pr_checks(view.get("statusCheckRollup"))
     if not checks:
         fail("FINALIZER_RECOVERY_PR_CHECKS_MISSING")
+    if any(bucket != "PASS" for _, bucket in checks):
+        fail("FINALIZER_RECOVERY_PR_CHECKS_NOT_PASSING")
     files = [item.get("path") for item in (view.get("files") or [])]
     if files != [identity_path]:
         fail("FINALIZER_RECOVERY_PR_FILES_INVALID")
-
-    checked = subprocess.run(
-        ["gh", "pr", "checks", str(existing["number"]), "--repo", REPO],
-        cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=os.environ,
-    )
-    if checked.returncode != 0:
-        fail("FINALIZER_RECOVERY_PR_CHECKS_NOT_PASSING")
 
     run("git", "fetch", "origin", branch)
     observed = json.loads(run("git", "show", f"FETCH_HEAD:{identity_path}"))
