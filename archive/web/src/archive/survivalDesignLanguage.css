@@ -739,3 +739,91 @@
 .knowledge-guide-question { color: #5f6068; font-size: clamp(15px, 1.7vw, 19px); line-height: 1.6; font-weight: 400; }
 .knowledge-guide-header .knowledge-guide-question { margin: 0 0 14px; }
 .knowledge-library-list .knowledge-guide-question { margin: 0 0 8px; }
+
+
+/* First flagship product: distinct from article categories and safety status colors. */
+.wiki-topbar > nav a.nav-bag-cta,
+.knowledge-nav a.nav-bag-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  margin-left: 5px;
+  padding: 8px 15px;
+  border: 1px solid #dc8645;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #244763, #142234);
+  color: #fffaf3 !important;
+  box-shadow: 0 4px 11px rgba(20,34,52,.19);
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: -.02em;
+  white-space: nowrap;
+  text-decoration: none !important;
+}
+.wiki-topbar > nav a.nav-bag-cta::before,
+.knowledge-nav a.nav-bag-cta::before {
+  content: "✦";
+  color: #ffc08a;
+  font-size: 15px;
+  line-height: 1;
+}
+.wiki-topbar > nav a.nav-bag-cta:hover,
+.knowledge-nav a.nav-bag-cta:hover {
+  border-color: #ffac70;
+  background: #30536d;
+  color: #fff !important;
+  box-shadow: 0 5px 15px rgba(20,34,52,.23);
+  transform: translateY(-1px);
+}
+.wiki-topbar > nav a.nav-bag-cta[aria-current="page"],
+.knowledge-nav a.nav-bag-cta[aria-current="page"] {
+  outline: 2px solid #ffb47a;
+  outline-offset: 2px;
+  text-decoration: none;
+}
+.wiki-topbar > nav a.nav-bag-cta:focus-visible,
+.knowledge-nav a.nav-bag-cta:focus-visible {
+  outline: 3px solid #ea8440;
+  outline-offset: 3px;
+}
+@media (max-width: 820px) {
+  .wiki-topbar > nav a.nav-bag-cta {
+    order: -1;
+    margin: 0 6px 0 0;
+  }
+}
+@media (max-width: 720px) {
+  .knowledge-nav a.nav-bag-cta { order: -1; margin: 0 5px 0 0; }
+}
+@media (max-width: 420px) {
+  .wiki-topbar > nav a.nav-bag-cta,
+  .knowledge-nav a.nav-bag-cta { min-height: 36px; padding: 7px 11px; font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wiki-topbar > nav a.nav-bag-cta:hover,
+  .knowledge-nav a.nav-bag-cta:hover { transform: none; }
+}
+
+/* Keep the sticky Reader header compact: only the menu row may scroll on narrow phones. */
+@media (max-width: 520px) {
+  .wiki-topbar > nav {
+    min-width: 0;
+    gap: 2px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+  }
+  .wiki-topbar > nav a { flex: 0 0 auto; }
+  .wiki-topbar > nav a:not(.nav-bag-cta) { padding: 7px 2px; font-size: 11px; }
+  .wiki-topbar > nav a.nav-bag-cta {
+    min-height: 34px;
+    margin-right: 2px;
+    padding: 6px 7px;
+    gap: 4px;
+    font-size: 11px;
+  }
+  .wiki-topbar > nav a.nav-bag-cta::before { font-size: 12px; }
+}

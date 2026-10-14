@@ -76,14 +76,28 @@ describe('STEP 3-1 shared public destinations', () => {
   })
 
   it('uses the same ordered menu on home, Wiki, tools, stories and the legacy public shell', () => {
-    const expected = ['생존 지식', '자료실', '생존 이야기', '세계관 위키']
+    const expected = ['생존 지식', '자료실', '생존 이야기', '세계관 위키', '생존가방']
     for (const path of ['/', '/?view=tools', '/?view=story', '/?view=wiki-preview&page=world&chronicle=C03-AFTERFALL', '/?view=archive']) {
       const markup = renderRoute(path)
       const nav = markup.match(/<nav (?:aria-label="공용 메뉴"|class="archive-primary-nav")[^>]*>(.*?)<\/nav>/s)![1]
       expect([...nav.matchAll(/<a[^>]*>([^<]+)<\/a>/g)].map((link) => link[1])).toEqual(expected)
       expect(nav).toContain('/?view=wiki-preview&amp;page=worlds')
+      expect(nav).toContain('href="/bag/"')
+      expect(nav).toContain('class="nav-bag-cta"')
     }
     expect(renderRoute('/?view=tools')).toContain('href="/?view=tools" aria-current="page"')
     expect(renderRoute('/?view=wiki-preview&page=world&chronicle=C03-AFTERFALL')).toContain('서진우의 생존기 · 세계관 전체보기')
+  })
+})
+
+describe('BAG-SIDE flagship header entry', () => {
+  it('keeps one canonical /bag/ call-to-action without replacing existing navigation', () => {
+    for (const route of ['/', '/?view=story', '/?view=tools', '/?view=wiki-preview&page=worlds', '/?view=archive']) {
+      const markup = renderRoute(route)
+      const nav = markup.match(/<nav (?:aria-label="공용 메뉴"|class="archive-primary-nav")[^>]*>(.*?)<\/nav>/s)?.[1] ?? ''
+      expect((nav.match(/href="\/bag\/"/g) ?? [])).toHaveLength(1)
+      expect(nav).toContain('class="nav-bag-cta"')
+      expect(nav).toContain('>생존가방</a>')
+    }
   })
 })

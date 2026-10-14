@@ -6,9 +6,11 @@ export const publicNavigation = [
   { id: 'tools', label: '자료실', href: '/?view=tools' },
   { id: 'story', label: '생존 이야기', href: '/?view=story' },
   { id: 'world', label: '세계관 위키', href: wikiLobbyHref },
+  { id: 'bag', label: '생존가방', href: '/bag/' },
 ] as const
 
 export function currentPublicMenu(pathname: string, search: string) {
+  if (pathname === '/bag' || pathname.startsWith('/bag/') || pathname === '/bag-lab' || pathname.startsWith('/bag-lab/')) return 'bag'
   if (pathname.startsWith('/knowledge/')) return 'knowledge'
   const params = new URLSearchParams(search)
   if (params.get('view') === 'tools') return 'tools'

@@ -64,7 +64,7 @@ export function ArchiveApp() {
         <a href="/knowledge/">생존 지식</a>
         <button onClick={() => open({ view: 'tools', chronicleId: activeChronicle.id })}>Tools</button>
         <button onClick={() => open({ view: 'media', chronicleId: activeChronicle.id })}>Media</button>
-        </> : publicNavigation.map((item) => <a key={item.id} href={item.href} aria-current={currentPublicMenu(window.location.pathname, window.location.search) === item.id ? 'page' : undefined}>{item.label}</a>)}
+        </> : publicNavigation.map((item) => <a key={item.id} href={item.href} aria-current={currentPublicMenu(window.location.pathname, window.location.search) === item.id ? 'page' : undefined} className={item.id === 'bag' ? 'nav-bag-cta' : undefined}>{item.label}</a>)}
       </nav>
     </header>
     {route.view === 'chronicle' && <ChronicleRoom key={route.chronicleId} chronicleId={route.chronicleId} section={roomSection} onSection={(section) => open({ ...route, section })} onRead={() => openBook(route.chronicleId)} onExplore={() => openRoom(route.chronicleId, 'graph')} onRaw={() => open({ view: 'raw', chronicleId: route.chronicleId })} onOpenHub={() => open({ view: 'story', chronicleId: activeChronicle.id })} />}
