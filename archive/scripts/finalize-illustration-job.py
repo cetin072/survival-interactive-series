@@ -77,6 +77,7 @@ PR_CHECK_PROPAGATION_ATTEMPTS = 200
 PR_CHECK_PROPAGATION_POLL_SECONDS = 3
 RECOVERABLE_CHECK_TIMEOUT = "FINALIZER_PR_CHECKS_NOT_REPORTED_TIMEOUT"
 RECOVERABLE_LEASE_CAP = "JOB_LEASE_EXPIRED"
+RECOVERABLE_PUBLISHED_CHECK_FAILURE = "FINALIZER_PR_CHECK_FAILED"
 IGNORED_PR_CHECK_PREFIXES = ("netlify/survival-zero-ai-test/",)
 PR_CHECK_WAIT_ATTEMPTS = 120
 PR_CHECK_WAIT_SECONDS = 10
@@ -440,6 +441,105 @@ def recover_lease_cap_job(job):
     return readback
 
 
+def verify_public_site_asset_file(asset):
+    public_path = asset.get("public_path")
+    if not isinstance(public_path, str) or not re.fullmatch(r"/visual-assets/[a-f0-9]{64}[.]png", public_path):
+        fail("FINALIZER_PUBLISHED_ASSET_PATH_INVALID")
+    target = ROOT / "archive/web/public" / public_path.lstrip("/")
+    if not target.is_file():
+        fail("FINALIZER_PUBLISHED_ASSET_FILE_MISSING")
+    data = target.read_bytes()
+    if len(data) != asset.get("bytes"):
+        fail("FINALIZER_PUBLISHED_ASSET_BYTES_MISMATCH")
+    if hashlib.sha256(data).hexdigest() != asset.get("sha256"):
+        fail("FINALIZER_PUBLISHED_ASSET_SHA_MISMATCH")
+    return True
+
+
+def validate_published_check_failure_recovery(job):
+    if (job.get("status") != "BLOCKED"
+        or job.get("blocker_code") != RECOVERABLE_PUBLISHED_CHECK_FAILURE
+        or job.get("blocker_stage") != "PROGRAM_FINALIZER"
+        or job.get("review_decision") != "PASS"
+        or int(job.get("finalizer_failure_count") or 0) < 5):
+        fail("FINALIZER_PUBLISHED_RECOVERY_NOT_ELIGIBLE")
+    for key in (
+        "review_staging_id", "output_sha256", "provider_asset_id",
+        "identity_path", "source_commit", "output_width", "output_height",
+    ):
+        if job.get(key) in (None, ""):
+            fail("FINALIZER_PUBLISHED_RECOVERY_BINDING_INCOMPLETE")
+
+    checkout_main()
+    if not main_has(job["identity_path"]):
+        fail("FINALIZER_PUBLISHED_RECOVERY_IDENTITY_MISSING")
+    observed_identity = json.loads(run("git", "show", f"origin/main:{job['identity_path']}"))
+    if observed_identity != identity_payload(job):
+        fail("FINALIZER_PUBLISHED_RECOVERY_IDENTITY_MISMATCH")
+
+    asset = site_asset(job)
+    if not asset:
+        fail("FINALIZER_PUBLISHED_RECOVERY_SITE_ASSET_MISSING")
+    if asset.get("derivative_version") not in ("site-png-512-v1", "site-png-fit-512-v2"):
+        fail("FINALIZER_PUBLISHED_RECOVERY_DERIVATIVE_VERSION_INVALID")
+    if asset.get("width") != job["output_width"] or asset.get("height") != job["output_height"]:
+        fail("FINALIZER_PUBLISHED_RECOVERY_DIMENSIONS_MISMATCH")
+    verify_public_site_asset_file(asset)
+    verify_storage_registry(job["identity_path"], job["output_sha256"])
+    return asset
+
+
+def recover_published_check_failure_job(job):
+    validate_published_check_failure_recovery(job)
+    recovered = rpc("archive_illustration_finalizer_recover_lease_cap", {
+        "p_job_id": job["job_id"],
+        "p_expected_output_sha256": job["output_sha256"],
+        "p_expected_provider_asset_id": job["provider_asset_id"],
+        "p_expected_review_staging_id": job["review_staging_id"],
+        "p_expected_identity_path": job["identity_path"],
+        "p_expected_source_commit": job["source_commit"],
+    })
+    if not isinstance(recovered, dict) or recovered.get("status") != "FINALIZE_QUEUED":
+        fail("FINALIZER_PUBLISHED_RECOVERY_RPC_FAILED")
+    readback = rpc("archive_illustration_render_job_readback", {"p_job_id": job["job_id"]})
+    if not isinstance(readback, dict) or readback.get("status") != "FINALIZE_QUEUED":
+        fail("FINALIZER_PUBLISHED_RECOVERY_READBACK_FAILED")
+    return readback
+
+
+def finish_existing_published_asset(job_id, job, asset):
+    identity_path = job["identity_path"]
+    if not identity_path or not main_has(identity_path):
+        fail("FINALIZER_PUBLISHED_FAST_PATH_IDENTITY_MISSING")
+    registry = verify_storage_registry(identity_path, job["output_sha256"])
+    verify_public_site_asset_file(asset)
+    rpc("archive_illustration_render_job_finish", {
+        "p_job_id": job_id,
+        "p_status": "SUCCEEDED",
+        "p_summary": {"lease_token": LEASE_TOKEN},
+    })
+    cleanup = rpc("archive_illustration_vault_cleanup_review_staging", {
+        "p_job_id": job_id,
+        "p_source_sha256": job["output_sha256"],
+    })
+    if not isinstance(cleanup, dict):
+        fail("FINALIZER_REVIEW_STAGING_CLEANUP_CHECK_FAILED")
+    return {
+        "status": "AUTOMATION_B_FINALIZED",
+        "job_id": job_id,
+        "subject_id": job["subject_id"],
+        "source_sha256": job["output_sha256"],
+        "registry_asset_id": registry.get("object_path"),
+        "public_path": asset["public_path"],
+        "identity_path": identity_path,
+        "identity_source_commit": job.get("source_commit"),
+        "handoff_staging_id": None,
+        "handoff_merge_sha": None,
+        "derivative_request_merge_sha": None,
+        "recovered_from_published_asset": True,
+    }
+
+
 def ensure_json_request(path, payload, branch, title, body):
     heartbeat()
     checkout_main()
@@ -665,6 +765,11 @@ def finalize(job_id):
         and job.get("blocker_stage") == "FINALIZER"):
         job = recover_lease_cap_job(job)
         CURRENT_JOB = job
+    if (job.get("status") == "BLOCKED"
+        and job.get("blocker_code") == RECOVERABLE_PUBLISHED_CHECK_FAILURE
+        and job.get("blocker_stage") == "PROGRAM_FINALIZER"):
+        job = recover_published_check_failure_job(job)
+        CURRENT_JOB = job
     if job.get("status") not in ("FINALIZE_QUEUED", "FINALIZING"):
         fail("FINALIZER_JOB_NOT_QUEUED")
     if job.get("review_decision") != "PASS":
@@ -687,6 +792,11 @@ def finalize(job_id):
     rpc("archive_illustration_render_job_finish", {
         "p_job_id": job_id, "p_status": "FINALIZING", "p_summary": {"lease_token": LEASE_TOKEN},
     })
+
+    checkout_main()
+    existing_asset = site_asset(job)
+    if existing_asset is not None:
+        return finish_existing_published_asset(job_id, job, existing_asset)
 
     identity_path, source_commit = ensure_identity(job)
     checkout_main()
