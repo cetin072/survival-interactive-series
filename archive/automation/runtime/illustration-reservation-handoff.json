@@ -25,5 +25,23 @@
     "next_run_time": null,
     "prompt_exact_readback": true
   },
-  "collection": null
+  "collection": {
+    "status": "READY_FOR_PROVIDER_COMPLETE",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_0000000096008243b95d6fd6526ed171",
+    "source_library_file_id": "libfile_74d834d3d92c81919eced05390efa61a",
+    "source_version_id": null,
+    "source_sha256": "b75432185078ebf7ba9eea1aff20c762a6d6f8f7885451f5efe429731a6ed9bf",
+    "source_width": 1024,
+    "source_height": 1536,
+    "source_size_bytes": 2333046,
+    "source_modified_at": "2026-10-14T08:43:26.446407Z",
+    "observed_at": "2026-10-14T09:35:01.744Z",
+    "png_verify": true,
+    "png_full_decode": true,
+    "provider_complete": {
+      "p_job_id": "illustration-char-hyerin-7be8bf3ba920-20261014-38532069997",
+      "p_prompt_sha256": "f4a382dd5b53357b9ddda73ff279fc438168030ef8e8bb9a7da44805867c95f6"
+    }
+  }
 }
