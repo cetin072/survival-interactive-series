@@ -1,0 +1,31 @@
+{
+  "id": "KC-c03-afterfall-chapter-14-35596baecd",
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-025",
+  "question": "임시 지원 거점의 수용 한계는 어떻게 정할까",
+  "topic_id": "community-evacuation-waypoints",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_002/PART_002.md"
+  ],
+  "source_hashes": [
+    "1a1bb88aad7ea55f3011da3a789cfeb8e061a2a651b574fcb07b90190e657f58"
+  ],
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "disposition_note": "공개 Reader의 허구 서사에서 주민복지관이 구체적인 지원 약속 없이 임시지원 거점 역할과 추가 수용을 요구받는 장면이 질문의 계기가 됐다. 이 서사는 질문의 내러티브 provenance일 뿐 현실 수용능력·시설안전·법적 권한의 근거가 아니다. K-006은 임시 거점의 상태 확인·기록, K-010은 조직 간 자원·비용 분담을 다루지만, 이 후보는 공간·접근성·인력·급식·위생·물자의 병목을 실제 수용 상한과 재평가 조건으로 바꾸는 데 초점을 두므로 실질적으로 중복되지 않는다.",
+  "reader_chapter_id": "c03-afterfall-chapter-14",
+  "reader_book_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b",
+  "reader_chapter_sha256": "f98422f1eb4ec8e05c1d330cd2239d9f5b71c730afaccb239edddd70c518adee",
+  "schema_projection": {
+    "version": "knowledge-draft-schema-projection-v1",
+    "original_decision": "HUMAN_REVIEW",
+    "original_qa_status": "HUMAN_REVIEW",
+    "original_publication_policy": "HUMAN_APPROVED",
+    "reason": "HUMAN_REVIEW_QA_ALIAS",
+    "job_id": "2b941799-337c-420d-83f7-d0f542bb5185",
+    "semantic_result_sha256": "1b9ea94d9ba02577242d943ace2a35c8a30ba3632d898a1b0f5d043f9df6aa13",
+    "source_sha256": "f98422f1eb4ec8e05c1d330cd2239d9f5b71c730afaccb239edddd70c518adee",
+    "policy_sha256": "915c211b16e27eb913d8778634336af2225050a6d3d04e622b26a16f87f9fcf1",
+    "projected_brief_sha256": "d730fa8e90dab100e14d46830dc22619a6eec087d15b9f05d5d7b04e892c312f"
+  }
+}
