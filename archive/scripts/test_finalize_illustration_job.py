@@ -484,6 +484,133 @@ class FinalizerIdentityTests(unittest.TestCase):
             },
         ))
 
+    def test_published_check_failure_recovery_requires_exact_main_asset(self):
+        job = self.fixture()
+        job.update({
+            "status": "BLOCKED",
+            "blocker_code": MODULE.RECOVERABLE_PUBLISHED_CHECK_FAILURE,
+            "blocker_stage": "PROGRAM_FINALIZER",
+            "finalizer_failure_count": 5,
+            "review_staging_id": "site-char-hayoung-f687a2a802b7",
+            "identity_path": MODULE.identity_path_for_subject(job["subject_id"]),
+            "source_commit": "f" * 40,
+            "output_width": 341,
+            "output_height": 512,
+        })
+        identity = MODULE.identity_payload(job)
+        asset = {
+            "point_id": job["point_id"],
+            "generation_key": job["generation_key"],
+            "subject_id": job["subject_id"],
+            "source_sha256": job["output_sha256"],
+            "derivative_version": "site-png-fit-512-v2",
+            "public_path": "/visual-assets/" + "1" * 64 + ".png",
+            "sha256": "1" * 64,
+            "bytes": 100,
+            "width": 341,
+            "height": 512,
+        }
+        with mock.patch.object(MODULE, "checkout_main"), \
+             mock.patch.object(MODULE, "main_has", return_value=True), \
+             mock.patch.object(MODULE, "run", return_value=json.dumps(identity)), \
+             mock.patch.object(MODULE, "site_asset", return_value=asset), \
+             mock.patch.object(MODULE, "verify_public_site_asset_file", return_value=True), \
+             mock.patch.object(MODULE, "verify_storage_registry", return_value={"status": "REGISTRY_READBACK_DIAGNOSTIC_PASS"}):
+            self.assertEqual(MODULE.validate_published_check_failure_recovery(job), asset)
+
+    def test_published_check_failure_recovery_rejects_dimension_mismatch(self):
+        job = self.fixture()
+        job.update({
+            "status": "BLOCKED",
+            "blocker_code": MODULE.RECOVERABLE_PUBLISHED_CHECK_FAILURE,
+            "blocker_stage": "PROGRAM_FINALIZER",
+            "finalizer_failure_count": 5,
+            "review_staging_id": "site-char-hayoung-f687a2a802b7",
+            "identity_path": MODULE.identity_path_for_subject(job["subject_id"]),
+            "source_commit": "f" * 40,
+            "output_width": 341,
+            "output_height": 512,
+        })
+        asset = {
+            "point_id": job["point_id"],
+            "generation_key": job["generation_key"],
+            "subject_id": job["subject_id"],
+            "source_sha256": job["output_sha256"],
+            "derivative_version": "site-png-fit-512-v2",
+            "public_path": "/visual-assets/" + "1" * 64 + ".png",
+            "sha256": "1" * 64,
+            "bytes": 100,
+            "width": 512,
+            "height": 512,
+        }
+        with mock.patch.object(MODULE, "checkout_main"), \
+             mock.patch.object(MODULE, "main_has", return_value=True), \
+             mock.patch.object(MODULE, "run", return_value=json.dumps(MODULE.identity_payload(job))), \
+             mock.patch.object(MODULE, "site_asset", return_value=asset):
+            with self.assertRaisesRegex(ValueError, "FINALIZER_PUBLISHED_RECOVERY_DIMENSIONS_MISMATCH"):
+                MODULE.validate_published_check_failure_recovery(job)
+
+    def test_recover_published_check_failure_uses_guarded_rpc(self):
+        job = self.fixture()
+        job.update({
+            "status": "BLOCKED",
+            "blocker_code": MODULE.RECOVERABLE_PUBLISHED_CHECK_FAILURE,
+            "blocker_stage": "PROGRAM_FINALIZER",
+            "finalizer_failure_count": 5,
+            "review_staging_id": "site-char-hayoung-f687a2a802b7",
+            "identity_path": MODULE.identity_path_for_subject(job["subject_id"]),
+            "source_commit": "f" * 40,
+            "output_width": 341,
+            "output_height": 512,
+        })
+        recovered = dict(job, status="FINALIZE_QUEUED", blocker_code=None, blocker_stage=None)
+        with mock.patch.object(MODULE, "validate_published_check_failure_recovery"), \
+             mock.patch.object(MODULE, "rpc", side_effect=[
+                 {"status": "FINALIZE_QUEUED", "finalizer_failure_count": 5},
+                 recovered,
+             ]) as rpc:
+            result = MODULE.recover_published_check_failure_job(job)
+        self.assertEqual(result["status"], "FINALIZE_QUEUED")
+        self.assertEqual(rpc.call_args_list[0], mock.call(
+            "archive_illustration_finalizer_recover_lease_cap",
+            {
+                "p_job_id": job["job_id"],
+                "p_expected_output_sha256": job["output_sha256"],
+                "p_expected_provider_asset_id": job["provider_asset_id"],
+                "p_expected_review_staging_id": job["review_staging_id"],
+                "p_expected_identity_path": job["identity_path"],
+                "p_expected_source_commit": job["source_commit"],
+            },
+        ))
+
+    def test_existing_published_asset_fast_path_finishes_without_new_handoff(self):
+        job = self.fixture()
+        job.update({
+            "identity_path": MODULE.identity_path_for_subject(job["subject_id"]),
+            "source_commit": "f" * 40,
+        })
+        asset = {
+            "public_path": "/visual-assets/" + "1" * 64 + ".png",
+            "source_sha256": job["output_sha256"],
+            "sha256": "1" * 64,
+            "bytes": 100,
+            "width": job["output_width"],
+            "height": job["output_height"],
+        }
+        MODULE.LEASE_TOKEN = "00000000-0000-0000-0000-000000000001"
+        with mock.patch.object(MODULE, "main_has", return_value=True), \
+             mock.patch.object(MODULE, "verify_storage_registry", return_value={"object_path": "trusted/object.png"}), \
+             mock.patch.object(MODULE, "verify_public_site_asset_file", return_value=True), \
+             mock.patch.object(MODULE, "rpc", side_effect=[
+                 {"status": "SUCCEEDED"},
+                 {"deleted": 0},
+             ]) as rpc:
+            result = MODULE.finish_existing_published_asset(job["job_id"], job, asset)
+        self.assertTrue(result["recovered_from_published_asset"])
+        self.assertEqual(result["public_path"], asset["public_path"])
+        self.assertEqual(rpc.call_args_list[0].args[0], "archive_illustration_render_job_finish")
+        self.assertEqual(rpc.call_args_list[0].args[1]["p_status"], "SUCCEEDED")
+
     def test_heartbeat_loss_kills_wait_and_prevents_later_side_effects(self):
         class Process:
             def __init__(self):
