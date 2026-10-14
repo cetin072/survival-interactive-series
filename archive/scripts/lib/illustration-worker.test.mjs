@@ -466,8 +466,14 @@ test('preserves approved images and validates the site asset contract', async ()
     const bytes = await readFile(resolve(root, 'archive/web/public', asset.public_path.slice(1)))
     assert.equal(bytes.length, asset.bytes)
     assert.equal(createHash('sha256').update(bytes).digest('hex'), asset.sha256)
-    assert.equal(asset.width, 512)
-    assert.equal(asset.height, 512)
+    assert.ok(Number.isInteger(asset.width) && asset.width >= 1 && asset.width <= 512)
+    assert.ok(Number.isInteger(asset.height) && asset.height >= 1 && asset.height <= 512)
+    assert.equal(Math.max(asset.width, asset.height), 512)
+    assert.ok(['site-png-512-v1', 'site-png-fit-512-v2'].includes(asset.derivative_version))
+    if (asset.derivative_version === 'site-png-512-v1') {
+      assert.equal(asset.width, 512)
+      assert.equal(asset.height, 512)
+    }
     if (approvedDerivatives[asset.subject_id]) {
       assert.deepEqual([asset.sha256, asset.bytes], approvedDerivatives[asset.subject_id])
     }
