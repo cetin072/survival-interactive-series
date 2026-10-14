@@ -380,3 +380,7 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261014073500_illustration_finalizer_lease_cap_recovery_v2.sql
       - name: Verify Automation B atomic successor parking
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_finalizer_lease_cap_recovery_v2_verification.sql
+      - name: Apply Automation B published asset recovery v3
+        run: psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261014080000_illustration_finalizer_published_asset_recovery_v3.sql
+      - name: Verify Automation B published asset recovery v3
+        run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_finalizer_published_asset_recovery_v3_verification.sql
