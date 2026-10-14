@@ -118,3 +118,20 @@ button { cursor: pointer; }
 }
 
 .reader-body h1, .reader-body h2, .reader-body h3 { font-family: ui-serif, "Noto Serif KR", Georgia, serif; color: #242429; line-height: 1.35; }.reader-body h1 { font-size: 1.7em; }.reader-body h2 { margin: 2.4em 0 1em; font-size: 1.35em; }.reader-body h3 { margin: 2em 0 .8em; font-size: 1.12em; }.reader-body blockquote { margin: 1.6em 0; padding: .25em 0 .25em 1.1em; border-left: 3px solid #b4b4bb; color: #565660; font-family: ui-serif, "Noto Serif KR", Georgia, serif; font-size: clamp(18px, 1.45vw, 20px); line-height: 2; }.reader-body ul, .reader-body ol { margin: 0 0 1.5em; padding-left: 1.5em; color: #303037; font-family: ui-serif, "Noto Serif KR", Georgia, serif; font-size: clamp(18px, 1.45vw, 20px); line-height: 2; }.scene-divider { width: 4.5em; margin: 2.6em auto; border: 0; border-top: 1px solid #9a9aa2; }
+
+
+/* Keep the flagship BAG link equally visible on the legacy Archive header. */
+.archive-primary-nav { flex-wrap: wrap; }
+.archive-primary-nav a.nav-bag-cta {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 38px;
+  border: 1px solid #dc8645; border-radius: 999px;
+  background: linear-gradient(135deg, #244763, #142234);
+  color: #fffaf3 !important; font-weight: 850;
+  box-shadow: 0 4px 11px rgba(20,34,52,.19);
+}
+.archive-primary-nav a.nav-bag-cta::before { content: "✦"; color: #ffc08a; }
+.archive-primary-nav a.nav-bag-cta:hover { border-color: #ffac70; background: #30536d; color: #fff !important; }
+.archive-primary-nav a.nav-bag-cta:focus-visible { outline: 3px solid #ea8440; outline-offset: 3px; }
+@media (max-width: 820px) {
+  .archive-primary-nav a.nav-bag-cta { order: -1; }
+}

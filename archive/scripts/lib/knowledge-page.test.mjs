@@ -207,6 +207,7 @@ test('canonical index reuses the existing Library UI as static HTML with origina
   assert.ok(page.includes(renderer.renderLibrary(projections)))
   assert.equal([...page.matchAll(/class="wiki-topbar"/g)].length, 0)
   assert.ok(page.includes('class="knowledge-library-list"'))
+  assert.ok(page.includes('<a href="/bag/" class="nav-bag-cta">생존가방</a>'))
   assert.ok(page.includes('href="/knowledge/wikiShell.css"'))
   assert.ok(page.includes('href="/knowledge/survivalDesignLanguage.css"'))
   assert.ok(page.includes('<title>생존 지식 | 생존일기</title>'))

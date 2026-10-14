@@ -10,7 +10,7 @@ export function WikiTopbar() {
     </a>
     <WikiSearchBox />
     <nav aria-label="공용 메뉴">
-      {publicNavigation.map((item) => <a key={item.id} href={item.href} aria-current={current === item.id ? 'page' : undefined}>{item.label}</a>)}
+      {publicNavigation.map((item) => <a key={item.id} href={item.href} aria-current={current === item.id ? 'page' : undefined} className={item.id === 'bag' ? 'nav-bag-cta' : undefined}>{item.label}</a>)}
     </nav>
   </header>
 }
