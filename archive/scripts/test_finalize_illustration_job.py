@@ -274,13 +274,14 @@ class FinalizerIdentityTests(unittest.TestCase):
             "headRefName": branch,
             "headRefOid": head,
             "baseRefName": "main",
-            "statusCheckRollup": [{"name": "Validate archive", "conclusion": "SUCCESS"}],
+            "statusCheckRollup": [
+                {"name": "Validate archive", "status": "COMPLETED", "conclusion": "SUCCESS"},
+                {"context": "netlify/survival-zero-ai-test/deploy-preview", "state": "PENDING"},
+            ],
             "files": [{"path": identity_path}],
         }
-        checked = mock.Mock(returncode=0)
         with mock.patch.object(MODULE, "find_open_pr", return_value=existing), \
              mock.patch.object(MODULE, "gh_json", return_value=view), \
-             mock.patch.object(MODULE.subprocess, "run", return_value=checked), \
              mock.patch.object(
                  MODULE, "run",
                  side_effect=["", json.dumps(MODULE.identity_payload(job))],
@@ -320,17 +321,34 @@ class FinalizerIdentityTests(unittest.TestCase):
             },
         ))
 
-    def test_wait_pr_and_merge_waits_for_checks_to_appear(self):
+    def test_relevant_pr_checks_ignore_unrelated_zero_ai_netlify(self):
+        checks = MODULE.relevant_pr_checks([
+            {"name": "Validate survival diary archive", "status": "COMPLETED", "conclusion": "SUCCESS"},
+            {"context": "netlify/survival-diary-archive/deploy-preview", "state": "SUCCESS"},
+            {"context": "netlify/survival-zero-ai-test/deploy-preview", "state": "PENDING"},
+        ])
+        self.assertEqual(checks, [
+            ("Validate survival diary archive", "PASS"),
+            ("netlify/survival-diary-archive/deploy-preview", "PASS"),
+        ])
+
+    def test_wait_pr_and_merge_ignores_unrelated_netlify_pending(self):
         head = "a" * 40
         merged = "d" * 40
+        passed_checks = [
+            {"name": "Validate survival diary archive", "status": "COMPLETED", "conclusion": "SUCCESS"},
+            {"name": "Validate survival game state", "status": "COMPLETED", "conclusion": "SUCCESS"},
+            {"context": "netlify/survival-diary-archive/deploy-preview", "state": "SUCCESS"},
+            {"context": "netlify/survival-zero-ai-test/deploy-preview", "state": "PENDING"},
+        ]
         views = [
             {
                 "state": "OPEN", "mergeable": "UNKNOWN", "headRefOid": head,
-                "mergeCommit": None, "statusCheckRollup": [],
+                "mergeCommit": None, "statusCheckRollup": passed_checks,
             },
             {
                 "state": "OPEN", "mergeable": "UNKNOWN", "headRefOid": head,
-                "mergeCommit": None, "statusCheckRollup": [{"name": "Validate archive"}],
+                "mergeCommit": None, "statusCheckRollup": passed_checks,
             },
             {
                 "state": "OPEN", "mergeable": "MERGEABLE", "headRefOid": head,
@@ -340,32 +358,131 @@ class FinalizerIdentityTests(unittest.TestCase):
         ]
         with mock.patch.object(MODULE, "heartbeat"), \
              mock.patch.object(MODULE.time, "sleep"), \
-             mock.patch.object(MODULE, "gh_json", side_effect=views) as gh_json, \
-             mock.patch.object(MODULE, "run_with_heartbeat", return_value=(0, "")) as watch:
-            self.assertEqual(MODULE.wait_pr_and_merge(418), merged)
-
+             mock.patch.object(MODULE, "PR_CHECK_STABLE_POLLS", 1), \
+             mock.patch.object(MODULE, "gh_json", side_effect=views) as gh_json:
+            self.assertEqual(MODULE.wait_pr_and_merge(534), merged)
         self.assertEqual(gh_json.call_count, 4)
-        watch.assert_called_once_with(
-            ["gh", "pr", "checks", "418", "--repo", MODULE.REPO, "--watch",
-             "--fail-fast", "--interval", "10"],
-            capture=False,
-        )
 
-    def test_wait_pr_and_merge_times_out_when_checks_never_attach(self):
-        no_checks = {
+    def test_wait_pr_and_merge_rejects_relevant_check_failure(self):
+        failed_checks = [
+            {"name": "Validate survival diary archive", "status": "COMPLETED", "conclusion": "FAILURE"},
+            {"context": "netlify/survival-zero-ai-test/deploy-preview", "state": "PENDING"},
+        ]
+        views = [
+            {
+                "state": "OPEN", "mergeable": "UNKNOWN", "headRefOid": "a" * 40,
+                "mergeCommit": None, "statusCheckRollup": failed_checks,
+            },
+            {
+                "state": "OPEN", "mergeable": "UNKNOWN", "headRefOid": "a" * 40,
+                "mergeCommit": None, "statusCheckRollup": failed_checks,
+            },
+        ]
+        with mock.patch.object(MODULE, "heartbeat"), \
+             mock.patch.object(MODULE.time, "sleep"), \
+             mock.patch.object(MODULE, "gh_json", side_effect=views):
+            with self.assertRaisesRegex(ValueError, "FINALIZER_PR_CHECK_FAILED"):
+                MODULE.wait_pr_and_merge(534)
+
+    def test_wait_pr_and_merge_times_out_when_only_ignored_checks_attach(self):
+        ignored_only = {
             "state": "OPEN", "mergeable": "UNKNOWN", "headRefOid": "a" * 40,
-            "mergeCommit": None, "statusCheckRollup": [],
+            "mergeCommit": None,
+            "statusCheckRollup": [
+                {"context": "netlify/survival-zero-ai-test/deploy-preview", "state": "PENDING"},
+            ],
         }
         with mock.patch.object(MODULE, "heartbeat"), \
              mock.patch.object(MODULE.time, "sleep"), \
              mock.patch.object(MODULE, "PR_CHECK_PROPAGATION_ATTEMPTS", 3), \
-             mock.patch.object(MODULE, "gh_json", return_value=no_checks), \
-             mock.patch.object(MODULE, "run_with_heartbeat") as watch:
+             mock.patch.object(MODULE, "gh_json", return_value=ignored_only):
             with self.assertRaisesRegex(
                 ValueError, "FINALIZER_PR_CHECKS_NOT_REPORTED_TIMEOUT"
             ):
-                MODULE.wait_pr_and_merge(418)
-        watch.assert_not_called()
+                MODULE.wait_pr_and_merge(534)
+
+    def test_lease_cap_recovery_validates_exact_derivative_pr_and_ignores_zero_ai_pending(self):
+        job = self.fixture()
+        job.update({
+            "status": "BLOCKED",
+            "blocker_code": MODULE.RECOVERABLE_LEASE_CAP,
+            "blocker_stage": "FINALIZER",
+            "finalizer_failure_count": 5,
+            "review_staging_id": "site-char-hayoung-f687a2a802b7",
+            "identity_path": MODULE.identity_path_for_subject(job["subject_id"]),
+            "source_commit": "f" * 40,
+            "output_width": 341,
+            "output_height": 512,
+        })
+        branch = f"automation/finalize-derivative-{job['job_id']}"
+        derivative_path = f"archive/automation/site-derivative-requests/{job['job_id']}.json"
+        head = "1" * 40
+        existing = {"number": 534, "headRefOid": head}
+        view = {
+            "state": "OPEN",
+            "mergeable": "MERGEABLE",
+            "headRefName": branch,
+            "headRefOid": head,
+            "baseRefName": "main",
+            "statusCheckRollup": [
+                {"name": "Validate survival diary archive", "status": "COMPLETED", "conclusion": "SUCCESS"},
+                {"name": "Validate survival game state", "status": "COMPLETED", "conclusion": "SUCCESS"},
+                {"context": "netlify/survival-diary-archive/deploy-preview", "state": "SUCCESS"},
+                {"context": "netlify/survival-zero-ai-test/deploy-preview", "state": "PENDING"},
+            ],
+            "files": [{"path": derivative_path}],
+        }
+        identity = MODULE.identity_payload(job)
+        request = {
+            "version": "site-derivative-request-v1",
+            "identity_path": job["identity_path"],
+            "point_id": job["point_id"],
+            "generation_key": job["generation_key"],
+            "subject_id": job["subject_id"],
+            "source_sha256": job["output_sha256"],
+        }
+        with mock.patch.object(MODULE, "find_open_pr", return_value=existing), \
+             mock.patch.object(MODULE, "gh_json", return_value=view), \
+             mock.patch.object(MODULE, "checkout_main"), \
+             mock.patch.object(MODULE, "main_has", return_value=True), \
+             mock.patch.object(MODULE, "run", side_effect=[
+                 json.dumps(identity), "", json.dumps(request)
+             ]):
+            self.assertEqual(MODULE.validate_lease_cap_recovery_pr(job), 534)
+
+    def test_recover_lease_cap_job_preserves_failure_history_and_uses_exact_binding(self):
+        job = self.fixture()
+        job.update({
+            "status": "BLOCKED",
+            "blocker_code": MODULE.RECOVERABLE_LEASE_CAP,
+            "blocker_stage": "FINALIZER",
+            "finalizer_failure_count": 5,
+            "review_staging_id": "site-char-hayoung-f687a2a802b7",
+            "identity_path": MODULE.identity_path_for_subject(job["subject_id"]),
+            "source_commit": "f" * 40,
+            "output_width": 341,
+            "output_height": 512,
+        })
+        recovered = dict(job, status="FINALIZE_QUEUED", blocker_code=None, blocker_stage=None)
+        with mock.patch.object(MODULE, "validate_lease_cap_recovery_pr", return_value=534), \
+             mock.patch.object(MODULE, "rpc", side_effect=[
+                 {"status": "FINALIZE_QUEUED", "finalizer_failure_count": 5},
+                 recovered,
+             ]) as rpc:
+            result = MODULE.recover_lease_cap_job(job)
+        self.assertEqual(result["status"], "FINALIZE_QUEUED")
+        self.assertEqual(result["finalizer_failure_count"], 5)
+        self.assertEqual(rpc.call_args_list[0], mock.call(
+            "archive_illustration_finalizer_recover_lease_cap",
+            {
+                "p_job_id": job["job_id"],
+                "p_expected_output_sha256": job["output_sha256"],
+                "p_expected_provider_asset_id": job["provider_asset_id"],
+                "p_expected_review_staging_id": job["review_staging_id"],
+                "p_expected_identity_path": job["identity_path"],
+                "p_expected_source_commit": job["source_commit"],
+            },
+        ))
 
     def test_heartbeat_loss_kills_wait_and_prevents_later_side_effects(self):
         class Process:
