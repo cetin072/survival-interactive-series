@@ -805,3 +805,25 @@
   .wiki-topbar > nav a.nav-bag-cta:hover,
   .knowledge-nav a.nav-bag-cta:hover { transform: none; }
 }
+
+/* Keep the sticky Reader header compact: only the menu row may scroll on narrow phones. */
+@media (max-width: 520px) {
+  .wiki-topbar > nav {
+    min-width: 0;
+    gap: 2px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+  }
+  .wiki-topbar > nav a { flex: 0 0 auto; }
+  .wiki-topbar > nav a:not(.nav-bag-cta) { padding: 7px 2px; font-size: 11px; }
+  .wiki-topbar > nav a.nav-bag-cta {
+    min-height: 34px;
+    margin-right: 2px;
+    padding: 6px 7px;
+    gap: 4px;
+    font-size: 11px;
+  }
+  .wiki-topbar > nav a.nav-bag-cta::before { font-size: 12px; }
+}
