@@ -372,3 +372,7 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261013005000_illustration_preserve_aspect_ratio_v2.sql
       - name: Verify Automation B proportional transfer contract
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_preserve_aspect_ratio_v2_verification.sql
+      - name: Apply Automation B finalizer lease-cap recovery
+        run: psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261014072000_illustration_finalizer_lease_cap_recovery_v1.sql
+      - name: Verify Automation B finalizer lease-cap recovery
+        run: psql -v ON_ERROR_STOP=1 --file supabase/tests/illustration_finalizer_lease_cap_recovery_v1_verification.sql
