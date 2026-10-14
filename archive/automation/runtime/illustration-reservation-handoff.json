@@ -46,5 +46,19 @@
     "provider_completed_at": "2026-10-14T09:35:16.877156+00:00",
     "job_status_after_provider_complete": "INGESTING",
     "readback_at": "2026-10-14T09:35:25.678Z"
+  },
+  "review": {
+    "status": "HANDOFF_COMMITTED",
+    "review_handoff_path": "archive/automation/runtime/illustration-review-handoff.json",
+    "review_handoff_commit_sha": "8325e9516e2905bb62bde6cb9b9a144c3310ea36",
+    "review_handoff_content_sha": "feff05be1d22d2f0337b999a2887e6ba4bf63ea5",
+    "decision": "PASS",
+    "review_provider": "native_chatgpt_vision",
+    "reviewed_at": "2026-10-14T10:27:16.282Z",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_file_id": "file_0000000096008243b95d6fd6526ed171",
+    "source_library_file_id": "libfile_74d834d3d92c81919eced05390efa61a",
+    "source_version_id": null,
+    "source_sha256": "b75432185078ebf7ba9eea1aff20c762a6d6f8f7885451f5efe429731a6ed9bf"
   }
 }
