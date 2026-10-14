@@ -76,6 +76,11 @@ HEARTBEAT_INTERVAL_SECONDS = 30
 PR_CHECK_PROPAGATION_ATTEMPTS = 200
 PR_CHECK_PROPAGATION_POLL_SECONDS = 3
 RECOVERABLE_CHECK_TIMEOUT = "FINALIZER_PR_CHECKS_NOT_REPORTED_TIMEOUT"
+RECOVERABLE_LEASE_CAP = "JOB_LEASE_EXPIRED"
+IGNORED_PR_CHECK_PREFIXES = ("netlify/survival-zero-ai-test/",)
+PR_CHECK_WAIT_ATTEMPTS = 120
+PR_CHECK_WAIT_SECONDS = 10
+PR_CHECK_STABLE_POLLS = 3
 
 
 def heartbeat():
@@ -169,9 +174,63 @@ def find_open_pr(branch):
     return prs[0] if prs else None
 
 
-def wait_pr_and_merge(number):
-    # A freshly-created PR may briefly report no checks before GitHub attaches
-    # workflow/check runs. Treat that as propagation delay, not CI failure.
+def pr_check_label(check):
+    return str(
+        check.get("context")
+        or check.get("name")
+        or check.get("workflowName")
+        or ""
+    )
+
+
+def pr_check_bucket(check):
+    label = pr_check_label(check)
+    if any(label.startswith(prefix) for prefix in IGNORED_PR_CHECK_PREFIXES):
+        return "IGNORED"
+
+    state = str(check.get("state") or "").upper()
+    status = str(check.get("status") or "").upper()
+    conclusion = str(check.get("conclusion") or "").upper()
+
+    if state in ("SUCCESS",):
+        return "PASS"
+    if state in ("PENDING", "EXPECTED"):
+        return "PENDING"
+    if state in ("ERROR", "FAILURE"):
+        return "FAIL"
+
+    if status in ("QUEUED", "IN_PROGRESS", "PENDING", "WAITING", "REQUESTED"):
+        return "PENDING"
+    if status == "COMPLETED":
+        if conclusion in ("SUCCESS", "SKIPPED", "NEUTRAL"):
+            return "PASS"
+        if conclusion in (
+            "FAILURE", "CANCELLED", "TIMED_OUT", "ACTION_REQUIRED",
+            "STARTUP_FAILURE", "STALE",
+        ):
+            return "FAIL"
+
+    if conclusion in ("SUCCESS", "SKIPPED", "NEUTRAL"):
+        return "PASS"
+    if conclusion in (
+        "FAILURE", "CANCELLED", "TIMED_OUT", "ACTION_REQUIRED",
+        "STARTUP_FAILURE", "STALE",
+    ):
+        return "FAIL"
+    return "PENDING"
+
+
+def relevant_pr_checks(checks):
+    return [
+        (pr_check_label(check), pr_check_bucket(check))
+        for check in (checks or [])
+        if pr_check_bucket(check) != "IGNORED"
+    ]
+
+
+def wait_relevant_pr_checks(number):
+    # Wait for at least one relevant check to attach. Unrelated Netlify sites do
+    # not satisfy propagation and never block Automation B.
     for _ in range(PR_CHECK_PROPAGATION_ATTEMPTS):
         heartbeat()
         view = gh_json(
@@ -182,14 +241,44 @@ def wait_pr_and_merge(number):
             return view["mergeCommit"]["oid"]
         if view["state"] != "OPEN":
             fail("FINALIZER_PR_NOT_OPEN")
-        if view.get("statusCheckRollup"):
+        if relevant_pr_checks(view.get("statusCheckRollup")):
             break
         time.sleep(PR_CHECK_PROPAGATION_POLL_SECONDS)
     else:
         fail("FINALIZER_PR_CHECKS_NOT_REPORTED_TIMEOUT")
 
-    run_with_heartbeat(["gh", "pr", "checks", str(number), "--repo", REPO, "--watch",
-        "--fail-fast", "--interval", "10"], capture=False)
+    stable = 0
+    for _ in range(PR_CHECK_WAIT_ATTEMPTS):
+        heartbeat()
+        view = gh_json(
+            "pr", "view", str(number), "--repo", REPO,
+            "--json", "state,mergeable,headRefOid,mergeCommit,statusCheckRollup",
+        )
+        if view["state"] == "MERGED":
+            return view["mergeCommit"]["oid"]
+        if view["state"] != "OPEN":
+            fail("FINALIZER_PR_NOT_OPEN")
+        checks = relevant_pr_checks(view.get("statusCheckRollup"))
+        if not checks:
+            stable = 0
+        elif any(bucket == "FAIL" for _, bucket in checks):
+            failed = next(label for label, bucket in checks if bucket == "FAIL")
+            raise ValueError(f"FINALIZER_PR_CHECK_FAILED:{failed}")
+        elif any(bucket == "PENDING" for _, bucket in checks):
+            stable = 0
+        else:
+            stable += 1
+            if stable >= PR_CHECK_STABLE_POLLS:
+                return None
+        time.sleep(PR_CHECK_WAIT_SECONDS)
+    fail("FINALIZER_PR_CHECKS_TIMEOUT")
+
+
+def wait_pr_and_merge(number):
+    merged_sha = wait_relevant_pr_checks(number)
+    if merged_sha:
+        return merged_sha
+
     for _ in range(20):
         heartbeat()
         view = gh_json(
@@ -275,6 +364,84 @@ def recover_check_timeout_job(job):
     readback = rpc("archive_illustration_render_job_readback", {"p_job_id": job["job_id"]})
     if not isinstance(readback, dict) or readback.get("status") != "FINALIZE_QUEUED":
         fail("FINALIZER_RECOVERY_READBACK_FAILED")
+    return readback
+
+
+def validate_lease_cap_recovery_pr(job):
+    if (job.get("status") != "BLOCKED"
+        or job.get("blocker_code") != RECOVERABLE_LEASE_CAP
+        or job.get("blocker_stage") != "FINALIZER"
+        or job.get("review_decision") != "PASS"
+        or int(job.get("finalizer_failure_count") or 0) < 5):
+        fail("FINALIZER_LEASE_CAP_RECOVERY_NOT_ELIGIBLE")
+    for key in (
+        "review_staging_id", "output_sha256", "provider_asset_id",
+        "identity_path", "source_commit",
+    ):
+        if not job.get(key):
+            fail("FINALIZER_LEASE_CAP_RECOVERY_BINDING_INCOMPLETE")
+
+    branch = f"automation/finalize-derivative-{job['job_id']}"
+    existing = find_open_pr(branch)
+    if not existing:
+        fail("FINALIZER_LEASE_CAP_RECOVERY_PR_NOT_FOUND")
+
+    derivative_path = f"archive/automation/site-derivative-requests/{job['job_id']}.json"
+    view = gh_json(
+        "pr", "view", str(existing["number"]), "--repo", REPO,
+        "--json", "state,mergeable,headRefName,headRefOid,baseRefName,statusCheckRollup,files",
+    )
+    if (view.get("state") != "OPEN"
+        or view.get("headRefName") != branch
+        or view.get("headRefOid") != existing.get("headRefOid")
+        or view.get("baseRefName") != "main"
+        or view.get("mergeable") != "MERGEABLE"):
+        fail("FINALIZER_LEASE_CAP_RECOVERY_PR_STATE_INVALID")
+    files = [item.get("path") for item in (view.get("files") or [])]
+    if files != [derivative_path]:
+        fail("FINALIZER_LEASE_CAP_RECOVERY_PR_FILES_INVALID")
+
+    checks = relevant_pr_checks(view.get("statusCheckRollup"))
+    if not checks or any(bucket != "PASS" for _, bucket in checks):
+        fail("FINALIZER_LEASE_CAP_RECOVERY_PR_CHECKS_NOT_PASSING")
+
+    checkout_main()
+    if not main_has(job["identity_path"]):
+        fail("FINALIZER_LEASE_CAP_RECOVERY_IDENTITY_MISSING")
+    observed_identity = json.loads(run("git", "show", f"origin/main:{job['identity_path']}"))
+    if observed_identity != identity_payload(job):
+        fail("FINALIZER_LEASE_CAP_RECOVERY_IDENTITY_MISMATCH")
+
+    run("git", "fetch", "origin", branch)
+    observed_request = json.loads(run("git", "show", f"FETCH_HEAD:{derivative_path}"))
+    expected_request = {
+        "version": "site-derivative-request-v1",
+        "identity_path": job["identity_path"],
+        "point_id": job["point_id"],
+        "generation_key": job["generation_key"],
+        "subject_id": job["subject_id"],
+        "source_sha256": job["output_sha256"],
+    }
+    if observed_request != expected_request:
+        fail("FINALIZER_LEASE_CAP_RECOVERY_REQUEST_MISMATCH")
+    return existing["number"]
+
+
+def recover_lease_cap_job(job):
+    validate_lease_cap_recovery_pr(job)
+    recovered = rpc("archive_illustration_finalizer_recover_lease_cap", {
+        "p_job_id": job["job_id"],
+        "p_expected_output_sha256": job["output_sha256"],
+        "p_expected_provider_asset_id": job["provider_asset_id"],
+        "p_expected_review_staging_id": job["review_staging_id"],
+        "p_expected_identity_path": job["identity_path"],
+        "p_expected_source_commit": job["source_commit"],
+    })
+    if not isinstance(recovered, dict) or recovered.get("status") != "FINALIZE_QUEUED":
+        fail("FINALIZER_LEASE_CAP_RECOVERY_RPC_FAILED")
+    readback = rpc("archive_illustration_render_job_readback", {"p_job_id": job["job_id"]})
+    if not isinstance(readback, dict) or readback.get("status") != "FINALIZE_QUEUED":
+        fail("FINALIZER_LEASE_CAP_RECOVERY_READBACK_FAILED")
     return readback
 
 
@@ -497,6 +664,11 @@ def finalize(job_id):
         return {"status": "NOOP_ALREADY_SUCCEEDED", "job_id": job_id}
     if job.get("status") == "BLOCKED" and job.get("blocker_code") == RECOVERABLE_CHECK_TIMEOUT:
         job = recover_check_timeout_job(job)
+        CURRENT_JOB = job
+    if (job.get("status") == "BLOCKED"
+        and job.get("blocker_code") == RECOVERABLE_LEASE_CAP
+        and job.get("blocker_stage") == "FINALIZER"):
+        job = recover_lease_cap_job(job)
         CURRENT_JOB = job
     if job.get("status") not in ("FINALIZE_QUEUED", "FINALIZING"):
         fail("FINALIZER_JOB_NOT_QUEUED")
