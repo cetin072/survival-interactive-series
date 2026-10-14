@@ -390,7 +390,7 @@ def validate_lease_cap_recovery_pr(job):
         or view.get("headRefName") != branch
         or view.get("headRefOid") != existing.get("headRefOid")
         or view.get("baseRefName") != "main"
-        or view.get("mergeable") != "MERGEABLE"):
+        or view.get("mergeable") == "CONFLICTING"):
         fail("FINALIZER_LEASE_CAP_RECOVERY_PR_STATE_INVALID")
     files = [item.get("path") for item in (view.get("files") or [])]
     if files != [derivative_path]:

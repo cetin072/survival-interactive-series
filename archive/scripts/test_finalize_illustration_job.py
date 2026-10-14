@@ -420,7 +420,7 @@ class FinalizerIdentityTests(unittest.TestCase):
         existing = {"number": 534, "headRefOid": head}
         view = {
             "state": "OPEN",
-            "mergeable": "MERGEABLE",
+            "mergeable": "UNKNOWN",
             "headRefName": branch,
             "headRefOid": head,
             "baseRefName": "main",
