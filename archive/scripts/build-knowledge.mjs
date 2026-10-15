@@ -48,11 +48,8 @@ const shell = (title, description, canonical, body, schema = '', detail = false,
 ${schema}
 </head>
 <body>
-  <div class="knowledge-shell">
-    <header class="knowledge-header">
-      <a class="knowledge-brand" href="/"><p class="knowledge-kicker">SURVIVAL DIARY</p><strong>생존일기</strong><span>생존 지식과 이야기</span></a>
-      <nav class="knowledge-nav" aria-label="주요 탐색">${renderer.navigation.map((item) => `<a href="${esc(item.href)}"${item.id === 'knowledge' ? ' aria-current="page"' : ''}${item.id === 'bag' ? ' class="nav-bag-cta"' : ''}>${esc(item.label)}</a>`).join('')}<a href="/#site-search">검색</a></nav>
-    </header>
+  <div class="wiki-shell knowledge-static-shell">
+    ${renderer.renderStaticTopbar()}
     ${body}${detail ? '\n    ' + sharePanel(canonical) : ''}
   </div>${detail ? '\n  <script defer src="/knowledge/share.js"></script>' : ''}
 </body>

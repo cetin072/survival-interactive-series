@@ -1418,3 +1418,20 @@
   outline: 2px solid var(--knowledge-topic-accent);
   outline-offset: 3px;
 }
+
+/* Static Knowledge pages reuse WikiTopbar; search links to the interactive home search. */
+.wiki-topbar .wiki-search-static {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  width: 100%;
+  padding: 0 13px;
+  border: 1px solid var(--sd-line, #cfd2d5);
+  border-radius: 6px;
+  background: var(--sd-paper, #fff);
+  color: var(--sd-ink-soft, #33353a);
+  font-size: 14px;
+  text-decoration: none;
+}
+.wiki-topbar .wiki-search-static:hover { background: #f3f4ef; }
+.wiki-topbar .wiki-search-static:focus-visible { outline: 2px solid var(--sd-olive, #385f34); outline-offset: 2px; }
