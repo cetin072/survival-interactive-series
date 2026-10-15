@@ -91,7 +91,7 @@ export function OperatorBagDraftInbox() {
         {rows.map((row) => <li key={row.id}>
           <button className="bag-draft-item" type="button" aria-pressed={selected?.id === row.id}
             onClick={() => void openDraft(row)}>
-            <strong>{row.id} · {row.id === 'guide-43' ? '손전등' : '물품별 생존지식'}</strong>
+            <strong>{row.id} · {row.catalogName}</strong>
             <span>{row.label}</span>
             <small>원고 읽기 →</small>
           </button>
