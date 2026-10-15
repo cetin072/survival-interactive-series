@@ -56,7 +56,7 @@ function githubApiUrl(file: string) {
 
 export function bagDraftFileUrl(id: string, file: string) {
   if (!bagDraftFileValid(id, file)) throw new Error('INVALID_BAG_DRAFT_FILE')
-  return GITHUB_TREE + encodeURIComponent(BAG_DRAFT_BRANCH) + '/docs/bunker_os/bag_knowledge/' + encodeURIComponent(file)
+  return GITHUB_TREE + BAG_DRAFT_BRANCH + '/docs/bunker_os/bag_knowledge/' + encodeURIComponent(file)
 }
 
 type GithubBlob = { content?: unknown; encoding?: unknown; type?: unknown }
@@ -69,7 +69,7 @@ export function decodeBagGithubContent(data: unknown): string {
   const base64 = blob.content.replace(/\s/g, '')
   if (base64.length > 180000 || !/^[A-Za-z0-9+/]*={0,2}$/.test(base64)) throw new Error('BAG_DRAFT_CONTENT_INVALID')
   try {
-    const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0))
+    const bytes = Uint8Array.from([...atob(base64)].map((char) => char.charCodeAt(0)))
     return new TextDecoder('utf-8', { fatal: true }).decode(bytes)
   } catch { throw new Error('BAG_DRAFT_CONTENT_INVALID') }
 }
