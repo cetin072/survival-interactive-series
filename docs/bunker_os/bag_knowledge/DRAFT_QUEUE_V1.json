@@ -3,7 +3,7 @@
   "project": "bag-side-item-knowledge",
   "catalogTotal": 49,
   "maxPendingIndependentReview": 49,
-  "nextCandidate": "guide-09",
+  "nextCandidate": "guide-10",
   "articles": {
     "guide-01": {
       "state": "USER_APPROVED_FOR_PUBLICATION",
@@ -65,6 +65,11 @@
       "state": "PENDING_INDEPENDENT_REVIEW",
       "file": "GUIDE_08_DRAFT_V01.md",
       "catalogName": "여벌 속옷"
+    },
+    "guide-09": {
+      "state": "PENDING_INDEPENDENT_REVIEW",
+      "file": "GUIDE_09_DRAFT_V01.md",
+      "catalogName": "여벌 양말"
     }
   },
   "reviewEvidence": {
