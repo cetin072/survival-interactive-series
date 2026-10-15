@@ -31,17 +31,17 @@ def home(page,base,label,width):
     assert page.get_by_role('textbox',name='통합 검색').count()==1
     for href in ['/knowledge/','/?view=tools','/?view=story']:
         assert page.locator(f'.wiki-topbar a[href="{href}"]').count()==1
-    assert page.locator('.wiki-topbar nav a').count()==4
+    assert page.locator('.wiki-topbar nav a').count()==(4 if label=='before' else 5)
     expect(page.get_by_role('heading',name='먼저 읽어볼 지식')).to_be_visible()
     expect(page.get_by_role('heading',name='생존 이야기',exact=True)).to_be_visible()
     if label!='before':
-        card=page.locator('a[href="/bag/"]')
+        card=page.locator('section[aria-labelledby="wiki-home-bag-title"] a[href="/bag/"]')
         assert card.count()==1
         assert page.locator('#wiki-resource-title').evaluate('(el)=>el.getBoundingClientRect().top') < card.evaluate('(el)=>el.getBoundingClientRect().top')
         page.screenshot(path=str(REPORT/f'{label}-home-{width}.png'),full_page=True)
         card.click();expect(page.locator('h1')).to_contain_text('준비는 한 번,')
     else:
-        assert page.locator('a[href="/bag/"]').count()==0
+        assert page.locator('section[aria-labelledby="wiki-home-bag-title"] a[href="/bag/"]').count()==0
         page.screenshot(path=str(REPORT/f'before-home-{width}.png'),full_page=True)
 
 def landing(browser,base,width,height,label):
