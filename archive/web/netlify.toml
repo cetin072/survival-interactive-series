@@ -63,6 +63,9 @@ command = "npm run build:verified"
 
   [headers.values]
     X-Robots-Tag = "noindex, nofollow, noarchive"
+    # Only the authenticated Operator route can read public GitHub draft manifests.
+    # No credentials or secrets are sent to api.github.com; other routes retain the original CSP.
+    Content-Security-Policy = "default-src 'self'; connect-src 'self' https://jgsxpdflgkqroecfjzxq.supabase.co https://api.github.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
 
 [[headers]]
   for = "/index.html"
