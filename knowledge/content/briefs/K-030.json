@@ -8,7 +8,7 @@
   "title": "재난 지원 요청은 직접 수행할지 연결할지 어떻게 정할까",
   "tools": [],
   "footer": "이 글은 일반적인 조직 운영 참고자료다. 생명 위험, 범죄, 화재, 의료, 구조, 전기·연소 작업은 현지 긴급신고와 관할 기관의 지시를 우선하고, 조직의 권한 밖 업무를 임의로 수행하지 않는다.",
-  "status": "READY",
+  "status": "PUBLISHED",
   "sources": [
     {
       "id": "FEMA-NIMS-RESOURCE-MANAGEMENT",
@@ -130,7 +130,7 @@
   "updated_at": "2026-10-16",
   "ai_assisted": true,
   "content_type": "BRIEF",
-  "published_at": null,
+  "published_at": "2026-10-15",
   "risk_domains": [
     "GENERAL_PREPAREDNESS"
   ],
