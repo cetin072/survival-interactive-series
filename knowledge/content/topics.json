@@ -52,7 +52,8 @@
     "id": "evacuation-decision-planning",
     "title": "대피 결정과 사전 계획",
     "brief_ids": [
-      "K-008"
+      "K-008",
+      "K-026"
     ],
     "guide_id": null,
     "tools": [],
