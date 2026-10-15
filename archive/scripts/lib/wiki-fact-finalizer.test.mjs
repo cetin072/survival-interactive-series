@@ -19,14 +19,20 @@ const factsRoot = 'archive/content/public-facts/C03-AFTERFALL/S03'
 const graphRef = 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'
 const bookRef = 'archive/content/stories/C03-AFTERFALL/BOOK.json'
 
-function aWikiSessionFromEvidence(evidence) {
-  const match = evidence?.source_ref?.match(/\/AWIKI_(?:AMENDMENT_)?SESSION_(\d{3})_[A-Za-z0-9_-]+\.json$/)
-  return match ? Number(match[1]) : null
+function aWikiRevisionFromEvidence(evidence) {
+  const match = evidence?.source_ref?.match(/\/S(\d{2,3})\/AWIKI_(?:AMENDMENT_)?SESSION_(\d{3})_[A-Za-z0-9_-]+\.json$/)
+  return match ? { season: Number(match[1]), session: Number(match[2]) } : null
 }
 
-function rollbackRecordBeforeSession(record, cutoffSession = 6) {
+function rollbackRecordBeforeSession(record, cutoffSession = 6, cutoffSeason = 3) {
   let current = structuredClone(record)
-  while ((aWikiSessionFromEvidence(current.evidence) ?? -1) >= cutoffSession) {
+  while (true) {
+    const revision = aWikiRevisionFromEvidence(current.evidence)
+    // Session numbers restart in each season. S04/001 is newer than S03/006,
+    // not an early S03 record. This rollback changes only temporary test data.
+    const afterCutoff = revision && (revision.season > cutoffSeason
+      || (revision.season === cutoffSeason && revision.session >= cutoffSession))
+    if (!afterCutoff) return current
     if (!current.history.length) return null
     const previous = current.history.at(-1)
     current = {
@@ -37,8 +43,28 @@ function rollbackRecordBeforeSession(record, cutoffSession = 6) {
       history: current.history.slice(0, -1),
     }
   }
-  return current
 }
+
+test('historical fixture rollback compares season and session together without mutating source records', () => {
+  const snapshot = (season, session, save) => ({
+    data: { label: `${season}/${session}` },
+    anchor: { save_version: save, game_time: `2099-01-01 ${String(save).padStart(2, '0')}:00` },
+    evidence: { source_ref: `${factsRoot.replace('/S03', '/' + season)}/AWIKI_SESSION_${session}_${'a'.repeat(64)}.json` },
+  })
+  const early = snapshot('S03', '005', 1)
+  const late = snapshot('S03', '008', 2)
+  const nextSeason = snapshot('S04', '002', 3)
+  const record = { id: 'fixture-node', ...nextSeason, history: [early, late] }
+  const before = structuredClone(record)
+  assert.deepEqual(rollbackRecordBeforeSession(record), { id: 'fixture-node', ...early, history: [] })
+  assert.deepEqual(record, before)
+  assert.equal(rollbackRecordBeforeSession({ id: 'new-node', ...nextSeason, history: [] }), null)
+  const future = { id: 'future-node', ...snapshot('S05', '001', 4), history: [early, late, nextSeason] }
+  assert.deepEqual(rollbackRecordBeforeSession(future), { id: 'future-node', ...early, history: [] })
+  assert.deepEqual(rollbackRecordBeforeSession(record, 2, 4), { id: 'fixture-node', ...late, history: [early] })
+  assert.deepEqual(rollbackRecordBeforeSession({ id: 'older', ...early, history: [] }), { id: 'older', ...early, history: [] })
+  assert.deepEqual(aWikiRevisionFromEvidence({ source_ref: `${factsRoot}/AWIKI_AMENDMENT_SESSION_006_test.json` }), { season: 3, session: 6 })
+})
 
 async function writePreSessionGraph(root, cutoffSession = 6) {
   const graph = JSON.parse(await readFile(resolve(repoRoot, graphRef), 'utf8'))
