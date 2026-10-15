@@ -196,16 +196,16 @@ describe('C live runtime contract', () => {
     const card = knowledgeCard({ active_count: 2, latest_job: { status: 'HOLD' }, prep: null })
     expect(card).toContain('상태 조회 필요')
     expect(card).toContain('<dt>진행 중</dt><dd>조회 필요')
-    expect(card).toContain('<dt>오류</dt><dd>조회 필요')
+    expect(card).toContain('<dt>현재 복구할 오류</dt><dd>조회 필요')
   })
 
   it('two human reviews occupy no machine slot and are not stalled even when old', () => {
     const card = knowledgeCard({ ...healthyC, human_review_count: 2,
       latest_job: { status: 'HUMAN_REVIEW', brief_id: 'K-018', stalled_code: 'KNOWLEDGE_PR_STALLED' } })
-    expect(card).toContain('검토 필요')
+    expect(card).toContain('사람 검토 2건')
     expect(card).toContain('<dt>진행 중</dt><dd>0건')
     expect(card).toContain('<dt>사람 검토 대기</dt><dd>2건')
-    expect(card).toContain('<dt>오류</dt><dd>0건')
+    expect(card).toContain('<dt>현재 복구할 오류</dt><dd>0건')
     expect(card).toContain('사람 검토 대기')
     expect(card).not.toContain('확인 필요')
     expect(card).not.toContain('KNOWLEDGE_PR_STALLED')
@@ -225,8 +225,8 @@ describe('C live runtime contract', () => {
     const card = knowledgeCard({ ...healthyC, human_review_count: 2, unresolved_blocked_count: 2,
       latest_job: { brief_id: 'K-024', status: 'HOLD', disposition_code: 'SEMANTIC_DUPLICATE' },
       latest_blocked_job: { brief_id: 'K-023', status: 'BLOCKED', blocker_code: 'KNOWLEDGE_CONTRACT', blocker_stage: 'FINALIZER' } })
-    expect(card).toContain('확인 필요')
-    expect(card).toContain('<dt>오류</dt><dd>2건')
+    expect(card).toContain('작업 장애 2건')
+    expect(card).toContain('<dt>현재 복구할 오류</dt><dd>2건')
     expect(card).toContain('<dt>최근 오류</dt><dd>K-023')
     expect(card).toContain('지식 글 형식 검증에서 문제가 발견됐습니다.')
     expect(card).toContain('FINALIZER')
@@ -235,7 +235,39 @@ describe('C live runtime contract', () => {
     const card = knowledgeCard({ ...healthyC, machine_active_count: 1, human_review_count: 2, machine_stalled_count: 1,
       latest_job: { brief_id: 'K-024', status: 'HOLD' },
       latest_stalled_job: { brief_id: 'K-022', status: 'PR_OPEN', stalled_code: 'KNOWLEDGE_PR_STALLED' } })
-    expect(card).toContain('확인 필요')
-    expect(card).toContain('<dt>오류</dt><dd>1건')
+    expect(card).toContain('작업 장애 1건')
+    expect(card).toContain('<dt>현재 복구할 오류</dt><dd>1건')
+  })
+})
+
+describe('Resolved incidents render as normal progress instead of current failures', () => {
+  it('keeps the merged A-Wiki success distinct from the next Production deploy', () => {
+    const card = wikiCard({ systemStatus: { ...systemStatus, a_wiki: {
+      job_count: 4, active_count: 0, human_review_count: 0, published_count: 4,
+      latest_job: { status: 'PUBLISHED', season_id: 'S04', session_id: 'SESSION_002', merge_sha: 'a'.repeat(40) },
+    } } })
+    expect(card).toContain('저장소 반영 완료')
+    expect(card).toContain('<dt>공개 사이트</dt><dd>배포 미확인')
+    expect(card).not.toContain('작업 장애 확인')
+  })
+  it('recognizes B PREPARED as waiting rather than a prior job fault', () => {
+    const page = renderDashboard({ systemStatus: { ...systemStatus,
+      visual: { ...systemStatus.visual, active_count: 1,
+        latest_job: { status: 'PREPARED', title: '오세훈', subject_id: 'char-sehoon' } },
+    } })
+    const card = page.split('B · 일러스트')[1].split('</article>')[0]
+    expect(card).toContain('이미지 생성 대기')
+    expect(card).toContain('오세훈')
+    expect(card).toContain('이전 이미지의 차단·재시도 이력은 보존')
+    expect(card).not.toContain('복구 필요')
+  })
+  it('keeps seven C human-review drafts out of the active error count', () => {
+    const card = knowledgeCard({ ...healthyC, human_review_count: 7,
+      latest_job: { status: 'HUMAN_REVIEW', brief_id: 'K-029' },
+      latest_published_job: { status: 'PUBLISHED', brief_id: 'K-023' } })
+    expect(card).toContain('사람 검토 7건')
+    expect(card).toContain('<dt>현재 복구할 오류</dt><dd>0건')
+    expect(card).toContain('새 원고 제작')
+    expect(card).not.toContain('작업 장애')
   })
 })
