@@ -111,6 +111,20 @@ export async function prepareRenderJob({
     catalog, siteAssets: effectiveSiteAssets, receipts, observedAttempts, batchLimit: 3,
     subjectIds: [...profileBySubject.keys()],
   })
+  // The Coordinator serializes a single Library image slot. Until a reviewed
+  // PASS asset has been recovered from BLOCKED to SUCCEEDED, a successor cannot
+  // safely dispatch. Do not enqueue a PREPARED successor that will just expire.
+  // selectIllustrationCandidates above validates the durable attempt history.
+  const unresolvedReviewed = observedAttempts.find((attempt) =>
+    attempt.status === 'BLOCKED' && attempt.review_decision === 'PASS')
+  if (unresolvedReviewed) {
+    return {
+      status: 'PREVIOUS_FINALIZER_RECOVERY',
+      subject_id: unresolvedReviewed.subject_id,
+      point_id: unresolvedReviewed.point_id,
+      active_provider: activeProvider,
+    }
+  }
   if (!plan.candidates.length) {
     return { status: 'NO_CANDIDATE', active_provider: activeProvider }
   }
