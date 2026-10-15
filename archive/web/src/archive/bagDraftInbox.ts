@@ -1,0 +1,122 @@
+/**
+ * Read-only bridge to the existing GitHub draft queue.
+ * No manuscript text or GitHub credentials are bundled into public build artifacts.
+ * The repository is public: this Operator UI is not a substitute for private storage.
+ */
+export const BAG_DRAFT_BRANCH = 'feat/bag-side-item-knowledge-template-v1'
+const API_ROOT = 'https://api.github.com/repos/cetin072/survival-interactive-series/contents/docs/bunker_os/bag_knowledge'
+const GITHUB_TREE = 'https://github.com/cetin072/survival-interactive-series/blob/'
+const DRAFT_FILENAME = /^GUIDE_(\d{2})(?:_[A-Z0-9]+)*_DRAFT_V01\.md$/
+
+export type BagDraftEntry = { state: string; file: string; catalogName?: string; approvedAt?: string }
+export type BagDraftQueue = {
+  catalogTotal: number
+  nextCandidate: string
+  articles: Record<string, BagDraftEntry>
+}
+export type BagDraftRow = BagDraftEntry & { id: string; label: string; catalogName: string }
+export type BagDraftFilter = 'ALL' | 'PENDING' | 'APPROVED'
+
+// Read-only display fallback for the existing 49-item catalogue; the stable key remains guide-XX.
+const catalogNames = [
+  '방수 서류 파우치','신분증 사본','가족 비상연락처 메모','소액권 현금','중요 서류 사본','여분 열쇠',
+  '우의','여벌 속옷','여벌 양말','계절용 보온 의류','모자·장갑','편한 여벌 신발',
+  '구급함','개인 상비약','밴드·거즈','마스크','의료 보조기기 예비품','처방약 예비품',
+  '호루라기','종이 지도','다목적 도구','방수 비닐봉투','작은 수리 테이프','고무장갑',
+  '생수','간편식','고열량 간식','통조림','식수 정화 도구','수동 캔따개','휴대용 식기',
+  '화장지','물티슈','손소독제','칫솔·치약','수건','개인 위생용품','아기용 위생용품',
+  '담요','단열 매트','침낭','작은 방수포','손전등','휴대용 라디오','보조배터리',
+  '충전 케이블','예비 건전지','충전 어댑터','휴대용 태양광 패널',
+] as const
+const approvedStates = new Set(['USER_APPROVED_FOR_PUBLICATION', 'PUBLISHED'])
+
+export function bagDraftStateLabel(state: string) {
+  switch (state) {
+    case 'USER_APPROVED_FOR_PUBLICATION': return '사용자 발행 승인'
+    case 'PUBLISHED': return '게시 완료'
+    case 'INDEPENDENT_PASS_USER_PENDING': return '사용자 검수 대기'
+    case 'LIGHT_REVIEW_PASS_USER_PENDING': return '간편 검수 완료'
+    case 'PENDING_INDEPENDENT_REVIEW': return '원고 검수 대기'
+    default: return '상태 확인 필요'
+  }
+}
+
+export function bagDraftIsApproved(state: string) { return approvedStates.has(state) }
+
+export function bagDraftFileValid(id: string, file: string) {
+  const match = DRAFT_FILENAME.exec(file)
+  return /^guide-\d{2}$/.test(id) && match?.[1] === id.slice(6)
+}
+
+function githubApiUrl(file: string) {
+  const url = new URL(API_ROOT + '/' + file)
+  url.searchParams.set('ref', BAG_DRAFT_BRANCH)
+  return url.toString()
+}
+
+export function bagDraftFileUrl(id: string, file: string) {
+  if (!bagDraftFileValid(id, file)) throw new Error('INVALID_BAG_DRAFT_FILE')
+  return GITHUB_TREE + BAG_DRAFT_BRANCH + '/docs/bunker_os/bag_knowledge/' + encodeURIComponent(file)
+}
+
+type GithubBlob = { content?: unknown; encoding?: unknown; type?: unknown }
+export function decodeBagGithubContent(data: unknown): string {
+  const blob = data as GithubBlob | null
+  if (!blob || typeof blob.content !== 'string' || blob.encoding !== 'base64' || blob.type !== 'file') {
+    throw new Error('BAG_DRAFT_CONTENT_INVALID')
+  }
+  // Convert base64 to UTF-8 without obsolete escape()/unescape() or unsafe HTML rendering.
+  const base64 = blob.content.replace(/\s/g, '')
+  if (base64.length > 180000 || !/^[A-Za-z0-9+/]*={0,2}$/.test(base64)) throw new Error('BAG_DRAFT_CONTENT_INVALID')
+  try {
+    const bytes = Uint8Array.from([...atob(base64)].map((char) => char.charCodeAt(0)))
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes)
+  } catch { throw new Error('BAG_DRAFT_CONTENT_INVALID') }
+}
+
+async function getGithubText(filename: string, fetcher: typeof fetch): Promise<string> {
+  const response = await fetcher(githubApiUrl(filename), {
+    cache: 'no-store',
+    headers: { Accept: 'application/vnd.github+json' },
+  })
+  if (!response.ok) throw new Error(response.status === 403 || response.status === 429
+    ? 'GITHUB_RATE_LIMIT_OR_DENIED' : 'GITHUB_DRAFT_READ_FAILED')
+  return decodeBagGithubContent(await response.json())
+}
+
+export function parseBagDraftQueue(text: string): BagDraftQueue {
+  const value = JSON.parse(text) as BagDraftQueue
+  if (!value || value.catalogTotal !== 49 || !value.articles ||
+      typeof value.articles !== 'object' || Array.isArray(value.articles) ||
+      typeof value.nextCandidate !== 'string') throw new Error('BAG_DRAFT_QUEUE_INVALID')
+  const entries = Object.entries(value.articles)
+  if (entries.length > value.catalogTotal ||
+      entries.some(([id, row]) => !row || typeof row.state !== 'string' ||
+        typeof row.file !== 'string' || !bagDraftFileValid(id, row.file))) {
+    throw new Error('BAG_DRAFT_QUEUE_INVALID')
+  }
+  return value
+}
+
+export function bagDraftRows(queue: BagDraftQueue, filter: BagDraftFilter = 'ALL'): BagDraftRow[] {
+  const rows = Object.entries(queue.articles).map(([id, row]) => ({
+    ...row, id, label: bagDraftStateLabel(row.state),
+    catalogName: row.catalogName ?? catalogNames[Number(id.slice(6)) - 1] ?? '품목별 생존지식',
+  })).sort((a, b) => Number(a.id.slice(6)) - Number(b.id.slice(6)))
+  if (filter === 'PENDING') return rows.filter((row) => !bagDraftIsApproved(row.state))
+  if (filter === 'APPROVED') return rows.filter((row) => bagDraftIsApproved(row.state))
+  return rows
+}
+
+export async function loadBagDraftQueue(fetcher: typeof fetch = fetch) {
+  return parseBagDraftQueue(await getGithubText('DRAFT_QUEUE_V1.json', fetcher))
+}
+
+export async function loadBagDraftBody(id: string, file: string, fetcher: typeof fetch = fetch) {
+  if (!bagDraftFileValid(id, file)) throw new Error('INVALID_BAG_DRAFT_FILE')
+  const text = await getGithubText(file, fetcher)
+  const front = /^---\r?\n[\s\S]*?\r?\n---\r?\n/
+  if (!front.test(text) || !text.includes('catalogId: ' + id) ||
+      !text.includes('contentType: bag-item-knowledge')) throw new Error('BAG_DRAFT_ID_MISMATCH')
+  return text.replace(front, '').trim()
+}
