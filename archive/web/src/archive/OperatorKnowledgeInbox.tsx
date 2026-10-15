@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabaseClient } from './supabaseClient'
 import { OperatorKnowledgeSources } from './OperatorKnowledgeSources'
+import { OperatorBagKnowledgeInbox } from './OperatorBagKnowledgeInbox'
 import { formatOperatorTime } from './operatorSystemStatus'
 import {
   emptyKnowledgeInbox,
@@ -38,7 +39,7 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
       <div>
         <p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p>
         <h1>Knowledge Inbox</h1>
-        <p>{email} · C3 자동화 글감과 외부 참고자료를 한곳에서 확인합니다. C3 글감은 기존 상세 페이지에서 읽고 편집합니다.</p>
+        <p>{email} · 생존가방 원고와 C3 자동화 글감, 외부 참고자료를 한곳에서 확인합니다. C3 글감은 기존 상세 페이지에서 읽고 편집합니다.</p>
       </div>
       <div className="operator-heading-actions">
         <a className="operator-secondary" href="/operator/">대시보드</a>
@@ -71,6 +72,8 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
         )}
       </div>
     </section>
+
+    <OperatorBagKnowledgeInbox />
 
     <OperatorKnowledgeSources />
 
