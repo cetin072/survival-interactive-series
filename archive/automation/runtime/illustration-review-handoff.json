@@ -1,17 +1,17 @@
 {
   "version": "illustration-review-handoff-v1",
-  "job_id": "illustration-char-sehoon-f4a64e9ee9c7-20261015-38722713342",
-  "main_sha": "2e78f23b52222a425654d59739cc4b6e0110ffc1",
-  "point_id": "point-d30f0212dfc1760af238951d2dc58018e9f1893baef08fa122ea917a72505dab",
-  "generation_key": "generation-f4a64e9ee9c754f2070f4dcebc1f77fe06a6bdd618a78d7413e1c1ef3b60f197",
-  "subject_id": "char-sehoon",
-  "prompt_sha256": "cd5232ef9783d481dd03e36a4531a8cba0dbb5bedb34031bb06ba8c26ff38e68",
-  "review_context_sha256": "ef38ce490144a9bad1fa6989a92dce7277460def7aacd0c82054f0c3bab21bf8",
+  "job_id": "illustration-char-jaemin-77bbbe706137-20261016-38802436020",
+  "main_sha": "f48f413b7188e8bc1df481d53f56d0fcdad2cb25",
+  "point_id": "point-dd7b0b496257c3bb65a21c2c26a3fc612bf459cb5ae1c25ddc4ff10b82c8e7ae",
+  "generation_key": "generation-77bbbe7061376ecaab00457b98824b605885c777eaf7eb9636fc0b7076f7055e",
+  "subject_id": "char-jaemin",
+  "prompt_sha256": "c5bc7277fcb5fe762818c2b1a97f26753d035258fada341a7dbaa719349f7045",
+  "review_context_sha256": "ed9340591d8c8fd77738387a8e7da3bd6b63a4def3259146174e1ba3ebc02fc7",
   "source_library_path": "/IMAGE-RENDER/output/current.png",
-  "source_library_file_id": "file_0000000015bc8230a6fc2eb83c45923a",
+  "source_library_file_id": "file_00000000498881f98693605a4096ed8e",
   "decision": "PASS",
   "review_provider": "native_chatgpt_vision",
-  "review_summary": "40대 중반의 마른 근육질 한국 남성 한 명이 짧은 검은 머리와 넓어진 이마, 도드라진 광대·깊은 눈가, 사용감 있는 회색 작업점퍼를 착용하고 자연스럽게 서 있다. 인물 기준 왼손 검지의 오래된 흉터가 보이며, 단순한 현대 한국 실내 배경·cool blue-gray 저채도·회화적 반실사와 사실적 비율이 brief에 부합한다. 글자, 추가 인물, 무기, 유혈, 판타지 요소는 없다.",
+  "review_summary": "20대 후반의 키가 크고 팔다리가 길며 마른 한국 남성 한 명이 눈썹 가까이 내려오는 검은 앞머리, 짙은 눈썹과 큰 눈, 볼살이 적고 부드러운 턱선을 보인다. 남색 후드 위에 낡은 짧은 재킷을 겹쳐 입고 자연스럽게 서 있으며, 단순한 현대 한국 실내 배경·cool blue-gray 저채도·회화적 반실사와 사실적 비율이 brief에 부합한다. 글자, 추가 인물, 무기, 유혈, 판타지 요소는 없다.",
   "rejection_codes": [],
-  "created_at": "2026-10-15T13:26:20.481Z"
+  "created_at": "2026-10-15T23:28:37.623Z"
 }
