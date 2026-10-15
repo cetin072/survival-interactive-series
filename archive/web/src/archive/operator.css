@@ -183,3 +183,16 @@
 .bunker-os-source-list article > span { display:inline-block; padding:3px 7px; border-radius:999px; background:#ececef; color:#62626a; font-size:11px; font-weight:700; }
 .bunker-os-source-list h3 { margin:8px 0 5px; font-size:17px; }.bunker-os-source-list h3 a { color:#2d2d33; }.bunker-os-source-list p { color:#5f5f67; line-height:1.6; }.bunker-os-source-list small, .bunker-os-source-list small a { color:#77777f; font-size:11px; }
 @media (max-width: 620px) { .bunker-os-detail-head { flex-direction:column; }.bunker-os-status-nav a { flex:1 1 auto; text-align:center; } }
+
+/* Operator signal legend; colors supplement explicit Korean text labels. */
+.operator-status-badge.running { border-color:#bfd6eb; background:#edf6fd; color:#255d88; }
+.operator-status-badge.danger { border-color:#ecc6c6; background:#fff2f2; color:#9b3232; }
+.operator-signal-legend { display:flex; flex-wrap:wrap; gap:8px 15px; margin:2px 0 8px; font-size:11px; color:#64646e; }
+.operator-signal-legend > span { display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
+.operator-signal-legend i { display:inline-block; width:9px; height:9px; border-radius:100%; flex:0 0 9px; background:#96969e; }
+.operator-signal-legend i.ok { background:#438456; }
+.operator-signal-legend i.running { background:#4389bf; }
+.operator-signal-legend i.warning { background:#bb8b32; }
+.operator-signal-legend i.danger { background:#bf5555; }
+.operator-signal-legend i.neutral { background:#96969e; }
+.operator-system > .operator-signal-legend + .operator-status-help { margin:0 0 14px; font-size:11px; }
