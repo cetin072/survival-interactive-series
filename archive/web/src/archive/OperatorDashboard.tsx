@@ -19,6 +19,8 @@ import {
   subjectWithKorean,
   timezoneLabel,
   visualStatusTone,
+  visualOperatorSignal,
+  knowledgeOperatorSignal,
 } from './operatorSystemStatus'
 
 export type ReviewItem = {
@@ -156,11 +158,16 @@ export function OperatorDashboard({
   const aWikiHumanReview = aWikiLatest?.status === 'HUMAN_REVIEW'
   const aWikiHumanCount = systemStatus?.a_wiki?.human_review_count ?? (aWikiHumanReview ? 1 : 0)
   const aWikiPublication = aWikiPublicationStatus(aWikiLatest, productionStatus)
-  const aWikiBadgeClass = aWikiGuidance.badge ? 'warning'
-    : aWikiLatest?.status === 'PUBLISHED' ? aWikiPublication.deploymentVerified ? 'ok' : 'neutral'
-    : visualStatusTone(aWikiLatest?.status)
+  const aWikiBadgeClass = !systemStatus?.a_wiki ? 'neutral'
+    : aWikiLatest?.status === 'BLOCKED' ? 'danger'
+    : aWikiGuidance.badge ? 'warning'
+    : systemStatus.a_wiki.active_count > 0 ? 'running'
+    : aWikiLatest?.status === 'PUBLISHED' ? 'ok' : visualStatusTone(aWikiLatest?.status)
+  // A published repository merge is a success even when the next regular
+  // Production deployment has not yet reflected the content.
   const aWikiBadge = !systemStatus?.a_wiki ? '상태 조회 필요'
-    : aWikiGuidance.badge ?? (aWikiLatest?.status === 'PUBLISHED' ? aWikiPublication.deployment
+    : aWikiGuidance.badge ?? (systemStatus.a_wiki.active_count > 0 ? '처리 중'
+      : aWikiLatest?.status === 'PUBLISHED' ? '저장소 반영 완료'
       : aWikiLatest?.status ? aWikiStatusLabel(aWikiLatest.status) : '실행 이력 없음')
 
   const visualLatest = systemStatus?.visual.latest_job ?? null
@@ -168,8 +175,12 @@ export function OperatorDashboard({
     && systemStatus?.visual.prep_cron?.last_status === 'succeeded'
     && systemStatus?.visual.retry_cron?.active === true
     && systemStatus?.visual.retry_cron?.last_status === 'succeeded'
-  const visualBlocker = visualLatest?.stalled_code ?? visualLatest?.blocker_code ?? visualLatest?.last_error_code ?? null
-  const visualBadgeClass = visualBlocker ? 'warning' : visualStatusTone(visualLatest?.status)
+  const visualSignal = visualOperatorSignal(visualLatest, !!systemStatus?.visual)
+  // Historical last-error codes must not turn a new/successful job red.
+  const visualBlocker = visualLatest?.status === 'BLOCKED'
+    ? visualLatest.blocker_code ?? visualLatest.last_error_code ?? null
+    : visualLatest?.stalled_code ?? null
+  const visualBadgeClass = visualSignal.tone
 
   const semantic = systemStatus?.knowledge_semantic
   const hasLiveContract = semantic?.machine_active_count !== undefined
@@ -181,21 +192,23 @@ export function OperatorDashboard({
   const blockedCount = semantic?.unresolved_blocked_count ?? (semanticLatest?.status === 'BLOCKED' ? 1 : 0)
   const stalledJob = semantic?.latest_stalled_job
     ?? (machineStatuses.includes(semanticLatest?.status ?? '') && semanticLatest?.stalled_code ? semanticLatest : null)
-  const blockedJob = semantic?.latest_blocked_job ?? (semanticLatest?.status === 'BLOCKED' ? semanticLatest : null)
+  const blockedJob = blockedCount > 0 ? semantic?.latest_blocked_job
+    ?? (semanticLatest?.status === 'BLOCKED' ? semanticLatest : null) : null
   const prepFailed = ['BLOCKED', 'FAILED', 'ERROR'].includes(semantic?.prep?.last_status ?? '')
   const semanticBlocker = blockedJob?.blocker_code ?? stalledJob?.stalled_code
     ?? (prepFailed ? semantic?.prep?.blocker_code : null) ?? null
   const knowledgeErrorCount = blockedCount + (semantic?.machine_stalled_count ?? (stalledJob ? 1 : 0))
   const knowledgeLatestBrief = semanticLatest?.brief_id ?? (semanticLatest ? '조회 필요' : '없음')
-  const knowledgeNeedsReview = humanCount > 0
-  const knowledgeNeedsAttention = knowledgeErrorCount > 0 || prepFailed
-  const knowledgeBadge = !hasLiveContract ? '상태 조회 필요'
-    : knowledgeNeedsAttention ? '확인 필요'
-    : knowledgeNeedsReview ? '검토 필요'
-    : machineCount > 0 ? statusLabel(semantic.latest_machine_job?.status ?? semanticLatest?.status)
-    : '정상'
-  const knowledgeBadgeClass = !hasLiveContract ? 'neutral' : knowledgeNeedsAttention || knowledgeNeedsReview ? 'warning'
-    : machineCount > 0 ? 'neutral' : 'ok'
+  const knowledgeSignal = knowledgeOperatorSignal({
+    available: hasLiveContract,
+    machineActive: machineCount,
+    humanReview: humanCount,
+    unresolvedBlocked: blockedCount,
+    machineStalled: semantic?.machine_stalled_count ?? (stalledJob ? 1 : 0),
+    prepFailed,
+  })
+  const knowledgeBadge = knowledgeSignal.badge
+  const knowledgeBadgeClass = knowledgeSignal.tone
   const latestProcessing = semanticLatest?.status === 'HOLD' && (semanticLatest.disposition_code ?? semanticLatest.blocker_code) === 'SEMANTIC_DUPLICATE'
     ? '중복으로 보류' : statusLabel(semanticLatest?.status)
 
@@ -241,6 +254,14 @@ export function OperatorDashboard({
         </button>
       </header>
 
+      <div className="operator-signal-legend" aria-label="자동화 상태 표시 안내">
+        <span><i className="ok" aria-hidden="true" />정상·완료</span>
+        <span><i className="running" aria-hidden="true" />진행·예약 대기</span>
+        <span><i className="warning" aria-hidden="true" />사람 검토</span>
+        <span><i className="danger" aria-hidden="true" />장애·복구 필요</span>
+        <span><i className="neutral" aria-hidden="true" />조회 불가</span>
+      </div>
+      <p className="operator-status-help">DB 작업 상태와 ChatGPT 예약 ON/OFF는 별개입니다. 이 화면은 ChatGPT 예약의 실제 ON/OFF를 직접 조회하지 않습니다.</p>
       <div className="operator-system-grid">
         <article className="operator-system-card">
           <div className="operator-system-title">
@@ -274,7 +295,7 @@ export function OperatorDashboard({
           <dl>
             <div><dt>최근 작업</dt><dd>{aWikiLatest?.season_id ? `${aWikiLatest.season_id} · ` : ''}{sessionLabel(aWikiLatest?.session_id)}</dd></div>
             <div><dt>작업 수</dt><dd>{systemStatus?.a_wiki ? `처리 중 ${systemStatus.a_wiki.active_count}건 · 검수 보류 ${aWikiHumanCount}건 · 저장소 반영 ${systemStatus.a_wiki.published_count}건` : '조회 필요'}</dd></div>
-            <div><dt>현 상태</dt><dd>{systemStatus?.a_wiki ? aWikiGuidance.category : '조회 필요'}</dd></div>
+            <div><dt>현 상태</dt><dd>{systemStatus?.a_wiki ? aWikiLatest?.status === 'PUBLISHED' ? '세계관 기록 저장소 반영 완료' : aWikiGuidance.category : '조회 필요'}</dd></div>
             <div><dt>내용 검수</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.review : '조회 필요'}</dd></div>
             <div><dt>저장소 반영</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.repository : '조회 필요'}</dd></div>
             <div><dt>공개 사이트</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.deployment : '조회 필요'}</dd></div>
@@ -309,10 +330,12 @@ export function OperatorDashboard({
         <article className="operator-system-card">
           <div className="operator-system-title">
             <h3>B · 일러스트 <small>이미지 자동 제작</small></h3>
-            <span className={`operator-status-badge ${visualBadgeClass}`}>{visualBlocker ? '확인 필요' : visualLatest?.status ? statusLabel(visualLatest.status) : '실행 이력 없음'}</span>
+            <span className={`operator-status-badge ${visualBadgeClass}`}>{visualSignal.badge}</span>
           </div>
           <dl>
-            <div><dt>자동 실행</dt><dd>{visualPrepHealthy ? '정상' : '확인 필요'}</dd></div>
+            <div><dt>DB 예약</dt><dd>{visualPrepHealthy ? '준비·재시도 정상' : '준비·재시도 확인 필요'} · ChatGPT 예약 별도</dd></div>
+            <div><dt>현재 판정</dt><dd>{visualSignal.summary}</dd></div>
+            <div><dt>다음 조치</dt><dd>{visualSignal.next}</dd></div>
             <div><dt>오늘 시도 / 성공</dt><dd>{systemStatus?.visual.today_job_count ?? 0}건 / {systemStatus?.visual.today_success_count ?? 0}건</dd></div>
             <div><dt>진행 중</dt><dd>{systemStatus?.visual.active_count ?? 0}건</dd></div>
             <div><dt>최근 대상</dt><dd>{visualLatest?.title ?? subjectWithKorean(visualLatest?.subject_id).split(' · ')[0]}</dd></div>
@@ -321,8 +344,9 @@ export function OperatorDashboard({
             <div><dt>현재 상태 시간</dt><dd>{visualLatest?.age_minutes == null ? '—' : `${visualLatest.age_minutes}분`}</dd></div>
             <div><dt>실패 횟수</dt><dd>생성 {visualLatest?.provider_failure_count ?? 0} · 저장 {visualLatest?.ingest_failure_count ?? 0} · 검수 {visualLatest?.review_failure_count ?? 0}</dd></div>
             <div><dt>검수 결과</dt><dd>{visualLatest?.review_decision ? statusLabel(visualLatest.review_decision) : '아직 없음'}</dd></div>
-            <div><dt>문제</dt><dd>{visualBlocker ? blockerLabel(visualBlocker) : '없음'}</dd></div>
+            <div><dt>현재 장애</dt><dd>{visualBlocker ? blockerLabel(visualBlocker) : '없음'}</dd></div>
           </dl>
+          <p className="operator-status-help">이전 이미지의 차단·재시도 이력은 보존되며 최신 작업의 현재 장애로 합산하지 않습니다.</p>
           <details className="operator-tech-details">
             <summary>기술 상세</summary>
             <dl>
@@ -342,10 +366,12 @@ export function OperatorDashboard({
             <span className={`operator-status-badge ${knowledgeBadgeClass}`}>{knowledgeBadge}</span>
           </div>
           <dl>
+            <div><dt>현재 판정</dt><dd>{knowledgeSignal.summary}</dd></div>
+            <div><dt>다음 조치</dt><dd>{knowledgeSignal.next}</dd></div>
             <div><dt>진행 중</dt><dd>{semantic?.machine_active_count === undefined ? '조회 필요' : `${machineCount}건`}</dd></div>
             <div><dt>최근 처리</dt><dd>{knowledgeLatestBrief} · {latestProcessing}</dd></div>
             <div><dt>최근 게시</dt><dd>{hasLiveContract ? semantic?.latest_published_job?.brief_id ?? '없음' : '조회 필요'}</dd></div>
-            <div><dt>오류</dt><dd>{hasLiveContract ? `${knowledgeErrorCount}건` : '조회 필요'}</dd></div>
+            <div><dt>현재 복구할 오류</dt><dd>{hasLiveContract ? `${knowledgeErrorCount}건` : '조회 필요'}</dd></div>
             <div><dt>최근 오류</dt><dd>{blockedJob?.brief_id ?? stalledJob?.brief_id ?? '없음'}</dd></div>
             <div><dt>원본</dt><dd>{sourceKindLabel(semanticLatest?.source_kind)}</dd></div>
             <div><dt>작업 시작 / 제출</dt><dd>{formatOperatorTime(semanticLatest?.prepared_at)} / {formatOperatorTime(semanticLatest?.submitted_at)}</dd></div>
@@ -354,6 +380,7 @@ export function OperatorDashboard({
             <div><dt>막힌 이유</dt><dd>{semanticBlocker ? blockerLabel(semanticBlocker) : '없음'}</dd></div>
             <div><dt>자동 실행 주기</dt><dd>{operatorStaticStatus.knowledge.triggerIntervalHours}시간 · {timezoneLabel(operatorStaticStatus.knowledge.timezone)}</dd></div>
           </dl>
+          <p className="operator-status-help">과거에 해결된 실패 이력과 사람 검토 대기 원고는 ‘현재 복구할 오류’에 포함하지 않습니다. 사람 검토가 쌓여도 새 글의 자동 집필은 별도로 진행됩니다.</p>
           <details className="operator-tech-details">
             <summary>기술 상세</summary>
             <dl>
