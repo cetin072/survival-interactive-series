@@ -67,6 +67,14 @@ command = "npm run build:verified"
     X-Robots-Tag = "noindex, nofollow, noarchive"
     Content-Security-Policy = "default-src 'self'; connect-src 'self' https://jgsxpdflgkqroecfjzxq.supabase.co https://api.github.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
 
+# Explicit nested Operator routing: avoid relying on /operator* segment-glob semantics.
+[[headers]]
+  for = "/operator/*"
+
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Content-Security-Policy = "default-src 'self'; connect-src 'self' https://jgsxpdflgkqroecfjzxq.supabase.co https://api.github.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
+
 [[headers]]
   for = "/index.html"
 
