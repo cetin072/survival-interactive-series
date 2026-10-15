@@ -79,6 +79,13 @@ RECOVERABLE_CHECK_TIMEOUT = "FINALIZER_PR_CHECKS_NOT_REPORTED_TIMEOUT"
 RECOVERABLE_LEASE_CAP = "JOB_LEASE_EXPIRED"
 RECOVERABLE_PUBLISHED_CHECK_FAILURE = "FINALIZER_PR_CHECK_FAILED"
 IGNORED_PR_CHECK_PREFIXES = ("netlify/survival-zero-ai-test/",)
+# Netlify reports both legacy StatusContexts and named CheckRuns for this
+# unrelated test site. Exclude only these exact names, never Archive checks.
+IGNORED_PR_CHECK_NAMES = frozenset({
+    "Header rules - survival-zero-ai-test",
+    "Redirect rules - survival-zero-ai-test",
+    "Pages changed - survival-zero-ai-test",
+})
 PR_CHECK_WAIT_ATTEMPTS = 120
 PR_CHECK_WAIT_SECONDS = 10
 PR_CHECK_STABLE_POLLS = 3
@@ -186,7 +193,7 @@ def pr_check_label(check):
 
 def pr_check_bucket(check):
     label = pr_check_label(check)
-    if any(label.startswith(prefix) for prefix in IGNORED_PR_CHECK_PREFIXES):
+    if label in IGNORED_PR_CHECK_NAMES or any(label.startswith(prefix) for prefix in IGNORED_PR_CHECK_PREFIXES):
         return "IGNORED"
 
     state = str(check.get("state") or "").upper()
