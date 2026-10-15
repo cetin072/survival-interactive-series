@@ -64,7 +64,10 @@ def landing(browser,base,width,height,label):
         assert page.locator(f'meta[property="{name}"]').get_attribute('content')
     assert page.locator('.hero .primary').bounding_box()['y']+page.locator('.hero .primary').bounding_box()['height']<=height,'CTA must be above fold'
     assert page.locator('.hero-description').bounding_box()['y']<height
-    expect(page.locator('.bag-body')).to_be_visible()
+    # Brand artwork replaces the old CSS-drawn bag; verify rendered asset instead.
+    expect(page.locator('.bag-illustration')).to_be_visible()
+    assert 'bag-ready-512.webp' in page.locator('.bag-illustration').evaluate('(el)=>getComputedStyle(el).backgroundImage')
+    assert page.evaluate('''async()=>{const image=new Image();image.src='/bag-lab/icons/bag-ready-512.webp';await image.decode();return [image.naturalWidth,image.naturalHeight]}''')==[512,512]
     expect(page.locator('.preview-tabs')).to_be_visible()
     for icon in page.locator('svg.icon').all():
         assert icon.evaluate('(el)=>el.getBBox().width>0'),'missing SVG icon'
