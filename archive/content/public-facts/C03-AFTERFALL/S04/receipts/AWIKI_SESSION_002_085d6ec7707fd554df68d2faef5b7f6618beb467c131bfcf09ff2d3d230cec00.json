@@ -1,0 +1,15 @@
+{
+  "version": "a-wiki-receipt-v1",
+  "season_id": "S04",
+  "session_id": "SESSION_002",
+  "source_ref": "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_002/SOURCE_MANIFEST.json",
+  "source_sha256": "085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00",
+  "job_id": "wiki-job-ac5ea9ab4e99db5bae8827ef66c71e4f7f37c1fac23530ae8f6f346d483eff27",
+  "proposal_sha256": "88c8a5047a5c3e469dd44c796096dcc258b554c2c35abfe844bb363bce216e9a",
+  "review_sha256": "255a56fee2863cad02c50fd060fbba0bd09f45f13a22480cb28a0d294e962ac2",
+  "outcome": "APPLIED",
+  "fact_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464",
+  "graph_before_sha256": "96e2c231689792df8249d6811d2620b12a6132508e4ada3bacbeac88628f4bc9",
+  "graph_after_sha256": "2624da2b7467443660562c5b4a70498db5c60297c7dff747d604c1abfa49b93a",
+  "coverage": "COMPLETE"
+}
