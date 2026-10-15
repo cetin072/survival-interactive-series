@@ -2,7 +2,7 @@ import { validateStoryRefs, projectReaderStoryRefs } from './knowledge-story-ref
 import { createHash } from 'node:crypto'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { loadKnowledge, validateKnowledge } from './knowledge-content.mjs'
+import { loadKnowledge, validateKnowledge, stageSemanticBrief } from './knowledge-content.mjs'
 import { recordBackfillResult, validateRuntimeState } from './knowledge-worker-runtime.mjs'
 import { recordKnowledgeDisposition, validateKnowledgeState } from './knowledge-scan.mjs'
 
@@ -112,6 +112,12 @@ export function buildSemanticContext({ jobType, source, target, existingKnowledg
     story_registry_ids: (existingKnowledge.stories ?? []).map(({ id }) => id),
     story_refs_policy: 'brief.story_refs contains only explicit story_registry_ids. Never copy BOOK/chapter/source_refs/raw paths or URLs. No explicit mapping means []. Preserve narrative provenance in candidate.reader_* and source_refs/source_hashes.',
     editorial_contract: { version: 'V2', spec_ref: 'docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V2.md' },
+    submission_schema: {
+      semantic_qa_status: ['PASS', 'REVIEW', 'HOLD'],
+      date_format: 'YYYY-MM-DD',
+      unpublished_published_at: null,
+      auto_evidence: 'AUTO_LOW_RISK requires no conflicts/unknowns, copyright_status=CLEAR and a verified source-status enum. Otherwise submit HUMAN_REVIEW; never erase uncertainty to pass a gate.',
+    },
     topics: existingKnowledge.topics.map(({ id, title }) => ({ id, title })),
     policy: {
       worker_policy_version: policy.version,
@@ -232,9 +238,16 @@ export async function applySemanticPackage({ root, job, result, reservation = nu
   }
   if (!targetTopic.brief_ids.includes(brief.id)) targetTopic.brief_ids.push(brief.id)
   const nowDate = knowledgeOperationalDate(now)
-  const stagedBrief = { ...brief, source_checked_at: brief.source_checked_at ?? nowDate, updated_at: nowDate }
+  const staged = stageSemanticBrief({ brief, evidence, decision: result.decision, config: data.config, nowDate })
+  const stagedBrief = staged.brief
   const stagedCandidate = { ...candidate }
   const stagedEvidence = { ...evidence }
+  if (staged.projection) stagedCandidate.schema_projection = {
+    ...staged.projection, job_id: job.job_id,
+    semantic_result_sha256: job.semantic_result_sha256 ?? null,
+    source_sha256: job.source_sha256, policy_sha256: job.policy_sha256 ?? null,
+    projected_brief_sha256: sha(Buffer.from(JSON.stringify(stagedBrief))),
+  }
 
   await writeFile(join(root, 'knowledge/content/topics.json'), `${JSON.stringify(topics, null, 2)}\n`)
   await writeFile(join(root, 'knowledge/content/candidates', `${candidate.id}.json`), `${JSON.stringify(stagedCandidate, null, 2)}\n`)
@@ -248,10 +261,10 @@ export async function applySemanticPackage({ root, job, result, reservation = nu
     recordKnowledgeDisposition(state, {
       sourceManifestRef: job.source_ref,
       sourceManifestSha256: job.source_sha256,
-      status: result.decision === 'HUMAN_REVIEW' ? 'HUMAN_REVIEW' : 'PROCESSED',
+      status: staged.requires_human_review ? 'HUMAN_REVIEW' : 'PROCESSED',
       processedAt: now,
       candidateIds: [candidate.id], briefIds: [brief.id],
-      ...(result.decision === 'HUMAN_REVIEW' ? { dispositionCode: result.code, dispositionNote: result.note } : {}),
+      ...(staged.requires_human_review ? { dispositionCode: result.code ?? 'AUTO_EVIDENCE_REQUIRES_HUMAN_REVIEW', dispositionNote: result.note ?? '원문과 불확실성을 보존한 채 사람 검토가 필요합니다.' } : {}),
     })
     await writeFile(statePath, `${JSON.stringify(state, null, 2)}\n`)
   } else if (job.source_kind === 'PUBLIC_READER') {
@@ -260,7 +273,7 @@ export async function applySemanticPackage({ root, job, result, reservation = nu
     validateRuntimeState(runtime)
     recordBackfillResult(runtime, {
       workKey: job.work_key,
-      status: result.decision === 'HUMAN_REVIEW' ? 'HUMAN_REVIEW' : 'PR_CREATED',
+      status: staged.requires_human_review ? 'HUMAN_REVIEW' : 'PR_CREATED',
       now,
     })
     await writeFile(runtimePath, `${JSON.stringify(runtime, null, 2)}\n`)
@@ -268,7 +281,9 @@ export async function applySemanticPackage({ root, job, result, reservation = nu
 
   const completed = await loadKnowledge(root)
   await validateKnowledge(completed)
-  return { publication_projection: projection.receipt, brief_id: brief.id, candidate_id: candidate.id, changed_files: [
+  return { publication_projection: projection.receipt, schema_projection: stagedCandidate.schema_projection ?? null,
+    requires_human_review: staged.requires_human_review, staged_brief: stagedBrief,
+    brief_id: brief.id, candidate_id: candidate.id, changed_files: [
     `knowledge/content/topics.json`, `knowledge/content/candidates/${candidate.id}.json`,
     `knowledge/content/evidence/${brief.id}.json`, `knowledge/content/briefs/${brief.id}.json`,
     ...(job.source_kind === 'PUBLIC_ARCHIVE' ? ['knowledge/automation/state.json'] : job.source_kind === 'PUBLIC_READER' ? ['knowledge/automation/runtime-state.json'] : []),

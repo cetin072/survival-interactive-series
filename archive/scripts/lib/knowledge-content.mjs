@@ -143,8 +143,11 @@ export async function validateKnowledge(data) {
     fail(['LOW', 'HIGH'].includes(brief.risk_level) && ['HUMAN_APPROVED', 'AUTO_LOW_RISK'].includes(brief.publication_policy), `${brief.id} policy`)
     fail(Array.isArray(brief.risk_domains) && brief.risk_domains.length > 0 && brief.risk_domains.every((domain) => allowedRiskDomains.has(domain)), `${brief.id} risk domains`)
     fail(['PASS', 'REVIEW', 'HOLD'].includes(brief.semantic_qa_status) && ['PUBLISHED', 'READY', 'HOLD', 'DRAFT'].includes(brief.status), `${brief.id} status`)
-    fail(date(brief.source_checked_at) && date(brief.published_at) && date(brief.updated_at), `${brief.id} dates`)
-    fail(brief.updated_at >= brief.published_at && typeof brief.ai_assisted === 'boolean' && nonempty(brief.editorial_note), `${brief.id} provenance`)
+    // A draft has no publication date. Only the existing promotion step creates it.
+    const publicationDateValid = date(brief.published_at)
+      || (brief.status !== 'PUBLISHED' && brief.published_at == null)
+    fail(date(brief.source_checked_at) && publicationDateValid && date(brief.updated_at), `${brief.id} dates`)
+    fail((brief.published_at == null || brief.updated_at >= brief.published_at) && typeof brief.ai_assisted === 'boolean' && nonempty(brief.editorial_note), `${brief.id} provenance`)
     fail(Array.isArray(brief.sections) && brief.sections.length > 0 && Array.isArray(brief.sources) && brief.sources.length > 0, `${brief.id} sections/sources`)
     fail(Array.isArray(brief.related_brief_ids) && Array.isArray(brief.tools) && Array.isArray(brief.story_refs), `${brief.id} relations`)
     fail(brief.related_brief_ids.every((id) => id !== brief.id && ids.has(id)), `${brief.id} related ref`)
@@ -212,4 +215,31 @@ export function publicationEligibility(brief, pack, config) {
   if (!Array.isArray(brief.risk_domains) || brief.risk_domains.length === 0 || brief.risk_domains.some((domain) => !lowRiskDomains.has(domain))) return 'HUMAN_REVIEW'
   if (brief.semantic_qa_status !== 'PASS' || !['READY', 'PUBLISHED'].includes(brief.status)) return 'HUMAN_REVIEW'
   return 'AUTO_PUBLISH_ELIGIBLE'
+}
+
+/** Storage projection only. It can require MORE review, never clear uncertainty. */
+export function stageSemanticBrief({ brief, evidence, decision, config, nowDate }) {
+  fail(['BRIEF_READY', 'HUMAN_REVIEW'].includes(decision), 'semantic staging decision')
+  fail(date(nowDate), 'semantic staging date')
+  const escalate = decision === 'BRIEF_READY'
+    && publicationEligibility(brief, evidence, config) !== 'AUTO_PUBLISH_ELIGIBLE'
+  const reviewAlias = decision === 'HUMAN_REVIEW'
+    && ['HUMAN_REVIEW', 'NEEDS_HUMAN_REVIEW'].includes(brief.semantic_qa_status)
+  return {
+    brief: {
+      ...brief,
+      source_checked_at: brief.source_checked_at ?? nowDate,
+      updated_at: nowDate,
+      semantic_qa_status: escalate || reviewAlias ? 'REVIEW' : brief.semantic_qa_status,
+      publication_policy: escalate ? 'HUMAN_APPROVED' : brief.publication_policy,
+    },
+    requires_human_review: decision === 'HUMAN_REVIEW' || escalate,
+    projection: escalate || reviewAlias ? {
+      version: 'knowledge-draft-schema-projection-v1',
+      original_decision: decision,
+      original_qa_status: brief.semantic_qa_status,
+      original_publication_policy: brief.publication_policy,
+      reason: escalate ? 'AUTO_EVIDENCE_REQUIRES_HUMAN_REVIEW' : 'HUMAN_REVIEW_QA_ALIAS',
+    } : null,
+  }
 }

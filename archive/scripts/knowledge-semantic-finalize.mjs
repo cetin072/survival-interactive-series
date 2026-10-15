@@ -42,7 +42,7 @@ export function reconcilePullRequest(job, pr, currentMainSha = null) {
   const registered = job.publication_heads?.includes(pr?.head?.sha)
   if (pr?.head?.sha !== job.final_head_sha && !registered) return { status: 'BLOCKED', code: 'PR_HEAD_CHANGED' }
   if (pr.state === 'open' && pr.merged !== true) {
-    return { status: job.result_decision === 'HUMAN_REVIEW' ? 'HUMAN_REVIEW' : 'PR_OPEN',
+    return { status: job.status === 'HUMAN_REVIEW' || job.result_decision === 'HUMAN_REVIEW' ? 'HUMAN_REVIEW' : 'PR_OPEN',
       ...(currentMainSha && pr.base.sha !== currentMainSha ? { revalidation_required: true } : {}),
       ...(registered && pr.head.sha !== job.final_head_sha ? { registered_head_sha: pr.head.sha } : {}),
     }
@@ -170,8 +170,10 @@ export async function runPackage(job, result, { currentMainSha, headRef, current
     const reservation = await verifyBriefReservation(job, result, { requestRpc })
     await verifyPins(job, temp)
     const applied = await applySemanticPackage({ root: temp, job, result, reservation, now: new Date(job.submitted_at ?? job.prepared_at).toISOString() })
+    const requiresHumanReview = result.decision === 'HUMAN_REVIEW' || applied.requires_human_review === true
 
     if (applied.publication_projection) console.log(JSON.stringify({ publication_projection: applied.publication_projection }))
+    if (applied.schema_projection) console.log(JSON.stringify({ schema_projection: applied.schema_projection }))
 
     runCommand('npm', ['ci'], join(temp, 'archive/web'))
     runCommand('npm', ['run', 'knowledge:test'], join(temp, 'archive/web'))
@@ -182,11 +184,11 @@ export async function runPackage(job, result, { currentMainSha, headRef, current
     const changedFiles = changedFilesFromGit({ baseRef: 'origin/main', headRef: 'HEAD', cwd: temp })
     const deterministicData = { ...data, config: { ...data.config, publication_mode: 'AUTO_LOW_RISK', auto_publish_enabled: true } }
     const deterministic = await checkRelease(deterministicData, { changedFiles, briefIds: [result.brief.id], mode: 'AUTO_LOW_RISK', base: temp })
-    if (result.decision === 'BRIEF_READY' && deterministic.decision !== 'AUTO_PUBLISH_ELIGIBLE') throw new Error(`SEMANTIC_RELEASE_GATE:${deterministic.decision}:${deterministic.reasons.join(',')}`)
-    if (result.decision === 'HUMAN_REVIEW' && !humanReviewPackageAllowed(deterministic)) throw new Error(`SEMANTIC_REVIEW_GATE:${deterministic.decision}`)
+    if (!requiresHumanReview && deterministic.decision !== 'AUTO_PUBLISH_ELIGIBLE') throw new Error(`SEMANTIC_RELEASE_GATE:${deterministic.decision}:${deterministic.reasons.join(',')}`)
+    if (requiresHumanReview && !humanReviewPackageAllowed(deterministic)) throw new Error(`SEMANTIC_REVIEW_GATE:${deterministic.decision}`)
     const release = await checkRelease(data, { changedFiles, briefIds: [result.brief.id], mode: data.config.publication_mode, base: temp })
-    if (result.decision === 'BRIEF_READY' && !['AUTO_PUBLISH_ELIGIBLE', 'WOULD_AUTO_PUBLISH', 'PR_ONLY'].includes(release.decision)) throw new Error(`SEMANTIC_MODE_GATE:${release.decision}:${release.reasons.join(',')}`)
-    if (result.decision === 'HUMAN_REVIEW' && release.decision !== 'PR_ONLY' && !humanReviewPackageAllowed(release)) throw new Error(`SEMANTIC_MODE_REVIEW_GATE:${release.decision}`)
+    if (!requiresHumanReview && !['AUTO_PUBLISH_ELIGIBLE', 'WOULD_AUTO_PUBLISH', 'PR_ONLY'].includes(release.decision)) throw new Error(`SEMANTIC_MODE_GATE:${release.decision}:${release.reasons.join(',')}`)
+    if (requiresHumanReview && release.decision !== 'PR_ONLY' && !humanReviewPackageAllowed(release)) throw new Error(`SEMANTIC_MODE_REVIEW_GATE:${release.decision}`)
 
     runCommand('git', ['checkout', '-b', headRef], temp)
     runCommand('git', ['add', '-A', '--', 'knowledge/content', 'knowledge/automation/state.json', 'knowledge/automation/runtime-state.json', 'archive/web/public/knowledge', 'archive/web/public/sitemap.xml'], temp)
@@ -204,7 +206,7 @@ export async function runPackage(job, result, { currentMainSha, headRef, current
       const remoteSha = remote.split(/\s+/)[0]
       if (remoteSha !== headSha) throw new Error('SEMANTIC_BRANCH_IDENTITY_CONFLICT')
     } else runCommand('git', ['push', 'origin', `HEAD:${headRef}`], temp)
-    return { ...applied, release_decision: release.decision, head_sha: headSha, current_main_sha: currentMainSha }
+    return { ...applied, requires_human_review: requiresHumanReview, release_decision: release.decision, head_sha: headSha, current_main_sha: currentMainSha }
   } finally {
     if (worktreeAdded) {
       try { runCommand('git', ['worktree', 'remove', '--force', temp], currentRoot) } catch { }
@@ -296,18 +298,19 @@ export async function runSemanticFinalizer({ requestRpc = rpc, shell = run, pack
     const headRef = semanticBranchRef(job.job_id)
     const packageResult = await packageSemantic(job, result, { currentMainSha, headRef, requestRpc })
     const pr = await createDraft(job, result, headRef, packageResult.head_sha)
+    const requiresHumanReview = result.decision === 'HUMAN_REVIEW' || packageResult.requires_human_review === true
 
-    if (result.decision === 'HUMAN_REVIEW') {
+    if (requiresHumanReview) {
       const payload = buildReviewQueuePayload({
-        brief: result.brief,
-        result: { decision: 'HUMAN_REVIEW_REQUIRED', reasons: [result.code] },
+        brief: packageResult.staged_brief ?? result.brief,
+        result: { decision: 'HUMAN_REVIEW_REQUIRED', reasons: [result.code ?? 'AUTO_EVIDENCE_REQUIRES_HUMAN_REVIEW'] },
         headSha: packageResult.head_sha,
         prNumber: pr.number,
         headRef,
       })
       await enqueueReviewEntry(payload, { projectUrl: process.env.ARCHIVE_SUPABASE_URL, serviceRoleKey: process.env.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY })
     }
-    const nextStatus = result.decision === 'HUMAN_REVIEW' ? 'HUMAN_REVIEW' : 'PR_OPEN'
+    const nextStatus = requiresHumanReview ? 'HUMAN_REVIEW' : 'PR_OPEN'
     const updated = await updateJob(requestRpc, job.job_id, 'FINALIZING', nextStatus, { prNumber: pr.number, headRef, headSha: packageResult.head_sha })
     return { status: nextStatus, job_id: job.job_id, pr_number: pr.number, head_sha: packageResult.head_sha, release_decision: packageResult.release_decision, update: updated }
   } catch (error) {
@@ -315,7 +318,8 @@ export async function runSemanticFinalizer({ requestRpc = rpc, shell = run, pack
     const exhausted = Number(job.finalizer_attempt_count ?? 0) >= 3
     const status = error.retryable && !exhausted ? 'FINALIZING' : 'BLOCKED'
     const updated = await updateJob(requestRpc, job.job_id, 'FINALIZING', status, { blockerCode: code, blockerStage: error.retryable ? 'FINALIZER_TRANSIENT' : 'FINALIZER' })
-    return { status, job_id: job.job_id, blocker_code: code, update: updated }
+    return { status, job_id: job.job_id, blocker_code: code,
+      ...(code === 'KNOWLEDGE_CONTRACT' ? { blocker_detail: error.message.slice(0, 500) } : {}), update: updated }
   }
 }
 
@@ -325,4 +329,4 @@ async function main() {
   if (result.status === 'BLOCKED') process.exitCode = 1
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) main().catch((error) => { console.error(error.message); process.exitCode = 1 })
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main().catch((error) => { console.error(error.message); process.exitCode = 1 })
