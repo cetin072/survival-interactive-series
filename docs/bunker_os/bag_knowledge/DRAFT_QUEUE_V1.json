@@ -97,6 +97,12 @@
       "state",
       "file",
       "catalogName"
-    ]
+    ],
+    "transactionMode": "GIT_TREE_SINGLE_COMMIT_EXPECTED_HEAD_V1",
+    "orphanRecovery": "CHECK_DRAFT_FILE_BEFORE_WRITING_NEXT",
+    "approvalUnchanged": true,
+    "queueAndDraftOneCommit": true,
+    "recoveryGuide": "docs/bunker_os/bag_knowledge/AUTOMATION_BAG_DRAFT_RECOVERY_V1.md",
+    "lastRecoveryReceipt": "b9cfd32416afd1aea31a7ea106b9a042e39fdd92"
   }
 }
