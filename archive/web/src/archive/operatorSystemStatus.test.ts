@@ -9,6 +9,8 @@ import {
   productionStatusTone,
   shortSha,
   visualStatusTone,
+  visualOperatorSignal,
+  knowledgeOperatorSignal,
   statusLabel,
   blockerLabel,
   decisionLabel,
@@ -124,5 +126,28 @@ describe('Operator system status helpers', () => {
     expect(sourceKindLabel('PUBLIC_READER')).toBe('공개 이야기 기록')
     expect(sessionLabel('SESSION_007')).toBe('7번째 기록 묶음')
     expect(timezoneLabel('Asia/Seoul')).toBe('한국시간')
+  })
+})
+
+describe('Human-readable operator signals', () => {
+  it('distinguishes B active work, real faults, completed work and human judgment', () => {
+    expect(visualOperatorSignal({ status: 'PREPARED' }, true)).toMatchObject({ badge: '이미지 생성 대기', tone: 'running' })
+    expect(visualOperatorSignal({ status: 'PREPARED', stalled_code: 'RENDERER_NOT_CONSUMED' }, true)).toMatchObject({ badge: '실행 지연', tone: 'danger' })
+    expect(visualOperatorSignal({ status: 'BLOCKED', blocker_code: 'JOB_LEASE_EXPIRED' }, true).tone).toBe('danger')
+    expect(visualOperatorSignal({ status: 'HUMAN_REVIEW' }, true).badge).toBe('사람 검토 대기')
+    expect(visualOperatorSignal({ status: 'REVIEW_REJECTED' }, true).tone).toBe('warning')
+    expect(visualOperatorSignal({ status: 'SUCCEEDED' }, true)).toMatchObject({ badge: '등록 완료', tone: 'ok' })
+    expect(visualOperatorSignal({ status: 'SUCCEEDED', blocker_code: 'FINALIZER_PR_CHECKS_TIMEOUT' }, true).tone).toBe('ok')
+    expect(visualOperatorSignal(null, false).tone).toBe('neutral')
+  })
+  it('keeps C review and historical blocked rows out of the current incident count', () => {
+    const healthy = { available: true, machineActive: 0, humanReview: 7, unresolvedBlocked: 0, machineStalled: 0, prepFailed: false }
+    expect(knowledgeOperatorSignal(healthy)).toMatchObject({ badge: '사람 검토 7건', tone: 'warning' })
+    expect(knowledgeOperatorSignal({ ...healthy, humanReview: 0 })).toMatchObject({ badge: '정상 대기', tone: 'ok' })
+    expect(knowledgeOperatorSignal({ ...healthy, machineActive: 1 })).toMatchObject({ badge: '처리 중 1건', tone: 'running' })
+    expect(knowledgeOperatorSignal({ ...healthy, unresolvedBlocked: 2 })).toMatchObject({ badge: '작업 장애 2건', tone: 'danger' })
+    expect(knowledgeOperatorSignal({ ...healthy, machineStalled: 1 })).toMatchObject({ badge: '작업 장애 1건', tone: 'danger' })
+    expect(knowledgeOperatorSignal({ ...healthy, prepFailed: true })).toMatchObject({ badge: '준비 오류', tone: 'danger' })
+    expect(knowledgeOperatorSignal({ ...healthy, available: false })).toMatchObject({ badge: '상태 조회 필요', tone: 'neutral' })
   })
 })
