@@ -49,3 +49,25 @@ test('Public-facing copy is launch-ready, with no review disclaimers or false sh
   assert.ok(!shareRuntime.includes('공유 요청을 마쳤습니다.'));
   assert.ok(!shareRuntime.includes('data-bag-share-preview'));
 });
+
+test('Approved READY backpack is consistently used by landing, app header and PWA splash', async()=>{
+  const appCss=await readFile(new URL('../../web/public/bag-lab/alpha.css',import.meta.url),'utf8');
+  const landingCss=await readFile(new URL('../../web/public/bag/bag.css',import.meta.url),'utf8');
+  const manifest=JSON.parse(await readFile(new URL('../../web/public/bag-lab/manifest.webmanifest',import.meta.url),'utf8'));
+  const logo='/bag-lab/icons/bag-ready-512.webp';
+  assert.ok(landingCss.includes(logo));
+  assert.ok(landingCss.includes('.preview-art .bag-illustration'));
+  assert.ok(appCss.includes(logo));
+  assert.ok(appCss.includes('.top .mini-bag'));
+  assert.equal(manifest.background_color,'#142234');
+  assert.equal(manifest.icons[0].src,'/bag-lab/icons/bag-192.png');
+  assert.deepEqual(manifest.icons.slice(1).map(icon=>[icon.src,icon.sizes,icon.type,icon.purpose]),
+    [[logo,'512x512','image/webp','any'],[logo,'512x512','image/webp','maskable']]);
+  const icon192=await readFile(new URL('../../web/public/bag-lab/icons/bag-192.png',import.meta.url));
+  assert.equal(icon192.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
+  assert.equal(icon192.readUInt32BE(16),192);
+  assert.equal(icon192.readUInt32BE(20),192);
+  const icon512=await readFile(new URL('../../web/public/bag-lab/icons/bag-ready-512.webp',import.meta.url));
+  assert.equal(icon512.toString('ascii',0,4),'RIFF');
+  assert.equal(icon512.toString('ascii',8,12),'WEBP');
+});

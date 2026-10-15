@@ -4,7 +4,7 @@ import {createHash} from 'node:crypto';
 const root=new URL('../web/public/bag-lab/',import.meta.url);
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const files=['alpha.html','alpha.css','manifest.webmanifest',...(await readdir(root)).filter(p=>p.endsWith('.mjs')&&p!=='app.mjs'),
-  'reused/schedule-reminder-service.mjs','icons/bag-192.png','icons/bag-512.png','icons/bag-maskable-512.png'].sort();
+  'reused/schedule-reminder-service.mjs','icons/bag-192.png','icons/bag-ready-512.webp'].sort();
 // app.mjs is demo-only but cached to keep the static module inventory complete.
 // Netlify Preview injects toolbar markup into .html. A generated plain-text source
 // lets the worker verify canonical HTML without disabling site-wide processing.
