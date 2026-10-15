@@ -204,6 +204,15 @@ test('static Knowledge pages reuse WikiTopbar and a working static search link',
   }
 })
 
+test('static Knowledge stylesheet contains no parallel legacy layout or header system', async () => {
+  const css = await readFile(join(root, 'archive/web/public/knowledge/knowledge.css'), 'utf8')
+  assert.doesNotMatch(css, /\\.(?:knowledge-(?:header|nav|shell|hero|grid|card|brand)|article-(?:shell|header|section|card))\\b/)
+  assert.ok(css.includes('.knowledge-share'))
+  assert.ok(css.includes('.related-question'))
+  const shared = await readFile(join(root, 'archive/web/public/knowledge/wikiShell.css'), 'utf8')
+  assert.ok(shared.includes('.wiki-search-static'))
+})
+
 test('canonical index reuses the existing Library UI as static HTML with original SEO and every public guide', async () => {
   const data = await loadKnowledge()
   const published = await publicBriefs(data)
