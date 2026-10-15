@@ -74,3 +74,7 @@ end
 $$;
 
 rollback;
+
+-- Continue the existing isolated B recovery suite; never run fixtures on production.
+\ir ../migrations/20261015103000_illustration_finalizer_reported_timeout_recovery.sql
+\ir illustration_finalizer_reported_timeout_recovery.sql

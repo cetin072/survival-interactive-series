@@ -64,6 +64,7 @@ jobs:
           python3 ../scripts/test_resolve_illustration_handoff_request.py
           python3 ../scripts/test_prepare_site_derivative.py
           python3 ../scripts/test_finalize_illustration_job.py
+          python3 ../scripts/test_illustration_check_scope.py
           node --check ../scripts/run-production-release.mjs
           node --check ../scripts/prepare-illustration-render-job.mjs
           node --check ../scripts/apply-illustration-review-handoff.mjs
