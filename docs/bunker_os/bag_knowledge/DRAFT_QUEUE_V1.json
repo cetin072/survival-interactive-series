@@ -9,53 +9,62 @@
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_01_WATERPROOF_DOCUMENT_POUCH_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "방수 서류 파우치"
     },
     "guide-02": {
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_02_IDENTITY_CARD_COPY_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "신분증 사본"
     },
     "guide-03": {
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_03_FAMILY_EMERGENCY_CONTACT_NOTE_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "가족 비상연락처 메모"
     },
     "guide-04": {
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_04_SMALL_DENOMINATION_CASH_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "소액권 현금"
     },
     "guide-05": {
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_05_IMPORTANT_DOCUMENT_COPIES_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "중요 서류 사본"
     },
     "guide-06": {
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_06_SPARE_KEYS_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "여분 열쇠"
     },
     "guide-43": {
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_43_FLASHLIGHT_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "손전등"
     },
     "guide-07": {
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_07_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "우의"
     },
     "guide-08": {
       "state": "PENDING_INDEPENDENT_REVIEW",
-      "file": "GUIDE_08_DRAFT_V01.md"
+      "file": "GUIDE_08_DRAFT_V01.md",
+      "catalogName": "여벌 속옷"
     }
   },
   "reviewEvidence": {
@@ -78,6 +87,11 @@
     "authoritativeSource": "DRAFT_QUEUE_V1.json on feat/bag-side-item-knowledge-template-v1",
     "storageStatus": "GitHub Draft working branch; Operator inbox is a read-only viewer",
     "publicationRule": "Only USER_APPROVED_FOR_PUBLICATION records in main publication manifest may reach the public frontend; no automatic promotion",
-    "finishCondition": "ALL_49_WRITTEN"
+    "finishCondition": "ALL_49_WRITTEN",
+    "queueDisplayFields": [
+      "state",
+      "file",
+      "catalogName"
+    ]
   }
 }
