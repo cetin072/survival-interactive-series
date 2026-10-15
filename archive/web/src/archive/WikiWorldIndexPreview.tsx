@@ -2,6 +2,7 @@ import { chronicleRegistry, getChronicle, sortChroniclesNewestFirst } from './ch
 import { chaptersForChronicle } from './storyData'
 import { hasPublishedWorldWiki, publishedWorldWikiIndex, type WorldWikiIndexItem } from './worldWikiIndexData'
 import { WikiTopbar } from './WikiTopbar'
+import { siteVisualsFor } from './siteVisual'
 import './wikiShell.css'
 import './survivalDesignLanguage.css'
 import './worldIndexDisclosure.css'
@@ -13,10 +14,18 @@ const storyHref = (id: string) => '/?view=story&chronicle=' + encodeURIComponent
 
 const worldIndexPreviewLimit = 6
 
-function WorldIndexLinks({ items, chronicleId }: { items: readonly WorldWikiIndexItem[]; chronicleId: string }) {
+function IllustrationDot({ hasIllustration }: { hasIllustration: boolean }) {
+  return <span
+    className={'wiki-illustration-dot' + (hasIllustration ? ' has-illustration' : '')}
+    role="img"
+    aria-label={hasIllustration ? '삽화 있음' : '삽화 없음'}
+  />
+}
+
+function WorldIndexLinks({ items, chronicleId, illustratedNodeIds }: { items: readonly WorldWikiIndexItem[]; chronicleId: string; illustratedNodeIds: ReadonlySet<string> }) {
   return <div className="wiki-world-index-list">
     {items.map((item) => <a key={item.id} href={wikiNodeHref(chronicleId, item.id)}>
-      <strong>{item.title}</strong>
+      <strong><IllustrationDot hasIllustration={illustratedNodeIds.has(item.id)} />{item.title}</strong>
       {item.subtitle && <small>{item.subtitle}</small>}
     </a>)}
   </div>
@@ -28,13 +37,16 @@ export function WorldIndexSection({
   countLabel,
   chronicleId = 'C03-AFTERFALL',
   items,
+  illustratedNodeIds,
 }: {
   id: string
   title: string
   countLabel: string
   chronicleId?: string
   items: readonly WorldWikiIndexItem[]
+  illustratedNodeIds?: ReadonlySet<string>
 }) {
+  const visualIds = illustratedNodeIds ?? new Set(siteVisualsFor(chronicleId).map(asset => asset.subject_id))
   const first = items.slice(0, worldIndexPreviewLimit)
   const remaining = items.slice(worldIndexPreviewLimit)
 
@@ -43,13 +55,13 @@ export function WorldIndexSection({
       <h2>{title}</h2>
       <span>{items.length}{countLabel}</span>
     </div>
-    <WorldIndexLinks items={first} chronicleId={chronicleId} />
+    <WorldIndexLinks items={first} chronicleId={chronicleId} illustratedNodeIds={visualIds} />
     {remaining.length > 0 && <details className="wiki-world-index-disclosure">
       <summary>
         <span className="wiki-world-index-more-label">나머지 {remaining.length}{countLabel} 더 보기</span>
         <span className="wiki-world-index-less-label">목록 접기</span>
       </summary>
-      <WorldIndexLinks items={remaining} chronicleId={chronicleId} />
+      <WorldIndexLinks items={remaining} chronicleId={chronicleId} illustratedNodeIds={visualIds} />
     </details>}
   </section>
 }
@@ -79,6 +91,7 @@ export function WikiWorldIndexPreview({ chronicleId = 'C03-AFTERFALL' }: { chron
   const chronicle = getChronicle(chronicleId)
   const world = publishedWorldWikiIndex(chronicleId)
   const chapters = chaptersForChronicle(chronicle.id)
+  const illustratedNodeIds = new Set(siteVisualsFor(chronicleId).map(asset => asset.subject_id))
 
   return <main className="wiki-shell wiki-home-shell">
     <WikiTopbar />
@@ -102,6 +115,10 @@ export function WikiWorldIndexPreview({ chronicleId = 'C03-AFTERFALL' }: { chron
 
       {world?.recent[0]?.notice && <p className="wiki-muted">{world.recent[0].notice}</p>}
       {world ? <>
+        <div className="wiki-illustration-legend" aria-label="삽화 표시 안내">
+          <span><span className="wiki-illustration-dot has-illustration" aria-hidden="true" />삽화 있음</span>
+          <span><span className="wiki-illustration-dot" aria-hidden="true" />삽화 없음</span>
+        </div>
         <div className="wiki-home-columns">
           <div>
             <section className="wiki-home-section" aria-labelledby="world-recent-title">
@@ -112,7 +129,7 @@ export function WikiWorldIndexPreview({ chronicleId = 'C03-AFTERFALL' }: { chron
               <div className="wiki-change-list">
                 {world.recent.map((document) => <a key={document.id} href={wikiNodeHref(chronicleId, document.id)}>
                   <span className="wiki-type-badge">{document.typeLabel}</span>
-                  <strong>{document.title}</strong>
+                  <strong><IllustrationDot hasIllustration={illustratedNodeIds.has(document.id)} />{document.title}</strong>
                   <small>{document.subtitle}</small>
                   <time>{document.anchor.gameTime}</time>
                 </a>)}
@@ -128,7 +145,7 @@ export function WikiWorldIndexPreview({ chronicleId = 'C03-AFTERFALL' }: { chron
                 {world.categories.map((category) => <section key={category.id}>
                   <strong>{category.label}</strong><b>{category.items.length}</b>
                   <div>{category.items.slice(0, 6).map((item) =>
-                    <a key={item.id} href={wikiNodeHref(chronicleId, item.id)}>{item.title}</a>)}</div>
+                    <a key={item.id} href={wikiNodeHref(chronicleId, item.id)}><IllustrationDot hasIllustration={illustratedNodeIds.has(item.id)} />{item.title}</a>)}</div>
                   <a className="wiki-category-more" href={'#' + category.id}>{category.label} 전체보기 →</a>
                 </section>)}
               </div>
@@ -158,6 +175,7 @@ export function WikiWorldIndexPreview({ chronicleId = 'C03-AFTERFALL' }: { chron
           countLabel={category.counter}
           items={category.items}
           chronicleId={chronicleId}
+          illustratedNodeIds={illustratedNodeIds}
         />)}
       </> : <>
         <section className="wiki-home-section" aria-labelledby="world-unavailable-title">

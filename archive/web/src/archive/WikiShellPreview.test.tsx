@@ -6,6 +6,7 @@ import { wikiCharacterIndex, wikiEventIndex, wikiLocationIndex } from './wikiDoc
 import { archiveRouteUrl, parseArchiveRoute } from './readerNavigation'
 import { hasPublishedWorldWiki } from './worldWikiIndexData'
 import { WorldIndexSection } from './WikiWorldIndexPreview'
+import { siteVisualsFor } from './siteVisual'
 
 describe('Wiki staged public structure', () => {
   it('uses the Wiki home as the default preview entrance', () => {
@@ -57,6 +58,38 @@ describe('Wiki staged public structure', () => {
       expect(markup).toContain(item.title)
       expect(markup).toContain('node=' + item.id)
     }
+  })
+
+  it('marks public illustration availability beside titles without loading images or leaking across Chronicles', () => {
+    const listed = [...wikiCharacterIndex, ...wikiLocationIndex, ...wikiEventIndex]
+    const published = new Set(siteVisualsFor('C03-AFTERFALL').map(asset => asset.subject_id))
+    const illustrated = listed.find(item => published.has(item.id))
+    const missing = listed.find(item => !published.has(item.id))
+    expect(illustrated).toBeDefined()
+    expect(missing).toBeDefined()
+
+    const markup = renderToStaticMarkup(createElement(WikiShellPreview, {
+      page: 'world', chronicleId: 'C03-AFTERFALL',
+    }))
+    const itemLink = (id: string, html: string, chronicleId = 'C03-AFTERFALL') =>
+      html.split('node=' + id + '&amp;chronicle=' + chronicleId + '"').at(-1)?.split('</a>')[0] ?? ''
+    expect(itemLink(illustrated!.id, markup)).toContain('aria-label="삽화 있음"')
+    expect(itemLink(illustrated!.id, markup)).toContain('wiki-illustration-dot has-illustration')
+    expect(itemLink(missing!.id, markup)).toContain('aria-label="삽화 없음"')
+    expect(itemLink(missing!.id, markup)).not.toContain('has-illustration')
+    expect(markup).toContain('삽화 표시 안내')
+    expect(markup).toContain('삽화 있음')
+    expect(markup).toContain('삽화 없음')
+    expect(markup).not.toContain('<img')
+
+    // C02 has its own Wiki documents and must never inherit a C03 image by node ID.
+    const otherChronicle = 'C02-STRONGHOLD'
+    const other = renderToStaticMarkup(createElement(WikiShellPreview, {
+      page: 'world', chronicleId: otherChronicle,
+    }))
+    const otherPublished = new Set(siteVisualsFor(otherChronicle).map(asset => asset.subject_id))
+    const expected = otherPublished.has('char-seojin') ? '삽화 있음' : '삽화 없음'
+    expect(itemLink('char-seojin', other, otherChronicle)).toContain('aria-label="' + expected + '"')
   })
 
   it('keeps the related Chronicle list in newest-first order, not the original registry order', () => {

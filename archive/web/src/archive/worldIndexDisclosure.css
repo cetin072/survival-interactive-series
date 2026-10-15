@@ -47,3 +47,37 @@
   margin-top: 5px;
 }
 
+
+/* World Wiki illustration availability: CSS only, no thumbnail downloads. */
+.wiki-illustration-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  box-sizing: border-box;
+  margin-right: 7px;
+  border: 1.5px solid #929ba0;
+  border-radius: 50%;
+  background: transparent;
+  vertical-align: 1px;
+}
+.wiki-illustration-dot.has-illustration {
+  border-color: #b96314;
+  background: #e78928;
+}
+.wiki-illustration-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin: 4px 4px 12px;
+  color: #60686d;
+  font-size: 11px;
+}
+.wiki-illustration-legend > span {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.wiki-illustration-legend .wiki-illustration-dot {
+  margin-right: 5px;
+}
