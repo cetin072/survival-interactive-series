@@ -182,21 +182,35 @@ test('robots and sitemap discover exactly the approved public pages without bloc
   assert.ok(config.includes('X-Robots-Tag = "noindex, nofollow, noarchive"'))
 })
 
-test('static Knowledge menu matches the existing public navigation and exposes a working home search link', async () => {
+test('static Knowledge pages reuse WikiTopbar and a working static search link', async () => {
   const data = await loadKnowledge()
   const published = await publicBriefs(data)
-  const labels = ['생존 지식', '자료실', '생존 이야기', '세계관 위키', '생존가방']
-  assert.deepEqual(renderer.navigation.map((item) => item.label), labels)
+  assert.deepEqual(renderer.navigation.map((item) => item.label),
+    ['생존 지식', '자료실', '생존 이야기', '세계관 위키', '생존가방'])
+  const expected = renderer.renderStaticTopbar()
   for (const path of ['index.html', ...published.map((brief) => brief.slug + '/index.html')]) {
     const page = await readFile(join(root, 'archive/web/public/knowledge', path), 'utf8')
-    const menu = page.match(/<nav class="knowledge-nav"[^>]*>(.*?)<\/nav>/s)[1]
-    const links = [...menu.matchAll(/<a href="([^"]+)"[^>]*>([^<]+)<\/a>/g)]
-    assert.deepEqual(links.slice(0, renderer.navigation.length).map((item) => ({ href: item[1], label: item[2] })), renderer.navigation.map((item) => ({ href: esc(item.href), label: item.label })))
+    assert.equal([...page.matchAll(/class="wiki-topbar"/g)].length, 1, path)
+    assert.ok(page.includes(expected), path)
+    assert.doesNotMatch(page, /class="knowledge-header"|class="knowledge-nav"|class="knowledge-brand"/)
+    const menu = page.split('<nav aria-label="공용 메뉴">')[1]?.split('</nav>')[0]
+    assert.ok(menu, path)
+    const links = [...menu.matchAll(new RegExp('<a href="([^"]+)"[^>]*>([^<]+)</a>', 'g'))]
+    assert.deepEqual(links.map((item) => ({ href: item[1], label: item[2] })),
+      renderer.navigation.map((item) => ({ href: esc(item.href), label: item.label })))
     assert.ok(menu.includes('href="/knowledge/" aria-current="page"'))
-    assert.ok(menu.includes('href="/#site-search">검색</a>'))
-    assert.ok(page.includes('<span>생존 지식과 이야기</span>'))
-    assert.doesNotMatch(menu, /<input|<form/)
+    assert.ok(page.includes('<a class="wiki-search-static" href="/#site-search">생존 지식·자료·작품 검색 →</a>'))
+    assert.doesNotMatch(page, /<form[^>]*id="site-search"/)
   }
+})
+
+test('static Knowledge stylesheet contains no parallel legacy layout or header system', async () => {
+  const css = await readFile(join(root, 'archive/web/public/knowledge/knowledge.css'), 'utf8')
+  for (const legacy of ['.knowledge-header', '.knowledge-nav', '.knowledge-shell', '.knowledge-hero', '.knowledge-grid', '.knowledge-card', '.knowledge-brand', '.article-shell', '.article-header', '.article-section', '.article-card']) assert.ok(!css.includes(legacy), legacy)
+  assert.ok(css.includes('.knowledge-share'))
+  assert.ok(css.includes('.related-question'))
+  const shared = await readFile(join(root, 'archive/web/public/knowledge/wikiShell.css'), 'utf8')
+  assert.ok(shared.includes('.wiki-search-static'))
 })
 
 test('canonical index reuses the existing Library UI as static HTML with original SEO and every public guide', async () => {
@@ -205,7 +219,7 @@ test('canonical index reuses the existing Library UI as static HTML with origina
   const projections = published.map((brief) => publicBriefData(brief, data))
   const page = await readFile(join(root, 'archive/web/public/knowledge/index.html'), 'utf8')
   assert.ok(page.includes(renderer.renderLibrary(projections)))
-  assert.equal([...page.matchAll(/class="wiki-topbar"/g)].length, 0)
+  assert.equal([...page.matchAll(/class="wiki-topbar"/g)].length, 1)
   assert.ok(page.includes('class="knowledge-library-list"'))
   assert.ok(page.includes('<a href="/bag/" class="nav-bag-cta">생존가방</a>'))
   assert.ok(page.includes('href="/knowledge/wikiShell.css"'))

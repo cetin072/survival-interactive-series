@@ -336,13 +336,13 @@ def audit_world_wiki(page, base: str, width: int, screenshots: str | None):
         box = item.bounding_box()
         assert box and box['x'] >= -1 and box['x'] + box['width'] <= width + 1, 'Menu clipped'
     capture('lobby')
-    # Static Knowledge must use its real HTML navigation, not a React search decoration.
+    # Static Knowledge uses the same header as Wiki, rendered into first-response HTML.
     page.goto(base.rstrip('/') + '/knowledge/emergency-supplies-inventory/')
-    tap(page.locator('.knowledge-nav').get_by_role('link', name='세계관 위키', exact=True), mobile)
+    tap(page.locator('.wiki-topbar nav').get_by_role('link', name='세계관 위키', exact=True), mobile)
     expect(page.locator('.world-wiki-card')).to_have_count(len(BOOKS))
     tap(page.locator('.wiki-topbar nav').get_by_role('link', name='생존 지식', exact=True), mobile)
-    expect(page.locator('.knowledge-nav')).to_be_visible()
-    tap(page.locator('.knowledge-nav').get_by_role('link', name='세계관 위키', exact=True), mobile)
+    expect(page.locator('.wiki-topbar nav')).to_be_visible()
+    tap(page.locator('.wiki-topbar nav').get_by_role('link', name='세계관 위키', exact=True), mobile)
 
     for chronicle in BOOKS:
         wiki_link = page.locator(f'.world-wiki-card a[href*="page=world&chronicle={chronicle}"]')
