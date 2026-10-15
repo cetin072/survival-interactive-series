@@ -261,7 +261,23 @@
       "width": 341,
       "height": 512,
       "mime_type": "image/png"
+    },
+    {
+      "point_id": "point-a5d4f9ae2c78a328f460c8a1f15d301fde38dcfc1aaae6a6f836203290f17bd3",
+      "generation_key": "generation-7be8bf3ba920aac5cf1589bf83c79e41b708a3f88de484c9187b87263d9fb649",
+      "subject_id": "char-hyerin",
+      "source_sha256": "171035a217e058eed0500941c7e5f3eba1e75a479f64f5a8178dc55b583961f9",
+      "storage_bucket": "survival-archive-originals",
+      "storage_object_path": "AFTERFALL/point-a5d4f9ae2c78a328f460c8a1f15d301fde38dcfc1aaae6a6f836203290f17bd3/generation-7be8bf3ba920aac5cf1589bf83c79e41b708a3f88de484c9187b87263d9fb649/171035a217e058eed0500941c7e5f3eba1e75a479f64f5a8178dc55b583961f9.png",
+      "registry_asset_id": "AF-CHAR-A5D4F9AE2C78A328F460C8A1",
+      "derivative_version": "site-png-fit-512-v2",
+      "public_path": "/visual-assets/6903c751d4d279a12724593ab4e6c3b350369cc429dcf25c0cf59d3a1b925fcc.png",
+      "sha256": "6903c751d4d279a12724593ab4e6c3b350369cc429dcf25c0cf59d3a1b925fcc",
+      "bytes": 123715,
+      "width": 341,
+      "height": 512,
+      "mime_type": "image/png"
     }
   ],
-  "content_sha256": "96d4483bad459e4b5405247c7f8e0de774ec68bb3de44d7f458b24832555b9db"
+  "content_sha256": "f996a685c9b294da6cab187a6017c7ded95314c74cf7f51eac326741070f8524"
 }
