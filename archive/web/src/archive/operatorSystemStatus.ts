@@ -74,6 +74,103 @@ export function visualStatusTone(status?: string | null) {
   return 'neutral'
 }
 
+
+export type OperatorSignalTone = 'ok' | 'running' | 'warning' | 'danger' | 'neutral'
+export type OperatorSignal = { badge: string; tone: OperatorSignalTone; summary: string; next: string }
+
+type VisualSignalJob = {
+  status?: string | null
+  blocker_code?: string | null
+  stalled_code?: string | null
+}
+
+// Only the current job determines the current B signal. A completed job may
+// retain historical errors without needing fresh repair.
+export function visualOperatorSignal(job: VisualSignalJob | null | undefined, available: boolean): OperatorSignal {
+  if (!available) return {
+    badge: '상태 조회 필요', tone: 'neutral',
+    summary: 'B 작업 상태를 조회하지 못했습니다.',
+    next: '상태를 다시 조회하고 DB 조회 오류를 확인하세요.',
+  }
+  if (!job?.status) return {
+    badge: '실행 이력 없음', tone: 'neutral',
+    summary: '최근 이미지 작업 기록이 없습니다.',
+    next: '다음 정규 작업 준비를 기다리세요.',
+  }
+  if (job.status === 'BLOCKED') return {
+    badge: '복구 필요', tone: 'danger',
+    summary: '현재 작업이 차단됐습니다. 안전한 복구가 필요합니다.',
+    next: '아래 문제 코드와 단계를 확인하고 기존 이미지·검수 이력을 보존하세요.',
+  }
+  if (job.stalled_code) return {
+    badge: '실행 지연', tone: 'danger',
+    summary: '현재 작업의 다음 단계가 지정된 시간 안에 진행되지 않았습니다.',
+    next: '작업 전달과 예약 실행 결과를 확인하세요. 중복 생성은 하지 마세요.',
+  }
+  if (job.status === 'HUMAN_REVIEW') return {
+    badge: '사람 검토 대기', tone: 'warning',
+    summary: '품질 판단을 기다리고 있으며 자동 등록하지 않습니다.',
+    next: '기존 검수 결과와 원본을 확인하세요.',
+  }
+  if (job.status === 'REVIEW_REJECTED') return {
+    badge: '품질 검수 반려', tone: 'warning',
+    summary: '품질 기준에 맞지 않아 등록하지 않았습니다. 자동화 장애는 아닙니다.',
+    next: '기존 후보 선정·재시도 정책에 따라 다음 작업을 기다리세요.',
+  }
+  if (job.status === 'SUCCEEDED') return {
+    badge: '등록 완료', tone: 'ok',
+    summary: '최근 이미지의 독립 검수와 사이트 자산 등록이 완료됐습니다.',
+    next: '정기 Production 배포에서 실제 공개 반영 여부를 확인하세요.',
+  }
+  if (['PREPARED', 'INGESTING', 'READY_FOR_REVIEW', 'REVIEW_PASS_STAGED', 'FINALIZE_QUEUED', 'FINALIZING'].includes(job.status)) return {
+    badge: job.status === 'PREPARED' ? '이미지 생성 대기' : '처리 중',
+    tone: 'running',
+    summary: '이미지 작업이 진행 중입니다. 완료 전 성공으로 표시하지 않습니다.',
+    next: '다음 예약 실행과 DB 상태 전환을 확인하세요.',
+  }
+  return { badge: '상태 확인 필요', tone: 'neutral', summary: '해석되지 않은 작업 상태입니다.', next: '기술 상세의 상태 코드를 확인하세요.' }
+}
+
+type KnowledgeSignalInput = {
+  available: boolean
+  machineActive: number
+  humanReview: number
+  unresolvedBlocked: number
+  machineStalled: number
+  prepFailed: boolean
+}
+
+// unresolvedBlocked excludes historical BLOCKED jobs resolved by publication;
+// HUMAN_REVIEW is not a machine slot and does not imply an outage.
+export function knowledgeOperatorSignal(input: KnowledgeSignalInput): OperatorSignal {
+  if (!input.available) return {
+    badge: '상태 조회 필요', tone: 'neutral',
+    summary: '현재 작업·사람 검토·복구 대상 수를 확인할 수 없습니다.',
+    next: '상태를 다시 조회하세요. 알 수 없는 수치를 0건으로 보지 않습니다.',
+  }
+  const errors = input.unresolvedBlocked + input.machineStalled
+  if (errors > 0 || input.prepFailed) return {
+    badge: errors ? `작업 장애 ${errors}건` : '준비 오류', tone: 'danger',
+    summary: '현재 조치가 필요한 기계 처리 오류가 있습니다. 과거에 해결된 실패는 제외됩니다.',
+    next: '문제 코드와 실패 단계부터 확인하고 기존 원고를 보존해 복구하세요.',
+  }
+  if (input.machineActive > 0) return {
+    badge: `처리 중 ${input.machineActive}건`, tone: 'running',
+    summary: '자동 집필 또는 게시 준비가 진행 중입니다.',
+    next: '현재 단계 완료를 확인하세요. 사람 검토 원고는 별도로 보관됩니다.',
+  }
+  if (input.humanReview > 0) return {
+    badge: `사람 검토 ${input.humanReview}건`, tone: 'warning',
+    summary: '자동 처리는 막히지 않았고 원고는 검토함에 안전하게 보관되어 있습니다.',
+    next: '시간이 될 때 검토하세요. 그동안 새 원고 제작은 계속될 수 있습니다.',
+  }
+  return {
+    badge: '정상 대기', tone: 'ok',
+    summary: '현재 복구할 작업 오류나 진행 중인 원고가 없습니다.',
+    next: '다음 정규 준비 작업 또는 새 공개 원문을 기다리세요.',
+  }
+}
+
 export function productionStatusTone(context?: string | null) {
   return context === 'production' ? 'ok' : 'neutral'
 }
@@ -225,6 +322,12 @@ const blockerKorean: Record<string, string> = {
   SEMANTIC_OVERLAP_NO_DISTINCT_LOW_RISK_QUESTION: '기존 글과 겹치지 않는 새 지식 주제를 찾지 못했습니다.',
   KNOWLEDGE_PR_STALLED: '게시 전 기계 검증이 오래 끝나지 않고 있습니다.',
   FINALIZER_STALLED: '게시 반영 작업이 오래 끝나지 않고 있습니다.',
+  JOB_LEASE_EXPIRED: '이미지 생성 작업이 기한 내 완료되지 않았습니다.',
+  PREVIOUS_FINALIZER_RECOVERY: '이전 검수 완료 이미지의 최종 등록을 복구 중이었습니다.',
+  FINALIZER_PR_CHECKS_TIMEOUT: '최종 등록 PR의 검증 시간이 초과됐습니다.',
+  FINALIZER_PR_CHECKS_NOT_REPORTED_TIMEOUT: '최종 등록 PR의 검사 결과가 기한 내 보고되지 않았습니다.',
+  WIKI_CITATION_ID_INVALID: '출처 식별자가 위키 규칙에 맞지 않았습니다.',
+  WIKI_NEW_NAME_NOT_IN_EVIDENCE: '새 인물·장소 이름이 인용 근거와 정확히 일치하지 않았습니다.',
   SEMANTIC_WORKER_NOT_CONSUMED: '준비된 지식 작업이 오래 시작되지 않았습니다.',
   SEMANTIC_DUPLICATE: '기존 글과 내용이 겹쳐 새 글을 만들지 않았습니다.',
   KNOWLEDGE_CONTRACT: '지식 글 형식 검증에서 문제가 발견됐습니다.',
