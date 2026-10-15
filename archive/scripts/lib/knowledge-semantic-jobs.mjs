@@ -116,6 +116,7 @@ export function buildSemanticContext({ jobType, source, target, existingKnowledg
       semantic_qa_status: ['PASS', 'REVIEW', 'HOLD'],
       date_format: 'YYYY-MM-DD',
       unpublished_published_at: null,
+      evidence_arrays: ['claims', 'conflicts', 'unknowns', 'risk_notes'],
       auto_evidence: 'AUTO_LOW_RISK requires no conflicts/unknowns, copyright_status=CLEAR and a verified source-status enum. Otherwise submit HUMAN_REVIEW; never erase uncertainty to pass a gate.',
     },
     topics: existingKnowledge.topics.map(({ id, title }) => ({ id, title })),
@@ -208,6 +209,14 @@ export function validateSemanticResult(job, result) {
   return { decision: result.decision, briefId: brief.id, candidateId: candidate.id, topicId: brief.topic_id }
 }
 
+/** Lossless list spelling on a copy; never discard or reinterpret a risk note. */
+export function stageEvidenceRiskNotes(evidence) {
+  const value = structuredClone(evidence)
+  const wrapped = typeof value.risk_notes === 'string' && value.risk_notes.trim().length > 0
+  if (wrapped) value.risk_notes = [value.risk_notes]
+  return { evidence: value, risk_notes_wrapped: wrapped }
+}
+
 export async function applySemanticPackage({ root, job, result, reservation = null, now = new Date().toISOString() }) {
   validateSemanticResult(job, result)
   fail(['BRIEF_READY', 'HUMAN_REVIEW'].includes(result.decision), 'SEMANTIC_PACKAGE_DECISION_REQUIRED')
@@ -241,12 +250,16 @@ export async function applySemanticPackage({ root, job, result, reservation = nu
   const staged = stageSemanticBrief({ brief, evidence, decision: result.decision, config: data.config, nowDate })
   const stagedBrief = staged.brief
   const stagedCandidate = { ...candidate }
-  const stagedEvidence = { ...evidence }
-  if (staged.projection) stagedCandidate.schema_projection = {
+  const evidenceProjection = stageEvidenceRiskNotes(evidence)
+  const stagedEvidence = evidenceProjection.evidence
+  if (staged.projection || evidenceProjection.risk_notes_wrapped) stagedCandidate.schema_projection = {
+    version: 'knowledge-draft-schema-projection-v1',
     ...staged.projection, job_id: job.job_id,
+    risk_notes_wrapped: evidenceProjection.risk_notes_wrapped,
     semantic_result_sha256: job.semantic_result_sha256 ?? null,
     source_sha256: job.source_sha256, policy_sha256: job.policy_sha256 ?? null,
     projected_brief_sha256: sha(Buffer.from(JSON.stringify(stagedBrief))),
+    projected_evidence_sha256: sha(Buffer.from(JSON.stringify(stagedEvidence))),
   }
 
   await writeFile(join(root, 'knowledge/content/topics.json'), `${JSON.stringify(topics, null, 2)}\n`)
