@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import { validateKnowledge, stageSemanticBrief, publicationEligibility } from './knowledge-content.mjs'
 import { promoteBriefRecord, promoteHumanApprovedBriefRecord } from './knowledge-publish.mjs'
 import { runSemanticFinalizer, reconcilePullRequest } from '../knowledge-semantic-finalize.mjs'
+import { stageEvidenceRiskNotes } from './knowledge-semantic-jobs.mjs'
 
 const config = { publication_mode: 'AUTO_LOW_RISK', auto_publish_enabled: true, site_origin: 'https://example.com' }
 function fixture() {
@@ -89,6 +90,40 @@ test('unknowns, conflicts and unverified rights escalate auto submissions to hum
   assert.equal(staged.brief.publication_policy, 'AUTO_LOW_RISK')
 })
 
+test('historical C draft shapes retain rights, unknowns and prose risk notes without auto publication', async () => {
+  for (const row of [
+    { decision: 'HUMAN_REVIEW', risk: 'HIGH', domain: 'OTHER_SEVERE_HARM',
+      policy: 'HUMAN_APPROVED', qa: 'NEEDS_HUMAN_REVIEW',
+      rights: 'PUBLIC_READER_PROVENANCE_ONLY', source: 'NARRATIVE_PROVENANCE_ONLY' },
+    { decision: 'BRIEF_READY', risk: 'LOW', domain: 'COMMUNICATION',
+      policy: 'AUTO_LOW_RISK', qa: 'PASS',
+      rights: 'PUBLIC_OFFICIAL_SOURCE_SUMMARY', source: 'NARRATIVE_PROVENANCE_ONLY' },
+  ]) {
+    const original = fixture()
+    Object.assign(original.brief, { risk_level: row.risk, risk_domains: [row.domain],
+      publication_policy: row.policy, semantic_qa_status: row.qa })
+    Object.assign(original.evidence, {
+      unknowns: ['현지 관할 기준과 현장 확인은 미완료'],
+      risk_notes: '안전 경계를 요약하지 말고 원문대로 보존한다.',
+      copyright_status: row.rights, story_source_status: row.source,
+    })
+    const before = JSON.stringify(original)
+    const staged = stageSemanticBrief({ ...original, decision: row.decision, config, nowDate: '2026-10-15' })
+    const normalized = stageEvidenceRiskNotes(original.evidence)
+    assert.equal(staged.requires_human_review, true)
+    assert.equal(staged.brief.publication_policy, 'HUMAN_APPROVED')
+    assert.equal(staged.brief.semantic_qa_status, 'REVIEW')
+    assert.equal(staged.brief.risk_level, row.risk)
+    assert.equal(staged.brief.published_at, undefined)
+    assert.deepEqual(normalized.evidence.risk_notes, ['안전 경계를 요약하지 말고 원문대로 보존한다.'])
+    assert.deepEqual(normalized.evidence.unknowns, original.evidence.unknowns)
+    assert.equal(normalized.evidence.copyright_status, row.rights)
+    assert.notEqual(publicationEligibility(staged.brief, normalized.evidence, config), 'AUTO_PUBLISH_ELIGIBLE')
+    assert.equal(await validateKnowledge(dataFor({ brief: staged.brief, evidence: normalized.evidence })), true)
+    assert.throws(() => promoteBriefRecord(staged.brief, '2026-10-16'))
+    assert.equal(JSON.stringify(original), before)
+  }
+})
 function jobFixture() {
   const f = fixture(), job_id = '287c20fb-7ad2-41e4-b9be-12426675d234'
   const source_ref = 'archive/content/transcripts/C03-AFTERFALL/S03/SESSION_001/SOURCE_MANIFEST.json'
