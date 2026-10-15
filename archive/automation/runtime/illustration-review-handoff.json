@@ -1,17 +1,17 @@
 {
   "version": "illustration-review-handoff-v1",
-  "job_id": "illustration-char-hyerin-7be8bf3ba920-20261014-38532069997",
-  "main_sha": "55ddefb4eadd345272269bc5fc9006ed6d5f31b0",
-  "point_id": "point-a5d4f9ae2c78a328f460c8a1f15d301fde38dcfc1aaae6a6f836203290f17bd3",
-  "generation_key": "generation-7be8bf3ba920aac5cf1589bf83c79e41b708a3f88de484c9187b87263d9fb649",
-  "subject_id": "char-hyerin",
-  "prompt_sha256": "f4a382dd5b53357b9ddda73ff279fc438168030ef8e8bb9a7da44805867c95f6",
-  "review_context_sha256": "377df782398caafd075d921c90b8f0fe1a0d17dc7a3b07bb568172ddf3fb9349",
+  "job_id": "illustration-char-sehoon-f4a64e9ee9c7-20261015-38722713342",
+  "main_sha": "2e78f23b52222a425654d59739cc4b6e0110ffc1",
+  "point_id": "point-d30f0212dfc1760af238951d2dc58018e9f1893baef08fa122ea917a72505dab",
+  "generation_key": "generation-f4a64e9ee9c754f2070f4dcebc1f77fe06a6bdd618a78d7413e1c1ef3b60f197",
+  "subject_id": "char-sehoon",
+  "prompt_sha256": "cd5232ef9783d481dd03e36a4531a8cba0dbb5bedb34031bb06ba8c26ff38e68",
+  "review_context_sha256": "ef38ce490144a9bad1fa6989a92dce7277460def7aacd0c82054f0c3bab21bf8",
   "source_library_path": "/IMAGE-RENDER/output/current.png",
-  "source_library_file_id": "file_0000000096008243b95d6fd6526ed171",
+  "source_library_file_id": "file_0000000015bc8230a6fc2eb83c45923a",
   "decision": "PASS",
   "review_provider": "native_chatgpt_vision",
-  "review_summary": "Matches the bound portrait: one Korean woman in her early forties with a slim build, short tied-back black hair, dark navy scrubs, and an old analog watch on her left wrist. Her relaxed pose and expression, simple contemporary Korean interior, cool blue-gray palette, realistic proportions, and painterly texture match the brief. No extra figures, readable text, weapons, gore, fantasy, or invented identifying features appear.",
+  "review_summary": "40대 중반의 마른 근육질 한국 남성 한 명이 짧은 검은 머리와 넓어진 이마, 도드라진 광대·깊은 눈가, 사용감 있는 회색 작업점퍼를 착용하고 자연스럽게 서 있다. 인물 기준 왼손 검지의 오래된 흉터가 보이며, 단순한 현대 한국 실내 배경·cool blue-gray 저채도·회화적 반실사와 사실적 비율이 brief에 부합한다. 글자, 추가 인물, 무기, 유혈, 판타지 요소는 없다.",
   "rejection_codes": [],
-  "created_at": "2026-10-14T10:27:16.282Z"
+  "created_at": "2026-10-15T13:26:20.481Z"
 }
