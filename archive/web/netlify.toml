@@ -58,11 +58,14 @@ command = "npm run build:verified"
   status = 200
   force = true
 
+# Narrow operator-only read access to the GitHub Contents API for the BAG draft inbox.
+# Public routes retain the existing CSP and are not allowed this connection.
 [[headers]]
   for = "/operator*"
 
   [headers.values]
     X-Robots-Tag = "noindex, nofollow, noarchive"
+    Content-Security-Policy = "default-src 'self'; connect-src 'self' https://jgsxpdflgkqroecfjzxq.supabase.co https://api.github.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
 
 [[headers]]
   for = "/index.html"
