@@ -1,7 +1,7 @@
 {
   "anchor": {
-    "game_time": "2027-11-23 15:42",
-    "save_version": 290
+    "game_time": "2027-11-23 16:17",
+    "save_version": 291
   },
   "articles": [
     {
@@ -90,7 +90,8 @@
     {
       "facts": {
         "겨울역할": "물류·기록 지원",
-        "상태": "ACTIVE"
+        "상태": "ACTIVE",
+        "연료거래검증_20271123": "연료장 독립 원본이 없는 길드 사본 대조의 한계를 지적하고 장기 정산주기를 경계했으며, 길드 일반창고와 사용권만 있는 위험물 부지의 연료 보관 제약을 확인했다."
       },
       "id": "char-eunchae",
       "label": "최은채",
@@ -123,6 +124,20 @@
           "label": "권리 확인과 협상 준비에 참여",
           "other_id": "event-wiki-bf4768814dd7f1559d9f7496",
           "relation_id": "rel-379921507d951549980d75a5036d96ce51a37ba682e79a003f7dc807ab14e1eb"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "서쪽길과 공공 급수시설 신청량 표로 정리",
+          "other_id": "event-wiki-d25d093314840e1906b712a2",
+          "relation_id": "rel-427e59189b1e1c1e5b59dd5631cbab8830f4a3b64fa3f32fce8488ace0d23884"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "유상보관 조건과 길드 저장능력 제약 확인",
+          "other_id": "event-wiki-fd781fe65ad211afb946c343",
+          "relation_id": "rel-60ad008ca02923e8126f1624feb3e2c9cab787023c1ee97baa476f38100a76ba"
         },
         {
           "direction": "outgoing",
@@ -212,6 +227,13 @@
           "relation_id": "rel-4db0209a3c3e97ba7b8eb6d1b24d9d73f587c113b4639f4699e1b624656fee0d"
         },
         {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "공공 급수지점 두 곳의 대체수단과 장기정전 위험 설명",
+          "other_id": "event-wiki-d25d093314840e1906b712a2",
+          "relation_id": "rel-4f53d3f44b7689e5bf300be393452e40fe851fe5b49a0cd03602d3ef089dc6b8"
+        },
+        {
           "direction": "incoming",
           "kind": "published_relation",
           "label": "분산 관측",
@@ -248,6 +270,7 @@
         "mention-1d9c5ecb37adc000c28d096f15d0a675bdcaa32fd5d2f7b9ac5a144d338e7387",
         "mention-217bac3e35ea823da135090aff8ec22064cee740cff8c263792b826471f6bad8",
         "mention-2454533d504aba930f85f2515aca3b92b9ca79b5df43a3f46dccc3fc300ed409",
+        "mention-2e9db848bc7cd8b3d7a647a68e4d4c6cf1cf524e7197c3b6a69ebf6fb8a0c337",
         "mention-3c65ef0f55cdaf89eeed4e895233d2cd947832380992a44ea7e6400b28b976c9",
         "mention-4155b692c6d45d0aec54c1242183d951748e8b2b0e6458abfcce7aec5ea64741",
         "mention-4ed0782eb6d4567462737afafec7edff5d32e35ccc4ae1e68f57a67155973b2d",
@@ -458,7 +481,8 @@
     {
       "facts": {
         "상태": "ACTIVE",
-        "소속": "CORE_FOUR"
+        "소속": "CORE_FOUR",
+        "연료협의_20271123": "연료장 반출 원본과 길드 장부가 서로 독립적으로 검증되는 방식과 길드 자체 구매에도 동일 규칙을 적용하는 안이 채택됐다. 길드 구매 수량을 정하기 전 서쪽길·공공 급수시설의 요구와 유종·보관조건을 먼저 확인했다."
       },
       "id": "char-jinwoo",
       "label": "서진우",
@@ -529,6 +553,13 @@
         },
         {
           "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "길드 수량 산정 전 타 신청자의 요구량·사유 청취",
+          "other_id": "event-wiki-d25d093314840e1906b712a2",
+          "relation_id": "rel-72e7966a64cedd6c3066d82a0299287792a3fe352d26c9ac3533a8ef8e0aba86"
+        },
+        {
+          "direction": "outgoing",
           "kind": "published_relation",
           "label": "통행·의료 접점",
           "other_id": "char-jisu",
@@ -582,6 +613,13 @@
           "label": "핵심 동료",
           "other_id": "char-seojin",
           "relation_id": "rel-b808579e2bd7719dc687412bc80373f7063244c09d0bd20d33c1c5d990ebcec5"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "길드 구매 수량 확정 전 유종·보관조건 확인 요청",
+          "other_id": "event-wiki-fd781fe65ad211afb946c343",
+          "relation_id": "rel-bc51f460b66d063edc5ac7d376eb719a05b3297f41abccc75017842c9bbb6bd7"
         },
         {
           "direction": "outgoing",
@@ -1131,7 +1169,8 @@
     },
     {
       "facts": {
-        "상태": "ACTIVE"
+        "상태": "ACTIVE",
+        "서쪽길연료신청_20271123": "서쪽길 관리조가 겨울 연료 총 3,600L(초기 1,200L, 추가 예비 2,400L)를 요청했다고 밝히고 작업거리와 운행시간 기록을 약속했다. 배분받지 못한 구간까지 길 개방을 보장하지는 않았다."
       },
       "id": "char-seongho",
       "label": "김성호",
@@ -1147,6 +1186,13 @@
         {
           "direction": "outgoing",
           "kind": "participated_in",
+          "label": "서쪽길 관리조 연료 3,600L 요청 및 단계별 필요량 제시",
+          "other_id": "event-wiki-d25d093314840e1906b712a2",
+          "relation_id": "rel-9057fd7a3ff29cd725f47f8463e8430092959a7e6cd39842ac2f4e19784bba65"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
           "label": "도로 작업비 별도 정산 제안",
           "other_id": "event-wiki-eb0397c1607ee222060dcaca",
           "relation_id": "rel-933fd11864ec7551ea0520f495c2824aa0f239f736a2e16c33d254cf9c416f34"
@@ -1156,6 +1202,7 @@
         "mention-09c02eaee3b5384b396fb591dcf65ac826d78717b0526a7d91a8bd7e7d5f6ef3",
         "mention-17955dac4d5b35823331f37f2aa10f9e457cfc55f1adb277240b0d335a160f7c",
         "mention-19844aa2e81ae82dc3cffb931459483e8a92fe8b4ac1b6589aeb850e298faf11",
+        "mention-3a921f2892abcd3626df2e2f8b1266bae8314f0bd3a0871021130d6cffc28bd3",
         "mention-4b0373e3f4644f1c769adf9e151507ffb270d3d1cf658b2e47f5172194c87830",
         "mention-6b447c754bb090b21c7136ce35d0433574727e5fb3965bccbc15eed648757e6a",
         "mention-81fe6573b20d187f868d2a909693ea7576ba88727deb04e2d230d0625624f707",
@@ -1179,7 +1226,8 @@
     {
       "facts": {
         "겨울역할": "설비·난방·급수 지원",
-        "상태": "ACTIVE"
+        "상태": "ACTIVE",
+        "연료적합성점검_20271123": "체육시설 주난방이 장작보일러임을 설명하고, 연료장 저장구역의 이송배관을 확인했으며 경유의 장비별 규격·품질점검 필요성과 길드의 대량 보관 제약을 지적했다."
       },
       "id": "char-taehoon",
       "label": "장태훈",
@@ -1191,6 +1239,13 @@
           "label": "핵심 동료",
           "other_id": "char-jinwoo",
           "relation_id": "rel-661cb1a147e956644e3479208e2b8cba00256abac0fb114a83b37f4752ce5cb9"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "이송배관을 살피고 경유의 장비별 규격·상태는 추가 확인이 필요하다고 설명",
+          "other_id": "event-wiki-fd781fe65ad211afb946c343",
+          "relation_id": "rel-67d185efd6f1d9817b88c457a3f9b5d56d5ee959e4346f77002deb98c18b4a7f"
         },
         {
           "direction": "incoming",
@@ -1256,6 +1311,7 @@
         "mention-a7b1c1ea8b6dfefab0d6d4a4069ac81cd51973de517ba70d99f1bac8066cbead",
         "mention-b13791ca69926aecee8d9edcaa9e3f6c1e14a0fb01b6f017c6f0d47526b9211c",
         "mention-b52fdab518d420aef1de51a6f85a28503f9a83a5941bb41245c08cf289c95437",
+        "mention-b9e7d412ff0dd59380d680bdde69704790a0f52f1ebc7812a26f713c64bfd55e",
         "mention-be44eccd9389e0f70b68e5ddd10975fa61b9dbf9458ed9b19d170b1a47ccd679",
         "mention-c777140c9b9a9dc5b0559d66b38f8e159a49206cb8592fc3edb461a319173562",
         "mention-cdb48fd2e2695e5eb3e82f68224d3a8f2c0e35da92e8262153c90e9ded450021",
@@ -2614,6 +2670,67 @@
     },
     {
       "facts": {},
+      "id": "event-wiki-d25d093314840e1906b712a2",
+      "label": "연료장 첫 배분 신청량 공개",
+      "overview": "서쪽길 관리조는 제설·도로유지용 연료 3,600L(1차 1,200L, 추가 예비 2,400L), 공공 급수시설은 두 지점의 펌프·비상발전용 2,400L(우선 600L, 나머지 1,800L)를 신청했다. 두 신청은 아직 미승인이며 길드 신청 수량도 확정되지 않았다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "related_to",
+          "label": "서쪽길 제설·도로작업 및 겨울 통행유지를 위한 연료 신청",
+          "other_id": "loc-west-road",
+          "relation_id": "rel-05fac535693a5a6803adbaa468e3ba59977baa49c6d32b307bff8220597d34f4"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "북쪽 연료장 구 물류사무실에서 신청량 논의",
+          "other_id": "loc-wiki-f73ae01ebcb8d89952911bbc",
+          "relation_id": "rel-0d31b588a441b3c82b699ac11b6e19a3acc6114016240d08c25280674241daf3"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "서쪽길과 공공 급수시설 신청량 표로 정리",
+          "other_id": "char-eunchae",
+          "relation_id": "rel-427e59189b1e1c1e5b59dd5631cbab8830f4a3b64fa3f32fce8488ace0d23884"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "공공 급수지점 두 곳의 대체수단과 장기정전 위험 설명",
+          "other_id": "char-hajin",
+          "relation_id": "rel-4f53d3f44b7689e5bf300be393452e40fe851fe5b49a0cd03602d3ef089dc6b8"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "길드 수량 산정 전 타 신청자의 요구량·사유 청취",
+          "other_id": "char-jinwoo",
+          "relation_id": "rel-72e7966a64cedd6c3066d82a0299287792a3fe352d26c9ac3533a8ef8e0aba86"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "서쪽길 관리조 연료 3,600L 요청 및 단계별 필요량 제시",
+          "other_id": "char-seongho",
+          "relation_id": "rel-9057fd7a3ff29cd725f47f8463e8430092959a7e6cd39842ac2f4e19784bba65"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 11월 23일 16:05",
+      "tags": [
+        "S04",
+        "연료",
+        "서쪽길",
+        "공공급수",
+        "배분신청",
+        "미승인"
+      ],
+      "type": "event"
+    },
+    {
+      "facts": {},
       "id": "event-wiki-d9895688b2873d713ac106cd",
       "label": "길드 거래 책임범위 공개",
       "overview": "길드는 중개한 거래, 에스크로를 받은 거래, 직접 운영한 서비스는 기록된 약속 범위에서 책임지고, 시장 바깥이나 주변 점포의 당사자 직접거래는 보증하지 않는다고 공개했다.",
@@ -2675,7 +2792,10 @@
       "type": "event"
     },
     {
-      "facts": {},
+      "facts": {
+        "길드자체구매동일규칙": "길드도 일반 구매자와 동일한 신청 절차를 따르고 연료장이 배분 여부·수량과 실제 반출 계측을 결정하며 길드는 자체 구매를 다른 거래와 같은 형식으로 기록한다.",
+        "독립장부대조": "연료장은 계측·승인 반출 원본을 보유하고 길드는 신청·거래·정산 기록을 별도로 작성한다. 반출번호를 통일해 3일마다 거래명세 사본·수량·대가를 대조하고 길드 처리비를 정산하며 큰 오차는 당일 확인하기로 했다."
+      },
       "id": "event-wiki-eb0397c1607ee222060dcaca",
       "label": "북쪽 연료장 겨울 연료·운송 협의",
       "overview": "북쪽 연료장 회의에서 연료장이 실제 가용량과 배분 우선순위를 정하고 사유를 기록하며, 길드는 신청·반출·정산·운송완료 기록과 중복·이중반출 방지를 맡는 잠정 구조가 정리됐다. 길드 수수료는 반출 1건당 기본 처리비에 추가 작업비를 더하고 현금 또는 사전 합의된 현물로 받을 수 있게 했으며, 도로관리조와 운송집단의 비용은 별도 정산하기로 했다.",
@@ -2738,6 +2858,59 @@
         "운송",
         "길드",
         "정산"
+      ],
+      "type": "event"
+    },
+    {
+      "facts": {},
+      "id": "event-wiki-fd781fe65ad211afb946c343",
+      "label": "연료장 유종·저장조건 현장 확인",
+      "overview": "길드 협의 참가자들이 북쪽 연료장 저장구역을 확인했다. 잠정 외부배분 물량 약 18,000L는 경유 약 12,000L·등유 약 5,000L·휘발유 약 1,000L로 구분되고 실제 계약량은 상태 확인과 당일 계측에 따라 달라진다. 연료 구매와 보관은 별도 계약이며 분할 인수의 기간·보관대가·손실 책임은 추가 협의가 필요하다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "북쪽 연료장 저장구역 현장 확인",
+          "other_id": "loc-wiki-f73ae01ebcb8d89952911bbc",
+          "relation_id": "rel-1ec4291c34e9147363b984d67d63e5e8969eb0045e81cf83e39e485b4cdbe8ed"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "유상보관 조건과 길드 저장능력 제약 확인",
+          "other_id": "char-eunchae",
+          "relation_id": "rel-60ad008ca02923e8126f1624feb3e2c9cab787023c1ee97baa476f38100a76ba"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "이송배관을 살피고 경유의 장비별 규격·상태는 추가 확인이 필요하다고 설명",
+          "other_id": "char-taehoon",
+          "relation_id": "rel-67d185efd6f1d9817b88c457a3f9b5d56d5ee959e4346f77002deb98c18b4a7f"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "related_to",
+          "label": "길드의 미개설 위험물 부지가 연료 인수·보관 제약으로 확인",
+          "other_id": "loc-wiki-ca235c61ad15acef511691cd",
+          "relation_id": "rel-765efc001bfffcefb2512d5a7428770196c3f8b4bda8c88b0e475afe176be0ab"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "길드 구매 수량 확정 전 유종·보관조건 확인 요청",
+          "other_id": "char-jinwoo",
+          "relation_id": "rel-bc51f460b66d063edc5ac7d376eb719a05b3297f41abccc75017842c9bbb6bd7"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 11월 23일 16:17",
+      "tags": [
+        "S04",
+        "연료",
+        "품질확인",
+        "유종",
+        "보관조건"
       ],
       "type": "event"
     },
@@ -3171,7 +3344,9 @@
       "type": "location"
     },
     {
-      "facts": {},
+      "facts": {
+        "주난방설비": "장작보일러"
+      },
       "id": "loc-sports-complex",
       "label": "폐쇄 체육시설",
       "overview": "공개 작업과 물류, 교환이 이어지는 생활망 노드다. 접근·재고·운영 인력의 세부는 공개 기록에 싣지 않는다.",
@@ -3245,6 +3420,13 @@
           "label": "길드 접수대 진품 확인체계 운영",
           "other_id": "event-wiki-d12d5299a253870e3748a92e",
           "relation_id": "rel-f63eca3e3221c899c44721adff2abf57ea29550564336dd86923721abc429e2d"
+        },
+        {
+          "direction": "incoming",
+          "kind": "related_to",
+          "label": "체육시설 서비스도로 바깥에 위치한 길드 사용권 부지",
+          "other_id": "loc-wiki-ca235c61ad15acef511691cd",
+          "relation_id": "rel-f98fccc65f4b415c5ee0983ebdd1c7bb027dbfc061306e062dad572c2b345929"
         }
       ],
       "story_link_ids": [
@@ -3278,6 +3460,13 @@
       "label": "서쪽길",
       "overview": "관리조가 실제 도로정비와 야간순찰을 수행하지만 통행기여의 자발성과 강제성 사이에서 변화 중이다.",
       "relations": [
+        {
+          "direction": "incoming",
+          "kind": "related_to",
+          "label": "서쪽길 제설·도로작업 및 겨울 통행유지를 위한 연료 신청",
+          "other_id": "event-wiki-d25d093314840e1906b712a2",
+          "relation_id": "rel-05fac535693a5a6803adbaa468e3ba59977baa49c6d32b307bff8220597d34f4"
+        },
         {
           "direction": "incoming",
           "kind": "published_relation",
@@ -3318,7 +3507,8 @@
         "mention-caa246e338f6043bef7bcf9fa9cc6c2f26db01038bfaeb3f3f490b3a6b1490bb",
         "mention-cb0c546e08187bd185644faee49039e53d361c82b9dc3632ecca797273a5c042",
         "mention-d01c23b8a2c8a8ad9c3c4fae2fdf8ca204808a30137179c08d8616efc78b375c",
-        "mention-ddb894009a016d423ca9165ca2a886a5a6c896d6396ecb2b4a1a94651ec179e4"
+        "mention-ddb894009a016d423ca9165ca2a886a5a6c896d6396ecb2b4a1a94651ec179e4",
+        "mention-f9b68e26609cbf5ada69aa42d3c75323b00a3c88e695bc41d455068e2463be04"
       ],
       "subtitle": "도로관리·통행 기여 갈등",
       "tags": [
@@ -3489,10 +3679,61 @@
     },
     {
       "facts": {},
+      "id": "loc-wiki-ca235c61ad15acef511691cd",
+      "label": "체육시설 서비스도로 바깥에 확보한 위험물 부지",
+      "overview": "길드가 체육시설 서비스도로 바깥에 사용권만 확보한 위험물 부지다. 2027년 11월 23일 현재 저장시설은 개설되지 않았으며 길드 일반창고도 연료 보관 용도로 사용할 수 없는 상태다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "related_to",
+          "label": "길드의 미개설 위험물 부지가 연료 인수·보관 제약으로 확인",
+          "other_id": "event-wiki-fd781fe65ad211afb946c343",
+          "relation_id": "rel-765efc001bfffcefb2512d5a7428770196c3f8b4bda8c88b0e475afe176be0ab"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "related_to",
+          "label": "체육시설 서비스도로 바깥에 위치한 길드 사용권 부지",
+          "other_id": "loc-sports-complex",
+          "relation_id": "rel-f98fccc65f4b415c5ee0983ebdd1c7bb027dbfc061306e062dad572c2b345929"
+        }
+      ],
+      "story_link_ids": [
+        "mention-34c07093ce4787a1e527d835e865ce2d7a82aeccf4402a6c31e68dcde74135ed"
+      ],
+      "subtitle": "길드 사용권 확보 · 저장시설 미개설",
+      "tags": [
+        "S04",
+        "길드",
+        "연료보관",
+        "위험물",
+        "사용권"
+      ],
+      "type": "location"
+    },
+    {
+      "facts": {
+        "구매보관별도계약": "연료 구매와 탱크 보관은 별도 계약이며 분할 인수 시 보관기간·보관대가·손실 책임을 별도로 협의해야 한다.",
+        "잠정배분유종_20271123": "외부 배분 검토 약 18,000L 중 경유 약 12,000L(일부 탱크 수분·침전 확인 필요), 등유 약 5,000L, 휘발유 약 1,000L로 구분한다. 실제 계약·반출량은 유종 상태와 당일 계측에 따라 달라질 수 있다."
+      },
       "id": "loc-wiki-f73ae01ebcb8d89952911bbc",
       "label": "북쪽 연료장 생활권",
       "overview": "구 물류장 안쪽에 차량 대기선과 작업구역이 분리되고 저장탱크 주변에 펜스와 통제선이 설치됐다. 2027년 11월 23일 장부상 21킬로리터를 조금 넘게 보유했고, 손실·침전·자체 겨울운영분을 뺀 약 18킬로리터를 외부 배분 상한으로 제시했으며 실제 반출량은 날짜별로 다시 계측하기로 했다.",
       "relations": [
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "북쪽 연료장 구 물류사무실에서 신청량 논의",
+          "other_id": "event-wiki-d25d093314840e1906b712a2",
+          "relation_id": "rel-0d31b588a441b3c82b699ac11b6e19a3acc6114016240d08c25280674241daf3"
+        },
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "북쪽 연료장 저장구역 현장 확인",
+          "other_id": "event-wiki-fd781fe65ad211afb946c343",
+          "relation_id": "rel-1ec4291c34e9147363b984d67d63e5e8969eb0045e81cf83e39e485b4cdbe8ed"
+        },
         {
           "direction": "incoming",
           "kind": "related_to",
@@ -3636,7 +3877,7 @@
     }
   ],
   "chronicle_id": "C03-AFTERFALL",
-  "content_sha256": "96e2c231689792df8249d6811d2620b12a6132508e4ada3bacbeac88628f4bc9",
+  "content_sha256": "2624da2b7467443660562c5b4a70498db5c60297c7dff747d604c1abfa49b93a",
   "nodes": [
     {
       "anchor": {
@@ -3699,17 +3940,18 @@
     },
     {
       "anchor": {
-        "game_time": "2027-11-22 22:40",
-        "save_version": 285
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
       },
       "data": {
         "id": "char-eunchae",
         "label": "최은채",
         "meta": {
           "겨울역할": "물류·기록 지원",
-          "상태": "ACTIVE"
+          "상태": "ACTIVE",
+          "연료거래검증_20271123": "연료장 독립 원본이 없는 길드 사본 대조의 한계를 지적하고 장기 정산주기를 경계했으며, 길드 일반창고와 사용권만 있는 위험물 부지의 연료 보관 제약을 확인했다."
         },
-        "source": "S03 SESSION_008 GM 공개 블록 001, 003, 005",
+        "source": "S04 SESSION_002 GM 공개 블록 001, 005",
         "subtitle": "병원 행정직 출신 · 물류·기록",
         "summary": "공공 급수지점 실태조사에서 운영기록을 확인했다. 길드 표준품의 번호체계를 정하고 판매·수리 장부와 대조해 사칭품을 확인했으며, 하루 거래 정산을 마감했다.",
         "tags": [
@@ -3721,9 +3963,9 @@
         "type": "character"
       },
       "evidence": {
-        "pointer": "/nodes/1",
-        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
-        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+        "pointer": "/nodes/7",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
       },
       "history": [
         {
@@ -3754,6 +3996,36 @@
             "pointer": "/nodes/2",
             "source_ref": "archive/web/src/archive/archiveData.ts",
             "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          }
+        },
+        {
+          "anchor": {
+            "game_time": "2027-11-22 22:40",
+            "save_version": 285
+          },
+          "data": {
+            "id": "char-eunchae",
+            "label": "최은채",
+            "meta": {
+              "겨울역할": "물류·기록 지원",
+              "상태": "ACTIVE"
+            },
+            "source": "S03 SESSION_008 GM 공개 블록 001, 003, 005",
+            "subtitle": "병원 행정직 출신 · 물류·기록",
+            "summary": "공공 급수지점 실태조사에서 운영기록을 확인했다. 길드 표준품의 번호체계를 정하고 판매·수리 장부와 대조해 사칭품을 확인했으며, 하루 거래 정산을 마감했다.",
+            "tags": [
+              "CORE",
+              "핵심 4인",
+              "물류",
+              "기록"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "1e69781151ef1b7ec7421ce034242b28460685eebb25b77ee76b47594743e9d5",
+          "evidence": {
+            "pointer": "/nodes/1",
+            "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+            "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
           }
         }
       ],
@@ -3916,17 +4188,18 @@
     },
     {
       "anchor": {
-        "game_time": "2027-11-22 22:40",
-        "save_version": 285
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
       },
       "data": {
         "id": "char-jinwoo",
         "label": "서진우",
         "meta": {
           "상태": "ACTIVE",
-          "소속": "CORE_FOUR"
+          "소속": "CORE_FOUR",
+          "연료협의_20271123": "연료장 반출 원본과 길드 장부가 서로 독립적으로 검증되는 방식과 길드 자체 구매에도 동일 규칙을 적용하는 안이 채택됐다. 길드 구매 수량을 정하기 전 서쪽길·공공 급수시설의 요구와 유종·보관조건을 먼저 확인했다."
         },
-        "source": "S03 SESSION_008 GM 공개 블록 001, 003, 005",
+        "source": "S04 SESSION_002 GM 공개 블록 001, 003, 005",
         "subtitle": "응급실 간호사 · 플레이어",
         "summary": "공공 급수지점에는 일반 유지보수와 기술지원을 제공하고 일상 운영은 행정 잔존팀이 맡도록 책임을 나눴다. 2027년 11월 9일에는 저장량과 대체수단을 비교해 생산거점을 먼저 복구하도록 결정했다. 길드 표식 사칭 문제에서는 상인의 물건을 빼앗거나 외부 장사를 금지하지 않고 피해거래 정산과 길드 서비스 이용 제한으로 대응했다.",
         "tags": [
@@ -3938,9 +4211,9 @@
         "type": "character"
       },
       "evidence": {
-        "pointer": "/nodes/0",
-        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
-        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+        "pointer": "/nodes/6",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
       },
       "history": [
         {
@@ -3971,6 +4244,36 @@
             "pointer": "/nodes/0",
             "source_ref": "archive/web/src/archive/archiveData.ts",
             "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          }
+        },
+        {
+          "anchor": {
+            "game_time": "2027-11-22 22:40",
+            "save_version": 285
+          },
+          "data": {
+            "id": "char-jinwoo",
+            "label": "서진우",
+            "meta": {
+              "상태": "ACTIVE",
+              "소속": "CORE_FOUR"
+            },
+            "source": "S03 SESSION_008 GM 공개 블록 001, 003, 005",
+            "subtitle": "응급실 간호사 · 플레이어",
+            "summary": "공공 급수지점에는 일반 유지보수와 기술지원을 제공하고 일상 운영은 행정 잔존팀이 맡도록 책임을 나눴다. 2027년 11월 9일에는 저장량과 대체수단을 비교해 생산거점을 먼저 복구하도록 결정했다. 길드 표식 사칭 문제에서는 상인의 물건을 빼앗거나 외부 장사를 금지하지 않고 피해거래 정산과 길드 서비스 이용 제한으로 대응했다.",
+            "tags": [
+              "PLAYER",
+              "핵심 4인",
+              "응급의료",
+              "외부정찰"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "2c150ae95d2345342dc57bf0133fb3d7e120c1bef6c7c7ad89ec90a324f81343",
+          "evidence": {
+            "pointer": "/nodes/0",
+            "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+            "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
           }
         }
       ],
@@ -4251,16 +4554,17 @@
     },
     {
       "anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
       },
       "data": {
         "id": "char-seongho",
         "label": "김성호",
         "meta": {
-          "상태": "ACTIVE"
+          "상태": "ACTIVE",
+          "서쪽길연료신청_20271123": "서쪽길 관리조가 겨울 연료 총 3,600L(초기 1,200L, 추가 예비 2,400L)를 요청했다고 밝히고 작업거리와 운행시간 기록을 약속했다. 배분받지 못한 구간까지 길 개방을 보장하지는 않았다."
         },
-        "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+        "source": "S04 SESSION_002 GM 공개 블록 003",
         "subtitle": "서쪽길 관리조 접점",
         "summary": "실제 도로정비를 수행하는 관리조의 접점. 통행 기여의 정당성과 사설권력화 사이의 경계가 핵심 관찰 포인트다.",
         "tags": [
@@ -4272,26 +4576,57 @@
         "type": "character"
       },
       "evidence": {
-        "pointer": "/nodes/12",
-        "source_ref": "archive/web/src/archive/archiveData.ts",
-        "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+        "pointer": "/nodes/9",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
       },
-      "history": [],
+      "history": [
+        {
+          "anchor": {
+            "game_time": "2027-03-23 17:50",
+            "save_version": 253
+          },
+          "data": {
+            "id": "char-seongho",
+            "label": "김성호",
+            "meta": {
+              "상태": "ACTIVE"
+            },
+            "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+            "subtitle": "서쪽길 관리조 접점",
+            "summary": "실제 도로정비를 수행하는 관리조의 접점. 통행 기여의 정당성과 사설권력화 사이의 경계가 핵심 관찰 포인트다.",
+            "tags": [
+              "MAJOR",
+              "도로",
+              "서쪽길",
+              "관리조"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "d95f082d35ec5cc21b72cdb5fbcc9a4e6eac30eb7e086b7c318e1f0a3a679405",
+          "evidence": {
+            "pointer": "/nodes/12",
+            "source_ref": "archive/web/src/archive/archiveData.ts",
+            "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          }
+        }
+      ],
       "id": "char-seongho"
     },
     {
       "anchor": {
-        "game_time": "2027-11-22 22:40",
-        "save_version": 285
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
       },
       "data": {
         "id": "char-taehoon",
         "label": "장태훈",
         "meta": {
           "겨울역할": "설비·난방·급수 지원",
-          "상태": "ACTIVE"
+          "상태": "ACTIVE",
+          "연료적합성점검_20271123": "체육시설 주난방이 장작보일러임을 설명하고, 연료장 저장구역의 이송배관을 확인했으며 경유의 장비별 규격·품질점검 필요성과 길드의 대량 보관 제약을 지적했다."
         },
-        "source": "S03 SESSION_008 GM 공개 블록 001, 005",
+        "source": "S04 SESSION_002 GM 공개 블록 003, 005",
         "subtitle": "시설운영 기술자",
         "summary": "공공 급수지점 두 곳의 설비를 조사하고 오래된 펌프 교체가 필요하다고 판단했다. 2027년 11월 9일에는 정민규와 생산거점 펌프를 오전 안에 복구하고, 이어 공공 급수지점 펌프를 교체해 오후에 정상화했다.",
         "tags": [
@@ -4304,9 +4639,9 @@
         "type": "character"
       },
       "evidence": {
-        "pointer": "/nodes/4",
-        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
-        "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+        "pointer": "/nodes/8",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
       },
       "history": [
         {
@@ -4338,6 +4673,37 @@
             "pointer": "/nodes/3",
             "source_ref": "archive/web/src/archive/archiveData.ts",
             "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          }
+        },
+        {
+          "anchor": {
+            "game_time": "2027-11-22 22:40",
+            "save_version": 285
+          },
+          "data": {
+            "id": "char-taehoon",
+            "label": "장태훈",
+            "meta": {
+              "겨울역할": "설비·난방·급수 지원",
+              "상태": "ACTIVE"
+            },
+            "source": "S03 SESSION_008 GM 공개 블록 001, 005",
+            "subtitle": "시설운영 기술자",
+            "summary": "공공 급수지점 두 곳의 설비를 조사하고 오래된 펌프 교체가 필요하다고 판단했다. 2027년 11월 9일에는 정민규와 생산거점 펌프를 오전 안에 복구하고, 이어 공공 급수지점 펌프를 교체해 오후에 정상화했다.",
+            "tags": [
+              "CORE",
+              "핵심 4인",
+              "시설",
+              "난방",
+              "급수"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "ed42fb5937c94ea39645a91264bbba81e3cd9996c5d6955d02029f27a1e135a0",
+          "evidence": {
+            "pointer": "/nodes/4",
+            "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
+            "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
           }
         }
       ],
@@ -5185,6 +5551,35 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
+      },
+      "data": {
+        "id": "event-wiki-d25d093314840e1906b712a2",
+        "label": "연료장 첫 배분 신청량 공개",
+        "source": "S04 SESSION_002 GM 공개 블록 003",
+        "subtitle": "2027년 11월 23일 16:05",
+        "summary": "서쪽길 관리조는 제설·도로유지용 연료 3,600L(1차 1,200L, 추가 예비 2,400L), 공공 급수시설은 두 지점의 펌프·비상발전용 2,400L(우선 600L, 나머지 1,800L)를 신청했다. 두 신청은 아직 미승인이며 길드 신청 수량도 확정되지 않았다.",
+        "tags": [
+          "S04",
+          "연료",
+          "서쪽길",
+          "공공급수",
+          "배분신청",
+          "미승인"
+        ],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/1",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+      },
+      "history": [],
+      "id": "event-wiki-d25d093314840e1906b712a2"
+    },
+    {
+      "anchor": {
         "game_time": "2027-09-22 16:10",
         "save_version": 280
       },
@@ -5239,13 +5634,17 @@
     },
     {
       "anchor": {
-        "game_time": "2027-11-23 15:42",
-        "save_version": 290
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
       },
       "data": {
         "id": "event-wiki-eb0397c1607ee222060dcaca",
         "label": "북쪽 연료장 겨울 연료·운송 협의",
-        "source": "S04 SESSION_001 GM 공개 블록 005, 007, 009",
+        "meta": {
+          "길드자체구매동일규칙": "길드도 일반 구매자와 동일한 신청 절차를 따르고 연료장이 배분 여부·수량과 실제 반출 계측을 결정하며 길드는 자체 구매를 다른 거래와 같은 형식으로 기록한다.",
+          "독립장부대조": "연료장은 계측·승인 반출 원본을 보유하고 길드는 신청·거래·정산 기록을 별도로 작성한다. 반출번호를 통일해 3일마다 거래명세 사본·수량·대가를 대조하고 길드 처리비를 정산하며 큰 오차는 당일 확인하기로 했다."
+        },
+        "source": "S04 SESSION_002 GM 공개 블록 001",
         "subtitle": "2027년 11월 23일",
         "summary": "북쪽 연료장 회의에서 연료장이 실제 가용량과 배분 우선순위를 정하고 사유를 기록하며, 길드는 신청·반출·정산·운송완료 기록과 중복·이중반출 방지를 맡는 잠정 구조가 정리됐다. 길드 수수료는 반출 1건당 기본 처리비에 추가 작업비를 더하고 현금 또는 사전 합의된 현물로 받을 수 있게 했으며, 도로관리조와 운송집단의 비용은 별도 정산하기로 했다.",
         "tags": [
@@ -5259,11 +5658,67 @@
       },
       "evidence": {
         "pointer": "/nodes/0",
-        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
-        "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+      },
+      "history": [
+        {
+          "anchor": {
+            "game_time": "2027-11-23 15:42",
+            "save_version": 290
+          },
+          "data": {
+            "id": "event-wiki-eb0397c1607ee222060dcaca",
+            "label": "북쪽 연료장 겨울 연료·운송 협의",
+            "source": "S04 SESSION_001 GM 공개 블록 005, 007, 009",
+            "subtitle": "2027년 11월 23일",
+            "summary": "북쪽 연료장 회의에서 연료장이 실제 가용량과 배분 우선순위를 정하고 사유를 기록하며, 길드는 신청·반출·정산·운송완료 기록과 중복·이중반출 방지를 맡는 잠정 구조가 정리됐다. 길드 수수료는 반출 1건당 기본 처리비에 추가 작업비를 더하고 현금 또는 사전 합의된 현물로 받을 수 있게 했으며, 도로관리조와 운송집단의 비용은 별도 정산하기로 했다.",
+            "tags": [
+              "S04",
+              "연료",
+              "운송",
+              "길드",
+              "정산"
+            ],
+            "type": "event"
+          },
+          "data_sha256": "6b2de3f252829835e9b1d6e055be6e746ac48a650b2c2d0710dd16a84a762263",
+          "evidence": {
+            "pointer": "/nodes/0",
+            "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
+            "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
+          }
+        }
+      ],
+      "id": "event-wiki-eb0397c1607ee222060dcaca"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
+      },
+      "data": {
+        "id": "event-wiki-fd781fe65ad211afb946c343",
+        "label": "연료장 유종·저장조건 현장 확인",
+        "source": "S04 SESSION_002 GM 공개 블록 005",
+        "subtitle": "2027년 11월 23일 16:17",
+        "summary": "길드 협의 참가자들이 북쪽 연료장 저장구역을 확인했다. 잠정 외부배분 물량 약 18,000L는 경유 약 12,000L·등유 약 5,000L·휘발유 약 1,000L로 구분되고 실제 계약량은 상태 확인과 당일 계측에 따라 달라진다. 연료 구매와 보관은 별도 계약이며 분할 인수의 기간·보관대가·손실 책임은 추가 협의가 필요하다.",
+        "tags": [
+          "S04",
+          "연료",
+          "품질확인",
+          "유종",
+          "보관조건"
+        ],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/2",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
       },
       "history": [],
-      "id": "event-wiki-eb0397c1607ee222060dcaca"
+      "id": "event-wiki-fd781fe65ad211afb946c343"
     },
     {
       "anchor": {
@@ -5532,13 +5987,16 @@
     },
     {
       "anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
       },
       "data": {
         "id": "loc-sports-complex",
         "label": "폐쇄 체육시설",
-        "source": "Supabase survival_rpg.saves / S02 RAW transcript",
+        "meta": {
+          "주난방설비": "장작보일러"
+        },
+        "source": "S04 SESSION_002 GM 공개 블록 003",
         "subtitle": "공개 작업·물류·정기시장 거점",
         "summary": "공개 작업과 물류, 교환이 이어지는 생활망 노드다. 접근·재고·운영 인력의 세부는 공개 기록에 싣지 않는다.",
         "tags": [
@@ -5550,11 +6008,38 @@
         "type": "location"
       },
       "evidence": {
-        "pointer": "/nodes/27",
-        "source_ref": "archive/web/src/archive/archiveData.ts",
-        "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+        "pointer": "/nodes/5",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
       },
-      "history": [],
+      "history": [
+        {
+          "anchor": {
+            "game_time": "2027-03-23 17:50",
+            "save_version": 253
+          },
+          "data": {
+            "id": "loc-sports-complex",
+            "label": "폐쇄 체육시설",
+            "source": "Supabase survival_rpg.saves / S02 RAW transcript",
+            "subtitle": "공개 작업·물류·정기시장 거점",
+            "summary": "공개 작업과 물류, 교환이 이어지는 생활망 노드다. 접근·재고·운영 인력의 세부는 공개 기록에 싣지 않는다.",
+            "tags": [
+              "공개",
+              "작업",
+              "물류",
+              "정기시장"
+            ],
+            "type": "location"
+          },
+          "data_sha256": "4968276b7cbe514b184729d3d5c0aa23363b1d7b6af4779a86bd2ff0e555fa9c",
+          "evidence": {
+            "pointer": "/nodes/27",
+            "source_ref": "archive/web/src/archive/archiveData.ts",
+            "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          }
+        }
+      ],
       "id": "loc-sports-complex"
     },
     {
@@ -5719,13 +6204,45 @@
     },
     {
       "anchor": {
-        "game_time": "2027-11-23 15:42",
-        "save_version": 290
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
+      },
+      "data": {
+        "id": "loc-wiki-ca235c61ad15acef511691cd",
+        "label": "체육시설 서비스도로 바깥에 확보한 위험물 부지",
+        "source": "S04 SESSION_002 GM 공개 블록 005",
+        "subtitle": "길드 사용권 확보 · 저장시설 미개설",
+        "summary": "길드가 체육시설 서비스도로 바깥에 사용권만 확보한 위험물 부지다. 2027년 11월 23일 현재 저장시설은 개설되지 않았으며 길드 일반창고도 연료 보관 용도로 사용할 수 없는 상태다.",
+        "tags": [
+          "S04",
+          "길드",
+          "연료보관",
+          "위험물",
+          "사용권"
+        ],
+        "type": "location"
+      },
+      "evidence": {
+        "pointer": "/nodes/3",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+      },
+      "history": [],
+      "id": "loc-wiki-ca235c61ad15acef511691cd"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
       },
       "data": {
         "id": "loc-wiki-f73ae01ebcb8d89952911bbc",
         "label": "북쪽 연료장 생활권",
-        "source": "S04 SESSION_001 GM 공개 블록 005",
+        "meta": {
+          "구매보관별도계약": "연료 구매와 탱크 보관은 별도 계약이며 분할 인수 시 보관기간·보관대가·손실 책임을 별도로 협의해야 한다.",
+          "잠정배분유종_20271123": "외부 배분 검토 약 18,000L 중 경유 약 12,000L(일부 탱크 수분·침전 확인 필요), 등유 약 5,000L, 휘발유 약 1,000L로 구분한다. 실제 계약·반출량은 유종 상태와 당일 계측에 따라 달라질 수 있다."
+        },
+        "source": "S04 SESSION_002 GM 공개 블록 005",
         "subtitle": "구 물류장 기반 연료 저장·배분 거점",
         "summary": "구 물류장 안쪽에 차량 대기선과 작업구역이 분리되고 저장탱크 주변에 펜스와 통제선이 설치됐다. 2027년 11월 23일 장부상 21킬로리터를 조금 넘게 보유했고, 손실·침전·자체 겨울운영분을 뺀 약 18킬로리터를 외부 배분 상한으로 제시했으며 실제 반출량은 날짜별로 다시 계측하기로 했다.",
         "tags": [
@@ -5737,9 +6254,9 @@
         "type": "location"
       },
       "evidence": {
-        "pointer": "/nodes/2",
-        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
-        "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
+        "pointer": "/nodes/4",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
       },
       "history": [
         {
@@ -5766,6 +6283,32 @@
             "pointer": "/nodes/5",
             "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_SESSION_008_3d15073c796967f27b1dd094ceecd948ab28b93aed7971818de48cb0e6cd4dc0.json",
             "source_sha256": "b0833f958e8c3ea3395f1b9aa1fbe8cd368183e3336971f0d9d85479f710530a"
+          }
+        },
+        {
+          "anchor": {
+            "game_time": "2027-11-23 15:42",
+            "save_version": 290
+          },
+          "data": {
+            "id": "loc-wiki-f73ae01ebcb8d89952911bbc",
+            "label": "북쪽 연료장 생활권",
+            "source": "S04 SESSION_001 GM 공개 블록 005",
+            "subtitle": "구 물류장 기반 연료 저장·배분 거점",
+            "summary": "구 물류장 안쪽에 차량 대기선과 작업구역이 분리되고 저장탱크 주변에 펜스와 통제선이 설치됐다. 2027년 11월 23일 장부상 21킬로리터를 조금 넘게 보유했고, 손실·침전·자체 겨울운영분을 뺀 약 18킬로리터를 외부 배분 상한으로 제시했으며 실제 반출량은 날짜별로 다시 계측하기로 했다.",
+            "tags": [
+              "S03",
+              "장소",
+              "연료",
+              "북쪽"
+            ],
+            "type": "location"
+          },
+          "data_sha256": "6fe87d6a2a7b17427b19589ec2cce9b5bfe69aa26f7a5e4e008d04e25dbccdfd",
+          "evidence": {
+            "pointer": "/nodes/2",
+            "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
+            "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
           }
         }
       ],
@@ -5952,6 +6495,44 @@
       },
       "history": [],
       "id": "rel-05d1eb1eace7023308e2f773415c17ed4a5c593eef0d1e1a97cd8ab272f7132f"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
+      },
+      "data": {
+        "from": "event-wiki-d25d093314840e1906b712a2",
+        "kind": "related_to",
+        "label": "서쪽길 제설·도로작업 및 겨울 통행유지를 위한 연료 신청",
+        "to": "loc-west-road"
+      },
+      "evidence": {
+        "pointer": "/relations/5",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+      },
+      "history": [],
+      "id": "rel-05fac535693a5a6803adbaa468e3ba59977baa49c6d32b307bff8220597d34f4"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
+      },
+      "data": {
+        "from": "event-wiki-d25d093314840e1906b712a2",
+        "kind": "occurred_at",
+        "label": "북쪽 연료장 구 물류사무실에서 신청량 논의",
+        "to": "loc-wiki-f73ae01ebcb8d89952911bbc"
+      },
+      "evidence": {
+        "pointer": "/relations/4",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+      },
+      "history": [],
+      "id": "rel-0d31b588a441b3c82b699ac11b6e19a3acc6114016240d08c25280674241daf3"
     },
     {
       "anchor": {
@@ -6161,6 +6742,25 @@
       },
       "history": [],
       "id": "rel-1dbf601f473b03b6a3ed9b27fc366ab28ec12c60ba9a88776913f3eaa959b7cd"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
+      },
+      "data": {
+        "from": "event-wiki-fd781fe65ad211afb946c343",
+        "kind": "occurred_at",
+        "label": "북쪽 연료장 저장구역 현장 확인",
+        "to": "loc-wiki-f73ae01ebcb8d89952911bbc"
+      },
+      "evidence": {
+        "pointer": "/relations/9",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+      },
+      "history": [],
+      "id": "rel-1ec4291c34e9147363b984d67d63e5e8969eb0045e81cf83e39e485b4cdbe8ed"
     },
     {
       "anchor": {
@@ -6506,6 +7106,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
+      },
+      "data": {
+        "from": "char-eunchae",
+        "kind": "participated_in",
+        "label": "서쪽길과 공공 급수시설 신청량 표로 정리",
+        "to": "event-wiki-d25d093314840e1906b712a2"
+      },
+      "evidence": {
+        "pointer": "/relations/2",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+      },
+      "history": [],
+      "id": "rel-427e59189b1e1c1e5b59dd5631cbab8830f4a3b64fa3f32fce8488ace0d23884"
+    },
+    {
+      "anchor": {
         "game_time": "2027-10-30 13:20",
         "save_version": 282
       },
@@ -6639,6 +7258,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
+      },
+      "data": {
+        "from": "char-hajin",
+        "kind": "participated_in",
+        "label": "공공 급수지점 두 곳의 대체수단과 장기정전 위험 설명",
+        "to": "event-wiki-d25d093314840e1906b712a2"
+      },
+      "evidence": {
+        "pointer": "/relations/3",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+      },
+      "history": [],
+      "id": "rel-4f53d3f44b7689e5bf300be393452e40fe851fe5b49a0cd03602d3ef089dc6b8"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -6712,6 +7350,25 @@
       },
       "history": [],
       "id": "rel-5f80a15d7073ac713bf260b37db7197ddfaf077e5596c8a9d55f53018f8dd14e"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
+      },
+      "data": {
+        "from": "char-eunchae",
+        "kind": "participated_in",
+        "label": "유상보관 조건과 길드 저장능력 제약 확인",
+        "to": "event-wiki-fd781fe65ad211afb946c343"
+      },
+      "evidence": {
+        "pointer": "/relations/8",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+      },
+      "history": [],
+      "id": "rel-60ad008ca02923e8126f1624feb3e2c9cab787023c1ee97baa476f38100a76ba"
     },
     {
       "anchor": {
@@ -6829,6 +7486,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
+      },
+      "data": {
+        "from": "char-taehoon",
+        "kind": "participated_in",
+        "label": "이송배관을 살피고 경유의 장비별 규격·상태는 추가 확인이 필요하다고 설명",
+        "to": "event-wiki-fd781fe65ad211afb946c343"
+      },
+      "evidence": {
+        "pointer": "/relations/7",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+      },
+      "history": [],
+      "id": "rel-67d185efd6f1d9817b88c457a3f9b5d56d5ee959e4346f77002deb98c18b4a7f"
+    },
+    {
+      "anchor": {
         "game_time": "2027-09-22 16:10",
         "save_version": 280
       },
@@ -6905,6 +7581,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
+      },
+      "data": {
+        "from": "char-jinwoo",
+        "kind": "participated_in",
+        "label": "길드 수량 산정 전 타 신청자의 요구량·사유 청취",
+        "to": "event-wiki-d25d093314840e1906b712a2"
+      },
+      "evidence": {
+        "pointer": "/relations/0",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+      },
+      "history": [],
+      "id": "rel-72e7966a64cedd6c3066d82a0299287792a3fe352d26c9ac3533a8ef8e0aba86"
+    },
+    {
+      "anchor": {
         "game_time": "2027-03-23 17:50",
         "save_version": 253
       },
@@ -6921,6 +7616,25 @@
       },
       "history": [],
       "id": "rel-75851ccfe6432721e580e11c4a2abc4fa34c35046e950abf1d6288b2c658f788"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
+      },
+      "data": {
+        "from": "event-wiki-fd781fe65ad211afb946c343",
+        "kind": "related_to",
+        "label": "길드의 미개설 위험물 부지가 연료 인수·보관 제약으로 확인",
+        "to": "loc-wiki-ca235c61ad15acef511691cd"
+      },
+      "evidence": {
+        "pointer": "/relations/10",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+      },
+      "history": [],
+      "id": "rel-765efc001bfffcefb2512d5a7428770196c3f8b4bda8c88b0e475afe176be0ab"
     },
     {
       "anchor": {
@@ -7187,6 +7901,25 @@
       },
       "history": [],
       "id": "rel-8ff0ed65beaeac6d206399852e2d6705b198675e0fc28c93d3307dceeb99cd19"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
+      },
+      "data": {
+        "from": "char-seongho",
+        "kind": "participated_in",
+        "label": "서쪽길 관리조 연료 3,600L 요청 및 단계별 필요량 제시",
+        "to": "event-wiki-d25d093314840e1906b712a2"
+      },
+      "evidence": {
+        "pointer": "/relations/1",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+      },
+      "history": [],
+      "id": "rel-9057fd7a3ff29cd725f47f8463e8430092959a7e6cd39842ac2f4e19784bba65"
     },
     {
       "anchor": {
@@ -7681,6 +8414,25 @@
       },
       "history": [],
       "id": "rel-b808579e2bd7719dc687412bc80373f7063244c09d0bd20d33c1c5d990ebcec5"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
+      },
+      "data": {
+        "from": "char-jinwoo",
+        "kind": "participated_in",
+        "label": "길드 구매 수량 확정 전 유종·보관조건 확인 요청",
+        "to": "event-wiki-fd781fe65ad211afb946c343"
+      },
+      "evidence": {
+        "pointer": "/relations/6",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+      },
+      "history": [],
+      "id": "rel-bc51f460b66d063edc5ac7d376eb719a05b3297f41abccc75017842c9bbb6bd7"
     },
     {
       "anchor": {
@@ -8270,6 +9022,25 @@
       },
       "history": [],
       "id": "rel-f63eca3e3221c899c44721adff2abf57ea29550564336dd86923721abc429e2d"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-23 16:17",
+        "save_version": 291
+      },
+      "data": {
+        "from": "loc-wiki-ca235c61ad15acef511691cd",
+        "kind": "related_to",
+        "label": "체육시설 서비스도로 바깥에 위치한 길드 사용권 부지",
+        "to": "loc-sports-complex"
+      },
+      "evidence": {
+        "pointer": "/relations/11",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+      },
+      "history": [],
+      "id": "rel-f98fccc65f4b415c5ee0983ebdd1c7bb027dbfc061306e062dad572c2b345929"
     },
     {
       "anchor": {
@@ -10251,6 +11022,27 @@
       ]
     },
     {
+      "body_sha256": "a647480c3f2b3e42e8f8f5b864c22b46b3d9db0ddeec3787146192beba42e54e",
+      "chapter_id": "c03-afterfall-auto-ad9daaa86fde8aa36bbe3315618f18dce8826ceea9d13dcf88e39ee484db87e2",
+      "chapter_title": "2027-11-23 15:53 — 북쪽 연료장 회의실",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
+      },
+      "id": "mention-2e9db848bc7cd8b3d7a647a68e4d4c6cf1cf524e7197c3b6a69ebf6fb8a0c337",
+      "node_id": "char-hajin",
+      "reasons": [
+        {
+          "alias": "문하진",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            716,
+            2524
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "2d4be9647b05860a23e940c65ba850d3c0472afec427831bd7b35fa093cda729",
       "chapter_id": "c03-afterfall-chapter-10",
       "chapter_title": "실증단지의 불",
@@ -10580,6 +11372,26 @@
       ]
     },
     {
+      "body_sha256": "a647480c3f2b3e42e8f8f5b864c22b46b3d9db0ddeec3787146192beba42e54e",
+      "chapter_id": "c03-afterfall-auto-ad9daaa86fde8aa36bbe3315618f18dce8826ceea9d13dcf88e39ee484db87e2",
+      "chapter_title": "2027-11-23 15:53 — 북쪽 연료장 회의실",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
+      },
+      "id": "mention-34c07093ce4787a1e527d835e865ce2d7a82aeccf4402a6c31e68dcde74135ed",
+      "node_id": "loc-wiki-ca235c61ad15acef511691cd",
+      "reasons": [
+        {
+          "alias": "체육시설 서비스도로 바깥에 확보한 위험물 부지",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            4450
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "2a940057398eee434a99ba3cf49ae9dc553d462c70fe1f47f3f1d42132d1bdc0",
       "chapter_id": "c03-afterfall-chapter-12",
       "chapter_title": "불이 지나간 자리",
@@ -10810,6 +11622,28 @@
             2202,
             4222,
             12709
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "a647480c3f2b3e42e8f8f5b864c22b46b3d9db0ddeec3787146192beba42e54e",
+      "chapter_id": "c03-afterfall-auto-ad9daaa86fde8aa36bbe3315618f18dce8826ceea9d13dcf88e39ee484db87e2",
+      "chapter_title": "2027-11-23 15:53 — 북쪽 연료장 회의실",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
+      },
+      "id": "mention-3a921f2892abcd3626df2e2f8b1266bae8314f0bd3a0871021130d6cffc28bd3",
+      "node_id": "char-seongho",
+      "reasons": [
+        {
+          "alias": "김성호",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            799,
+            1886,
+            4786
           ]
         }
       ]
@@ -15272,6 +16106,26 @@
       ]
     },
     {
+      "body_sha256": "a647480c3f2b3e42e8f8f5b864c22b46b3d9db0ddeec3787146192beba42e54e",
+      "chapter_id": "c03-afterfall-auto-ad9daaa86fde8aa36bbe3315618f18dce8826ceea9d13dcf88e39ee484db87e2",
+      "chapter_title": "2027-11-23 15:53 — 북쪽 연료장 회의실",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
+      },
+      "id": "mention-b9e7d412ff0dd59380d680bdde69704790a0f52f1ebc7812a26f713c64bfd55e",
+      "node_id": "char-taehoon",
+      "reasons": [
+        {
+          "alias": "장태훈",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            3588
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "c1671d7762f9ca8245da91ffeb60ac5e84edbc4f6013ac5ba95ae0d81719ce8d",
       "chapter_id": "c03-afterfall-chapter-08",
       "chapter_title": "겨울 전 갈무리",
@@ -17350,6 +18204,27 @@
           "offsets": [
             6858,
             9645
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "a647480c3f2b3e42e8f8f5b864c22b46b3d9db0ddeec3787146192beba42e54e",
+      "chapter_id": "c03-afterfall-auto-ad9daaa86fde8aa36bbe3315618f18dce8826ceea9d13dcf88e39ee484db87e2",
+      "chapter_title": "2027-11-23 15:53 — 북쪽 연료장 회의실",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b"
+      },
+      "id": "mention-f9b68e26609cbf5ada69aa42d3c75323b00a3c88e695bc41d455068e2463be04",
+      "node_id": "loc-west-road",
+      "reasons": [
+        {
+          "alias": "서쪽길",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            1606,
+            2771
           ]
         }
       ]
