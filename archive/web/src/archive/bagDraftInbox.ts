@@ -8,15 +8,26 @@ const API_ROOT = 'https://api.github.com/repos/cetin072/survival-interactive-ser
 const GITHUB_TREE = 'https://github.com/cetin072/survival-interactive-series/blob/'
 const DRAFT_FILENAME = /^GUIDE_(\d{2})(?:_[A-Z0-9]+)*_DRAFT_V01\.md$/
 
-export type BagDraftEntry = { state: string; file: string; approvedAt?: string }
+export type BagDraftEntry = { state: string; file: string; catalogName?: string; approvedAt?: string }
 export type BagDraftQueue = {
   catalogTotal: number
   nextCandidate: string
   articles: Record<string, BagDraftEntry>
 }
-export type BagDraftRow = BagDraftEntry & { id: string; label: string }
+export type BagDraftRow = BagDraftEntry & { id: string; label: string; catalogName: string }
 export type BagDraftFilter = 'ALL' | 'PENDING' | 'APPROVED'
 
+// Read-only display fallback for the existing 49-item catalogue; the stable key remains guide-XX.
+const catalogNames = [
+  '방수 서류 파우치','신분증 사본','가족 비상연락처 메모','소액권 현금','중요 서류 사본','여분 열쇠',
+  '우의','여벌 속옷','여벌 양말','계절용 보온 의류','모자·장갑','편한 여벌 신발',
+  '구급함','개인 상비약','밴드·거즈','마스크','의료 보조기기 예비품','처방약 예비품',
+  '호루라기','종이 지도','다목적 도구','방수 비닐봉투','작은 수리 테이프','고무장갑',
+  '생수','간편식','고열량 간식','통조림','식수 정화 도구','수동 캔따개','휴대용 식기',
+  '화장지','물티슈','손소독제','칫솔·치약','수건','개인 위생용품','아기용 위생용품',
+  '담요','단열 매트','침낭','작은 방수포','손전등','휴대용 라디오','보조배터리',
+  '충전 케이블','예비 건전지','충전 어댑터','휴대용 태양광 패널',
+] as const
 const approvedStates = new Set(['USER_APPROVED_FOR_PUBLICATION', 'PUBLISHED'])
 
 export function bagDraftStateLabel(state: string) {
@@ -90,6 +101,7 @@ export function parseBagDraftQueue(text: string): BagDraftQueue {
 export function bagDraftRows(queue: BagDraftQueue, filter: BagDraftFilter = 'ALL'): BagDraftRow[] {
   const rows = Object.entries(queue.articles).map(([id, row]) => ({
     ...row, id, label: bagDraftStateLabel(row.state),
+    catalogName: row.catalogName ?? catalogNames[Number(id.slice(6)) - 1] ?? '품목별 생존지식',
   })).sort((a, b) => Number(a.id.slice(6)) - Number(b.id.slice(6)))
   if (filter === 'PENDING') return rows.filter((row) => !bagDraftIsApproved(row.state))
   if (filter === 'APPROVED') return rows.filter((row) => bagDraftIsApproved(row.state))
