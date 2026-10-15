@@ -345,3 +345,10 @@ footer{font-size:11px}
 .item-knowledge-wrap{margin-top:12px}
 .item-knowledge-link{display:inline-flex;align-items:center;min-height:44px;padding:10px 12px;border-radius:10px;border:1px solid #b4cadc;background:#eef5fb;color:#234e7c;font-size:13px;font-weight:750;text-decoration:none}
 .item-knowledge-link:focus-visible{outline:3px solid #ff955d;outline-offset:2px}
+
+/* Approved READY backpack: one asset for the app header and installed launch identity. */
+.top .mini-bag{width:72px;min-width:72px;height:72px;flex:none;transform:none;background:#142234 url('/bag-lab/icons/bag-ready-512.webp') center/contain no-repeat;border-radius:18px}
+.top .mini-bag>*{display:none}
+.top .brand-symbol{background:#142234 url('/bag-lab/icons/bag-ready-512.webp') center/cover no-repeat;border-radius:9px}
+.top .brand-symbol .ui-icon{visibility:hidden}
+@media(max-width:740px){.top .mini-bag{width:60px;min-width:60px;height:60px;transform:none}}
