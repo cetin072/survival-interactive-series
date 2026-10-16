@@ -2,7 +2,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { KnowledgeDraftBrief } from './KnowledgeDraftEditor'
-import { KnowledgeReviewFocus, editReviewTarget, normalizeHumanReviewDraft, reviewTargetValue, selectKnowledgeReviewTargets } from './KnowledgeReviewFocus'
+import { KnowledgeEvidenceGatePanel, KnowledgeReviewFocus, editReviewTarget, knowledgeEvidenceGate, normalizeHumanReviewDraft, reviewTargetValue, selectKnowledgeReviewTargets } from './KnowledgeReviewFocus'
 
 function example(): KnowledgeDraftBrief {
   return {
@@ -52,6 +52,25 @@ describe('Knowledge focused human review', () => {
     expect(edited.semantic_qa_status).toBe('REVIEW')
     expect(original.semantic_qa_status).toBe('NEEDS_HUMAN_REVIEW')
     expect(normalizeHumanReviewDraft({ ...example(), semantic_qa_status: 'PASS' }).semantic_qa_status).toBe('PASS')
+  })
+
+  it('keeps unresolved machine evidence visible and blocks approval until its separate gate can validate', () => {
+    const unresolved = knowledgeEvidenceGate({ evidence: {
+      unknowns: ['현지 소방 정원 확인 필요', '동의 여부 불명'],
+      conflicts: [], copyright_status: 'PUBLIC_OFFICIAL_SOURCE_SUMMARY',
+      story_source_status: 'NARRATIVE_PROVENANCE_ONLY',
+    } })
+    expect(unresolved.blockers.length).toBe(3)
+    expect(unresolved.unknowns).toContain('현지 소방 정원 확인 필요')
+    const markup = renderToStaticMarkup(createElement(KnowledgeEvidenceGatePanel, { gate: unresolved }))
+    expect(markup).toContain('현지 소방 정원 확인 필요')
+    expect(markup).toContain('재사용 권한 검증 필요')
+    expect(markup).toContain('사람의 문장 검토와 별개')
+    const cleared = knowledgeEvidenceGate({ evidence: {
+      unknowns: [], conflicts: [], copyright_status: 'CLEAR',
+      story_source_status: 'VERIFIED_PUBLIC_ARCHIVE',
+    } })
+    expect(cleared.blockers).toHaveLength(0)
   })
 
   it('renders source text, an immediately following reason, and review checkboxes safely', () => {
