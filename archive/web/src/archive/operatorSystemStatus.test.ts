@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
+import type { AWikiContinuousStatus } from './operatorSystemStatus'
 import {
   aWikiPublicationStatus,
   aWikiOperatorGuidance,
   aWikiStatusLabel,
+  aWikiContinuousGuidance,
   formatOperatorRefreshTime,
   formatOperatorTime,
   operatorStaticStatus,
@@ -23,6 +25,32 @@ import {
   timezoneLabel,
   timezoneWithKorean,
 } from './operatorSystemStatus'
+
+describe('multi-world review telemetry', () => {
+  const idle: AWikiContinuousStatus = {
+    worker_connected: true, last_scan_at: '2026-10-16T13:00:00Z', next_status: 'NO_JOB',
+    current_chronicle_id: null, current_work_type: null, new_source_count: 0, review_count: 64,
+    candidate_count: 0, published_count: 0, duplicate_count: 0, no_change_count: 64,
+    human_review_count: 0, error_count: 0, last_success_at: '2026-10-16T13:00:00Z',
+  }
+  it('TEST 12: known idle source scan does not imply a disabled reservation', () => {
+    const value = aWikiContinuousGuidance(idle)
+    expect(value.next).toBe('정상 대기 — 현재 새로 반영할 사실 없음')
+    expect(value.schedule).toBe('예약 상태 별도 확인 필요')
+  })
+  it('missing/unconnected telemetry never claims successful multi-world operation', () => {
+    expect(aWikiContinuousGuidance().connection).toContain('미확인')
+    expect(aWikiContinuousGuidance({ ...idle, worker_connected: false }).next).toContain('연결 확인 필요')
+    expect(aWikiContinuousGuidance({ ...idle, last_scan_at: null }).next).toContain('연결 확인 필요')
+  })
+  it('human holds, system failures and stale reviews are distinct', () => {
+    expect(aWikiContinuousGuidance({ ...idle, human_review_count: 1 }).next).toContain('사람 검수 대기')
+    expect(aWikiContinuousGuidance({ ...idle, human_approval_required_count: 1 }).next).toContain('공개 승인 대기')
+    expect(aWikiContinuousGuidance({ ...idle, error_count: 1 }).next).toContain('시스템 오류')
+    expect(aWikiContinuousGuidance({ ...idle, next_status: 'STALE_JOB' }).next).toContain('새로운 독립 검수')
+    expect(aWikiContinuousGuidance({ ...idle, current_work_type: 'MISSING_RELATION' }).workType).toBe('누락 관계')
+  })
+})
 
 describe('Operator system status helpers', () => {
   const mergeSha = '1'.repeat(40)

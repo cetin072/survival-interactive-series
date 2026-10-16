@@ -1,0 +1,125 @@
+{
+  "version": "wiki-continuous-local-evidence-v1",
+  "baseline_main": "91e64a52e43478beef8369790167b91bbc1ae3ca",
+  "runtime": "LOCAL_PROGRAM_NOT_SCHEDULED_WORKER",
+  "source_discovery": [
+    {
+      "chronicle_id": "C01-HAN-JUNHO",
+      "worldline_id": "CANON-V2",
+      "wiki_ref": "archive/content/wiki/C01-HAN-JUNHO/SEED.json",
+      "wiki_sha256": "8d637e81adae45048d9f36bab7e0d0b588b87bcd9a9acb9283b8002a6c9da9fe",
+      "book_sha256": "98235add2392dc66591e26772aa07fb2c45f60b2ecb609ff1a36be4837f290c3",
+      "nodes": 58,
+      "relations": 111,
+      "publication_policy": "NEW_EXACT_HUMAN_APPROVAL_REQUIRED"
+    },
+    {
+      "chronicle_id": "C02-STRONGHOLD",
+      "worldline_id": "STRONGHOLD",
+      "wiki_ref": "archive/content/wiki/C02-STRONGHOLD/SEED.json",
+      "wiki_sha256": "a040d5b885714c9259046e1d54c34b70e3269dc53df440e5f816f929eaf50197",
+      "book_sha256": "cc21254acc575113b00713bf92dc27d807a14ea6baee727e3acbe2ff85c64fba",
+      "nodes": 65,
+      "relations": 72,
+      "publication_policy": "NEW_EXACT_HUMAN_APPROVAL_REQUIRED"
+    },
+    {
+      "chronicle_id": "C03-AFTERFALL",
+      "worldline_id": "AFTERFALL",
+      "wiki_ref": "archive/content/graphs/C03-AFTERFALL/GRAPH.json",
+      "wiki_sha256": "bd37d60de0f7ec9a0208b8abe47e43c00504f7daf4e21e67b4057c3468337bb4",
+      "book_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b",
+      "nodes": 77,
+      "relations": 148,
+      "publication_policy": "EXISTING_C03_FINALIZER_ONLY"
+    }
+  ],
+  "verified_reader_scopes": 64,
+  "semantic_scopes_reviewed": 1,
+  "operating_publications": 0,
+  "job_id": "wiki-review-1e66785718e3da4a530a78b360b5270f9a47cfe3e188b957ed4a1132b1aa29db",
+  "scope_sha256": "1e66785718e3da4a530a78b360b5270f9a47cfe3e188b957ed4a1132b1aa29db",
+  "proposal_sha256": "29b4f8a15ef20448e5fbf37ca997586a5175b3a90755a48aba0b8be5a657405d",
+  "source_id": "c01-han-junho-chapter-01",
+  "source_sha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+  "extractor_execution_id": "root-extractor-20261016",
+  "reviewer_execution_id": "independent-wiki-reviewer-20261016",
+  "result": {
+    "version": "wiki-continuous-result-v1",
+    "job_id": "wiki-review-1e66785718e3da4a530a78b360b5270f9a47cfe3e188b957ed4a1132b1aa29db",
+    "scope_sha256": "1e66785718e3da4a530a78b360b5270f9a47cfe3e188b957ed4a1132b1aa29db",
+    "coverage": "COMPLETE",
+    "checked_fact_count": 23,
+    "candidates": [
+      {
+        "work_type": "FACT_ENRICHMENT",
+        "chronicle_id": "C01-HAN-JUNHO",
+        "text": "제1장 18:48 · 서윤은 병원 응급실 환자가 늘고 있으며 교통사고·호흡기 증상 환자가 섞여 들어오는 것 같다고 전했다.",
+        "meaningful_change": "기존 제1장 병원 기록은 비상전원과 잔류만 담고 있다. 병원에 전해진 환자 유입 변화를 당시 서윤의 관찰·전언으로 추가해 초기 재난 대응 상황을 보강한다. 확정 통계·진단으로 바꾸지 않는다.",
+        "assertion_kind": "REPORTED",
+        "entity_ids": [
+          "loc-hospital",
+          "char-seoyun"
+        ],
+        "previous_record_sha256": "7d50cd1914e0469f9efa7631eb207ed93f7d2adaa6d4f3fad5d81e98127728ed",
+        "evidence": [
+          {
+            "source_sha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "“지금은. 그런데 응급실 쪽 환자가 계속 늘고 있어. 산불 직접 피해보다 교통사고랑 호흡기 증상 환자가 섞여 들어오는 것 같아.”"
+          }
+        ]
+      }
+    ],
+    "insufficient_evidence": [
+      {
+        "reason": "정호의 농로 통과 성공·최종 가족 합류·박씨의 정확한 신원은 이 장만으로 확정하지 않음."
+      }
+    ],
+    "next_review_condition": "공개 Reader/RAW, 현재 세계관 위키 또는 승인 바인딩 변경; 원문에 근거한 새로운 오류 제보."
+  },
+  "proposal": {
+    "version": "wiki-continuous-proposal-v1",
+    "job_id": "wiki-review-1e66785718e3da4a530a78b360b5270f9a47cfe3e188b957ed4a1132b1aa29db",
+    "scope_sha256": "1e66785718e3da4a530a78b360b5270f9a47cfe3e188b957ed4a1132b1aa29db",
+    "result_sha256": "c1f86a50e4be27c38633b7bccc5a6517a0424eada58dfe114b8727873c00a4c3",
+    "candidates": [
+      {
+        "work_type": "FACT_ENRICHMENT",
+        "chronicle_id": "C01-HAN-JUNHO",
+        "text": "제1장 18:48 · 서윤은 병원 응급실 환자가 늘고 있으며 교통사고·호흡기 증상 환자가 섞여 들어오는 것 같다고 전했다.",
+        "meaningful_change": "기존 제1장 병원 기록은 비상전원과 잔류만 담고 있다. 병원에 전해진 환자 유입 변화를 당시 서윤의 관찰·전언으로 추가해 초기 재난 대응 상황을 보강한다. 확정 통계·진단으로 바꾸지 않는다.",
+        "assertion_kind": "REPORTED",
+        "entity_ids": [
+          "loc-hospital",
+          "char-seoyun"
+        ],
+        "previous_record_sha256": "7d50cd1914e0469f9efa7631eb207ed93f7d2adaa6d4f3fad5d81e98127728ed",
+        "evidence": [
+          {
+            "source_sha256": "ef2e9690f9b53ee105588ae1ea4066045754e3d73248e1bc3576f3b2c2e6f2ce",
+            "quote": "“지금은. 그런데 응급실 쪽 환자가 계속 늘고 있어. 산불 직접 피해보다 교통사고랑 호흡기 증상 환자가 섞여 들어오는 것 같아.”"
+          }
+        ],
+        "candidate_sha256": "bbe69a5d41dcbf3e6f7eb356181877f4f60d7ca037ff64df373b04a066625d0a",
+        "semantic_key": "eea2efa71dbae014084ef33d7c2c2fb4e16e3e8e0215463c7303240b2d35d0d6"
+      }
+    ],
+    "duplicates": [],
+    "insufficient_evidence": [
+      {
+        "reason": "정호의 농로 통과 성공·최종 가족 합류·박씨의 정확한 신원은 이 장만으로 확정하지 않음."
+      }
+    ],
+    "checked_fact_count": 23,
+    "next_review_condition": "공개 Reader/RAW, 현재 세계관 위키 또는 승인 바인딩 변경; 원문에 근거한 새로운 오류 제보."
+  },
+  "review": {
+    "version": "wiki-continuous-review-v1",
+    "job_id": "wiki-review-1e66785718e3da4a530a78b360b5270f9a47cfe3e188b957ed4a1132b1aa29db",
+    "proposal_sha256": "29b4f8a15ef20448e5fbf37ca997586a5175b3a90755a48aba0b8be5a657405d",
+    "decision": "APPROVE",
+    "note": "독립 실행 independent-wiki-reviewer-20261016. AGENTS.md, job.scope.source.text 제1장 전문(18:17~19:01), 기존 nodes 58개와 그 facts/evidence 전체, relations 111개와 evidence 전체, immutable proposal 전체의 후보 1건을 대조했다. 18:48 서윤의 응급실 환자 유입 발언 인용은 원문에 정확히 존재하며 source_sha256도 일치한다. 서윤·기존 병원의 신원과 시각이 맞고 다른 장의 의료원이나 후속 가족 합류를 소급 혼합하지 않는다. REPORTED 및 ‘섞여 들어오는 것 같다고 전했다’가 관찰·전언의 불확실성을 보존하며 확정 진단·통계·산불 원인으로 과장하지 않는다. 기존 제1장 병원 기록의 비상전원·잔류, 제4장 정상 전력·응급실 운영과 의미상 중복되지 않으며 초기 응급실 유입 변화를 유의미하게 보강한다. previous_record_sha256는 기존 loc-hospital 레코드와 일치한다. 정호의 통과 성공·최종 합류·박씨 신원을 이 장에서 확정하지 않은 처리도 타당하다. Coverage는 제공된 전문과 기존 기록 전체를 읽어 대조한 범위에서 충족한다. 다만 checked_fact_count=23의 개별 대조목록은 제공되지 않아 그 수치 자체를 재현 검증한 것은 아니며, 모든 가능한 보강 후보가 소진됐다는 뜻도 아니다. 후보와 원본은 수정하지 않았다. 본 승인은 로컬 후보 검수 판단이며 운영 게시 승인 또는 게시 성공을 뜻하지 않는다."
+  },
+  "status": "HUMAN_APPROVAL_REQUIRED",
+  "next": "Separate exact candidate publication approval and production-safe multi-world DB/Program/Native routing required."
+}
