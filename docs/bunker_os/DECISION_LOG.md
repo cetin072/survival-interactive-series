@@ -105,3 +105,14 @@
 - Guard: E-002는 기존 상태 PLANNED(실행 보류)로 유지하고 Week 2 Freeze·실제 이용자 결과·VERIFIED 마일스톤을 만들지 않는다. 기존 8명·10분·판정기준·동의/철회/삭제 규칙은 설계 이력으로 보존하되 실행 일정이나 모집 의무로 취급하지 않는다. 외부 유입·색인·다운로드는 실제 준비행동 성공으로 대체하지 않는다.
 - Revisit when: 감독자가 모집 가능하다고 새로 말하고 명시적으로 재개를 승인할 때. 그때 표본·환경·소요시간·기존 QA 유효성을 재점검한다.
 - Linked: PR #549, [Experiment Brief V1](EXPERIMENT_BRIEF_V1.md), [Week 1 Review V1](WEEK1_REVIEW_V1.md), Issue #501, SEO Issue #491
+
+## D-015 — 전 프로젝트를 Bunker OS에 정렬한다
+- Date: 2026-10-16
+- Status: USER_APPROVED_DIRECTION (실행 UI와 자동 동기화는 미구현)
+- Decision: 삶의 최상위 목적은 가족과 함께 안정적인 미래를 구축하는 것이다. AI와 함께 실제 벙커를 만드는 것은 장기 북극성이다. 당장은 생계를 지탱하는 본업의 안정성과 추가로 재투입할 수 있는 현금흐름을 먼저 확보한다.
+- Decision: 프로젝트별 목표·중요한 판단·검증 결과·다음 행동을 [전 프로젝트 정렬판](CROSS_PROJECT_ALIGNMENT_V1.md)에서 종합한다. 실행 원본은 각 프로젝트의 기존 기록계에 남기고 Bunker OS는 프로젝트 간 목표·전략 결정의 중심이 된다.
+- Why: AI와 자동화 개발 자체가 목적이 되는 문제를 예방하고, 서로 다른 대화에서 결정한 우선순위가 흩어지는 것을 줄인다.
+- Guard: 이 저장소는 공개되어 있다. 세부 재무, 고객, 계약, 자산, 보안 정보는 비공개 원본에서만 확인한다. 각 프로젝트의 새 분석 보고가 없으면 최신 진척을 확정하지 않는다.
+- Revisit when: 삶의 목표가 바뀌거나 실제 성과가 전략 수정의 근거가 될 때.
+- Linked: [NORTH_STAR](NORTH_STAR.md), [STRATEGY](STRATEGY.md), [CROSS_PROJECT_ALIGNMENT_V1](CROSS_PROJECT_ALIGNMENT_V1.md).
+
