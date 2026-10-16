@@ -31,3 +31,11 @@
   .knowledge-review-focus-list li { padding:11px; }
   .knowledge-review-edit textarea { font-size:16px; }
 }
+
+.knowledge-evidence-gate { margin:18px 0 12px; padding:14px; background:#fff9ee; border:1px solid #d7bd8b; border-radius:8px; line-height:1.65; font-size:13px; color:#514839; }
+.knowledge-evidence-gate h3 { margin:0 0 8px; font-size:16px; }
+.knowledge-evidence-gate p { margin:7px 0; }
+.knowledge-evidence-gate ul { margin:6px 0; padding-left:20px; overflow-wrap:anywhere; }
+.knowledge-evidence-gate li { margin:4px 0; }
+.knowledge-evidence-gate details { margin-top:8px; }
+.knowledge-evidence-gate summary { font-weight:700; cursor:pointer; }
