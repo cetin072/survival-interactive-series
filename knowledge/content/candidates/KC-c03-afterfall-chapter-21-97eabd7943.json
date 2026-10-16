@@ -1,0 +1,21 @@
+{
+  "id": "KC-c03-afterfall-chapter-21-97eabd7943",
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-032",
+  "question": "재난 중 공동자산의 사용 권한이 불분명하면 어떻게 해야 할까",
+  "topic_id": "community-emergency-resource-management",
+  "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-chapter-21",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_007/PART_001.md"
+  ],
+  "source_hashes": [
+    "1ab4f8982fb108ec1e3319d8c38cf9ac14c50d9235d4f927988f6895cd10c5c0"
+  ],
+  "source_sha256": "6993cace0f823a8dbac0eccb36078e3c659afa9cfb45796ea711cf73da9ca82e",
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "disposition_note": "기존 K-016은 구성원이 떠날 때 공용 장비와 개인 물품을 인수인계하는 절차, K-020은 거래 당사자의 두 원기록을 대조하는 절차, K-030은 지원 요청을 직접 수행·조정·연결 중 무엇으로 처리할지 다룬다. 이 질문은 제3자가 재난 중 도착한 공동자산의 소유·사용·처분 권한을 확인할 수 없을 때 사람 지원과 자산 처리를 분리하고, 임의 거래를 막으면서 사실·권한·인계 상태를 확인하는 판단에 초점을 두므로 의미상 독립적이다.",
+  "reader_chapter_id": "c03-afterfall-chapter-21",
+  "reader_book_sha256": "a3f9d1ec57311efa744d484b079e589cff8321dd40697b5b7a910ae52a3bef5b",
+  "reader_chapter_sha256": "6993cace0f823a8dbac0eccb36078e3c659afa9cfb45796ea711cf73da9ca82e"
+}
