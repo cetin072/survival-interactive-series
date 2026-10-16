@@ -4,12 +4,14 @@ import type { StateConsoleView } from '../runtime/types'
 
 type Props = {
   view: StateConsoleView
-  source: RuntimeLoadResult['source']
+  source: RuntimeLoadResult['source'] | 'canon-v2-bundled'
   sourceWarning: string | null
   refreshing: boolean
   onRefresh: () => void
+  showRefresh?: boolean
   playBridge: ReactNode
   bgmControl: ReactNode
+  embedded?: boolean
 }
 
 function Section({ title, children, empty }: { title: string; children: ReactNode; empty?: boolean }) {
@@ -23,9 +25,10 @@ function valueOrNone(value: string | null): string {
   return value ?? '미기록'
 }
 
-export function StateConsole({ view, source, sourceWarning, refreshing, onRefresh, playBridge, bgmControl }: Props) {
-  return <main className="console-shell">
-    <header className="console-header">
+export function StateConsole({ view, source, sourceWarning, refreshing, onRefresh, showRefresh = true, playBridge, bgmControl, embedded = false }: Props) {
+  const Root = embedded ? 'section' : 'main'
+  return <Root className={`console-shell${embedded ? ' console-shell-embedded' : ''}`}>
+    {!embedded && <header className="console-header">
       <div>
         <p className="console-kicker">생존기록 · WEB PLAY SHELL</p>
         <h1>{view.header.season}</h1>
@@ -35,16 +38,16 @@ export function StateConsole({ view, source, sourceWarning, refreshing, onRefres
       </div>
       <div className="header-controls">
         {bgmControl}
-        <button className="refresh-button" type="button" onClick={onRefresh} disabled={refreshing}>
+        {showRefresh && <button className="refresh-button" type="button" onClick={onRefresh} disabled={refreshing}>
           {refreshing ? 'SYNC…' : 'REFRESH'}
-        </button>
+        </button>}
       </div>
-    </header>
+    </header>}
 
-    <div className="source-line">
-      <span className={source === 'github-raw' ? 'source-dot live' : 'source-dot'} aria-hidden="true" />
-      {source === 'github-raw' ? 'LIVE CHECKPOINT' : 'DEPLOY FALLBACK'}
-    </div>
+    {!embedded && <div className="source-line">
+      <span className={source === 'github-raw' || source === 'canon-v2-bundled' ? 'source-dot live' : 'source-dot'} aria-hidden="true" />
+      {source === 'github-raw' ? 'LIVE CHECKPOINT' : source === 'canon-v2-bundled' ? 'CANON V2 START STATE' : 'DEPLOY FALLBACK'}
+    </div>}
     {sourceWarning && <p className="source-warning" role="status">{sourceWarning}</p>}
 
     {playBridge}
@@ -52,7 +55,7 @@ export function StateConsole({ view, source, sourceWarning, refreshing, onRefres
     <Section title="FAMILY" empty={view.family.length === 0}>
       <div className="family-list">
         {view.family.map((member) => <article className="family-row" key={member.id}>
-          <div><strong>{member.name}</strong><span>{member.age}세 · {member.sex} · {member.relation}</span></div>
+          <div><strong>{member.name}</strong><span>{[`${member.age}세`, member.sex, member.relation].filter(Boolean).join(' · ')}</span></div>
           <div className="row-values"><span>{member.location}</span><b>{member.status}</b></div>
         </article>)}
       </div>
@@ -107,6 +110,6 @@ export function StateConsole({ view, source, sourceWarning, refreshing, onRefres
         : <ul className="warning-list">{view.warnings.map((warning, index) => <li key={`${warning.code}-${index}`}><strong>{warning.code}</strong><span>{warning.message}</span></li>)}</ul>}
     </Section>
 
-    <footer>PUBLIC STATE ONLY · RUNTIME AI/API CALLS 0</footer>
-  </main>
+    {!embedded && <footer>PUBLIC STATE ONLY · RUNTIME AI/API CALLS 0</footer>}
+  </Root>
 }
