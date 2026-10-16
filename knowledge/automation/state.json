@@ -72,6 +72,18 @@
       "brief_ids": [
         "K-020"
       ]
+    },
+    {
+      "source_manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_003/SOURCE_MANIFEST.json",
+      "source_manifest_sha256": "b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad",
+      "status": "PROCESSED",
+      "processed_at": "2026-10-16T21:03:03.406Z",
+      "candidate_ids": [
+        "KC-source-manifest-json-63015ab2c5"
+      ],
+      "brief_ids": [
+        "K-033"
+      ]
     }
   ]
 }

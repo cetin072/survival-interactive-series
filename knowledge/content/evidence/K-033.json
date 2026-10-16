@@ -1,0 +1,75 @@
+{
+  "claims": [
+    {
+      "claim": "비상자원 계획은 예상되는 위협과 취약점에 필요한 자원 요건을 식별하고, 필요한 양을 추정해 배분·주문·배치까지 연결하는 과정이다.",
+      "context": "FEMA의 NIMS 공식 교육자료는 사고 전 공동계획에서 자원 요건을 식별하고 자원을 추정·배분·주문·배치하도록 설명한다.",
+      "limitation": "미국 NIMS의 조직 단위 사고관리 원칙이며, 특정 물자의 법정 비축량이나 한국 조직의 의무 수량을 정하지 않는다.",
+      "source_ids": [
+        "FEMA-IS700B-RM"
+      ]
+    },
+    {
+      "claim": "사고가 진행되면 필요한 자원의 종류·수량·가용성이 달라질 수 있으므로, 최초 산정 뒤에도 요구량을 계속 확인하고 수정해야 한다.",
+      "context": "FEMA 교육자료는 사고 중 자원 요구를 계속 식별·검증·정교화하고, 우선순위와 목표에 따라 초기·후속 평가를 수행하도록 설명한다.",
+      "limitation": "공식 자료는 '확정분'과 '조건부 추가분'이라는 용어 또는 공통 계산식을 제시하지 않는다. 이 구분은 변화하는 수요를 기록하기 위한 편집적 적용이다.",
+      "source_ids": [
+        "FEMA-IS700B-RM"
+      ]
+    },
+    {
+      "claim": "현재 재고와 확정된 외부 지원을 따로 적고 부족분만 신청량에 반영하면, 같은 수요를 여러 공급원에 중복 계산하는 위험을 줄일 수 있다.",
+      "context": "FEMA와 USFA 자료는 정확한 재고로 상태·가용성을 파악하고, 부족분을 상호지원이나 외부 자원으로 보완하며, 공급자와 요청자 모두 자원을 계획·추적하도록 한다. 이를 신청서의 '보유량·확정 입고·신규 요청' 분리 원칙으로 합성했다.",
+      "limitation": "중복 계산 방지 필드와 차감식은 공식 단일 양식이 아니라 여러 공식 원칙을 결합한 편집안이다. 외부 지원은 제공자의 동의와 실제 확정 상태를 확인하기 전까지 보유량처럼 계산해서는 안 된다.",
+      "source_ids": [
+        "FEMA-IS700B-RM",
+        "USFA-NIMS-RM-2026",
+        "USFA-NIMS-MANAGING-2026"
+      ]
+    },
+    {
+      "claim": "요청량과 인도량, 일정, 우선순위, 예산을 함께 추적하면 확정분을 먼저 조달하고 조건부 추가분은 발동 조건이 충족될 때 나누어 요청하는 계획을 운영할 수 있다.",
+      "context": "USFA는 요청·인도 자원의 일정, 운영 우선순위, 예산을 함께 살피고 배치부터 회수까지 자원을 보고·관리하도록 안내한다. 이 원칙을 분할 조달과 신청 상한 기록에 적용했다.",
+      "limitation": "분할 시점, 승인 한도, 계약 방식은 물자·조직·현지 조달규정마다 다르며, '신청 상한'은 배정 승인이나 구매 허가를 뜻하지 않는다.",
+      "source_ids": [
+        "USFA-NIMS-MANAGING-2026",
+        "FEMA-IS700B-RM"
+      ]
+    }
+  ],
+  "source": {
+    "ref": "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_003/SOURCE_MANIFEST.json",
+    "kind": "PUBLIC_ARCHIVE",
+    "refs": [
+      "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_003/PART_001.md"
+    ],
+    "hashes": [
+      "4fe9d8792477dbf8c1adc146c21547141f06d81a0597d2b3f8018d609be8c0a3"
+    ],
+    "sha256": "b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad"
+  },
+  "brief_id": "K-033",
+  "question": "비상물자 신청량은 확정분과 조건부 추가분을 어떻게 나눌까",
+  "unknowns": [],
+  "conflicts": [],
+  "risk_notes": [
+    "일반 비상물자의 수요계획과 기록만 다루며 연료·발전기·연소·일산화탄소·전기·의료·정수·구조 작업의 수량 산정이나 운용 절차는 다루지 않는다.",
+    "신청 상한은 예상 가능한 최대 수요를 검토하기 위한 관리값이며 실제 배정, 구매, 인도 또는 사용 승인이 아니다.",
+    "현지 법령·조달규정·예산 승인·공급계약·전문 안전기준이 있으면 해당 기준과 담당자의 지시가 우선한다.",
+    "공식 자료의 원칙은 직접 인용하지 않고 요지를 재서술했으며, 사례 숫자는 설명용 가정이지 FEMA가 정한 표준량이 아니다."
+  ],
+  "source_kind": "PUBLIC_ARCHIVE",
+  "source_refs": [
+    "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_003/PART_001.md"
+  ],
+  "candidate_id": "KC-source-manifest-json-63015ab2c5",
+  "source_hashes": [
+    "4fe9d8792477dbf8c1adc146c21547141f06d81a0597d2b3f8018d609be8c0a3"
+  ],
+  "policy_version": "knowledge-c3-policy-v1",
+  "copyright_status": "CLEAR",
+  "narrative_context": "허구·서사(narrative)인 《생존일기》에서 한정된 기간의 확정 필요량과 예상치 못한 정전·긴급 운송에 대비한 조건부 추가량을 나누고, 합계를 확정 소비량이 아닌 신청 상한으로 다루는 장면이 질문의 출발점이다. 작품은 현실 근거로 사용하지 않았다.",
+  "source_manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_003/SOURCE_MANIFEST.json",
+  "story_source_status": "VERIFIED_PUBLIC_ARCHIVE",
+  "narrative_limitation": "작품 속 수량, 연료 종류, 저장·운송 조건, 발전기와 정전 대응은 허구·서사(narrative) 설정이며 현실의 적정량·안전성·법규 준수를 입증하지 않는다.",
+  "source_manifest_sha256": "b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad"
+}
