@@ -8,7 +8,7 @@
   "title": "비상자원을 복구에 쓸 때 남겨 둘 최저량은 어떻게 정할까",
   "tools": [],
   "footer": "이 글은 일반적인 비상자원 계획 참고자료다. 식수 안전, 의료, 전기, 화재, 구조, 배관 수리, 한랭 작업은 현지 당국과 자격 있는 전문가의 지시를 우선하며, 보호 최저량 계산이 위험 작업의 수행 허가가 되지는 않는다.",
-  "status": "READY",
+  "status": "PUBLISHED",
   "sources": [
     {
       "id": "FEMA-CONTINUITY-GUIDANCE-2024",
@@ -165,7 +165,7 @@
   "updated_at": "2026-10-16",
   "ai_assisted": true,
   "content_type": "BRIEF",
-  "published_at": null,
+  "published_at": "2026-10-16",
   "risk_domains": [
     "GENERAL_PREPAREDNESS"
   ],
