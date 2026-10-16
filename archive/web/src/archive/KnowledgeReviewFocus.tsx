@@ -129,6 +129,56 @@ export function editReviewTarget(
   return copy
 }
 
+export type KnowledgeEvidenceGate = {
+  blockers: string[]
+  unknowns: string[]
+  conflicts: string[]
+  copyrightStatus: string | null
+  storySourceStatus: string | null
+}
+
+// Mirrors the existing human-approved release gates without overriding them.
+// Machine-readable evidence is immutable here: no checkbox may silently erase
+// an unresolved fact or invent copyright/Reader verification.
+export function knowledgeEvidenceGate(result?: Record<string, unknown> | null): KnowledgeEvidenceGate {
+  const ev = result?.evidence
+  const evidence = ev && typeof ev === 'object' && !Array.isArray(ev) ? ev as Record<string, unknown> : {}
+  const strs = (value: unknown): string[] => Array.isArray(value)
+    ? value.map((entry) => typeof entry === 'string' ? entry : JSON.stringify(entry)).filter(Boolean)
+    : []
+  const unknowns = strs(evidence.unknowns)
+  const conflicts = strs(evidence.conflicts)
+  const copyrightStatus = typeof evidence.copyright_status === 'string' ? evidence.copyright_status : null
+  const storySourceStatus = typeof evidence.story_source_status === 'string' ? evidence.story_source_status : null
+  const blockers = []
+  if (unknowns.length) blockers.push('확인되지 않은 근거 ' + unknowns.length + '건')
+  if (conflicts.length) blockers.push('상충되는 근거 ' + conflicts.length + '건')
+  if (copyrightStatus !== 'CLEAR') blockers.push('재사용 권한 검증 필요')
+  if (!['VERIFIED_PUBLIC_READER_BACKFILL','VERIFIED_PUBLIC_ARCHIVE','USER_REPORTED_EXPERIENCE'].includes(storySourceStatus ?? '')) {
+    blockers.push('원문 출처 상태 검증 필요')
+  }
+  return { blockers, unknowns, conflicts, copyrightStatus, storySourceStatus }
+}
+
+export function KnowledgeEvidenceGatePanel({ gate }: { gate: KnowledgeEvidenceGate }) {
+  return <section className="knowledge-evidence-gate" aria-label="아직 해소되지 않은 출처 검증 항목">
+    <h3>{gate.blockers.length ? '게시 안전검사에 남은 문제' : '근거 상태 사전점검'}</h3>
+    {gate.blockers.length ? <>
+      <p>아래 사항은 사람의 문장 검토와 별개입니다. 정확한 자료 확인 없이 모두 체크해도 게시할 수 없습니다. 현재 검토함은 원본 Evidence를 임의 변경하지 않습니다.</p>
+      <ul>{gate.blockers.map((msg) => <li key={msg}>{msg}</li>)}</ul>
+      {gate.unknowns.length > 0 && <details open>
+        <summary>실제 미확인 항목 {gate.unknowns.length}건</summary>
+        <ul>{gate.unknowns.map((msg, index) => <li key={index}>{msg}</li>)}</ul>
+      </details>}
+      {gate.conflicts.length > 0 && <details>
+        <summary>충돌하는 출처 근거</summary>
+        <ul>{gate.conflicts.map((msg, index) => <li key={index}>{msg}</li>)}</ul>
+      </details>}
+      <p className="operator-muted">우선 표시된 문장을 수정해 초안을 저장할 수 있습니다. 공개 승인은 이 항목들을 검증하고 기존 게시 검사 조건을 충족한 뒤에만 진행할 수 있습니다.</p>
+    </> : <p>등록된 미해결 근거·저작권·원문 출처 차단은 없습니다. 최종 게이트와 원본 검수는 계속 적용됩니다.</p>}
+  </section>
+}
+
 export function KnowledgeReviewFocus({
   brief, targets, aiNote, reasonCode, reviewed, disabled, onChange, onReview,
 }: {
