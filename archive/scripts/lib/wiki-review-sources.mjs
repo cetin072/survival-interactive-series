@@ -82,7 +82,8 @@ export async function loadWikiReviewSources(base = root) {
         // Whole BOOK/approval changes invalidate any old semantic review as well.
         book_sha256: byteHash(bookBytes), approval_sha256: byteHash(approvals) }
       scopes.push({ ...binding, scope_sha256: graphHash(binding), source_ref: bookRef,
-        season_id: chapter.seasonId, chapter_number: chapter.chapterNumber,
+        ...(chapter.seasonId ? { season_id: chapter.seasonId } : {}),
+        ...(Number.isSafeInteger(chapter.chapterNumber) ? { chapter_number: chapter.chapterNumber } : {}),
         source: { text: chapter.body, raw }, existing,
         publication_policy: inventory.at(-1).publication_policy })
     }

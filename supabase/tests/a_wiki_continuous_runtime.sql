@@ -1,5 +1,16 @@
 -- Isolated database regression only. Every test row is rolled back.
 begin;
+-- REST runs with pg_safeupdate in production; even singleton UPDATE needs WHERE.
+do $$
+declare signature text;
+begin
+ foreach signature in array array['public.archive_a_wiki_review_scan(text,integer,text)',
+ 'public.archive_a_wiki_review_dispatch(text)','public.archive_a_wiki_review_advance(text,text,text,jsonb)'] loop
+  if position('where singleton=true' in lower(pg_get_functiondef(signature::regprocedure)))=0 then
+   raise exception 'SAFEUPDATE_WHERE_MISSING: %',signature;
+  end if;
+ end loop;
+end $$;
 create function pg_temp.job(c text,h text) returns jsonb language sql as $$
  select jsonb_build_object('version','wiki-continuous-job-v1','job_id','wiki-review-'||repeat(h,64),
  'chronicle_id',c,'worldline_id',c,'scope_sha256',repeat(h,64),'work_type','SOURCE_REVIEW',

@@ -167,6 +167,14 @@ test('actual corpus: all 3 worlds and C03 S01/S02 present, hashes checked, no fa
     assert.equal(s.game_time, undefined)
   }
   assert.equal(d.semantic_review_performed, false)
+  // C02 has real chapter order but no C03-style season. Undefined optional
+  // metadata must not enter hashed jobs or become fabricated Runtime state.
+  for (const world of ['C01-HAN-JUNHO', 'C02-STRONGHOLD', 'C03-AFTERFALL']) {
+    const actual = d.scopes.find(s => s.chronicle_id === world)
+    const queued = enqueueReviewWork(discovery([actual]), emptyReviewLedger(), at)
+    assert.equal(queued.status, 'QUEUED')
+    assert.deepEqual(JSON.parse(JSON.stringify(queued.job)), queued.job)
+  }
   assert.equal(enqueueReviewWork(d, emptyReviewLedger(), at).status, d.new_source ? 'LEGACY_NEW_SOURCE' : 'QUEUED')
 })
 test('ledger rejects source-tree writes through directory or file symlinks', async () => {

@@ -10,6 +10,7 @@ for file in \
  supabase/migrations/20261012050000_a_wiki_label_correction_v1.sql \
  supabase/migrations/20261013223500_a_wiki_native_review_relation_revision_v1.sql \
  supabase/migrations/20261016141219_a_wiki_continuous_runtime_v1.sql \
+ supabase/migrations/20261016141609_a_wiki_continuous_safeupdate_v1.sql \
  supabase/tests/a_wiki_native_jobs_recovery_verification.sql \
  supabase/tests/a_wiki_native_jobs_label_correction.sql \
  supabase/tests/a_wiki_native_jobs_human_review_revision.sql \
