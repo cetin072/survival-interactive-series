@@ -43,7 +43,7 @@ export type KnowledgeDetail = KnowledgeItem & {
   result?: Record<string, unknown> | null
 }
 
-export type KnowledgeFilter = 'ALL' | 'WORKING' | 'REVIEW' | 'HELD' | 'PUBLISHED'
+export type KnowledgeFilter = 'ALL' | 'WORKING' | 'REVIEW' | 'APPROVED' | 'HELD' | 'PUBLISHED'
 
 export const emptyKnowledgeInbox: KnowledgeInbox = {
   total_count: 0,
@@ -56,7 +56,11 @@ export const emptyKnowledgeInbox: KnowledgeInbox = {
 
 export const knowledgeBucketFor = (item: KnowledgeItem): Exclude<KnowledgeFilter, 'ALL'> => {
   if (item.status === 'PUBLISHED') return 'PUBLISHED'
-  if (item.status === 'HUMAN_REVIEW') return 'REVIEW'
+  if (item.status === 'HUMAN_REVIEW') {
+    if (item.review_status === 'APPROVED') return 'APPROVED'
+    if (item.review_status === 'HOLD' || item.review_status === 'REJECTED') return 'HELD'
+    return 'REVIEW'
+  }
   if (item.status === 'HOLD' || item.status === 'BLOCKED') return 'HELD'
   return 'WORKING'
 }
@@ -67,6 +71,7 @@ export const knowledgeSourceLabel = (kind?: string | null): string =>
 export const knowledgeBucketLabel: Record<Exclude<KnowledgeFilter, 'ALL'>, string> = {
   WORKING: '작업 중',
   REVIEW: '사람 검토',
+  APPROVED: '휴먼체크 완료',
   HELD: '보관',
   PUBLISHED: '게시됨',
 }
