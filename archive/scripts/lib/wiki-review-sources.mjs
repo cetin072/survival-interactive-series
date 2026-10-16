@@ -1,6 +1,7 @@
 /** Build/program-only adapters. Never import into the public browser projection. */
-import { readFile } from 'node:fs/promises'
+import { readFile, readdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
+import { approvedSeasonCatalog } from './approved-reader-sources.mjs'
 import { byteHash, graphHash } from './publication-graph.mjs'
 import { loadReaderWikiSeeds } from './reader-wiki-seed.mjs'
 import { rawCatalog } from '../reader-source-catalog.mjs'
@@ -14,7 +15,25 @@ const insist = (ok, code) => { if (!ok) throw new Error(code) }
  * Adding a seed/approval registers a Reader world; C03 keeps its Graph adapter.
  */
 export async function loadWikiReviewSources(base = root) {
-  const seeds = await loadReaderWikiSeeds(base, { allowPreview: false })
+  // A deployed program can inspect a freshly fetched main worktree while its
+  // code is pinned to a separately reviewed commit. Catalog and bytes must agree.
+  const catalog = { ...rawCatalog }
+  if (resolve(base) !== root) {
+    // Never execute JS from the source worktree. Reuse pinned approval code on
+    // fresh manifest/RAW data; historical catalogs remain fail-closed.
+    const transcriptRoot = 'archive/content/transcripts/C03-AFTERFALL'
+    const automatic = []
+    for (const season of await readdir(resolve(base, transcriptRoot))) {
+      if (!/^S\d{2,3}$/.test(season) || Number(season.slice(1)) < 3) continue
+      const manifest = JSON.parse(await readFile(resolve(base, transcriptRoot, season, 'MANIFEST.json')))
+      automatic.push(...await approvedSeasonCatalog(manifest, season, {
+        read: ref => readFile(resolve(base, ref)),
+        listParts: async ref => (await readdir(resolve(base, ref))).filter(name => /^PART_\d{3}\.md$/.test(name)),
+      }))
+    }
+    catalog['C03-AFTERFALL'] = [...rawCatalog['C03-AFTERFALL'].filter(p => ['S01','S02'].includes(p.group)), ...automatic]
+  }
+  const seeds = await loadReaderWikiSeeds(base, { allowPreview: false, catalog })
   const worlds = seeds.map(seed => ({ id: seed.chronicleId, seed }))
   worlds.push({ id: 'C03-AFTERFALL' })
   const scopes = [], inventory = [], exclusions = []
@@ -39,7 +58,7 @@ export async function loadWikiReviewSources(base = root) {
       wiki_sha256: wikiSha, book_sha256: byteHash(bookBytes),
       nodes: wiki.nodes.length, relations: wiki.relations.length,
       publication_policy: seed ? 'NEW_EXACT_HUMAN_APPROVAL_REQUIRED' : 'EXISTING_C03_FINALIZER_ONLY' })
-    const allowed = new Set((rawCatalog[id] ?? []).map(p => p.archivePath))
+    const allowed = new Set((catalog[id] ?? []).map(p => p.archivePath))
     for (const chapter of book.chapters) {
       if (chapter.sourceKind !== 'VERIFIED_GM_NARRATIVE') {
         exclusions.push({ chronicle_id: id, source_id: chapter.id, reason: 'UNVERIFIED_READER_SOURCE' })

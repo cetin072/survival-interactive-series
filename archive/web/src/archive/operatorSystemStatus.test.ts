@@ -45,6 +45,7 @@ describe('multi-world review telemetry', () => {
   })
   it('human holds, system failures and stale reviews are distinct', () => {
     expect(aWikiContinuousGuidance({ ...idle, human_review_count: 1 }).next).toContain('사람 검수 대기')
+    expect(aWikiContinuousGuidance({ ...idle, human_approval_required_count: 1 }).next).toContain('공개 승인 대기')
     expect(aWikiContinuousGuidance({ ...idle, error_count: 1 }).next).toContain('시스템 오류')
     expect(aWikiContinuousGuidance({ ...idle, next_status: 'STALE_JOB' }).next).toContain('새로운 독립 검수')
     expect(aWikiContinuousGuidance({ ...idle, current_work_type: 'MISSING_RELATION' }).workType).toBe('누락 관계')

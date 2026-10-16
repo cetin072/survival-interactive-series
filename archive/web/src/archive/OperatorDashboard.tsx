@@ -301,6 +301,9 @@ export function OperatorDashboard({
             <div><dt>멀티 세계관 연결</dt><dd>{aWikiContinuousHelp.connection}</dd></div>
             <div><dt>정기예약</dt><dd>{aWikiContinuousHelp.schedule}</dd></div>
             <div><dt>재검수 대상</dt><dd>{aWikiContinuous?.current_chronicle_id ?? '조회 필요'} · {aWikiContinuousHelp.workType}</dd></div>
+            <div><dt>재검수 처리 상태</dt><dd>{aWikiContinuous?.current_status ? aWikiContinuous.current_status === 'HUMAN_APPROVAL_REQUIRED' ? '독립 검수 통과 · 사람 공개 승인 대기' : aWikiStatusLabel(aWikiContinuous.current_status) : '조회 필요'}</dd></div>
+            <div><dt>재검수 독립 검수</dt><dd>{aWikiContinuous?.review_decision ? decisionLabel(aWikiContinuous.review_decision) : '검수 결과 대기'}</dd></div>
+            <div><dt>별도 공개 승인 대기</dt><dd>{aWikiContinuous ? `${aWikiContinuous.human_approval_required_count ?? 0}건 · 초기 SEED 승인은 새 사실에 승계되지 않음` : '집계 미확인'}</dd></div>
             <div><dt>전체 원문 탐색</dt><dd>{formatOperatorTime(aWikiContinuous?.last_scan_at)}</dd></div>
             <div><dt>기존 세계관 다음 작업</dt><dd>{aWikiContinuousHelp.next}</dd></div>
             <div><dt>재검수 집계</dt><dd>{aWikiContinuous ? `신규 원문 ${aWikiContinuous.new_source_count} · 재검수 ${aWikiContinuous.review_count} · 후보 ${aWikiContinuous.candidate_count} · 게시 ${aWikiContinuous.published_count}` : '탐색 집계 연결 필요'}</dd></div>

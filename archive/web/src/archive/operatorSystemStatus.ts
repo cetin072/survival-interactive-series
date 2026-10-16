@@ -284,6 +284,9 @@ export type AWikiContinuousStatus = {
   duplicate_count: number
   no_change_count: number
   human_review_count: number
+  human_approval_required_count?: number
+  current_status?: string | null
+  review_decision?: string | null
   error_count: number
   last_success_at: string | null
 }
@@ -299,6 +302,7 @@ export function aWikiContinuousGuidance(state?: AWikiContinuousStatus | null) {
     workType: state?.current_work_type ? kinds[state.current_work_type] ?? '작업 유형 확인 필요' : '현재 작업 없음',
     next: !state?.worker_connected || !state.last_scan_at ? '전체 세계관 탐색 연결 확인 필요'
       : state.error_count > 0 ? '시스템 오류 확인 필요'
+      : (state.human_approval_required_count ?? 0) > 0 ? '독립 검수 통과 · 별도 사람 공개 승인 대기'
       : state.human_review_count > 0 ? '사람 검수 대기 · 자동화 장애와 다름'
       : state.next_status === 'NO_JOB' ? '정상 대기 — 현재 새로 반영할 사실 없음'
       : state.next_status === 'STALE_JOB' ? '원문 또는 위키 변경 · 새로운 독립 검수 필요'

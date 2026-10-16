@@ -1,5 +1,11 @@
 # A-Wiki continuous review V1 — implementation and operating boundary
 
+Stage 1 checkpoint below is retained as history. Stage 2 operating contracts,
+versioned Program/Worker router and deployment boundaries are documented in
+[A_WIKI_WORKER_ROUTER_V2.md](A_WIKI_WORKER_ROUTER_V2.md). Actual operating run and
+DB evidence are recorded in PR #595 after verification; do not infer live
+connection merely from either implementation document.
+
 ## Status: PARTIAL, not multi-world production acceptance
 
 Baseline main: `91e64a52e43478beef8369790167b91bbc1ae3ca` (2026-10-16).
