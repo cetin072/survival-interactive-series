@@ -8,6 +8,9 @@ on:
       - 'archive/scripts/lib/wiki-fact-*'
       - 'archive/scripts/lib/wiki-semantic-jobs*'
       - 'archive/scripts/lib/a-wiki-publication-evidence*'
+      - 'archive/scripts/lib/wiki-continuous-review*'
+      - 'archive/scripts/lib/wiki-review-sources*'
+      - 'archive/scripts/run-wiki-continuous-review*'
       - 'archive/scripts/lib/publication-graph.mjs'
       - 'supabase/migrations/*a_wiki_native_jobs*'
       - 'docs/automation/A_WIKI_NATIVE_HANDOFF_V1.md'
@@ -68,7 +71,10 @@ jobs:
             archive/scripts/lib/wiki-fact-extractor.test.mjs \
             archive/scripts/lib/wiki-fact-finalizer.test.mjs \
             archive/scripts/lib/a-wiki-publication-evidence.test.mjs \
+            archive/scripts/lib/wiki-continuous-review.test.mjs \
             archive/scripts/a-wiki-native-control.test.mjs
+      - name: Verify real public multi-world discovery (read only)
+        run: node archive/scripts/run-wiki-continuous-review.mjs --scan
 
   prepare:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.action == 'prepare')

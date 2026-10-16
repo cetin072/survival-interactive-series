@@ -5,6 +5,7 @@ import {
   aWikiPublicationStatus,
   aWikiOperatorGuidance,
   aWikiStatusLabel,
+  aWikiContinuousGuidance,
   blockerLabel,
   decisionLabel,
   formatOperatorRefreshTime,
@@ -22,6 +23,7 @@ import {
   visualOperatorSignal,
   knowledgeOperatorSignal,
 } from './operatorSystemStatus'
+import type { AWikiContinuousStatus } from './operatorSystemStatus'
 
 export type ReviewItem = {
   id: string; source_worker: string; item_type: string; chronicle_id: string | null
@@ -85,7 +87,7 @@ export type SystemStatus = {
     retry_cron: CronStatus | null
   }
   review: { pending_count: number; automation_error_count: number }
-  a_wiki?: { job_count: number; active_count: number; human_review_count?: number; published_count: number; latest_job: AWikiJob | null }
+  a_wiki?: { job_count: number; active_count: number; human_review_count?: number; published_count: number; latest_job: AWikiJob | null; continuous_review?: AWikiContinuousStatus | null }
   knowledge_semantic?: {
     active_count: number
     machine_active_count?: number
@@ -155,6 +157,8 @@ export function OperatorDashboard({
   const aWikiLatest = systemStatus?.a_wiki?.latest_job ?? null
   const aWikiBlocker = aWikiLatest?.blocker_code ?? null
   const aWikiGuidance = aWikiOperatorGuidance(aWikiLatest)
+  const aWikiContinuous = systemStatus?.a_wiki?.continuous_review
+  const aWikiContinuousHelp = aWikiContinuousGuidance(aWikiContinuous)
   const aWikiHumanReview = aWikiLatest?.status === 'HUMAN_REVIEW'
   const aWikiHumanCount = systemStatus?.a_wiki?.human_review_count ?? (aWikiHumanReview ? 1 : 0)
   const aWikiPublication = aWikiPublicationStatus(aWikiLatest, productionStatus)
@@ -294,6 +298,14 @@ export function OperatorDashboard({
           </div>
           <dl>
             <div><dt>최근 작업</dt><dd>{aWikiLatest?.season_id ? `${aWikiLatest.season_id} · ` : ''}{sessionLabel(aWikiLatest?.session_id)}</dd></div>
+            <div><dt>멀티 세계관 연결</dt><dd>{aWikiContinuousHelp.connection}</dd></div>
+            <div><dt>정기예약</dt><dd>{aWikiContinuousHelp.schedule}</dd></div>
+            <div><dt>재검수 대상</dt><dd>{aWikiContinuous?.current_chronicle_id ?? '조회 필요'} · {aWikiContinuousHelp.workType}</dd></div>
+            <div><dt>전체 원문 탐색</dt><dd>{formatOperatorTime(aWikiContinuous?.last_scan_at)}</dd></div>
+            <div><dt>기존 세계관 다음 작업</dt><dd>{aWikiContinuousHelp.next}</dd></div>
+            <div><dt>재검수 집계</dt><dd>{aWikiContinuous ? `신규 원문 ${aWikiContinuous.new_source_count} · 재검수 ${aWikiContinuous.review_count} · 후보 ${aWikiContinuous.candidate_count} · 게시 ${aWikiContinuous.published_count}` : '탐색 집계 연결 필요'}</dd></div>
+            <div><dt>재검수 결과</dt><dd>{aWikiContinuous ? `중복 제외 ${aWikiContinuous.duplicate_count} · 변경 없음 ${aWikiContinuous.no_change_count} · 사람 검수 ${aWikiContinuous.human_review_count} · 시스템 오류 ${aWikiContinuous.error_count}` : '집계 미확인'}</dd></div>
+            <div><dt>마지막 재검수 성공</dt><dd>{formatOperatorTime(aWikiContinuous?.last_success_at)}</dd></div>
             <div><dt>작업 수</dt><dd>{systemStatus?.a_wiki ? `처리 중 ${systemStatus.a_wiki.active_count}건 · 검수 보류 ${aWikiHumanCount}건 · 저장소 반영 ${systemStatus.a_wiki.published_count}건` : '조회 필요'}</dd></div>
             <div><dt>현 상태</dt><dd>{systemStatus?.a_wiki ? aWikiLatest?.status === 'PUBLISHED' ? '세계관 기록 저장소 반영 완료' : aWikiGuidance.category : '조회 필요'}</dd></div>
             <div><dt>내용 검수</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.review : '조회 필요'}</dd></div>

@@ -271,6 +271,41 @@ export function aWikiStatusLabel(value?: string | null) {
   return statusLabel(value)
 }
 
+export type AWikiContinuousStatus = {
+  worker_connected: boolean
+  last_scan_at: string | null
+  next_status: 'NO_JOB' | 'JOB_AVAILABLE' | 'EXISTING_JOB' | 'STALE_JOB' | 'LEGACY_NEW_SOURCE'
+  current_chronicle_id: string | null
+  current_work_type: string | null
+  new_source_count: number
+  review_count: number
+  candidate_count: number
+  published_count: number
+  duplicate_count: number
+  no_change_count: number
+  human_review_count: number
+  error_count: number
+  last_success_at: string | null
+}
+
+export function aWikiContinuousGuidance(state?: AWikiContinuousStatus | null) {
+  const kinds: Record<string, string> = {
+    NEW_SOURCE: '신규 원문 처리', MISSING_FACT: '누락 사실', MISSING_RELATION: '누락 관계',
+    FACT_CORRECTION: '사실 정정', FACT_ENRICHMENT: '사실 보강', SOURCE_REVIEW: '기존 원문 재검수', NO_CHANGE: '변경 없음',
+  }
+  return {
+    schedule: '예약 상태 별도 확인 필요',
+    connection: state?.worker_connected ? '기존 Worker 연결 확인' : '멀티 세계관 Worker 연결 미확인',
+    workType: state?.current_work_type ? kinds[state.current_work_type] ?? '작업 유형 확인 필요' : '현재 작업 없음',
+    next: !state?.worker_connected || !state.last_scan_at ? '전체 세계관 탐색 연결 확인 필요'
+      : state.error_count > 0 ? '시스템 오류 확인 필요'
+      : state.human_review_count > 0 ? '사람 검수 대기 · 자동화 장애와 다름'
+      : state.next_status === 'NO_JOB' ? '정상 대기 — 현재 새로 반영할 사실 없음'
+      : state.next_status === 'STALE_JOB' ? '원문 또는 위키 변경 · 새로운 독립 검수 필요'
+      : '우선순위에 따라 다음 공개 원문 또는 기존 세계관 검수',
+  }
+}
+
 
 const statusKorean: Record<string, string> = {
   AUTO: '자동 운영',
