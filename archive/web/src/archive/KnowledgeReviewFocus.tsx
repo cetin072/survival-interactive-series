@@ -144,7 +144,7 @@ export function knowledgeEvidenceGate(result?: Record<string, unknown> | null): 
   const ev = result?.evidence
   const evidence = ev && typeof ev === 'object' && !Array.isArray(ev) ? ev as Record<string, unknown> : {}
   const strs = (value: unknown): string[] => Array.isArray(value)
-    ? value.map((entry) => typeof entry === 'string' ? entry : JSON.stringify(entry)).filter(Boolean)
+    ? value.map((entry) => typeof entry === 'string' ? entry : (JSON.stringify(entry) ?? '')).filter(Boolean)
     : []
   const unknowns = strs(evidence.unknowns)
   const conflicts = strs(evidence.conflicts)
