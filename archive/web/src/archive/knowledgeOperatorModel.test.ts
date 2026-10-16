@@ -6,7 +6,7 @@ const item = (review_status?: string): KnowledgeItem => ({
 })
 
 describe('Knowledge operator review queue', () => {
-  it('keeps unreviewed content in the person's inbox regardless of semantic decision', () => {
+  it("keeps unreviewed content in the person's inbox regardless of semantic decision", () => {
     expect(knowledgeBucketFor(item('PENDING'))).toBe('REVIEW')
     expect(knowledgeBucketFor(item())).toBe('REVIEW')
   })
