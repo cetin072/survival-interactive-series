@@ -135,3 +135,28 @@ consumer, then a fresh independent Reviewer. Record actual run IDs, DB state and
 original byte preservation in the PR. A main merge requires the repository's human
 approval; this user request authorizes PR update/connection validation, not an
 unreviewed merge or Production deployment. Keep the two-day release policy.
+
+## Operating DDL verification — 2026-10-16
+
+Applied migration version `20261016141219` (`a_wiki_continuous_runtime_v1`), after
+local PostgreSQL 17 and GitHub DB/native-contract CI passed. The CLI-created
+migration file was renamed to the actual platform-assigned applied version;
+its SQL bytes are unchanged. Initial transport request expired with no DB change;
+absence was read back before the successful retry. No migration was applied twice.
+
+Both new private tables have RLS enabled and no anon/authenticated SELECT or
+service-role direct UPDATE privileges. Anon submit and authenticated Worker-read
+are denied; service prepare is granted. Security advisors return INFO-only
+RLS-without-policy entries for these intentionally deny-all private tables; access
+is exclusively through guarded definers, matching the existing C03 architecture.
+See https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy.
+
+The original five C03 durable rows still hash to
+`d555adf7c610cabea2257898a555a4e98945ee70fc86d48f9d804c955d115505`.
+Definitions of the original prepare/current/submit/advance/recovery-current RPCs
+were compared before and after and remained exactly equal. Original Graph,
+SEED, BOOK, RAW, PUBLIC_APPROVALS, Fact/Receipt and release marker files are absent
+from this PR's diff. The new router initially returned IDLE/NO_JOB, and
+`worker_connected` remains false. Subsequent actual Program/native pilot results
+must be checked separately in PR #595; this DDL verification does not imply a
+published fact or a changed reservation prompt.
