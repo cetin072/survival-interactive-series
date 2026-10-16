@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { KnowledgeDraftEditor, KnowledgeDraftPreview, type KnowledgeDraftBrief } from './KnowledgeDraftEditor'
-import { KnowledgeReviewFocus, editReviewTarget, normalizeHumanReviewDraft, selectKnowledgeReviewTargets, type KnowledgeReviewTarget } from './KnowledgeReviewFocus'
+import { KnowledgeEvidenceGatePanel, KnowledgeReviewFocus, editReviewTarget, knowledgeEvidenceGate, normalizeHumanReviewDraft, selectKnowledgeReviewTargets, type KnowledgeReviewTarget } from './KnowledgeReviewFocus'
 import './KnowledgeReviewFocus.css'
 import { uploadKnowledgeImage } from './knowledgeMedia'
 import {
@@ -141,6 +141,10 @@ export function OperatorKnowledgeDetail({
   }, [selected])
 
   const publishDraft = useCallback(async () => {
+    if (knowledgeEvidenceGate(selected?.result).blockers.length > 0) {
+      setError('해결되지 않은 출처·근거 검증이 있습니다. 초안 수정은 저장할 수 있지만 이 상태로 공개 승인하면 게시 안전검사를 통과하지 못합니다.')
+      return
+    }
     // A checked priority review is explicit human action, not an automatic QA pass.
     if (!supabaseClient || !selected || !draftEditable || !draftBrief
       || reviewTargets.length === 0 || !reviewTargets.every((target) => reviewed[target.key] === true)) return
@@ -177,6 +181,8 @@ export function OperatorKnowledgeDetail({
       setSavingDraft(false); setBusy(false)
     }
   }, [draftBrief, draftEditable, draftRevision, loadDetail, reviewNote, reviewed, reviewTargets, selected])
+
+  const evidenceGate = knowledgeEvidenceGate(selected?.result)
 
   return <section className="operator-page knowledge-detail-page">
     <header className="operator-heading">
@@ -231,6 +237,8 @@ export function OperatorKnowledgeDetail({
           </div>}
         </div>
 
+        {draftEditable && <KnowledgeEvidenceGatePanel gate={evidenceGate} />}
+
         {draftEditable && <KnowledgeReviewFocus
           brief={draftBrief}
           targets={reviewTargets}
@@ -260,12 +268,12 @@ export function OperatorKnowledgeDetail({
         {draftEditable && <div className="operator-decision knowledge-publication-decision">
           <label>검토 메모<textarea maxLength={1000} value={reviewNote} onChange={(event) => setReviewNote(event.target.value)} /></label>
           <div>
-            <button disabled={busy || savingDraft || reviewTargets.length === 0 || !reviewTargets.every((target) => reviewed[target.key])}
+            <button disabled={busy || savingDraft || evidenceGate.blockers.length > 0 || reviewTargets.length === 0 || !reviewTargets.every((target) => reviewed[target.key])}
               onClick={() => void publishDraft()}>휴먼체크 완료 · 공개 승인</button>
             <button className="operator-secondary" disabled={busy} onClick={() => void decideReview('HOLD')}>보류</button>
             <button className="operator-danger" disabled={busy} onClick={() => void decideReview('REJECTED')}>거절</button>
           </div>
-          <p className="knowledge-review-complete-hint">표시된 구간을 직접 확인·수정한 후 모두 체크하면 승인할 수 있습니다. 승인 시 편집본을 최신 revision으로 저장하고 검토 완료를 기록합니다. 기존 C3가 근거·계약 검증, PR·CI, 정확한 커밋 병합을 수행하며, 정규 Production 배포 이후 홈페이지에 게시됩니다.</p>
+          <p className="knowledge-review-complete-hint">표시된 구간을 직접 확인·수정하고, 별도 근거 차단이 모두 해소되면 승인할 수 있습니다. 승인 시 편집본을 최신 revision으로 저장하고 검토 완료를 기록합니다. 기존 C3가 근거·계약 검증, PR·CI, 정확한 커밋 병합을 수행하며, 정규 Production 배포 이후 홈페이지에 게시됩니다.</p>
           <p className="operator-muted">사람 체크만으로 근거 충돌이나 국내 법령·전문가 확인 필요가 사라지지는 않습니다. 근거 검증이 통과하지 않으면 공개는 계속 보류됩니다.</p>
           {draftDirty && <p className="operator-muted">편집 내용이 저장되지 않았습니다. '초안 저장' 또는 '휴먼체크 완료 · 공개 승인'에서 정확한 수정본을 저장합니다.</p>}
         </div>}
