@@ -1,0 +1,34 @@
+{
+  "id": "KC-source-manifest-json-63015ab2c5",
+  "source": {
+    "ref": "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_003/SOURCE_MANIFEST.json",
+    "kind": "PUBLIC_ARCHIVE",
+    "refs": [
+      "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_003/PART_001.md"
+    ],
+    "hashes": [
+      "4fe9d8792477dbf8c1adc146c21547141f06d81a0597d2b3f8018d609be8c0a3"
+    ],
+    "sha256": "b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad"
+  },
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-033",
+  "question": "비상물자 신청량은 확정분과 조건부 추가분을 어떻게 나눌까",
+  "topic_id": "community-emergency-resource-management",
+  "risk_level": "LOW",
+  "source_kind": "PUBLIC_ARCHIVE",
+  "source_refs": [
+    "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_003/PART_001.md"
+  ],
+  "risk_domains": [
+    "GENERAL_PREPAREDNESS"
+  ],
+  "source_hashes": [
+    "4fe9d8792477dbf8c1adc146c21547141f06d81a0597d2b3f8018d609be8c0a3"
+  ],
+  "policy_version": "knowledge-c3-policy-v1",
+  "disposition_note": "기존 K-031은 이미 보유한 비상자원에서 복구에 투입할 수 있는 양과 보호 최저량을 다루고, K-010은 조직 간 자원·비용 분담 합의를, K-004는 분산 재고 기록을 다룬다. 이 후보는 조달 전에 현재 운영에 필요한 확정 신청량과 특정 조건에서만 열리는 추가량을 분리하고 그 합계를 신청 상한으로 관리하는 수요계획 절차에 초점을 두므로 실질적으로 구별된다. 위험물의 보관·운송·사용은 제외하고 일반 비상물자의 저위험 계획 원칙만 다룬다.",
+  "publication_policy": "AUTO_LOW_RISK",
+  "source_manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S04/SESSION_003/SOURCE_MANIFEST.json",
+  "source_manifest_sha256": "b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad"
+}
