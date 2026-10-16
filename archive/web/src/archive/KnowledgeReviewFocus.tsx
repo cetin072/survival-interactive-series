@@ -77,7 +77,10 @@ export function selectKnowledgeReviewTargets(
     })
   })
   candidates.sort((a, b) => b.score - a.score || (a.sectionIndex ?? 0) - (b.sectionIndex ?? 0) || (a.blockIndex ?? 0) - (b.blockIndex ?? 0))
-  const selected = candidates.slice(0, 2).map(({ score: unused, ...target }) => target)
+  const selected: KnowledgeReviewTarget[] = candidates.slice(0, 2).map((item) => ({
+    key: item.key, heading: item.heading, reason: item.reason,
+    sectionIndex: item.sectionIndex, blockIndex: item.blockIndex, itemIndex: item.itemIndex,
+  }))
   // Every held package needs evidence-scope verification, including LOW-risk
   // BRIEF_READY packages routed to a person's inbox by the publication gate.
   if (brief.basis?.trim()) selected.push({
@@ -143,7 +146,9 @@ export function KnowledgeReviewFocus({
         return <li key={target.key} className={reviewed[target.key] ? 'review-checked' : ''}>
           <h3>{target.heading}</h3>
           <p className="knowledge-review-quote"><mark>{current}</mark></p>
-          <div className="knowledge-review-reason"><strong>AI가 확인을 요청한 이유</strong><p>{target.reason}</p></div>
+          <div className="knowledge-review-reason"><strong>AI가 확인을 요청한 이유</strong><p>{target.reason}</p>
+            {aiNote && <p className="knowledge-review-original-reason"><b>AI 원본 판단:</b> {aiNote}</p>}
+          </div>
           <label className="knowledge-review-edit">이 부분만 직접 수정
             <textarea rows={Math.min(9, Math.max(3, Math.ceil(current.length / 55)))} maxLength={10000}
               value={current} disabled={disabled}
