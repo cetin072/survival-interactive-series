@@ -19,7 +19,7 @@
     ],
     "sha256": "b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad"
   },
-  "status": "READY",
+  "status": "PUBLISHED",
   "sources": [
     {
       "id": "FEMA-IS700B-RM",
@@ -205,7 +205,7 @@
   ],
   "candidate_id": "KC-source-manifest-json-63015ab2c5",
   "content_type": "BRIEF",
-  "published_at": null,
+  "published_at": "2026-10-16",
   "risk_domains": [
     "GENERAL_PREPAREDNESS"
   ],
