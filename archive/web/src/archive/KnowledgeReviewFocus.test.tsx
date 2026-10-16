@@ -2,7 +2,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { KnowledgeDraftBrief } from './KnowledgeDraftEditor'
-import { KnowledgeReviewFocus, editReviewTarget, reviewTargetValue, selectKnowledgeReviewTargets } from './KnowledgeReviewFocus'
+import { KnowledgeReviewFocus, editReviewTarget, normalizeHumanReviewDraft, reviewTargetValue, selectKnowledgeReviewTargets } from './KnowledgeReviewFocus'
 
 function example(): KnowledgeDraftBrief {
   return {
@@ -44,6 +44,14 @@ describe('Knowledge focused human review', () => {
     const targets = selectKnowledgeReviewTargets(example(), 'AUTO_EVIDENCE_REQUIRES_HUMAN_REVIEW')
     expect(targets[0].reason).toContain('특정 오류 문장을 지목한 것은 아닙니다')
     expect(targets.some((v) => v.field === 'basis')).toBe(true)
+  })
+
+  it('normalizes only the legacy editable copy while keeping the original QA decision', () => {
+    const original = { ...example(), semantic_qa_status: 'NEEDS_HUMAN_REVIEW' }
+    const edited = normalizeHumanReviewDraft(original)
+    expect(edited.semantic_qa_status).toBe('REVIEW')
+    expect(original.semantic_qa_status).toBe('NEEDS_HUMAN_REVIEW')
+    expect(normalizeHumanReviewDraft({ ...example(), semantic_qa_status: 'PASS' }).semantic_qa_status).toBe('PASS')
   })
 
   it('renders source text, an immediately following reason, and review checkboxes safely', () => {
