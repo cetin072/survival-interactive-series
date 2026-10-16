@@ -5,7 +5,7 @@ import { OperatorBagKnowledgeInbox } from './OperatorBagKnowledgeInbox'
 import {
   BAG_QUEUE_PATH, BAG_WRITING_BRANCH, bagDraftLabel, checkedDraftFile,
   decodeGithubText, githubContentUrl, githubDraftWebUrl,
-  joinBagReviewStates, parseBagDraft, readBagDraftQueue,
+  joinBagReviewStates, parseBagDraft, readBagDraftQueue, readBagDraftDirectory,
 } from './bagKnowledgeDraftInbox'
 
 const draft = (items: Record<string, { state: string; file: string; catalogName: string }>, next = 'guide-09') =>
@@ -47,6 +47,35 @@ describe('Bag knowledge draft inbox boundary', () => {
     expect(next[1].published).toBe(true)
     expect(next[0].published).toBe(false)
     expect(bagDraftLabel(next[0].state)).toBe('미검수 · 보관')
+  })
+  it('keeps manuscripts 11-13 visible even while working queue is stuck at 10', () => {
+    const working = readBagDraftQueue(draft({
+      'guide-08': record('guide-08', 'PENDING_INDEPENDENT_REVIEW'),
+    }, 'guide-09'))
+    const main = readBagDraftQueue(draft({}))
+    const files = readBagDraftDirectory([
+      { type: 'file', name: 'GUIDE_08_DRAFT_V01.md' },
+      { type: 'file', name: 'GUIDE_11_DRAFT_V01.md' },
+      { type: 'file', name: 'GUIDE_12_DRAFT_V01.md' },
+      { type: 'file', name: 'GUIDE_13_DRAFT_V01.md' },
+      { type: 'file', name: 'DRAFT_QUEUE_V1.json' },
+      { type: 'dir', name: 'GUIDE_14_DRAFT_V01.md' },
+    ])
+    const result = joinBagReviewStates(working, main, files)
+    expect(result.map(item => [item.id,item.name,item.published])).toEqual([
+      ['guide-08','여벌 속옷',false],
+      ['guide-11','모자·장갑',false],
+      ['guide-12','편한 여벌 신발',false],
+      ['guide-13','구급함',false],
+    ])
+    expect(result.every(item => bagDraftLabel(item.state) === '미검수 · 보관')).toBe(true)
+  })
+  it('blocks duplicate IDs in the actual guide directory', () => {
+    expect(() => readBagDraftDirectory([
+      { type:'file',name:'GUIDE_13_DRAFT_V01.md' },
+      { type:'file',name:'GUIDE_13_OTHER_DRAFT_V01.md' },
+    ])).toThrow('DUPLICATE_BAG_DRAFT_ID')
+    expect(() => readBagDraftDirectory({ name:'not directory' })).toThrow('INVALID_BAG_DRAFT_DIRECTORY')
   })
   it('rejects malformed article metadata, mismatched ID and missing body', () => {
     const markdown = '---\ncatalogId: guide-08\ntitle: 여벌 속옷은 왜 생존가방에 필요할까?\n---\n# 여벌 속옷'
