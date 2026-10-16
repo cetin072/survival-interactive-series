@@ -2,49 +2,19 @@
   "receipt": {
     "version": "illustration-reservation-handoff-v1",
     "mode": "LIVE",
-    "job_id": "illustration-char-jaemin-77bbbe706137-20261016-38802436020",
-    "main_sha": "f48f413b7188e8bc1df481d53f56d0fcdad2cb25",
-    "point_id": "point-dd7b0b496257c3bb65a21c2c26a3fc612bf459cb5ae1c25ddc4ff10b82c8e7ae",
-    "generation_key": "generation-77bbbe7061376ecaab00457b98824b605885c777eaf7eb9636fc0b7076f7055e",
-    "subject_id": "char-jaemin",
-    "prompt_sha256": "c5bc7277fcb5fe762818c2b1a97f26753d035258fada341a7dbaa719349f7045",
-    "review_context_sha256": "ed9340591d8c8fd77738387a8e7da3bd6b63a4def3259146174e1ba3ebc02fc7",
+    "job_id": "illustration-char-mira-ad95d41ddd63-20261017-38962672125",
+    "main_sha": "9f7b5bdee907a09eb0d9b3a77e57522f4a43610d",
+    "point_id": "point-e1660ca03fde9eb7d7be4f529f95073c06051dcf16f08f053d6cdddd01e646b6",
+    "generation_key": "generation-ad95d41ddd636fdfee6e478b21702792eba13128f1c41290505ebfde944545e4",
+    "subject_id": "char-mira",
+    "prompt_sha256": "d0982bfe018e5210867b719466c7c3fdc3dcef833c187fc29ac9daa9855e01e8",
+    "review_context_sha256": "d3fc3791873478accce109f280ede9f696e3aa3ca25439805e0e6d8f4db49f97",
     "renderer_id": "6ac2e58fc3848191aba731468f6c3e18",
-    "requested_at": "2026-10-15T21:30:18.949Z",
-    "job_created_at": "2026-10-15T20:30:15.087276+00:00",
-    "renderer_prompt_sha256": "5ab114328033fc78260d107ab95505b1077ad4790b14e4fd9057cccb50a9b682",
+    "requested_at": "2026-10-16T21:26:10.371153+00:00",
+    "job_created_at": "2026-10-16T20:30:15.670296+00:00",
+    "renderer_prompt_sha256": "d4dd13571c2f9e2004568a083f2c1e6ba97033d8b2109e41a74d2c59c4508c19",
     "baseline": null
   },
-  "dispatch": {
-    "status": "DISPATCHED",
-    "renderer_id": "6ac2e58fc3848191aba731468f6c3e18",
-    "renderer_prompt_sha256": "5ab114328033fc78260d107ab95505b1077ad4790b14e4fd9057cccb50a9b682",
-    "task_updated_at": "2026-10-15T21:30:32.778827+00:00",
-    "schedule": "BEGIN:VEVENT\nDTSTART:20261015T213232Z\nEND:VEVENT",
-    "scheduled_for": "20261015T213232Z",
-    "next_run_time": null,
-    "prompt_exact_readback": true
-  },
-  "collection": {
-    "status": "PROVIDER_COMPLETE_CONFIRMED",
-    "collected_at": "2026-10-15T22:31:27.054Z",
-    "observed_at": "2026-10-15T22:31:27.054Z",
-    "source_library_path": "/IMAGE-RENDER/output/current.png",
-    "source_library_file_id": "libfile_29465764b95c81918a7931f0d95558e8",
-    "source_file_id": "file_00000000498881f98693605a4096ed8e",
-    "source_version_id": null,
-    "source_modified_at": "2026-10-15T21:38:32.648065Z",
-    "source_sha256": "e21541037618d4c9b4d0ce069c55aae71b74f09dc23d63e6bb0022f95a7dbca8",
-    "source_size_bytes": 2260441,
-    "source_mime_type": "image/png",
-    "source_width": 1024,
-    "source_height": 1536,
-    "source_fully_decoded": true,
-    "provider_complete": {
-      "p_job_id": "illustration-char-jaemin-77bbbe706137-20261016-38802436020",
-      "p_prompt_sha256": "c5bc7277fcb5fe762818c2b1a97f26753d035258fada341a7dbaa719349f7045"
-    },
-    "provider_completed_at": "2026-10-15T22:31:50.247379+00:00",
-    "job_status_readback": "INGESTING"
-  }
+  "dispatch": null,
+  "collection": null
 }
