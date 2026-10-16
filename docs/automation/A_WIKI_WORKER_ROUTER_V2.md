@@ -67,8 +67,12 @@ published and no initial SEED or PUBLIC_APPROVALS item is edited.
 
 Keep task `6ac52bb7615c81918c012afd9f4a4d80`, enabled state, timezone and the existing
 KST 01/05/09/13/17/21 schedule. Do not create a task or change scheduling. Add this
-file to current-main authority along with A_WIKI_FACT_WORKER_V1.md and
-A_WIKI_NATIVE_HANDOFF_V1.md. The task must retain its prohibition on changing
+file to authority along with current-main A_WIKI_FACT_WORKER_V1.md and
+A_WIKI_NATIVE_HANDOFF_V1.md. During this authorized operating pilot, load this V2
+file from the exact reviewed Program commit (explicit immutable SHA in the task
+prompt), while V1 authority remains current main. Do not follow a mutable PR ref
+as Native authority. After merge, current main may own V2 as well. The task must
+retain its prohibition on changing
 itself or any other reservation.
 
 1. Read `public.archive_a_wiki_worker_current_v2()` once.
@@ -112,10 +116,13 @@ itself or any other reservation.
    Program RPC, no paid API, no new schedule or schema changes. Program-owned
    phases simply end this native execution.
 
-Do not replace the task prompt while current main lacks this router authority,
-while the workflow/DB contracts are unverified, or while `program_sha` does not
-identify the reviewed runnable Program. A PR-only pilot is not proof that the
-existing scheduled task has adopted V2. Report that connection separately.
+Do not replace the task prompt until the workflow/DB contracts and actual Program
+prepare/consume are verified and an explicit immutable Program SHA supplies the
+V2 authority. Preserve current-main V1 authority and all its submit behavior.
+A PR-only Program pilot is not proof that the existing scheduled task has adopted
+V2; confirm prompt readback and a separate actual run of that same reservation.
+Updating the prompt after these checks is within this Stage 2 user authorization;
+it does not authorize main merge or a Production deployment.
 
 ## Dashboard and rollout
 
@@ -160,3 +167,17 @@ from this PR's diff. The new router initially returned IDLE/NO_JOB, and
 `worker_connected` remains false. Subsequent actual Program/native pilot results
 must be checked separately in PR #595; this DDL verification does not imply a
 published fact or a changed reservation prompt.
+
+
+## Operating REST correction
+
+The first actual Program pilot (`38914185445`) validated C01 source and imported
+only its durable extraction. Operating REST pg_safeupdate then rejected a singleton
+control UPDATE lacking WHERE; the durable phase remained EXTRACTOR_SUBMITTED and
+review_result remained null. No original fact/review was reset. Follow-up migration
+`20261016141914` changes only the three control writes to WHERE singleton=true,
+retaining the first migration and all rows. Isolated DB and GitHub DB-contract
+checks passed; actual REST and Program resume are verified in the subsequent
+PR #595 execution evidence. C02 scopes also omit nonexistent optional season
+metadata so all three worlds roundtrip through JSON/hashing without inventing a
+season or Runtime anchor.
