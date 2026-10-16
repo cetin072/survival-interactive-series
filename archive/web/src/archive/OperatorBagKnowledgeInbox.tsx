@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SafeMarkdown } from './SafeMarkdown'
 import {
-  BAG_QUEUE_PATH, BAG_WRITING_BRANCH, bagDraftLabel, fetchGithubDraft,
+  BAG_QUEUE_PATH, BAG_WRITING_BRANCH, bagDraftLabel, fetchGithubDraft, fetchGithubDraftDirectory,
   githubDraftWebUrl, joinBagReviewStates, parseBagDraft, readBagDraftQueue,
   type BagDraftItem,
 } from './bagKnowledgeDraftInbox'
@@ -22,12 +22,14 @@ export function OperatorBagKnowledgeInbox() {
   const refresh = useCallback(async () => {
     setLoading(true); setError('')
     try {
-      // Working-branch queue has new hourly drafts; main queue alone authorizes publication.
-      const [working, publicQueue] = await Promise.all([
+      // Actual GitHub guide Markdown files are the durable hourly progress source.
+      // Working queue is legacy review metadata; only main authorizes publication.
+      const [directory, working, publicQueue] = await Promise.all([
+        fetchGithubDraftDirectory(),
         fetchGithubDraft(BAG_QUEUE_PATH, BAG_WRITING_BRANCH),
         fetchGithubDraft(BAG_QUEUE_PATH, 'main'),
       ])
-      setItems(joinBagReviewStates(readBagDraftQueue(working), readBagDraftQueue(publicQueue)))
+      setItems(joinBagReviewStates(readBagDraftQueue(working), readBagDraftQueue(publicQueue), directory))
     } catch (cause) {
       setError(cause instanceof Error ? `원고 목록을 조회하지 못했습니다 (${cause.message}).` : '원고 목록을 조회하지 못했습니다.')
     } finally { setLoading(false) }
