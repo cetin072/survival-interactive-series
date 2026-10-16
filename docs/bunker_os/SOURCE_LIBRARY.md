@@ -119,3 +119,14 @@ V1은 Markdown으로 시작한다. 규모가 커져 실제 조회/중복 관리 
 - Impact: MEDIUM (유통 경로·측정 정의), 시장성/수익성 증거 NONE
 - Status: REVIEWED (자료 내용/정책 경계에 한정, 사람 승인 receipt 아님)
 - Linked: [Distribution Map V1](DISTRIBUTION_MAP_V1.md), [Experiment Brief V1](EXPERIMENT_BRIEF_V1.md), D-012/D-013, Issue #501
+
+
+### S-008 — AI 시대 목표 집중과 현실 답안지에 관한 영상
+- Source: https://www.youtube.com/watch?v=SBGM08Y-tlM
+- Area: 전략 / 사업 / AI 협업 / 전 프로젝트 의사결정
+- Why it matters: AI 도구를 많이 아는 것보다 **상위목표 → 현실의 성공·실패 기록 → 결과를 좌우할 핵심 변수**에 집중해야 한다는 틀을 제공. 대화에서 **작게 실행해 실제 효과를 검증**하는 네 번째 원칙을 추가해 채택.
+- Reliability: 사용자 제공 **한국어 자막 텍스트**를 읽어 내용 확인. 강연자의 기업 사례와 효과 수치는 독립적인 인과 검증 자료가 아니라 주장·예시로 취급. 자막 음성과의 전 구간 대조 및 사례 독립 검증은 하지 않음.
+- Rights: 원본 링크와 독자적으로 작성한 짧은 요약·의사결정만 기록. 자막 전문, 영상, 썸네일 재게시/상업적 사용 권한은 확인되지 않음.
+- Impact: HIGH — 여러 프로젝트의 목표 정렬과 최우선 실행 선택 기준.
+- Status: APPLIED (목표 정렬 규칙에 적용. 강연의 모든 주장에 대한 동의/사실 검증 아님)
+- Linked: [NORTH_STAR](NORTH_STAR.md), [STRATEGY](STRATEGY.md), [DECISION_LOG](DECISION_LOG.md) D-015, [CROSS_PROJECT_ALIGNMENT_V1](CROSS_PROJECT_ALIGNMENT_V1.md).
