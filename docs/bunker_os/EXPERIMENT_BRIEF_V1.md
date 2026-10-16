@@ -1,5 +1,7 @@
 # Experiment Brief V1 — Month 01 / Day 6
 
+> 현재 실행 상태 (2026-10-16): [D-014](DECISION_LOG.md)에 따라 외부 8명 모집·실제 시험은 보류, E-002=PLANNED. 아래 설계·일정·판정 기준은 이력이며 실행 지시가 아니다. 이번 생존가방 앱 1인 3종 점검은 별도 BAG-SIDE-01이며 [EXPERIMENT_LOG](EXPERIMENT_LOG.md#생존가방-1인-실사용--대화에서-기록하는-최소-흐름)에 기록한다.
+
 초안: 2026-10-13 · 검수: 2026-10-14 KST · **E-002 주 실험 제안 1개 / PLANNED / Day 7 감독 검토 대기**
 실제 참가·클릭·준비 행동·수익 관측값: **미수집** · 기준선: **미확보**
 상위: [#501](https://github.com/cetin072/survival-interactive-series/issues/501), [Distribution Map V1](DISTRIBUTION_MAP_V1.md), [Experiment Log](EXPERIMENT_LOG.md)
