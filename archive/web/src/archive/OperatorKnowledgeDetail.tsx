@@ -203,6 +203,10 @@ export function OperatorKnowledgeDetail({
         <span>{selected.risk_level ?? '위험도 미정'}</span>
       </div>
 
+      {selected.review_status === 'APPROVED' && <p className="knowledge-review-complete-hint" role="status">
+        휴먼체크 승인 완료. 이후 자동화 C가 원문·근거·게시 계약을 재검증하고, 안전한 병합을 거친 다음 정규 Production 배포에 반영합니다. 현재 단계는 공개 완료가 아닙니다.
+      </p>}
+
       {selected.note && <p>{selected.note}</p>}
       <dl>
         <div><dt>Candidate</dt><dd>{selected.candidate_id ?? '아직 미작성'}</dd></div>
