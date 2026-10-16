@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { KnowledgeDraftEditor, KnowledgeDraftPreview, type KnowledgeDraftBrief } from './KnowledgeDraftEditor'
-import { KnowledgeReviewFocus, editReviewTarget, selectKnowledgeReviewTargets, type KnowledgeReviewTarget } from './KnowledgeReviewFocus'
+import { KnowledgeReviewFocus, editReviewTarget, normalizeHumanReviewDraft, selectKnowledgeReviewTargets, type KnowledgeReviewTarget } from './KnowledgeReviewFocus'
 import './KnowledgeReviewFocus.css'
 import { uploadKnowledgeImage } from './knowledgeMedia'
 import {
@@ -68,7 +68,7 @@ export function OperatorKnowledgeDetail({
       let visibleBrief: KnowledgeDraftBrief | null = null
       if (!draftResponse.error && draftResponse.data) {
         const draft = draftResponse.data as DraftEnvelope
-        visibleBrief = draft.brief ? cloneBrief(draft.brief) : null
+        visibleBrief = draft.brief ? (draft.editable ? normalizeHumanReviewDraft(draft.brief) : cloneBrief(draft.brief)) : null
         setDraftRevision(draft.revision ?? 0)
         setDraftEditable(draft.editable === true)
       } else {
