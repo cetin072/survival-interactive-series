@@ -37,6 +37,15 @@ const RULES: Record<string, { terms: string[]; explanation: string }> = {
   },
 }
 
+// Older archived human-review packages used legacy QA markers. Normalize only
+// the editable operator copy to REVIEW; never mutate the pinned AI source or
+// claim machine QA PASS before an explicit human approval.
+export function normalizeHumanReviewDraft(brief: KnowledgeDraftBrief): KnowledgeDraftBrief {
+  const copy = JSON.parse(JSON.stringify(brief)) as KnowledgeDraftBrief
+  if (!['PASS', 'REVIEW'].includes(String(copy.semantic_qa_status ?? ''))) copy.semantic_qa_status = 'REVIEW'
+  return copy
+}
+
 const FALLBACK = {
   terms: ['안전', '근거', '범위', '기준', '권한', '조건'],
   explanation: 'AI의 검토 대기 판정이 있습니다. 이 구간은 우선 확인 후보이며, 오류로 확정된 문장은 아닙니다. 원문과 출처를 대조하세요.',
