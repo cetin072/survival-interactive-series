@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { KnowledgeDraftEditor, KnowledgeDraftPreview, type KnowledgeDraftBrief } from './KnowledgeDraftEditor'
+import { KnowledgeEvidenceGatePanel, KnowledgeReviewFocus, editReviewTarget, knowledgeEvidenceGate, normalizeHumanReviewDraft, selectKnowledgeReviewTargets, type KnowledgeReviewTarget } from './KnowledgeReviewFocus'
+import './KnowledgeReviewFocus.css'
 import { uploadKnowledgeImage } from './knowledgeMedia'
 import {
   knowledgeBucketFor,
@@ -36,6 +38,10 @@ export function OperatorKnowledgeDetail({
 }) {
   const [selected, setSelected] = useState<KnowledgeDetail | null>(null)
   const [reviewNote, setReviewNote] = useState('')
+  const [reviewTargets, setReviewTargets] = useState<KnowledgeReviewTarget[]>([])
+  const [reviewed, setReviewed] = useState<Record<string, boolean>>({})
+  const [reviewReasonCode, setReviewReasonCode] = useState<string | null>(null)
+  const [reviewAiNote, setReviewAiNote] = useState<string | null>(null)
   const [draftBrief, setDraftBrief] = useState<KnowledgeDraftBrief | null>(null)
   const [draftRevision, setDraftRevision] = useState(0)
   const [draftEditable, setDraftEditable] = useState(false)
@@ -59,17 +65,33 @@ export function OperatorKnowledgeDetail({
       const detail = detailResponse.data as KnowledgeDetail
       setSelected(detail)
       setReviewNote(detail.review_decision_note ?? '')
+      let visibleBrief: KnowledgeDraftBrief | null = null
       if (!draftResponse.error && draftResponse.data) {
         const draft = draftResponse.data as DraftEnvelope
-        setDraftBrief(draft.brief ? cloneBrief(draft.brief) : null)
+        visibleBrief = draft.brief ? (draft.editable ? normalizeHumanReviewDraft(draft.brief) : cloneBrief(draft.brief)) : null
         setDraftRevision(draft.revision ?? 0)
         setDraftEditable(draft.editable === true)
       } else {
         const resultBrief = detail.result?.brief as KnowledgeDraftBrief | undefined
-        setDraftBrief(resultBrief ? cloneBrief(resultBrief) : null)
+        visibleBrief = resultBrief ? cloneBrief(resultBrief) : null
         setDraftRevision(0)
         setDraftEditable(false)
       }
+      setDraftBrief(visibleBrief)
+      const aiNote = typeof detail.result?.note === 'string' ? detail.result.note : null
+      let reasonCode = typeof detail.result?.code === 'string' ? detail.result.code : null
+      if (detail.review_item_id) {
+        const { data: reviewData } = await supabaseClient.rpc('archive_operator_review_item_detail', {
+          p_item_id: detail.review_item_id,
+        })
+        const payload = (reviewData as { payload?: { reason_codes?: unknown } } | null)?.payload
+        const codes = payload?.reason_codes
+        if (!reasonCode && Array.isArray(codes) && typeof codes[0] === 'string') reasonCode = codes[0]
+      }
+      setReviewReasonCode(reasonCode)
+      setReviewAiNote(aiNote)
+      setReviewTargets(visibleBrief ? selectKnowledgeReviewTargets(visibleBrief, reasonCode, aiNote) : [])
+      setReviewed({})
       setEditing(false)
       setDraftDirty(false)
     }
@@ -119,17 +141,48 @@ export function OperatorKnowledgeDetail({
   }, [selected])
 
   const publishDraft = useCallback(async () => {
-    if (!supabaseClient || !selected || draftRevision < 1 || draftDirty) return
-    setBusy(true); setError('')
-    const { error: publishError } = await supabaseClient.rpc('archive_operator_knowledge_publish', {
-      p_job_id: selected.job_id,
-      p_expected_revision: draftRevision,
-      p_note: reviewNote.trim() || null,
-    })
-    if (publishError) setError('공개 승인을 저장하지 못했습니다. 최신 초안 저장 상태를 확인하세요.')
-    else await loadDetail()
-    setBusy(false)
-  }, [draftDirty, draftRevision, loadDetail, reviewNote, selected])
+    if (knowledgeEvidenceGate(selected?.result).blockers.length > 0) {
+      setError('해결되지 않은 출처·근거 검증이 있습니다. 초안 수정은 저장할 수 있지만 이 상태로 공개 승인하면 게시 안전검사를 통과하지 못합니다.')
+      return
+    }
+    // A checked priority review is explicit human action, not an automatic QA pass.
+    if (!supabaseClient || !selected || !draftEditable || !draftBrief
+      || reviewTargets.length === 0 || !reviewTargets.every((target) => reviewed[target.key] === true)) return
+    setBusy(true); setSavingDraft(true); setError('')
+    try {
+      // Exact revision + approved content are bound by the existing RPC contract.
+      const checkedBrief = { ...draftBrief, semantic_qa_status: 'PASS' }
+      const { data, error: saveError } = await supabaseClient.rpc('archive_operator_knowledge_draft_save', {
+        p_job_id: selected.job_id,
+        p_expected_revision: draftRevision,
+        p_draft_brief: checkedBrief,
+      })
+      if (saveError) {
+        setError(saveError.message.includes('REVISION_CONFLICT')
+          ? '다른 편집본이 먼저 저장되었습니다. 새로고침한 뒤 다시 확인하세요.'
+          : '검토 내용을 저장하지 못했습니다. 수정 내용과 필수 필드를 확인하세요.')
+        return
+      }
+      const saved = data as { revision: number; brief: KnowledgeDraftBrief }
+      setDraftBrief(cloneBrief(saved.brief))
+      setDraftRevision(saved.revision)
+      setDraftDirty(false)
+      const { error: publishError } = await supabaseClient.rpc('archive_operator_knowledge_publish', {
+        p_job_id: selected.job_id,
+        p_expected_revision: saved.revision,
+        p_note: reviewNote.trim() || null,
+      })
+      if (publishError) {
+        setError('검토 내용은 저장됐지만 공개 승인을 마치지 못했습니다. 승인 조건과 기존 게시 이력을 확인하세요.')
+        return
+      }
+      await loadDetail()
+    } finally {
+      setSavingDraft(false); setBusy(false)
+    }
+  }, [draftBrief, draftEditable, draftRevision, loadDetail, reviewNote, reviewed, reviewTargets, selected])
+
+  const evidenceGate = knowledgeEvidenceGate(selected?.result)
 
   return <section className="operator-page knowledge-detail-page">
     <header className="operator-heading">
@@ -156,6 +209,10 @@ export function OperatorKnowledgeDetail({
         <span>{selected.risk_level ?? '위험도 미정'}</span>
       </div>
 
+      {selected.review_status === 'APPROVED' && <p className="knowledge-review-complete-hint" role="status">
+        휴먼체크 승인 완료. 이후 자동화 C가 원문·근거·게시 계약을 재검증하고, 안전한 병합을 거친 다음 정규 Production 배포에 반영합니다. 현재 단계는 공개 완료가 아닙니다.
+      </p>}
+
       {selected.note && <p>{selected.note}</p>}
       <dl>
         <div><dt>Candidate</dt><dd>{selected.candidate_id ?? '아직 미작성'}</dd></div>
@@ -180,25 +237,45 @@ export function OperatorKnowledgeDetail({
           </div>}
         </div>
 
+        {draftEditable && <KnowledgeEvidenceGatePanel gate={evidenceGate} />}
+
+        {draftEditable && <KnowledgeReviewFocus
+          brief={draftBrief}
+          targets={reviewTargets}
+          aiNote={reviewAiNote}
+          reasonCode={reviewReasonCode}
+          reviewed={reviewed}
+          disabled={busy}
+          onChange={(target, text) => {
+            setDraftBrief((current) => current ? editReviewTarget(current, target, text) : null)
+            setDraftDirty(true)
+            setReviewed((current) => ({ ...current, [target.key]: false }))
+          }}
+          onReview={(key, checked) => setReviewed((current) => ({ ...current, [key]: checked }))}
+        />}
+
         {editing && draftEditable
           ? <KnowledgeDraftEditor
               brief={draftBrief}
               disabled={busy}
-              onChange={(next) => { setDraftBrief(next); setDraftDirty(true) }}
+              onChange={(next) => { setDraftBrief(next); setDraftDirty(true); setReviewed({}) }}
               onUploadImage={uploadDraftImage}
             />
-          : <KnowledgeDraftPreview brief={draftBrief} />}
+          : draftEditable
+            ? <details className="knowledge-full-preview"><summary>전체 글 펼쳐보기 · 최종 문맥 검토</summary><KnowledgeDraftPreview brief={draftBrief} /></details>
+            : <KnowledgeDraftPreview brief={draftBrief} />}
 
         {draftEditable && <div className="operator-decision knowledge-publication-decision">
           <label>검토 메모<textarea maxLength={1000} value={reviewNote} onChange={(event) => setReviewNote(event.target.value)} /></label>
           <div>
-            <button disabled={busy || draftRevision < 1 || draftDirty} onClick={() => void publishDraft()}>공개 승인</button>
+            <button disabled={busy || savingDraft || evidenceGate.blockers.length > 0 || reviewTargets.length === 0 || !reviewTargets.every((target) => reviewed[target.key])}
+              onClick={() => void publishDraft()}>휴먼체크 완료 · 공개 승인</button>
             <button className="operator-secondary" disabled={busy} onClick={() => void decideReview('HOLD')}>보류</button>
             <button className="operator-danger" disabled={busy} onClick={() => void decideReview('REJECTED')}>거절</button>
           </div>
-          <p className="operator-muted">공개 승인은 저장된 정확한 편집본 revision에 묶입니다. 이후 기존 C3가 계약 검증·PR·CI·exact-head 병합을 수행하고 Production은 기존 배치 정책을 따릅니다.</p>
-          {draftRevision < 1 && <p className="operator-muted">한 번 이상 초안을 저장해야 공개 승인할 수 있습니다. 수정 없이 검토를 마쳤다면 원문을 그대로 초안 저장할 수 있습니다.</p>}
-          {draftDirty && <p className="operator-muted">저장되지 않은 수정이 있습니다. 먼저 초안 저장을 눌러주세요.</p>}
+          <p className="knowledge-review-complete-hint">표시된 구간을 직접 확인·수정하고, 별도 근거 차단이 모두 해소되면 승인할 수 있습니다. 승인 시 편집본을 최신 revision으로 저장하고 검토 완료를 기록합니다. 기존 C3가 근거·계약 검증, PR·CI, 정확한 커밋 병합을 수행하며, 정규 Production 배포 이후 홈페이지에 게시됩니다.</p>
+          <p className="operator-muted">사람 체크만으로 근거 충돌이나 국내 법령·전문가 확인 필요가 사라지지는 않습니다. 근거 검증이 통과하지 않으면 공개는 계속 보류됩니다.</p>
+          {draftDirty && <p className="operator-muted">편집 내용이 저장되지 않았습니다. '초안 저장' 또는 '휴먼체크 완료 · 공개 승인'에서 정확한 수정본을 저장합니다.</p>}
         </div>}
       </>}
 

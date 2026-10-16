@@ -28,6 +28,9 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
 
   useEffect(() => { void refresh() }, [refresh])
 
+  const pendingReviewCount = inbox.items.filter((item) => knowledgeBucketFor(item) === 'REVIEW').length
+  const approvedReviewCount = inbox.items.filter((item) => knowledgeBucketFor(item) === 'APPROVED').length
+
   const visibleItems = useMemo(
     () => filter === 'ALL' ? inbox.items : inbox.items.filter((item) => knowledgeBucketFor(item) === filter),
     [filter, inbox.items],
@@ -52,7 +55,8 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
     <div className="operator-counts">
       <article><span>C3 작업 글감</span><strong>{inbox.total_count}</strong></article>
       <article><span>작업 중</span><strong>{inbox.working_count}</strong></article>
-      <article><span>사람 검토</span><strong>{inbox.review_count}</strong></article>
+      <article><span>사람 검토</span><strong>{pendingReviewCount}</strong></article>
+      <article><span>휴먼체크 완료 · 발행 대기</span><strong>{approvedReviewCount}</strong></article>
       <article><span>보관</span><strong>{inbox.held_count}</strong></article>
       <article><span>공개 게시됨</span><strong>{inbox.published_count}</strong></article>
     </div>
@@ -64,7 +68,7 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
       </header>
       <p className="operator-muted">글감을 누르면 별도 상세 페이지가 열립니다. HUMAN_REVIEW 완성 초안은 그 페이지에서 한글 편집·이미지·YouTube·초안 저장·공개 승인을 처리합니다.</p>
       <div className="operator-heading-actions">
-        {(['ALL','WORKING','REVIEW','HELD','PUBLISHED'] as const).map((value) =>
+        {(['ALL','WORKING','REVIEW','APPROVED','HELD','PUBLISHED'] as const).map((value) =>
           <button key={value} className="operator-secondary" aria-pressed={filter === value} onClick={() => setFilter(value)}>
             {value === 'ALL' ? '전체' : knowledgeBucketLabel[value]}
           </button>
@@ -89,6 +93,7 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
             <strong>{item.title ?? item.brief_id ?? item.candidate_id ?? item.source_ref?.split('/').at(-1) ?? item.job_id}</strong>
             <small>{item.job_type ?? '—'} · {knowledgeSourceLabel(item.source_kind)} · {formatOperatorTime(item.prepared_at)}</small>
             {item.note && <p>{item.note}</p>}
+            {item.review_status === 'APPROVED' && <p>사람 검토 완료 · 자동 게시 검증 및 정규 배포 대기</p>}
             <em>상세 열기 →</em>
           </a>
         </li>)}
