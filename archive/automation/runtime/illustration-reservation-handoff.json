@@ -25,5 +25,25 @@
     "next_run_time": null,
     "prompt_exact_readback": true
   },
-  "collection": null
+  "collection": {
+    "status": "READY_FOR_PROVIDER_COMPLETE",
+    "collected_at": "2026-10-16T22:31:38.862Z",
+    "observed_at": "2026-10-16T22:31:38.862Z",
+    "source_library_path": "/IMAGE-RENDER/output/current.png",
+    "source_library_file_id": "libfile_65a1b8b555f48191979208dcc83c8f02",
+    "source_file_id": "file_00000000007c82309bb258bca01e0b30",
+    "source_version_id": null,
+    "source_modified_at": "2026-10-16T21:29:31.217592Z",
+    "source_sha256": "99e18eab7fc87a3cd034b709a1053020f4d7762d7a2ff28e3a0e1ff8d3532bec",
+    "source_size_bytes": 2492953,
+    "source_mime_type": "image/png",
+    "source_width": 1024,
+    "source_height": 1536,
+    "source_fully_decoded": true,
+    "provider_complete": {
+      "p_job_id": "illustration-char-mira-ad95d41ddd63-20261017-38962672125",
+      "p_prompt_sha256": "d0982bfe018e5210867b719466c7c3fdc3dcef833c187fc29ac9daa9855e01e8"
+    },
+    "provider_completed_at": null
+  }
 }
