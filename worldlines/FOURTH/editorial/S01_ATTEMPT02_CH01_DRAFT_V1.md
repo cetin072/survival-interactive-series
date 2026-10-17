@@ -1,7 +1,7 @@
 <!-- C04 EDITORIAL DRAFT · not RAW, not Canon, not published.
 Source: Supabase WORLDLINE_04 / C04 / S01 / session 557a7f18-b172-4f72-b1c5-98799d7bacf6, attempt 02.
 Source verified by exact message IDs + content SHA-256 in S01_ATTEMPT02_EDITS_V1.json.
-Editor applied 23 replacements/exclusions to GM turns 0,1,3. GM turn 2 (planning) intentionally omitted.
+Editor applied 27 replacements/exclusions to GM turns 0,1,3. GM turn 2 (planning) intentionally omitted.
 This draft is EDITED_NARRATIVE, never label it VERIFIED_GM_NARRATIVE.
 No game state, chronology, inventory or player choices have been updated by this draft.
 -->
@@ -50,7 +50,7 @@ No game state, chronology, inventory or player choices have been updated by this
 
 *충돌 가능성.*
 
-‘운석’이라는 단어도 없고, 어디에 떨어진다는 설명도 없었다. 그런데 화면 위에는 분명 긴급 안내라고 적혀 있었다.
+어디에 떨어진다는 말은 없었다.
 
 복도에서 누군가 달려오는 발소리가 났다. 관리사무소 문이 벌컥 열렸다.
 
@@ -72,7 +72,7 @@ No game state, chronology, inventory or player choices have been updated by this
 
 브리핑까지 **4분**.
 
-관리사무소 밖에서는 편의점 쪽으로 빠르게 걷는 사람들이 하나둘 눈에 띄기 시작했다. 아직 줄이 길지는 않았다. 하지만 태준은 배송 일을 하며 알고 있었다. 같은 시간에 사람들이 같은 곳으로 향하기 시작하면, 평소 십 분 걸리던 일이 한 시간으로 늘어나는 데 오래 걸리지 않는다는 것을.
+관리사무소 밖에서는 편의점 쪽으로 빠르게 걷는 사람들이 하나둘 눈에 띄기 시작했다. 아직 줄은 길지 않았다.
 
 ***
 
@@ -144,7 +144,7 @@ No game state, chronology, inventory or player choices have been updated by this
 
 **오전 9시 27분. 인근 마트.**
 
-마트 주차장에는 아직 빈자리가 있었다. 다만 평소 이 시간과는 달랐다.
+마트 주차장에는 아직 빈자리가 있었다.
 
 한 남자가 카트를 끌고 주차장으로 뛰어나왔다. 카트에는 생수가 높이 쌓여 있었고, 바퀴 하나가 덜덜거리며 비틀거렸다. 다른 차에서는 아이를 안은 여자가 내리면서 연달아 전화를 걸었다.
 
@@ -152,9 +152,7 @@ No game state, chronology, inventory or player choices have been updated by this
 
 “생수는 한 분에 두 묶음까지만 부탁드립니다! 뒤에 손님들도 계세요!”
 
-아직 가게 문은 열려 있었다. 계산대도 돌아가고 있었다.
-
-하지만 사람들이 물건을 고르는 속도보다 들어오는 속도가 빨랐다.
+계산대는 돌아가고 있었지만 손님은 계속 밀려들었다.
 
 태준은 탑차를 주차선 안에 세우고 시동을 껐다. 적재칸의 배송 물건은 그대로 두고 차를 잠갔다. 휴대전화를 손에 들자 배송센터 단체방 알림 수십 개가 겹쳐 있었다.
 
