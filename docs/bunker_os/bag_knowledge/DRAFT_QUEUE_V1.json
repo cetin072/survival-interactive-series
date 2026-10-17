@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "project": "bag-side-item-knowledge",
+  "catalogTotal": 49,
+  "maxPendingIndependentReview": 49,
+  "nextCandidate": "guide-10",
+  "articles": {
+    "guide-01": {
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_01_WATERPROOF_DOCUMENT_POUCH_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "방수 서류 파우치"
+    },
+    "guide-02": {
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_02_IDENTITY_CARD_COPY_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "신분증 사본"
+    },
+    "guide-03": {
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_03_FAMILY_EMERGENCY_CONTACT_NOTE_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "가족 비상연락처 메모"
+    },
+    "guide-04": {
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_04_SMALL_DENOMINATION_CASH_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "소액권 현금"
+    },
+    "guide-05": {
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_05_IMPORTANT_DOCUMENT_COPIES_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "중요 서류 사본"
+    },
+    "guide-06": {
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_06_SPARE_KEYS_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "여분 열쇠"
+    },
+    "guide-43": {
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_43_FLASHLIGHT_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "손전등"
+    },
+    "guide-07": {
+      "state": "USER_APPROVED_FOR_PUBLICATION",
+      "file": "GUIDE_07_DRAFT_V01.md",
+      "approvedAt": "2026-10-13",
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "catalogName": "우의"
+    },
+    "guide-08": {
+      "state": "PENDING_INDEPENDENT_REVIEW",
+      "file": "GUIDE_08_DRAFT_V01.md",
+      "catalogName": "여벌 속옷"
+    },
+    "guide-09": {
+      "state": "PENDING_INDEPENDENT_REVIEW",
+      "file": "GUIDE_09_DRAFT_V01.md",
+      "catalogName": "여벌 양말"
+    }
+  },
+  "reviewEvidence": {
+    "guide-01_to_guide-06": "https://github.com/cetin072/survival-interactive-series/pull/525#issuecomment-6134230795",
+    "guide-01_note": "A reviewer-approved wording received only a spacing correction in commit 45d4adfc560b06296593c9f82e1d0d264a9fedf7.",
+    "guide-07_and_guide-43_light": "https://github.com/cetin072/survival-interactive-series/pull/525#issuecomment-6138009925",
+    "main_publication_snapshot": "https://github.com/cetin072/survival-interactive-series/pull/540"
+  },
+  "writingPolicy": {
+    "oneArticlePerRun": true,
+    "contentApprovalIsNotPublication": true,
+    "nextNewFilename": "GUIDE_XX_DRAFT_V01.md",
+    "reviewStatusOwner": "independent review feedback verified by operator",
+    "noAutoPublish": true,
+    "noAutoApprove": true,
+    "writeBranch": "feat/bag-side-item-knowledge-template-v1",
+    "pullRequest": 525,
+    "reviewBacklogBlocksWriting": false,
+    "cadence": "HOURLY",
+    "authoritativeSource": "DRAFT_QUEUE_V1.json on feat/bag-side-item-knowledge-template-v1",
+    "storageStatus": "GitHub Draft working branch; Operator inbox is a read-only viewer",
+    "publicationRule": "Only USER_APPROVED_FOR_PUBLICATION records in main publication manifest may reach the public frontend; no automatic promotion",
+    "finishCondition": "ALL_49_WRITTEN",
+    "queueDisplayFields": [
+      "state",
+      "file",
+      "catalogName"
+    ],
+    "transactionMode": "GIT_TREE_SINGLE_COMMIT_EXPECTED_HEAD_V1",
+    "orphanRecovery": "CHECK_DRAFT_FILE_BEFORE_WRITING_NEXT",
+    "approvalUnchanged": true,
+    "queueAndDraftOneCommit": true,
+    "recoveryGuide": "docs/bunker_os/bag_knowledge/AUTOMATION_BAG_DRAFT_RECOVERY_V1.md",
+    "lastRecoveryReceipt": "b9cfd32416afd1aea31a7ea106b9a042e39fdd92"
+  }
+}
