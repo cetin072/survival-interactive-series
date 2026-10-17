@@ -99,3 +99,23 @@ https://help.openai.com/en/articles/10169521-projects-in-chatgpt
 5. 준비상태를 짧게 피드백한 뒤 본편을 시작한다. DB 안전·첫날 조건이 비어 있는 상태에서 분위기 장면부터 만들지 않는다.
 
 이번에 수행한 것은 **외부 보고서 검토, 읽기 전용 재확인, 이 검토 기록의 Draft 저장**이다. 새 Save/세션 생성, DB 구조·권한 변경, 원문 정책 전환, 프로젝트 설정 변경, main 병합, 배포, 기존 자동화 중단은 수행하지 않았다.
+
+## 8. 감사 수용 후 실제 최소 실행 — 2026-10-17
+
+사용자는 기존 감사 피드백을 기록하고, 같은 프로젝트의 **일반 ChatGPT 채팅방**에서 시즌1을 이어가도록 요청했다. 이는 웹게임/새 플랫폼 구축 지시가 아니며, 서진우의 운영 데이터를 수정하라는 뜻도 아니다.
+
+### 실험으로 확인한 부분
+- 기존 함수의 범용 최소 경로를 **실제 Supabase 단일 트랜잭션에서 시험**: 임시 Save 1행 → 기본 `open_public_transcript_session` → 일반 `append_public_transcript_turn` USER/GM 2개 → 동일 payload 재시도에서 동일 메시지 ID 반환·중복 없음 → session last_message_order=1 → optimistic 조건으로 임시 Save 버전 1→2.
+- 시험 끝에 `ROLLBACK` 실행. 후속 별도 SELECT에서 임시 Save·세션·메시지 **모두 0건** 확인. AFTERFALL Save는 **295 유지**.
+- 새 정식 기술 ID는 `WORLDLINE_04 / C04 / S01`로 지정. 독립 시작 브랜치 `worldline/fourth-rpg`, `worldlines/FOURTH/BOOT.md`가 시작점이다. 저장소 루트 WORLDLINE_ROUTER.md에도 이 브랜치 전용 항목을 추가했다(기본 main 미변경).
+- Supabase `survival_rpg.saves`에 신규 세계선 `WORLDLINE_04` **Save 1행을 추가**. 버전 1, `PREPLAY_READY`, 창원시 성산구 일반 배송기사; 이름·나이는 아직 null. 이후 다시 읽어 C04 1건, AFTERFALL 295 확인. `get_scene_context`가 새 worldline에 대한 빈 장면 컨텍스트를 반환하는 것도 확인했다.
+- 서사에 필요한 `GM_RULES.md`, `WORLD_BIBLE.md`, `BOOT.md`, `CURRENT_STATE.json`, `START_ROOM.md`를 새 브랜치에 만들었다. 평시 GM 입력은 최소로 유지하며 감사/기획 전문을 매 턴 읽지 않는다.
+
+### 아직 해결되지 않았거나 범위 밖인 부분
+- F-01/F-02: AFTERFALL 전용 `..._with_state_link` 및 `..._with_archive_intent`는 **계속 사용 금지**. 기존 DB 함수/제약/트리거를 바꾸지 않았다. 일반 원문 함수가 성공했다는 사실이 state-linked 원문 보장을 의미하지 않는다.
+- F-08: SHA·UUID·정확한 원문 재전달은 **프로그램으로 완전 자동화되지 않았다**. 트랜잭션 리허설에서는 SQL의 digest와 고정 UUID를 썼지만 실게임 각 턴의 자동 캡처 워크플로를 E2E로 입증한 것이 아니다. GM 경량화는 짧은 부팅/장면 캐시 적용부터 시작하고, 이후 실사용의 마찰을 근거로 가장 작은 코드 보완을 한다.
+- F-10: Reader/위키/삽화/지식 자동 발행에는 C04를 연결하지 않았다. 공개 발행이 되지 않아도 DB 기록이 곧바로 손실되는 것은 아니지만, 원문 저장 실패는 별도로 감지해야 한다.
+- 초기 캐릭터 **이름·나이·정확한 성산구 배송 첫 장면 장소**는 새 플레이방에서 최소 결정 후 Save 갱신한다. 대재난의 세부 물리 모델도 완전 검증된 수치처럼 묘사하지 않는다.
+- 외부 AI 보고서의 성공 주장은 현재 직접 재검증한 범위와 구분한다. Playtest FUN GATE는 실게임 이후에만 가능하다. `PREPLAY.json`은 과거 기획 점검 파일로 남기되 정식 플레이의 차단기/준비도 판정에는 사용하지 않는다.
+
+**실행 판정:** 새 세계선의 독립 Save·빈 장면 조회·기본 원문 경로의 트랜잭션 리허설은 PASS. 자동 라이브 원문 캡처/장기재개/후속 발행은 아직 미검증. 첫 플레이는 **일반 ChatGPT 프로젝트 새 방에서 캐릭터 최소 결정 후** 시작하되, 실제 저장 실패를 숨기지 않는다.
