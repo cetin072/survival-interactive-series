@@ -29,3 +29,11 @@ test('malformed details are rejected', () => {
   changed.protagonist.age = 7;
   assert.ok(validatePreplay(changed).some((issue) => issue.includes('age must')));
 });
+
+test('selected Seongsan-gu district is required', () => {
+  for (const district of [null, '의창구', '']) {
+    const changed = structuredClone(source);
+    changed.opening.district = district;
+    assert.ok(validatePreplay(changed).some((issue) => issue.includes('Seongsan-gu')));
+  }
+});
