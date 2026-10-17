@@ -129,9 +129,9 @@
     },
     {
       "turn": 1,
-      "find": "**태준이 가장 먼저 연락할 소중한 사람은 누구인가?**",
+      "find": "**오전 9시 28분.**",
       "op": "truncate_before",
-      "why": "이미 다음 플레이에서 해결된 불필요한 선택지 제거"
+      "why": "선택지·시간표 UI 제거, 이후 시간은 다음 장면에서 확정"
     },
     {
       "turn": 3,
@@ -171,20 +171,32 @@
     },
     {
       "turn": 3,
-      "find": "그리고 이제는 어느 쪽에 시간을 썼느냐가 결과를 바꿀 수 있었다.\n\n",
-      "replace": "",
-      "why": "선택 부담을 장면으로 보여주기"
-    },
-    {
-      "turn": 3,
-      "find": "**태준은 주유소 줄에 들어갈까, 아니면 집으로 돌아갈까?**",
+      "find": "**한 시간 남짓 뒤면 정말 무언가가 달라질 수도 있었다.**",
       "op": "truncate_before",
-      "why": "게임 선택문 제외; 결과는 아직 진행 중"
+      "why": "독자가 이미 알 수 있는 시간 압박 해설과 미선택 질문 제외"
     }
   ],
   "publication_policy": {
     "reader_requires_separate_C04_supported_transform_and_review": true,
     "knowledge_site_requires_evidence_based_guide_and_review": true,
     "versioned_postpublication_revision": true
-  }
+  },
+  "source_user_messages": [
+    {
+      "turn": 0,
+      "id": "acfcd96b-347e-4354-b90e-9d8162527c39",
+      "sha256": "1ca4efcc32e0216d39ee8268d35996faa8616d31db71a45ec611dfc729bd7126"
+    },
+    {
+      "turn": 1,
+      "id": "ef6b1a60-07c0-4608-8a2f-412200ab6f41",
+      "sha256": "f4b99c8ecd18c4e527801d0fe0315352c7041024561375aba81a20455ba40f4c"
+    },
+    {
+      "turn": 3,
+      "id": "6c4606d8-77b8-4e57-9c9b-013ee06993e4",
+      "sha256": "57b97736816483a9da95ebb2af11a276535cf7b4f34e9f83496d36a544e4b85f"
+    }
+  ],
+  "editorial_note": "Active attempt 02 only. GM turn 2 is editorial discussion, not story. First attempt 01 is superseded draft, never mix its scenes or gear. Literary revisions only; no changes to player action, world timeline or Save."
 }
