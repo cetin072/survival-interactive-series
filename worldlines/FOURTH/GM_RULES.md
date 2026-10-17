@@ -13,8 +13,10 @@
 
 ## 간결한 기록 경계
 - 현재 사실의 정본은 Supabase survival_rpg.saves에서 worldline_id='WORLDLINE_04'.
-- 같은 장면은 이미 로드한 컨텍스트를 재사용한다. 중요 변동만 기대 버전과 비교한 후 갱신한다. 장면 관련 캐릭터·압력도 실제 조회 원본과 정합성을 맞춘다.
-- 공개 대화 원문은 기본 함수 open_public_transcript_session + append_public_transcript_turn만 사용. AFTERFALL 전용 with_archive_intent, with_state_link, lock_afterfall_* 금지.
-- 정확한 원문과 SHA/UUID를 이용하되 가능한 한 안전한 코드/SQL에서 계산하고, 저장 확인 없이는 저장 성공이라고 말하지 않는다. 두 번의 출력을 회피할 수 있다고 허위 약속하지 않는다.
+- 새 방 부팅·새 장면 전환 시 `saves`의 `save_version`, `state`, `gm_state`를 C04 키로 직접 읽는다. `state.game_time/current_scene`, `state.npcs`, `gm_state.pressures`, `state.go_bag/vehicles/supplies`를 실제 기준으로 삼는다. 범용 `get_scene_context`가 C04의 시간·인물·압력을 비워 보여줘도 세계에 없다는 뜻이 아니다. 같은 장면은 이미 확인한 값 재사용; 중요 변경만 기대 버전과 비교한 후 갱신한다.
+- 공개 원문은 기본 `open_public_transcript_session` + 새 C04 안전 기록 함수 `append_c04_public_turn`을 사용한다(내부에서 기존 `append_public_transcript_turn` 재사용). 이 함수가 원문의 해시와 멱등 식별자를 계산한다. USER 입력에 Codex 도구 진단이 붙어 있으면 거부하므로 사용자 메시지와 도구 오류를 구별해 정확한 실제 텍스트만 전달한다. AFTERFALL 전용 with_archive_intent, with_state_link, lock_afterfall_*는 계속 금지.
+- USER/GM 저장은 최종 공개 원문과 동일해야 한다. 실패 시 임의 보정·과거 RAW 변조 대신 출처 확인과 멱등 재시도로 처리한다. 기록 성공이 확인되지 않으면 저장 성공이라고 보고하지 않는다. 새 함수가 기계적 해시·UUID 작업을 줄이지만, 원문을 전달하는 일까지 없애는 것은 아니다.
 - Reader·Wiki·삽화·지식·배포·GitHub 작업을 일반 플레이 턴의 필수 과정으로 만들지 않는다.
 - 기존 PREPLAY.json 검사기는 기획 검사용 역사 파일이지 S01 실행 조건/보안 장치가 아니다.
+
+- **표시 중복 방지:** 이동 중 가방의 실제 착용/보관 상태는 `state.go_bag`, 차량 위치는 `state.vehicles`를 우선한다. `state.gear`의 오래된 요약은 새 장면에서 함께 갱신하되 별도 상태 원본을 만들지 않는다.
