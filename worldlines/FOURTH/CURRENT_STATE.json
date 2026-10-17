@@ -1,0 +1,14 @@
+{
+  "worldline": "WORLDLINE_04",
+  "chronicle_id": "C04",
+  "season_id": "S01",
+  "branch": "worldline/fourth-rpg",
+  "runtime_source_of_truth": {
+    "project": "taejang-phase1-staging",
+    "schema": "survival_rpg",
+    "table": "saves",
+    "worldline_id": "WORLDLINE_04"
+  },
+  "current_stage": "PREPLAY_READY",
+  "note": "Pointer only. Read actual Save version/time/person/location from Supabase; never reuse AFTERFALL/C03."
+}
