@@ -1,0 +1,42 @@
+{
+  "schema_version": "c04-editorial-revisions-v1",
+  "worldline_id": "WORLDLINE_04",
+  "chronicle_id": "C04",
+  "content_id": "c04-s01-normal-delivery-day0-part1",
+  "kind": "NARRATIVE_READER_CHAPTER",
+  "target_story_url": null,
+  "publication_status": "UNPUBLISHED",
+  "active_published_revision": null,
+  "source_kind": "EDITED_NARRATIVE",
+  "never_label_as": "VERIFIED_GM_NARRATIVE",
+  "immutable_source": {
+    "storage": "survival_rpg.transcript_messages",
+    "session_id": "557a7f18-b172-4f72-b1c5-98799d7bacf6",
+    "source_ref_manifest": "worldlines/FOURTH/editorial/S01_ATTEMPT02_EDITS_V1.json"
+  },
+  "revisions": [
+    {
+      "revision": 1,
+      "kind": "EDITORIAL_DRAFT",
+      "status": "NOT_REVIEWED",
+      "body": "worldlines/FOURTH/editorial/S01_ATTEMPT02_CH01_DRAFT_V1.md",
+      "operations": "worldlines/FOURTH/editorial/S01_ATTEMPT02_EDITS_V1.json",
+      "published_at": null
+    }
+  ],
+  "change_policy": {
+    "keep_content_id_and_slug": true,
+    "create_new_revision_after_publication": true,
+    "never_rewrite_previous_approved_revision": true,
+    "require_exact_source_ref_and_hash": true,
+    "require_human_review_and_preview_before_release": true,
+    "publication_pipeline_for_c04": "NOT_IMPLEMENTED"
+  },
+  "knowledge_site": {
+    "status": "NOT_CONNECTED",
+    "brief_id": null,
+    "source_fiction_is_not_scientific_evidence": true,
+    "updatable_by_revision_with_existing_operator_review": true,
+    "editor_ui_for_c04": "NOT_IMPLEMENTED"
+  }
+}
