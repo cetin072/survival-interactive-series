@@ -102,3 +102,16 @@ AFTERFALL은 《생존일기》 IP의 세 번째 주인공 연대기다.
 GitHub는 부팅·세계/캐릭터 바이블·시즌 체크포인트·아카이브·IP 보존을 담당한다.
 
 재개 시에는 해당 branch의 `CURRENT_STATE.json`이 가리키는 checkpoint를 확인하고, 오래된 START_HANDOFF로 현재 상태를 되감지 않는다.
+
+### FOURTH — C04 / WORLDLINE_04
+- IP Chronicle: **04** (독립 신작)
+- Protagonist: **창원 성산구 일반 배송기사**, 이름·나이 첫 장면 전 결정
+- Branch: `worldline/fourth-rpg`
+- Directory: `worldlines/FOURTH/`
+- Primary entrypoint: `worldlines/FOURTH/START_ROOM.md`
+- BOOT: `worldlines/FOURTH/BOOT.md`
+- Current state pointer: `worldlines/FOURTH/CURRENT_STATE.json` (정본은 Supabase)
+- Current runtime state: Supabase `taejang-phase1-staging.survival_rpg.saves`, `worldline_id='WORLDLINE_04'`
+- Opening state: PREPLAY_READY / S01 (실제 Save에서 검증해야 함)
+- AFTERFALL/C03 및 STRONGHOLD/C02의 현재 기록/인물/압력은 절대 fallback하지 않는다.
+- PREPLAY.json·사전 감사용 문서는 해당 세계선의 본편 실행 입력이 아니다.
