@@ -19,7 +19,7 @@
     ],
     "sha256": "05c73d10cdec984699a6c2275fdde4acb64acd236051857e401abe2801a4ca7c"
   },
-  "status": "READY",
+  "status": "PUBLISHED",
   "sources": [
     {
       "id": "FEMA-EOC-TOOLKIT",
@@ -240,7 +240,7 @@
   ],
   "candidate_id": "KC-c03-afterfall-chapter-22-cb01a339d7",
   "content_type": "BRIEF",
-  "published_at": null,
+  "published_at": "2026-10-17",
   "risk_domains": [
     "GENERAL_PREPAREDNESS"
   ],
