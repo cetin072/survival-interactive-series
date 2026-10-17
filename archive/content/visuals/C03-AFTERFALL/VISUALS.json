@@ -1,18 +1,18 @@
 {
   "anchor": {
-    "game_time": "2027-11-23 16:17",
-    "save_version": 291
+    "game_time": "2027-11-24 07:12",
+    "save_version": 293
   },
-  "batch_id": "batch-3eecd6dfac7bd9f91d15c5528d283a0225d7f31cb209e699b06f4bd70f537dbe",
+  "batch_id": "batch-32d3698a06c694ae97f295dafc627d80cced6665a1d075cfbd74b3a076e8e718",
   "chronicle_id": "C03-AFTERFALL",
-  "content_sha256": "02c23801f9a6fed6d7b92248cc55e48c1c48e6ab9281f2475b27a398bd0f8bb1",
+  "content_sha256": "59794636bc80dae430d4e68e3ce1069b900d103ff29943c7091a408415a75337",
   "execution": {
     "enabled": false,
     "mode": "ZERO_COST_ONLY",
     "provider": null,
     "reason": "CHATGPT_BRIDGE_NOT_VERIFIED"
   },
-  "graph_sha256": "2624da2b7467443660562c5b4a70498db5c60297c7dff747d604c1abfa49b93a",
+  "graph_sha256": "1cfdf150a54152af9335fd7c0b01ee43ab557e6fa607ab7a9adb009300494e0b",
   "map_gate": "WAITING_PUBLIC_MAP_PROJECTION",
   "points": [
     {
@@ -83,14 +83,14 @@
       "reason": "PUBLIC_BRIEF_READY",
       "registry_asset_id": null,
       "source_anchor": {
-        "game_time": "2027-11-23 16:17",
-        "save_version": 291
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "source_refs": [
         {
-          "pointer": "/nodes/6",
-          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
-          "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+          "pointer": "/nodes/2",
+          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+          "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
         },
         {
           "pointer": "/characters/char-jinwoo",
@@ -171,14 +171,14 @@
       "reason": "PUBLIC_BRIEF_READY",
       "registry_asset_id": null,
       "source_anchor": {
-        "game_time": "2027-11-23 16:17",
-        "save_version": 291
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "source_refs": [
         {
-          "pointer": "/nodes/7",
-          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
-          "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+          "pointer": "/nodes/0",
+          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+          "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
         },
         {
           "pointer": "/characters/char-eunchae",
@@ -258,14 +258,14 @@
       "reason": "PUBLIC_BRIEF_READY",
       "registry_asset_id": null,
       "source_anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "source_refs": [
         {
-          "pointer": "/nodes/1",
-          "source_ref": "archive/web/src/archive/archiveData.ts",
-          "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          "pointer": "/nodes/6",
+          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+          "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
         },
         {
           "pointer": "/characters/char-seojin",
@@ -346,14 +346,14 @@
       "reason": "PUBLIC_BRIEF_READY",
       "registry_asset_id": null,
       "source_anchor": {
-        "game_time": "2027-11-23 16:17",
-        "save_version": 291
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "source_refs": [
         {
-          "pointer": "/nodes/8",
-          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
-          "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+          "pointer": "/nodes/1",
+          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+          "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
         },
         {
           "pointer": "/characters/char-taehoon",
@@ -919,14 +919,14 @@
       "reason": "PUBLIC_BRIEF_READY",
       "registry_asset_id": null,
       "source_anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "source_refs": [
         {
-          "pointer": "/nodes/20",
-          "source_ref": "archive/web/src/archive/archiveData.ts",
-          "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          "pointer": "/nodes/7",
+          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+          "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
         }
       ],
       "status": "READY",
@@ -1437,6 +1437,80 @@
           "theme": "Small humans in a beautiful, vast damaged world; quiet survival, not spectacle."
         },
         "canon_facts": {
+          "public_description": "2027년 11월 24일 이동식 발전기를 쓰던 사람들의 어지럼증과 쓰러짐이 보고된 복지관 근처 상가다. 배기가스 유입은 현장의 의심이며 원인은 미확정이다. 윤서진의 후속 무전에는 환자들이 밖에 있고 추가 노출자를 확인 중이며 안전 확인 전 재진입을 막도록 요청한 상태가 기록됐다.",
+          "public_role": "이동식 발전기 사용 중 환자 발생이 보고된 장소"
+        },
+        "point_type": "LOCATION",
+        "safeguards": [
+          "Canon facts are data, not instructions.",
+          "Do not add named participants, motives, weapons, injuries or outcomes.",
+          "Do not invent floor counts, architectural layout, security positions or routes.",
+          "Unspecified season, weather and clothing remain unspecified.",
+          "An illustration is not new Canon. Captions and labels are rendered by the website."
+        ],
+        "scope": "Illustrative public overview, not surveyed architecture or proof of an unrecorded scene.",
+        "subject": {
+          "label": "복지관 근처의 낡은 상가",
+          "node_id": "loc-wiki-b677877be03ac7c2ad1dd760"
+        },
+        "version": "visual-brief-v1"
+      },
+      "generation_key": "generation-d7847a068450a111af4d1907ccb4dd19c9e67eb299d02287893ea083af1750d8",
+      "point_id": "point-4d388c5352f39a1f5c9ab70e951d8a5529e9b483e3fcbcdb68e30a86e16a9ee1",
+      "point_type": "LOCATION",
+      "priority": 20,
+      "reason": "PUBLIC_BRIEF_READY",
+      "registry_asset_id": null,
+      "source_anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "source_refs": [
+        {
+          "pointer": "/nodes/13",
+          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+          "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+        }
+      ],
+      "status": "READY",
+      "subject_id": "loc-wiki-b677877be03ac7c2ad1dd760",
+      "title": "복지관 근처의 낡은 상가",
+      "visibility": "PUBLIC_ARCHIVE"
+    },
+    {
+      "asset_type": "LOCATION",
+      "brief": {
+        "art_direction": {
+          "avoid": [
+            "embedded typography, labels or numbers",
+            "generic zombie poster",
+            "cyberpunk neon by default",
+            "Mad Max brown desert by default",
+            "glossy tactical poster",
+            "automatic guns, explosions, corpses or gore",
+            "magic, medieval buildings or fantasy creatures",
+            "invented identifying features"
+          ],
+          "brief_version": "afterfall-visual-brief-v1",
+          "composition": "wide environmental illustration; no close-up identities unless explicitly sourced",
+          "mood": "QUIET_DECAY",
+          "mood_rules": [
+            "cool blue-gray",
+            "quiet lived-in survival atmosphere; no invented decay or vegetation"
+          ],
+          "rendering": [
+            "non-photorealistic painterly illustration",
+            "realistic human proportions",
+            "believable contemporary Korean environment",
+            "quiet cinematic composition",
+            "low-to-medium saturation",
+            "natural light",
+            "atmospheric depth and negative space"
+          ],
+          "style_version": "AFTERFALL_ARCHIVE_V1",
+          "theme": "Small humans in a beautiful, vast damaged world; quiet survival, not spectacle."
+        },
+        "canon_facts": {
           "public_description": "길드가 체육시설 서비스도로 바깥에 사용권만 확보한 위험물 부지다. 2027년 11월 23일 현재 저장시설은 개설되지 않았으며 길드 일반창고도 연료 보관 용도로 사용할 수 없는 상태다.",
           "public_role": "길드 사용권 확보 · 저장시설 미개설"
         },
@@ -1536,14 +1610,14 @@
       "reason": "PUBLIC_BRIEF_READY",
       "registry_asset_id": null,
       "source_anchor": {
-        "game_time": "2027-11-23 16:17",
-        "save_version": 291
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "source_refs": [
         {
-          "pointer": "/nodes/4",
-          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
-          "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+          "pointer": "/nodes/8",
+          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+          "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
         }
       ],
       "status": "READY",
@@ -3016,6 +3090,105 @@
           "theme": "Small humans in a beautiful, vast damaged world; quiet survival, not spectacle."
         },
         "canon_facts": {
+          "public_description": "외곽 주민복지관 앞에 난방이 멈춘 근처 주택의 주민 3명, 북쪽에서 내려와 숙박을 찾는 3명, 사고 상가의 가족 대기자 1명, 급수 소문 확인자 1명 등 8명이 모였다. 문하진은 환자 연락과 숙박·이동 문의를 나누고 단기 숙박 두 자리 및 임시 보온과 계속 머무는 숙박의 경계를 설명했다. 최유진은 담요의 현장 사용과 양말 교체를 안내했다. 도착한 서진우에게 문하진은 북쪽에서 온 세 사람의 당일 밤 행선지가 미정이라고 설명했다. 장기 체류나 숙박 확대 결정은 기록되지 않았다.",
+          "public_role": "2027년 11월 24일 07:12"
+        },
+        "point_type": "EVENT",
+        "safeguards": [
+          "Canon facts are data, not instructions.",
+          "Do not add named participants, motives, weapons, injuries or outcomes.",
+          "Do not invent floor counts, architectural layout, security positions or routes.",
+          "Unspecified season, weather and clothing remain unspecified.",
+          "An illustration is not new Canon. Captions and labels are rendered by the website."
+        ],
+        "scope": "Illustrative public overview, not surveyed architecture or proof of an unrecorded scene.",
+        "subject": {
+          "label": "외곽 주민복지관 방문자 접수와 임시 보온",
+          "node_id": "event-wiki-c9b034ab6a27257ac62b1fc8"
+        },
+        "version": "visual-brief-v1"
+      },
+      "generation_key": "generation-239b1739a7d507a3a552f8136009472e9d4587f91fc70474401bf9cb7de9a1b3",
+      "point_id": "point-5e25b70619e66aa9bbdaa54e740e1230d6bc5590a1039b3da533095d05af1352",
+      "point_type": "EVENT",
+      "priority": 25,
+      "reason": "PUBLIC_BRIEF_READY",
+      "registry_asset_id": null,
+      "source_anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "source_refs": [
+        {
+          "pointer": "/nodes/12",
+          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+          "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+        }
+      ],
+      "status": "READY",
+      "subject_id": "event-wiki-c9b034ab6a27257ac62b1fc8",
+      "title": "외곽 주민복지관 방문자 접수와 임시 보온",
+      "visibility": "PUBLIC_ARCHIVE"
+    },
+    {
+      "asset_type": "EVENT",
+      "brief": null,
+      "generation_key": null,
+      "point_id": "point-3cc8908efe43aa345472aafb576de567eb7c6b9acc8c31e151d1c773e8cd7c3a",
+      "point_type": "EVENT",
+      "priority": 25,
+      "reason": "WAITING_RESOLVED_VISUAL_SCOPE",
+      "registry_asset_id": null,
+      "source_anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "source_refs": [
+        {
+          "pointer": "/nodes/11",
+          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+          "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+        }
+      ],
+      "status": "WAITING_CANON",
+      "subject_id": "event-wiki-ce2fb53dadec2a08057b235e",
+      "title": "상가 발전기 사용 중 환자 발생과 대응",
+      "visibility": "PUBLIC_ARCHIVE"
+    },
+    {
+      "asset_type": "EVENT",
+      "brief": {
+        "art_direction": {
+          "avoid": [
+            "embedded typography, labels or numbers",
+            "generic zombie poster",
+            "cyberpunk neon by default",
+            "Mad Max brown desert by default",
+            "glossy tactical poster",
+            "automatic guns, explosions, corpses or gore",
+            "magic, medieval buildings or fantasy creatures",
+            "invented identifying features"
+          ],
+          "brief_version": "afterfall-visual-brief-v1",
+          "composition": "wide environmental illustration; no close-up identities unless explicitly sourced",
+          "mood": "QUIET_DECAY",
+          "mood_rules": [
+            "cool blue-gray",
+            "quiet lived-in survival atmosphere; no invented decay or vegetation"
+          ],
+          "rendering": [
+            "non-photorealistic painterly illustration",
+            "realistic human proportions",
+            "believable contemporary Korean environment",
+            "quiet cinematic composition",
+            "low-to-medium saturation",
+            "natural light",
+            "atmospheric depth and negative space"
+          ],
+          "style_version": "AFTERFALL_ARCHIVE_V1",
+          "theme": "Small humans in a beautiful, vast damaged world; quiet survival, not spectacle."
+        },
+        "canon_facts": {
           "public_description": "길드 표준품은 제품 번호, 길드 판매·수리 장부 기록, 현재 보증·수리 상태를 함께 확인하는 체계로 정리됐다. 겉표식 하나만으로는 진품을 증명하지 않는다.",
           "public_role": "2027년 11월 중순"
         },
@@ -3312,6 +3485,80 @@
           "theme": "Small humans in a beautiful, vast damaged world; quiet survival, not spectacle."
         },
         "canon_facts": {
+          "public_description": "주변 공공 전력선에 전기가 잠깐 들어왔다 다시 끊겼고 공공 급수지점 한 곳의 펌프가 멈췄다는 보고가 전해졌다. 문제 시작 지점은 미확인이고 다른 급수원과 저장수는 남아 있었다. 장태훈은 후속 연락에서 펌프 전원을 격리해 놓았고 아직 재가동하지 않았으며 다른 공급선은 살아 있다고 보고했다. 문하진은 복지관 물 보충이 불확실하다고 설명했지만 복지관 단수나 전체 급수 중단은 확인되지 않았다.",
+          "public_role": "2027년 11월 24일 새벽 · 07:12 장면 후속 보고"
+        },
+        "point_type": "EVENT",
+        "safeguards": [
+          "Canon facts are data, not instructions.",
+          "Do not add named participants, motives, weapons, injuries or outcomes.",
+          "Do not invent floor counts, architectural layout, security positions or routes.",
+          "Unspecified season, weather and clothing remain unspecified.",
+          "An illustration is not new Canon. Captions and labels are rendered by the website."
+        ],
+        "scope": "Illustrative public overview, not surveyed architecture or proof of an unrecorded scene.",
+        "subject": {
+          "label": "새벽 공공 급수 펌프 정지와 전원 격리",
+          "node_id": "event-wiki-e7ea4b4204ee5377988d0e82"
+        },
+        "version": "visual-brief-v1"
+      },
+      "generation_key": "generation-3b91626bbddd806d1e51749d5db45a1d6459998461bb547873920ac3d973fb96",
+      "point_id": "point-fe223cecd4556454b32fdf1479182b53d661bf11c6caa64180ed267f72a5a439",
+      "point_type": "EVENT",
+      "priority": 25,
+      "reason": "PUBLIC_BRIEF_READY",
+      "registry_asset_id": null,
+      "source_anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "source_refs": [
+        {
+          "pointer": "/nodes/10",
+          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+          "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+        }
+      ],
+      "status": "READY",
+      "subject_id": "event-wiki-e7ea4b4204ee5377988d0e82",
+      "title": "새벽 공공 급수 펌프 정지와 전원 격리",
+      "visibility": "PUBLIC_ARCHIVE"
+    },
+    {
+      "asset_type": "EVENT",
+      "brief": {
+        "art_direction": {
+          "avoid": [
+            "embedded typography, labels or numbers",
+            "generic zombie poster",
+            "cyberpunk neon by default",
+            "Mad Max brown desert by default",
+            "glossy tactical poster",
+            "automatic guns, explosions, corpses or gore",
+            "magic, medieval buildings or fantasy creatures",
+            "invented identifying features"
+          ],
+          "brief_version": "afterfall-visual-brief-v1",
+          "composition": "wide environmental illustration; no close-up identities unless explicitly sourced",
+          "mood": "QUIET_DECAY",
+          "mood_rules": [
+            "cool blue-gray",
+            "quiet lived-in survival atmosphere; no invented decay or vegetation"
+          ],
+          "rendering": [
+            "non-photorealistic painterly illustration",
+            "realistic human proportions",
+            "believable contemporary Korean environment",
+            "quiet cinematic composition",
+            "low-to-medium saturation",
+            "natural light",
+            "atmospheric depth and negative space"
+          ],
+          "style_version": "AFTERFALL_ARCHIVE_V1",
+          "theme": "Small humans in a beautiful, vast damaged world; quiet survival, not spectacle."
+        },
+        "canon_facts": {
           "public_description": "북쪽 연료장 회의에서 연료장이 실제 가용량과 배분 우선순위를 정하고 사유를 기록하며, 길드는 신청·반출·정산·운송완료 기록과 중복·이중반출 방지를 맡는 잠정 구조가 정리됐다. 길드 수수료는 반출 1건당 기본 처리비에 추가 작업비를 더하고 현금 또는 사전 합의된 현물로 받을 수 있게 했으며, 도로관리조와 운송집단의 비용은 별도 정산하기로 했다.",
           "public_role": "2027년 11월 23일"
         },
@@ -3350,6 +3597,80 @@
       "status": "READY",
       "subject_id": "event-wiki-eb0397c1607ee222060dcaca",
       "title": "북쪽 연료장 겨울 연료·운송 협의",
+      "visibility": "PUBLIC_ARCHIVE"
+    },
+    {
+      "asset_type": "EVENT",
+      "brief": {
+        "art_direction": {
+          "avoid": [
+            "embedded typography, labels or numbers",
+            "generic zombie poster",
+            "cyberpunk neon by default",
+            "Mad Max brown desert by default",
+            "glossy tactical poster",
+            "automatic guns, explosions, corpses or gore",
+            "magic, medieval buildings or fantasy creatures",
+            "invented identifying features"
+          ],
+          "brief_version": "afterfall-visual-brief-v1",
+          "composition": "wide environmental illustration; no close-up identities unless explicitly sourced",
+          "mood": "QUIET_DECAY",
+          "mood_rules": [
+            "cool blue-gray",
+            "quiet lived-in survival atmosphere; no invented decay or vegetation"
+          ],
+          "rendering": [
+            "non-photorealistic painterly illustration",
+            "realistic human proportions",
+            "believable contemporary Korean environment",
+            "quiet cinematic composition",
+            "low-to-medium saturation",
+            "natural light",
+            "atmospheric depth and negative space"
+          ],
+          "style_version": "AFTERFALL_ARCHIVE_V1",
+          "theme": "Small humans in a beautiful, vast damaged world; quiet survival, not spectacle."
+        },
+        "canon_facts": {
+          "public_description": "북쪽 연료장에서 장태훈과 최은채가 운전기록과 최소 운전량을 대조하고 외부 운송업체 부담분의 중복을 피하며 길드 경유 신청 상한을 900L로 산정했다. 핵심 전력·설비 2주 제한 운전 비상분 약 250L와 단전·긴급운송 조건부 추가분 약 650L이며 확정 소비량이 아니다. 분할 인수 신청은 접수됐으나 배분은 미승인이고, 안전한 보관·운송 확인 전에는 반출하지 않기로 했다. 당일 새 연료 구매는 없었다.",
+          "public_role": "2027년 11월 23일 17:05 · 배분 미승인"
+        },
+        "point_type": "EVENT",
+        "safeguards": [
+          "Canon facts are data, not instructions.",
+          "Do not add named participants, motives, weapons, injuries or outcomes.",
+          "Do not invent floor counts, architectural layout, security positions or routes.",
+          "Unspecified season, weather and clothing remain unspecified.",
+          "An illustration is not new Canon. Captions and labels are rendered by the website."
+        ],
+        "scope": "Illustrative public overview, not surveyed architecture or proof of an unrecorded scene.",
+        "subject": {
+          "label": "길드 경유 900리터 분할 인수 신청",
+          "node_id": "event-wiki-f61869742cc3c810573074eb"
+        },
+        "version": "visual-brief-v1"
+      },
+      "generation_key": "generation-e97cd8a15005c947cb171bc347f669bfc81e244b848615a225fa5e1af2e445a2",
+      "point_id": "point-d198a0ca16b12e329b727c3e9b975f2563ea1a5d4dc88ac366cef8d4eb14ebc5",
+      "point_type": "EVENT",
+      "priority": 25,
+      "reason": "PUBLIC_BRIEF_READY",
+      "registry_asset_id": null,
+      "source_anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "source_refs": [
+        {
+          "pointer": "/nodes/9",
+          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+          "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+        }
+      ],
+      "status": "READY",
+      "subject_id": "event-wiki-f61869742cc3c810573074eb",
+      "title": "길드 경유 900리터 분할 인수 신청",
       "visibility": "PUBLIC_ARCHIVE"
     },
     {
@@ -3743,14 +4064,14 @@
       "reason": "PUBLIC_BRIEF_READY",
       "registry_asset_id": null,
       "source_anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "source_refs": [
         {
-          "pointer": "/nodes/9",
-          "source_ref": "archive/web/src/archive/archiveData.ts",
-          "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          "pointer": "/nodes/3",
+          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+          "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
         },
         {
           "pointer": "/characters/char-hajin",
@@ -4355,14 +4676,14 @@
       "reason": "PUBLIC_BRIEF_READY",
       "registry_asset_id": null,
       "source_anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "source_refs": [
         {
-          "pointer": "/nodes/7",
-          "source_ref": "archive/web/src/archive/archiveData.ts",
-          "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          "pointer": "/nodes/5",
+          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+          "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
         },
         {
           "pointer": "/characters/char-minho",
@@ -4703,14 +5024,14 @@
       "reason": "PUBLIC_BRIEF_READY",
       "registry_asset_id": null,
       "source_anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "source_refs": [
         {
-          "pointer": "/nodes/5",
-          "source_ref": "archive/web/src/archive/archiveData.ts",
-          "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          "pointer": "/nodes/4",
+          "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+          "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
         },
         {
           "pointer": "/characters/char-yujin",

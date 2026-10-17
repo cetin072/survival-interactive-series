@@ -1,7 +1,7 @@
 {
   "anchor": {
-    "game_time": "2027-11-23 16:17",
-    "save_version": 291
+    "game_time": "2027-11-24 07:12",
+    "save_version": 293
   },
   "articles": [
     {
@@ -90,6 +90,7 @@
     {
       "facts": {
         "겨울역할": "물류·기록 지원",
+        "길드연료신청_20271123": "외부 운송업체 부담 연료와 길드 직접 확보분을 나눠 중복 계산을 피하고 장태훈과 최소 운전량을 바탕으로 경유 신청 상한 900L를 산정했다. 비상분 약 250L와 조건부 추가분 약 650L이며 확정 소비량은 아니다. 신청서에 분할 인수를 적고 안전한 보관·운송 확인 전에는 반출하지 않기로 했다. 신청은 접수됐으나 배분은 미승인이며 당일 새 연료 구매는 없었다.",
         "상태": "ACTIVE",
         "연료거래검증_20271123": "연료장 독립 원본이 없는 길드 사본 대조의 한계를 지적하고 장기 정산주기를 경계했으며, 길드 일반창고와 사용권만 있는 위험물 부지의 연료 보관 제약을 확인했다."
       },
@@ -161,6 +162,13 @@
           "relation_id": "rel-cb45632abd508d72c4fbcbf855c6db4e205cd02c47b372091b88965680ee9440"
         },
         {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "연료 부담 중복 구분과 분할 인수 신청서 작성",
+          "other_id": "event-wiki-f61869742cc3c810573074eb",
+          "relation_id": "rel-f8cf382f6bbdc542cf44161eff5ad78e43c324ca2f53bce2dbde15d6d7e46584"
+        },
+        {
           "direction": "incoming",
           "kind": "published_relation",
           "label": "참여",
@@ -206,6 +214,8 @@
     },
     {
       "facts": {
+        "복지관급수설명_20271124": "난방과 물은 유지되지만 공공 급수지점 한 곳의 정지로 보충이 불확실하다고 설명했다. 당장 물이 소진된 것은 아니며 복지관 물이 곧 끊긴다는 말도 확인된 사실이 아니라고 정정했다.",
+        "복지관접수운영_20271124": "외곽 주민복지관 출입구에서 환자 연락과 숙박·이동 문의의 대기선을 분리했다. 접수에서 문의와 확정을 구분하며 단기 숙박은 두 자리뿐이고 모두를 밤까지 받아둘 공간은 없다고 설명했다. 잠시 쉬는 기능과 계속 머무는 숙박을 구분했다.",
         "상태": "ACTIVE"
       },
       "id": "char-hajin",
@@ -250,6 +260,13 @@
         {
           "direction": "outgoing",
           "kind": "participated_in",
+          "label": "대기선 분리와 수용·급수 상태 설명",
+          "other_id": "event-wiki-c9b034ab6a27257ac62b1fc8",
+          "relation_id": "rel-a6e3b269b28b431197f4cf3b8afb135106b8a5051e03c8b482e46ddb7854e14e"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
           "label": "공공 급수지점 요청 전달",
           "other_id": "event-wiki-3fd45d2cb293984e10fb4440",
           "relation_id": "rel-a7414041a557e8c23bea27b1baf0f7ffa58bee6acc2d973b86138f5b2f2b555a"
@@ -272,6 +289,7 @@
         "mention-2454533d504aba930f85f2515aca3b92b9ca79b5df43a3f46dccc3fc300ed409",
         "mention-2e9db848bc7cd8b3d7a647a68e4d4c6cf1cf524e7197c3b6a69ebf6fb8a0c337",
         "mention-3c65ef0f55cdaf89eeed4e895233d2cd947832380992a44ea7e6400b28b976c9",
+        "mention-3da55d302900d0219a3372991f94cc9ece833f1042a3993838195587e582d1ee",
         "mention-4155b692c6d45d0aec54c1242183d951748e8b2b0e6458abfcce7aec5ea64741",
         "mention-4ed0782eb6d4567462737afafec7edff5d32e35ccc4ae1e68f57a67155973b2d",
         "mention-664074250a243f8e47001b6ff707a6b22b823b46125b13ba9d69aac4001defb8",
@@ -480,6 +498,7 @@
     },
     {
       "facts": {
+        "복지관방문_20271124": "07:12 외곽 주민복지관에 도착했다. 문하진이 보여준 접수지와 설명을 통해 북쪽에서 내려온 세 사람의 당일 밤 행선지가 정해지지 않은 상황을 접했다.",
         "상태": "ACTIVE",
         "소속": "CORE_FOUR",
         "연료협의_20271123": "연료장 반출 원본과 길드 장부가 서로 독립적으로 검증되는 방식과 길드 자체 구매에도 동일 규칙을 적용하는 안이 채택됐다. 길드 구매 수량을 정하기 전 서쪽길·공공 급수시설의 요구와 유종·보관조건을 먼저 확인했다."
@@ -529,6 +548,13 @@
           "label": "길드 책임경계·수수료 원칙 협상",
           "other_id": "event-wiki-eb0397c1607ee222060dcaca",
           "relation_id": "rel-45ca7847fe2ddfc14718323eb677f2b4b6af91390133353a7b3fea5a770e7e3e"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "복지관 도착 후 북쪽 방문자 숙박 미정 상황 청취",
+          "other_id": "event-wiki-c9b034ab6a27257ac62b1fc8",
+          "relation_id": "rel-5f6cd3f2479505d34259af218884d96f6979561ee739c272257112378fcb7259"
         },
         {
           "direction": "incoming",
@@ -917,12 +943,20 @@
     {
       "facts": {
         "관계": "신뢰 높은 외부협력자",
+        "상가환자대응_20271124": "쓰러진 사람이 밖으로 옮겨져 반응은 있으나 상태가 좋지 않고 산소 공급 가능한 장비 쪽으로 연락 중이라고 보고했다. 이후 윤서진의 무전에서 박민호와 추가 노출자를 확인 중이라고 전해졌다. 원인이나 치료 완료는 확정되지 않았다.",
         "상태": "ACTIVE"
       },
       "id": "char-minho",
       "label": "박민호",
       "overview": "흩어진 현장과 사람을 연결하는 이동형 정보·응급 축. 북서2동 폐업 세차장을 정기 접촉지로 사용한다.",
       "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "환자 상태·장비 연락 보고와 추가 노출자 확인",
+          "other_id": "event-wiki-ce2fb53dadec2a08057b235e",
+          "relation_id": "rel-7127cbe4f466649bf3a76dc36f591397466419635f9c6bdb613a5d3f4206e6f3"
+        },
         {
           "direction": "outgoing",
           "kind": "published_relation",
@@ -961,6 +995,7 @@
         "mention-749e33a00fcc1e6e8d96e906e73092037045965ccea318d9726878704c82761f",
         "mention-780ca1b3549c6c02650e764a2a3003a8519afba4c7f4d9b9ff2f1c610130c546",
         "mention-85d438149dceabfbd05e0bb2b67c4639dead5b99969a25dd8657e6ac628fae15",
+        "mention-aa9d8d9d7b31c51699cba665f2434354afe07c7ddd4daa1a0742b0c7fb948997",
         "mention-c7cca36ed9ee0085f2169cd3ce5f1a9706ecdbcb861ba4af0d47226d134bc638",
         "mention-d501d05e759c17c8f1e99d67c536a0ea860c6e36e9c6d050fb1b36e35e2ab53c",
         "mention-d6ce15609923c3bc1dbaec0d8fad08baf06d17461154242e1828007175fd6521",
@@ -1118,12 +1153,20 @@
     {
       "facts": {
         "겨울역할": "의료·건강 지원",
+        "상가의료대응_20271124": "긴급 보고를 듣고 의료가방을 챙기겠다고 밝혔다. 07:12 장면의 무전에서는 상가 환자들이 밖에 나와 있고 박민호와 추가 노출자를 확인 중이라고 보고했다. 원인을 아직 단정하지 않았으며 안전 확인 전 재진입을 막도록 요청했다.",
         "상태": "ACTIVE"
       },
       "id": "char-seojin",
       "label": "윤서진",
       "overview": "핵심 4인의 의료 판단과 건강관리 축. 중증환자 인계 후 북서 실습센터에 합류했고 겨울편에서는 의료·건강 지원을 맡는다.",
       "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "추가 노출자 확인과 안전 확인 전 재진입 금지 요청",
+          "other_id": "event-wiki-ce2fb53dadec2a08057b235e",
+          "relation_id": "rel-0f526745b57ff6df0ceddc23a5b96ffa34b4d774501d3d5667968876a6f93717"
+        },
         {
           "direction": "incoming",
           "kind": "published_relation",
@@ -1149,6 +1192,7 @@
         "mention-554dab0c447f72a7d01626bb6409c610e5063f6f1288936e0bba2e6d0c0892c8",
         "mention-675e77a734f301062292801f0dae43f08af5f394c77bb2c7ab8fa7aad0ef66b1",
         "mention-69b62cf6eef30894bc7ce9feeab78031e423f97946b4831d365755153509a18a",
+        "mention-725964c45f8f62943cf8acb4fde3536634941955b52ef93dd0b358a6e6333a0e",
         "mention-9b02cbfb3b1e0919e979915c50435182dbb20398f7d52ff2b978c473c0d6e732",
         "mention-9db2b72d1cabb349ecb6fc977f86fc848d267afc3af6d4e9291b1b31fb30bf3a",
         "mention-c749719818634a65149ab37ba297fac8685db884e0615c412af1cf163be7a4c9",
@@ -1226,13 +1270,22 @@
     {
       "facts": {
         "겨울역할": "설비·난방·급수 지원",
+        "급수대응보고_20271124": "급수시설 담당자에게 현장 확인 없이 차단기를 다시 올리지 말라는 경고를 전달하도록 요청했다. 07:12 장면의 후속 보고에서는 급수 펌프 전원을 격리해 놓았고 아직 재가동하지 않았으며 다른 공급선은 살아 있다고 밝혔다.",
         "상태": "ACTIVE",
+        "연료수요산정_20271123": "최은채와 설비 운전기록을 대조해 경유 신청 상한 900L(핵심 전력·설비 2주 제한 운전 비상분 약 250L, 단전·긴급운송 조건부 추가분 약 650L)를 산정했다. 예비품·동파구간·전원 전환을 다시 점검하겠다는 계획을 밝혔다.",
         "연료적합성점검_20271123": "체육시설 주난방이 장작보일러임을 설명하고, 연료장 저장구역의 이송배관을 확인했으며 경유의 장비별 규격·품질점검 필요성과 길드의 대량 보관 제약을 지적했다."
       },
       "id": "char-taehoon",
       "label": "장태훈",
       "overview": "공공 급수지점 두 곳의 설비를 조사하고 오래된 펌프 교체가 필요하다고 판단했다. 2027년 11월 9일에는 정민규와 생산거점 펌프를 오전 안에 복구하고, 이어 공공 급수지점 펌프를 교체해 오후에 정상화했다.",
       "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "운전기록 대조와 경유 신청 상한 산정",
+          "other_id": "event-wiki-f61869742cc3c810573074eb",
+          "relation_id": "rel-4544fe81d248a4f0a97dfe661d9239598362d647e2e73a9bedeec62a8f6d38ef"
+        },
         {
           "direction": "incoming",
           "kind": "published_relation",
@@ -1260,6 +1313,13 @@
           "label": "시설·생산 협력",
           "other_id": "char-mira",
           "relation_id": "rel-acdda7eafae0ee86dae52f4ce4224fc17b9ba4dadd7b520d3191f403c1437f56"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "펌프 전원 격리 및 미재가동 상태 보고",
+          "other_id": "event-wiki-e7ea4b4204ee5377988d0e82",
+          "relation_id": "rel-bc8b6ba08a499a928f0bfc45dc1d14883c151b9e05c47e3923722ad06f6f6aed"
         },
         {
           "direction": "incoming",
@@ -1651,6 +1711,7 @@
     },
     {
       "facts": {
+        "복지관생활지원_20271124": "외곽 주민복지관에서 담요를 접고 의자에 펴 주며 현장 사용은 가능하나 반출하면 다음 사람이 쓰지 못한다고 안내했다. 젖은 양말 교체를 권하고 마른 양말이 조금 있다고 알렸다. 신하영 등의 답을 기다리지 않고 안내했으며 당장 내보낼 필요는 없지만 계속 머물 수 있다고 약속해서는 안 된다고 말했다.",
         "상태": "ACTIVE",
         "연합원": "아님"
       },
@@ -1678,6 +1739,13 @@
           "label": "생활 동료",
           "other_id": "char-hayoung",
           "relation_id": "rel-39648dbe9f57d2df86f65fe11c6199f907b93dcc639973bff1cb66f2b0f4d205"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "participated_in",
+          "label": "담요·양말 안내와 계속 체류 약속의 경계 제시",
+          "other_id": "event-wiki-c9b034ab6a27257ac62b1fc8",
+          "relation_id": "rel-432f2aa61d10c5d5044db528dd801aa64e69727f9eef49bd8d8e741976064070"
         },
         {
           "direction": "outgoing",
@@ -1713,6 +1781,7 @@
         "mention-9042985b63863cc42a1fd558c6064e09beeeb936e5914fdd3f5ccef75d45f754",
         "mention-918078b9e27a21a0f36aa29c88ce2d70b07c4156917c256c3a9c4058c438f341",
         "mention-9b63fbe44f8ae3d3bae8faa08ebbe92ea69ad3f89de2b63b111fe98379a3a7f1",
+        "mention-a3363ccc04a5515ce31898cb3bea55fdcd3151c9f956200bb814859e49b809be",
         "mention-c67e5faf464f6fa188207474667d38bdea80e9f44cb9501a695f84f993af2cde"
       ],
       "subtitle": "세탁·침구·생활물자 전문가",
@@ -2610,6 +2679,86 @@
     },
     {
       "facts": {},
+      "id": "event-wiki-c9b034ab6a27257ac62b1fc8",
+      "label": "외곽 주민복지관 방문자 접수와 임시 보온",
+      "overview": "외곽 주민복지관 앞에 난방이 멈춘 근처 주택의 주민 3명, 북쪽에서 내려와 숙박을 찾는 3명, 사고 상가의 가족 대기자 1명, 급수 소문 확인자 1명 등 8명이 모였다. 문하진은 환자 연락과 숙박·이동 문의를 나누고 단기 숙박 두 자리 및 임시 보온과 계속 머무는 숙박의 경계를 설명했다. 최유진은 담요의 현장 사용과 양말 교체를 안내했다. 도착한 서진우에게 문하진은 북쪽에서 온 세 사람의 당일 밤 행선지가 미정이라고 설명했다. 장기 체류나 숙박 확대 결정은 기록되지 않았다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "담요·양말 안내와 계속 체류 약속의 경계 제시",
+          "other_id": "char-yujin",
+          "relation_id": "rel-432f2aa61d10c5d5044db528dd801aa64e69727f9eef49bd8d8e741976064070"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "복지관 도착 후 북쪽 방문자 숙박 미정 상황 청취",
+          "other_id": "char-jinwoo",
+          "relation_id": "rel-5f6cd3f2479505d34259af218884d96f6979561ee739c272257112378fcb7259"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "대기선 분리와 수용·급수 상태 설명",
+          "other_id": "char-hajin",
+          "relation_id": "rel-a6e3b269b28b431197f4cf3b8afb135106b8a5051e03c8b482e46ddb7854e14e"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "외곽 주민복지관 출입구와 실내",
+          "other_id": "loc-shelter",
+          "relation_id": "rel-b258db0df08dc0b2089d0f96128fddf9ab7fca2f3434a1bb56f7abc8475871bf"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 11월 24일 07:12",
+      "tags": [],
+      "type": "event"
+    },
+    {
+      "facts": {},
+      "id": "event-wiki-ce2fb53dadec2a08057b235e",
+      "label": "상가 발전기 사용 중 환자 발생과 대응",
+      "overview": "복지관 근처 낡은 상가에서 이동식 발전기를 쓰던 사람들 중 둘이 어지럼증을 호소하고 한 명이 쓰러졌다고 전해졌다. 현장에서는 배기가스 유입을 의심했으나 원인은 확정되지 않았다. 박민호는 쓰러진 사람이 밖으로 옮겨져 반응은 있지만 상태가 좋지 않으며 산소 공급 가능한 장비 쪽으로 연락 중이라고 보고했다. 후속 무전에서 윤서진은 환자들이 밖에 있고 박민호와 추가 노출자를 확인 중이라며 안전 확인 전 재진입을 막도록 요청했다. 전체 피해 규모와 치료 결과는 미확정이다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "추가 노출자 확인과 안전 확인 전 재진입 금지 요청",
+          "other_id": "char-seojin",
+          "relation_id": "rel-0f526745b57ff6df0ceddc23a5b96ffa34b4d774501d3d5667968876a6f93717"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "발전기 사용자들의 증상 발생이 보고된 상가",
+          "other_id": "loc-wiki-b677877be03ac7c2ad1dd760",
+          "relation_id": "rel-2df71014103fa863573bf94211e41bd99bf7f9fbe952460f29fe88492383df9b"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "related_to",
+          "label": "사고 상가의 가족을 기다리는 방문자가 복지관에 모임",
+          "other_id": "loc-shelter",
+          "relation_id": "rel-6fa1a50080cf02bae73dc2298170bdddc76f9f57a5e8a16a9f16ecec7eb3aa0a"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "환자 상태·장비 연락 보고와 추가 노출자 확인",
+          "other_id": "char-minho",
+          "relation_id": "rel-7127cbe4f466649bf3a76dc36f591397466419635f9c6bdb613a5d3f4206e6f3"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 11월 24일 새벽 · 원인 미확정",
+      "tags": [],
+      "type": "event"
+    },
+    {
+      "facts": {},
       "id": "event-wiki-d12d5299a253870e3748a92e",
       "label": "길드 표준품 진품확인 체계 확립",
       "overview": "길드 표준품은 제품 번호, 길드 판매·수리 장부 기록, 현재 보증·수리 상태를 함께 확인하는 체계로 정리됐다. 겉표식 하나만으로는 진품을 증명하지 않는다.",
@@ -2792,6 +2941,32 @@
       "type": "event"
     },
     {
+      "facts": {},
+      "id": "event-wiki-e7ea4b4204ee5377988d0e82",
+      "label": "새벽 공공 급수 펌프 정지와 전원 격리",
+      "overview": "주변 공공 전력선에 전기가 잠깐 들어왔다 다시 끊겼고 공공 급수지점 한 곳의 펌프가 멈췄다는 보고가 전해졌다. 문제 시작 지점은 미확인이고 다른 급수원과 저장수는 남아 있었다. 장태훈은 후속 연락에서 펌프 전원을 격리해 놓았고 아직 재가동하지 않았으며 다른 공급선은 살아 있다고 보고했다. 문하진은 복지관 물 보충이 불확실하다고 설명했지만 복지관 단수나 전체 급수 중단은 확인되지 않았다.",
+      "relations": [
+        {
+          "direction": "outgoing",
+          "kind": "related_to",
+          "label": "공공 급수지점 정지에 따른 물 보충 불확실성",
+          "other_id": "loc-shelter",
+          "relation_id": "rel-a6f2c71257da0b723daa401a850d98fbf4be7d6f45813bbcf3f7587b6010b2ff"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "펌프 전원 격리 및 미재가동 상태 보고",
+          "other_id": "char-taehoon",
+          "relation_id": "rel-bc8b6ba08a499a928f0bfc45dc1d14883c151b9e05c47e3923722ad06f6f6aed"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 11월 24일 새벽 · 07:12 장면 후속 보고",
+      "tags": [],
+      "type": "event"
+    },
+    {
       "facts": {
         "길드자체구매동일규칙": "길드도 일반 구매자와 동일한 신청 절차를 따르고 연료장이 배분 여부·수량과 실제 반출 계측을 결정하며 길드는 자체 구매를 다른 거래와 같은 형식으로 기록한다.",
         "독립장부대조": "연료장은 계측·승인 반출 원본을 보유하고 길드는 신청·거래·정산 기록을 별도로 작성한다. 반출번호를 통일해 3일마다 거래명세 사본·수량·대가를 대조하고 길드 처리비를 정산하며 큰 오차는 당일 확인하기로 했다."
@@ -2859,6 +3034,39 @@
         "길드",
         "정산"
       ],
+      "type": "event"
+    },
+    {
+      "facts": {},
+      "id": "event-wiki-f61869742cc3c810573074eb",
+      "label": "길드 경유 900리터 분할 인수 신청",
+      "overview": "북쪽 연료장에서 장태훈과 최은채가 운전기록과 최소 운전량을 대조하고 외부 운송업체 부담분의 중복을 피하며 길드 경유 신청 상한을 900L로 산정했다. 핵심 전력·설비 2주 제한 운전 비상분 약 250L와 단전·긴급운송 조건부 추가분 약 650L이며 확정 소비량이 아니다. 분할 인수 신청은 접수됐으나 배분은 미승인이고, 안전한 보관·운송 확인 전에는 반출하지 않기로 했다. 당일 새 연료 구매는 없었다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "운전기록 대조와 경유 신청 상한 산정",
+          "other_id": "char-taehoon",
+          "relation_id": "rel-4544fe81d248a4f0a97dfe661d9239598362d647e2e73a9bedeec62a8f6d38ef"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "occurred_at",
+          "label": "북쪽 연료장에서 신청 접수",
+          "other_id": "loc-wiki-f73ae01ebcb8d89952911bbc",
+          "relation_id": "rel-d56a3913d79504adbbf307a24bb50308f4fbb53c116082587de452ae7e038594"
+        },
+        {
+          "direction": "incoming",
+          "kind": "participated_in",
+          "label": "연료 부담 중복 구분과 분할 인수 신청서 작성",
+          "other_id": "char-eunchae",
+          "relation_id": "rel-f8cf382f6bbdc542cf44161eff5ad78e43c324ca2f53bce2dbde15d6d7e46584"
+        }
+      ],
+      "story_link_ids": [],
+      "subtitle": "2027년 11월 23일 17:05 · 배분 미승인",
+      "tags": [],
       "type": "event"
     },
     {
@@ -3291,7 +3499,11 @@
       "type": "location"
     },
     {
-      "facts": {},
+      "facts": {
+        "급수난방현황_20271124_0712": "문하진의 설명상 난방과 물은 유지되지만 공공 급수지점 한 곳의 정지로 보충은 불확실했다. 물 소진이나 복지관 단수가 확인된 상태는 아니다.",
+        "생활물자운영_20271124_0712": "최유진이 담요의 현장 사용과 반출을 구분하고 젖은 양말 교체를 안내했다. 계속 머무를 수 있다는 약속을 해서는 안 된다는 경계도 밝혔다.",
+        "접수수용현황_20271124_0712": "전면 출입구 앞에는 난방이 멈춘 근처 주택에서 몸을 녹이러 온 3명, 북쪽에서 내려와 숙박을 구하는 3명, 발전기 사고 상가의 가족을 기다리는 1명, 급수 중단 소문을 확인하러 온 1명 등 8명이 있었다. 문하진은 대기선을 환자 연락과 숙박·이동 문의로 나누고 단기 숙박 두 자리와 임시 보온의 한계를 설명했다."
+      },
       "id": "loc-shelter",
       "label": "외곽 주민복지관",
       "overview": "전기·급수·화장실·접근성을 살려 가동한 공개 생활시설. 신하영·최유진이 생활운영의 신뢰 가능한 접점으로 자리잡았다.",
@@ -3312,10 +3524,38 @@
         },
         {
           "direction": "incoming",
+          "kind": "related_to",
+          "label": "사고 상가의 가족을 기다리는 방문자가 복지관에 모임",
+          "other_id": "event-wiki-ce2fb53dadec2a08057b235e",
+          "relation_id": "rel-6fa1a50080cf02bae73dc2298170bdddc76f9f57a5e8a16a9f16ecec7eb3aa0a"
+        },
+        {
+          "direction": "incoming",
+          "kind": "related_to",
+          "label": "복지관 근처에 있는 상가",
+          "other_id": "loc-wiki-b677877be03ac7c2ad1dd760",
+          "relation_id": "rel-78d7ced56150ddefb128a1fe177afe0ecf289e3e915ab488c8bbde9f4bfe7a52"
+        },
+        {
+          "direction": "incoming",
           "kind": "published_relation",
           "label": "생활운영 접점",
           "other_id": "char-hayoung",
           "relation_id": "rel-812dedd68c83531601dbffd67b7d1cde26743e2bb3b865398b393da3a946f229"
+        },
+        {
+          "direction": "incoming",
+          "kind": "related_to",
+          "label": "공공 급수지점 정지에 따른 물 보충 불확실성",
+          "other_id": "event-wiki-e7ea4b4204ee5377988d0e82",
+          "relation_id": "rel-a6f2c71257da0b723daa401a850d98fbf4be7d6f45813bbcf3f7587b6010b2ff"
+        },
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "외곽 주민복지관 출입구와 실내",
+          "other_id": "event-wiki-c9b034ab6a27257ac62b1fc8",
+          "relation_id": "rel-b258db0df08dc0b2089d0f96128fddf9ab7fca2f3434a1bb56f7abc8475871bf"
         },
         {
           "direction": "incoming",
@@ -3331,6 +3571,7 @@
         "mention-17f09a3a1134f195eb57b0d9f7fa06f2e8d77851a147b2bb5600686566c74118",
         "mention-3a1d5754bf1f527aad598d2137f66884ea5be5f48e65bd2696243dacbd61ecee",
         "mention-4c5616f2ab3dfb20eade2cc109f01beb46fb2d81d6044cc119f07e28a121fa82",
+        "mention-535ed855bc5c158801d435b30c0a95d6305c5932ef0b3fae23de340e3620e311",
         "mention-55d3f4c92b26d8e1af5be814defed12155f3e0c278ef1690c3aeb6ea707020e0",
         "mention-696b18d09cad5cf92284cf0f471e6a81bb2fef4cbc7c067c2f6c519833c0b669",
         "mention-6f9f6585afab3f52ac2a73e1e98aea12ccd1d2964b70eae2e68488290910d9dc"
@@ -3679,6 +3920,34 @@
     },
     {
       "facts": {},
+      "id": "loc-wiki-b677877be03ac7c2ad1dd760",
+      "label": "복지관 근처의 낡은 상가",
+      "overview": "2027년 11월 24일 이동식 발전기를 쓰던 사람들의 어지럼증과 쓰러짐이 보고된 복지관 근처 상가다. 배기가스 유입은 현장의 의심이며 원인은 미확정이다. 윤서진의 후속 무전에는 환자들이 밖에 있고 추가 노출자를 확인 중이며 안전 확인 전 재진입을 막도록 요청한 상태가 기록됐다.",
+      "relations": [
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "발전기 사용자들의 증상 발생이 보고된 상가",
+          "other_id": "event-wiki-ce2fb53dadec2a08057b235e",
+          "relation_id": "rel-2df71014103fa863573bf94211e41bd99bf7f9fbe952460f29fe88492383df9b"
+        },
+        {
+          "direction": "outgoing",
+          "kind": "related_to",
+          "label": "복지관 근처에 있는 상가",
+          "other_id": "loc-shelter",
+          "relation_id": "rel-78d7ced56150ddefb128a1fe177afe0ecf289e3e915ab488c8bbde9f4bfe7a52"
+        }
+      ],
+      "story_link_ids": [
+        "mention-df1514a23c88b7e8cde31eafddbb497389fe365591cc1dcfb4e62ae6ea986dc3"
+      ],
+      "subtitle": "이동식 발전기 사용 중 환자 발생이 보고된 장소",
+      "tags": [],
+      "type": "location"
+    },
+    {
+      "facts": {},
       "id": "loc-wiki-ca235c61ad15acef511691cd",
       "label": "체육시설 서비스도로 바깥에 확보한 위험물 부지",
       "overview": "길드가 체육시설 서비스도로 바깥에 사용권만 확보한 위험물 부지다. 2027년 11월 23일 현재 저장시설은 개설되지 않았으며 길드 일반창고도 연료 보관 용도로 사용할 수 없는 상태다.",
@@ -3714,6 +3983,7 @@
     {
       "facts": {
         "구매보관별도계약": "연료 구매와 탱크 보관은 별도 계약이며 분할 인수 시 보관기간·보관대가·손실 책임을 별도로 협의해야 한다.",
+        "길드신청접수_20271123_1705": "길드의 경유 900L 상한·분할 인수 신청을 담당자가 접수했다. 배분은 아직 미승인이며 당일 길드는 새 연료를 구매하지 않았다. 첫 필요 물량도 안전한 보관·운송 확인 전에는 반출하지 않기로 했다.",
         "잠정배분유종_20271123": "외부 배분 검토 약 18,000L 중 경유 약 12,000L(일부 탱크 수분·침전 확인 필요), 등유 약 5,000L, 휘발유 약 1,000L로 구분한다. 실제 계약·반출량은 유종 상태와 당일 계측에 따라 달라질 수 있다."
       },
       "id": "loc-wiki-f73ae01ebcb8d89952911bbc",
@@ -3747,6 +4017,13 @@
           "label": "북쪽 연료장 구 물류장 회의",
           "other_id": "event-wiki-eb0397c1607ee222060dcaca",
           "relation_id": "rel-bfc1ca6abf21fcd6b988534aea495ab9d1cb076d9d92388a2e29a0904e149210"
+        },
+        {
+          "direction": "incoming",
+          "kind": "occurred_at",
+          "label": "북쪽 연료장에서 신청 접수",
+          "other_id": "event-wiki-f61869742cc3c810573074eb",
+          "relation_id": "rel-d56a3913d79504adbbf307a24bb50308f4fbb53c116082587de452ae7e038594"
         }
       ],
       "story_link_ids": [
@@ -3877,7 +4154,7 @@
     }
   ],
   "chronicle_id": "C03-AFTERFALL",
-  "content_sha256": "437a71c79920754b105b901f7de9cf0549e28bb6112d8fc95dcebab900baacf5",
+  "content_sha256": "1cfdf150a54152af9335fd7c0b01ee43ab557e6fa607ab7a9adb009300494e0b",
   "nodes": [
     {
       "anchor": {
@@ -3940,18 +4217,19 @@
     },
     {
       "anchor": {
-        "game_time": "2027-11-23 16:17",
-        "save_version": 291
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "data": {
         "id": "char-eunchae",
         "label": "최은채",
         "meta": {
           "겨울역할": "물류·기록 지원",
+          "길드연료신청_20271123": "외부 운송업체 부담 연료와 길드 직접 확보분을 나눠 중복 계산을 피하고 장태훈과 최소 운전량을 바탕으로 경유 신청 상한 900L를 산정했다. 비상분 약 250L와 조건부 추가분 약 650L이며 확정 소비량은 아니다. 신청서에 분할 인수를 적고 안전한 보관·운송 확인 전에는 반출하지 않기로 했다. 신청은 접수됐으나 배분은 미승인이며 당일 새 연료 구매는 없었다.",
           "상태": "ACTIVE",
           "연료거래검증_20271123": "연료장 독립 원본이 없는 길드 사본 대조의 한계를 지적하고 장기 정산주기를 경계했으며, 길드 일반창고와 사용권만 있는 위험물 부지의 연료 보관 제약을 확인했다."
         },
-        "source": "S04 SESSION_002 GM 공개 블록 001, 005",
+        "source": "S04 SESSION_003 GM 공개 블록 001",
         "subtitle": "병원 행정직 출신 · 물류·기록",
         "summary": "공공 급수지점 실태조사에서 운영기록을 확인했다. 길드 표준품의 번호체계를 정하고 판매·수리 장부와 대조해 사칭품을 확인했으며, 하루 거래 정산을 마감했다.",
         "tags": [
@@ -3963,9 +4241,9 @@
         "type": "character"
       },
       "evidence": {
-        "pointer": "/nodes/7",
-        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
-        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+        "pointer": "/nodes/0",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
       },
       "history": [
         {
@@ -4027,22 +4305,55 @@
             "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
             "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
           }
+        },
+        {
+          "anchor": {
+            "game_time": "2027-11-23 16:17",
+            "save_version": 291
+          },
+          "data": {
+            "id": "char-eunchae",
+            "label": "최은채",
+            "meta": {
+              "겨울역할": "물류·기록 지원",
+              "상태": "ACTIVE",
+              "연료거래검증_20271123": "연료장 독립 원본이 없는 길드 사본 대조의 한계를 지적하고 장기 정산주기를 경계했으며, 길드 일반창고와 사용권만 있는 위험물 부지의 연료 보관 제약을 확인했다."
+            },
+            "source": "S04 SESSION_002 GM 공개 블록 001, 005",
+            "subtitle": "병원 행정직 출신 · 물류·기록",
+            "summary": "공공 급수지점 실태조사에서 운영기록을 확인했다. 길드 표준품의 번호체계를 정하고 판매·수리 장부와 대조해 사칭품을 확인했으며, 하루 거래 정산을 마감했다.",
+            "tags": [
+              "CORE",
+              "핵심 4인",
+              "물류",
+              "기록"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "be34fe31df07eb67c6d110e5f7ae1cb8862ecfdfe0e47c3078926770a926b05b",
+          "evidence": {
+            "pointer": "/nodes/7",
+            "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+            "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+          }
         }
       ],
       "id": "char-eunchae"
     },
     {
       "anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "data": {
         "id": "char-hajin",
         "label": "문하진",
         "meta": {
+          "복지관급수설명_20271124": "난방과 물은 유지되지만 공공 급수지점 한 곳의 정지로 보충이 불확실하다고 설명했다. 당장 물이 소진된 것은 아니며 복지관 물이 곧 끊긴다는 말도 확인된 사실이 아니라고 정정했다.",
+          "복지관접수운영_20271124": "외곽 주민복지관 출입구에서 환자 연락과 숙박·이동 문의의 대기선을 분리했다. 접수에서 문의와 확정을 구분하며 단기 숙박은 두 자리뿐이고 모두를 밤까지 받아둘 공간은 없다고 설명했다. 잠시 쉬는 기능과 계속 머무는 숙박을 구분했다.",
           "상태": "ACTIVE"
         },
-        "source": "Supabase survival_rpg.characters / PERSISTENT_CANON.md",
+        "source": "S04 SESSION_003 GM 공개 블록 003",
         "subtitle": "잔존 행정·급수·시설 실무자",
         "summary": "북서권 지방행정 잔존 대응팀의 시설·급수 실무자. 공공수원 복구와 제한적 연락망을 유지한다.",
         "tags": [
@@ -4054,11 +4365,41 @@
         "type": "character"
       },
       "evidence": {
-        "pointer": "/nodes/9",
-        "source_ref": "archive/web/src/archive/archiveData.ts",
-        "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+        "pointer": "/nodes/3",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
       },
-      "history": [],
+      "history": [
+        {
+          "anchor": {
+            "game_time": "2027-03-23 17:50",
+            "save_version": 253
+          },
+          "data": {
+            "id": "char-hajin",
+            "label": "문하진",
+            "meta": {
+              "상태": "ACTIVE"
+            },
+            "source": "Supabase survival_rpg.characters / PERSISTENT_CANON.md",
+            "subtitle": "잔존 행정·급수·시설 실무자",
+            "summary": "북서권 지방행정 잔존 대응팀의 시설·급수 실무자. 공공수원 복구와 제한적 연락망을 유지한다.",
+            "tags": [
+              "RECURRING",
+              "행정",
+              "급수",
+              "공공시설"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "5fcd409a252c6c4cd539a8bb92bb5b61d6ea09e9bc0e4bf2371fe20b2618b93f",
+          "evidence": {
+            "pointer": "/nodes/9",
+            "source_ref": "archive/web/src/archive/archiveData.ts",
+            "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          }
+        }
+      ],
       "id": "char-hajin"
     },
     {
@@ -4188,18 +4529,19 @@
     },
     {
       "anchor": {
-        "game_time": "2027-11-23 16:17",
-        "save_version": 291
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "data": {
         "id": "char-jinwoo",
         "label": "서진우",
         "meta": {
+          "복지관방문_20271124": "07:12 외곽 주민복지관에 도착했다. 문하진이 보여준 접수지와 설명을 통해 북쪽에서 내려온 세 사람의 당일 밤 행선지가 정해지지 않은 상황을 접했다.",
           "상태": "ACTIVE",
           "소속": "CORE_FOUR",
           "연료협의_20271123": "연료장 반출 원본과 길드 장부가 서로 독립적으로 검증되는 방식과 길드 자체 구매에도 동일 규칙을 적용하는 안이 채택됐다. 길드 구매 수량을 정하기 전 서쪽길·공공 급수시설의 요구와 유종·보관조건을 먼저 확인했다."
         },
-        "source": "S04 SESSION_002 GM 공개 블록 001, 003, 005",
+        "source": "S04 SESSION_003 GM 공개 블록 003",
         "subtitle": "응급실 간호사 · 플레이어",
         "summary": "공공 급수지점에는 일반 유지보수와 기술지원을 제공하고 일상 운영은 행정 잔존팀이 맡도록 책임을 나눴다. 2027년 11월 9일에는 저장량과 대체수단을 비교해 생산거점을 먼저 복구하도록 결정했다. 길드 표식 사칭 문제에서는 상인의 물건을 빼앗거나 외부 장사를 금지하지 않고 피해거래 정산과 길드 서비스 이용 제한으로 대응했다.",
         "tags": [
@@ -4211,9 +4553,9 @@
         "type": "character"
       },
       "evidence": {
-        "pointer": "/nodes/6",
-        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
-        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+        "pointer": "/nodes/2",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
       },
       "history": [
         {
@@ -4274,6 +4616,37 @@
             "pointer": "/nodes/0",
             "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
             "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+          }
+        },
+        {
+          "anchor": {
+            "game_time": "2027-11-23 16:17",
+            "save_version": 291
+          },
+          "data": {
+            "id": "char-jinwoo",
+            "label": "서진우",
+            "meta": {
+              "상태": "ACTIVE",
+              "소속": "CORE_FOUR",
+              "연료협의_20271123": "연료장 반출 원본과 길드 장부가 서로 독립적으로 검증되는 방식과 길드 자체 구매에도 동일 규칙을 적용하는 안이 채택됐다. 길드 구매 수량을 정하기 전 서쪽길·공공 급수시설의 요구와 유종·보관조건을 먼저 확인했다."
+            },
+            "source": "S04 SESSION_002 GM 공개 블록 001, 003, 005",
+            "subtitle": "응급실 간호사 · 플레이어",
+            "summary": "공공 급수지점에는 일반 유지보수와 기술지원을 제공하고 일상 운영은 행정 잔존팀이 맡도록 책임을 나눴다. 2027년 11월 9일에는 저장량과 대체수단을 비교해 생산거점을 먼저 복구하도록 결정했다. 길드 표식 사칭 문제에서는 상인의 물건을 빼앗거나 외부 장사를 금지하지 않고 피해거래 정산과 길드 서비스 이용 제한으로 대응했다.",
+            "tags": [
+              "PLAYER",
+              "핵심 4인",
+              "응급의료",
+              "외부정찰"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "32fa84495fd06dc7325bc1ac20c13040ddcb06f196107cda92a5cbf903be40ab",
+          "evidence": {
+            "pointer": "/nodes/6",
+            "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+            "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
           }
         }
       ],
@@ -4433,17 +4806,18 @@
     },
     {
       "anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "data": {
         "id": "char-minho",
         "label": "박민호",
         "meta": {
           "관계": "신뢰 높은 외부협력자",
+          "상가환자대응_20271124": "쓰러진 사람이 밖으로 옮겨져 반응은 있으나 상태가 좋지 않고 산소 공급 가능한 장비 쪽으로 연락 중이라고 보고했다. 이후 윤서진의 무전에서 박민호와 추가 노출자를 확인 중이라고 전해졌다. 원인이나 치료 완료는 확정되지 않았다.",
           "상태": "ACTIVE"
         },
-        "source": "Supabase survival_rpg.characters / PERSISTENT_CANON.md",
+        "source": "S04 SESSION_003 GM 공개 블록 001, 003",
         "subtitle": "119 응급구조사 · 이동형 외부협력자",
         "summary": "흩어진 현장과 사람을 연결하는 이동형 정보·응급 축. 북서2동 폐업 세차장을 정기 접촉지로 사용한다.",
         "tags": [
@@ -4455,11 +4829,42 @@
         "type": "character"
       },
       "evidence": {
-        "pointer": "/nodes/7",
-        "source_ref": "archive/web/src/archive/archiveData.ts",
-        "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+        "pointer": "/nodes/5",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
       },
-      "history": [],
+      "history": [
+        {
+          "anchor": {
+            "game_time": "2027-03-23 17:50",
+            "save_version": 253
+          },
+          "data": {
+            "id": "char-minho",
+            "label": "박민호",
+            "meta": {
+              "관계": "신뢰 높은 외부협력자",
+              "상태": "ACTIVE"
+            },
+            "source": "Supabase survival_rpg.characters / PERSISTENT_CANON.md",
+            "subtitle": "119 응급구조사 · 이동형 외부협력자",
+            "summary": "흩어진 현장과 사람을 연결하는 이동형 정보·응급 축. 북서2동 폐업 세차장을 정기 접촉지로 사용한다.",
+            "tags": [
+              "MAJOR",
+              "119",
+              "응급",
+              "정보망"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "53d3ad8da890703fe5e6af018fc4fe73b60c7339191183fa7682e1699d410984",
+          "evidence": {
+            "pointer": "/nodes/7",
+            "source_ref": "archive/web/src/archive/archiveData.ts",
+            "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          }
+        }
+      ],
       "id": "char-minho"
     },
     {
@@ -4524,17 +4929,18 @@
     },
     {
       "anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "data": {
         "id": "char-seojin",
         "label": "윤서진",
         "meta": {
           "겨울역할": "의료·건강 지원",
+          "상가의료대응_20271124": "긴급 보고를 듣고 의료가방을 챙기겠다고 밝혔다. 07:12 장면의 무전에서는 상가 환자들이 밖에 나와 있고 박민호와 추가 노출자를 확인 중이라고 보고했다. 원인을 아직 단정하지 않았으며 안전 확인 전 재진입을 막도록 요청했다.",
           "상태": "ACTIVE"
         },
-        "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+        "source": "S04 SESSION_003 GM 공개 블록 001, 003",
         "subtitle": "응급의학과 전공의",
         "summary": "핵심 4인의 의료 판단과 건강관리 축. 중증환자 인계 후 북서 실습센터에 합류했고 겨울편에서는 의료·건강 지원을 맡는다.",
         "tags": [
@@ -4545,11 +4951,41 @@
         "type": "character"
       },
       "evidence": {
-        "pointer": "/nodes/1",
-        "source_ref": "archive/web/src/archive/archiveData.ts",
-        "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+        "pointer": "/nodes/6",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
       },
-      "history": [],
+      "history": [
+        {
+          "anchor": {
+            "game_time": "2027-03-23 17:50",
+            "save_version": 253
+          },
+          "data": {
+            "id": "char-seojin",
+            "label": "윤서진",
+            "meta": {
+              "겨울역할": "의료·건강 지원",
+              "상태": "ACTIVE"
+            },
+            "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+            "subtitle": "응급의학과 전공의",
+            "summary": "핵심 4인의 의료 판단과 건강관리 축. 중증환자 인계 후 북서 실습센터에 합류했고 겨울편에서는 의료·건강 지원을 맡는다.",
+            "tags": [
+              "CORE",
+              "핵심 4인",
+              "의료"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "19ab3f26f32cd9a3429b70f74f9c44a7f266dc46b5ab6aa8984a6a0f318f1feb",
+          "evidence": {
+            "pointer": "/nodes/1",
+            "source_ref": "archive/web/src/archive/archiveData.ts",
+            "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          }
+        }
+      ],
       "id": "char-seojin"
     },
     {
@@ -4615,18 +5051,20 @@
     },
     {
       "anchor": {
-        "game_time": "2027-11-23 16:17",
-        "save_version": 291
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "data": {
         "id": "char-taehoon",
         "label": "장태훈",
         "meta": {
           "겨울역할": "설비·난방·급수 지원",
+          "급수대응보고_20271124": "급수시설 담당자에게 현장 확인 없이 차단기를 다시 올리지 말라는 경고를 전달하도록 요청했다. 07:12 장면의 후속 보고에서는 급수 펌프 전원을 격리해 놓았고 아직 재가동하지 않았으며 다른 공급선은 살아 있다고 밝혔다.",
           "상태": "ACTIVE",
+          "연료수요산정_20271123": "최은채와 설비 운전기록을 대조해 경유 신청 상한 900L(핵심 전력·설비 2주 제한 운전 비상분 약 250L, 단전·긴급운송 조건부 추가분 약 650L)를 산정했다. 예비품·동파구간·전원 전환을 다시 점검하겠다는 계획을 밝혔다.",
           "연료적합성점검_20271123": "체육시설 주난방이 장작보일러임을 설명하고, 연료장 저장구역의 이송배관을 확인했으며 경유의 장비별 규격·품질점검 필요성과 길드의 대량 보관 제약을 지적했다."
         },
-        "source": "S04 SESSION_002 GM 공개 블록 003, 005",
+        "source": "S04 SESSION_003 GM 공개 블록 001, 003",
         "subtitle": "시설운영 기술자",
         "summary": "공공 급수지점 두 곳의 설비를 조사하고 오래된 펌프 교체가 필요하다고 판단했다. 2027년 11월 9일에는 정민규와 생산거점 펌프를 오전 안에 복구하고, 이어 공공 급수지점 펌프를 교체해 오후에 정상화했다.",
         "tags": [
@@ -4639,9 +5077,9 @@
         "type": "character"
       },
       "evidence": {
-        "pointer": "/nodes/8",
-        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
-        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+        "pointer": "/nodes/1",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
       },
       "history": [
         {
@@ -4704,6 +5142,38 @@
             "pointer": "/nodes/4",
             "source_ref": "archive/content/public-facts/C03-AFTERFALL/S03/AWIKI_AMENDMENT_SESSION_008_20261005.json",
             "source_sha256": "af7e6db0387620cf8b44c114cfaa8f8690944a848a21a97dbd1f48e9b198d187"
+          }
+        },
+        {
+          "anchor": {
+            "game_time": "2027-11-23 16:17",
+            "save_version": 291
+          },
+          "data": {
+            "id": "char-taehoon",
+            "label": "장태훈",
+            "meta": {
+              "겨울역할": "설비·난방·급수 지원",
+              "상태": "ACTIVE",
+              "연료적합성점검_20271123": "체육시설 주난방이 장작보일러임을 설명하고, 연료장 저장구역의 이송배관을 확인했으며 경유의 장비별 규격·품질점검 필요성과 길드의 대량 보관 제약을 지적했다."
+            },
+            "source": "S04 SESSION_002 GM 공개 블록 003, 005",
+            "subtitle": "시설운영 기술자",
+            "summary": "공공 급수지점 두 곳의 설비를 조사하고 오래된 펌프 교체가 필요하다고 판단했다. 2027년 11월 9일에는 정민규와 생산거점 펌프를 오전 안에 복구하고, 이어 공공 급수지점 펌프를 교체해 오후에 정상화했다.",
+            "tags": [
+              "CORE",
+              "핵심 4인",
+              "시설",
+              "난방",
+              "급수"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "58e40a9bbb6a90909319e77b34d8a26c43534219d42bf63d9de76e5ea80da189",
+          "evidence": {
+            "pointer": "/nodes/8",
+            "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+            "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
           }
         }
       ],
@@ -4947,17 +5417,18 @@
     },
     {
       "anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "data": {
         "id": "char-yujin",
         "label": "최유진",
         "meta": {
+          "복지관생활지원_20271124": "외곽 주민복지관에서 담요를 접고 의자에 펴 주며 현장 사용은 가능하나 반출하면 다음 사람이 쓰지 못한다고 안내했다. 젖은 양말 교체를 권하고 마른 양말이 조금 있다고 알렸다. 신하영 등의 답을 기다리지 않고 안내했으며 당장 내보낼 필요는 없지만 계속 머물 수 있다고 약속해서는 안 된다고 말했다.",
           "상태": "ACTIVE",
           "연합원": "아님"
         },
-        "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+        "source": "S04 SESSION_003 GM 공개 블록 003",
         "subtitle": "세탁·침구·생활물자 전문가",
         "summary": "신하영과 함께 백운생활관을 떠나 공개 접점에서 자립 중. 겨울편에서 침구·세탁·수면공간·생활물자·일상 유지를 주도한다.",
         "tags": [
@@ -4970,11 +5441,43 @@
         "type": "character"
       },
       "evidence": {
-        "pointer": "/nodes/5",
-        "source_ref": "archive/web/src/archive/archiveData.ts",
-        "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+        "pointer": "/nodes/4",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
       },
-      "history": [],
+      "history": [
+        {
+          "anchor": {
+            "game_time": "2027-03-23 17:50",
+            "save_version": 253
+          },
+          "data": {
+            "id": "char-yujin",
+            "label": "최유진",
+            "meta": {
+              "상태": "ACTIVE",
+              "연합원": "아님"
+            },
+            "source": "Supabase survival_rpg.characters / CHARACTER_BIBLE.md",
+            "subtitle": "세탁·침구·생활물자 전문가",
+            "summary": "신하영과 함께 백운생활관을 떠나 공개 접점에서 자립 중. 겨울편에서 침구·세탁·수면공간·생활물자·일상 유지를 주도한다.",
+            "tags": [
+              "MAJOR",
+              "겨울편 주도",
+              "세탁",
+              "침구",
+              "TRUSTED_EXTERNAL"
+            ],
+            "type": "character"
+          },
+          "data_sha256": "01162d45061e5fa1b642f8b6cabb508ce22333091aae24a747a9f30b5591efa4",
+          "evidence": {
+            "pointer": "/nodes/5",
+            "source_ref": "archive/web/src/archive/archiveData.ts",
+            "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          }
+        }
+      ],
       "id": "char-yujin"
     },
     {
@@ -5523,6 +6026,50 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "id": "event-wiki-c9b034ab6a27257ac62b1fc8",
+        "label": "외곽 주민복지관 방문자 접수와 임시 보온",
+        "source": "S04 SESSION_003 GM 공개 블록 003",
+        "subtitle": "2027년 11월 24일 07:12",
+        "summary": "외곽 주민복지관 앞에 난방이 멈춘 근처 주택의 주민 3명, 북쪽에서 내려와 숙박을 찾는 3명, 사고 상가의 가족 대기자 1명, 급수 소문 확인자 1명 등 8명이 모였다. 문하진은 환자 연락과 숙박·이동 문의를 나누고 단기 숙박 두 자리 및 임시 보온과 계속 머무는 숙박의 경계를 설명했다. 최유진은 담요의 현장 사용과 양말 교체를 안내했다. 도착한 서진우에게 문하진은 북쪽에서 온 세 사람의 당일 밤 행선지가 미정이라고 설명했다. 장기 체류나 숙박 확대 결정은 기록되지 않았다.",
+        "tags": [],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/12",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "event-wiki-c9b034ab6a27257ac62b1fc8"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "id": "event-wiki-ce2fb53dadec2a08057b235e",
+        "label": "상가 발전기 사용 중 환자 발생과 대응",
+        "source": "S04 SESSION_003 GM 공개 블록 001, 003",
+        "subtitle": "2027년 11월 24일 새벽 · 원인 미확정",
+        "summary": "복지관 근처 낡은 상가에서 이동식 발전기를 쓰던 사람들 중 둘이 어지럼증을 호소하고 한 명이 쓰러졌다고 전해졌다. 현장에서는 배기가스 유입을 의심했으나 원인은 확정되지 않았다. 박민호는 쓰러진 사람이 밖으로 옮겨져 반응은 있지만 상태가 좋지 않으며 산소 공급 가능한 장비 쪽으로 연락 중이라고 보고했다. 후속 무전에서 윤서진은 환자들이 밖에 있고 박민호와 추가 노출자를 확인 중이라며 안전 확인 전 재진입을 막도록 요청했다. 전체 피해 규모와 치료 결과는 미확정이다.",
+        "tags": [],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/11",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "event-wiki-ce2fb53dadec2a08057b235e"
+    },
+    {
+      "anchor": {
         "game_time": "2027-11-22 22:40",
         "save_version": 285
       },
@@ -5634,6 +6181,28 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "id": "event-wiki-e7ea4b4204ee5377988d0e82",
+        "label": "새벽 공공 급수 펌프 정지와 전원 격리",
+        "source": "S04 SESSION_003 GM 공개 블록 001, 003",
+        "subtitle": "2027년 11월 24일 새벽 · 07:12 장면 후속 보고",
+        "summary": "주변 공공 전력선에 전기가 잠깐 들어왔다 다시 끊겼고 공공 급수지점 한 곳의 펌프가 멈췄다는 보고가 전해졌다. 문제 시작 지점은 미확인이고 다른 급수원과 저장수는 남아 있었다. 장태훈은 후속 연락에서 펌프 전원을 격리해 놓았고 아직 재가동하지 않았으며 다른 공급선은 살아 있다고 보고했다. 문하진은 복지관 물 보충이 불확실하다고 설명했지만 복지관 단수나 전체 급수 중단은 확인되지 않았다.",
+        "tags": [],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/10",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "event-wiki-e7ea4b4204ee5377988d0e82"
+    },
+    {
+      "anchor": {
         "game_time": "2027-11-23 16:17",
         "save_version": 291
       },
@@ -5691,6 +6260,28 @@
         }
       ],
       "id": "event-wiki-eb0397c1607ee222060dcaca"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "id": "event-wiki-f61869742cc3c810573074eb",
+        "label": "길드 경유 900리터 분할 인수 신청",
+        "source": "S04 SESSION_003 GM 공개 블록 001",
+        "subtitle": "2027년 11월 23일 17:05 · 배분 미승인",
+        "summary": "북쪽 연료장에서 장태훈과 최은채가 운전기록과 최소 운전량을 대조하고 외부 운송업체 부담분의 중복을 피하며 길드 경유 신청 상한을 900L로 산정했다. 핵심 전력·설비 2주 제한 운전 비상분 약 250L와 단전·긴급운송 조건부 추가분 약 650L이며 확정 소비량이 아니다. 분할 인수 신청은 접수됐으나 배분은 미승인이고, 안전한 보관·운송 확인 전에는 반출하지 않기로 했다. 당일 새 연료 구매는 없었다.",
+        "tags": [],
+        "type": "event"
+      },
+      "evidence": {
+        "pointer": "/nodes/9",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "event-wiki-f61869742cc3c810573074eb"
     },
     {
       "anchor": {
@@ -5961,13 +6552,18 @@
     },
     {
       "anchor": {
-        "game_time": "2027-03-23 17:50",
-        "save_version": 253
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "data": {
         "id": "loc-shelter",
         "label": "외곽 주민복지관",
-        "source": "Supabase scene S02_SECOND_SHELTER",
+        "meta": {
+          "급수난방현황_20271124_0712": "문하진의 설명상 난방과 물은 유지되지만 공공 급수지점 한 곳의 정지로 보충은 불확실했다. 물 소진이나 복지관 단수가 확인된 상태는 아니다.",
+          "생활물자운영_20271124_0712": "최유진이 담요의 현장 사용과 반출을 구분하고 젖은 양말 교체를 안내했다. 계속 머무를 수 있다는 약속을 해서는 안 된다는 경계도 밝혔다.",
+          "접수수용현황_20271124_0712": "전면 출입구 앞에는 난방이 멈춘 근처 주택에서 몸을 녹이러 온 3명, 북쪽에서 내려와 숙박을 구하는 3명, 발전기 사고 상가의 가족을 기다리는 1명, 급수 중단 소문을 확인하러 온 1명 등 8명이 있었다. 문하진은 대기선을 환자 연락과 숙박·이동 문의로 나누고 단기 숙박 두 자리와 임시 보온의 한계를 설명했다."
+        },
+        "source": "S04 SESSION_003 GM 공개 블록 003",
         "subtitle": "공개 전진기지·생활망",
         "summary": "전기·급수·화장실·접근성을 살려 가동한 공개 생활시설. 신하영·최유진이 생활운영의 신뢰 가능한 접점으로 자리잡았다.",
         "tags": [
@@ -5978,11 +6574,37 @@
         "type": "location"
       },
       "evidence": {
-        "pointer": "/nodes/20",
-        "source_ref": "archive/web/src/archive/archiveData.ts",
-        "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+        "pointer": "/nodes/7",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
       },
-      "history": [],
+      "history": [
+        {
+          "anchor": {
+            "game_time": "2027-03-23 17:50",
+            "save_version": 253
+          },
+          "data": {
+            "id": "loc-shelter",
+            "label": "외곽 주민복지관",
+            "source": "Supabase scene S02_SECOND_SHELTER",
+            "subtitle": "공개 전진기지·생활망",
+            "summary": "전기·급수·화장실·접근성을 살려 가동한 공개 생활시설. 신하영·최유진이 생활운영의 신뢰 가능한 접점으로 자리잡았다.",
+            "tags": [
+              "공공",
+              "주민복지관",
+              "생활망"
+            ],
+            "type": "location"
+          },
+          "data_sha256": "090a16ce9258283f13ce7e219d3049bd1e855519476311e49e08f9cbb00513e3",
+          "evidence": {
+            "pointer": "/nodes/20",
+            "source_ref": "archive/web/src/archive/archiveData.ts",
+            "source_sha256": "81b054fcd00a00423dd42f81628dff35ddddd00d70456b2f01b9eeb335655e0d"
+          }
+        }
+      ],
       "id": "loc-shelter"
     },
     {
@@ -6204,6 +6826,28 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "id": "loc-wiki-b677877be03ac7c2ad1dd760",
+        "label": "복지관 근처의 낡은 상가",
+        "source": "S04 SESSION_003 GM 공개 블록 001, 003",
+        "subtitle": "이동식 발전기 사용 중 환자 발생이 보고된 장소",
+        "summary": "2027년 11월 24일 이동식 발전기를 쓰던 사람들의 어지럼증과 쓰러짐이 보고된 복지관 근처 상가다. 배기가스 유입은 현장의 의심이며 원인은 미확정이다. 윤서진의 후속 무전에는 환자들이 밖에 있고 추가 노출자를 확인 중이며 안전 확인 전 재진입을 막도록 요청한 상태가 기록됐다.",
+        "tags": [],
+        "type": "location"
+      },
+      "evidence": {
+        "pointer": "/nodes/13",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "loc-wiki-b677877be03ac7c2ad1dd760"
+    },
+    {
+      "anchor": {
         "game_time": "2027-11-23 16:17",
         "save_version": 291
       },
@@ -6232,17 +6876,18 @@
     },
     {
       "anchor": {
-        "game_time": "2027-11-23 16:17",
-        "save_version": 291
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
       },
       "data": {
         "id": "loc-wiki-f73ae01ebcb8d89952911bbc",
         "label": "북쪽 연료장 생활권",
         "meta": {
           "구매보관별도계약": "연료 구매와 탱크 보관은 별도 계약이며 분할 인수 시 보관기간·보관대가·손실 책임을 별도로 협의해야 한다.",
+          "길드신청접수_20271123_1705": "길드의 경유 900L 상한·분할 인수 신청을 담당자가 접수했다. 배분은 아직 미승인이며 당일 길드는 새 연료를 구매하지 않았다. 첫 필요 물량도 안전한 보관·운송 확인 전에는 반출하지 않기로 했다.",
           "잠정배분유종_20271123": "외부 배분 검토 약 18,000L 중 경유 약 12,000L(일부 탱크 수분·침전 확인 필요), 등유 약 5,000L, 휘발유 약 1,000L로 구분한다. 실제 계약·반출량은 유종 상태와 당일 계측에 따라 달라질 수 있다."
         },
-        "source": "S04 SESSION_002 GM 공개 블록 005",
+        "source": "S04 SESSION_003 GM 공개 블록 001",
         "subtitle": "구 물류장 기반 연료 저장·배분 거점",
         "summary": "구 물류장 안쪽에 차량 대기선과 작업구역이 분리되고 저장탱크 주변에 펜스와 통제선이 설치됐다. 2027년 11월 23일 장부상 21킬로리터를 조금 넘게 보유했고, 손실·침전·자체 겨울운영분을 뺀 약 18킬로리터를 외부 배분 상한으로 제시했으며 실제 반출량은 날짜별로 다시 계측하기로 했다.",
         "tags": [
@@ -6254,9 +6899,9 @@
         "type": "location"
       },
       "evidence": {
-        "pointer": "/nodes/4",
-        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
-        "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
+        "pointer": "/nodes/8",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
       },
       "history": [
         {
@@ -6309,6 +6954,36 @@
             "pointer": "/nodes/2",
             "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_001_0fe994398bc641ddcf911a01a8f6bdb34ef7a294956ced83e6d3e94c6351c1cc.json",
             "source_sha256": "9633aabd92d3d8f07b03dfea22dbc79eec1beca613991ac0f850ab09020026bb"
+          }
+        },
+        {
+          "anchor": {
+            "game_time": "2027-11-23 16:17",
+            "save_version": 291
+          },
+          "data": {
+            "id": "loc-wiki-f73ae01ebcb8d89952911bbc",
+            "label": "북쪽 연료장 생활권",
+            "meta": {
+              "구매보관별도계약": "연료 구매와 탱크 보관은 별도 계약이며 분할 인수 시 보관기간·보관대가·손실 책임을 별도로 협의해야 한다.",
+              "잠정배분유종_20271123": "외부 배분 검토 약 18,000L 중 경유 약 12,000L(일부 탱크 수분·침전 확인 필요), 등유 약 5,000L, 휘발유 약 1,000L로 구분한다. 실제 계약·반출량은 유종 상태와 당일 계측에 따라 달라질 수 있다."
+            },
+            "source": "S04 SESSION_002 GM 공개 블록 005",
+            "subtitle": "구 물류장 기반 연료 저장·배분 거점",
+            "summary": "구 물류장 안쪽에 차량 대기선과 작업구역이 분리되고 저장탱크 주변에 펜스와 통제선이 설치됐다. 2027년 11월 23일 장부상 21킬로리터를 조금 넘게 보유했고, 손실·침전·자체 겨울운영분을 뺀 약 18킬로리터를 외부 배분 상한으로 제시했으며 실제 반출량은 날짜별로 다시 계측하기로 했다.",
+            "tags": [
+              "S03",
+              "장소",
+              "연료",
+              "북쪽"
+            ],
+            "type": "location"
+          },
+          "data_sha256": "ed55c256cad4d5a2bbf2b695f735bc9005928b245f4b6f8333ebd8b05b315204",
+          "evidence": {
+            "pointer": "/nodes/4",
+            "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_002_085d6ec7707fd554df68d2faef5b7f6618beb467c131bfcf09ff2d3d230cec00.json",
+            "source_sha256": "2d18f6442822a94d46f7f08cadf5fe278b4c7e29793c2fedaa0cce5e11330464"
           }
         }
       ],
@@ -6552,6 +7227,25 @@
       },
       "history": [],
       "id": "rel-0e77240921c8e1916dd267add5ceb3249638ca06208bad6f69a310ef532bded4"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "from": "char-seojin",
+        "kind": "participated_in",
+        "label": "추가 노출자 확인과 안전 확인 전 재진입 금지 요청",
+        "to": "event-wiki-ce2fb53dadec2a08057b235e"
+      },
+      "evidence": {
+        "pointer": "/relations/6",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "rel-0f526745b57ff6df0ceddc23a5b96ffa34b4d774501d3d5667968876a6f93717"
     },
     {
       "anchor": {
@@ -6935,6 +7629,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "from": "event-wiki-ce2fb53dadec2a08057b235e",
+        "kind": "occurred_at",
+        "label": "발전기 사용자들의 증상 발생이 보고된 상가",
+        "to": "loc-wiki-b677877be03ac7c2ad1dd760"
+      },
+      "evidence": {
+        "pointer": "/relations/7",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "rel-2df71014103fa863573bf94211e41bd99bf7f9fbe952460f29fe88492383df9b"
+    },
+    {
+      "anchor": {
         "game_time": "2027-09-22 16:10",
         "save_version": 280
       },
@@ -7125,6 +7838,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "from": "char-yujin",
+        "kind": "participated_in",
+        "label": "담요·양말 안내와 계속 체류 약속의 경계 제시",
+        "to": "event-wiki-c9b034ab6a27257ac62b1fc8"
+      },
+      "evidence": {
+        "pointer": "/relations/10",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "rel-432f2aa61d10c5d5044db528dd801aa64e69727f9eef49bd8d8e741976064070"
+    },
+    {
+      "anchor": {
         "game_time": "2027-10-30 13:20",
         "save_version": 282
       },
@@ -7141,6 +7873,25 @@
       },
       "history": [],
       "id": "rel-443dc241512a9226aa94f281b56367117503b9967af8f625446c7c11d30834a5"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "from": "char-taehoon",
+        "kind": "participated_in",
+        "label": "운전기록 대조와 경유 신청 상한 산정",
+        "to": "event-wiki-f61869742cc3c810573074eb"
+      },
+      "evidence": {
+        "pointer": "/relations/1",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "rel-4544fe81d248a4f0a97dfe661d9239598362d647e2e73a9bedeec62a8f6d38ef"
     },
     {
       "anchor": {
@@ -7331,6 +8082,25 @@
       },
       "history": [],
       "id": "rel-5e447bae9bc82b989fc0a76a073402527ae9e1a7e99fd80f5fe8d4e96542ec66"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "from": "char-jinwoo",
+        "kind": "participated_in",
+        "label": "복지관 도착 후 북쪽 방문자 숙박 미정 상황 청취",
+        "to": "event-wiki-c9b034ab6a27257ac62b1fc8"
+      },
+      "evidence": {
+        "pointer": "/relations/11",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "rel-5f6cd3f2479505d34259af218884d96f6979561ee739c272257112378fcb7259"
     },
     {
       "anchor": {
@@ -7543,6 +8313,44 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "from": "event-wiki-ce2fb53dadec2a08057b235e",
+        "kind": "related_to",
+        "label": "사고 상가의 가족을 기다리는 방문자가 복지관에 모임",
+        "to": "loc-shelter"
+      },
+      "evidence": {
+        "pointer": "/relations/8",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "rel-6fa1a50080cf02bae73dc2298170bdddc76f9f57a5e8a16a9f16ecec7eb3aa0a"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "from": "char-minho",
+        "kind": "participated_in",
+        "label": "환자 상태·장비 연락 보고와 추가 노출자 확인",
+        "to": "event-wiki-ce2fb53dadec2a08057b235e"
+      },
+      "evidence": {
+        "pointer": "/relations/5",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "rel-7127cbe4f466649bf3a76dc36f591397466419635f9c6bdb613a5d3f4206e6f3"
+    },
+    {
+      "anchor": {
         "game_time": "2027-09-22 16:10",
         "save_version": 280
       },
@@ -7654,6 +8462,25 @@
       },
       "history": [],
       "id": "rel-76ce107fd3b4d8d91b45eb5a0d5aa5e8db1b91285fe01523566aeb370723cc9b"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "from": "loc-wiki-b677877be03ac7c2ad1dd760",
+        "kind": "related_to",
+        "label": "복지관 근처에 있는 상가",
+        "to": "loc-shelter"
+      },
+      "evidence": {
+        "pointer": "/relations/13",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "rel-78d7ced56150ddefb128a1fe177afe0ecf289e3e915ab488c8bbde9f4bfe7a52"
     },
     {
       "anchor": {
@@ -8189,6 +9016,44 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "from": "char-hajin",
+        "kind": "participated_in",
+        "label": "대기선 분리와 수용·급수 상태 설명",
+        "to": "event-wiki-c9b034ab6a27257ac62b1fc8"
+      },
+      "evidence": {
+        "pointer": "/relations/9",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "rel-a6e3b269b28b431197f4cf3b8afb135106b8a5051e03c8b482e46ddb7854e14e"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "from": "event-wiki-e7ea4b4204ee5377988d0e82",
+        "kind": "related_to",
+        "label": "공공 급수지점 정지에 따른 물 보충 불확실성",
+        "to": "loc-shelter"
+      },
+      "evidence": {
+        "pointer": "/relations/4",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "rel-a6f2c71257da0b723daa401a850d98fbf4be7d6f45813bbcf3f7587b6010b2ff"
+    },
+    {
+      "anchor": {
         "game_time": "2027-10-30 13:20",
         "save_version": 282
       },
@@ -8379,6 +9244,25 @@
     },
     {
       "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "from": "event-wiki-c9b034ab6a27257ac62b1fc8",
+        "kind": "occurred_at",
+        "label": "외곽 주민복지관 출입구와 실내",
+        "to": "loc-shelter"
+      },
+      "evidence": {
+        "pointer": "/relations/12",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "rel-b258db0df08dc0b2089d0f96128fddf9ab7fca2f3434a1bb56f7abc8475871bf"
+    },
+    {
+      "anchor": {
         "game_time": "2027-09-22 16:10",
         "save_version": 280
       },
@@ -8433,6 +9317,25 @@
       },
       "history": [],
       "id": "rel-bc51f460b66d063edc5ac7d376eb719a05b3297f41abccc75017842c9bbb6bd7"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "from": "char-taehoon",
+        "kind": "participated_in",
+        "label": "펌프 전원 격리 및 미재가동 상태 보고",
+        "to": "event-wiki-e7ea4b4204ee5377988d0e82"
+      },
+      "evidence": {
+        "pointer": "/relations/3",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "rel-bc8b6ba08a499a928f0bfc45dc1d14883c151b9e05c47e3923722ad06f6f6aed"
     },
     {
       "anchor": {
@@ -8585,6 +9488,25 @@
       },
       "history": [],
       "id": "rel-d54a4521487899d2b7611e6f71a7833d2ce75af0a06834bff7f844e1d06e5214"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "from": "event-wiki-f61869742cc3c810573074eb",
+        "kind": "occurred_at",
+        "label": "북쪽 연료장에서 신청 접수",
+        "to": "loc-wiki-f73ae01ebcb8d89952911bbc"
+      },
+      "evidence": {
+        "pointer": "/relations/2",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "rel-d56a3913d79504adbbf307a24bb50308f4fbb53c116082587de452ae7e038594"
     },
     {
       "anchor": {
@@ -9022,6 +9944,25 @@
       },
       "history": [],
       "id": "rel-f63eca3e3221c899c44721adff2abf57ea29550564336dd86923721abc429e2d"
+    },
+    {
+      "anchor": {
+        "game_time": "2027-11-24 07:12",
+        "save_version": 293
+      },
+      "data": {
+        "from": "char-eunchae",
+        "kind": "participated_in",
+        "label": "연료 부담 중복 구분과 분할 인수 신청서 작성",
+        "to": "event-wiki-f61869742cc3c810573074eb"
+      },
+      "evidence": {
+        "pointer": "/relations/0",
+        "source_ref": "archive/content/public-facts/C03-AFTERFALL/S04/AWIKI_SESSION_003_b819acfab3678a689d87326550234047889a065ec5533bb20d9afe57b04760ad.json",
+        "source_sha256": "aee92e5d4659c67c8f904c731df86b0d049a9da63f541b60b3c0ac0d10e07fbe"
+      },
+      "history": [],
+      "id": "rel-f8cf382f6bbdc542cf44161eff5ad78e43c324ca2f53bce2dbde15d6d7e46584"
     },
     {
       "anchor": {
@@ -11854,6 +12795,32 @@
       ]
     },
     {
+      "body_sha256": "843779f6226db61bc0e5a5d8a9922a92ce68517147810dd00bda62c8219f716b",
+      "chapter_id": "c03-afterfall-auto-51eb9401a8c6f4d252cb2696a09c06b7ef7f7c02b7a587b40a9529be9a29c04d",
+      "chapter_title": "2027-11-23 17:05 — 북쪽 연료장",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0"
+      },
+      "id": "mention-3da55d302900d0219a3372991f94cc9ece833f1042a3993838195587e582d1ee",
+      "node_id": "char-hajin",
+      "reasons": [
+        {
+          "alias": "문하진",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            968,
+            2202,
+            2481,
+            2761,
+            3048,
+            3412,
+            3587
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "1338f9044cde2f346b0c94d62811b4c80fe8faccc5958da560bea5a76da10055",
       "chapter_id": "c03-afterfall-chapter-03",
       "chapter_title": "폐쇄된 체육시설",
@@ -12745,6 +13712,26 @@
       "reasons": [
         {
           "kind": "EDITORIAL_REFERENCE"
+        }
+      ]
+    },
+    {
+      "body_sha256": "843779f6226db61bc0e5a5d8a9922a92ce68517147810dd00bda62c8219f716b",
+      "chapter_id": "c03-afterfall-auto-51eb9401a8c6f4d252cb2696a09c06b7ef7f7c02b7a587b40a9529be9a29c04d",
+      "chapter_title": "2027-11-23 17:05 — 북쪽 연료장",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0"
+      },
+      "id": "mention-535ed855bc5c158801d435b30c0a95d6305c5932ef0b3fae23de340e3620e311",
+      "node_id": "loc-shelter",
+      "reasons": [
+        {
+          "alias": "외곽 주민복지관",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            1881
+          ]
         }
       ]
     },
@@ -13761,6 +14748,27 @@
             10308,
             12922,
             15453
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "843779f6226db61bc0e5a5d8a9922a92ce68517147810dd00bda62c8219f716b",
+      "chapter_id": "c03-afterfall-auto-51eb9401a8c6f4d252cb2696a09c06b7ef7f7c02b7a587b40a9529be9a29c04d",
+      "chapter_title": "2027-11-23 17:05 — 북쪽 연료장",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0"
+      },
+      "id": "mention-725964c45f8f62943cf8acb4fde3536634941955b52ef93dd0b358a6e6333a0e",
+      "node_id": "char-seojin",
+      "reasons": [
+        {
+          "alias": "윤서진",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            902,
+            3105
           ]
         }
       ]
@@ -15490,6 +16498,26 @@
       ]
     },
     {
+      "body_sha256": "843779f6226db61bc0e5a5d8a9922a92ce68517147810dd00bda62c8219f716b",
+      "chapter_id": "c03-afterfall-auto-51eb9401a8c6f4d252cb2696a09c06b7ef7f7c02b7a587b40a9529be9a29c04d",
+      "chapter_title": "2027-11-23 17:05 — 북쪽 연료장",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0"
+      },
+      "id": "mention-a3363ccc04a5515ce31898cb3bea55fdcd3151c9f956200bb814859e49b809be",
+      "node_id": "char-yujin",
+      "reasons": [
+        {
+          "alias": "최유진",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            2552
+          ]
+        }
+      ]
+    },
+    {
       "body_sha256": "8b447561fb51c1f0ebebcb83dd39a72684d4156b0d7abc7ba2cf4a6e1dd49942",
       "chapter_id": "c03-afterfall-chapter-19",
       "chapter_title": "열세 사람의 밤",
@@ -15632,6 +16660,26 @@
             6211,
             6607,
             9588
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "843779f6226db61bc0e5a5d8a9922a92ce68517147810dd00bda62c8219f716b",
+      "chapter_id": "c03-afterfall-auto-51eb9401a8c6f4d252cb2696a09c06b7ef7f7c02b7a587b40a9529be9a29c04d",
+      "chapter_title": "2027-11-23 17:05 — 북쪽 연료장",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0"
+      },
+      "id": "mention-aa9d8d9d7b31c51699cba665f2434354afe07c7ddd4daa1a0742b0c7fb948997",
+      "node_id": "char-minho",
+      "reasons": [
+        {
+          "alias": "박민호",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            1301
           ]
         }
       ]
@@ -17296,6 +18344,26 @@
           "kind": "EXACT_TEXT_MENTION",
           "offsets": [
             6308
+          ]
+        }
+      ]
+    },
+    {
+      "body_sha256": "843779f6226db61bc0e5a5d8a9922a92ce68517147810dd00bda62c8219f716b",
+      "chapter_id": "c03-afterfall-auto-51eb9401a8c6f4d252cb2696a09c06b7ef7f7c02b7a587b40a9529be9a29c04d",
+      "chapter_title": "2027-11-23 17:05 — 북쪽 연료장",
+      "evidence": {
+        "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+        "source_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0"
+      },
+      "id": "mention-df1514a23c88b7e8cde31eafddbb497389fe365591cc1dcfb4e62ae6ea986dc3",
+      "node_id": "loc-wiki-b677877be03ac7c2ad1dd760",
+      "reasons": [
+        {
+          "alias": "복지관 근처의 낡은 상가",
+          "kind": "EXACT_TEXT_MENTION",
+          "offsets": [
+            1184
           ]
         }
       ]
