@@ -22,6 +22,7 @@ Runtime SoT: Supabase taejang-phase1-staging / survival_rpg.saves(worldline_id='
 - 상태 갱신은 `saves`의 expected_version(CAS) 조건으로 실제 변한 항목만 반영한다. C04 초반에는 `state.npcs` / `gm_state.pressures` / `state.game_time` / `state.current_scene`에서 읽는다. `state.known_world.time/location`이나 별도 NPC/Pressure 테이블을 정본으로 혼동하지 않는다. 새 장면으로 이동할 때 `state.current_location`을 기존 사실과 일치하도록 기록한다. 차량·가방 등 여러 표시가 있을 때는 최신 `state.vehicles`, `state.go_bag`가 상세 위치의 정본이고 `state.gear`의 오래된 문구는 장면 갱신 때만 정정한다. 모순 발견 시 저장값을 확인하고 임의 창작 없이 최소 보정한다.
 - GitHub의 PREPLAY.json 및 check-fourth-worldline-preplay.mjs는 옛 기획 상태 검사 기록이다. PLAYING이 되면 FAIL하도록 설계되어 있으므로 정식 런타임 게이트로 사용하지 않는다.
 - 새 작품의 Reader·Wiki·B 삽화·C 지식·발행 배치는 아직 미연결이다. 원문 보존과 공개 발행을 혼동하지 않는다.
+- **C04 독자용 편집:** 플레이 RAW는 정확한 원문으로 보존한다. 기존 장면의 반복 해설·단역 과잉 묘사·선택 UI는 `worldlines/FOURTH/editorial/`에 별도의 `EDITED_NARRATIVE` 초안으로 수정하며, 사람 검수 전에는 공개하지 않는다. 향후 Reader/생존지식 사이트의 재편집·버전 갱신은 `editorial/EDITORIAL_PUBLICATION_POLICY_V1.md`를 따른다. 편집 작업은 일반 턴을 막지 않는다.
 
 ## C04 초기 QA 인계 (2026-10-17)
 - 초기 저장된 USER 턴 0~6에 도구 이미지 읽기 실패 진단문이 섞인 사실 확인. **기존 원문은 append-only이므로 수정·삭제하지 않는다.** 새 C04 전용 저장 함수는 같은 패턴의 오염 입력을 거부한다. 이후 입력이 실제 사용자 발언만 포함하는지 확인한다.
