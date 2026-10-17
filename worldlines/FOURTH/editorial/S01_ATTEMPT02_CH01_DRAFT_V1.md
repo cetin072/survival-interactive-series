@@ -1,7 +1,7 @@
 <!-- C04 EDITORIAL DRAFT · not RAW, not Canon, not published.
 Source: Supabase WORLDLINE_04 / C04 / S01 / session 557a7f18-b172-4f72-b1c5-98799d7bacf6, attempt 02.
 Source verified by exact message IDs + content SHA-256 in S01_ATTEMPT02_EDITS_V1.json.
-Editor applied 24 replacements/exclusions to GM turns 0,1,3. GM turn 2 (planning) intentionally omitted.
+Editor applied 23 replacements/exclusions to GM turns 0,1,3. GM turn 2 (planning) intentionally omitted.
 This draft is EDITED_NARRATIVE, never label it VERIFIED_GM_NARRATIVE.
 No game state, chronology, inventory or player choices have been updated by this draft.
 -->
@@ -166,7 +166,6 @@ No game state, chronology, inventory or player choices have been updated by this
 
 태준의 손가락이 연락처 목록 위에서 멈췄다.
 
-**오전 9시 28분.**
 
 ---
 
@@ -287,9 +286,3 @@ No game state, chronology, inventory or player choices have been updated by this
 태준이 시계를 봤다.
 
 열 시 팔 분.
-
-**한 시간 남짓 뒤면 정말 무언가가 달라질 수도 있었다.**
-
-지금 주유소 줄에 들어가면 연료를 확보할 가능성이 있었다. 반면 집으로 돌아가면 수도가 나오는 동안 물을 받아 놓고, 이미 가진 물건을 정리할 수 있었다.
-
-그에게는 두 가지 모두 필요했다.
