@@ -1,0 +1,826 @@
+{
+  "record_type": "PRESERVED_PRE_RESTART_SAVE",
+  "preserved_on": "2026-10-17",
+  "source": "Supabase survival_rpg.saves direct read; version 9 reconfirmed immediately before preservation",
+  "attempt": "C04_S01_ATTEMPT_01",
+  "worldline_id": "WORLDLINE_04",
+  "save_version": 9,
+  "state": {
+    "body": {
+      "condition": "확인된 부상 없음·계단 물자 운반으로 땀과 피로",
+      "last_food": "D0 12:22 이전 집 보유 빵1개 섭취"
+    },
+    "gear": [
+      "휴대전화·지갑·신분증·집 열쇠",
+      "생존가방(집 현관 안쪽)",
+      "개인 물병·손전등·보조배터리·펜치·의류·기본 처치용품(배낭)",
+      "휴대용 라디오(식탁 위에서 청취)",
+      "충전기·선(배낭)",
+      "배송용 카트·차량 USB 충전기(탑차)",
+      "가정용 공구함·드라이버(집)",
+      "휴대용 가스버너(집·미점화)",
+      "10L 물통2개(집·충수 완료)"
+    ],
+    "home": {
+      "city": "창원시 성산구",
+      "floor": 3,
+      "building": "다세대주택",
+      "power_bank": "추가 구매 후 배낭에 보관",
+      "neighborhood": "아직 명시하지 않음",
+      "observed_items": {
+        "large_pots": 2,
+        "small_toolbox": [
+          "드라이버 등·펜치는 배낭으로 이동"
+        ],
+        "food_safe_lidded_container": "있음·개수 미확인"
+      },
+      "current_utilities": {
+        "tap_water": "물통 충수 당시 나옴",
+        "television": "충돌 확인·피해 파악 중 방송 수신",
+        "electricity": "휴대전화 충전·TV 작동",
+        "observed_at": "D0 12:22 이전 최근 확인"
+      },
+      "occupancy_details": "미정",
+      "latest_observation": {
+        "cause": "주인공은 진원·세기를 판단하지 못함",
+        "observed": "컵끼리 가볍게 부딪히고 발바닥에 짧은 움직임, 등갓 작은 흔들림",
+        "game_time": "D0 11:57 무렵",
+        "structural_damage_assessment": "실시하지 않음"
+      },
+      "resident_knowledge": {
+        "baseline": "지하가 없고 뒤쪽 통로·철문이 있다는 일상 구조는 태준이 평소 알고 있음",
+        "provenance": "사용자의 생활지식 지적에 따른 현재 설정 명료화·기존 RAW 미수정",
+        "current_uncertainty": "출입문 현 상태·현재 열쇠 보유/관리 상황·갈라짐의 신규 여부 등"
+      },
+      "personal_purchased_cargo": "추가 구매품 집 안 운반 완료·배낭 배분 별도 유지"
+    },
+    "npcs": {
+      "W04_NPC_MOON_SEA": {
+        "age": 33,
+        "name": "문세아",
+        "location": "인근 생활용품점(마지막 관찰)",
+        "occupation": "생활용품점 점주",
+        "last_seen_at": "D0 10:32~10:47",
+        "relationship": "이번 구매에서 대화한 판매자",
+        "traits_observed": [
+          "귀 뒤에 볼펜을 꽂아 둠",
+          "폐점 시각을 명확히 반복 안내"
+        ],
+        "last_observed_action": "11시 폐점 안내문 부착·보조배터리 단자 설명·계산 업무",
+        "private_information_boundary": "이후의 실제 폐점 여부는 아직 관찰하지 않음"
+      },
+      "W04_NPC_HAN_JIEUN": {
+        "age": 32,
+        "name": "한지은",
+        "location": "태준 집3층 실내·식탁 곁",
+        "presence": [
+          "차분한 말투",
+          "구체적인 답을 확인하는 시선"
+        ],
+        "residence": "같은 다세대주택2층",
+        "occupation": "재택 책 편집 작업(본인 설명)",
+        "relationship": "같은 건물 이웃·공동 확인 및 브리핑 청취 후 잠시 집에 초대받음",
+        "current_action": "지역 임시 대기 공간 공지를 읽고 주민센터 현장 확인을 제안하며 태준의 답을 기다림",
+        "observed_items": [
+          "휴대전화",
+          "작은 배낭(자기 집에서 가져옴)",
+          "개인 물병"
+        ],
+        "alliance_status": "단기 협력·잠시 방문에 동의. 동거·장기 동행·연애·물자 공동 소유 합의 없음",
+        "observed_limits": [
+          "벽 갈라짐이 기존인지 판단하지 못함",
+          "모바일 영상 재생 지연으로 방송 정보 일부를 놓침"
+        ],
+        "first_impression": "낮은 목소리로 필요한 것을 묻고 사진과 연락으로 스스로 확인하려는 이웃",
+        "requests_pending": [
+          "짐 전체 이동 결정 전에 주민센터 운영 상황 확인 제안"
+        ],
+        "appearance_anchor": {
+          "face": "턱으로 좁아지는 얼굴·긴 눈매",
+          "hair": "검은 머리를 목덜미에서 느슨하게 묶음",
+          "build": "어깨가 가는 체형",
+          "voice": "조금 낮고 말끝이 분명함",
+          "height": "보통 키",
+          "distinctive": [
+            "대답을 기다릴 때 상대를 똑바로 봄"
+          ],
+          "apparent_age": "30대 초반",
+          "first_clothing": "흰 티셔츠·옅은 회색 카디건·짙은 청바지·운동화"
+        },
+        "observed_strengths": [
+          "사진과 메시지로 관찰 기록·문의",
+          "자신이 맡을 연락을 먼저 제안함"
+        ],
+        "appearance_provenance": {
+          "basis": "C04 현 장면의 최초 구체 묘사",
+          "established_turn": 7,
+          "cross_worldline_character_import": false
+        },
+        "latest_personal_report": "인쇄소가 오늘 작업 취소·추후 일정 재연락 통지. 작업 파일을 컴퓨터·외장 드라이브 등 여러 곳에 보관한다고 설명"
+      },
+      "W04_NPC_OH_SUGYEONG": {
+        "age": 38,
+        "name": "오수경",
+        "location": "관리사무소",
+        "occupation": "아파트 관리사무소 회계·행정 직원",
+        "relationship": "배송 때 얼굴을 보는 사이",
+        "current_action": "어머니와 통화를 마치고 자신의 물병과 충전기를 챙김"
+      },
+      "W04_NPC_PARK_MANAGER": {
+        "name": "박 소장",
+        "location": "관리사무소",
+        "occupation": "아파트 관리소장",
+        "relationship": "배송 현장에서 마주친 관리소장",
+        "current_action": "승강기 점검을 미루고 주민의 대피·학교 관련 질문에 대응 중"
+      },
+      "W04_NPC_CHOI_DONGWOOK": {
+        "age": 37,
+        "name": "최동욱",
+        "location": "자기 집 근처 도로를 벗어난 정차 위치(통화 당시)",
+        "occupation": "같은 배송센터 소속 기사",
+        "commitments": "공동 이동·합류 약속은 정하지 않음",
+        "relationship": "같은 구역 물량을 몇 번 나눠 배송한 동료",
+        "last_contact_at": "D0 12:03 무렵",
+        "last_reported_action": "교통 정체를 피해 정차 중·귀가 의사·태준과 현재 위치 메시지 교환"
+      },
+      "W04_NPC_JEONG_YEONSIK": {
+        "age": 61,
+        "name": "정연식",
+        "location": "가전 수리점(마지막 관찰)",
+        "occupation": "가전 수리점 주인",
+        "last_seen_at": "D0 11:11~11:17",
+        "relationship": "전화로 재고 확인 후 라디오를 구매한 판매자",
+        "traits_observed": [
+          "기기에 손님 이름·전화번호 종이표를 묶어 보관",
+          "맡겨진 물건 정리를 끝내고 폐점하려 함"
+        ],
+        "last_observed_action": "라디오 배터리 규격·수신 확인 도움, 판매 후 수리 맡긴 기기 정리"
+      },
+      "W04_NPC_KIM_SANGCHEOL": {
+        "name": "김상철",
+        "location": "자기 집2층(마지막 관찰)",
+        "residence": "같은 건물2층·한지은 맞은편",
+        "occupation": "미정",
+        "commitments": "방송에 변화 있으면 문을 두드려 알려달라고 요청·공동생활 합의 없음",
+        "relationship": "같은 건물 거주자·13시 브리핑 공동 청취",
+        "observed_items": [
+          "휴대전화",
+          "접이식 의자"
+        ],
+        "appearance_anchor": {
+          "face": "희끗한 턱수염",
+          "build": "목이 굵고 팔이 두꺼움",
+          "distinctive": [
+            "의자를 펴기 전에 바닥을 손바닥으로 쓸어봄"
+          ],
+          "first_clothing": "회색 반팔·체크무늬 잠옷 바지"
+        },
+        "identity_provenance": "이전 재활용 상자 정리를 허락한 남자와 동일인·이번 공동 청취에서 자기소개",
+        "last_observed_action": "브리핑 청취 후 의자를 챙겨 집으로 돌아가 물을 더 받으려 함"
+      },
+      "W04_NPC_DELIVERY_DISPATCHER": {
+        "name": "배차 담당자(실명 미제시)",
+        "location": "배송센터(통화 당시)",
+        "occupation": "배송센터 배차 담당",
+        "last_contact_at": "D0 12:00 무렵",
+        "last_reported_action": "다수 전화 대응·차량 위치 취합·추가 집하 중단 안내·기사 전원 집결 지시 없음"
+      }
+    },
+    "bases": [],
+    "flags": {
+      "pending_player_choice": true,
+      "initial_character_confirmed": true,
+      "first_public_warning_received": true
+    },
+    "party": [],
+    "go_bag": {
+      "kind": "기존 여행용 일반 배낭",
+      "worn": false,
+      "weight": "실측하지 않음",
+      "summary": "물·즉시 먹을 음식·여벌 옷·수건·조명·예비 건전지·충전기·보조배터리·기본 처치용품·우의·장갑·마스크·펜치·휴대용 라디오·추가 예비 전지",
+      "location": "집 현관 안쪽",
+      "packed_at": "D0 10:08~10:25",
+      "restocked_at": "D0 11:11~11:17",
+      "radio_location": "식탁 위에서 방송 청취",
+      "contents_quantities": "각 supplies 배분과 equipment 위치가 정본",
+      "phone_charger_location": "배낭에 회수한 상태"
+    },
+    "player": {
+      "age": 35,
+      "sex": "남성",
+      "name": "이태준",
+      "children": 0,
+      "occupation": "일반 배송기사",
+      "marital_status": "미혼",
+      "current_partner": null
+    },
+    "quests": {},
+    "season": 1,
+    "status": "PLAYING",
+    "contacts": {
+      "CHOI_DONGWOOK": {
+        "reported": "자기 집 근처 도로를 벗어나 정차·주변에서 확인한 것은 차량 정체",
+        "agreement": "현재 위치 메시지 교환",
+        "contacted_at": "D0 12:03 무렵",
+        "joint_move_commitment": false
+      },
+      "delivery_center": {
+        "source": "배차 담당자와 통화",
+        "reported": "센터 전기 작동·직원 몇 명 현존·추가 집하 중단·전원 집결 지시 없음·별도 대기 장소 확보하지 않음",
+        "contacted_at": "D0 12:00 무렵",
+        "player_report": "귀가·차량 위치·배송 물건 보관 전달"
+      }
+    },
+    "factions": {},
+    "finances": {
+      "cards": "라디오·건전지 구매 및 가득 주유 카드 승인 확인",
+      "bank_balance": "미확인",
+      "known_cash_krw": 40000,
+      "purchase_total": "각 영수증 발급·본문 금액 미제시"
+    },
+    "supplies": {
+      "eggs": {
+        "units": 4,
+        "location": "냉장고·기존 보유"
+      },
+      "rice": {
+        "approx_kg": 12,
+        "allocations_kg": {
+          "home": 12,
+          "truck": 0
+        }
+      },
+      "salt": {
+        "weight": null,
+        "location": "집",
+        "packages": 1
+      },
+      "soap": {
+        "location": "집",
+        "quantity": "포장 단위 본문 미제시"
+      },
+      "bread": {
+        "units": 3,
+        "allocations": {
+          "home": 1,
+          "go_bag": 2
+        },
+        "consumed_this_turn": "집 보유 빵1개"
+      },
+      "masks": {
+        "units": 5,
+        "location": "배낭"
+      },
+      "crackers": {
+        "packs": 6,
+        "allocations": {
+          "home": 5,
+          "truck": 0,
+          "go_bag": 1
+        }
+      },
+      "wet_wipes": {
+        "location": "집",
+        "quantity": "포장 단위·매수 본문 미제시"
+      },
+      "cooking_oil": {
+        "volume": null,
+        "bottles": 1,
+        "location": "집"
+      },
+      "canned_beans": {
+        "cans": 2,
+        "location": "집"
+      },
+      "garbage_bags": {
+        "location": "집",
+        "quantity": "포장 단위·매수 본문 미제시"
+      },
+      "instant_rice": {
+        "packs": 12,
+        "location": "집"
+      },
+      "medical_tape": {
+        "rolls": 1,
+        "location": "배낭"
+      },
+      "toilet_paper": {
+        "location": "집",
+        "quantity": "포장 단위·롤 수 본문 미제시"
+      },
+      "bottled_water": {
+        "liters": 36,
+        "bottles": 18,
+        "allocations": {
+          "home_bottles": 17,
+          "truck_bottles": 0,
+          "go_bag_bottles": 1
+        },
+        "bottle_liters": 2
+      },
+      "sterile_gauze": {
+        "packs": 1,
+        "location": "배낭"
+      },
+      "instant_noodles": {
+        "packs": 25,
+        "allocations": {
+          "home": 25,
+          "truck": 0
+        }
+      },
+      "butane_canisters": {
+        "units": 4,
+        "status": "새 네 개들이 팩",
+        "location": "집"
+      },
+      "stored_tap_water": {
+        "liters": null,
+        "status": "냄비를 씻어 물을 받고 뚜껑 덮음·정확한 부피 미측정",
+        "location": "집",
+        "filled_pots": 2,
+        "prepared_at": "D0 10:08~10:25"
+      },
+      "adhesive_bandages": {
+        "new_boxes": 1,
+        "allocations": {
+          "home": "기존 두 장",
+          "go_bag": "새 한 갑"
+        },
+        "old_loose_pieces": 2
+      },
+      "spare_aa_batteries": {
+        "note": "기존 예비2개는 라디오 장착·새4개 구매",
+        "units": 4,
+        "location": "배낭"
+      },
+      "pull_tab_canned_tuna": {
+        "cans": 9,
+        "allocations": {
+          "home": 8,
+          "truck": 0,
+          "go_bag": 1
+        }
+      },
+      "personal_water_bottle": {
+        "status": "가득 참",
+        "location": "배낭",
+        "capacity_liters": null
+      },
+      "ready_to_eat_porridge": {
+        "pouches": 4,
+        "allocations": {
+          "home": 3,
+          "go_bag": 1
+        }
+      },
+      "stored_canister_water": {
+        "status": "새 물통을 헹군 뒤 가득 채워 뚜껑 닫음",
+        "location": "집",
+        "prepared_at": "D0 12:17~12:22",
+        "filled_canisters": 2,
+        "nominal_liters_each": 10,
+        "nominal_total_liters": 20,
+        "exact_measured_liters": null
+      },
+      "kimchi_and_side_dishes": {
+        "location": "냉장고·기존 보유",
+        "quantity": "정확한 수량 미확인"
+      }
+    },
+    "vehicles": [
+      {
+        "id": "W04_DELIVERY_TRUCK_01",
+        "kind": "업무용 탑차",
+        "location": "집 골목·출입구 및 차량 통로를 남겨 주차",
+        "fuel_type": "경유",
+        "ownership": "미정",
+        "fuel_gauge": "D0 11:34 가득 주유 후 귀가 운행. 정확한 현재 잔량 미측정",
+        "last_refuel": {
+          "liters": null,
+          "status": "가득 주유 완료·카드 승인·영수증 수령",
+          "game_time": "D0 11:30~11:34"
+        },
+        "personal_cargo": "추가 개인 구매품 집에 운반 완료·차량용 USB 충전기와 카트는 차량에 유지",
+        "commercial_cargo": "기존 배송 물건 차량 보관 유지·뒤문 잠금 및 손잡이 확인"
+      }
+    ],
+    "equipment": {
+      "cord": {
+        "location": "집",
+        "quantity": "한 구매 단위·길이 미측정"
+      },
+      "pliers": {
+        "units": 1,
+        "location": "배낭"
+      },
+      "clothing": {
+        "towel": 1,
+        "location": "배낭·깨끗한 비닐봉투",
+        "underwear": 1,
+        "sock_pairs": 2,
+        "windbreaker": 1,
+        "long_sleeve_outfit": 1
+      },
+      "handcart": {
+        "units": 1,
+        "location": "탑차·접어서 보관"
+      },
+      "raincoat": {
+        "units": 1,
+        "location": "배낭"
+      },
+      "flashlight": {
+        "power": "AA 2개 장착·기존 점등 확인",
+        "units": 1,
+        "location": "배낭 앞주머니"
+      },
+      "power_bank": {
+        "units": 1,
+        "location": "배낭",
+        "function_check": "휴대전화 연결 확인",
+        "rated_capacity_mAh": 10000,
+        "last_charge_indicator": "4칸 중 2칸"
+      },
+      "general_tape": {
+        "location": "집",
+        "quantity": "한 구매 단위"
+      },
+      "home_toolbox": {
+        "contents": "드라이버 등·펜치는 배낭으로 이동",
+        "location": "집"
+      },
+      "portable_radio": {
+        "kind": "휴대용 AM/FM 라디오·다이얼 조작·접이식 안테나",
+        "power": "AA 2개 장착",
+        "units": 1,
+        "status": "켜짐·브리핑 청취",
+        "location": "집 식탁 위",
+        "function_check": "배터리로 방송 수신 확인·방향/위치에 따라 수신 상태 변화"
+      },
+      "car_usb_charger": {
+        "units": 1,
+        "status": "차량 연결 후 휴대전화 충전 표시 확인",
+        "location": "차량"
+      },
+      "travel_backpack": {
+        "kind": "기존 여행용 일반 배낭",
+        "weight": "미측정",
+        "capacity": "미측정",
+        "location": "집 현관 안쪽"
+      },
+      "coated_work_gloves": {
+        "pairs": 1,
+        "location": "배낭"
+      },
+      "portable_gas_stove": {
+        "units": 1,
+        "status": "구성품 확인·미점화",
+        "location": "집"
+      },
+      "lidded_water_canisters": {
+        "units": 2,
+        "status": "헹군 뒤 두 통 충수·뚜껑 닫음",
+        "location": "집",
+        "capacity_liters_each": 10,
+        "nominal_water_liters": 20
+      },
+      "phone_charger_and_cable": {
+        "location": "배낭",
+        "departure_note": "추가 사용·회수 변동 없음"
+      }
+    },
+    "game_time": "D0 13:22",
+    "worldline": "WORLDLINE_04",
+    "known_world": {
+      "city": "창원",
+      "country": "대한민국",
+      "district": "성산구",
+      "neighborhood": "가음동",
+      "first_delivery_site": "아파트 단지"
+    },
+    "work_status": {
+      "source": "배송센터 단체 공지",
+      "observed_at": "D0 13:00~13:22",
+      "next_day_dispatch": "편성 보류·출근은 추가 연락 전 대기",
+      "employment_or_income_resolution": "미정"
+    },
+    "world_phase": "IMPACT_AFTERMATH",
+    "chronicle_id": "C04",
+    "local_notice": {
+      "reported": "인근 주민센터 임시 대기 공간 개방·집에 머물기 어려운 주민 이용 가능·개인 물과 식품 등 지참 안내",
+      "received_at": "D0 13:22",
+      "center_location": "지역 배송으로 태준이 위치와 차량 출입로를 아는 주민센터(정확 명칭·주소 본문 미제시)",
+      "conditions_verified_on_site": false
+    },
+    "current_scene": "S01_D0_HOME_SHARED_BRIEFING_SHELTER_NOTICE",
+    "recent_events": [
+      {
+        "event": "가음동 아파트에서 첫 배송 시작",
+        "game_time": "D0 09:03"
+      },
+      {
+        "event": "생수 두 묶음·휴지 한 상자 703호 배송 및 관리사무소 상자 전달 완료",
+        "game_time": "D0 09:03~09:21"
+      },
+      {
+        "event": "국외 대형 천체 충돌 위험 관련 정부 발표 안내 수신. TV 브리핑룸 연결",
+        "game_time": "D0 09:21"
+      },
+      {
+        "event": "배송센터는 확인 중이며 추가 지시 전까지 기존 배송 유지 요청",
+        "game_time": "D0 09:21"
+      },
+      {
+        "event": "태준이 관리사무소에 남아 정부 발표 청취. 충돌 위험·예상 지역·시간 정보 획득",
+        "game_time": "D0 09:21~09:28"
+      },
+      {
+        "event": "박 소장이 지하 기계실에서 복귀. 승강기 정기점검을 미루며 공식 행동 요령 확인 중",
+        "game_time": "D0 09:23~09:28"
+      },
+      {
+        "event": "배송센터가 신규 배송 중단·안전한 곳 정차 및 차량·적재물 현재 위치 보고 요청. 태준은 아직 위치 보고를 하지 않음",
+        "game_time": "D0 09:28"
+      },
+      {
+        "event": "주민의 첫 대피·학교 문의 발생. 확인된 시설 피해·현지 직접 충격 없음",
+        "game_time": "D0 09:28"
+      },
+      {
+        "event": "센터에 현재 위치·적재물 보관·상가 방문 후 귀가 계획 보고, 접수 확인",
+        "game_time": "D0 09:28~09:34"
+      },
+      {
+        "event": "편의점에서 생수 12L·빵4·즉석죽4·참치3·크래커2·소형 손전등1·AA건전지4 구매 및 결제 성공",
+        "game_time": "D0 09:34~09:45"
+      },
+      {
+        "event": "신호·도로는 작동 중이나 교통 지연을 거쳐 성산구 다세대주택의 집으로 이동. 센터에 주차 위치 보고",
+        "game_time": "D0 09:45~10:02"
+      },
+      {
+        "event": "구매 물자를 집3층으로 운반. 쌀 약2kg·라면5·계란4·김치/반찬·기본 공구와 용기 확인. 새 손전등 점등 및 휴대전화 충전 확인",
+        "game_time": "D0 10:02~10:08"
+      },
+      {
+        "event": "집에서 수도·전기·TV 작동 확인. 추가 물 받기와 가족 연락·이웃 확인은 아직 실행하지 않음",
+        "game_time": "D0 10:08"
+      },
+      {
+        "event": "부족 물자 확인, 냄비2개 수돗물 비축·뚜껑 덮음, 기존 배낭에 물·일부 식량·조명·의류·충전기·펜치를 넣어 착용. 현금4만원 확인",
+        "game_time": "D0 10:08~10:25"
+      },
+      {
+        "event": "생활용품점·철물점에서 보조배터리1(10000mAh·표시등2/4칸)·차량용충전기·기본 처치/위생용품·우의·장갑·마스크5·빈10L물통2·버너1·부탄4·테이프/끈 구매. 라디오는 취급하지 않아 미확보",
+        "game_time": "D0 10:32~10:47"
+      },
+      {
+        "event": "보조배터리 휴대전화 연결 확인. 배낭에 보조배터리·기본 처치용품·우의·장갑 등을 추가",
+        "game_time": "D0 10:47"
+      },
+      {
+        "event": "마트에서 생수24L·쌀10kg·즉석밥12·라면20·참치6·콩통조림2·크래커4·소금1·식용유1 구매. 카드 승인·영수증 발급, 탑차에 배송 물건과 나누어 적재",
+        "game_time": "D0 10:48~11:06"
+      },
+      {
+        "event": "주유소 대기 줄 관찰. 집까지 내비 예상14분. 주유·라디오 탐색·귀가는 아직 실행하지 않음",
+        "game_time": "D0 11:06"
+      },
+      {
+        "event": "가까운 가전 수리점에 전화하여 건전지식 라디오 판매 재고 확인 후 이동",
+        "game_time": "D0 11:06~11:11"
+      },
+      {
+        "event": "정연식의 수리점에서 휴대용 AM/FM 라디오1 및 AA4개 구매. 기존 예비AA2개를 라디오에 장착하여 수신 확인, 새AA4개는 배낭에 보관",
+        "game_time": "D0 11:11~11:17"
+      },
+      {
+        "event": "주유소 대기 줄 진입, 차량용 USB 충전기 연결 및 휴대전화 충전 표시 확인",
+        "game_time": "D0 11:19~11:30"
+      },
+      {
+        "event": "라디오가 정부의 충돌 예상 시간대 진입을 알림. 현장에서는 직접 충격을 관찰하지 못했고 공식 충돌 확인 발표도 아직 없음",
+        "game_time": "D0 11:30"
+      },
+      {
+        "event": "경유 가득 주유 완료·계기판 확인·카드 승인. 주유기를 비운 뒤 출구에서 도로 합류 대기. 집까지 내비 예상18분",
+        "game_time": "D0 11:30~11:34"
+      },
+      {
+        "event": "탑차로 귀가. 교통 정체를 거쳤으나 차량과 기존 확보 물자 손실 없음",
+        "game_time": "D0 11:34~11:55"
+      },
+      {
+        "event": "몽골 남부에서 소행성 지상 충돌 발생(전지적 장면). 이 시각 자체는 주인공이 확인한 정보가 아님",
+        "game_time": "D0 11:43"
+      },
+      {
+        "event": "라디오가 예상 지역 대규모 현상 관측·확인 중 소식을 보도",
+        "game_time": "D0 11:48 무렵"
+      },
+      {
+        "event": "귀가·배낭과 라디오 집 안 반입. 라디오 지상 충돌 확인 보도 청취. 집에서 컵·등갓의 가벼운 흔들림과 짧은 발밑 움직임 관찰",
+        "game_time": "D0 11:55~11:57"
+      },
+      {
+        "event": "센터와 동료 최동욱에게 통화. 전원 집결 소문 정정·별도 대기 장소 없음 확인·현재 위치 교환, 공동 이동 약속 없음",
+        "game_time": "D0 12:00~12:04"
+      },
+      {
+        "event": "추가 개인 구매품 모두 집 안 운반·물통2개 헹군 뒤 충수·휴대전화 충전·집 보유 빵1개 섭취. 배송 물건은 잠근 탑차에 유지",
+        "game_time": "D0 12:04~12:22"
+      },
+      {
+        "event": "2층 이웃 한지은이 현관에서 방송 수신과 흔들림을 질문",
+        "game_time": "D0 12:22"
+      },
+      {
+        "event": "한지은과 현관에서 정보 교환. 지은은 재택 책 편집 작업을 한다고 설명. C04 최초 외형 앵커 확정",
+        "game_time": "D0 12:22~12:30"
+      },
+      {
+        "event": "태준이 충전기·선을 회수해 배낭에 넣고 착용 후 집 잠금. 한지은과 계단·공동현관·1층주차공간·뒤문 확인",
+        "game_time": "D0 12:30~12:43"
+      },
+      {
+        "event": "2층 거주자 허락을 받아 재활용 상자를 접어 통로 확보. 거주자가 지하가 없고 뒤문 열쇠는 없다고 설명",
+        "game_time": "D0 12:30~12:43"
+      },
+      {
+        "event": "한지은이 잠긴 뒤문·벽 갈라짐을 사진 기록, 집주인에게 문·열쇠 문의 메시지 전송. 현재 미응답",
+        "game_time": "D0 12:43"
+      },
+      {
+        "event": "라디오가 정부13시 추가 브리핑 예고. 한지은이 함께 듣기를 요청, 태준의 응답은 아직 미정",
+        "game_time": "D0 12:43"
+      },
+      {
+        "event": "태준이 다른 세대에브리핑알림, 2층계단참에라디오설치. 지은은자기집에서배낭·물병을가져옴. 옆집남자가김상철로자기소개",
+        "game_time": "D0 12:43~13:00"
+      },
+      {
+        "event": "태준·한지은·김상철이브리핑청취. 충돌지주변피해·운항통제확대·국제운송일정과식량/에너지수급점검 발표. 국내외정상운영시점미제시",
+        "game_time": "D0 13:00~13:12"
+      },
+      {
+        "event": "센터가내일집하·배송편성및출근보류공지. 동욱이귀가완료메시지. 인쇄소는지은에게오늘작업취소통지",
+        "game_time": "D0 13:00~13:22"
+      },
+      {
+        "event": "김상철은물을더받으려자기집으로돌아감. 태준이한지은초대, 지은은조금더방송을보고내려가겠다고수락",
+        "game_time": "D0 13:12~13:22"
+      },
+      {
+        "event": "집주인이뒤문열쇠직접보유·즉시방문어려움·도착시각미정답신. 지은이방문가능시각통보요청",
+        "game_time": "D0 13:12~13:22"
+      },
+      {
+        "event": "주민센터임시대기공간개방안내수신. 지은이현장확인제안. 태준의선택은미정",
+        "game_time": "D0 13:22"
+      }
+    ],
+    "pending_choice": {
+      "context": "D0 13:22 태준집에 한지은이 잠시 방문 중. 주민센터 임시 대기 공간 개방 문자 수신, 지은이 상황 확인 방문을 제안",
+      "options": [
+        "지은과 주민센터 현장 확인 후 머물 곳 결정",
+        "집에 머물며 준비와 방송·안내 확인",
+        "가족·가까운 사람 중 연락할 대상 결정 및 연락",
+        "자유 행동"
+      ],
+      "selected": null
+    },
+    "current_location": "창원시 성산구·태준 집3층 실내·한지은과 식탁 곁",
+    "current_knowledge": [
+      "정부는 지름 약 2km 천체가 오늘 지구와 충돌할 가능성이 매우 높다고 발표함",
+      "정부 발표상 예상 충돌 지역은 몽골 남부 고비사막 일대이며 위치·시각에는 오차가 있음",
+      "정부 발표상 예상 시각은 D0 11:30~12:00 KST",
+      "한국의 구체적인 직접 피해 범위와 창원 지역 행동 요령은 아직 발표되지 않음",
+      "배송센터가 신규 배송 중단 및 안전한 곳 정차·현재 위치 보고 요청",
+      "단체방의 과거 영상을 현재 충돌 장면으로 오인한 게시물이 정정됨",
+      "인근 생활용품점은 11시 폐점을 예고했고 라디오는 취급하지 않음",
+      "마트는 생수 1인 두 묶음 제한 중이며 태준의 추가 구매는 완료됨",
+      "집까지 내비 예상14분, 주유소 대기시간은 불명",
+      "휴대용 라디오는 AA2개로 방송 수신 확인·기존 손전등과 같은 규격",
+      "주유소 경유 가득 주유 완료·차량 연료계 확인",
+      "D0 11:34 집까지 내비18분·맞은편 상가 출입문은 열려 있으나 실내 사정은 미확인",
+      "귀가 무렵 라디오에서 지상 충돌 확인 보도를 들음·정확한 시각과 피해 범위는 모름",
+      "집에서 짧은 흔들림 관찰·구조 안전이나 진원 판단은 하지 못함",
+      "센터 전기·직원 일부 현존·추가 집하 중단·전원 집결 지시 없음·별도 대기 장소 확보 없음",
+      "최동욱과 현재 위치 메시지 교환·공동 이동 약속 없음",
+      "집 수도·전기·TV·라디오 작동 확인, 일부 모바일 영상 재생 지연",
+      "2층 이웃 한지은이 방송·흔들림 정보를 물으러 방문",
+      "한지은은 재택 책 편집 작업을 한다고 설명",
+      "공동현관 개폐 확인·계단참 상자 접어 통로 확보",
+      "2층 거주자는 지하가 없고 뒤문 열쇠가 없다고 설명",
+      "뒤문 잠김·벽지 끝 갈라짐의 기존/신규 여부 미확인·한지은의 집주인 문의 미응답",
+      "정부13시 추가 브리핑 예고·한지은 공동 청취 요청",
+      "13시브리핑:충돌지주변광범위피해·운항통제확대·국제운송및식량에너지수급점검·정상운영시점미제시",
+      "센터내일집하/배송편성보류·동욱귀가완료",
+      "집주인뒤문열쇠보유·즉시방문어려움·도착시각미정",
+      "인근주민센터임시대기공간개방공지수신·태준은위치와배송차출입로를알고있으나현재내부운영조건미확인"
+    ],
+    "last_player_action": {
+      "action": "다른 세대에13시브리핑 알림→2층계단참에서한지은·김상철과청취→한지은을집으로초대해TV·라디오청취와대화",
+      "turn_no": 8,
+      "choices_in_order": [
+        2,
+        1
+      ]
+    },
+    "building_observations": {
+      "wall": "벽지 끝 가느다란 갈라짐 사진 기록·기존/신규 미확인",
+      "rear_key": "집주인이 직접 보유 중이라고 한지은에게 답신",
+      "rear_gate": "외부 좁은 통로가 보이는 철문·자물쇠 잠김",
+      "staircase": "2층 계단참 재활용 상자를 거주자 허락 후 접어 벽에 붙여 통로 넓힘",
+      "observed_at": "D0 12:22~12:43",
+      "ground_floor": "주차 공간·거주자 설명상 지하 없음",
+      "main_entrance": "문 열림·도어클로저 닫힘·문턱 장애물 없음",
+      "observer_scope": "태준·한지은이 확인한 범위",
+      "landlord_contact": "바로 방문하기 어려우며 도착 시각 미정이라고 답신. 한지은이 방문 가능 시각 확정 시 통보 요청",
+      "structural_assessment": "실시하지 않음",
+      "normal_layout_knowledge": "지하 없음·뒤쪽 통로 존재는 주민인 태준이 평소 아는 구조"
+    }
+  },
+  "gm_state": {
+    "status": "PLAYING",
+    "pressures": {
+      "social": "지은의잠시방문수락·김상철과공동청취. 지은이센터현장확인제안, 태준응답미정",
+      "transport": "가득 주유한 탑차로 귀가 후 골목 주차. 기존 배송 물건 잠금 보관. 현재 연료 잔량은 재측정하지 않음",
+      "livelihood": "내일집하·배송편성보류와지은의인쇄작업취소로두사람의통상업무일정이끊김. 재개시점미정",
+      "local_response": "13:22인근주민센터임시대기공간개방문자. 현장조건·인원·비품은미확인. 현재주거지포기나전원대피지시로단정하지않음",
+      "public_information": "13시브리핑이충돌지광범위피해·운항통제확대·국제운송및식량에너지수급점검 발표. 피해숫자와정상운영시점은미제시",
+      "personal_preparation": "PC물자추가소비없음·지은은자기물병물마심. 가방현관안쪽·충전기와선배낭·라디오식탁수신"
+    },
+    "worldline": "WORLDLINE_04",
+    "unresolved": [
+      "impact_details",
+      "realistic_changwon_effects"
+    ],
+    "npc_intents": {
+      "W04_NPC_MOON_SEA": "11시 폐점을 예고하며 손님에게 반복 안내. 남은 영업시간 동안 판매를 계속하고 매장 정리·폐점을 하려 함",
+      "W04_NPC_HAN_JIEUN": "자기 준비와 거처 판단을 위해 공공 대기 공간의 실제 운영 조건을 먼저 보고 싶어 함. 집주인 문의는 계속 담당하며 태준집 방문은 잠깐이라고 밝힘",
+      "W04_NPC_OH_SUGYEONG": "어머니의 상황을 확인했고 자신의 귀가도 염두에 두면서 관리사무소 업무를 이어감",
+      "W04_NPC_PARK_MANAGER": "주민에게 확인되지 않은 대피 지시를 내리지 않으면서 단지 대응 책임을 수행하려 함",
+      "W04_NPC_CHOI_DONGWOOK": "자기 집에 돌아가려 하며 주변 교통 상황 확인. 센터 집결 소문을 확인하고 위치를 주고받음",
+      "W04_NPC_JEONG_YEONSIK": "판매용 라디오를 판매하고 맡겨진 수리품을 창가에서 옮겨 안전하게 정리한 뒤 가게를 닫으려 함. 직원은 먼저 퇴근시킴",
+      "W04_NPC_KIM_SANGCHEOL": "자기 집 물 비축을 늘리려 함. 브리핑 변화 시 알려달라고 이웃에게 요청",
+      "W04_NPC_DELIVERY_DISPATCHER": "센터의 다수 문의와 차량 위치를 관리하면서 불필요한 전원 이동 지시를 피함"
+    },
+    "story_phase": "SHARED_NEWS_AND_FIRST_SHELTER_DECISION",
+    "warning_mode": "SCIENTISTS_FIRST_PUBLIC_LATE",
+    "current_scene": "S01_D0_HOME_SHARED_BRIEFING_SHELTER_NOTICE",
+    "disaster_seed": {
+      "kind": "ASTEROID_IMPACT",
+      "certainty": "IN_WORLD_IMPACT_OCCURRED",
+      "clock_scope": "세계 사건의 GM 내부 시각·주인공이 아는 정보가 아님",
+      "event_status": "OCCURRED",
+      "impact_region": "몽골 남부 고비사막",
+      "approx_diameter_km": 2,
+      "impact_clock_game_time": "D0 11:43",
+      "physical_effects_status": "근거리 충돌·상승 기둥 장면 및 원거리의 짧고 약한 흔들림만 묘사. 창원 직접 피해 규모·장기 기후 영향은 미확정"
+    },
+    "public_report": {
+      "kind": "ASTEROID_IMPACT_HIGH_PROBABILITY",
+      "caveat": "극중 정부의 예측 발표이며 위치·시각 오차와 한국 구체적 피해는 미확정",
+      "reported_at": "D0 09:23",
+      "latest_report": "지상 충돌 확인·정확한 피해 범위 파악 중",
+      "latest_report_at": "D0 12:22",
+      "projected_region": "몽골 남부 고비사막 일대",
+      "projected_window": "D0 11:30~12:00 KST",
+      "approx_diameter_km": 2,
+      "player_known_exact_impact_time": false
+    },
+    "current_session_id": "5a0b633d-dc06-4db2-bab2-ff4fbf392b04",
+    "narrative_preferences": {
+      "pacing": "별도 시트 작성·전 인물 외형 감사에 매몰되지 않고 현재 장면의 인물 묘사와 시나리오 진행에 적용한다.",
+      "priority": "독자가 인물을 상상할 수 있게 하는 것이 핵심이며, 이를 '해설을 전반적으로 절제하라'는 지시로 바꾸지 않는다.",
+      "repetition": "이후 필요할 때만 특징을 짧게 환기하고 기존 외형을 유지한다.",
+      "c04_storage": "현재 인물 앵커는 C04 state.npcs의 해당 인물 항목에 보존한다.",
+      "reuse_scope": "묘사 방식과 항목만 재사용. AFTERFALL 인물·외형·사건·Save·전용 테이블은 가져오지 않는다.",
+      "source_rule": "worldline/afterfall-rpg:worldlines/AFTERFALL/CHARACTER_VISUAL_RULE_V1.md@4a39d262df1ffde5975ef19c49963713bbcc4d0a",
+      "independence": "외형·매력과 호감·동행·연애는 별개이며 관계는 플레이로 결정된다.",
+      "user_feedback_date": "2026-10-17",
+      "familiar_environment": "태준은 자기 집·평소 생활동선·배송 경험에서 아는 기본 정보를 이미 알고 있다. 관찰 대상은 변한 상태·새로운 정보·현재 통행과 운영 조건이다. 일반인이라는 이유로 일상지식까지 없애지 않는다.",
+      "character_introduction": "주요 인물의 최초 의미 있는 등장에 외모·체형·얼굴·머리·복장·목소리·특징을 장면 속 2~5문장 정도로 충분히 보여준다."
+    },
+    "offscreen_observations": {
+      "delivery_center": "복귀 차량이 한꺼번에 몰릴 경우 진입로 혼잡을 우려해 정차 위치 취합 중. 태준은 센터 내부 사정을 직접 알지 못함"
+    },
+    "last_transcript_turn_no": 8,
+    "science_reference_check": {
+      "boundary": "현지 관찰 장면을 한국 전역의 동시 파괴·즉시 정전·정밀 피해 예측으로 확대하지 않음",
+      "references": [
+        "https://www.nas.nasa.gov/pubs/stories/2024/feature_how_NASA_supercomputers_capture_hypothetical_asteroid_impacts.html",
+        "https://onlinelibrary.wiley.com/doi/10.1111/j.1945-5100.2005.tb00157.x"
+      ],
+      "checked_for": "충돌 근거리와 원거리 도달 현상을 구분하는 정성적 장면",
+      "numeric_regional_simulation": "미수행·온라인 계산기 조회 실패. 정확한 지역 진도·압력·시간 계산의 검증을 주장하지 않음"
+    },
+    "latest_operator_feedback": {
+      "date": "2026-10-17",
+      "text": "자기 집 건물에 지하가있는지\n뒷길이 있는지 묻는건 좀 이상한데",
+      "application": "주인공의 평소 생활지식을 반영하는 GM 연출 보정. 망각·첫 입주 등의 사후 이유를 창작하지 않음. 기존 원문은 유지"
+    }
+  }
+}
