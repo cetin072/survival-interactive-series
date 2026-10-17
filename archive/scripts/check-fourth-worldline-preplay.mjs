@@ -28,6 +28,7 @@ export function validatePreplay(doc) {
 
   insist(isObject(doc.opening), 'opening must exist');
   insist(doc.opening?.country === 'KR' && doc.opening?.city === '창원', 'opening must be Changwon, Korea');
+  insist(doc.opening?.district === '성산구', 'opening district must be Seongsan-gu');
   insist(doc.opening?.delivery_type === '일반배송', 'delivery type mismatch');
   for (const field of ['district', 'workplace', 'employer', 'vehicle', 'home_access']) {
     const chosen = doc.opening?.[field];
