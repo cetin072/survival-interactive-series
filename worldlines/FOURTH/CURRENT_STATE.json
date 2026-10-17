@@ -9,6 +9,5 @@
     "table": "saves",
     "worldline_id": "WORLDLINE_04"
   },
-  "current_stage": "PREPLAY_READY",
-  "note": "Pointer only. Read actual Save version/time/person/location from Supabase; never reuse AFTERFALL/C03."
+  "note": "Routing pointer only. No status, Save version, player location or scene is authoritative here. Always read live survival_rpg.saves for WORLDLINE_04. Never fallback to AFTERFALL/C03."
 }
