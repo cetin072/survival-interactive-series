@@ -7,6 +7,18 @@ Season: S01
 Runtime SoT: Supabase taejang-phase1-staging / survival_rpg.saves(worldline_id='WORLDLINE_04')
 기획 감사본: docs/FOURTH_WORLDLINE_AUDIT_RESPONSE_V1.md (GM 평시 입력이 아님)
 
+## 현재 활성 제3시도 — 충돌 카메라 첫 화 (2026-10-18)
+
+**기존의 '첫 진입 캐릭터 결정' 절차보다 우선한다. 최초 캐릭터는 이태준 35세/가음동으로 확정돼 있다.**
+
+- 실제 Save 재조회 정본: `WORLDLINE_04` / Save **34** (이후 실제 버전 증가 가능) / `status=PLAYING`, `attempt=3`, `scene_stage=OPENING_NOT_YET_NARRATED`, 게임 B 시각 `D0 09:03`.
+- **활성 세션:** `411f4d93-fbea-4078-85b4-ac48cfc1862a`. 이 세션에서 실제 저장된 턴이 아직 없으면 **turn_no=0**부터 기록한다. Save의 `gm_state.current_session_id`와 DB `OPEN` 세션을 교차 확인한다.
+- 이전 시도1·2는 `CLOSED`, RAW 원본 64개는 수정·삭제 없음. 시도2 Save 33 전체는 `survival_rpg.state_archives`의 id 8 `PRE_RESTART_ATTEMPT_03_FULL_SNAPSHOT`로 보존. 과거 구매·물품·만남·약속은 새 제3시도에 자동 승계하지 않는다.
+- **첫 화 출력 규칙:** `worldlines/FOURTH/S01_DUAL_CAMERA_IMPACT_RESTART_V1.md` §6·§7을 첫 턴에 한 번 읽는다. **몽골 충돌 T0에서 생명의 즉각적 소멸과 조금 먼 곳의 고통스러운 생존을 강렬하게 보여준 뒤**, `약 2시간 40분 전 — 창원 오전 9시 3분`으로 컷하여 평범한 배송기사의 일상과 첫 경보 직전/현장을 연기한다. 외부 미래 컷은 이태준의 실제 경험·지식·소지품에 소급 반영하지 않는다.
+- 감독용 잠정 충돌 T0은 `D0 11:43 KST`. 미래 시점의 프롤로그가 공개돼도 B의 현재 Save 시간은 `D0 09:03`을 기반으로 **실제로 진행한 시각만** 갱신한다. 대기파 도착시각이나 피해 반경을 단정적으로 계산해 강요하지 않는다. 두 카메라가 만나는 시점은 실제 플레이 선택과 인과관계에 따라 잡는다.
+- 이번 준비 작업에서는 제1화 본문이나 새 세션 RAW를 아직 작성·저장하지 않았다. 첫 게임 턴에서 **사용자가 실제 보낸 내용과 GM이 최종 출력한 원문**을 `append_c04_public_turn` 경로로 저장하고 저장 확인을 한다. 기획방에서 쓴 프롤로그 예시를 실제 플레이 RAW로 등록하지 않는다.
+- 다음 일반 플레이 턴에는 BOOT·과학 자료 전체를 다시 읽지 말고 필요한 현재 상태만 확인한다. 첫 화에서 결정적 선택에 도달하면 멈춰 플레이어에게 맡긴다.
+
 ## 일반 ChatGPT 프로젝트 채팅에서 최초 시작하기
 1. 세계선 정체성을 WORLDLINE_04/C04/S01로 고정한다. 다른 작품 AFTERFALL/C03나 STRONGHOLD/C02를 대체자료로 쓰지 않는다.
 2. 이 폴더의 WORLD_BIBLE.md와 GM_RULES.md를 새 방 첫 진입에 한 번 읽는다. 기존 모든 시즌·감사·자동화 문서를 기본 입력으로 불러오지 않는다.
