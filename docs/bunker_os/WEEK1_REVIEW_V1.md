@@ -1,5 +1,7 @@
 # Week 1 Review V1 — Day 7 / Week 2 준비
 
+> 현재 실행 상태 (2026-10-16): 문서는 PR #549로 병합됐고 [D-014](DECISION_LOG.md)에 따라 외부 8명 모집·실제 시험은 보류됐다. 아래의 감독 검토 대기·10/14~20 준비 일정은 당시 이력이며 현재 실행 일정이 아니다. E-002=PLANNED(실행 보류), Week 2 Freeze 미완료. 별도 생존가방 1인 실사용은 [EXPERIMENT_LOG](EXPERIMENT_LOG.md#생존가방-1인-실사용--대화에서-기록하는-최소-흐름)를 따른다.
+
 작성·QA: 2026-10-14 KST · **AI 전략 리뷰 작성, 감독 검토 대기 / Week 2 Freeze 미완료**
 기준: [#500](https://github.com/cetin072/survival-interactive-series/issues/500), [#501](https://github.com/cetin072/survival-interactive-series/issues/501), [Draft PR #549](https://github.com/cetin072/survival-interactive-series/pull/549)
 재확인 main: `e8ddc20955e7fede3ce52f9c557b816554c554e7` · 재확인 PR HEAD: `cc399490d0b4aac77eb14e79b9bec1958be896d7`
