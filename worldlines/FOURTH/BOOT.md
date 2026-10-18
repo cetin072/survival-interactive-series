@@ -14,6 +14,7 @@ Runtime SoT: Supabase taejang-phase1-staging / survival_rpg.saves(worldline_id='
 - 실제 Save 재조회 정본: `WORLDLINE_04` / Save **34** (이후 실제 버전 증가 가능) / `status=PLAYING`, `attempt=3`, `scene_stage=OPENING_NOT_YET_NARRATED`, 게임 B 시각 `D0 09:03`.
 - **활성 세션:** `411f4d93-fbea-4078-85b4-ac48cfc1862a`. 이 세션에서 실제 저장된 턴이 아직 없으면 **turn_no=0**부터 기록한다. Save의 `gm_state.current_session_id`와 DB `OPEN` 세션을 교차 확인한다.
 - 이전 시도1·2는 `CLOSED`, RAW 원본 64개는 수정·삭제 없음. 시도2 Save 33 전체는 `survival_rpg.state_archives`의 id 8 `PRE_RESTART_ATTEMPT_03_FULL_SNAPSHOT`로 보존. 과거 구매·물품·만남·약속은 새 제3시도에 자동 승계하지 않는다.
+- **첫 화 문학적 초안:** `worldlines/FOURTH/narrative/S01_ATTEMPT03_IMPACT_COLD_OPEN_DRAFT_V1.md`를 첫 턴에서만 참고한다. 사용자 요청에 맞춰 몽골 충돌의 즉각적 소멸→먼 지역의 지연·고통스러운 생존→충돌 약 2시간 40분 전 창원 배송 일상의 대비를 실제 문장으로 작성한 안이다. **DRAFT·NOT RAW·NOT CANON**이므로 읽거나 파일을 만들었다고 사건이 실제 게임에 저장된 것이 아니다. 그대로 출력하더라도 최종 사용자/GM 원문이 새 세션에 저장됐는지 확인한다. 이후 평시 장면에서는 반복해서 불러오지 않는다.
 - **첫 화 출력 규칙:** `worldlines/FOURTH/S01_DUAL_CAMERA_IMPACT_RESTART_V1.md` §6·§7을 첫 턴에 한 번 읽는다. **몽골 충돌 T0에서 생명의 즉각적 소멸과 조금 먼 곳의 고통스러운 생존을 강렬하게 보여준 뒤**, `약 2시간 40분 전 — 창원 오전 9시 3분`으로 컷하여 평범한 배송기사의 일상과 첫 경보 직전/현장을 연기한다. 외부 미래 컷은 이태준의 실제 경험·지식·소지품에 소급 반영하지 않는다.
 - 감독용 잠정 충돌 T0은 `D0 11:43 KST`. 미래 시점의 프롤로그가 공개돼도 B의 현재 Save 시간은 `D0 09:03`을 기반으로 **실제로 진행한 시각만** 갱신한다. 대기파 도착시각이나 피해 반경을 단정적으로 계산해 강요하지 않는다. 두 카메라가 만나는 시점은 실제 플레이 선택과 인과관계에 따라 잡는다.
 - 이번 준비 작업에서는 제1화 본문이나 새 세션 RAW를 아직 작성·저장하지 않았다. 첫 게임 턴에서 **사용자가 실제 보낸 내용과 GM이 최종 출력한 원문**을 `append_c04_public_turn` 경로로 저장하고 저장 확인을 한다. 기획방에서 쓴 프롤로그 예시를 실제 플레이 RAW로 등록하지 않는다.
