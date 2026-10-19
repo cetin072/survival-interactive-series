@@ -53,6 +53,11 @@ export async function runProductionRelease(args = []) {
     '--source-sha', decision.source_main_sha,
     '--release-sha', releaseSha,
   )
+  runNode(
+    'archive/scripts/archive-production-smoke.mjs',
+    '--source-sha', decision.source_main_sha,
+    '--release-sha', releaseSha,
+  )
 
   return {
     status: 'PRODUCTION_RELEASE_VERIFIED',
