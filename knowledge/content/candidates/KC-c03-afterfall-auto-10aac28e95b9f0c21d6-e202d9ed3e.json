@@ -1,0 +1,39 @@
+{
+  "id": "KC-c03-afterfall-auto-10aac28e95b9f0c21d6-e202d9ed3e",
+  "source": {
+    "ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-10aac28e95b9f0c21d6caa86b33abe3c3210e5b05df5f80e904e6f3b8f353663",
+    "kind": "PUBLIC_READER",
+    "refs": [
+      "worldlines/AFTERFALL/seasons/S03/raw_transcript/SESSION_002/PART_001.md"
+    ],
+    "hashes": [
+      "8147a5929b04f445c519328c320a49d908ea9c1a55e785c73ee75c30ce0a9af8"
+    ],
+    "sha256": "dd60b499327e66202fca158a3de166d1723a669d173e90e8c4ef0413f49458df"
+  },
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-039",
+  "question": "배터리·연료·용제를 받기 전에 무엇을 확인해야 할까",
+  "topic_id": "community-emergency-resource-management",
+  "risk_level": "HIGH",
+  "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-10aac28e95b9f0c21d6caa86b33abe3c3210e5b05df5f80e904e6f3b8f353663",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S03/raw_transcript/SESSION_002/PART_001.md"
+  ],
+  "risk_domains": [
+    "ELECTRICAL",
+    "OTHER_SEVERE_HARM"
+  ],
+  "source_hashes": [
+    "8147a5929b04f445c519328c320a49d908ea9c1a55e785c73ee75c30ce0a9af8"
+  ],
+  "source_sha256": "dd60b499327e66202fca158a3de166d1723a669d173e90e8c4ef0413f49458df",
+  "policy_version": "knowledge-c3-policy-v1",
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "disposition_note": "기존 K-005는 물자 재고를 용도별로 나누어 추적하는 운영 기록이고, K-035는 거점의 기능을 먼저 정한 뒤 후보 위치를 비교하는 일반 계획이다. 이 후보는 납축전지·연료·용제처럼 물질별 분류와 수량에 따라 화재·폭발·노출 위험 및 법적 요건이 달라지는 물품을 보관 서비스로 수령하기 전에 확인해야 할 수입 중단선, 분류, 전용시설, 책임자와 비상대응을 다루므로 의미상 독립적이다. 위험물 여부·지정수량·시설 적합성·사용 권한을 개별 현장 정보 없이 확정할 수 없고 화재·전기·인명 위험이 커 HUMAN_REVIEW로 보관한다.",
+  "reader_chapter_id": "c03-afterfall-auto-10aac28e95b9f0c21d6caa86b33abe3c3210e5b05df5f80e904e6f3b8f353663",
+  "publication_policy": "HUMAN_APPROVED",
+  "reader_book_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0",
+  "reader_chapter_sha256": "dd60b499327e66202fca158a3de166d1723a669d173e90e8c4ef0413f49458df"
+}

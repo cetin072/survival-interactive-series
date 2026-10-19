@@ -1,0 +1,89 @@
+{
+  "claims": [
+    {
+      "claim": "보관을 수락하기 전에 제품명만 보지 말고 물질별 성분, 물리적 상태, 용기, 수량과 안전자료를 확인해 위험물 해당 여부와 적용 요건을 분류해야 한다.",
+      "context": "국가법령정보센터의 위험물안전관리법과 시행령 별표는 위험물의 품명과 지정수량을 구분하고, 소방청 위험물정보시스템은 혼합물·미등재 물질의 정확한 판정에 별도 시험이나 전문기관 문의가 필요할 수 있다고 안내한다. 안전보건공단은 유통 화학물질·혼합물의 물질안전보건자료를 제조·수입·판매자로부터 제공받아 확인하도록 안내한다.",
+      "limitation": "온라인 검색과 일반 명칭만으로 특정 제품의 위험물 해당 여부, 지정수량 합산, 저장·취급 허가 필요성을 확정할 수 없다. 실제 SDS, 성분과 농도, 총량, 용기, 저장 방식 및 관할 소방기관·전문가의 판단이 우선한다.",
+      "source_ids": [
+        "LAW-HAZMAT-ACT",
+        "LAW-HAZMAT-DECREE-ANNEX1",
+        "NFA-HAZMAT-INFO",
+        "KOSHA-MSDS"
+      ]
+    },
+    {
+      "claim": "물질 분류와 수량에 따라 법정 저장·취급 장소와 시설 요건이 달라질 수 있으므로, 일반 창고의 빈 공간이나 재고표만으로 수령 가능 여부를 결정해서는 안 된다.",
+      "context": "위험물안전관리법은 일정 수량 이상의 위험물을 지정된 저장소가 아닌 곳에 저장하거나 제조소 등이 아닌 곳에서 취급하는 것을 제한하며, 시행령 별표는 품명별 지정수량을 제시한다.",
+      "limitation": "이 원칙은 개별 현장의 허가 상태나 예외 적용을 판정하지 않는다. 물질별 수량과 합산 방식, 장소 용도, 설치·변경 허가, 임시 저장·취급 가능 여부는 최신 법령과 관할 소방기관 확인이 필요하다.",
+      "source_ids": [
+        "LAW-HAZMAT-ACT",
+        "LAW-HAZMAT-DECREE-ANNEX1"
+      ]
+    },
+    {
+      "claim": "배터리와 인화성 액체를 받는 시설은 점화원 통제, 환기, 적합한 보관 구획, 누출·화재 대응, 피난과 담당자 체계를 수령 전에 확인해야 한다.",
+      "context": "고용노동부의 배터리 제조·취급 화재·폭발 안전 가이드와 2026년 화재·폭발 예방 자료는 스파크, 인화성 가스·증기, 정전기, 환기, 소화설비와 대피 조건의 사전 점검을 강조한다.",
+      "limitation": "공식 자료는 특정 창고의 설계 승인이나 제품별 보관 간격·방폭 등급·소화약제를 대신하지 않는다. 납축전지의 충전 여부, 환기 필요량, 연료·용제의 종류, 건물 구조와 설비에 따라 요구조건이 달라지므로 자격 있는 전문가와 관할 기관의 현장 검토가 필요하다.",
+      "source_ids": [
+        "MOEL-BATTERY-SAFETY-2024",
+        "MOEL-FIRE-PREVENTION-2026"
+      ]
+    },
+    {
+      "claim": "분류·법적 권한·시설·책임자·비상대응 가운데 하나라도 확인되지 않으면 입고를 보류하고, 미확인 항목과 재검토 조건을 기록하는 운영 중단선이 필요하다.",
+      "context": "법적 저장·취급 제한과 공식 화재·폭발 예방 원칙을 실제 수령 절차로 옮긴 편집적 적용이다. 먼저 물질과 수량을 확인하고, 적용 법규와 시설 능력을 확인한 뒤, 책임자와 비상대응이 준비된 경우에만 수령하도록 단계화했다.",
+      "limitation": "이 중단선은 법정 표준 양식이 아니며 허가나 전문 위험성평가를 대체하지 않는다. 조직은 관할 규정, 보험, 임대·소유권, 계약과 전문검토 결과에 맞춰 승인권자와 보류 기준을 정해야 한다.",
+      "source_ids": [
+        "LAW-HAZMAT-ACT",
+        "KOSHA-MSDS",
+        "MOEL-BATTERY-SAFETY-2024",
+        "MOEL-FIRE-PREVENTION-2026"
+      ]
+    }
+  ],
+  "source": {
+    "ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-10aac28e95b9f0c21d6caa86b33abe3c3210e5b05df5f80e904e6f3b8f353663",
+    "kind": "PUBLIC_READER",
+    "refs": [
+      "worldlines/AFTERFALL/seasons/S03/raw_transcript/SESSION_002/PART_001.md"
+    ],
+    "hashes": [
+      "8147a5929b04f445c519328c320a49d908ea9c1a55e785c73ee75c30ce0a9af8"
+    ],
+    "sha256": "dd60b499327e66202fca158a3de166d1723a669d173e90e8c4ef0413f49458df"
+  },
+  "brief_id": "K-039",
+  "question": "배터리·연료·용제를 받기 전에 무엇을 확인해야 할까",
+  "unknowns": [
+    "제안된 납축전지의 충전 상태, 전해액 상태, 개별 용량·수량과 총량이 제공되지 않았다.",
+    "연료와 용제의 정확한 제품명, 성분·농도, 인화점, 용기와 수량이 제공되지 않았다.",
+    "후보 시설의 법정 용도, 위험물 저장·취급 관련 허가, 소방·환기·전기·누출 방지 설비와 피난 조건이 확인되지 않았다.",
+    "토지와 건물의 소유·임대·사용 권한, 보험 및 사고 책임 배분이 확인되지 않았다."
+  ],
+  "conflicts": [],
+  "risk_notes": [
+    "잘못 분류하거나 일반 창고에 수령하면 화재·폭발·유해물질 노출과 법적 위반으로 이어질 수 있다.",
+    "배터리 단자 단락, 충전 중 가스 발생, 손상·누액과 연료·용제의 증기·점화원 위험은 제품과 상태에 따라 달라진다.",
+    "현장 설비나 허가가 미확인인 동안에는 수령·충전·소분·이송을 시작하지 않는다.",
+    "누출, 발열, 팽창, 이상 냄새, 연기나 화재 징후가 있으면 접근·임의 처리를 피하고 즉시 현장 비상절차와 119 및 관할 기관 지침을 따른다."
+  ],
+  "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-10aac28e95b9f0c21d6caa86b33abe3c3210e5b05df5f80e904e6f3b8f353663",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S03/raw_transcript/SESSION_002/PART_001.md"
+  ],
+  "candidate_id": "KC-c03-afterfall-auto-10aac28e95b9f0c21d6-e202d9ed3e",
+  "source_hashes": [
+    "8147a5929b04f445c519328c320a49d908ea9c1a55e785c73ee75c30ce0a9af8"
+  ],
+  "source_sha256": "dd60b499327e66202fca158a3de166d1723a669d173e90e8c4ef0413f49458df",
+  "policy_version": "knowledge-c3-policy-v1",
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "copyright_status": "CLEAR",
+  "narrative_context": "공개 Reader의 허구·서사(narrative)에서 공동체가 납축전지·연료·용제를 일반 창고에 바로 받지 않고 수요만 기록한 뒤, 토지와 건물 권리·전용 시설·출입·야간 감시·사고 분리 조건을 검토하는 장면이 질문의 출발점이다. 작품은 현실의 위험물 분류나 시설 적합성을 증명하는 근거로 사용하지 않았다.",
+  "reader_chapter_id": "c03-afterfall-auto-10aac28e95b9f0c21d6caa86b33abe3c3210e5b05df5f80e904e6f3b8f353663",
+  "reader_book_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0",
+  "story_source_status": "VERIFIED_PUBLIC_READER_BACKFILL",
+  "narrative_limitation": "작품 속 물품, 후보 부지, 권리관계와 시설 상태는 허구·서사(narrative) 설정이다. 현실의 위험물 해당 여부, 법적 저장 가능성, 건축·소방·전기 설비 적합성 또는 안전한 취급 방법을 입증하지 않는다.",
+  "reader_chapter_sha256": "dd60b499327e66202fca158a3de166d1723a669d173e90e8c4ef0413f49458df"
+}
