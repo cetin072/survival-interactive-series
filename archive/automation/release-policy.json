@@ -4,5 +4,23 @@
   "site": "survival-diary-archive",
   "production_interval_days": 2,
   "release_hour_kst": 23,
-  "max_production_deploys_per_day": 1
+  "max_production_deploys_per_day": 1,
+  "repository": "cetin072/survival-interactive-series",
+  "site_id": "4b344369-f418-48ba-81b8-991be8974486",
+  "workflow": "archive-production-release.yml",
+  "marker_path": "archive/web/public/release/production.json",
+  "deploy_inputs": [
+    "^(archive/web|archive/content|knowledge/content)/",
+    "^(archive/automation/(config|release-policy)|knowledge/automation/(config|worker-policy|state|runtime-state))\\.json$",
+    "^archive/scripts/(build-|check-reader|check-knowledge|knowledge-scan|write-deploy-meta|scheduled-netlify-release)",
+    "^archive/scripts/lib/(knowledge-|bag-item-|wiki-public-sources|approved-reader-sources|reader-transform|publication-graph)",
+    "^docs/bunker_os/bag_knowledge/(DRAFT_QUEUE_V1\\.json|GUIDE_[A-Z0-9_]+\\.md)$"
+  ],
+  "deploy_excludes": [
+    "^archive/web/public/(release/production|deploy-meta)\\.json$",
+    "/README"
+  ],
+  "schedule_anchor_utc": "2026-10-19T08:20:00.000Z",
+  "schedule_interval_hours": 48,
+  "schedule_window_hours": 24
 }
