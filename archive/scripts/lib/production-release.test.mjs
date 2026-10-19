@@ -181,6 +181,6 @@ test('checked-in Survival Diary config keeps one two-day Production gate', () =>
   assert.equal(checkedInPolicy.production_interval_days, 2)
   assert.equal(checkedInPolicy.max_production_deploys_per_day, 1)
   assert.match(productionContext,
-    /git diff --quiet \$COMMIT_REF\^1 \$COMMIT_REF -- public\/release\/production\.json/)
+    /node \.\.\/scripts\/scheduled-netlify-release\.mjs ignore/)
   assert.doesNotMatch(productionContext, /\$CACHED_COMMIT_REF/)
 })
