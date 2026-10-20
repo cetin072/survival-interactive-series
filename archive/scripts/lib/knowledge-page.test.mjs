@@ -147,12 +147,24 @@ test('risk, editorial review requirement/completion and public approval are sepa
 test('media permission is scoped to knowledge while executable code and Operator remain restricted', async () => {
   const config = await readFile(join(root, 'archive/web/netlify.toml'), 'utf8')
   const policies = [...config.matchAll(/Content-Security-Policy = "([^"]+)"/g)].map((match) => match[1])
-  assert.equal(policies.length, 2)
+  assert.equal(policies.length, 3)
   assert.ok(policies[0].includes("img-src 'self' data:;"))
   assert.ok(!policies[0].includes('frame-src'))
   assert.ok(config.includes('for = "/knowledge/*"'))
   assert.ok(policies[1].includes("img-src 'self' data: https:;"))
   assert.ok(policies[1].includes('frame-src https://www.youtube-nocookie.com;'))
+  // The manuscript shelf adds only a route-scoped, read-only GitHub connection.
+  // Reader/Knowledge origins and all executable-code restrictions stay narrow.
+  const scoped = config.split('[[headers]]').slice(1).map(block => ({
+    path: block.match(/for = "([^"]+)"/)?.[1],
+    policy: block.match(/Content-Security-Policy = "([^"]+)"/)?.[1],
+  })).filter(block => block.policy)
+  assert.deepEqual(scoped.map(block => block.path), ['/*', '/knowledge/*', '/operator*'])
+  for (const policy of policies.slice(0, 2)) assert.ok(!policy.includes('api.github.com'))
+  assert.ok(policies[2].includes("img-src 'self' data:;"))
+  assert.ok(!policies[2].includes('frame-src'))
+  assert.equal(policies[2].match(/connect-src ([^;]+)/)?.[1], "'self' https://jgsxpdflgkqroecfjzxq.supabase.co https://api.github.com")
+  for (const policy of policies) assert.ok(policy.includes("frame-ancestors 'none';"))
   for (const policy of policies) assert.ok(policy.includes("script-src 'self';"))
 })
 

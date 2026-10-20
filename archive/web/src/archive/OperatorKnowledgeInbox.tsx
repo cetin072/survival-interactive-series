@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabaseClient } from './supabaseClient'
 import { OperatorKnowledgeSources } from './OperatorKnowledgeSources'
+import { OperatorBagKnowledgeInbox } from './OperatorBagKnowledgeInbox'
 import { formatOperatorTime } from './operatorSystemStatus'
 import {
   emptyKnowledgeInbox,
@@ -75,6 +76,8 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
         )}
       </div>
     </section>
+
+    <OperatorBagKnowledgeInbox />
 
     <OperatorKnowledgeSources />
 
