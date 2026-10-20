@@ -7,6 +7,7 @@ import { OperatorIllustrationVault } from './OperatorIllustrationVault'
 import { OperatorBunkerOsDashboard } from './OperatorBunkerOsDashboard'
 import type { RoadmapLog } from './operatorRoadmapModel'
 import { supabaseClient } from './supabaseClient'
+import { clearSiteDeployments, loadSiteDeployments, type SiteDeploymentObservation } from './siteDeploymentStatus'
 import { operatorPasswordRedirectUrl, validatePasswordChange } from './operatorPassword'
 import './operator.css'
 import {
@@ -44,6 +45,8 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
   const [roadmapLogs, setRoadmapLogs] = useState<RoadmapLog[] | null>(null)
   const [roadmapError, setRoadmapError] = useState('')
   const [productionStatus, setProductionStatus] = useState<ProductionStatus>({ release: null, deploy: null })
+  const [siteDeployments, setSiteDeployments] = useState<SiteDeploymentObservation[] | null>(null)
+  const deploymentRefresh = useRef(0)
   const [statusError, setStatusError] = useState('')
   const [selected, setSelected] = useState<ReviewDetail | null>(null)
   const [note, setNote] = useState('')
@@ -55,6 +58,8 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
 
   const refresh = useCallback(async () => {
     if (!supabaseClient) return
+    const generation = ++deploymentRefresh.current
+    setSiteDeployments(null)
     setBusy(true); setRefreshing(true); setError(''); setStatusError(''); setRoadmapError('')
     try {
       const [inboxResult, systemResult, release, deploy, roadmapResult] = await Promise.all([
@@ -82,6 +87,17 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
         if (!Array.isArray(payload?.logs)) setRoadmapError('작업 기록 응답을 확인하지 못했습니다.')
       }
       setLastRefreshedAt(new Date().toISOString())
+      // The existing server-side capability check is authoritative. Do not
+      // request external observations for signed-in users denied by this RPC.
+      if (!systemResult.error && systemResult.data && generation === deploymentRefresh.current) {
+        await loadSiteDeployments(fetch, Date.now, (observation) => {
+          if (generation !== deploymentRefresh.current) return
+          setSiteDeployments((current) => [...(current ?? []).filter((o) => o.site.siteId !== observation.site.siteId), observation])
+        })
+      }
+    } catch {
+      setStatusError('상태를 불러오지 못했습니다. 다시 조회해 주세요.')
+      setSiteDeployments(null)
     } finally {
       setRefreshing(false)
       setBusy(false)
@@ -112,6 +128,9 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
       if (event === 'PASSWORD_RECOVERY') setRecoveryMode(true)
       setUser(session?.user ?? null)
       if (!session?.user) {
+        deploymentRefresh.current++
+        clearSiteDeployments()
+        setSiteDeployments(null)
         initialDashboardLoaded.current = false
         setInbox(emptyInbox); setSelected(null); setRoadmapLogs(null); setRoadmapError('')
       }
@@ -222,6 +241,7 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
     roadmapError={roadmapError}
     systemStatus={systemStatus}
     productionStatus={productionStatus}
+    siteDeployments={siteDeployments}
     selected={selected}
     note={note}
     onNoteChange={setNote}

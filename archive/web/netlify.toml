@@ -60,6 +60,8 @@ command = "node ../scripts/scheduled-netlify-release.mjs guard ../automation/rel
 
   [headers.values]
     X-Robots-Tag = "noindex, nofollow, noarchive"
+    # Operator-only public GET observations. No credentials or wildcard origins.
+    Content-Security-Policy = "default-src 'self'; connect-src 'self' https://jgsxpdflgkqroecfjzxq.supabase.co https://api.github.com https://api.netlify.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
 
 [[headers]]
   for = "/index.html"

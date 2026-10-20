@@ -1,5 +1,7 @@
 import { chronicleRegistry } from './chronicleRegistry'
 import { OperatorRoadmap } from './OperatorRoadmap'
+import { OperatorSiteDeployments } from './OperatorSiteDeployments'
+import type { SiteDeploymentObservation } from './siteDeploymentStatus'
 import type { RoadmapLog } from './operatorRoadmapModel'
 import {
   aWikiPublicationStatus,
@@ -121,6 +123,7 @@ export function OperatorDashboard({
   roadmapError,
   systemStatus,
   productionStatus,
+  siteDeployments,
   selected,
   note,
   onNoteChange,
@@ -140,6 +143,7 @@ export function OperatorDashboard({
   roadmapError?: string
   systemStatus: SystemStatus | null
   productionStatus: ProductionStatus
+  siteDeployments?: SiteDeploymentObservation[] | null
   selected: ReviewDetail | null
   note: string
   onNoteChange: (value: string) => void
@@ -396,11 +400,12 @@ export function OperatorDashboard({
         </article>
       </div>
 
+      <OperatorSiteDeployments observations={siteDeployments} refreshing={refreshing} />
       <div className="operator-release-strip">
-        <strong>실사이트 배포 <small>공개 사이트에 반영된 상태</small></strong>
-        <span className={`operator-status-badge ${productionStatusTone(productionContext)}`}>{productionContext === 'production' ? '정상' : '확인 필요'}</span>
-        <span>최근 배포 {productionStatus.release?.released_on_kst ?? '기록 없음'}</span>
-        <span>배포 주기 {operatorStaticStatus.release.productionIntervalDays}일 · {operatorStaticStatus.release.releaseHourKst}시 · 하루 최대 {operatorStaticStatus.release.maxProductionDeploysPerDay}회</span>
+        <strong>실사이트 배포 <small>이 화면의 빌드 검증 정보</small></strong>
+        <span className={`operator-status-badge ${productionStatusTone(productionContext)}`}>{productionContext === 'production' ? '정식 사이트 빌드' : '검수 빌드 또는 확인 필요'}</span>
+        <span>배포 기록 {productionStatus.release?.released_on_kst ?? '기록 없음'}</span>
+        <span>고정 기준점 이후 {operatorStaticStatus.release.productionIntervalDays}일 간격 · {operatorStaticStatus.release.releaseTimeKst}</span>
         <details className="operator-tech-details operator-release-tech">
           <summary>기술 상세</summary>
           <span>원본 코드 <code>{shortSha(productionStatus.release?.source_main_sha)}</code></span>

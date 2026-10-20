@@ -75,6 +75,7 @@ describe('Operator system status helpers', () => {
     expect(operatorStaticStatus.archive.mode).toBeTruthy()
     expect(typeof operatorStaticStatus.knowledge.workerEnabled).toBe('boolean')
     expect(operatorStaticStatus.release.productionIntervalDays).toBeGreaterThan(0)
+    expect(operatorStaticStatus.release.releaseTimeKst).toBe('오후 5:20')
   })
 
   it('formats status values safely', () => {
