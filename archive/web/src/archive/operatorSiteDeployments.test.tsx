@@ -4,7 +4,7 @@ import { describe, expect, it, vi, afterEach } from 'vitest'
 import { OperatorSiteDeployments } from './OperatorSiteDeployments'
 import {
   deploymentSites, deploymentSlot, isDeploymentInput, compareWebChanges, validateSitePolicy,
-  validatePublished, latestProductionAttempt, siteDeploymentSignal, formatDeploymentTime,
+  validatePublished, latestProductionAttempt, siteDeploymentSignal, siteWebChangeSignal, formatDeploymentTime,
   deploymentCountdown, observeSiteDeployment, loadSiteDeployments, clearSiteDeployments,
   emptySiteObservation, type SiteReleasePolicy, type PublicDeploy, type SiteDeploymentObservation,
   NETLIFY_IGNORED_BUILD,
@@ -144,6 +144,47 @@ function fixtureFetcher(failSite = '') {
   })
 }
 afterEach(() => { clearSiteDeployments(); vi.unstubAllGlobals(); vi.useRealTimers() })
+describe('independent web-publication and release-execution signals', () => {
+  it('shows verified pending web changes when Netlify hides a historical cancellation reason', () => {
+    const observation = { ...healthy(), mainSha: main, webChanges: true,
+      errors: ['NETLIFY: DEPLOY_DETAIL_INCOMPLETE'] }
+    expect(siteWebChangeSignal(observation, now).label).toBe('웹 변경 반영 대기')
+    expect(siteDeploymentSignal(observation, now).label).toBe('상태 조회 불가')
+    const markup = renderToStaticMarkup(createElement(OperatorSiteDeployments, { at: now, observations: [observation] }))
+    expect(markup).toContain('<strong>웹 반영 상태</strong>')
+    expect(markup).toContain('<strong>배포 실행 상태</strong>')
+    expect(markup).toContain('operator-status-badge warning')
+    expect(markup).toContain('웹 변경 반영 대기')
+    expect(markup).toContain('상태 조회 불가')
+    expect(markup).toContain('최근 배포 시도의 실패·정책상 취소 사유')
+  })
+  it('does not upgrade an unknown or expired web comparison into a green badge', () => {
+    expect(siteWebChangeSignal({ ...healthy(), webChanges: null }, now).label).toBe('웹 반영 확인 불가')
+    expect(siteWebChangeSignal({ ...healthy(), checkedAt: new Date(now - 120_000).toISOString() }, now).label).toBe('웹 반영 확인 불가')
+    expect(siteWebChangeSignal({ ...healthy(), mainSha: main, webChanges: false,
+      errors: ['NETLIFY: DEPLOY_DETAIL_INCOMPLETE'] }, now).label).toBe('웹 배포 대상 변경 없음')
+    expect(siteWebChangeSignal({ ...healthy() }, now).label).toBe('최신 웹 반영 확인')
+  })
+  it('prioritizes a confirmed failed scheduled run even if unrelated Netlify cancel details are missing', () => {
+    const observation: SiteDeploymentObservation = { ...healthy(), mainSha: main, webChanges: true,
+      errors: ['NETLIFY: DEPLOY_DETAIL_INCOMPLETE'],
+      scheduledRun: { id: 42, event: 'schedule', head_branch: 'main',
+        created_at: '2026-10-20T08:00:00Z', status: 'completed', conclusion: 'failure' } }
+    expect(siteDeploymentSignal(observation, now).label).toBe('배포 실패·확인 필요')
+    expect(siteWebChangeSignal(observation, now).label).toBe('웹 변경 반영 대기')
+    const markup = renderToStaticMarkup(createElement(OperatorSiteDeployments, { at: now, observations: [observation] }))
+    expect(markup).toContain('operator-status-badge danger')
+    expect(markup).toContain('배포 실패·확인 필요')
+    expect(markup).toContain('웹 변경 반영 대기')
+  })
+  it('marks a proven Production build as in progress without reclassifying pending web files as deployed', () => {
+    const observation: SiteDeploymentObservation = { ...healthy(), mainSha: main, webChanges: true,
+      latestProduction: { ...published, state: 'building' } }
+    expect(siteDeploymentSignal(observation, now).label).toBe('배포 진행 중')
+    expect(siteWebChangeSignal(observation, now).label).toBe('웹 변경 반영 대기')
+  })
+})
+
 describe('bounded, isolated public reads', () => {
   it('pins policies and compares actual Production rather than metadata/merge times', async () => {
     const fetcher = fixtureFetcher()

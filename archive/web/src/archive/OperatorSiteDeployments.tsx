@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  deploymentSites, deploymentSlot, deploymentCountdown, formatDeploymentTime, siteDeploymentSignal,
+  deploymentSites, deploymentSlot, deploymentCountdown, formatDeploymentTime, siteDeploymentSignal, siteWebChangeSignal,
   type SiteDeploymentObservation,
 } from './siteDeploymentStatus'
 
@@ -26,15 +26,17 @@ export function OperatorSiteDeployments({ observations, refreshing = false, at }
     </header>
     <div className="operator-sites-grid">
       {rows.map(({ site, observation }, i) => {
-        const signal = siteDeploymentSignal(observation, now)
+        const execution = siteDeploymentSignal(observation, now)
+        const web = siteWebChangeSignal(observation, now)
+        // Explicit failure and a real in-progress Production build take priority.
+        // A hidden historical cancellation reason does not override verified web differences.
+        const priority = ['배포 실패·확인 필요', '배포 진행 중'].includes(execution.label)
+        const headline = priority ? execution : web
         const slot = schedules[i]
         const run = observation?.scheduledRun
         const published = observation?.published
-        const mainText = observation?.webChanges === true ? '웹 변경사항 반영 대기'
-          : observation?.webChanges === false ? observation.mainSha === published?.commit_ref ? '최신 버전 공개 확인' : '웹 배포 대상 변경 없음'
-          : '반영 여부 확인 불가'
         return <article className="operator-site-card" key={site.siteId}>
-          <div className="operator-system-title"><h3>{site.name}</h3><span className={`operator-status-badge ${signal.tone}`}>{signal.label}</span></div>
+          <div className="operator-system-title"><h3>{site.name}</h3><span className={`operator-status-badge ${headline.tone}`}>{headline.label}</span></div>
           <dl className="operator-site-times">
             <div><dt>최근 실제 배포</dt><dd>{formatDeploymentTime(published?.published_at)}</dd></div>
             <div><dt>다음 정기 배포</dt><dd>{formatDeploymentTime(slot?.next)}</dd></div>
@@ -43,8 +45,16 @@ export function OperatorSiteDeployments({ observations, refreshing = false, at }
           {slot?.currentStart && <p className="operator-status-help">현재 배포 슬롯의 확인 허용 시간입니다. 예약 실행이 지연될 수 있습니다.</p>}
           {published && slot && Date.parse(slot.next) - Date.parse(published.published_at!) < 48 * 3_600_000
             && <p className="operator-status-help">최근 공개 후 최소 48시간 조건 때문에 다음 슬롯에서 배포를 건너뛸 수 있습니다.</p>}
-          <p className="operator-site-main"><strong>최근 확인된 저장소 반영 상태</strong> {mainText}</p>
-          <p className="operator-status-help">{signal.detail}</p>
+          <div className="operator-site-main">
+            <strong>웹 반영 상태</strong>
+            <span>{web.label}</span>
+            <p className="operator-status-help">{web.detail}</p>
+          </div>
+          <div className="operator-site-main">
+            <strong>배포 실행 상태</strong>
+            <span>{execution.label === '배포 대기' ? '다음 정기 배포 대기' : execution.label}</span>
+            <p className="operator-status-help">{execution.detail}</p>
+          </div>
           {refreshing && <p className="operator-muted" role="status">최신 상태를 조회하고 있습니다…</p>}
           <details className="operator-tech-details">
             <summary>기술 상세</summary>

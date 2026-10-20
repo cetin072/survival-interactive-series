@@ -212,6 +212,7 @@
 .operator-site-countdown { color:#55555e; font-size:12px; line-height:1.6; }
 .operator-site-main { font-size:12px; line-height:1.6; padding-top:12px; border-top:1px solid #e4e4e7; }
 .operator-site-main strong { display:block; margin-bottom:3px; }
+.operator-site-main .operator-status-help { margin:4px 0 0; font-size:11px; }
 .operator-site-technical { display:grid; gap:12px; margin:12px 0; font-size:11px; }
 .operator-site-technical dt { color:#77777f; }
 .operator-site-technical dd { margin:4px 0 0; overflow-wrap:anywhere; }

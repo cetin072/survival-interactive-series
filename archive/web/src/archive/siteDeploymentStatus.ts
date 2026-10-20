@@ -121,26 +121,43 @@ export function latestProductionAttempt(deploys: PublicDeploy[], site: Deploymen
 }
 
 export type DeploymentSignal = { label: string; tone: 'ok' | 'warning' | 'danger' | 'running' | 'neutral'; detail: string }
+// Repository/web comparison is independent of Netlify's incomplete error details.
+// A missing or stale comparison stays unknown; we never treat a main merge as publication.
+export function siteWebChangeSignal(observation: SiteDeploymentObservation | null | undefined, now: number): DeploymentSignal {
+  const unknown = (detail: string): DeploymentSignal => ({ label: '웹 반영 확인 불가', tone: 'neutral', detail })
+  if (!observation) return unknown('운영자 권한 확인 후 웹 반영 상태를 조회합니다.')
+  const age = now - Date.parse(observation.checkedAt)
+  if (!Number.isFinite(age) || age < 0 || age >= DEPLOYMENT_FRESH_MS)
+    return unknown('기존 조회가 만료됐습니다. 상태 새로고침을 눌러 주세요.')
+  if (!observation.policy || !observation.published || !observation.mainSha || observation.webChanges === null)
+    return unknown('실제 Production과 저장소 웹 변경사항을 함께 확인하지 못했습니다.')
+  if (observation.webChanges)
+    return { label: '웹 변경 반영 대기', tone: 'warning', detail: '저장소의 웹 변경사항이 아직 정식 사이트에 공개되지 않았습니다.' }
+  if (observation.mainSha === observation.published.commit_ref)
+    return { label: '최신 웹 반영 확인', tone: 'ok', detail: '현재 main 코드와 실제 Production 게시 코드가 일치합니다.' }
+  return { label: '웹 배포 대상 변경 없음', tone: 'ok', detail: 'main에 새 변경사항은 있으나 현재 웹 배포 대상 파일에는 차이가 없습니다.' }
+}
+
 export function siteDeploymentSignal(observation: SiteDeploymentObservation | null | undefined, now: number): DeploymentSignal {
   const unknown = (detail: string): DeploymentSignal => ({ label: '상태 조회 불가', tone: 'neutral', detail })
   if (!observation) return unknown('운영자 권한 확인 후 상태를 조회합니다.')
   const age = now - Date.parse(observation.checkedAt)
   if (!Number.isFinite(age) || age < 0 || age >= DEPLOYMENT_FRESH_MS) return unknown('확인한 정보가 오래되었습니다. 상태 새로고침을 눌러 주세요.')
+  const { latestProduction: attempt, scheduledRun: run, published } = observation
+  if (published && attempt && ['error', 'failed'].includes(attempt.state)) return {
+    label: '배포 실패·확인 필요', tone: 'danger', detail: '최근 정식 사이트 배포가 실패했습니다. 이전 공개본은 유지됩니다.',
+  }
+  if (published && attempt && ['new', 'pending_review', 'enqueued', 'building', 'uploading', 'uploaded', 'preparing', 'processing'].includes(attempt.state)) return {
+    label: '배포 진행 중', tone: 'running', detail: '정식 사이트 빌드가 진행 중입니다. 실제 공개 완료는 아직 확인되지 않았습니다.',
+  }
+  if (published && run && ['failure', 'cancelled', 'timed_out', 'action_required', 'startup_failure', 'stale'].includes(run.conclusion ?? '')
+    && Date.parse(run.created_at) > Date.parse(published.published_at!)) return {
+    label: '배포 실패·확인 필요', tone: 'danger', detail: '최근 예약 실행이 실패하거나 중단됐습니다. 실제 공개본과 실행 결과를 확인해 주세요.',
+  }
   if (observation.errors.includes('NETLIFY: DEPLOY_DETAIL_INCOMPLETE'))
     return unknown('최근 배포 시도의 실패·정책상 취소 사유가 공개 자료에 없어 현재 배포 상태를 확정할 수 없습니다. 공개 시각과 저장소 비교는 각각 확인된 값입니다.')
   if (observation.errors.length || !observation.policy || !observation.published || observation.webChanges === null || !observation.mainSha)
     return unknown('필요한 자료를 모두 확인하지 못했습니다. 기술 상세에서 조회 결과를 확인해 주세요.')
-  const { latestProduction: attempt, scheduledRun: run, published } = observation
-  if (attempt && ['error', 'failed'].includes(attempt.state)) return {
-    label: '배포 실패·확인 필요', tone: 'danger', detail: '최근 정식 사이트 배포가 실패했습니다. 이전 공개본은 유지됩니다.',
-  }
-  if (attempt && ['new', 'pending_review', 'enqueued', 'building', 'uploading', 'uploaded', 'preparing', 'processing'].includes(attempt.state)) return {
-    label: '배포 진행 중', tone: 'running', detail: '정식 사이트 빌드가 진행 중입니다. 실제 공개 완료는 아직 확인되지 않았습니다.',
-  }
-  if (run && ['failure', 'cancelled', 'timed_out', 'action_required', 'startup_failure', 'stale'].includes(run.conclusion ?? '')
-    && Date.parse(run.created_at) > Date.parse(published.published_at!)) return {
-    label: '배포 실패·확인 필요', tone: 'danger', detail: '최근 예약 실행이 실패하거나 중단됐습니다. 실제 공개본과 실행 결과를 확인해 주세요.',
-  }
   if (attempt) return unknown('게시 확인 중입니다. 빌드 결과와 현재 정식 사이트 공개본이 아직 일치하지 않습니다.')
   if (run?.conclusion === 'skipped' && Date.parse(run.created_at) > Date.parse(published.published_at!))
     return unknown('최근 예약 실행이 건너뛰어졌습니다. 배포 정책과 실행 조건을 확인해 주세요.')

@@ -46,9 +46,11 @@ therefore get individual public deploy-detail GETs (at most 20, bounded timeouts
 and parallel reads). Missing or mismatched detail responses fail closed. Full
 provider error text is neither rendered nor logged by the app.
 The actual unauthenticated detail endpoint can also omit error reasons. In that
-case the overall signal is unavailable, while independently verified publication
-times, the next policy slot and the repository comparison remain visible with
-their observation time. Account-authenticated MCP reads are not evidence that a
+case the execution signal alone is unavailable, while independently verified publication
+times, the next policy slot and repository web changes remain visible as their
+own state with their observation time. The card has two distinct rows: web changes
+vs. deployment execution. Historical cancel ambiguity must not hide known pending
+web changes; a directly confirmed scheduled/build failure takes badge priority. Account-authenticated MCP reads are not evidence that a
 browser can read those fields anonymously. No account token or new Secret is
 configured by this implementation. A future authenticated collector, if desired,
 requires a separately reviewed credential and server-side Operator authorization;
