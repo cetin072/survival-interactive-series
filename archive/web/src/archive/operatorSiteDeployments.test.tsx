@@ -173,6 +173,14 @@ describe('bounded, isolated public reads', () => {
     expect(o.latestProduction).toBeNull()
     expect(siteDeploymentSignal(o, now).label).toBe('배포할 변경 없음')
     expect(fetcher.mock.calls.some(([u]) => String(u).endsWith(`/deploys/${ignored.id}`))).toBe(true)
+    fetcher.mockImplementation(async (input, init) => {
+      if (String(input).includes('/deploys?')) return response([ignored, published])
+      if (String(input).endsWith(`/deploys/${ignored.id}`)) return response(ignored)
+      return base(input, init)
+    })
+    const incomplete = await observeSiteDeployment(site, fetcher, () => now)
+    expect(incomplete.errors).toContain('NETLIFY: DEPLOY_DETAIL_INCOMPLETE')
+    expect(siteDeploymentSignal(incomplete, now).label).toBe('상태 조회 불가')
   })
   it('cache hits do not extend freshness; failed refresh never restores old success', async () => {
     let time = now

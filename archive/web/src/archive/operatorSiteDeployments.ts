@@ -220,6 +220,7 @@ export async function observeSiteDeployment(site: DeploymentSite, fetcher: Fetch
         const detail = await publicJson<PublicDeploy>(`https://api.netlify.com/api/v1/deploys/${d.id}`, fetcher)
         if (detail.id !== d.id || detail.site_id !== site.siteId || detail.context !== 'production'
           || detail.branch !== 'main' || detail.commit_ref !== d.commit_ref || detail.state !== d.state) throw new Error('DEPLOY_DETAIL_MISMATCH')
+        if (detail.skipped !== true && typeof detail.error_message !== 'string') throw new Error('DEPLOY_DETAIL_INCOMPLETE')
         return { ...d, skipped: detail.skipped, error_message: detail.error_message }
       }))
       result.latestProduction = latestProductionAttempt(detailed, site, result.published, now())
