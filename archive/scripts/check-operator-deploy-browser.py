@@ -150,9 +150,9 @@ def run(args):
                                'state': 'building' if state == 'building' else 'error', 'skipped': state == 'skipped',
                                'error_message': None}
                     if '/api/v1/deploys/' in url:
-                        body = {**attempt, 'error_message': IGNORED_BUILD if state == 'ignored' else 'Build command failed'}
+                        body = {**attempt, 'error_message': None if state == 'ambiguous' else IGNORED_BUILD if state == 'ignored' else 'Build command failed'}
                     else:
-                        body = [attempt, pub] if state in ['building', 'failed', 'skipped', 'ignored'] else [pub]
+                        body = [attempt, pub] if state in ['building', 'failed', 'skipped', 'ignored', 'ambiguous'] else [pub]
                 else:
                     body = {'id': row[2], 'published_deploy': pub}
                 route.fulfill(json=body, headers={'Access-Control-Allow-Origin': '*'})
@@ -166,7 +166,9 @@ def run(args):
             # Synthetic browser session only: real server-side capability is mocked
             # above. This does not claim real login/role integration success.
             page.evaluate('(session) => localStorage.setItem("sb-jgsxpdflgkqroecfjzxq-auth-token", JSON.stringify(session))', synthetic_session())
-            expected = {'pending': '배포 대기', 'building': '배포 진행 중', 'complete': '배포 완료', 'unchanged': '배포할 변경 없음', 'failed': '배포 실패·확인 필요', 'unknown': '상태 조회 불가', 'skipped': '배포 대기', 'ignored': '배포 대기'}
+            expected = {'pending': '웹 변경 반영 대기', 'building': '배포 진행 중', 'complete': '최신 웹 반영 확인', 'unchanged': '웹 배포 대상 변경 없음', 'failed': '배포 실패·확인 필요', 'unknown': '웹 반영 확인 불가', 'skipped': '웹 변경 반영 대기', 'ignored': '웹 변경 반영 대기', 'ambiguous': '웹 변경 반영 대기'}
+            expected_web = {'pending': '웹 변경 반영 대기', 'building': '웹 변경 반영 대기', 'complete': '최신 웹 반영 확인', 'unchanged': '웹 배포 대상 변경 없음', 'failed': '웹 변경 반영 대기', 'unknown': '웹 반영 확인 불가', 'skipped': '웹 변경 반영 대기', 'ignored': '웹 변경 반영 대기', 'ambiguous': '웹 변경 반영 대기'}
+            expected_execution = {'pending': '다음 정기 배포 대기', 'building': '배포 진행 중', 'complete': '배포 완료', 'unchanged': '배포할 변경 없음', 'failed': '배포 실패·확인 필요', 'unknown': '상태 조회 불가', 'skipped': '다음 정기 배포 대기', 'ignored': '다음 정기 배포 대기', 'ambiguous': '상태 조회 불가'}
             states = ['live'] if args.live else list(expected) + ['partial']
             for state in states:
                 mode['state'] = state
@@ -179,9 +181,19 @@ def run(args):
                     reports.append({'mode': 'LIVE_PUBLIC_GETS_AUTH_RPC_MOCKED', 'width': width, 'badges': badges,
                                     'cards': page.locator('.operator-site-card').all_text_contents()})
                 elif state == 'partial':
-                    assert badges == ['상태 조회 불가', '배포 대기', '배포 대기'], badges
+                    assert badges == ['웹 반영 확인 불가', '웹 변경 반영 대기', '웹 변경 반영 대기'], badges
                 else:
                     assert badges == [expected[state]] * 3, (state, badges, page.locator('.operator-sites').text_content())
+                if not args.live:
+                    web_labels = (['웹 반영 확인 불가', '웹 변경 반영 대기', '웹 변경 반영 대기']
+                                  if state == 'partial' else [expected_web[state]] * 3)
+                    run_labels = (['상태 조회 불가', '다음 정기 배포 대기', '다음 정기 배포 대기']
+                                  if state == 'partial' else [expected_execution[state]] * 3)
+                    for index, card in enumerate(page.locator('.operator-site-card').all()):
+                        facts = card.locator('.operator-site-main')
+                        expect(facts).to_have_count(2)
+                        assert web_labels[index] in facts.nth(0).text_content(), (state, index, 'web evidence')
+                        assert run_labels[index] in facts.nth(1).text_content(), (state, index, 'execution evidence')
                 assert page.locator('.operator-site-card details[open]').count() == 0
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'), (width, state, 'overflow')
                 cards = page.locator('.operator-site-card').all()
@@ -194,7 +206,7 @@ def run(args):
                 expect(cards[0].locator('details')).to_have_attribute('open', '')
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'), 'Open details overflow'
                 cards[0].get_by_text('기술 상세', exact=True).click()
-                if state in ['pending', 'partial', 'live']:
+                if state in ['pending', 'partial', 'ambiguous', 'live']:
                     page.locator('.operator-sites').screenshot(path=str(output / f'{state}-{width}.png'))
                 reports.append({'mode': 'mock' if not args.live else 'live-layout', 'width': width, 'state': state, 'result': 'PASS'})
             if not args.live:
@@ -203,7 +215,7 @@ def run(args):
                 page.reload()
                 expect(page.locator('.operator-sites')).to_have_attribute('aria-busy', 'false', timeout=15000)
                 assert len(external_requests) == count, 'Denied capability must not fetch providers'
-                assert page.locator('.operator-site-card .operator-status-badge').all_text_contents() == ['상태 조회 불가'] * 3
+                assert page.locator('.operator-site-card .operator-status-badge').all_text_contents() == ['웹 반영 확인 불가'] * 3
             assert not errors, errors
             context.close()
         browser.close()
