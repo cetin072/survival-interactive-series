@@ -7,6 +7,7 @@ import {
   validatePublished, latestProductionAttempt, siteDeploymentSignal, formatDeploymentTime,
   deploymentCountdown, observeSiteDeployment, loadSiteDeployments, clearSiteDeployments,
   emptySiteObservation, type SiteReleasePolicy, type PublicDeploy, type SiteDeploymentObservation,
+  NETLIFY_IGNORED_BUILD,
 } from './operatorSiteDeployments'
 import survivalPolicy from '../../../automation/release-policy.json'
 
@@ -81,6 +82,14 @@ describe('actual Production evidence', () => {
     const skipped = { ...published, id: 'c'.repeat(24), state: 'error', skipped: true, created_at: '2026-10-20T08:00:00Z' }
     expect(latestProductionAttempt([skipped, published], site, published, now)).toBeNull()
     expect(latestProductionAttempt([{ ...skipped, skipped: false }, published], site, published, now)?.state).toBe('error')
+  })
+  it('recognizes the exact live Netlify ignore result without hiding genuine errors or inventing no changes', () => {
+    const ignored = { ...published, id: 'c'.repeat(24), state: 'error', skipped: null,
+      error_message: NETLIFY_IGNORED_BUILD, created_at: '2026-10-20T08:00:00Z' }
+    const latest = latestProductionAttempt([ignored, published], site, published, now)
+    expect(latest).toBeNull()
+    expect(siteDeploymentSignal({ ...healthy(), latestProduction: latest, mainSha: main, webChanges: true }, now).label).toBe('배포 대기')
+    expect(latestProductionAttempt([{ ...ignored, error_message: 'Build command failed' }, published], site, published, now)?.state).toBe('error')
   })
   it('keeps ready-but-unpublished distinct from published', () => {
     const d = { ...published, id: 'c'.repeat(24), created_at: '2026-10-20T08:00:00Z', published_at: null }

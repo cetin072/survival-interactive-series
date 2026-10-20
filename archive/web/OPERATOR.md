@@ -36,7 +36,11 @@ Only `published_deploy` with the correct site, main branch, Production context,
 ready state, full commit and valid publication time proves a public release.
 An Actions success or a ready but unpublished deploy does not prove publication.
 An explicitly `skipped=true` Netlify record is an ignored build, not a failed
-release attempt. Other Production failures are not hidden by this rule.
+release attempt. Live reads also verified that Netlify reports the exact ignore
+result `Failed during stage 'checking build content for changes': Canceled build
+due to no content change` as `state=error, skipped=null`. Only this exact known
+reason is excluded; other Production failures are not hidden. An ignored build
+does not prove there are no web changes: the GitHub comparison still decides.
 `deploy_inputs` / `deploy_excludes` and the scheduler's test-file exclusions decide
 whether a differing main actually needs a web deployment. Comparisons at GitHub's
 300-file limit or with diverged ancestry fail closed.

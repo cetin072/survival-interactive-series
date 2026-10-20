@@ -25,6 +25,7 @@ SITES = [
 ]
 SHA, MAIN = 'a' * 40, 'b' * 40
 POLICY = json.loads((ROOT / 'archive/automation/release-policy.json').read_text())
+IGNORED_BUILD = "Failed during stage 'checking build content for changes': Canceled build due to no content change"
 CSP = next(h['values']['Content-Security-Policy'] for h in tomllib.loads((ROOT / 'archive/web/netlify.toml').read_text())['headers'] if h['for'] == '/operator*')
 
 def iso(value):
@@ -81,7 +82,8 @@ def run(args):
                     fields = ['id', 'site_id', 'context', 'branch', 'state', 'skipped', 'created_at', 'published_at', 'commit_ref']
                     data = response.json()
                     reports.append({'mode': 'LIVE_PRODUCTION_ATTEMPTS', 'http': response.status,
-                                    'deploys': [{k: d.get(k) for k in fields} for d in data if d.get('context') == 'production']})
+                                    'deploys': [{**{k: d.get(k) for k in fields}, 'ignored_no_content_change': d.get('error_message') == IGNORED_BUILD}
+                                                for d in data if d.get('context') == 'production']})
                 except Exception:
                     reports.append({'mode': 'LIVE_PRODUCTION_ATTEMPTS', 'http': response.status, 'readable': False})
             page.on('response', live_attempts)
@@ -145,8 +147,9 @@ def run(args):
                         body['files'] = [{'filename': 'archive/web/src/app.tsx' if row[0] == '생존일기' else 'public/app.js' if row[0] == '업무수첩' else 'app/app.js'}]
                 elif '/deploys?' in url:
                     attempt = {**pub, 'id': 'c' * 24, 'created_at': iso(now - timedelta(minutes=1)), 'published_at': None,
-                               'state': 'building' if state == 'building' else 'error', 'skipped': state == 'skipped'}
-                    body = [attempt, pub] if state in ['building', 'failed', 'skipped'] else [pub]
+                               'state': 'building' if state == 'building' else 'error', 'skipped': state == 'skipped',
+                               'error_message': IGNORED_BUILD if state == 'ignored' else None}
+                    body = [attempt, pub] if state in ['building', 'failed', 'skipped', 'ignored'] else [pub]
                 else:
                     body = {'id': row[2], 'published_deploy': pub}
                 route.fulfill(json=body, headers={'Access-Control-Allow-Origin': '*'})
@@ -160,7 +163,7 @@ def run(args):
             # Synthetic browser session only: real server-side capability is mocked
             # above. This does not claim real login/role integration success.
             page.evaluate('(session) => localStorage.setItem("sb-jgsxpdflgkqroecfjzxq-auth-token", JSON.stringify(session))', synthetic_session())
-            expected = {'pending': '배포 대기', 'building': '배포 진행 중', 'complete': '배포 완료', 'unchanged': '배포할 변경 없음', 'failed': '배포 실패·확인 필요', 'unknown': '상태 조회 불가', 'skipped': '배포 대기'}
+            expected = {'pending': '배포 대기', 'building': '배포 진행 중', 'complete': '배포 완료', 'unchanged': '배포할 변경 없음', 'failed': '배포 실패·확인 필요', 'unknown': '상태 조회 불가', 'skipped': '배포 대기', 'ignored': '배포 대기'}
             states = ['live'] if args.live else list(expected) + ['partial']
             for state in states:
                 mode['state'] = state

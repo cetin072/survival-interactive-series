@@ -17,6 +17,7 @@ export type PublicDeploy = {
   id: string; site_id: string; context: string; state: string; branch: string
   commit_ref: string; created_at: string; published_at: string | null
   skipped?: boolean | null
+  error_message?: string | null
 }
 export type ScheduledRun = {
   id: number; event: string; head_branch: string; created_at: string
@@ -31,6 +32,9 @@ export type SiteDeploymentObservation = {
 }
 const HOUR = 3_600_000
 const shaPattern = /^[a-f0-9]{40}$/
+// Observed Netlify ignore-command result: error + skipped=null is used even for
+// deliberate no-content cancellation. Never classify other error text as a skip.
+export const NETLIFY_IGNORED_BUILD = "Failed during stage 'checking build content for changes': Canceled build due to no content change"
 export const DEPLOYMENT_FRESH_MS = 120_000
 const dateValid = (s: unknown): s is string => typeof s === 'string' && Number.isFinite(Date.parse(s))
 
@@ -102,9 +106,10 @@ function pickDeploy(d: PublicDeploy): PublicDeploy {
 
 export function latestProductionAttempt(deploys: PublicDeploy[], site: DeploymentSite, published: PublicDeploy, now: number) {
   if (!Array.isArray(deploys)) throw new Error('DEPLOYS_INVALID')
-  // Netlify explicitly marks ignored builds as skipped. These are not failed
-  // deployment attempts (ordinary main pushes may intentionally be ignored).
-  const production = deploys.filter((d) => d.context === 'production' && d.branch === 'main' && d.skipped !== true)
+  // An ignored ordinary main push is not a failed scheduled release. Neither
+  // ignore result proves NO_CHANGES: that still requires the GitHub file diff.
+  const production = deploys.filter((d) => d.context === 'production' && d.branch === 'main'
+    && d.skipped !== true && d.error_message !== NETLIFY_IGNORED_BUILD)
   if (deploys.length >= 20 && !production.some((d) => d.id === published.id)) throw new Error('DEPLOYS_INCOMPLETE')
   for (const d of production) {
     if (d.site_id !== site.siteId || !dateValid(d.created_at) || Date.parse(d.created_at) > now
