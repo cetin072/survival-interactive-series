@@ -1,6 +1,8 @@
 # C04 / WORLDLINE_04 / S01 — 제4시도 정방향 동시시각 교차서사 계약 V1
 
-상태: USER_APPROVED_CHRONOLOGICAL_RESTART / IMPLEMENTATION_HANDOFF
+상태: USER_APPROVED_CHRONOLOGICAL_RESTART / **ATTEMPT_04_INITIALIZED** / FIRST_STORY_TURN_NOT_YET_WRITTEN
+
+**실제 적용 확인 (2026-10-20):** C04 제3시도 Save43/D1 19:15 전체가 `survival_rpg.state_archives`의 `PRE_RESTART_ATTEMPT_04_FULL_SNAPSHOT`으로 보존됐다. 기존 두 시도 및 제3시도 원문 **82건 모두 보존**, 제3시도 세션 CLOSED. 제4시도 Save **44 / D0 09:03 / S01_A04_D0_0903_FORWARD_OPENING_PENDING**, 활성 세션 `4306a61c-e760-4db9-b94a-9359c284a5d1` OPEN, 저장 메시지 0건. `get_c04_turn_context_v1`의 다음 ticket turn_no=0 검증 통과. **이 문서를 다시 읽어도 재시작을 반복하지 않는다.** 실제 진행 후 최신 수치는 DB를 우선한다.
 이 문서의 적용 대상은 몽골 약 2km 소행성 충돌과 지구적 지각 연쇄재난의 세계관4 **제4시도**다. 제1~3시도의 Save와 공개 USER/GM RAW는 원문 그대로 영구 보존하고, 시간순 4번째 시도에서 이전 플레이의 자원·NPC·선택·결과를 자동 승계하지 않는다.
 
 ## 1. 독자가 혼란을 겪지 않는 것이 가장 중요한 연출 규칙
@@ -43,5 +45,7 @@
 - **운영 지시문·재시작 승인만으로 제1화 RAW를 임의로 등록하지 않는다.** 첫 실제 게임방 턴에서 그 방의 USER 입력과 최종 GM 본문을 함께 저장한다. `get_c04_turn_context_v1`·`commit_c04_turn_v1` 사용, 낡은 ticket 재활용 금지.
 
 ## 5. 리셋 안전 기준
+
+**다음은 2026-10-20에 이미 완료한 최초 재시작 절차의 역사적 기록이다. 현재 제4시도에서는 다시 실행하지 않는다.**
 
 제4시도로 실제 재시작하기 전에는 현재 제3시도 최신 Save 전체(JSON state와 gm_state, 버전), RAW 개수, 세션 3개를 확인한다. 완전한 스냅샷을 별도 보존하고, 기존 세션을 CLOSED로 종료한 후 새 UUID 세션을 개설한다. 최신 Save 버전 CAS로 새 최소 초기 상태를 구성하고, 이전 RAW·C03 Save를 건드리지 않는다. 신규 세션에는 최초 실제 게임 턴 전까지 메시지 0건. 다시 시작 작업이 끝난 뒤에는 **이 문서의 리셋 절차를 재실행하지 않는다**.
