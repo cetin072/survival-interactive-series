@@ -34,7 +34,7 @@ export const operatorStaticStatus = {
   release: {
     mode: releasePolicy.mode,
     productionIntervalDays: releasePolicy.production_interval_days,
-    releaseHourKst: releasePolicy.release_hour_kst,
+    releaseTimeKst: new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(releasePolicy.schedule_anchor_utc)),
     maxProductionDeploysPerDay: releasePolicy.max_production_deploys_per_day,
   },
 } as const

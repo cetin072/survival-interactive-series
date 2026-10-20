@@ -8,6 +8,7 @@ on:
       - 'archive/scripts/run-daily-archive.mjs'
       - 'archive/scripts/lib/archive-source-discovery*'
       - 'archive/scripts/check-reader-browser.py'
+      - 'archive/scripts/check-operator-deploy-browser.py'
       - 'archive/scripts/reader_deploy_identity.py'
       - 'archive/scripts/test_reader_deploy_identity.py'
       - '.github/workflows/archive-reader-browser.yml'
@@ -17,6 +18,7 @@ on:
       - 'archive/web/**'
       - 'archive/content/**'
       - 'archive/scripts/check-reader-browser.py'
+      - 'archive/scripts/check-operator-deploy-browser.py'
       - 'archive/scripts/reader_deploy_identity.py'
       - 'archive/scripts/test_reader_deploy_identity.py'
       - '.github/workflows/archive-reader-browser.yml'
@@ -54,12 +56,17 @@ jobs:
         env:
           ARCHIVE_AFTERFALL_SOURCE_REF: origin/worldline/afterfall-rpg
           ARCHIVE_BUILD_REF: ${{ github.event.pull_request.head.sha || github.sha }}
+          # Synthetic Auth is intercepted by browser QA; never a real login/key.
+          VITE_SUPABASE_URL: https://jgsxpdflgkqroecfjzxq.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: operator-browser-qa
       - name: Install browser test tooling (not a runtime dependency)
         run: |
           python -m pip install playwright==1.55.0
           python -m playwright install --with-deps chromium
       - name: Audit built app on touch mobile and desktop
         run: python ../scripts/check-reader-browser.py --world-wiki --screenshots "$RUNNER_TEMP/archive-browser/local"
+      - name: Audit read-only Operator states, permissions and mobile layout (mock providers)
+        run: python ../scripts/check-operator-deploy-browser.py --screenshots "$RUNNER_TEMP/archive-browser/operator-local"
       - name: Fetch recent PR history for source-equivalent preview verification
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         working-directory: .
@@ -72,6 +79,12 @@ jobs:
       - name: Verify tested assets and navigation on Deploy Preview
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         run: python ../scripts/check-reader-browser.py --url https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app --wait-assets --allow-ancestor-equivalent --world-wiki --screenshots "$RUNNER_TEMP/archive-browser/preview"
+      - name: Audit Operator on Deploy Preview (mock Auth and provider states)
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: python ../scripts/check-operator-deploy-browser.py --url https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app --screenshots "$RUNNER_TEMP/archive-browser/operator-preview"
+      - name: Observe live public deployment APIs from Preview (Auth/RPC mocked; no provider credentials)
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: python ../scripts/check-operator-deploy-browser.py --url https://deploy-preview-${{ github.event.pull_request.number }}--survival-diary-archive.netlify.app --live --screenshots "$RUNNER_TEMP/archive-browser/operator-live"
       - name: Detect a batched Production release commit
         id: production_release
         if: github.event_name == 'push'
