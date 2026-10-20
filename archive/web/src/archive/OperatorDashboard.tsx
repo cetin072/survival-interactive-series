@@ -1,7 +1,7 @@
 import { chronicleRegistry } from './chronicleRegistry'
 import { OperatorRoadmap } from './OperatorRoadmap'
 import { OperatorSiteDeployments } from './OperatorSiteDeployments'
-import type { SiteDeploymentObservation } from './operatorSiteDeployments'
+import type { SiteDeploymentObservation } from './siteDeploymentStatus'
 import type { RoadmapLog } from './operatorRoadmapModel'
 import {
   aWikiPublicationStatus,

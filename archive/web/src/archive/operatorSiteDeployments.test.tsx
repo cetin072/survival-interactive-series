@@ -8,7 +8,7 @@ import {
   deploymentCountdown, observeSiteDeployment, loadSiteDeployments, clearSiteDeployments,
   emptySiteObservation, type SiteReleasePolicy, type PublicDeploy, type SiteDeploymentObservation,
   NETLIFY_IGNORED_BUILD,
-} from './operatorSiteDeployments'
+} from './siteDeploymentStatus'
 import survivalPolicy from '../../../automation/release-policy.json'
 
 const site = deploymentSites[1]

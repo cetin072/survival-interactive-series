@@ -7,7 +7,7 @@ import { OperatorIllustrationVault } from './OperatorIllustrationVault'
 import { OperatorBunkerOsDashboard } from './OperatorBunkerOsDashboard'
 import type { RoadmapLog } from './operatorRoadmapModel'
 import { supabaseClient } from './supabaseClient'
-import { clearSiteDeployments, loadSiteDeployments, type SiteDeploymentObservation } from './operatorSiteDeployments'
+import { clearSiteDeployments, loadSiteDeployments, type SiteDeploymentObservation } from './siteDeploymentStatus'
 import { operatorPasswordRedirectUrl, validatePasswordChange } from './operatorPassword'
 import './operator.css'
 import {

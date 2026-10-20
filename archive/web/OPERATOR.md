@@ -29,7 +29,7 @@ GETs for Taejang, Survival Diary Archive and **worklog-voice-pwa** (not
 work-notebook-app). The four automation boards and the current screen's build /
 release-marker evidence remain separate from these live site observations.
 
-`operatorSiteDeployments.ts` reads each site's public Netlify site snapshot and
+`siteDeploymentStatus.ts` reads each site's public Netlify site snapshot and
 recent Production deploys, the repository's main ref, the policy pinned to that
 SHA, the last scheduled release run and an ancestor-checked GitHub comparison.
 Only `published_deploy` with the correct site, main branch, Production context,

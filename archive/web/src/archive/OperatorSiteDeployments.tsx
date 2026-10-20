@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   deploymentSites, deploymentSlot, deploymentCountdown, formatDeploymentTime, siteDeploymentSignal,
   type SiteDeploymentObservation,
-} from './operatorSiteDeployments'
+} from './siteDeploymentStatus'
 
 export function OperatorSiteDeployments({ observations, refreshing = false, at }: {
   observations?: SiteDeploymentObservation[] | null; refreshing?: boolean; at?: number
