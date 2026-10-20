@@ -211,6 +211,14 @@ describe('bounded, isolated public reads', () => {
 })
 
 describe('three-site presentation', () => {
+  it('preserves independently verified repository facts while the overall deployment state is unavailable', () => {
+    const markup = renderToStaticMarkup(createElement(OperatorSiteDeployments, { at: now,
+      observations: [{ ...healthy(), mainSha: main, webChanges: true, errors: ['NETLIFY: DEPLOY_DETAIL_INCOMPLETE'] }],
+    }))
+    expect(markup).toContain('웹 변경사항 반영 대기')
+    expect(markup).toContain('실패·정책상 취소 사유가 공개 자료에 없어')
+    expect(markup).toContain('상태 조회 불가')
+  })
   it('hides technical details initially and separates failure from pending', () => {
     const markup = renderToStaticMarkup(createElement(OperatorSiteDeployments, { at: now,
       observations: deploymentSites.map((s) => ({ ...healthy(), site: s, policy: { ...policy, site_id: s.siteId, repository: s.repository } })),

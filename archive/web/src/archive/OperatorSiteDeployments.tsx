@@ -43,7 +43,7 @@ export function OperatorSiteDeployments({ observations, refreshing = false, at }
           {slot?.currentStart && <p className="operator-status-help">현재 배포 슬롯의 확인 허용 시간입니다. 예약 실행이 지연될 수 있습니다.</p>}
           {published && slot && Date.parse(slot.next) - Date.parse(published.published_at!) < 48 * 3_600_000
             && <p className="operator-status-help">최근 공개 후 최소 48시간 조건 때문에 다음 슬롯에서 배포를 건너뛸 수 있습니다.</p>}
-          <p className="operator-site-main"><strong>저장소 반영 상태</strong> {signal.label === '상태 조회 불가' ? '현재 상태 확인 필요' : mainText}</p>
+          <p className="operator-site-main"><strong>최근 확인된 저장소 반영 상태</strong> {mainText}</p>
           <p className="operator-status-help">{signal.detail}</p>
           {refreshing && <p className="operator-muted" role="status">최신 상태를 조회하고 있습니다…</p>}
           <details className="operator-tech-details">

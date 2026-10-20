@@ -45,6 +45,14 @@ The public list omits this error reason. Recent errors since the published relea
 therefore get individual public deploy-detail GETs (at most 20, bounded timeouts
 and parallel reads). Missing or mismatched detail responses fail closed. Full
 provider error text is neither rendered nor logged by the app.
+The actual unauthenticated detail endpoint can also omit error reasons. In that
+case the overall signal is unavailable, while independently verified publication
+times, the next policy slot and the repository comparison remain visible with
+their observation time. Account-authenticated MCP reads are not evidence that a
+browser can read those fields anonymously. No account token or new Secret is
+configured by this implementation. A future authenticated collector, if desired,
+requires a separately reviewed credential and server-side Operator authorization;
+merely adding a tokenless proxy cannot recover fields absent from public data.
 `deploy_inputs` / `deploy_excludes` and the scheduler's test-file exclusions decide
 whether a differing main actually needs a web deployment. Comparisons at GitHub's
 300-file limit or with diverged ancestry fail closed.

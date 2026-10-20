@@ -126,6 +126,8 @@ export function siteDeploymentSignal(observation: SiteDeploymentObservation | nu
   if (!observation) return unknown('운영자 권한 확인 후 상태를 조회합니다.')
   const age = now - Date.parse(observation.checkedAt)
   if (!Number.isFinite(age) || age < 0 || age >= DEPLOYMENT_FRESH_MS) return unknown('확인한 정보가 오래되었습니다. 상태 새로고침을 눌러 주세요.')
+  if (observation.errors.includes('NETLIFY: DEPLOY_DETAIL_INCOMPLETE'))
+    return unknown('최근 배포 시도의 실패·정책상 취소 사유가 공개 자료에 없어 현재 배포 상태를 확정할 수 없습니다. 공개 시각과 저장소 비교는 각각 확인된 값입니다.')
   if (observation.errors.length || !observation.policy || !observation.published || observation.webChanges === null || !observation.mainSha)
     return unknown('필요한 자료를 모두 확인하지 못했습니다. 기술 상세에서 조회 결과를 확인해 주세요.')
   const { latestProduction: attempt, scheduledRun: run, published } = observation
