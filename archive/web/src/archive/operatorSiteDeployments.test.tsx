@@ -159,6 +159,21 @@ describe('bounded, isolated public reads', () => {
     expect(seen).toHaveLength(3)
     expect(rows.map((o) => siteDeploymentSignal(o, now).label)).toEqual(['상태 조회 불가', '배포할 변경 없음', '배포할 변경 없음'])
   })
+  it('reads recent error details because the actual list endpoint omits ignore reasons', async () => {
+    const base = fixtureFetcher()
+    const ignored = { ...published, id: 'c'.repeat(24), state: 'error', skipped: null,
+      created_at: '2026-10-20T08:00:00Z', published_at: null }
+    const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (String(input).includes('/deploys?')) return response([ignored, published])
+      if (String(input).endsWith(`/deploys/${ignored.id}`)) return response({ ...ignored, error_message: NETLIFY_IGNORED_BUILD })
+      return base(input, init)
+    })
+    const o = await observeSiteDeployment(site, fetcher, () => now)
+    expect(o.errors).toEqual([])
+    expect(o.latestProduction).toBeNull()
+    expect(siteDeploymentSignal(o, now).label).toBe('배포할 변경 없음')
+    expect(fetcher.mock.calls.some(([u]) => String(u).endsWith(`/deploys/${ignored.id}`))).toBe(true)
+  })
   it('cache hits do not extend freshness; failed refresh never restores old success', async () => {
     let time = now
     const fetcher = fixtureFetcher()

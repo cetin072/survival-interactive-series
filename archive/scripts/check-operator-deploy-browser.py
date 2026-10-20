@@ -121,7 +121,7 @@ def run(args):
                     route.continue_()
                     return
                 url = request.url
-                row = next(s for s in SITES if s[1] in url or s[2] in url)
+                row = next(s for i, s in enumerate(SITES) if s[1] in url or s[2] in url or url.endswith('/deploys/' + str(i + 1) * 24))
                 state = mode['state']
                 if state == 'partial' and row[0] == '태장' or state == 'unknown':
                     route.fulfill(status=503, json={}, headers={'Access-Control-Allow-Origin': '*'})
@@ -145,11 +145,14 @@ def run(args):
                     # Apply each repository's real deployment scope for mock changes.
                     if state != 'unchanged':
                         body['files'] = [{'filename': 'archive/web/src/app.tsx' if row[0] == '생존일기' else 'public/app.js' if row[0] == '업무수첩' else 'app/app.js'}]
-                elif '/deploys?' in url:
-                    attempt = {**pub, 'id': 'c' * 24, 'created_at': iso(now - timedelta(minutes=1)), 'published_at': None,
+                elif '/deploys?' in url or '/api/v1/deploys/' in url:
+                    attempt = {**pub, 'id': str(SITES.index(row) + 1) * 24, 'created_at': iso(now - timedelta(minutes=1)), 'published_at': None,
                                'state': 'building' if state == 'building' else 'error', 'skipped': state == 'skipped',
-                               'error_message': IGNORED_BUILD if state == 'ignored' else None}
-                    body = [attempt, pub] if state in ['building', 'failed', 'skipped', 'ignored'] else [pub]
+                               'error_message': None}
+                    if '/api/v1/deploys/' in url:
+                        body = {**attempt, 'error_message': IGNORED_BUILD if state == 'ignored' else 'Build command failed'}
+                    else:
+                        body = [attempt, pub] if state in ['building', 'failed', 'skipped', 'ignored'] else [pub]
                 else:
                     body = {'id': row[2], 'published_deploy': pub}
                 route.fulfill(json=body, headers={'Access-Control-Allow-Origin': '*'})

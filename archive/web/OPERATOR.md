@@ -41,6 +41,10 @@ result `Failed during stage 'checking build content for changes': Canceled build
 due to no content change` as `state=error, skipped=null`. Only this exact known
 reason is excluded; other Production failures are not hidden. An ignored build
 does not prove there are no web changes: the GitHub comparison still decides.
+The public list omits this error reason. Recent errors since the published release
+therefore get individual public deploy-detail GETs (at most 20, bounded timeouts
+and parallel reads). Missing or mismatched detail responses fail closed. Full
+provider error text is neither rendered nor logged by the app.
 `deploy_inputs` / `deploy_excludes` and the scheduler's test-file exclusions decide
 whether a differing main actually needs a web deployment. Comparisons at GitHub's
 300-file limit or with diverged ancestry fail closed.

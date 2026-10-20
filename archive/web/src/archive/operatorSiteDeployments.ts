@@ -209,7 +209,20 @@ export async function observeSiteDeployment(site: DeploymentSite, fetcher: Fetch
     }),
     capture('NETLIFY', async () => {
       result.published = validatePublished(await publicJson(netlify, fetcher), site, now())
-      result.latestProduction = latestProductionAttempt(await publicJson<PublicDeploy[]>(`${netlify}/deploys?production=true&per_page=20`, fetcher), site, result.published, now())
+      const deploys = await publicJson<PublicDeploy[]>(`${netlify}/deploys?production=true&per_page=20`, fetcher)
+      // The list API omits error_message. Read only recent errors' details to
+      // distinguish actual failures from the policy's intentional ignore result.
+      // At most 20 bounded GETs, in parallel; never read logs or trigger builds.
+      latestProductionAttempt(deploys, site, result.published, now())
+      const detailed = await Promise.all(deploys.map(async (d) => {
+        if (d.context !== 'production' || d.branch !== 'main' || d.skipped === true
+          || !['error', 'failed'].includes(d.state) || Date.parse(d.created_at) < Date.parse(result.published!.published_at!)) return d
+        const detail = await publicJson<PublicDeploy>(`https://api.netlify.com/api/v1/deploys/${d.id}`, fetcher)
+        if (detail.id !== d.id || detail.site_id !== site.siteId || detail.context !== 'production'
+          || detail.branch !== 'main' || detail.commit_ref !== d.commit_ref || detail.state !== d.state) throw new Error('DEPLOY_DETAIL_MISMATCH')
+        return { ...d, skipped: detail.skipped, error_message: detail.error_message }
+      }))
+      result.latestProduction = latestProductionAttempt(detailed, site, result.published, now())
     }),
   ])
   if (result.policy && result.published && result.mainSha) {
