@@ -182,6 +182,19 @@ describe('bounded, isolated public reads', () => {
     expect(incomplete.errors).toContain('NETLIFY: DEPLOY_DETAIL_INCOMPLETE')
     expect(siteDeploymentSignal(incomplete, now).label).toBe('상태 조회 불가')
   })
+  it('shows an actual current Production build without requiring older error reasons', async () => {
+    const base = fixtureFetcher()
+    const older = { ...published, id: 'c'.repeat(24), state: 'error', published_at: null, created_at: '2026-10-20T07:00:00Z' }
+    const building = { ...older, id: 'd'.repeat(24), state: 'building', created_at: '2026-10-20T08:00:00Z' }
+    const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (String(input).includes('/deploys?')) return response([building, older, published])
+      if (String(input).includes('/api/v1/deploys/')) throw new Error('Older details unavailable')
+      return base(input, init)
+    })
+    const o = await observeSiteDeployment(site, fetcher, () => now)
+    expect(o.errors).toEqual([])
+    expect(siteDeploymentSignal(o, now).label).toBe('배포 진행 중')
+  })
   it('cache hits do not extend freshness; failed refresh never restores old success', async () => {
     let time = now
     const fetcher = fixtureFetcher()

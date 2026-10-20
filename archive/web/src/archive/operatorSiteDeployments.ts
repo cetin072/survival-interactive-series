@@ -215,7 +215,13 @@ export async function observeSiteDeployment(site: DeploymentSite, fetcher: Fetch
       // The list API omits error_message. Read only recent errors' details to
       // distinguish actual failures from the policy's intentional ignore result.
       // At most 20 bounded GETs, in parallel; never read logs or trigger builds.
-      latestProductionAttempt(deploys, site, result.published, now())
+      const latest = latestProductionAttempt(deploys, site, result.published, now())
+      if (!latest || !['error', 'failed'].includes(latest.state)) {
+        // A current build/ready record is direct evidence. Historical ambiguous
+        // errors must not hide an actual Production build in progress.
+        result.latestProduction = latest
+        return
+      }
       const detailed = await Promise.all(deploys.map(async (d) => {
         if (d.context !== 'production' || d.branch !== 'main' || d.skipped === true
           || !['error', 'failed'].includes(d.state) || Date.parse(d.created_at) < Date.parse(result.published!.published_at!)) return d
