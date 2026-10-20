@@ -1,5 +1,7 @@
 # C04 — 전 지구 지각 연쇄재난 시나리오 V1
 
+> **제4시도 시간순 우선:** 이 문서의 지역/사건 설계는 유지하되 과거 Save 수치와 과거 외부회상 권고는 이력이다. 최신 `S01_FORWARD_CHRONOLOGY_RESTART_V1.md`에 따라 KST 정방향 + 동일 시간대 교차만 허용하고, 독자용 시간 역행 컷은 사용하지 않는다.
+
 **상태: USER_DIRECTION_ACCEPTED / FUTURE_WORLDLINE_DESIGN / NOT_YET_PLAYED**
 **세계선:** WORLDLINE_04 / C04 / S01~S04
 **적용 기준:** 제3시도 기존 몽골 충돌 이후. 충돌 원점, 시간, 창원에서 이미 겪은 감각과 플레이어 자산을 소급 변경하지 않는다.
