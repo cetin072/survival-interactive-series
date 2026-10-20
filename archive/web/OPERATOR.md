@@ -35,6 +35,8 @@ SHA, the last scheduled release run and an ancestor-checked GitHub comparison.
 Only `published_deploy` with the correct site, main branch, Production context,
 ready state, full commit and valid publication time proves a public release.
 An Actions success or a ready but unpublished deploy does not prove publication.
+An explicitly `skipped=true` Netlify record is an ignored build, not a failed
+release attempt. Other Production failures are not hidden by this rule.
 `deploy_inputs` / `deploy_excludes` and the scheduler's test-file exclusions decide
 whether a differing main actually needs a web deployment. Comparisons at GitHub's
 300-file limit or with diverged ancestry fail closed.

@@ -16,6 +16,7 @@ export type SiteReleasePolicy = {
 export type PublicDeploy = {
   id: string; site_id: string; context: string; state: string; branch: string
   commit_ref: string; created_at: string; published_at: string | null
+  skipped?: boolean | null
 }
 export type ScheduledRun = {
   id: number; event: string; head_branch: string; created_at: string
@@ -101,7 +102,9 @@ function pickDeploy(d: PublicDeploy): PublicDeploy {
 
 export function latestProductionAttempt(deploys: PublicDeploy[], site: DeploymentSite, published: PublicDeploy, now: number) {
   if (!Array.isArray(deploys)) throw new Error('DEPLOYS_INVALID')
-  const production = deploys.filter((d) => d.context === 'production' && d.branch === 'main')
+  // Netlify explicitly marks ignored builds as skipped. These are not failed
+  // deployment attempts (ordinary main pushes may intentionally be ignored).
+  const production = deploys.filter((d) => d.context === 'production' && d.branch === 'main' && d.skipped !== true)
   if (deploys.length >= 20 && !production.some((d) => d.id === published.id)) throw new Error('DEPLOYS_INCOMPLETE')
   for (const d of production) {
     if (d.site_id !== site.siteId || !dateValid(d.created_at) || Date.parse(d.created_at) > now

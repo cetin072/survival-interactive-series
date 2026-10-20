@@ -72,6 +72,19 @@ def run(args):
             errors = []
             mode = {'state': 'pending', 'deny': False}
             page.on('pageerror', lambda e: errors.append(str(e)))
+            def live_attempts(response):
+                if not args.live or not response.url.startswith('https://api.netlify.com/api/v1/sites/') or '/deploys?' not in response.url:
+                    return
+                # Sanitized provider evidence only; never dump full site records,
+                # error messages, headers, tokens, hook URLs or function metadata.
+                try:
+                    fields = ['id', 'site_id', 'context', 'branch', 'state', 'skipped', 'created_at', 'published_at', 'commit_ref']
+                    data = response.json()
+                    reports.append({'mode': 'LIVE_PRODUCTION_ATTEMPTS', 'http': response.status,
+                                    'deploys': [{k: d.get(k) for k in fields} for d in data if d.get('context') == 'production']})
+                except Exception:
+                    reports.append({'mode': 'LIVE_PRODUCTION_ATTEMPTS', 'http': response.status, 'readable': False})
+            page.on('response', live_attempts)
 
             def supabase(route):
                 path = urlparse(route.request.url).path
@@ -132,8 +145,8 @@ def run(args):
                         body['files'] = [{'filename': 'archive/web/src/app.tsx' if row[0] == '생존일기' else 'public/app.js' if row[0] == '업무수첩' else 'app/app.js'}]
                 elif '/deploys?' in url:
                     attempt = {**pub, 'id': 'c' * 24, 'created_at': iso(now - timedelta(minutes=1)), 'published_at': None,
-                               'state': 'building' if state == 'building' else 'error'}
-                    body = [attempt, pub] if state in ['building', 'failed'] else [pub]
+                               'state': 'building' if state == 'building' else 'error', 'skipped': state == 'skipped'}
+                    body = [attempt, pub] if state in ['building', 'failed', 'skipped'] else [pub]
                 else:
                     body = {'id': row[2], 'published_deploy': pub}
                 route.fulfill(json=body, headers={'Access-Control-Allow-Origin': '*'})
@@ -147,7 +160,7 @@ def run(args):
             # Synthetic browser session only: real server-side capability is mocked
             # above. This does not claim real login/role integration success.
             page.evaluate('(session) => localStorage.setItem("sb-jgsxpdflgkqroecfjzxq-auth-token", JSON.stringify(session))', synthetic_session())
-            expected = {'pending': '배포 대기', 'building': '배포 진행 중', 'complete': '배포 완료', 'unchanged': '배포할 변경 없음', 'failed': '배포 실패·확인 필요', 'unknown': '상태 조회 불가'}
+            expected = {'pending': '배포 대기', 'building': '배포 진행 중', 'complete': '배포 완료', 'unchanged': '배포할 변경 없음', 'failed': '배포 실패·확인 필요', 'unknown': '상태 조회 불가', 'skipped': '배포 대기'}
             states = ['live'] if args.live else list(expected) + ['partial']
             for state in states:
                 mode['state'] = state

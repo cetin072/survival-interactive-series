@@ -77,6 +77,11 @@ describe('actual Production evidence', () => {
   it('does not treat a Preview build as a Production attempt', () => {
     expect(latestProductionAttempt([{ ...published, id: 'c'.repeat(24), context: 'deploy-preview', created_at: '2026-10-20T08:00:00Z' }, published], site, published, now)).toBeNull()
   })
+  it('does not turn an explicitly skipped Production build into a release failure', () => {
+    const skipped = { ...published, id: 'c'.repeat(24), state: 'error', skipped: true, created_at: '2026-10-20T08:00:00Z' }
+    expect(latestProductionAttempt([skipped, published], site, published, now)).toBeNull()
+    expect(latestProductionAttempt([{ ...skipped, skipped: false }, published], site, published, now)?.state).toBe('error')
+  })
   it('keeps ready-but-unpublished distinct from published', () => {
     const d = { ...published, id: 'c'.repeat(24), created_at: '2026-10-20T08:00:00Z', published_at: null }
     const attempt = latestProductionAttempt([d, published], site, published, now)
