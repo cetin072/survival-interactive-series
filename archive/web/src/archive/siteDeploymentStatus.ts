@@ -156,7 +156,7 @@ export function siteDeploymentSignal(observation: SiteDeploymentObservation | nu
   }
   if (observation.errors.includes('NETLIFY: DEPLOY_DETAIL_INCOMPLETE'))
     return unknown('최근 배포 시도의 실패·정책상 취소 사유가 공개 자료에 없어 현재 배포 상태를 확정할 수 없습니다. 공개 시각과 저장소 비교는 각각 확인된 값입니다.')
-  if (observation.errors.length || !observation.policy || !observation.published || observation.webChanges === null || !observation.mainSha)
+  if (observation.errors.length || !observation.policy || !published || observation.webChanges === null || !observation.mainSha)
     return unknown('필요한 자료를 모두 확인하지 못했습니다. 기술 상세에서 조회 결과를 확인해 주세요.')
   if (attempt) return unknown('게시 확인 중입니다. 빌드 결과와 현재 정식 사이트 공개본이 아직 일치하지 않습니다.')
   if (run?.conclusion === 'skipped' && Date.parse(run.created_at) > Date.parse(published.published_at!))
