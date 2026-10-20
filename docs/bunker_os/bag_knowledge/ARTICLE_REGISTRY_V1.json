@@ -1,0 +1,819 @@
+{
+  "schemaVersion": 1,
+  "catalogTotal": 49,
+  "available": 21,
+  "missing": [
+    "guide-14",
+    "guide-15",
+    "guide-16",
+    "guide-17",
+    "guide-18",
+    "guide-19",
+    "guide-21",
+    "guide-22",
+    "guide-24",
+    "guide-25",
+    "guide-26",
+    "guide-27",
+    "guide-28",
+    "guide-30",
+    "guide-31",
+    "guide-32",
+    "guide-33",
+    "guide-34",
+    "guide-36",
+    "guide-37",
+    "guide-38",
+    "guide-39",
+    "guide-40",
+    "guide-41",
+    "guide-42",
+    "guide-44",
+    "guide-45",
+    "guide-49"
+  ],
+  "articles": {
+    "guide-01": {
+      "catalogId": "guide-01",
+      "catalogName": "방수 서류 파우치",
+      "group": "documents",
+      "category": "documents",
+      "file": "GUIDE_01_WATERPROOF_DOCUMENT_POUCH_DRAFT_V01.md",
+      "slug": "waterproof-document-pouch",
+      "sha256": "6f33dd7d5b8d0bc613318ae8ef98eae60f3aaf68c2de15944b8340c6853f72d4",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_01_WATERPROOF_DOCUMENT_POUCH_DRAFT_V01.md",
+        "blob": "da7e95077e71663f5e47df52efa207afaf008f1c",
+        "sha256": "6f33dd7d5b8d0bc613318ae8ef98eae60f3aaf68c2de15944b8340c6853f72d4"
+      },
+      "readerProjection": {
+        "ready": true
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-02": {
+      "catalogId": "guide-02",
+      "catalogName": "신분증 사본",
+      "group": "documents",
+      "category": "documents",
+      "file": "GUIDE_02_IDENTITY_CARD_COPY_DRAFT_V01.md",
+      "slug": "identity-card-copy",
+      "sha256": "cbd10b1bb7138f3fa4b19c857abe5776d1820261a5a0a9fa54ff7e94900ab8fa",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_02_IDENTITY_CARD_COPY_DRAFT_V01.md",
+        "blob": "fc2293450024dfeb2f90424e89b1ae2e29a6f3e9",
+        "sha256": "cbd10b1bb7138f3fa4b19c857abe5776d1820261a5a0a9fa54ff7e94900ab8fa"
+      },
+      "readerProjection": {
+        "ready": true
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-03": {
+      "catalogId": "guide-03",
+      "catalogName": "가족 비상연락처 메모",
+      "group": "documents",
+      "category": "documents",
+      "file": "GUIDE_03_FAMILY_EMERGENCY_CONTACT_NOTE_DRAFT_V01.md",
+      "slug": "family-emergency-contact-note",
+      "sha256": "5150696dcb59a793b3e1d9fe523abb1e7b6a0de628e1517b0930a6c7c561c9a2",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_03_FAMILY_EMERGENCY_CONTACT_NOTE_DRAFT_V01.md",
+        "blob": "80b76050b1e5684995b26419e2c1e4bf98151ca1",
+        "sha256": "5150696dcb59a793b3e1d9fe523abb1e7b6a0de628e1517b0930a6c7c561c9a2"
+      },
+      "readerProjection": {
+        "ready": true
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-04": {
+      "catalogId": "guide-04",
+      "catalogName": "소액권 현금",
+      "group": "documents",
+      "category": "other",
+      "file": "GUIDE_04_SMALL_DENOMINATION_CASH_DRAFT_V01.md",
+      "slug": "small-denomination-cash",
+      "sha256": "96c9f33c531ca05a75a4448654be5956c40a18df3912216955455c58fdd0f949",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_04_SMALL_DENOMINATION_CASH_DRAFT_V01.md",
+        "blob": "98278f3b967d73915520e549e47c25e707bd4474",
+        "sha256": "96c9f33c531ca05a75a4448654be5956c40a18df3912216955455c58fdd0f949"
+      },
+      "readerProjection": {
+        "ready": true
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-05": {
+      "catalogId": "guide-05",
+      "catalogName": "중요 서류 사본",
+      "group": "documents",
+      "category": "documents",
+      "file": "GUIDE_05_IMPORTANT_DOCUMENT_COPIES_DRAFT_V01.md",
+      "slug": "important-document-copies",
+      "sha256": "3dd68f878bacbe825c26d74e138ec3e08dae46d0408bde797b4564d5f63c02d1",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_05_IMPORTANT_DOCUMENT_COPIES_DRAFT_V01.md",
+        "blob": "ca6e3bb0b1d28d33e0ce250a836d2b595fbc500c",
+        "sha256": "3dd68f878bacbe825c26d74e138ec3e08dae46d0408bde797b4564d5f63c02d1"
+      },
+      "readerProjection": {
+        "ready": true
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-06": {
+      "catalogId": "guide-06",
+      "catalogName": "여분 열쇠",
+      "group": "documents",
+      "category": "other",
+      "file": "GUIDE_06_SPARE_KEYS_DRAFT_V01.md",
+      "slug": "spare-keys",
+      "sha256": "95f793661b2dca08207c4e4ed11f74a1057eb1b9ee9293715971786b9d0fa7e9",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_06_SPARE_KEYS_DRAFT_V01.md",
+        "blob": "3f05c1d4ffa4f907da46e49338cadd3be0a405e3",
+        "sha256": "95f793661b2dca08207c4e4ed11f74a1057eb1b9ee9293715971786b9d0fa7e9"
+      },
+      "readerProjection": {
+        "ready": true
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-07": {
+      "catalogId": "guide-07",
+      "catalogName": "우의",
+      "group": "clothing",
+      "category": "equipment",
+      "file": "GUIDE_07_DRAFT_V01.md",
+      "slug": "raincoat",
+      "sha256": "945515b1b3584828d14b9114d9793eae550e9a601c77081cd1f3bfe39cc0c724",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_07_DRAFT_V01.md",
+        "blob": "1284201f721b4e3c409f53063ec28926d5b9b1a5",
+        "sha256": "945515b1b3584828d14b9114d9793eae550e9a601c77081cd1f3bfe39cc0c724"
+      },
+      "readerProjection": {
+        "ready": true
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-08": {
+      "catalogId": "guide-08",
+      "catalogName": "여벌 속옷",
+      "group": "clothing",
+      "category": "other",
+      "file": "GUIDE_08_DRAFT_V01.md",
+      "slug": "spare-underwear",
+      "sha256": "722b4cb261032c460a6aeb27a57ccecfae57136911a0dc5c1bcee2b725dfa5f6",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_08_DRAFT_V01.md",
+        "blob": "d844870aa33e4f80f0095dcd01767da91ef77c92",
+        "sha256": "722b4cb261032c460a6aeb27a57ccecfae57136911a0dc5c1bcee2b725dfa5f6"
+      },
+      "readerProjection": {
+        "ready": true
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-09": {
+      "catalogId": "guide-09",
+      "catalogName": "여벌 양말",
+      "group": "clothing",
+      "category": "other",
+      "file": "GUIDE_09_DRAFT_V01.md",
+      "slug": "spare-socks",
+      "sha256": "7eb81e0187ce3fb62a0fcb69437af2fd929c90059d0be768967c476e09716639",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_09_DRAFT_V01.md",
+        "blob": "749c515e781b9cdd498a766a93fab0820ff35694",
+        "sha256": "7eb81e0187ce3fb62a0fcb69437af2fd929c90059d0be768967c476e09716639"
+      },
+      "readerProjection": {
+        "ready": false,
+        "reason": "Article links missing"
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-10": {
+      "catalogId": "guide-10",
+      "catalogName": "계절용 보온 의류",
+      "group": "clothing",
+      "category": "other",
+      "file": "GUIDE_10_DRAFT_V01.md",
+      "slug": "seasonal-warm-clothing",
+      "sha256": "9a8dd32fa14aa533ef51b0dd29ecede737acfbcf42922a79bdc5867dc5278fbc",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_10_DRAFT_V01.md",
+        "blob": "5494fc187fe2fe13635a5ac160e943e057081b57",
+        "sha256": "9a8dd32fa14aa533ef51b0dd29ecede737acfbcf42922a79bdc5867dc5278fbc"
+      },
+      "readerProjection": {
+        "ready": false,
+        "reason": "Article links missing"
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-11": {
+      "catalogId": "guide-11",
+      "catalogName": "모자·장갑",
+      "group": "clothing",
+      "category": "other",
+      "file": "GUIDE_11_DRAFT_V01.md",
+      "slug": "seasonal-hat-and-gloves",
+      "sha256": "207c385958fc67c8773ab2cf693e00366ac5cb63850b0e8f80a46982f4f1c592",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_11_DRAFT_V01.md",
+        "blob": "6877a0bfb5a7d09eaf6e4c61a31c342e6b764510",
+        "sha256": "207c385958fc67c8773ab2cf693e00366ac5cb63850b0e8f80a46982f4f1c592"
+      },
+      "readerProjection": {
+        "ready": false,
+        "reason": "Article links missing"
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-12": {
+      "catalogId": "guide-12",
+      "catalogName": "편한 여벌 신발",
+      "group": "clothing",
+      "category": "other",
+      "file": "GUIDE_12_DRAFT_V01.md",
+      "slug": "comfortable-spare-shoes",
+      "sha256": "b8f96deb9dc699e1f33bf9ab14c11317a4982c1de0e868af3ab1a56eb176db7a",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_12_DRAFT_V01.md",
+        "blob": "fd1ca2065e373e5a306e13e003a068ee5424a3c5",
+        "sha256": "b8f96deb9dc699e1f33bf9ab14c11317a4982c1de0e868af3ab1a56eb176db7a"
+      },
+      "readerProjection": {
+        "ready": false,
+        "reason": "Article links missing"
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-13": {
+      "catalogId": "guide-13",
+      "catalogName": "구급함",
+      "group": "medical",
+      "category": "medicine",
+      "file": "GUIDE_13_DRAFT_V01.md",
+      "slug": "first-aid-kit",
+      "sha256": "fa6a731a735b396429fd9e282f07a29e8998aa711fac328b17f744ab1e64383f",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_13_DRAFT_V01.md",
+        "blob": "b5245f03921b2557a6c93c150b6417d236dd642a",
+        "sha256": "fa6a731a735b396429fd9e282f07a29e8998aa711fac328b17f744ab1e64383f"
+      },
+      "readerProjection": {
+        "ready": false,
+        "reason": "Article links missing"
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-14": {
+      "catalogId": "guide-14",
+      "catalogName": "개인 상비약",
+      "group": "medical",
+      "category": "medicine",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-15": {
+      "catalogId": "guide-15",
+      "catalogName": "밴드·거즈",
+      "group": "medical",
+      "category": "medicine",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-16": {
+      "catalogId": "guide-16",
+      "catalogName": "마스크",
+      "group": "medical",
+      "category": "hygiene",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-17": {
+      "catalogId": "guide-17",
+      "catalogName": "의료 보조기기 예비품",
+      "group": "medical",
+      "category": "equipment",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-18": {
+      "catalogId": "guide-18",
+      "catalogName": "처방약 예비품",
+      "group": "medical",
+      "category": "medicine",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-19": {
+      "catalogId": "guide-19",
+      "catalogName": "호루라기",
+      "group": "tools",
+      "category": "equipment",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-20": {
+      "catalogId": "guide-20",
+      "catalogName": "종이 지도",
+      "group": "tools",
+      "category": "documents",
+      "file": "GUIDE_20_DRAFT_V01.md",
+      "slug": "paper-map",
+      "sha256": "e75cf349773c25248186a0332b26c64f5753fabcbc2a461bb79b165a5a7a9fec",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_20_DRAFT_V01.md",
+        "blob": "ef20b1788c277ac855a844f3a984a3e6c0a8d4d6",
+        "sha256": "e75cf349773c25248186a0332b26c64f5753fabcbc2a461bb79b165a5a7a9fec"
+      },
+      "readerProjection": {
+        "ready": false,
+        "reason": "Approved article template changed: guide-20"
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-21": {
+      "catalogId": "guide-21",
+      "catalogName": "다목적 도구",
+      "group": "tools",
+      "category": "equipment",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-22": {
+      "catalogId": "guide-22",
+      "catalogName": "방수 비닐봉투",
+      "group": "tools",
+      "category": "hygiene",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-23": {
+      "catalogId": "guide-23",
+      "catalogName": "작은 수리 테이프",
+      "group": "tools",
+      "category": "equipment",
+      "file": "GUIDE_23_DRAFT_V01.md",
+      "slug": "small-repair-tape",
+      "sha256": "ea4f2c44a55832c745c1b295c3b158d5d29eff368903d014b47647a0a6009c16",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_23_DRAFT_V01.md",
+        "blob": "28762f50c90eee5ef0fd77f57a53635822d8bd52",
+        "sha256": "ea4f2c44a55832c745c1b295c3b158d5d29eff368903d014b47647a0a6009c16"
+      },
+      "readerProjection": {
+        "ready": false,
+        "reason": "Approved article template changed: guide-23"
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-24": {
+      "catalogId": "guide-24",
+      "catalogName": "고무장갑",
+      "group": "tools",
+      "category": "hygiene",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-25": {
+      "catalogId": "guide-25",
+      "catalogName": "생수",
+      "group": "food",
+      "category": "water",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-26": {
+      "catalogId": "guide-26",
+      "catalogName": "간편식",
+      "group": "food",
+      "category": "food",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-27": {
+      "catalogId": "guide-27",
+      "catalogName": "고열량 간식",
+      "group": "food",
+      "category": "food",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-28": {
+      "catalogId": "guide-28",
+      "catalogName": "통조림",
+      "group": "food",
+      "category": "food",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-29": {
+      "catalogId": "guide-29",
+      "catalogName": "식수 정화 도구",
+      "group": "food",
+      "category": "equipment",
+      "file": "GUIDE_29_DRAFT_V01.md",
+      "slug": "portable-water-treatment",
+      "sha256": "4164a5d98b06126cc4883391382a46c4083348c4d65e5e9aefaa970bd884209d",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_29_DRAFT_V01.md",
+        "blob": "b16f488c3e7d1e2ee589146cb59536b22b23cdb5",
+        "sha256": "4164a5d98b06126cc4883391382a46c4083348c4d65e5e9aefaa970bd884209d"
+      },
+      "readerProjection": {
+        "ready": false,
+        "reason": "Approved article template changed: guide-29"
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-30": {
+      "catalogId": "guide-30",
+      "catalogName": "수동 캔따개",
+      "group": "food",
+      "category": "equipment",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-31": {
+      "catalogId": "guide-31",
+      "catalogName": "휴대용 식기",
+      "group": "food",
+      "category": "equipment",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-32": {
+      "catalogId": "guide-32",
+      "catalogName": "화장지",
+      "group": "hygiene",
+      "category": "hygiene",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-33": {
+      "catalogId": "guide-33",
+      "catalogName": "물티슈",
+      "group": "hygiene",
+      "category": "hygiene",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-34": {
+      "catalogId": "guide-34",
+      "catalogName": "손소독제",
+      "group": "hygiene",
+      "category": "hygiene",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-35": {
+      "catalogId": "guide-35",
+      "catalogName": "칫솔·치약",
+      "group": "hygiene",
+      "category": "hygiene",
+      "file": "GUIDE_35_DRAFT_V01.md",
+      "slug": "toothbrush-toothpaste",
+      "sha256": "b6d98c10fbb9080277fe2838f88a18db826847b12ef2a3e38b9e6197bf7f32ad",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_35_DRAFT_V01.md",
+        "blob": "ccdffa69900774305619f0842e75a5b832557806",
+        "sha256": "b6d98c10fbb9080277fe2838f88a18db826847b12ef2a3e38b9e6197bf7f32ad"
+      },
+      "readerProjection": {
+        "ready": false,
+        "reason": "Approved article template changed: guide-35"
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-36": {
+      "catalogId": "guide-36",
+      "catalogName": "수건",
+      "group": "hygiene",
+      "category": "hygiene",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-37": {
+      "catalogId": "guide-37",
+      "catalogName": "개인 위생용품",
+      "group": "hygiene",
+      "category": "hygiene",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-38": {
+      "catalogId": "guide-38",
+      "catalogName": "아기용 위생용품",
+      "group": "hygiene",
+      "category": "hygiene",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-39": {
+      "catalogId": "guide-39",
+      "catalogName": "담요",
+      "group": "sleep",
+      "category": "equipment",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-40": {
+      "catalogId": "guide-40",
+      "catalogName": "단열 매트",
+      "group": "sleep",
+      "category": "equipment",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-41": {
+      "catalogId": "guide-41",
+      "catalogName": "침낭",
+      "group": "sleep",
+      "category": "equipment",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-42": {
+      "catalogId": "guide-42",
+      "catalogName": "작은 방수포",
+      "group": "sleep",
+      "category": "equipment",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-43": {
+      "catalogId": "guide-43",
+      "catalogName": "손전등",
+      "group": "power",
+      "category": "equipment",
+      "file": "GUIDE_43_FLASHLIGHT_DRAFT_V01.md",
+      "slug": "flashlight",
+      "sha256": "00f56044bd38baa0e5bbf56f2f18ff828a0dd3f266521022c4ef9e257113701d",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_43_FLASHLIGHT_DRAFT_V01.md",
+        "blob": "cc99ec3c46097fd00e6142031fa4a4c04fb7f762",
+        "sha256": "00f56044bd38baa0e5bbf56f2f18ff828a0dd3f266521022c4ef9e257113701d"
+      },
+      "readerProjection": {
+        "ready": true
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-44": {
+      "catalogId": "guide-44",
+      "catalogName": "휴대용 라디오",
+      "group": "power",
+      "category": "equipment",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-45": {
+      "catalogId": "guide-45",
+      "catalogName": "보조배터리",
+      "group": "power",
+      "category": "equipment",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    },
+    "guide-46": {
+      "catalogId": "guide-46",
+      "catalogName": "충전 케이블",
+      "group": "power",
+      "category": "equipment",
+      "file": "GUIDE_46_DRAFT_V01.md",
+      "slug": "charging-cable",
+      "sha256": "e0d4f03c7576b2b530ca32025442169d474f7365da2c2bfe46a8348021ae7df8",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_46_DRAFT_V01.md",
+        "blob": "ec03e4e854435ca22af4782e2686ed02e202e4ef",
+        "sha256": "e0d4f03c7576b2b530ca32025442169d474f7365da2c2bfe46a8348021ae7df8"
+      },
+      "readerProjection": {
+        "ready": false,
+        "reason": "Approved article template changed: guide-46"
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-47": {
+      "catalogId": "guide-47",
+      "catalogName": "예비 건전지",
+      "group": "power",
+      "category": "equipment",
+      "file": "GUIDE_47_DRAFT_V01.md",
+      "slug": "spare-batteries",
+      "sha256": "4c301410c7d6130c0aa30223bdfaac2ba7c2e1fc5fa6328f311bcce494e406fa",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_47_DRAFT_V01.md",
+        "blob": "6271eb819eac35758bae5a1d4c776a061ee694fd",
+        "sha256": "4c301410c7d6130c0aa30223bdfaac2ba7c2e1fc5fa6328f311bcce494e406fa"
+      },
+      "readerProjection": {
+        "ready": false,
+        "reason": "Approved article template changed: guide-47"
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-48": {
+      "catalogId": "guide-48",
+      "catalogName": "충전 어댑터",
+      "group": "power",
+      "category": "equipment",
+      "file": "GUIDE_48_DRAFT_V01.md",
+      "slug": "charging-adapter",
+      "sha256": "e2d86f0e2e9a1f4b1eb228af6aef98ead7dd9509ff77339c424527dc1b4b348b",
+      "source": {
+        "origin": "GITHUB",
+        "repository": "cetin072/survival-interactive-series",
+        "branch": "feat/bag-side-item-knowledge-template-v1",
+        "commit": "c1029820248224c27ea34efc32537c2b8ad169fa",
+        "file": "GUIDE_48_DRAFT_V01.md",
+        "blob": "292f34c7ee28008d51f3d192e439ae660977ea0a",
+        "sha256": "e2d86f0e2e9a1f4b1eb228af6aef98ead7dd9509ff77339c424527dc1b4b348b"
+      },
+      "readerProjection": {
+        "ready": false,
+        "reason": "Approved article template changed: guide-48"
+      },
+      "storage": "SAVED_IN_REPOSITORY"
+    },
+    "guide-49": {
+      "catalogId": "guide-49",
+      "catalogName": "휴대용 태양광 패널",
+      "group": "power",
+      "category": "equipment",
+      "file": null,
+      "slug": null,
+      "sha256": null,
+      "source": null,
+      "storage": "SOURCE_NOT_RECEIVED"
+    }
+  }
+}

@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {PUBLISHED_ITEMS} from '../../web/public/bag-lab/knowledge-links.mjs';
 import {CATALOG} from '../../web/public/bag-lab/catalog.mjs';
 import {articleFromDraft} from './bag-item-article.mjs';
+import {manuscriptRegistry,verifyPublicationSource} from './bag-item-registry.mjs';
 
 const root=new URL('../../../',import.meta.url);
 const drafts=new URL('docs/bunker_os/bag_knowledge/',root);
@@ -15,6 +16,7 @@ export const publicationFiles=Object.freeze([
 
 export async function approvedBagArticles(){
   const queue=JSON.parse(await readFile(publicationFiles[0],'utf8'));
+  const registry=await manuscriptRegistry();
   const found=new Set(),slugs=new Set(),result=[];
   for(const [id,href] of Object.entries(PUBLISHED_ITEMS)){
     if(!/^guide-(0[1-9]|[1-4][0-9])$/.test(id)||found.has(id))throw new Error('BAG_PUBLICATION_INVALID_ID:'+id);
@@ -23,6 +25,7 @@ export async function approvedBagArticles(){
       throw new Error('BAG_PUBLICATION_APPROVAL_MISSING:'+id);
     if(!/^GUIDE_[A-Z0-9_]+\.md$/.test(item.file))throw new Error('BAG_PUBLICATION_INVALID_SOURCE:'+id);
     const source=new URL(item.file,drafts);
+    verifyPublicationSource(id,item,registry.articles[id]);
     const raw=await readFile(source,'utf8');
     const article=articleFromDraft(raw,id);
     const expected='/knowledge/bag/'+article.slug+'/';
@@ -34,7 +37,7 @@ export async function approvedBagArticles(){
     if(!summary||summary.length>320)throw new Error('BAG_PUBLICATION_INVALID_SUMMARY:'+id);
     found.add(id);slugs.add(article.slug);
     result.push({id,slug:article.slug,href,title:article.title,summary,group:catalog.group,keyword:catalog.name,
-      publishedAt:item.approvedAt??'2026-10-13',article,source:fileURLToPath(source)});
+      publishedAt:item.approvedAt??'2026-10-13',sourceSha256:item.sourceSha256,article,source:fileURLToPath(source)});
   }
   for(const [id,item] of Object.entries(queue.articles)){
     if(item.state==='USER_APPROVED_FOR_PUBLICATION'&&!found.has(id))

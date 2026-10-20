@@ -39,7 +39,7 @@ if(items.length){
     +'<p><a href="/knowledge/">모든 생존지식 보기 →</a></p>'
     +'</main></div></body></html>';
   await writeFile(new URL('index.html',articleFolder),listing,'utf8');
-  await writeFile(new URL('index.json',articleFolder),JSON.stringify(items.map(({id,title,summary,href})=>({id,title,summary,href})),null,2)+'\n','utf8');
+  await writeFile(new URL('index.json',articleFolder),JSON.stringify(items.map(({id,title,summary,href,sourceSha256})=>({id,title,summary,href,sourceSha256})),null,2)+'\n','utf8');
   const indexPath=new URL('knowledge/index.html',dist);
   const current=await readFile(indexPath,'utf8');
   const terminator='</div></main>';

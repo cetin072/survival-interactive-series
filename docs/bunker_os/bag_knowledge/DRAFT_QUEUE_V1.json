@@ -9,49 +9,57 @@
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_01_WATERPROOF_DOCUMENT_POUCH_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "sourceSha256": "6f33dd7d5b8d0bc613318ae8ef98eae60f3aaf68c2de15944b8340c6853f72d4"
     },
     "guide-02": {
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_02_IDENTITY_CARD_COPY_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "sourceSha256": "cbd10b1bb7138f3fa4b19c857abe5776d1820261a5a0a9fa54ff7e94900ab8fa"
     },
     "guide-03": {
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_03_FAMILY_EMERGENCY_CONTACT_NOTE_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "sourceSha256": "5150696dcb59a793b3e1d9fe523abb1e7b6a0de628e1517b0930a6c7c561c9a2"
     },
     "guide-04": {
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_04_SMALL_DENOMINATION_CASH_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "sourceSha256": "96c9f33c531ca05a75a4448654be5956c40a18df3912216955455c58fdd0f949"
     },
     "guide-05": {
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_05_IMPORTANT_DOCUMENT_COPIES_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "sourceSha256": "3dd68f878bacbe825c26d74e138ec3e08dae46d0408bde797b4564d5f63c02d1"
     },
     "guide-06": {
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_06_SPARE_KEYS_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "sourceSha256": "95f793661b2dca08207c4e4ed11f74a1057eb1b9ee9293715971786b9d0fa7e9"
     },
     "guide-43": {
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_43_FLASHLIGHT_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "sourceSha256": "00f56044bd38baa0e5bbf56f2f18ff828a0dd3f266521022c4ef9e257113701d"
     },
     "guide-07": {
       "state": "USER_APPROVED_FOR_PUBLICATION",
       "file": "GUIDE_07_DRAFT_V01.md",
       "approvedAt": "2026-10-13",
-      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST"
+      "approvalEvidence": "User explicitly approved all eight item articles for public release in chat on 2026-10-13 KST",
+      "sourceSha256": "945515b1b3584828d14b9114d9793eae550e9a601c77081cd1f3bfe39cc0c724"
     }
   },
   "reviewEvidence": {

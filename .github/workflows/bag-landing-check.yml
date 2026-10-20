@@ -9,6 +9,7 @@ on:
       - 'archive/web/public/bag-lab/pwa.mjs'
       - 'archive/scripts/lib/bag-landing.test.mjs'
       - 'archive/scripts/check-bag-knowledge.py'
+      - 'archive/scripts/check-bag-manuscripts.py'
       - 'archive/scripts/build-bag-knowledge-preview.mjs'
       - 'archive/scripts/lib/bag-item-article.mjs'
       - 'docs/bunker_os/bag_knowledge/**'
@@ -36,7 +37,7 @@ jobs:
           python -m pip install playwright==1.55.0
           python -m playwright install --with-deps chromium
       - name: Landing contract and unchanged Alpha models
-        run: node --test archive/scripts/lib/bag-landing.test.mjs archive/scripts/lib/bag-side-*.test.mjs
+        run: node --test archive/scripts/lib/bag-landing.test.mjs archive/scripts/lib/bag-side-*.test.mjs archive/scripts/lib/bag-item-*.test.mjs
       - name: Build real before snapshot at Stage 4 source SHA
         run: |
           git worktree add --detach /tmp/bag-landing-before 7837b3deca5e2db29775fcc327ff6864a7145b6f
@@ -55,6 +56,7 @@ jobs:
           python archive/scripts/check-bag-landing.py
           python archive/scripts/check-bag-install-share.py
           python archive/scripts/check-bag-knowledge.py
+          python archive/scripts/check-bag-manuscripts.py
           python archive/scripts/check-bag-side-demo.py
           python archive/scripts/check-bag-side-alpha.py
           python archive/scripts/check-bag-side-presets.py

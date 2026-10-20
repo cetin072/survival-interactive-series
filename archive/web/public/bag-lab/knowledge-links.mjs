@@ -17,6 +17,9 @@ export function knowledgeFor(entry){
 export function publishedKnowledgeForItem(item){
   if(!item||typeof item.name!=='string'||typeof item.id!=='string')return null;
   const normalized=item.name.normalize('NFC').trim().toLowerCase();
-  const entry=CATALOG.find(e=>item.id==='catalog-'+e.id||e.name.normalize('NFC').toLowerCase()===normalized);
+  // A stable catalog ID wins even when the user renames the item. Exact-name
+  // recognition is kept only for pre-catalog/custom V1 records without that ID.
+  const entry=item.id.startsWith('catalog-')?CATALOG.find(e=>item.id==='catalog-'+e.id):
+    CATALOG.find(e=>e.name.normalize('NFC').toLowerCase()===normalized);
   return entry?PUBLISHED_ITEMS[entry.id]??null:null;
 }

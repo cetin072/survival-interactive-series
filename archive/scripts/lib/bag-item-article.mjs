@@ -30,7 +30,7 @@ export function articleFromDraft(raw,id){
   if(!match)throw new Error('Article front matter missing');
   const field=key=>match[1].match(new RegExp('^'+key+': (.+)$','m'))?.[1];
   const entry=CATALOG.find(e=>e.id===id),slug=field('slug');
-  if(!entry||field('catalogId')!==id||field('catalogName')!==entry.name||field('group')!==entry.group||!/^[a-z0-9-]+$/.test(slug))throw new Error('Article/catalog mismatch');
+  if(!entry||field('catalogId')!==id||field('catalogName')!==entry.name||field('group')!==entry.group||field('category')!==entry.category||!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug))throw new Error('Article/catalog mismatch');
   const text=match[2].trimStart(),title=text.match(/^# (.+)$/m)?.[1];
   const sections=[...text.matchAll(/^## (.+)\n([\s\S]*?)(?=^## |$(?![\s\S]))/gm)];
   if(JSON.stringify(sections.map(s=>s[1]))!==JSON.stringify(headings))throw new Error('Approved article template changed: '+id);
