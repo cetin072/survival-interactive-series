@@ -49,6 +49,9 @@ test('real Git main drift fixture reapplies approved immutable data on new main;
     const git=(...args)=>execFileSync('git',args,{cwd:base,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim()
     git('init','-b','main');git('config','user.name','C3 fixture');git('config','user.email','fixture@example.test');git('config','core.autocrlf','false')
     const data=await loadKnowledge(base)
+    const fixtureBriefId=Array.from({length:900},(_,index)=>'K-'+String(999-index).padStart(3,'0'))
+      .find(id=>!data.briefs.some(brief=>brief.id===id) && !data.evidence.has(id))
+    assert.ok(fixtureBriefId,'an unused synthetic brief ID is required')
     const [policy,config,editorial]=await Promise.all(['knowledge/automation/worker-policy.json','knowledge/automation/config.json','docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V1.md'].map(p=>readFile(join(base,p))))
     const candidate=structuredClone(data.candidates.find(c=>c.brief_id==='K-004'))
     const evidence=structuredClone(data.evidence.get('K-004')),brief=structuredClone(data.briefs.find(b=>b.id==='K-004'))
@@ -69,10 +72,10 @@ test('real Git main drift fixture reapplies approved immutable data on new main;
     const job={job_id:'11111111-1111-4111-8111-111111111111',status:'HUMAN_REVIEW',source_kind:'PUBLIC_READER',source_ref:source.ref,source_sha256:source.sha256,
       work_key:`PUBLIC_READER:${source.ref}:${source.sha256}`,policy_sha256:hashPolicyBytes(policy,config,editorial),policy_pin:{sha256:hashPolicyBytes(policy,config,editorial)},submitted_at:'2026-10-05T00:00:00Z',
       final_pr_number:999,final_head_ref:'knowledge/worker/semantic-fixture',semantic_result_sha256:'a'.repeat(64)}
-    candidate.id=reservedCandidateId(`PUBLIC_READER:${job.source_ref}:${job.source_sha256}`);candidate.brief_id='K-015';candidate.status='BRIEF_PROPOSED'
-    evidence.brief_id='K-015';brief.id='K-015';brief.slug='main-drift-fixture';brief.status='READY';brief.publication_policy='HUMAN_APPROVED';brief.semantic_qa_status='PASS'
+    candidate.id=reservedCandidateId(`PUBLIC_READER:${job.source_ref}:${job.source_sha256}`);candidate.brief_id=fixtureBriefId;candidate.status='BRIEF_PROPOSED'
+    evidence.brief_id=fixtureBriefId;brief.id=fixtureBriefId;brief.slug='main-drift-fixture';brief.status='READY';brief.publication_policy='HUMAN_APPROVED';brief.semantic_qa_status='PASS'
     candidate.question=brief.title;evidence.question=brief.title
-    job.semantic_context={source,policy:{publication_mode:data.config.publication_mode,auto_publish_enabled:data.config.auto_publish_enabled},target:{brief_id:'K-015',candidate_id:candidate.id}}
+    job.semantic_context={source,policy:{publication_mode:data.config.publication_mode,auto_publish_enabled:data.config.auto_publish_enabled},target:{brief_id:fixtureBriefId,candidate_id:candidate.id}}
     job.semantic_result={version:'knowledge-semantic-result-v1',job_id:job.job_id,decision:'HUMAN_REVIEW',code:'FIXTURE_REVIEW',note:'Synthetic package review',candidate,evidence,brief}
     git('add','.');git('commit','-m','baseline');const original=git('rev-parse','HEAD')
     await writeFile(join(base,'unrelated-main.txt'),'other automation\n');git('add','unrelated-main.txt');git('commit','-m','unrelated automation');const current=git('rev-parse','HEAD')
@@ -95,9 +98,9 @@ test('real Git main drift fixture reapplies approved immutable data on new main;
     await applyApprovedPackageOnMain({inspection,packageData,base})
     assert.equal(git('rev-parse','HEAD'),current)
     assert.equal(await readFile(join(base,'unrelated-main.txt'),'utf8'),'other automation\n')
-    assert.equal(JSON.parse(await readFile(join(base,'knowledge/content/briefs/K-015.json'))).title,brief.title)
-    const gate=await checkHumanApprovedRelease(await loadKnowledge(base),{base,briefIds:['K-015'],changedFiles:[
-      'knowledge/content/briefs/K-015.json',`knowledge/content/candidates/${candidate.id}.json`,'knowledge/content/evidence/K-015.json','knowledge/automation/runtime-state.json']})
+    assert.equal(JSON.parse(await readFile(join(base,'knowledge/content/briefs',fixtureBriefId+'.json'))).title,brief.title)
+    const gate=await checkHumanApprovedRelease(await loadKnowledge(base),{base,briefIds:[fixtureBriefId],changedFiles:[
+      'knowledge/content/briefs/'+fixtureBriefId+'.json',`knowledge/content/candidates/${candidate.id}.json`,'knowledge/content/evidence/'+fixtureBriefId+'.json','knowledge/automation/runtime-state.json']})
     assert.equal(gate.decision,'HUMAN_APPROVED_ELIGIBLE',JSON.stringify(gate))
     await assert.rejects(applyApprovedPackageOnMain({inspection,packageData,base}),/SEMANTIC_TARGET_BRIEF_ALREADY_EXISTS/)
   } finally {await rm(base,{recursive:true,force:true})}
