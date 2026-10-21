@@ -1,6 +1,7 @@
 // One-time read-only K-015 diagnostic. GHA temporary checkout only.
 // To be removed before main merge. Never call publication/decision/merge RPCs.
-import { resolve } from 'node:path'
+import { resolve, join } from 'node:path'
+import { execFileSync } from 'node:child_process'
 import { postSupabaseRpc, applySemanticPackage } from './lib/knowledge-semantic-jobs.mjs'
 import { validateApprovedPackage } from './knowledge-review-revalidate.mjs'
 import { verifyPins } from './knowledge-semantic-finalize.mjs'
@@ -36,6 +37,18 @@ try {
   stage='APPLY_SAVED_DRAFT'
   await applyApprovedOperatorDraft({projectUrl,serviceRoleKey,jobId:j.job_id,
     revision:r.payload.operator_draft_revision,draftSha256:r.payload.operator_draft_sha256,briefId:'K-015',base})
+  const run=(cmd,args,cwd=base)=>execFileSync(cmd,args,{cwd,stdio:['ignore','pipe','pipe'],encoding:'utf8',timeout:120000})
+  const web=join(base,'archive/web')
+  stage='NPM_CI'; run('npm',['ci'],web)
+  stage='KNOWLEDGE_BUILD'; run('npm',['run','knowledge:build'],web)
+  stage='KNOWLEDGE_TEST'; run('npm',['run','knowledge:test'],web)
+  stage='KNOWLEDGE_CHECK'; run('npm',['run','knowledge:check'],web)
+  stage='PUBLISH_PREPARE'; run('node',['archive/scripts/knowledge-human-approved-prepare.mjs','--brief','K-015',
+    '--base','HEAD','--head','HEAD','--date','2026-10-21'],base)
+  stage='WEB_TEST';run('npm',['test'],web)
+  stage='WEB_BUILD';run('npm',['run','build'],web)
+  stage='RELEASE_GATE';run('node',['archive/scripts/knowledge-human-approved-release-check.mjs',
+    '--brief','K-015','--base','HEAD','--head','HEAD'],base)
   console.log(JSON.stringify({diagnostic:'PASS_ALL_LOCAL_STAGES'}))
 } catch (e) {
   const msg=String(e?.message??'UNKNOWN')
