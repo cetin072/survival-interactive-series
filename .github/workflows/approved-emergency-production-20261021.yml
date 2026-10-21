@@ -12,7 +12,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: emergency-production-survival-2026-10-21
+  group: archive-production-release
   cancel-in-progress: false
 
 jobs:
