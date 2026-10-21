@@ -4,8 +4,6 @@ on:
     branches: [main]
     paths:
       - 'archive/scripts/scheduled-netlify-release.mjs'
-      - 'archive/scripts/one-time-approved-release-20261021.mjs'
-      - 'archive/scripts/lib/one-time-approved-release-20261021.test.mjs'
       - 'archive/scripts/lib/scheduled-netlify-release.test.mjs'
       - 'archive/automation/release-policy.json'
       - 'archive/web/netlify.toml'
@@ -23,4 +21,3 @@ jobs:
         with:
           node-version: 24
       - run: node --test archive/scripts/lib/scheduled-netlify-release.test.mjs
-      - run: node --test archive/scripts/lib/one-time-approved-release-20261021.test.mjs
