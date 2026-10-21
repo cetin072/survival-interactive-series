@@ -75,3 +75,18 @@ export const knowledgeBucketLabel: Record<Exclude<KnowledgeFilter, 'ALL'>, strin
   HELD: '보관',
   PUBLISHED: '게시됨',
 }
+
+
+// The dashboard's general review queue and the C knowledge editor share the
+// same existing review_item_id. Only use verified UUIDs to construct local URLs.
+export function knowledgeReviewJobMap(inbox: KnowledgeInbox | null): Record<string, string> {
+  const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i
+  const result: Record<string, string> = {}
+  for (const item of inbox?.items ?? []) {
+    if (typeof item.review_item_id === 'string' && uuid.test(item.review_item_id)
+      && typeof item.job_id === 'string' && uuid.test(item.job_id)) {
+      result[item.review_item_id] = item.job_id
+    }
+  }
+  return result
+}
