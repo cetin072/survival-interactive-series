@@ -26,14 +26,16 @@ function supabaseHeaders(serviceRoleKey) {
   }
 }
 
-export async function listApprovedReview({ projectUrl, serviceRoleKey, fetchImpl = fetch }) {
+export async function listApprovedReview({ projectUrl, serviceRoleKey, itemId = process.env.REVIEW_ITEM_ID, fetchImpl = fetch }) {
   required(projectUrl, 'ARCHIVE_SUPABASE_URL_REQUIRED')
   required(serviceRoleKey, 'ARCHIVE_SUPABASE_SERVICE_ROLE_KEY_REQUIRED')
-  const data = await jsonFetch(`${projectUrl.replace(/\/$/, '')}/rest/v1/rpc/archive_worker_list_approved_reviews`, {
+  if (itemId && !itemPattern.test(itemId)) throw new Error('REVIEW_ITEM_ID_INVALID')
+  const data = await jsonFetch(`${projectUrl.replace(/\/$/, '')}/rest/v1/rpc/${itemId ? 'archive_worker_get_approved_review' : 'archive_worker_list_approved_reviews'}`, {
     method: 'POST',
     headers: supabaseHeaders(serviceRoleKey),
-    body: JSON.stringify({ p_limit: 1 }),
+    body: JSON.stringify(itemId ? { p_item_id: itemId } : { p_limit: 1 }),
   }, fetchImpl)
+  if (itemId) return data
   if (!Array.isArray(data)) throw new Error('APPROVED_REVIEW_RESPONSE_INVALID')
   return data[0] ?? null
 }
@@ -157,7 +159,8 @@ export async function inspectApprovedReview({ projectUrl, serviceRoleKey, github
     if (!expected) return { status: 'BLOCKED', reason: 'REVIEW_PR_HEAD_CHANGED', item_id: item.id, decided_at: item.decided_at }
     if (pr.state === 'closed' && pr.merged_at && semantic.prepared_heads?.includes(pr.head.sha) && shaPattern.test(pr.merge_commit_sha ?? '')) {
       return { status: 'RECOVER_CONSUMED', item_id: item.id, decided_at: item.decided_at, brief_id: identity.briefId,
-        prepared_head_sha: pr.head.sha, merge_sha: pr.merge_commit_sha }
+        prepared_head_sha: pr.head.sha, merge_sha: pr.merge_commit_sha,
+        pr_number: identity.prNumber, head_ref: identity.headRef, current_main: currentMain }
     }
     if (pr.state !== 'open') return { status: 'BLOCKED', reason: 'REVIEW_PR_NOT_OPEN', item_id: item.id, decided_at: item.decided_at }
     return { status: 'REVALIDATE_PACKAGE', item_id: item.id, decided_at: item.decided_at, brief_id: identity.briefId,

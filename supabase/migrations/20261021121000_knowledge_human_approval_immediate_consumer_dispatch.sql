@@ -74,7 +74,7 @@ begin
     end if;
     select net.http_post(
       url:='https://api.github.com/repos/cetin072/survival-interactive-series/actions/workflows/knowledge-review-consumer.yml/dispatches',
-      body:=pg_catalog.jsonb_build_object('ref','main'),
+      body:=pg_catalog.jsonb_build_object('ref','main','inputs',jsonb_build_object('review_item_id',review_row.id::text)),
       headers:=pg_catalog.jsonb_build_object(
         'Accept','application/vnd.github+json',
         'Authorization','Bearer ' || github_token,

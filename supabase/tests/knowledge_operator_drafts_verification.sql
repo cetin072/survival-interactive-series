@@ -18,6 +18,8 @@ declare
   v_result jsonb;
   v_draft jsonb;
   v_original_sha text;
+  v_receipt_id uuid;
+  v_decided_at timestamptz;
 begin
   if has_function_privilege('anon','public.archive_operator_knowledge_draft_get(uuid)','EXECUTE')
      or has_function_privilege('anon','public.archive_operator_knowledge_draft_save(uuid,integer,jsonb)','EXECUTE')
@@ -184,6 +186,45 @@ begin
   exception when no_data_found then
     if sqlerrm <> 'KNOWLEDGE_OPERATOR_DRAFT_BINDING_NOT_FOUND' then raise; end if;
   end;
+  if to_regprocedure('public.archive_worker_retry_validated_review(uuid,timestamptz,uuid,text,text)') is not null then
+    v_decided_at := (v_published->>'decided_at')::timestamptz;
+    begin
+      perform public.archive_worker_record_review_consumption((v_review->>'id')::uuid,v_decided_at,'CONSUMED',
+        jsonb_build_object('brief_id','K-998','prepared_sha',repeat('c',40),'merge_sha',repeat('d',40)));
+      raise exception 'merge-only receipt incorrectly marked publication complete';
+    exception when others then
+      if sqlerrm <> 'KNOWLEDGE_PUBLICATION_NOT_VERIFIED' then raise; end if;
+    end;
+    if (select status from survival_ops.knowledge_semantic_jobs where job_id=v_job_id)<>'HUMAN_REVIEW' then
+      raise exception 'premature PUBLISHED transition'; end if;
+    perform public.archive_worker_record_review_consumption((v_review->>'id')::uuid,v_decided_at,'BLOCKED',
+      '{"reason":"CURRENT_MAIN_MACHINE_VALIDATION_FAILED"}'::jsonb);
+    select id into v_receipt_id from survival_ops.archive_review_consumption_receipts where item_id=(v_review->>'id')::uuid;
+    if public.archive_worker_get_approved_review((v_review->>'id')::uuid) is not null then
+      raise exception 'blocked approval was returned'; end if;
+    begin
+      perform public.archive_worker_retry_validated_review((v_review->>'id')::uuid,v_decided_at,v_receipt_id,repeat('f',64),repeat('1',40));
+      raise exception 'wrong draft permitted retry';
+    exception when others then
+      if sqlerrm <> 'KNOWLEDGE_RETRY_DRAFT_CHANGED' then raise; end if;
+    end;
+    perform public.archive_worker_retry_validated_review((v_review->>'id')::uuid,v_decided_at,v_receipt_id,v_saved->>'draft_sha256',repeat('1',40));
+    if not exists(select 1 from survival_ops.knowledge_review_retry_audits where receipt_id=v_receipt_id
+      and previous_receipt->>'outcome'='BLOCKED' and previous_receipt#>>'{result,reason}'='CURRENT_MAIN_MACHINE_VALIDATION_FAILED') then
+      raise exception 'blocked history lost'; end if;
+    if public.archive_worker_get_approved_review((v_review->>'id')::uuid)->>'id' is distinct from v_review->>'id' then
+      raise exception 'exact approved retry not available'; end if;
+    begin
+      perform public.archive_worker_retry_validated_review((v_review->>'id')::uuid,v_decided_at,v_receipt_id,v_saved->>'draft_sha256',repeat('1',40));
+      raise exception 'repeated recovery permitted';
+    exception when others then
+      if sqlerrm <> 'KNOWLEDGE_RETRY_RECEIPT_CHANGED' then raise; end if;
+    end;
+    if has_function_privilege('authenticated','public.archive_worker_retry_validated_review(uuid,timestamptz,uuid,text,text)','EXECUTE')
+      or has_table_privilege('service_role','survival_ops.knowledge_review_retry_audits','UPDATE') then
+      raise exception 'retry audit privilege leak'; end if;
+  end if;
+
 end
 $verify$;
 

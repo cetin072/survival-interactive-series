@@ -142,6 +142,26 @@ export async function runCycle({ config, env, api, snapshot, head, files, prefli
     slot_index: schedule.slot.index, issued_at: now().toISOString() }) };
 }
 
+// A static deployment replaces the whole site. Refuse any other pending authored
+// Knowledge brief or Reader content, even if it was merged into main.
+export async function assertReviewedContentScope(config, payload, publishedSha, fetcher = fetch) {
+  const response = await fetcher('https://api.github.com/repos/' + config.repository
+    + '/compare/' + publishedSha + '...' + payload.merge_sha, {
+      headers: { Accept: 'application/vnd.github+json' }, signal: AbortSignal.timeout(30000),
+    });
+  if (!response.ok) throw Error('HUMAN_APPROVED_SCOPE_UNAVAILABLE');
+  const comparison = await response.json(), files = comparison.files;
+  if (!['ahead', 'identical'].includes(comparison.status) || !Array.isArray(files) || files.length >= 300) throw Error('HUMAN_APPROVED_SCOPE_INCOMPLETE');
+  for (const file of files) {
+    const paths = [file.filename, file.previous_filename].filter(Boolean);
+    if (paths.some(path => path.startsWith('archive/content/')
+      || (path.startsWith('knowledge/content/briefs/') && path !== 'knowledge/content/briefs/' + payload.brief_id + '.json'))) {
+      throw Error('HUMAN_APPROVED_OTHER_CONTENT_PENDING');
+    }
+  }
+  return true;
+}
+
 export async function verifyHumanApprovedReleaseProof(config, payload, fetcher = fetch) {
   const root = 'https://api.github.com/repos/' + config.repository;
   const headers = { 'Accept': 'application/vnd.github+json', 'User-Agent': 'survival-human-knowledge-release-guard' };
@@ -170,6 +190,7 @@ export async function guard(config, env = process.env, { fetcher = fetch, now = 
   if (published.commit_ref === payload.source_main_sha) throw new Error('ALREADY_PUBLISHED');
   if (payload.version === 2) {
     await verifyHumanApprovedReleaseProof(config, payload, fetcher);
+    await assertReviewedContentScope(config, payload, published.commit_ref, fetcher);
   } else if (new Date(now) - new Date(published.published_at) < 48 * HOUR) {
     throw new Error('WAITING_WINDOW');
   }

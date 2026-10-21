@@ -68,6 +68,7 @@ jobs:
         run: |
           node --test ../scripts/lib/knowledge-review-sync.test.mjs
           node --test ../scripts/lib/knowledge-review-consumer.test.mjs
+          node --test ../scripts/lib/knowledge-human-reviewed-release.test.mjs
           node --test ../scripts/lib/knowledge-human-approved.test.mjs
           node --test ../scripts/lib/knowledge-operator-draft-apply.test.mjs
       - name: Syntax-check Knowledge publication executors

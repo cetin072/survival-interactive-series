@@ -183,7 +183,7 @@ test('manual human-reviewed release bypasses 48h only with a merged exact PR and
     head: { ref: 'knowledge/worker/test', repo: { full_name: config.repository } },
     body: '<!-- knowledge-worker-phase-v1:PUBLICATION_HANDOFF -->', title: 'knowledge: prepare K-015' };
   const fastFetcher = async (url) => ({ ok: true, json: async () => (
-    url.includes('/sites/') ? { ...snapshot, published_deploy: { ...published, published_at: '2026-10-21T07:00:00Z' } }
+    url.includes('/compare/') ? {status:'ahead',files:[]} : url.includes('/sites/') ? { ...snapshot, published_deploy: { ...published, published_at: '2026-10-21T07:00:00Z' } }
       : url.includes('/pulls/') ? pr : { object: { sha: b } }
   ) });
   const tmp = mkdtempSync(join(tmpdir(), 'human-release-guard-')), marker = join(tmp, 'marker.json');
