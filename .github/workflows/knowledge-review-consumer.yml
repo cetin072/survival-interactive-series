@@ -17,7 +17,6 @@ concurrency:
 
 jobs:
   consume:
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -488,23 +487,3 @@ jobs:
         if: steps.inspect.outputs.status == 'NOOP'
         run: echo "No approved human-review item is waiting."
 
-  diagnose-k015-temporary:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/knowledge-immediate-human-approval-20261021'
-    runs-on: ubuntu-latest
-    timeout-minutes: 7
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
-          fetch-depth: 1
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: archive/web/package-lock.json
-      - name: Read-only original approved package diagnostic
-        env:
-          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
-          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
-        run: node archive/scripts/knowledge-human-review-diagnose-temp.mjs
