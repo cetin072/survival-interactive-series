@@ -68,10 +68,10 @@ export function validateHook(config, env, now) {
     // exact-head, previously human-approved Knowledge PR.
     if (payload.mode !== 'HUMAN_APPROVED_KNOWLEDGE'
       || payload.merge_sha !== payload.source_main_sha
-      || !/^K-\\d{3,}$/.test(payload.brief_id ?? '')
+      || !/^K-\d{3,}$/.test(payload.brief_id ?? '')
       || !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(payload.review_item_id ?? '')
       || !Number.isSafeInteger(payload.pr_number) || payload.pr_number < 1
-      || !/^\\d+$/.test(String(payload.run_id))) {
+      || !/^\d+$/.test(String(payload.run_id))) {
       throw new Error('HUMAN_APPROVED_HOOK_INVALID');
     }
     return payload;
