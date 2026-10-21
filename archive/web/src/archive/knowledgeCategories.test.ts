@@ -3,10 +3,10 @@ import { groupKnowledge } from './knowledgeCategories'
 import { publishedKnowledgeGuides, type KnowledgeGuide } from './knowledgeGuide'
 
 describe('STEP 3-2 public Knowledge shelf', () => {
-  it('groups the existing public Knowledge exactly once into four stable categories', () => {
+  it('preserves four core categories while allowing new topics in other', () => {
     const groups = groupKnowledge(publishedKnowledgeGuides)
     // Automation C keeps publishing: category identity stays fixed, counts don't.
-    expect(groups.map((group) => [group.id, group.label])).toEqual([
+    expect(groups.filter((group) => group.id !== 'other').map((group) => [group.id, group.label])).toEqual([
       ['household', '생활 대비'],
       ['information', '연락·정보'],
       ['evacuation', '대피·이동'],
