@@ -3,6 +3,7 @@ import type { User } from '@supabase/supabase-js'
 import { OperatorVisualMetadata } from './OperatorVisualMetadata'
 import { OperatorKnowledgeInbox } from './OperatorKnowledgeInbox'
 import { OperatorKnowledgeDetail } from './OperatorKnowledgeDetail'
+import { knowledgeReviewJobMap, type KnowledgeInbox } from './knowledgeOperatorModel'
 import { OperatorIllustrationVault } from './OperatorIllustrationVault'
 import { OperatorBunkerOsDashboard } from './OperatorBunkerOsDashboard'
 import type { RoadmapLog } from './operatorRoadmapModel'
@@ -41,6 +42,7 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [inbox, setInbox] = useState<Inbox>(emptyInbox)
+  const [knowledgeReviewJobs, setKnowledgeReviewJobs] = useState<Record<string, string>>({})
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null)
   const [roadmapLogs, setRoadmapLogs] = useState<RoadmapLog[] | null>(null)
   const [roadmapError, setRoadmapError] = useState('')
@@ -62,16 +64,20 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
     setSiteDeployments(null)
     setBusy(true); setRefreshing(true); setError(''); setStatusError(''); setRoadmapError('')
     try {
-      const [inboxResult, systemResult, release, deploy, roadmapResult] = await Promise.all([
+      const [inboxResult, systemResult, release, deploy, roadmapResult, knowledgeInboxResult] = await Promise.all([
         supabaseClient.rpc('archive_operator_review_inbox'),
         supabaseClient.rpc('archive_operator_system_status'),
         readJson<ReleaseMarker>('/release/production.json'),
         readJson<DeployMeta>('/deploy-meta.json'),
         // Existing permission-checked Bunker OS RPC, without new DB or scheduler.
         supabaseClient.rpc('archive_operator_bunker_os_logs', { p_status: null, p_limit: 100 }),
+        supabaseClient.rpc('archive_operator_knowledge_inbox'),
       ])
       if (inboxResult.error) setError(rpcError(inboxResult.error))
       else setInbox((inboxResult.data ?? emptyInbox) as Inbox)
+      // Reuse the existing authenticated Knowledge Inbox; no new DB RPC or job state.
+      // On lookup failure, the dashboard links to the general editor list instead.
+      setKnowledgeReviewJobs(knowledgeInboxResult.error ? {} : knowledgeReviewJobMap(knowledgeInboxResult.data as KnowledgeInbox | null))
       if (systemResult.error) {
         setSystemStatus(null)
         setStatusError('자동화 실행 상태를 불러오지 못했습니다.')
@@ -132,7 +138,7 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
         clearSiteDeployments()
         setSiteDeployments(null)
         initialDashboardLoaded.current = false
-        setInbox(emptyInbox); setSelected(null); setRoadmapLogs(null); setRoadmapError('')
+        setInbox(emptyInbox); setKnowledgeReviewJobs({}); setSelected(null); setRoadmapLogs(null); setRoadmapError('')
       }
     })
     return () => { alive = false; listener.subscription.unsubscribe() }
@@ -189,6 +195,10 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
 
   async function decide(decision: 'APPROVED' | 'HOLD' | 'REJECTED') {
     if (!supabaseClient || !selected) return
+    if (selected.source_worker === 'C_KNOWLEDGE' && selected.item_type === 'KNOWLEDGE') {
+      setError('생존지식 글은 전용 검토함에서 원고를 수정하고 발행 요청해 주세요.')
+      return
+    }
     setBusy(true); setError('')
     const { data, error: decisionError } = await supabaseClient.rpc('archive_operator_decide_review_item', {
       p_item_id: selected.id, p_decision: decision, p_note: note.trim() || null,
@@ -237,6 +247,7 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
     error={error}
     statusError={statusError}
     inbox={inbox}
+    knowledgeReviewJobs={knowledgeReviewJobs}
     roadmapLogs={roadmapLogs}
     roadmapError={roadmapError}
     systemStatus={systemStatus}
