@@ -56,7 +56,7 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
       <article><span>C3 작업 글감</span><strong>{inbox.total_count}</strong></article>
       <article><span>작업 중</span><strong>{inbox.working_count}</strong></article>
       <article><span>사람 검토</span><strong>{pendingReviewCount}</strong></article>
-      <article><span>휴먼체크 완료 · 발행 대기</span><strong>{approvedReviewCount}</strong></article>
+      <article><span>휴먼체크 완료 · 공개 확인 대기</span><strong>{approvedReviewCount}</strong></article>
       <article><span>보관</span><strong>{inbox.held_count}</strong></article>
       <article><span>공개 게시됨</span><strong>{inbox.published_count}</strong></article>
     </div>
@@ -91,7 +91,7 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
             <strong>{item.title ?? item.brief_id ?? item.candidate_id ?? item.source_ref?.split('/').at(-1) ?? item.job_id}</strong>
             <small>{item.job_type ?? '—'} · {knowledgeSourceLabel(item.source_kind)} · {formatOperatorTime(item.prepared_at)}</small>
             {item.note && <p>{item.note}</p>}
-            {item.review_status === 'APPROVED' && <p>사람 검토 완료 · 자동 게시 검증 및 정규 배포 대기</p>}
+            {item.review_status === 'APPROVED' && <p>사람 검토 완료 · 게시 검증 및 실제 공개 여부 확인 중</p>}
             <em>상세 열기 →</em>
           </a>
         </li>)}

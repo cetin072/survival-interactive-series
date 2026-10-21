@@ -60,9 +60,23 @@ export function validateHook(config, env, now) {
   if (!payload || typeof payload !== 'object') throw new Error('SCHEDULED_HOOK_REQUIRED');
   const age = new Date(now) - new Date(payload.issued_at);
   if (env.BRANCH !== 'main' || env.INCOMING_HOOK_TITLE !== HOOK_TITLE
-    || payload.version !== 1 || payload.repository !== config.repository || payload.site_id !== config.site_id
+    || ![1,2].includes(payload.version) || payload.repository !== config.repository || payload.site_id !== config.site_id
     || !SHA.test(payload.source_main_sha || '') || payload.source_main_sha !== env.COMMIT_REF
     || !/^\d+$/.test(String(payload.run_id)) || !Number.isFinite(age) || age < 0 || age > 90 * 60000) throw new Error('HOOK_SOURCE_OR_TIME_INVALID');
+  if (payload.version === 2) {
+    // Independent on-demand publication only for an actually merged,
+    // exact-head, previously human-approved Knowledge PR.
+    if (payload.mode !== 'HUMAN_APPROVED_KNOWLEDGE'
+      || payload.merge_sha !== payload.source_main_sha
+      || !/^K-\d{3,}$/.test(payload.brief_id ?? '')
+      || !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(payload.review_item_id ?? '')
+      || !Number.isSafeInteger(payload.pr_number) || payload.pr_number < 1
+      || !/^\d+$/.test(String(payload.run_id))) {
+      throw new Error('HUMAN_APPROVED_HOOK_INVALID');
+    }
+    return payload;
+  }
+  if (payload.version !== 1) throw new Error('HOOK_VERSION_INVALID');
   const slot = calendarSlot(config, payload.run_created_at);
   if (slot.status !== 'DUE' || payload.slot_index !== slot.slot.index
     || new Date(now) < new Date(slot.slot.start_utc) || new Date(now) >= new Date(slot.slot.expires_utc)) throw new Error('HOOK_SLOT_INVALID');
@@ -127,12 +141,59 @@ export async function runCycle({ config, env, api, snapshot, head, files, prefli
     source_main_sha: sha, run_id: String(run.id), run_created_at: run.created_at,
     slot_index: schedule.slot.index, issued_at: now().toISOString() }) };
 }
+
+// A static deployment replaces the whole site. Refuse any other pending authored
+// Knowledge brief or Reader content, even if it was merged into main.
+export async function assertReviewedContentScope(config, payload, publishedSha, fetcher = fetch) {
+  const response = await fetcher('https://api.github.com/repos/' + config.repository
+    + '/compare/' + publishedSha + '...' + payload.merge_sha, {
+      headers: { Accept: 'application/vnd.github+json' }, signal: AbortSignal.timeout(30000),
+    });
+  if (!response.ok) throw Error('HUMAN_APPROVED_SCOPE_UNAVAILABLE');
+  const comparison = await response.json(), files = comparison.files;
+  if (!['ahead', 'identical'].includes(comparison.status) || !Array.isArray(files) || files.length >= 300) throw Error('HUMAN_APPROVED_SCOPE_INCOMPLETE');
+  for (const file of files) {
+    const paths = [file.filename, file.previous_filename].filter(Boolean);
+    if (paths.some(path => path.startsWith('archive/content/')
+      || (path.startsWith('knowledge/content/briefs/') && path !== 'knowledge/content/briefs/' + payload.brief_id + '.json'))) {
+      throw Error('HUMAN_APPROVED_OTHER_CONTENT_PENDING');
+    }
+  }
+  return true;
+}
+
+export async function verifyHumanApprovedReleaseProof(config, payload, fetcher = fetch) {
+  const root = 'https://api.github.com/repos/' + config.repository;
+  const headers = { 'Accept': 'application/vnd.github+json', 'User-Agent': 'survival-human-knowledge-release-guard' };
+  const [prResponse, headResponse] = await Promise.all([
+    fetcher(root + '/pulls/' + payload.pr_number, { headers, signal: AbortSignal.timeout(30000) }),
+    fetcher(root + '/git/ref/heads/main', { headers, signal: AbortSignal.timeout(30000) }),
+  ]);
+  if (!prResponse.ok || !headResponse.ok) throw new Error('HUMAN_APPROVED_GITHUB_PROOF_UNAVAILABLE');
+  const [pr, head] = await Promise.all([prResponse.json(), headResponse.json()]);
+  if (head.object?.sha !== payload.merge_sha || pr.state !== 'closed' || !pr.merged_at
+    || pr.merge_commit_sha !== payload.merge_sha
+    || pr.base?.ref !== 'main'
+    || pr.head?.repo?.full_name !== config.repository
+    || !pr.head?.ref?.startsWith('knowledge/worker/')
+    || !pr.body?.includes('<!-- knowledge-worker-phase-v1:PUBLICATION_HANDOFF -->')
+    || !pr.title?.includes(payload.brief_id)) {
+    throw new Error('HUMAN_APPROVED_GITHUB_PROOF_MISMATCH');
+  }
+  return true;
+}
+
 export async function guard(config, env = process.env, { fetcher = fetch, now = new Date() } = {}) {
   const payload = validateHook(config, env, now);
   if (!payload) return { status: 'PREVIEW_ALLOWED' };
   const published = publishedDeploy(await publicSite(config, fetcher), config.site_id);
   if (published.commit_ref === payload.source_main_sha) throw new Error('ALREADY_PUBLISHED');
-  if (new Date(now) - new Date(published.published_at) < 48 * HOUR) throw new Error('WAITING_WINDOW');
+  if (payload.version === 2) {
+    await verifyHumanApprovedReleaseProof(config, payload, fetcher);
+    await assertReviewedContentScope(config, payload, published.commit_ref, fetcher);
+  } else if (new Date(now) - new Date(published.published_at) < 48 * HOUR) {
+    throw new Error('WAITING_WINDOW');
+  }
   if (config.marker_path) {
     const markerPath = resolve(config.marker_path);
     let previous = {};
@@ -140,9 +201,10 @@ export async function guard(config, env = process.env, { fetcher = fetch, now = 
     mkdirSync(dirname(markerPath), { recursive: true });
     writeFileSync(markerPath, JSON.stringify({ ...previous, source_main_sha: payload.source_main_sha,
       released_at_utc: now.toISOString(), released_on_kst: new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul' }).format(now),
-      interval_days: 2, release_attempt: (previous.release_attempt || 0) + 1, release_run_id: payload.run_id }, null, 2) + '\n');
+      interval_days: 2, release_attempt: (previous.release_attempt || 0) + 1, release_run_id: payload.run_id,
+      ...(payload.version === 2 ? { release_kind: 'HUMAN_APPROVED_KNOWLEDGE', reviewed_brief_id: payload.brief_id } : {}) }, null, 2) + '\n');
   }
-  return { status: 'SCHEDULED_PRODUCTION_ALLOWED', source_main_sha: payload.source_main_sha };
+  return { status: payload.version === 2 ? 'HUMAN_APPROVED_PRODUCTION_ALLOWED' : 'SCHEDULED_PRODUCTION_ALLOWED', source_main_sha: payload.source_main_sha };
 }
 async function cli() {
   const [mode, configPath] = process.argv.slice(2);

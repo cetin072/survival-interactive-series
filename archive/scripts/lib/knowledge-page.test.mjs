@@ -147,12 +147,14 @@ test('risk, editorial review requirement/completion and public approval are sepa
 test('media permission is scoped to knowledge while executable code and Operator remain restricted', async () => {
   const config = await readFile(join(root, 'archive/web/netlify.toml'), 'utf8')
   const policies = [...config.matchAll(/Content-Security-Policy = "([^"]+)"/g)].map((match) => match[1])
-  assert.equal(policies.length, 2)
+  assert.equal(policies.length, 3)
   assert.ok(policies[0].includes("img-src 'self' data:;"))
   assert.ok(!policies[0].includes('frame-src'))
   assert.ok(config.includes('for = "/knowledge/*"'))
   assert.ok(policies[1].includes("img-src 'self' data: https:;"))
   assert.ok(policies[1].includes('frame-src https://www.youtube-nocookie.com;'))
+  assert.ok(policies[2].includes("connect-src 'self' https://jgsxpdflgkqroecfjzxq.supabase.co"))
+  assert.ok(!policies[2].includes('frame-src'))
   for (const policy of policies) assert.ok(policy.includes("script-src 'self';"))
 })
 

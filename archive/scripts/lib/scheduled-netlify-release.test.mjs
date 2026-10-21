@@ -4,7 +4,7 @@ import { readFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { calendarSlot, evaluateSchedule, publishedDeploy, decide, deployInput, validateHook, guard, trigger, runCycle, HOOK_TITLE } from '../scheduled-netlify-release.mjs';
+import { calendarSlot, evaluateSchedule, publishedDeploy, decide, deployInput, validateHook, guard, trigger, verifyHumanApprovedReleaseProof, runCycle, HOOK_TITLE } from '../scheduled-netlify-release.mjs';
 
 const config = JSON.parse(readFileSync(new URL('../../automation/release-policy.json', import.meta.url), 'utf8'));
 
@@ -167,4 +167,49 @@ test('ignore command stops Production only; CLI dry-run does not mutate reposito
   }
   const source = readFileSync(file, 'utf8');
   assert.doesNotMatch(source, /git\(['"](?:push|commit|merge|reset|checkout)['"]/);
+});
+
+
+test('manual human-reviewed release bypasses 48h only with a merged exact PR and current main SHA', async () => {
+  const immediate = { version: 2, mode: 'HUMAN_APPROVED_KNOWLEDGE',
+    repository: config.repository, site_id: config.site_id,
+    source_main_sha: b, merge_sha: b,
+    review_item_id: '263d256d-2cf8-45cf-82fb-98aab2e52d12',
+    brief_id: 'K-015', pr_number: 425, run_id: '123',
+    issued_at: due.toISOString() };
+  const directEnv = { ...hookEnv, INCOMING_HOOK_BODY: JSON.stringify(immediate) };
+  assert.equal(validateHook(config, directEnv, due).brief_id, 'K-015');
+  const pr = { state: 'closed', merged_at: due.toISOString(), merge_commit_sha: b, base: { ref: 'main' },
+    head: { ref: 'knowledge/worker/test', repo: { full_name: config.repository } },
+    body: '<!-- knowledge-worker-phase-v1:PUBLICATION_HANDOFF -->', title: 'knowledge: prepare K-015' };
+  const fastFetcher = async (url) => ({ ok: true, json: async () => (
+    url.includes('/compare/') ? {status:'ahead',files:[]} : url.includes('/sites/') ? { ...snapshot, published_deploy: { ...published, published_at: '2026-10-21T07:00:00Z' } }
+      : url.includes('/pulls/') ? pr : { object: { sha: b } }
+  ) });
+  const tmp = mkdtempSync(join(tmpdir(), 'human-release-guard-')), marker = join(tmp, 'marker.json');
+  try {
+    const result = await guard({ ...config, marker_path: marker }, directEnv, { now: due, fetcher: fastFetcher });
+    assert.equal(result.status, 'HUMAN_APPROVED_PRODUCTION_ALLOWED');
+    assert.equal(JSON.parse(readFileSync(marker, 'utf8')).reviewed_brief_id, 'K-015');
+    await assert.rejects(guard({ ...config, marker_path: marker }, hookEnv, { now: due, fetcher: fastFetcher }), /WAITING_WINDOW/);
+  } finally { rmSync(tmp, { recursive: true, force: true }); }
+  assert.equal(await verifyHumanApprovedReleaseProof(config, immediate, fastFetcher), true);
+});
+
+test('spoofed reviewed-release payloads and unmerged/unrelated PRs fail closed', async () => {
+  const good = { version: 2, mode: 'HUMAN_APPROVED_KNOWLEDGE', repository: config.repository,
+    site_id: config.site_id, source_main_sha: b, merge_sha: b, brief_id: 'K-015',
+    review_item_id: '263d256d-2cf8-45cf-82fb-98aab2e52d12', pr_number: 425, run_id: '123',
+    issued_at: due.toISOString() };
+  const ready = (candidate) => ({ ...hookEnv, INCOMING_HOOK_BODY: JSON.stringify(candidate) });
+  for (const patch of [
+    { merge_sha: a }, { mode: 'ANY' }, { review_item_id: '../bad' }, { pr_number: -2 },
+    { brief_id: '../bad' }, { issued_at: '2026-10-20T00:00:00Z' },
+  ]) assert.throws(() => validateHook(config, ready({ ...good, ...patch }), due));
+  const badPr = { state: 'open', merge_commit_sha: b, base: { ref: 'main' },
+    head: { ref: 'knowledge/worker/test', repo: { full_name: config.repository } },
+    body: '<!-- knowledge-worker-phase-v1:PUBLICATION_HANDOFF -->', title: 'knowledge: prepare K-015' };
+  await assert.rejects(verifyHumanApprovedReleaseProof(config, good, async url => ({
+    ok: true, json: async () => url.includes('/pulls/') ? badPr : { object: { sha: b } },
+  })), /HUMAN_APPROVED_GITHUB_PROOF_MISMATCH/);
 });

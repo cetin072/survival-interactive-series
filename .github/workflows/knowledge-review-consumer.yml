@@ -5,6 +5,11 @@ on:
     # Keep the approval-to-action window short without adding Netlify Production deploys.
     - cron: '17 * * * *'
   workflow_dispatch:
+    inputs:
+      review_item_id:
+        description: 'Exact approved review item; empty uses the existing scheduled queue'
+        type: string
+        required: false
 
 permissions:
   contents: write
@@ -47,6 +52,7 @@ jobs:
       - name: Inspect one approved review
         id: inspect
         env:
+          REVIEW_ITEM_ID: ${{ inputs.review_item_id }}
           GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
           ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
           ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
@@ -85,33 +91,6 @@ jobs:
             --item-id "$ITEM_ID" \
             --decided-at "$DECIDED_AT" \
             --outcome BLOCKED \
-            --result-json "$RESULT_JSON"
-
-      - name: Recover already-merged approval receipt
-        if: steps.inspect.outputs.status == 'RECOVER_CONSUMED'
-        env:
-          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
-          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
-          ITEM_ID: ${{ steps.inspect.outputs.item_id }}
-          DECIDED_AT: ${{ steps.inspect.outputs.decided_at }}
-          BRIEF_ID: ${{ steps.inspect.outputs.brief_id }}
-          PREPARED_SHA: ${{ steps.inspect.outputs.prepared_head_sha }}
-          MERGE_SHA: ${{ steps.inspect.outputs.merge_sha }}
-        run: |
-          set -euo pipefail
-          RESULT_JSON="$(node --input-type=module <<'NODE'
-          console.log(JSON.stringify({
-            status: 'RECOVERED_AFTER_MERGE',
-            brief_id: process.env.BRIEF_ID,
-            prepared_sha: process.env.PREPARED_SHA,
-            merge_sha: process.env.MERGE_SHA,
-          }))
-          NODE
-          )"
-          node archive/scripts/knowledge-review-consumer.mjs record \
-            --item-id "$ITEM_ID" \
-            --decided-at "$DECIDED_AT" \
-            --outcome CONSUMED \
             --result-json "$RESULT_JSON"
 
       - name: Reapply approved C3 data using current-main code
@@ -441,34 +420,49 @@ jobs:
           )"
           echo "sha=$MERGE_SHA" >> "$GITHUB_OUTPUT"
 
-      - name: Record consumed human review
-        if: steps.merge.outputs.sha != ''
+      - name: Publish and verify exact human-approved Knowledge
+        id: publication
+        if: steps.merge.outputs.sha != '' || steps.inspect.outputs.status == 'RECOVER_CONSUMED'
         env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          NETLIFY_PRODUCTION_BUILD_HOOK: ${{ secrets.NETLIFY_PRODUCTION_BUILD_HOOK }}
+          REVIEW_ITEM_ID: ${{ steps.inspect.outputs.item_id }}
+          DECIDED_AT: ${{ steps.inspect.outputs.decided_at }}
+          PR_NUMBER: ${{ steps.inspect.outputs.pr_number }}
           ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
           ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          BRIEF_ID: ${{ steps.inspect.outputs.brief_id }}
+          PREPARED_SHA: ${{ steps.head.outputs.sha || steps.inspect.outputs.prepared_head_sha }}
+          MERGE_SHA: ${{ steps.merge.outputs.sha || steps.inspect.outputs.merge_sha }}
+        run: node archive/scripts/knowledge-human-reviewed-release.mjs
+
+      - name: Record publicly verified human review
+        if: steps.publication.outputs.status == 'LIVE_VERIFIED'
+        env:
           ITEM_ID: ${{ steps.inspect.outputs.item_id }}
           DECIDED_AT: ${{ steps.inspect.outputs.decided_at }}
+          PUBLIC_URL: ${{ steps.publication.outputs.public_url }}
+          VERIFIED_AT: ${{ steps.publication.outputs.verified_at }}
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
           BRIEF_ID: ${{ steps.inspect.outputs.brief_id }}
-          PREPARED_SHA: ${{ steps.head.outputs.sha }}
-          MERGE_SHA: ${{ steps.merge.outputs.sha }}
+          PREPARED_SHA: ${{ steps.head.outputs.sha || steps.inspect.outputs.prepared_head_sha }}
+          MERGE_SHA: ${{ steps.merge.outputs.sha || steps.inspect.outputs.merge_sha }}
         run: |
           set -euo pipefail
           RESULT_JSON="$(node --input-type=module <<'NODE'
           console.log(JSON.stringify({
-            status: 'CONSUMED',
-            brief_id: process.env.BRIEF_ID,
-            prepared_sha: process.env.PREPARED_SHA,
-            merge_sha: process.env.MERGE_SHA,
-            production: 'BATCHED_RELEASE_GATE',
+            status: 'LIVE_VERIFIED', brief_id: process.env.BRIEF_ID,
+            prepared_sha: process.env.PREPARED_SHA, merge_sha: process.env.MERGE_SHA,
+            public_url: process.env.PUBLIC_URL, verified_at: process.env.VERIFIED_AT,
           }))
           NODE
           )"
           node archive/scripts/knowledge-review-consumer.mjs record \
-            --item-id "$ITEM_ID" \
-            --decided-at "$DECIDED_AT" \
-            --outcome CONSUMED \
-            --result-json "$RESULT_JSON"
+            --item-id "$ITEM_ID" --decided-at "$DECIDED_AT" \
+            --outcome CONSUMED --result-json "$RESULT_JSON"
 
       - name: Summarize no-op
         if: steps.inspect.outputs.status == 'NOOP'
         run: echo "No approved human-review item is waiting."
+

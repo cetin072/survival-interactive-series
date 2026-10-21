@@ -242,6 +242,9 @@ jobs:
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261003121000_operator_live_automation_status_v2.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261013130945_knowledge_operator_story_refs_contract.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_operator_story_refs_contract.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261021121000_knowledge_human_approval_immediate_consumer_dispatch.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261021141433_knowledge_review_verified_publication_recovery.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_operator_drafts_verification.sql
 
   illustration-db-contract:
     runs-on: ubuntu-latest

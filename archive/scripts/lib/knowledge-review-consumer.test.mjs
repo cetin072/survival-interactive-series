@@ -220,3 +220,13 @@ test('READY approval carries exact operator draft identity to the workflow bound
   assert.equal(result.operator_draft_revision, 2)
   assert.equal(result.operator_draft_sha256, 'e'.repeat(64))
 })
+
+test('immediate request selects only its exact approved item', async () => {
+  const selected = await listApprovedReview({ projectUrl: 'https://project.supabase.co', serviceRoleKey: 'server-key',
+    itemId: item.id, fetchImpl: async (url, options) => {
+      assert.match(url, /archive_worker_get_approved_review$/)
+      assert.deepEqual(JSON.parse(options.body), {p_item_id:item.id})
+      return response({ ...item, status: 'APPROVED', source_worker: 'C_KNOWLEDGE', item_type: 'KNOWLEDGE' })
+    } })
+  assert.equal(selected.id,item.id)
+})
