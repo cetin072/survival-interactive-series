@@ -53,6 +53,9 @@ try {
 } catch (e) {
   const msg=String(e?.message??'UNKNOWN')
   const reason=/^[A-Z][A-Z0-9_:.-]{3,150}$/.test(msg)?msg:'SANITIZED_EXCEPTION'
-  console.log(JSON.stringify({diagnostic:'FAIL',stage,reason}))
+  const diagnosticLines=String(e?.stdout??'').split('\n')
+    .filter(line=>/FAIL |Test Files|Tests |failed|AssertionError|src\/.*\.test\.|\.test\.tsx?\s*\(/i.test(line))
+    .slice(-16).map(line=>line.replace(/\x1b\[[0-9;]*m/g,'').slice(0,240))
+  console.log(JSON.stringify({diagnostic:'FAIL',stage,reason,diagnosticLines}))
   process.exitCode=1
 }
