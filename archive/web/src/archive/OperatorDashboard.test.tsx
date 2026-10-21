@@ -1,7 +1,7 @@
 import { createElement, type ComponentProps } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { OperatorDashboard, emptyInbox, type ProductionStatus, type SystemStatus } from './OperatorDashboard'
+import { OperatorDashboard, emptyInbox, knowledgeReviewEditorHref, type ProductionStatus, type SystemStatus, type ReviewItem, type ReviewDetail } from './OperatorDashboard'
 
 const systemStatus: SystemStatus = {
   archive: { dispatch_count: 1, latest_dispatch: null, cron: null },
@@ -271,5 +271,47 @@ describe('Resolved incidents render as normal progress instead of current failur
     expect(card).toContain('<dt>현재 복구할 오류</dt><dd>0건')
     expect(card).toContain('새 원고 제작')
     expect(card).not.toContain('작업 장애')
+  })
+})
+
+
+describe('C human review uses one editable route', () => {
+  const reviewId = '263d256d-2cf8-45cf-82fb-98aab2e52d12'
+  const jobId = 'c8da8c82-c60c-4dd9-9556-b3f0d08c9507'
+  const review: ReviewItem = {
+    id: reviewId, source_worker: 'C_KNOWLEDGE', item_type: 'KNOWLEDGE',
+    chronicle_id: null, priority: 'P1', title: '긴급 복구 요청의 우선순위는 어떻게 정할까',
+    summary: 'Generic machine review note', risk_level: 'HIGH',
+    source_ref: 'https://github.com/cetin072/survival-interactive-series', status: 'PENDING',
+    created_at: '2026-10-21T10:00:00Z',
+  }
+  const jobs = { [reviewId]: jobId }
+  it('opens the exact existing editor and omits generic one-click approval for C', () => {
+    const selected: ReviewDetail = {
+      ...review, payload: {}, updated_at: review.created_at,
+      decided_at: null, decision_note: null, decision_history: [],
+    }
+    const markup = renderDashboard({
+      inbox: { ...emptyInbox, pending_count: 1, items: [review] },
+      knowledgeReviewJobs: jobs, selected,
+    })
+    expect(markup).toContain('href="/operator/knowledge/' + jobId + '/"')
+    expect(markup).toContain('원고 읽기 · 수정 · 발행 요청')
+    expect(markup).toContain('여기에서는 바로 승인하지 않습니다')
+    expect(markup).not.toMatch(/<button[^>]*>승인<\/button>/)
+  })
+  it('fails closed to the existing inbox if a job is unresolved', () => {
+    expect(knowledgeReviewEditorHref(review, {})).toBe('/operator/knowledge/')
+    expect(knowledgeReviewEditorHref(review, { [reviewId]: '../unsafe' })).toBe('/operator/knowledge/')
+    expect(knowledgeReviewEditorHref({ ...review, source_worker: 'A_WIKI' }, jobs)).toBeNull()
+  })
+  it('retains ordinary non-C review buttons and decisions', () => {
+    const other = { ...review, source_worker: 'A_WIKI' }
+    const markup = renderDashboard({
+      inbox: { ...emptyInbox, pending_count: 1, items: [other] },
+      selected: { ...other, payload: {}, updated_at: other.created_at, decided_at: null, decision_note: null, decision_history: [] },
+      knowledgeReviewJobs: jobs,
+    })
+    expect(markup).toMatch(/<button[^>]*>승인<\/button>/)
   })
 })
