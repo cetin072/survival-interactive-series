@@ -50,6 +50,7 @@ export function OperatorKnowledgeDetail({
   const [savingDraft, setSavingDraft] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [publicationNotice, setPublicationNotice] = useState('')
 
   const loadDetail = useCallback(async () => {
     if (!supabaseClient) return
@@ -148,7 +149,7 @@ export function OperatorKnowledgeDetail({
     // A checked priority review is explicit human action, not an automatic QA pass.
     if (!supabaseClient || !selected || !draftEditable || !draftBrief
       || reviewTargets.length === 0 || !reviewTargets.every((target) => reviewed[target.key] === true)) return
-    setBusy(true); setSavingDraft(true); setError('')
+    setBusy(true); setSavingDraft(true); setError(''); setPublicationNotice('')
     try {
       // Exact revision + approved content are bound by the existing RPC contract.
       const checkedBrief = { ...draftBrief, semantic_qa_status: 'PASS' }
@@ -167,7 +168,7 @@ export function OperatorKnowledgeDetail({
       setDraftBrief(cloneBrief(saved.brief))
       setDraftRevision(saved.revision)
       setDraftDirty(false)
-      const { error: publishError } = await supabaseClient.rpc('archive_operator_knowledge_publish', {
+      const { data: approvalData, error: publishError } = await supabaseClient.rpc('archive_operator_knowledge_publish', {
         p_job_id: selected.job_id,
         p_expected_revision: saved.revision,
         p_note: reviewNote.trim() || null,
@@ -176,6 +177,10 @@ export function OperatorKnowledgeDetail({
         setError('검토 내용은 저장됐지만 공개 승인을 마치지 못했습니다. 승인 조건과 기존 게시 이력을 확인하세요.')
         return
       }
+      const dispatch = (approvalData as { publication_dispatch?: string } | null)?.publication_dispatch
+      setPublicationNotice(dispatch === 'QUEUED_FOR_VERIFICATION'
+        ? '검토가 완료되어 즉시 게시 검증을 요청했습니다. 검증 통과 후 실제 홈페이지 배포를 진행합니다.'
+        : '검토 승인은 저장됐습니다. 즉시 요청 확인이 필요해 기존 예약 재시도도 유지합니다.')
       await loadDetail()
     } finally {
       setSavingDraft(false); setBusy(false)
@@ -199,6 +204,7 @@ export function OperatorKnowledgeDetail({
     </header>
 
     {error && <p className="operator-error" role="alert">{error}</p>}
+    {publicationNotice && <p className="operator-success" role="status">{publicationNotice}</p>}
     {busy && !selected && <section className="operator-panel"><p className="operator-muted" aria-live="polite">글을 불러오는 중…</p></section>}
     {!busy && !selected && !error && <section className="operator-panel"><p className="operator-empty">해당 글감을 찾을 수 없습니다.</p></section>}
 
@@ -210,7 +216,7 @@ export function OperatorKnowledgeDetail({
       </div>
 
       {selected.review_status === 'APPROVED' && <p className="knowledge-review-complete-hint" role="status">
-        휴먼체크 승인 완료. 이후 자동화 C가 원문·근거·게시 계약을 재검증하고, 안전한 병합을 거친 다음 정규 Production 배포에 반영합니다. 현재 단계는 공개 완료가 아닙니다.
+        사람 검토 승인은 저장되었습니다. 원문·근거 검증과 GitHub 병합을 통과하면 정규 배포 날짜를 기다리지 않고 즉시 공개 배포를 확인합니다. 검증에 실패하면 원고는 공개되지 않습니다.
       </p>}
 
       {selected.note && <p>{selected.note}</p>}
@@ -269,11 +275,11 @@ export function OperatorKnowledgeDetail({
           <label>검토 메모<textarea maxLength={1000} value={reviewNote} onChange={(event) => setReviewNote(event.target.value)} /></label>
           <div>
             <button disabled={busy || savingDraft || evidenceGate.blockers.length > 0 || reviewTargets.length === 0 || !reviewTargets.every((target) => reviewed[target.key])}
-              onClick={() => void publishDraft()}>휴먼체크 완료 · 공개 승인</button>
+              onClick={() => void publishDraft()}>휴먼체크 완료 · 바로 발행 요청</button>
             <button className="operator-secondary" disabled={busy} onClick={() => void decideReview('HOLD')}>보류</button>
             <button className="operator-danger" disabled={busy} onClick={() => void decideReview('REJECTED')}>거절</button>
           </div>
-          <p className="knowledge-review-complete-hint">표시된 구간을 직접 확인·수정하고, 별도 근거 차단이 모두 해소되면 승인할 수 있습니다. 승인 시 편집본을 최신 revision으로 저장하고 검토 완료를 기록합니다. 기존 C3가 근거·계약 검증, PR·CI, 정확한 커밋 병합을 수행하며, 정규 Production 배포 이후 홈페이지에 게시됩니다.</p>
+          <p className="knowledge-review-complete-hint">표시된 구간을 직접 확인·수정하고, 별도 근거 차단이 모두 해소되면 승인할 수 있습니다. 승인 시 편집본을 최신 revision으로 저장하고 검토 완료를 기록합니다. 기존 C3가 근거·계약 검증, PR·CI, 정확한 커밋 병합을 수행하며, 검증된 원고는 정규 배포를 기다리지 않고 공개를 시도합니다.</p>
           <p className="operator-muted">사람 체크만으로 근거 충돌이나 국내 법령·전문가 확인 필요가 사라지지는 않습니다. 근거 검증이 통과하지 않으면 공개는 계속 보류됩니다.</p>
           {draftDirty && <p className="operator-muted">편집 내용이 저장되지 않았습니다. '초안 저장' 또는 '휴먼체크 완료 · 공개 승인'에서 정확한 수정본을 저장합니다.</p>}
         </div>}
