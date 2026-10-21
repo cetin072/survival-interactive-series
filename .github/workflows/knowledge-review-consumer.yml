@@ -469,6 +469,20 @@ jobs:
             --outcome CONSUMED \
             --result-json "$RESULT_JSON"
 
+      - name: Publish exact human-approved Knowledge to Production now
+        if: steps.merge.outputs.sha != ''
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          NETLIFY_PRODUCTION_BUILD_HOOK: ${{ secrets.NETLIFY_PRODUCTION_BUILD_HOOK }}
+          REVIEW_ITEM_ID: ${{ steps.inspect.outputs.item_id }}
+          BRIEF_ID: ${{ steps.inspect.outputs.brief_id }}
+          PR_NUMBER: ${{ steps.inspect.outputs.pr_number }}
+          PREPARED_SHA: ${{ steps.head.outputs.sha }}
+          MERGE_SHA: ${{ steps.merge.outputs.sha }}
+        run: |
+          set -euo pipefail
+          node archive/scripts/knowledge-human-reviewed-release.mjs
+
       - name: Summarize no-op
         if: steps.inspect.outputs.status == 'NOOP'
         run: echo "No approved human-review item is waiting."
