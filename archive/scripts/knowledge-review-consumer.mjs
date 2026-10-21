@@ -167,6 +167,20 @@ export async function inspectApprovedReview({ projectUrl, serviceRoleKey, github
         pr_number: identity.prNumber, head_ref: identity.headRef, current_main: currentMain }
     }
     if (pr.state !== 'open') return { status: 'BLOCKED', reason: 'REVIEW_PR_NOT_OPEN', item_id: item.id, decided_at: item.decided_at }
+    if (semantic.prepared_heads?.includes(pr.head.sha)) {
+      const comparison = await jsonFetch(
+        'https://api.github.com/repos/' + repo + '/compare/' + currentMain + '...' + pr.head.sha,
+        { headers: githubHeaders(githubToken) }, fetchImpl)
+      // Only a DB-registered preparation containing current main may resume.
+      // The workflow still reruns exact-head content/evidence checks and CI.
+      if (comparison.status === 'ahead' && comparison.behind_by === 0) {
+        return { status: 'RESUME_PREPARED', item_id: item.id, decided_at: item.decided_at,
+          brief_id: identity.briefId, approved_head_sha: identity.headSha, prepared_head_sha: pr.head.sha,
+          pr_number: identity.prNumber, head_ref: identity.headRef, current_main: currentMain,
+          operator_job_id: identity.operatorJobId, operator_draft_revision: identity.operatorDraftRevision,
+          operator_draft_sha256: identity.operatorDraftSha256 }
+      }
+    }
     return { status: 'REVALIDATE_PACKAGE', item_id: item.id, decided_at: item.decided_at, brief_id: identity.briefId,
       approved_head_sha: identity.headSha, expected_head_sha: pr.head.sha, pr_number: identity.prNumber,
       head_ref: identity.headRef, current_main: currentMain, c3_job_id: semantic.job.job_id,

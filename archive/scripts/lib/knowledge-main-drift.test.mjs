@@ -29,14 +29,15 @@ test('C3 approval survives unrelated main and rejects unregistered head or close
   const item={id:'11111111-1111-4111-8111-111111111111',decision:'APPROVED',decided_at:'2026-10-05T00:00:00Z',
     source_ref:`https://github.com/cetin072/survival-interactive-series/blob/${approved}/knowledge/content/briefs/K-999.json`,
     payload:{brief_id:'K-999',head_sha:approved,pr_number:999,head_ref:'knowledge/worker/semantic-test'}}
-  for(const [prHead,state,expected] of [[approved,'open','REVALIDATE_PACKAGE'],[head,'open','REVALIDATE_PACKAGE'],['d'.repeat(40),'open','BLOCKED'],[approved,'closed','BLOCKED']]) {
+  for(const [prHead,state,expected] of [[approved,'open','REVALIDATE_PACKAGE'],[head,'open','RESUME_PREPARED'],['d'.repeat(40),'open','BLOCKED'],[approved,'closed','BLOCKED']]) {
     const outcome=await inspectApprovedReview({projectUrl:'https://example.supabase.co',serviceRoleKey:'test',githubToken:'test',
       fetchImpl:async url=>({ok:true,json:async()=>{
         if(url.includes('archive_worker_list_approved_reviews'))return[item]
         if(url.includes('archive_knowledge_review_package'))return{status:'C3',job:{job_id:'job',semantic_result_sha256:'e'.repeat(64),source_sha256:'f'.repeat(64),policy_sha256:'1'.repeat(64)},prepared_heads:[head]}
         if(url.endsWith('/pulls/999'))return{state,base:{ref:'main'},head:{sha:prHead,ref:item.payload.head_ref,repo:{full_name:'cetin072/survival-interactive-series'}}}
         if(url.endsWith('/git/ref/heads/main'))return{object:{sha:current}}
-        assert.fail('C3 must not use whole-repo ancestry as approval identity')
+        if(url.includes('/compare/'))return{status:'ahead',behind_by:0}
+        assert.fail('unexpected C3 proof request')
       }})})
     assert.equal(outcome.status,expected)
   }
