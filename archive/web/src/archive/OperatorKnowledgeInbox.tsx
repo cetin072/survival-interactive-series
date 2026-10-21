@@ -13,7 +13,7 @@ import {
 
 export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: { email?: string | null; busy: boolean; onSignOut: () => void }) {
   const [inbox, setInbox] = useState<KnowledgeInbox>(emptyKnowledgeInbox)
-  const [filter, setFilter] = useState<KnowledgeFilter>('ALL')
+  const [filter, setFilter] = useState<KnowledgeFilter>('REVIEW')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -40,8 +40,8 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
     <header className="operator-heading">
       <div>
         <p className="archive-eyebrow">SURVIVAL DIARY · OPERATOR</p>
-        <h1>Knowledge Inbox</h1>
-        <p>{email} · C3 자동화 글감과 외부 참고자료를 한곳에서 확인합니다. C3 글감은 기존 상세 페이지에서 읽고 편집합니다.</p>
+        <h1>생존지식 검토함</h1>
+        <p>{email} · 먼저 사람 검토가 필요한 글을 보여줍니다. 글을 눌러 AI가 지목한 부분을 확인하고 수정한 다음 발행을 요청하세요.</p>
       </div>
       <div className="operator-heading-actions">
         <a className="operator-secondary" href="/operator/">대시보드</a>
@@ -63,10 +63,10 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
 
     <section className="operator-system">
       <header>
-        <div><p className="archive-eyebrow">STAGING FLOW</p><h2>글감 → 상세 → 편집 → 공개 승격</h2></div>
+        <div><p className="archive-eyebrow">사람 검토</p><h2>글 선택 → 읽고 수정 → 검토 완료·발행 요청</h2></div>
         <button className="operator-secondary" disabled={busy} onClick={() => void refresh()}>새로고침</button>
       </header>
-      <p className="operator-muted">글감을 누르면 별도 상세 페이지가 열립니다. HUMAN_REVIEW 완성 초안은 그 페이지에서 한글 편집·이미지·YouTube·초안 저장·공개 승인을 처리합니다.</p>
+      <p className="operator-muted">문제 문장은 강조하고 그 아래에 AI 판단 이유를 표시합니다. 해당 부분만 고치거나 전체 편집을 할 수 있습니다. 근거·출처가 해결되지 않은 글은 수정본을 저장하고 검증 대기 상태로 보관합니다.</p>
       <div className="operator-heading-actions">
         {(['ALL','WORKING','REVIEW','APPROVED','HELD','PUBLISHED'] as const).map((value) =>
           <button key={value} className="operator-secondary" aria-pressed={filter === value} onClick={() => setFilter(value)}>
@@ -75,8 +75,6 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
         )}
       </div>
     </section>
-
-    <OperatorKnowledgeSources />
 
     <section className="operator-panel knowledge-inbox-list-page">
       <header><h2>글감 목록</h2><strong>{visibleItems.length}건</strong></header>
@@ -99,5 +97,6 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
         </li>)}
       </ul>
     </section>
+    <OperatorKnowledgeSources />
   </section>
 }
