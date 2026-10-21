@@ -1,0 +1,11 @@
+{
+  "id": "KC-source-manifest-json-c919ca8afd",
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-015",
+  "question": "긴급 복구 요청의 우선순위는 어떻게 정할까",
+  "topic_id": "emergency-restoration-prioritization",
+  "source_kind": "PUBLIC_ARCHIVE",
+  "disposition_note": "SESSION_008의 동시 복구 요청 장면에서 질문을 얻었다. K-009는 내부 권한 분담, K-010은 조직 간 사전 협약이다. 이 질문은 복수 현장의 피해·시간·대체수단·가용자원을 비교하고 변경 판단을 기록하는 단계라 중복되지 않는다. 생명 안전에 영향을 주므로 사람 검토를 요청한다.",
+  "source_manifest_ref": "archive/content/transcripts/C03-AFTERFALL/S03/SESSION_008/SOURCE_MANIFEST.json",
+  "source_manifest_sha256": "3d15073c796967f27b1dd094ceecd948ab28b93aed7971818de48cb0e6cd4dc0"
+}
