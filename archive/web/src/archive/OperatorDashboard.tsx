@@ -36,6 +36,15 @@ export type ReviewDetail = ReviewItem & {
   decision_note: string | null; decision_history: Decision[]
 }
 export type Inbox = { pending_count: number; automation_error_count: number; items: ReviewItem[] }
+
+// All C Knowledge approvals must flow through the existing revision-bound
+// editor, not the generic review-decision RPC on this dashboard.
+export function knowledgeReviewEditorHref(item: Pick<ReviewItem, 'source_worker' | 'item_type' | 'id'>, jobs: Record<string, string> = {}): string | null {
+  if (item.source_worker !== 'C_KNOWLEDGE' || item.item_type !== 'KNOWLEDGE') return null
+  const id = jobs[item.id]
+  const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i
+  return typeof id === 'string' && uuid.test(id) ? `/operator/knowledge/${id}/` : '/operator/knowledge/'
+}
 type CronStatus = {
   jobname?: string | null; schedule?: string | null; active?: boolean | null
   last_status?: string | null; last_start_at?: string | null; last_end_at?: string | null
@@ -119,6 +128,7 @@ export function OperatorDashboard({
   error,
   statusError,
   inbox,
+  knowledgeReviewJobs = {},
   roadmapLogs,
   roadmapError,
   systemStatus,
@@ -139,6 +149,7 @@ export function OperatorDashboard({
   error: string
   statusError: string
   inbox: Inbox
+  knowledgeReviewJobs?: Record<string, string>
   roadmapLogs?: RoadmapLog[] | null
   roadmapError?: string
   systemStatus: SystemStatus | null
@@ -422,14 +433,22 @@ export function OperatorDashboard({
         {busy && <p className="operator-muted" aria-live="polite">처리 중…</p>}
         {!inbox.items.length && <p className="operator-empty">현재 대기 중인 검토 항목이 없습니다.</p>}
         <ul className="operator-inbox">
-          {inbox.items.map((item) => <li key={item.id}>
-            <button className={selected?.id === item.id ? 'selected' : ''} onClick={() => onLoadDetail(item.id)}>
-              <span><b>{item.priority}</b><b>{item.item_type}</b><b>{item.risk_level}</b></span>
+          {inbox.items.map((item) => {
+            const editorHref = knowledgeReviewEditorHref(item, knowledgeReviewJobs)
+            const description = editorHref
+              ? 'AI가 게시 전에 확인을 요청한 글입니다. 전체 원고와 검토 이유를 읽고 수정할 수 있습니다.'
+              : item.summary
+            const content = <>
+              <span><b>{item.priority}</b><b>{item.item_type === 'KNOWLEDGE' ? '생존지식' : item.item_type}</b><b>{item.risk_level}</b></span>
               <strong>{item.title}</strong>
-              <small>{item.source_worker} · {item.status} · {item.chronicle_id ?? '공용'}</small>
-              <p>{item.summary}</p>
-            </button>
-          </li>)}
+              <small>{item.source_worker} · {editorHref ? '편집·검토 대기' : item.status} · {item.chronicle_id ?? '공용'}</small>
+              <p>{description}</p>
+            </>
+            return <li key={item.id}>{editorHref
+              ? <a href={editorHref} aria-label={`${item.title} 원고 읽고 수정하기`}>{content}<em>원고 읽기 · 수정 · 발행 요청 →</em></a>
+              : <button className={selected?.id === item.id ? 'selected' : ''} onClick={() => onLoadDetail(item.id)}>{content}</button>
+            }</li>
+          })}
         </ul>
       </section>
 
@@ -446,14 +465,19 @@ export function OperatorDashboard({
           </dl>
           <details><summary>기술 상세 데이터</summary><pre>{JSON.stringify(selected.payload, null, 2)}</pre></details>
           {!!selected.decision_history.length && <div className="operator-history"><h4>결정 기록</h4>{selected.decision_history.map((entry, index) => <p key={index}>{entry.decision} · {entry.actor ?? '운영자'} · {new Date(entry.created_at).toLocaleString()} {entry.note && `· ${entry.note}`}</p>)}</div>}
-          {selected.status === 'PENDING' && <div className="operator-decision">
-            <label>검토 메모<textarea maxLength={1000} value={note} onChange={(event) => onNoteChange(event.target.value)} /></label>
-            <div>
-              <button disabled={busy} onClick={() => onDecide('APPROVED')}>승인</button>
-              <button className="operator-secondary" disabled={busy} onClick={() => onDecide('HOLD')}>보류</button>
-              <button className="operator-danger" disabled={busy} onClick={() => onDecide('REJECTED')}>거절</button>
-            </div>
-          </div>}
+          {selected.status === 'PENDING' && (knowledgeReviewEditorHref(selected, knowledgeReviewJobs)
+            ? <div className="operator-decision">
+                <p className="operator-muted">생존지식 글은 원고를 읽고 수정한 뒤 전용 편집기에서 발행을 요청합니다. 여기에서는 바로 승인하지 않습니다.</p>
+                <a className="operator-secondary" href={knowledgeReviewEditorHref(selected, knowledgeReviewJobs) ?? '/operator/knowledge/'}>원고 읽기 · 수정 · 발행 요청 →</a>
+              </div>
+            : <div className="operator-decision">
+                <label>검토 메모<textarea maxLength={1000} value={note} onChange={(event) => onNoteChange(event.target.value)} /></label>
+                <div>
+                  <button disabled={busy} onClick={() => onDecide('APPROVED')}>승인</button>
+                  <button className="operator-secondary" disabled={busy} onClick={() => onDecide('HOLD')}>보류</button>
+                  <button className="operator-danger" disabled={busy} onClick={() => onDecide('REJECTED')}>거절</button>
+                </div>
+              </div>)}
         </>}
       </section>
     </div>
@@ -462,6 +486,6 @@ export function OperatorDashboard({
       <h2>Chronicles</h2>
       <div>{chronicleRegistry.map((item) => <span key={item.id}>C{String(item.number).padStart(2,'0')} · {item.title}</span>)}</div>
     </section>
-    <p className="operator-muted">검토 결정은 Supabase에 기록되고, 승인된 C 항목만 기존 GitHub CI와 Batched Production 흐름으로 이어집니다. Security/Cost는 실제 데이터원이 연결될 때까지 미연결로 표시합니다.</p>
+    <p className="operator-muted">생존지식은 전용 검토함에서 읽기·수정·발행 요청을 진행합니다. 검토가 끝나도 기존 근거 검사와 정규 Production 배포를 통과한 글만 공개됩니다.</p>
   </section>
 }
