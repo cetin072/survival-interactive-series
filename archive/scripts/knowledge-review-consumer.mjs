@@ -35,7 +35,11 @@ export async function listApprovedReview({ projectUrl, serviceRoleKey, itemId = 
     headers: supabaseHeaders(serviceRoleKey),
     body: JSON.stringify(itemId ? { p_item_id: itemId } : { p_limit: 1 }),
   }, fetchImpl)
-  if (itemId) return data
+  if (itemId) {
+    if (!data || data.status !== 'APPROVED' || data.source_worker !== 'C_KNOWLEDGE' || data.item_type !== 'KNOWLEDGE'
+      || (data.receipt && data.receipt.outcome !== 'RETRYABLE')) return null
+    return { ...data, decision: data.status }
+  }
   if (!Array.isArray(data)) throw new Error('APPROVED_REVIEW_RESPONSE_INVALID')
   return data[0] ?? null
 }

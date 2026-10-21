@@ -11,24 +11,6 @@ create table survival_ops.knowledge_review_retry_audits (
 alter table survival_ops.knowledge_review_retry_audits enable row level security;
 revoke all on survival_ops.knowledge_review_retry_audits from public,anon,authenticated,service_role;
 
-create function public.archive_worker_get_approved_review(p_item_id uuid)
-returns jsonb language plpgsql security definer set search_path='' as $fn$
-declare result jsonb;
-begin
-  if (select auth.jwt()->>'role') is distinct from 'service_role' then
-    raise exception using errcode='42501', message='SURVIVAL_ARCHIVE_WORKER_FORBIDDEN';
-  end if;
-  select jsonb_build_object('id',i.id,'idempotency_key',i.idempotency_key,
-    'source_ref',i.source_ref,'payload',i.payload,'decided_at',i.decided_at,'decision',i.status)
-  into result from survival_ops.archive_review_items i
-  where i.id=p_item_id and i.status='APPROVED' and i.source_worker='C_KNOWLEDGE' and i.item_type='KNOWLEDGE'
-    and not exists(select 1 from survival_ops.archive_review_consumption_receipts r where r.item_id=i.id and r.outcome<>'RETRYABLE');
-  return result;
-end;
-$fn$;
-revoke all on function public.archive_worker_get_approved_review(uuid) from public,anon,authenticated;
-grant execute on function public.archive_worker_get_approved_review(uuid) to service_role;
-
 create function public.archive_worker_retry_validated_review(
  p_item_id uuid,p_decided_at timestamptz,p_receipt_id uuid,p_draft_sha256 text,p_validated_main_sha text)
 returns jsonb language plpgsql security definer set search_path='' as $fn$

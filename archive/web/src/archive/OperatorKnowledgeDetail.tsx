@@ -187,6 +187,12 @@ export function OperatorKnowledgeDetail({
     }
   }, [draftBrief, draftEditable, draftRevision, loadDetail, reviewNote, reviewed, reviewTargets, selected])
 
+  useEffect(() => {
+    if (selected?.review_status !== 'APPROVED' || selected.status === 'PUBLISHED') return
+    const timer = window.setInterval(() => { void loadDetail() }, 15000)
+    return () => window.clearInterval(timer)
+  }, [selected?.review_status, selected?.status, loadDetail])
+
   const evidenceGate = knowledgeEvidenceGate(selected?.result)
 
   return <section className="operator-page knowledge-detail-page">
@@ -215,7 +221,8 @@ export function OperatorKnowledgeDetail({
         <span>{selected.risk_level ?? '위험도 미정'}</span>
       </div>
 
-      {selected.review_status === 'APPROVED' && <p className="knowledge-review-complete-hint" role="status">
+      {selected.status === 'PUBLISHED' && <p className="knowledge-review-complete-hint" role="status">발행 완료 · 공개 홈페이지에서 확인됐습니다.</p>}
+      {selected.review_status === 'APPROVED' && selected.status !== 'PUBLISHED' && <p className="knowledge-review-complete-hint" role="status">
         사람 검토 승인은 저장되었습니다. 원문·근거 검증과 GitHub 병합을 통과하면 정규 배포 날짜를 기다리지 않고 즉시 공개 배포를 확인합니다. 검증에 실패하면 원고는 공개되지 않습니다.
       </p>}
 
@@ -281,7 +288,7 @@ export function OperatorKnowledgeDetail({
           </div>
           <p className="knowledge-review-complete-hint">표시된 구간을 직접 확인·수정하고, 별도 근거 차단이 모두 해소되면 승인할 수 있습니다. 승인 시 편집본을 최신 revision으로 저장하고 검토 완료를 기록합니다. 기존 C3가 근거·계약 검증, PR·CI, 정확한 커밋 병합을 수행하며, 검증된 원고는 정규 배포를 기다리지 않고 공개를 시도합니다.</p>
           <p className="operator-muted">사람 체크만으로 근거 충돌이나 국내 법령·전문가 확인 필요가 사라지지는 않습니다. 근거 검증이 통과하지 않으면 공개는 계속 보류됩니다.</p>
-          {draftDirty && <p className="operator-muted">편집 내용이 저장되지 않았습니다. '초안 저장' 또는 '휴먼체크 완료 · 공개 승인'에서 정확한 수정본을 저장합니다.</p>}
+          {draftDirty && <p className="operator-muted">편집 내용이 저장되지 않았습니다. '초안 저장' 또는 '휴먼체크 완료 · 바로 발행 요청'에서 정확한 수정본을 저장합니다.</p>}
         </div>}
       </>}
 

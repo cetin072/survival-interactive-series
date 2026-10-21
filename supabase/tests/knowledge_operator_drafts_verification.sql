@@ -200,8 +200,8 @@ begin
     perform public.archive_worker_record_review_consumption((v_review->>'id')::uuid,v_decided_at,'BLOCKED',
       '{"reason":"CURRENT_MAIN_MACHINE_VALIDATION_FAILED"}'::jsonb);
     select id into v_receipt_id from survival_ops.archive_review_consumption_receipts where item_id=(v_review->>'id')::uuid;
-    if public.archive_worker_get_approved_review((v_review->>'id')::uuid) is not null then
-      raise exception 'blocked approval was returned'; end if;
+    if public.archive_worker_get_approved_review((v_review->>'id')::uuid)#>>'{receipt,outcome}' is distinct from 'BLOCKED' then
+      raise exception 'blocked receipt missing'; end if;
     begin
       perform public.archive_worker_retry_validated_review((v_review->>'id')::uuid,v_decided_at,v_receipt_id,repeat('f',64),repeat('1',40));
       raise exception 'wrong draft permitted retry';

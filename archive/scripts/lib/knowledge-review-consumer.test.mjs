@@ -226,7 +226,7 @@ test('immediate request selects only its exact approved item', async () => {
     itemId: item.id, fetchImpl: async (url, options) => {
       assert.match(url, /archive_worker_get_approved_review$/)
       assert.deepEqual(JSON.parse(options.body), {p_item_id:item.id})
-      return response(item)
+      return response({ ...item, status: 'APPROVED', source_worker: 'C_KNOWLEDGE', item_type: 'KNOWLEDGE' })
     } })
   assert.equal(selected.id,item.id)
 })
