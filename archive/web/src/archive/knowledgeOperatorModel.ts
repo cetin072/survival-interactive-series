@@ -1,4 +1,10 @@
+import type {EditorialRequest} from './knowledgeEditorialModel'
 export type KnowledgeItem = {
+  editor_archived?: boolean
+  editor_request?: EditorialRequest | null
+  public_record?: EditorialRequest | null
+  updated_at?: string | null
+  has_body?: boolean
   job_id: string
   job_type?: string | null
   status: string
@@ -55,7 +61,12 @@ export const emptyKnowledgeInbox: KnowledgeInbox = {
 }
 
 export const knowledgeBucketFor = (item: KnowledgeItem): Exclude<KnowledgeFilter, 'ALL'> => {
+  if (item.editor_archived === true) return 'HELD'
+  if (item.editor_request?.status === 'PUBLISHED') return 'PUBLISHED'
+  if (item.editor_request && ['QUEUED','CHECKING','WAITING_CI','PUBLISHING'].includes(item.editor_request.status)) return 'APPROVED'
+  if (item.editor_request && ['FAILED','RETRYABLE','CHECKED'].includes(item.editor_request.status)) return 'REVIEW'
   if (item.status === 'PUBLISHED') return 'PUBLISHED'
+  if (item.editor_archived === false && ['HOLD','BLOCKED'].includes(item.status)) return 'REVIEW'
   if (item.status === 'HUMAN_REVIEW') {
     if (item.review_status === 'APPROVED') return 'APPROVED'
     if (item.review_status === 'HOLD' || item.review_status === 'REJECTED') return 'HELD'
@@ -69,10 +80,10 @@ export const knowledgeSourceLabel = (kind?: string | null): string =>
   kind === 'USER_REPORTED_EXPERIENCE' ? '개인 경험' : kind ?? '—'
 
 export const knowledgeBucketLabel: Record<Exclude<KnowledgeFilter, 'ALL'>, string> = {
-  WORKING: '작업 중',
-  REVIEW: '사람 검토',
-  APPROVED: '휴먼체크 완료',
-  HELD: '보관',
+  WORKING: '초안 작성 중',
+  REVIEW: '검토할 글',
+  APPROVED: '발행 중',
+  HELD: '보관함',
   PUBLISHED: '게시됨',
 }
 

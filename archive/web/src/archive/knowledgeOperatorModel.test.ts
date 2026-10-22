@@ -13,7 +13,7 @@ describe('Knowledge operator review queue', () => {
 
   it('shows human-check approval separately and never calls it published', () => {
     expect(knowledgeBucketFor(item('APPROVED'))).toBe('APPROVED')
-    expect(knowledgeBucketLabel.APPROVED).toBe('휴먼체크 완료')
+    expect(knowledgeBucketLabel.APPROVED).toBe('발행 중')
     expect(knowledgeBucketFor({ ...item('APPROVED'), status: 'PUBLISHED' })).toBe('PUBLISHED')
   })
 

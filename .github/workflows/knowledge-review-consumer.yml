@@ -6,6 +6,10 @@ on:
     - cron: '17 * * * *'
   workflow_dispatch:
     inputs:
+      editorial_request_id:
+        description: Exact saved editorial request; empty retains the existing review queue
+        type: string
+        required: false
       review_item_id:
         description: 'Exact approved review item; empty uses the existing scheduled queue'
         type: string
@@ -21,7 +25,30 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  editorial:
+    if: inputs.editorial_request_id != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Validate exact saved revision and publish only after required CI
+        env:
+          EDITORIAL_REQUEST_ID: ${{ inputs.editorial_request_id }}
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+          NETLIFY_PRODUCTION_BUILD_HOOK: ${{ secrets.NETLIFY_PRODUCTION_BUILD_HOOK }}
+        run: node archive/scripts/knowledge-editor-request.mjs
+
   consume:
+    if: inputs.editorial_request_id == ''
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:

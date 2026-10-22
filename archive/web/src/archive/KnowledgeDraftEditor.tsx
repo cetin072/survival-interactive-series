@@ -101,10 +101,7 @@ export function KnowledgeDraftEditor({
   }
 
   return <div className="knowledge-draft-editor">
-    <div className="knowledge-draft-fixed">
-      <span>질문 제목 · Evidence 연결 때문에 V1에서는 고정</span>
-      <strong>{brief.title}</strong>
-    </div>
+    <label className="knowledge-draft-field">제목<input disabled={disabled} value={brief.title} onChange={event => onChange(setText(brief, 'title', event.target.value))} /></label>
 
     {([
       ['summary', '요약'],
@@ -140,7 +137,7 @@ export function KnowledgeDraftEditor({
           <div>
             <button type="button" disabled={disabled || sectionIndex === 0} onClick={() => moveSection(sectionIndex, -1)}>↑</button>
             <button type="button" disabled={disabled || sectionIndex === brief.sections.length - 1} onClick={() => moveSection(sectionIndex, 1)}>↓</button>
-            <button type="button" className="operator-danger" disabled={disabled || brief.sections.length <= 1} onClick={() => {
+            <button type="button" className="operator-danger" disabled={disabled} onClick={() => {
               const next = clone(brief); next.sections.splice(sectionIndex, 1); onChange(next)
             }}>삭제</button>
           </div>
@@ -148,11 +145,11 @@ export function KnowledgeDraftEditor({
 
         {section.blocks.map((block, blockIndex) => <article className="knowledge-draft-block" key={blockIndex}>
           <div className="knowledge-draft-block-head">
-            <strong>{block.type}</strong>
+            <strong>{{prose:'문단',note:'주의',ordered_list:'순서 목록',unordered_list:'목록',image:'이미지',youtube:'영상',table:'표','download/tool':'자료'}[block.type]}</strong>
             <div>
               <button type="button" disabled={disabled || blockIndex === 0} onClick={() => moveBlock(sectionIndex, blockIndex, -1)}>↑</button>
               <button type="button" disabled={disabled || blockIndex === section.blocks.length - 1} onClick={() => moveBlock(sectionIndex, blockIndex, 1)}>↓</button>
-              <button type="button" className="operator-danger" disabled={disabled || section.blocks.length <= 1} onClick={() => updateSection(sectionIndex, (target) => { target.blocks.splice(blockIndex, 1) })}>삭제</button>
+              <button type="button" className="operator-danger" disabled={disabled} onClick={() => updateSection(sectionIndex, (target) => { target.blocks.splice(blockIndex, 1) })}>삭제</button>
             </div>
           </div>
 
@@ -169,7 +166,7 @@ export function KnowledgeDraftEditor({
             value={block.items.join('\n')}
             placeholder="한 줄에 한 항목"
             onChange={(event) => updateBlock(sectionIndex, blockIndex, (target) => {
-              if (target.type === 'ordered_list' || target.type === 'unordered_list') target.items = event.target.value.split('\n')
+              if (target.type === 'ordered_list' || target.type === 'unordered_list') target.items = event.target.value.split('\n').filter(item => item.trim())
             })}
           />}
 
@@ -216,7 +213,7 @@ export function KnowledgeDraftEditor({
             <label>영상 설명<input disabled={disabled} value={block.title} onChange={(event) => updateBlock(sectionIndex, blockIndex, (target) => { if (target.type === 'youtube') target.title = event.target.value })} /></label>
           </div>}
 
-          {block.type === 'table' && <div className="knowledge-draft-readonly">표 블록은 V1에서 보존만 합니다. 내용 변경은 이후 필요성이 확인되면 확장합니다.</div>}
+          {block.type === 'table' && <div className="knowledge-preview-table"><table><thead><tr>{block.headers.map((cell, ci) => <th key={ci}><input aria-label={'표 제목 '+(ci+1)} disabled={disabled} value={cell} onChange={e=>updateBlock(sectionIndex,blockIndex,b=>{if(b.type==='table')b.headers[ci]=e.target.value})} /></th>)}</tr></thead><tbody>{block.rows.map((row,ri)=><tr key={ri}>{row.map((cell,ci)=><td key={ci}><input aria-label={'표 '+(ri+1)+'행 '+(ci+1)+'열'} disabled={disabled} value={cell} onChange={e=>updateBlock(sectionIndex,blockIndex,b=>{if(b.type==='table')b.rows[ri][ci]=e.target.value})}/></td>)}<td><button disabled={disabled} onClick={()=>updateBlock(sectionIndex,blockIndex,b=>{if(b.type==='table')b.rows.splice(ri,1)})}>행 삭제</button></td></tr>)}</tbody></table><button disabled={disabled} onClick={()=>updateBlock(sectionIndex,blockIndex,b=>{if(b.type==='table')b.rows.push(b.headers.map(()=>''))})}>행 추가</button></div>}
           {block.type === 'download/tool' && <div className="knowledge-draft-readonly">도구 블록 · {block.tool_path}</div>}
         </article>)}
 
@@ -233,6 +230,7 @@ export function KnowledgeDraftEditor({
       </section>)}
     </div>
 
+    <section aria-label="출처 편집"><h3>출처 보강</h3>{(brief.sources??[]).map((source,index)=><fieldset key={index}><legend>출처 {index+1}</legend>{(['title','url','note','checked_at'] as const).map(key=><label key={key}>{{title:'자료 제목',url:'원문 주소',note:'확인한 내용과 한계',checked_at:'확인 날짜'}[key]}<input disabled={disabled} value={source[key]??''} onChange={e=>{const next=clone(brief);next.sources![index][key]=e.target.value;onChange(next)}} /></label>)}<button disabled={disabled} onClick={()=>{const next=clone(brief);next.sources!.splice(index,1);onChange(next)}}>출처 삭제</button></fieldset>)}<button disabled={disabled} onClick={()=>{const next=clone(brief);next.sources??=[];let i=1;while(next.sources.some(s=>s.id==='S-'+i))i++;next.sources.push({id:'S-'+i,title:'',url:'',note:'',checked_at:new Date().toISOString().slice(0,10)});onChange(next)}}>출처 추가</button></section>
     <button type="button" className="operator-secondary knowledge-add-section" disabled={disabled} onClick={() => {
       const next = clone(brief)
       next.sections.push({ heading: '새 섹션', blocks: [{ type: 'prose', text: '' }] })

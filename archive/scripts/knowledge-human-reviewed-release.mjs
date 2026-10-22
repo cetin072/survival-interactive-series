@@ -43,6 +43,16 @@ export async function ensureReviewedMain({ payload, preparedSha, githubToken, fe
   return brief
 }
 export async function ensureApproval({ env, payload, fetcher = fetch }) {
+  if(env.EDITORIAL_REQUEST_ID) {
+    if(env.EDITORIAL_REQUEST_ID!==payload.review_item_id)throw Error('HUMAN_APPROVED_DB_PROOF_INVALID')
+    const request=await postSupabaseRpc({projectUrl:env.ARCHIVE_SUPABASE_URL,serviceRoleKey:env.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY,
+      name:'archive_worker_knowledge_editor_request',args:{p_request_id:env.EDITORIAL_REQUEST_ID,p_action:'GET'},fetchImpl:fetcher})
+    if(request.status!=='PUBLISHING'||request.publish_requested!==true||!request.approved_by
+      ||request.result?.brief_id!==payload.brief_id||request.result?.pr_number!==payload.pr_number
+      ||request.result?.prepared_sha!==env.PREPARED_SHA||request.result?.merge_sha!==payload.merge_sha
+      ||request.snapshot?.brief?.id!==payload.brief_id)throw Error('HUMAN_APPROVED_DB_PROOF_INVALID')
+    return request.snapshot.brief
+  }
   const data = await postSupabaseRpc({ projectUrl: env.ARCHIVE_SUPABASE_URL, serviceRoleKey: env.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY,
     name: 'archive_knowledge_review_package', args: { p_item_id: payload.review_item_id, p_decided_at: env.DECIDED_AT }, fetchImpl: fetcher })
   if (data.status !== 'C3' || data.review?.id !== payload.review_item_id || data.review.status !== 'APPROVED'
