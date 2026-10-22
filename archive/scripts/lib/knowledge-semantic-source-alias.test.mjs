@@ -5,6 +5,8 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { archivedS03RawLocation, readVerifiedArchivedS03Raw } from './knowledge-semantic-source-alias.mjs'
+import { chapterHash, hashPolicyBytes } from './knowledge-semantic-jobs.mjs'
+import { verifyPins } from '../knowledge-semantic-finalize.mjs'
 
 const root = resolve(import.meta.dirname, '../../..')
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex')
@@ -73,4 +75,48 @@ test('archive alias fails closed for missing manifest, false public-safe metadat
   } finally {
     await rm(dir,{recursive:true,force:true})
   }
+})
+
+test('real Finalizer verifyPins accepts the S03 Reader source only via a byte-verified public archive', async () => {
+  const readerBookRef = 'archive/content/stories/C03-AFTERFALL/BOOK.json'
+  const book = JSON.parse(await readFile(join(root, readerBookRef), 'utf8'))
+  const chapter = book.chapters.find((item) => item.sourceKind === 'VERIFIED_GM_NARRATIVE'
+    && item.sourceRefs?.includes(raw('002')))
+  assert.ok(chapter, 'expected source-pinned public Reader chapter for SESSION_002')
+  const chapterSha256 = chapterHash(chapter)
+  const [policyBytes, configBytes, editorialBytes] = await Promise.all([
+    readFile(join(root, 'knowledge/automation/worker-policy.json')),
+    readFile(join(root, 'knowledge/automation/config.json')),
+    readFile(join(root, 'docs/KNOWLEDGE_BRIEF_EDITORIAL_SPEC_V1.md')),
+  ])
+  const policySha256 = hashPolicyBytes(policyBytes, configBytes, editorialBytes)
+  const config = JSON.parse(configBytes.toString('utf8'))
+  const sourceRef = `${readerBookRef}#${chapter.id}`
+  const job = {
+    source_kind: 'PUBLIC_READER',
+    source_ref: sourceRef,
+    source_sha256: chapterSha256,
+    policy_sha256: policySha256,
+    policy_pin: { sha256: policySha256 },
+    semantic_context: {
+      source: {
+        kind: 'PUBLIC_READER',
+        ref: sourceRef,
+        sha256: chapterSha256,
+        chapter_id: chapter.id,
+        chapter_sha256: chapterSha256,
+        reader_book_ref: readerBookRef,
+        refs: chapter.sourceRefs,
+        hashes: chapter.sourceHashes,
+      },
+      target: { brief_id: 'K-TEST' },
+      policy: {
+        publication_mode: config.publication_mode,
+        auto_publish_enabled: config.auto_publish_enabled,
+      },
+    },
+  }
+  const verified = await verifyPins(job, root)
+  assert.equal(verified.context.source.sha256, chapterSha256)
+  assert.equal(chapter.sourceHashes[chapter.sourceRefs.indexOf(raw('002'))], cases[1][1])
 })
