@@ -1,3 +1,4 @@
+import { readPinnedSourceBytes } from './knowledge-semantic-pins.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
@@ -119,4 +120,26 @@ test('real Finalizer verifyPins accepts the S03 Reader source only via a byte-ve
   const verified = await verifyPins(job, root)
   assert.equal(verified.context.source.sha256, chapterSha256)
   assert.equal(chapter.sourceHashes[chapter.sourceRefs.indexOf(raw('002'))], cases[1][1])
+})
+
+test('S04 K-046 archive is byte-identical, with season and manifest pins enforced', async () => {
+  const ref = 'worldlines/AFTERFALL/seasons/S04/raw_transcript/SESSION_001/PART_001.md'
+  const expectedSha256 = '5217b71025a5e39f248bd431c4cc2c09c35a0174faa0bd1f3c006e56f7da8152'
+  const bytes = await readVerifiedArchivedS03Raw({base:root,ref,expectedSha256})
+  assert.equal(sha(bytes), expectedSha256)
+  const location = archivedS03RawLocation(ref)
+  const manifest = JSON.parse(await readFile(join(root,location.manifestRef),'utf8'))
+  for (const change of [{season_id:'S03'}, {visibility:'PRIVATE'}, {atomic_pairing_complete:false}, {capture_quality:'UNVERIFIED'}, {parts:[]}, {parts_sha256:{}}]) {
+    await assert.rejects(readVerifiedArchivedS03Raw({base:root,ref,expectedSha256,read:async (path) => path.endsWith('SOURCE_MANIFEST.json') ? Buffer.from(JSON.stringify({...manifest,...change})) : bytes}), /SEMANTIC_ARCHIVE_PROVENANCE_INVALID/)
+  }
+})
+
+test('main then worldline originals take precedence; S02 still uses worldline without archive alias', async () => {
+  const ref = 'worldlines/AFTERFALL/seasons/S02/raw_transcript/SESSION_001/PART_001.md'
+  const original = Buffer.from('verified original')
+  let branchReads = 0
+  assert.equal(await readPinnedSourceBytes({base:root,ref,expectedHash:sha(original),read:async () => original,readWorldline:async () => {branchReads++;throw Error('must not read branch')}}), original)
+  assert.equal(branchReads,0)
+  assert.equal(await readPinnedSourceBytes({base:root,ref,expectedHash:sha(original),read:async () => {throw Object.assign(Error('missing'),{code:'ENOENT'})},readWorldline:async () => original}), original)
+  await assert.rejects(readPinnedSourceBytes({base:root,ref,expectedHash:sha(original),read:async () => {throw Object.assign(Error('missing'),{code:'ENOENT'})},readWorldline:async () => {throw Error('missing')}}), /SEMANTIC_SOURCE_UNAVAILABLE/)
 })
