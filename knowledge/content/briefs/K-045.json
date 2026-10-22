@@ -19,7 +19,7 @@
     ],
     "sha256": "a2a1447e2648605ac1740ef51e41eb1f24a35672675ce8cc6aa09f45220a4e44"
   },
-  "status": "READY",
+  "status": "PUBLISHED",
   "sources": [
     {
       "id": "FEMA-ICS218-EQUIPMENT-INVENTORY",
@@ -196,7 +196,7 @@
   ],
   "candidate_id": "KC-c03-afterfall-auto-7a589e3a941834319a8-707697a6fb",
   "content_type": "BRIEF",
-  "published_at": null,
+  "published_at": "2026-10-22",
   "risk_domains": [
     "GENERAL_PREPAREDNESS"
   ],
