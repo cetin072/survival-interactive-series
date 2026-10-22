@@ -13,7 +13,7 @@
     "knowledge:build": "node ../scripts/build-knowledge.mjs",
     "knowledge:check": "node ../scripts/build-knowledge.mjs --check && node ../scripts/knowledge-scan.mjs --check",
     "knowledge:test": "node --test ../scripts/lib/knowledge.test.mjs ../scripts/lib/knowledge-experience.test.mjs ../scripts/lib/knowledge-public.test.mjs ../scripts/lib/knowledge-page.test.mjs ../scripts/lib/knowledge-share.test.mjs ../scripts/lib/knowledge-editorial-v2.test.mjs",
-    "knowledge:semantic:test": "node --test ../scripts/lib/knowledge-story-refs.test.mjs ../scripts/lib/knowledge-semantic-jobs.test.mjs ../scripts/lib/knowledge-semantic-finalizer.test.mjs ../scripts/lib/knowledge-main-drift.test.mjs ../scripts/lib/knowledge-draft-recovery.test.mjs ../scripts/lib/knowledge-evidence-shape.test.mjs",
+    "knowledge:semantic:test": "node --test ../scripts/lib/knowledge-story-refs.test.mjs ../scripts/lib/knowledge-semantic-jobs.test.mjs ../scripts/lib/knowledge-semantic-finalizer.test.mjs ../scripts/lib/knowledge-semantic-source-alias.test.mjs ../scripts/lib/knowledge-main-drift.test.mjs ../scripts/lib/knowledge-draft-recovery.test.mjs ../scripts/lib/knowledge-evidence-shape.test.mjs",
     "knowledge:publish-prepare": "node ../scripts/knowledge-publish-prepare.mjs",
     "knowledge:review-sync": "node ../scripts/knowledge-review-sync.mjs",
     "wiki:seed:test": "node --test ../scripts/lib/reader-wiki-seed.test.mjs"
