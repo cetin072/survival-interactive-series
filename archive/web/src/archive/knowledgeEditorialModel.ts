@@ -1,10 +1,10 @@
 import type { KnowledgeDraftBrief } from './KnowledgeDraftEditor'
-export type EditorialClaim = { claim: string; source_ids: string[]; context: string; limitation: string }
+export type EditorialClaim = { role?:'REAL'|'NARRATIVE'; claim: string; source_ids: string[]; context: string; limitation: string }
 export type EditorialResolution = { key: string; method: string; quote: string; reason: string; source_ids: string[] }
-export type EditorialReview = { claims: EditorialClaim[]; resolutions: EditorialResolution[]; rights?: Array<{ source_id: string; url: string; quote: string }> }
+export type EditorialReview = { claims: EditorialClaim[]; resolutions: EditorialResolution[]; duplicate_note?:string; rights?: Array<{ source_id: string; url: string; quote: string }> }
 export type EditorialIssue = {key:string; reason:string; kind:string; quote?:string}
 export type EditorialRequest = {request_id:string; revision:number; publish_requested:boolean; status:string; updated_at:string; result?:{reason?:string;issues?:Array<{key:string;message:string;action?:string}>;public_url?:string;merge_sha?:string}}
-export type EditorialEnvelope = {job_id:string;revision:number;draft_sha256?:string;brief:KnowledgeDraftBrief|null;original?:Record<string, unknown>;context?:Record<string, unknown>;archived:boolean;evidence_review:EditorialReview;status:string;blocker_code?:string;updated_at?:string;request?:EditorialRequest|null;public_record?:EditorialRequest|null;history:Array<{revision:number;draft_sha256:string;created_at:string}>;source_ref?:string;brief_id:string}
+export type EditorialEnvelope = {job_id:string;revision:number;draft_sha256?:string;brief:KnowledgeDraftBrief|null;original?:Record<string, unknown>;context?:Record<string, unknown>;archived:boolean;evidence_review:EditorialReview;status:string;blocker_code?:string;updated_at?:string;request?:EditorialRequest|null;public_record?:EditorialRequest|null;related_public?:Array<{title:string;url:string}>;history:Array<{revision:number;draft_sha256:string;created_at:string}>;source_ref?:string;brief_id:string}
 export const publicationActive = (r?:EditorialRequest|null) => !!r && ['QUEUED','CHECKING','WAITING_CI','PUBLISHING'].includes(r.status)
 export function editorialStatus(value:EditorialEnvelope):string {
  const r=value.request
@@ -48,13 +48,32 @@ export function quoteLocations(brief:KnowledgeDraftBrief,quote:string):number {
 }
 
 // Lossless structural projection for old drafts; callers keep the raw original.
-export function readableBrief(raw:KnowledgeDraftBrief):KnowledgeDraftBrief {
+export function readableBrief(raw:KnowledgeDraftBrief, original?:Record<string,unknown>):KnowledgeDraftBrief {
  const brief=JSON.parse(JSON.stringify(raw)) as KnowledgeDraftBrief
- brief.sections=(Array.isArray(brief.sections)?brief.sections:[]).map(section=>{
+ const evidence=(original?.evidence??{}) as {sources?:KnowledgeDraftBrief['sources'];source_checked_at?:string}
+ const markdown=typeof raw.body_md==='string'?raw.body_md:''
+ const markdownSections=markdown?markdown.split(/^## +/m).filter(Boolean).map((part,index)=>({heading:index===0?'본문':part.split('\n')[0].trim(),blocks:[{type:'prose',text:index===0?part.trim():part.slice(part.indexOf('\n')+1).trim()}]})):[]
+ brief.sections=(Array.isArray(brief.sections)?brief.sections:markdownSections).map(section=>{
   const old=section as unknown as {body?:string;blocks?:unknown[];heading:string}
   const blocks=Array.isArray(old.blocks)?old.blocks:typeof old.body==='string'?[{type:'prose',text:old.body}]:[]
   return {heading:old.heading??'',blocks:blocks.map(b=>{const block=b as Record<string,unknown>;if(block.type==='table'&&!Array.isArray(block.headers)&&Array.isArray(block.columns))return {...block,headers:block.columns};return block})} as KnowledgeDraftBrief['sections'][number]
  })
- brief.sources=Array.isArray(brief.sources)?brief.sources:[]
+ brief.sources=(Array.isArray(brief.sources)?brief.sources:evidence.sources??[]).map(source=>({...source,note:source.note??[(source as Record<string,unknown>).context,(source as Record<string,unknown>).limitation].filter(v=>typeof v==='string').join(' ')}))
+ brief.slug??='knowledge-'+brief.id.toLowerCase()
+ brief.topic_id??='community-emergency-resource-management'
+ brief.summary??=typeof raw.dek==='string'?raw.dek:''
+ for(const field of ['meta_description','lead','scope','basis','footer'])brief[field]??=''
+ brief.label??='생존 지식'
+ brief.editorial_note??='보존된 원문을 편집용 구조로 옮긴 초안입니다. 내용 검토와 발행 승인은 별도로 진행합니다.'
+ brief.source_checked_at??=evidence.source_checked_at??''
+ brief.risk_level??='HIGH'
+ brief.risk_domains??=['OTHER_SEVERE_HARM']
+ brief.publication_policy??='HUMAN_APPROVED'
+ brief.ai_assisted??=true
+ brief.content_type??='BRIEF'
+ brief.guide_id??=null
+ brief.tools??=[]
+ brief.related_brief_ids??=[]
+ brief.story_refs??=[]
  return brief
 }

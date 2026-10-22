@@ -123,6 +123,7 @@ export function KnowledgeDraftEditor({
       </label>
     )}
 
+    <section><h3>자료 연결</h3>{((brief.tools??[]) as unknown[]).map((tool,i)=><div key={i}><p>{typeof tool==='string'?tool:'title' in (tool as object)?String((tool as {title:string}).title):'연결된 자료'}</p><button disabled={disabled} onClick={()=>{const next=clone(brief);(next.tools as unknown[]).splice(i,1);onChange(next)}}>자료 연결 삭제</button></div>)}</section>
     <div className="knowledge-draft-sections">
       {brief.sections.map((section, sectionIndex) => <section className="knowledge-draft-section" key={sectionIndex}>
         <header>
@@ -239,11 +240,17 @@ export function KnowledgeDraftEditor({
   </div>
 }
 
-function renderBlock(block: KnowledgeDraftBlock, key: number): ReactNode {
-  if (block.type === 'prose') return <p key={key}>{block.text}</p>
-  if (block.type === 'note') return <div className="knowledge-preview-note" key={key}>{block.text}</div>
-  if (block.type === 'ordered_list') return <ol key={key}>{block.items.filter(Boolean).map((item, index) => <li key={index}>{item}</li>)}</ol>
-  if (block.type === 'unordered_list') return <ul key={key}>{block.items.filter(Boolean).map((item, index) => <li key={index}>{item}</li>)}</ul>
+function highlightText(value:string,quotes:string[]):ReactNode {
+  const matching=quotes.filter(q=>q&&value.includes(q))
+  if(!matching.length)return value
+  const quote=matching.sort((a,b)=>b.length-a.length)[0],parts=value.split(quote)
+  return parts.flatMap((part,index)=>index?[<mark key={'q'+index}>{quote}</mark>,part]:[part])
+}
+function renderBlock(block: KnowledgeDraftBlock, key: number, quotes:string[]=[]): ReactNode {
+  if (block.type === 'prose') return <p key={key}>{highlightText(block.text,quotes)}</p>
+  if (block.type === 'note') return <div className="knowledge-preview-note" key={key}>{highlightText(block.text,quotes)}</div>
+  if (block.type === 'ordered_list') return <ol key={key}>{block.items.filter(Boolean).map((item, index) => <li key={index}>{highlightText(item,quotes)}</li>)}</ol>
+  if (block.type === 'unordered_list') return <ul key={key}>{block.items.filter(Boolean).map((item, index) => <li key={index}>{highlightText(item,quotes)}</li>)}</ul>
   if (block.type === 'image') return block.src.startsWith('https://') ? <figure className="knowledge-preview-media" key={key}><img src={block.src} alt={block.alt} />{block.caption && <figcaption>{block.caption}</figcaption>}</figure> : null
   if (block.type === 'youtube') {
     const id = youtubeId(block.url)
@@ -254,14 +261,14 @@ function renderBlock(block: KnowledgeDraftBlock, key: number): ReactNode {
   return null
 }
 
-export function KnowledgeDraftPreview({ brief }: { brief: KnowledgeDraftBrief }) {
+export function KnowledgeDraftPreview({ brief, highlights=[] }: { brief: KnowledgeDraftBrief; highlights?:string[] }) {
   return <article className="knowledge-draft-preview">
     <p className="archive-eyebrow">{brief.label}</p>
     <h2>{brief.title}</h2>
-    <p className="knowledge-preview-lead">{brief.lead}</p>
+    <p className="knowledge-preview-lead">{highlightText(brief.lead,highlights)}</p>
     {brief.sections.map((section, sectionIndex) => <section key={sectionIndex}>
       <h3>{section.heading}</h3>
-      {section.blocks.map(renderBlock)}
+      {section.blocks.map((block,i)=>renderBlock(block,i,highlights))}
     </section>)}
     {!!brief.sources?.length && <section>
       <h3>출처와 확인 범위</h3>

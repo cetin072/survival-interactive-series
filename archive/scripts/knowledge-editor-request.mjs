@@ -10,7 +10,7 @@ import {postSupabaseRpc} from './lib/knowledge-semantic-jobs.mjs'
 import {verifyPins} from './knowledge-semantic-finalize.mjs'
 import {evaluateEditorialSnapshot,verifyEditorialRights} from './lib/knowledge-editor-review.mjs'
 import {checkHumanApprovedRelease} from './lib/knowledge-release.mjs'
-import {releaseReviewed} from './knowledge-human-reviewed-release.mjs'
+import {releaseReviewed,verifyPublicArticle} from './knowledge-human-reviewed-release.mjs'
 const repo='cetin072/survival-interactive-series'
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i
 const root=resolve(import.meta.dirname,'../..')
@@ -22,8 +22,7 @@ const rpc=(name,args)=>postSupabaseRpc({projectUrl:process.env.ARCHIVE_SUPABASE_
 const pause=ms=>new Promise(r=>setTimeout(r,ms))
 export function candidateFromSnapshot(snapshot, brief) {
  const j=snapshot.job,s=j.semantic_context.source
- if(j.semantic_result?.candidate) return {...structuredClone(j.semantic_result.candidate),question:brief.title,brief_id:brief.id}
- const c={id:j.semantic_context.target.candidate_id,topic_id:brief.topic_id,question:brief.title,brief_id:brief.id,source_kind:j.source_kind,status:'BRIEF_PROPOSED',disposition_note:'운영자가 보관된 글감에서 새 원고를 작성하고 검토를 요청했습니다.'}
+ const c={...structuredClone(j.semantic_result?.candidate??{}),id:j.semantic_context.target.candidate_id,topic_id:brief.topic_id,question:brief.title,brief_id:brief.id,source_kind:j.source_kind,status:'BRIEF_PROPOSED',disposition_note:'운영자가 보관된 글감에서 새 원고를 작성하고 검토를 요청했습니다.'}
  if(j.source_kind==='PUBLIC_READER') Object.assign(c,{reader_book_ref:s.reader_book_ref,reader_book_sha256:s.reader_book_sha256,reader_chapter_id:s.chapter_id,reader_chapter_sha256:s.chapter_sha256,source_refs:s.refs,source_hashes:s.hashes})
  else if(j.source_kind==='PUBLIC_ARCHIVE') Object.assign(c,{source_manifest_ref:j.source_ref,source_manifest_sha256:j.source_sha256})
  else Object.assign(c,{source_ref:j.source_ref,source_sha256:j.source_sha256})
@@ -33,13 +32,16 @@ export async function prepareEditorialFiles({snapshot,base=root,sourceVerifier=v
  const {job,brief:approved,review}=snapshot
  // Pin verifier never consults the editable copy for source/policy authority.
  await sourceVerifier(job,base)
- const rightsVerified=job.semantic_result?.evidence?.copyright_status==='CLEAR'||await rightsVerifier(approved,review)
+ const sameSources=JSON.stringify(approved.sources)===JSON.stringify(job.semantic_result?.brief?.sources)
+ const rightsVerified=(sameSources&&job.semantic_result?.evidence?.copyright_status==='CLEAR')||await rightsVerifier(approved,review,{trustedSources:job.semantic_result?.evidence?.copyright_status==='CLEAR'?job.semantic_result.brief?.sources??[]:[]})
  const evaluation=evaluateEditorialSnapshot(snapshot,{sourceVerified:true,rightsVerified})
  if(evaluation.issues.length) return evaluation
  const data=await loadKnowledge(base)
  const prior=data.briefs.find(b=>b.id===approved.id)
  if(prior&&job.status!=='PUBLISHED') throw Error('KNOWLEDGE_EDITOR_RESERVED_ID_CONFLICT')
  if(prior&&(prior.slug!==approved.slug||prior.id!==approved.id))throw Error('KNOWLEDGE_EDITOR_PUBLIC_URL_CHANGED')
+ const authored=['id','slug','title','summary','meta_description','lead','label','scope','basis','footer','editorial_note','sections','sources','tools','source_checked_at','risk_level','risk_domains','story_refs','related_brief_ids','guide_id']
+ if(prior?.status==='PUBLISHED'&&authored.every(key=>JSON.stringify(prior[key]??null)===JSON.stringify(approved[key]??null)))return {...evaluation,status:'ALREADY_LIVE',brief:prior,brief_id:prior.id}
  const today=new Date().toISOString().slice(0,10)
  const brief={...structuredClone(approved),content_type:'BRIEF',status:'READY',publication_policy:'HUMAN_APPROVED',
   // A server-side structural/content/evidence check creates this projection.
@@ -51,10 +53,14 @@ export async function prepareEditorialFiles({snapshot,base=root,sourceVerifier=v
  }
  const candidate=candidateFromSnapshot(snapshot,brief)
  candidate.question=brief.title
- if(data.candidates.some(c=>c.id===candidate.id&&c.brief_id!==brief.id))throw Error('KNOWLEDGE_EDITOR_CANDIDATE_COLLISION')
+ if(data.candidates.some(c=>c.id===candidate.id&&c.brief_id!==brief.id))candidate.id='KC-editorial-'+job.job_id
  // No guessed Story registry IDs. Narrative provenance remains in pinned Candidate.
  const validStories=new Set(data.stories.map(s=>s.id))
- if(brief.story_refs.some(id=>!validStories.has(id)))throw Error('KNOWLEDGE_EDITOR_STORY_REFERENCE_INVALID')
+ const invalid=brief.story_refs.filter(id=>!validStories.has(id))
+ const provenance=new Set([job.source_ref,job.semantic_context.source.reader_book_ref,...job.semantic_context.source.refs])
+ if(invalid.some(id=>!provenance.has(id)))throw Error('KNOWLEDGE_EDITOR_STORY_REFERENCE_INVALID')
+ brief.story_refs=brief.story_refs.filter(id=>validStories.has(id))
+ if(invalid.length)evaluation.evidence.editorial_review.projected_provenance_refs=invalid
  const topic=data.topics.find(t=>t.id===brief.topic_id)
  if(!topic) {
   const proposed=job.semantic_result?.topic
@@ -99,6 +105,15 @@ async function main() {
   console.log(JSON.stringify({status:request.status,request_id:requestId}))
  }
  try {
+  if(request.publish_requested&&request.result?.pr_number&&!request.result?.merge_sha) {
+   const previousPr=JSON.parse(gh('api','repos/'+repo+'/pulls/'+request.result.pr_number))
+   if(previousPr.merged_at&&previousPr.head?.sha===request.result.prepared_sha)await update('PUBLISHING',{merge_sha:previousPr.merge_commit_sha})
+  }
+  if(request.publish_requested&&request.result?.merge_sha&&request.result?.prepared_sha) {
+   await update('PUBLISHING')
+   const live=await releaseReviewed({env:{...process.env,EDITORIAL_REQUEST_ID:requestId,REVIEW_ITEM_ID:requestId,BRIEF_ID:request.result.brief_id,MERGE_SHA:request.result.merge_sha,PREPARED_SHA:request.result.prepared_sha,PR_NUMBER:String(request.result.pr_number)}})
+   await update('PUBLISHED',live);return
+  }
   const current=JSON.parse(gh('api','repos/'+repo+'/git/ref/heads/main')).object.sha
   git('fetch','origin','main:refs/remotes/origin/main');git('switch','--detach',current)
   const snapshot=request.snapshot, job=snapshot.job
@@ -111,6 +126,16 @@ async function main() {
   }
   const preparation=await prepareEditorialFiles({snapshot})
   if(preparation.issues?.length){await update('FAILED',{issues:preparation.issues});return}
+  if(preparation.status==='ALREADY_LIVE') {
+   if(!request.publish_requested){await update('CHECKED',{issues:[],reason:'NO_CHANGES'});return}
+   const metaResponse=await fetch('https://survival-diary-archive.netlify.app/deploy-meta.json',{cache:'no-store'})
+   if(!metaResponse.ok)throw Error('KNOWLEDGE_EDITOR_PUBLIC_READ_FAILED')
+   const meta=await metaResponse.json()
+   if(meta.context!=='production'||!/^[a-f0-9]{40}$/.test(meta.commit_ref??''))throw Error('KNOWLEDGE_EDITOR_PUBLIC_READ_FAILED')
+   const path=await verifyPublicArticle({payload:{merge_sha:meta.commit_ref},brief:preparation.brief})
+   await update('PUBLISHING',{reason:'ALREADY_LIVE'})
+   await update('PUBLISHED',{status:'LIVE_VERIFIED',merge_sha:meta.commit_ref,public_url:'https://survival-diary-archive.netlify.app'+path,verified_at:new Date().toISOString(),issues:[]});return
+  }
   command('npm',['ci'],join(root,'archive/web'))
   command('npm',['run','knowledge:build'],join(root,'archive/web'))
   command('npm',['run','knowledge:test'],join(root,'archive/web'))
@@ -119,7 +144,7 @@ async function main() {
   if(!request.publish_requested){await update('CHECKED',{issues:[],checked_revision:request.revision});return}
   command('node',['archive/scripts/knowledge-human-approved-prepare.mjs','--brief',preparation.brief_id,'--base',current,'--head','HEAD'])
   const brief=JSON.parse(await readFile(join(root,'knowledge/content/briefs/'+preparation.brief_id+'.json'),'utf8'))
-  const candidate=candidateFromSnapshot(snapshot,brief)
+  const candidate=(await loadKnowledge(root)).candidates.find(c=>c.brief_id===brief.id)
   const changed=git('status','--porcelain').split(/\r?\n/).filter(Boolean).map(s=>s.slice(3))
   if(!changed.length) {await update('CHECKED',{issues:[],reason:'NO_CHANGES'});return}
   if(changed.some(p=>!permitted(p,brief.id,brief.slug,candidate.id)))throw Error('KNOWLEDGE_EDITOR_SCOPE_VIOLATION')
@@ -141,6 +166,7 @@ async function main() {
   if(JSON.parse(gh('api','repos/'+repo+'/git/ref/heads/main')).object.sha!==current)throw Error('KNOWLEDGE_EDITOR_MAIN_MOVED')
   const pr=JSON.parse(gh('api','repos/'+repo+'/pulls/'+created.number))
   if(pr.head.sha!==head||pr.base.ref!=='main')throw Error('KNOWLEDGE_EDITOR_PR_HEAD_CHANGED')
+  await update('WAITING_CI')
   const merged=JSON.parse(gh('api','--method','PUT','repos/'+repo+'/pulls/'+created.number+'/merge','-f','merge_method=squash','-f','sha='+head))
   if(!merged.merged)throw Error('KNOWLEDGE_EDITOR_MERGE_FAILED')
   await update('PUBLISHING',{merge_sha:merged.sha})

@@ -38,6 +38,7 @@ export function evaluateEditorialSnapshot(snapshot, { sourceVerified = false, ri
   const {brief,review={},job}=snapshot, original=job?.semantic_result??{}, ev=original.evidence??{}
   const issues=[], add=(key,message,action='본문과 근거를 수정하고 다시 검사하세요.')=>issues.push({key,message,action})
   if (!plain(brief) || !job?.job_id) return {status:'NEEDS_CHANGES',issues:[{key:'draft',message:'원고가 없습니다.',action:'초안을 작성하세요.'}]}
+  if(job.result_decision==='HOLD'&&(!text(review.duplicate_note)||review.duplicate_note.length<40))add('duplicate','기존 글과 다른 질문과 추가할 내용을 구체적으로 기록하세요.','관련 기존 글을 확인하거나 계속 보관하세요.')
   const body=manuscriptText(brief), originalBody=manuscriptText(original.brief??{})
   for(const f of ['title','summary','meta_description','lead','scope','basis','footer','editorial_note']) if(!text(brief[f])) add(f,({title:'제목',summary:'요약',meta_description:'검색 설명',lead:'도입',scope:'적용 범위',basis:'근거 설명',footer:'주의문',editorial_note:'편집 메모'})[f]+'을 입력하세요.')
   if (!Array.isArray(brief.sections)||!brief.sections.length||brief.sections.some(s=>!text(s.heading)||!s.blocks?.length)) add('sections','제목과 본문이 있는 문단이 필요합니다.')
@@ -49,12 +50,21 @@ export function evaluateEditorialSnapshot(snapshot, { sourceVerified = false, ri
   if(!byId.size) add('sources','근거 출처를 추가하세요.')
   const claims=Array.isArray(review.claims)?review.claims:[]
   if(!claims.length) add('claims','본문의 핵심 주장과 출처·확인 범위를 연결하세요.')
+  const narrative=[]
   for(const [i,c] of claims.entries()) {
-    if(!text(c.claim)||!text(c.context)||!text(c.limitation)||!c.source_ids?.length||!c.source_ids.every(id=>official(byId.get(id)?.url))) add(`claim:${i}`,'주장마다 공식 출처와 확인 범위·한계를 기록하세요.')
+    if(c.role==='NARRATIVE') {
+      const prior=ev.claims?.find(p=>p.claim===c.claim&&p.context===c.context&&p.limitation===c.limitation&&JSON.stringify(p.source_ids)===JSON.stringify(c.source_ids))
+      const knownNarrative=prior&&/허구|서사|fiction|narrative/i.test(c.context)&&/허구|서사|fiction|narrative/i.test(c.limitation)&&c.source_ids.every(id=>ev.sources?.some(s=>s.id===id&&s.source_type==='NARRATIVE_PROVENANCE'))
+      if(knownNarrative){narrative.push(c);continue}
+      add('claim:'+i,'현실 주장을 작품 속 출발점으로 바꿔 검증을 우회할 수 없습니다.');continue
+    }
+    if(!text(c.claim)||!text(c.context)||!text(c.limitation)||!c.source_ids?.length||!c.source_ids.every(id=>byId.has(id))||(!c.source_ids.some(id=>official(byId.get(id)?.url))&&!(c.source_ids.every(id=>byId.get(id)?.url?.startsWith('https://survival-diary-archive.netlify.app/'))&&/허구|서사|fiction|narrative/i.test(c.context)&&/허구|서사|fiction|narrative/i.test(c.limitation)))) add(`claim:${i}`,'주장마다 공식 출처와 확인 범위·한계를 기록하세요.')
   }
   // A reasoned, evidence-linked editorial judgment is not an expert certificate.
   // Dangerous specifics cannot use the condition/limitation route.
   const dangerous=/안전거리|허가\s*정원|복용량|투약|전압|농도|인화점|소유권|저작권|개인정보|개인\s*정보|서명|보관기간|법적|유독가스|안전\s*수치/
+  if(/\b\d+(?:\.\d+)?\s*(?:m|km|mg|ml|V|ppm|미터|밀리그램|볼트)\b/i.test(body)&&brief.risk_level==='HIGH')add('safety-specific','안전 수치·전문 작업 지침이 포함돼 있습니다. 일반 한계 설명만으로 확인할 수 없습니다.','해당 수치를 삭제하거나 별도의 전문 검증을 받으세요.')
+  if(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|01[016789][- ]?\d{3,4}[- ]?\d{4}/i.test(body))add('privacy','공개 본문에 개인 연락처가 포함될 수 있습니다.','개인정보를 제거하고 다시 검사하세요.')
   const resolved=[]
   for(const issue of reviewIssues(original,brief,review)) {
     const r=issue.resolution
@@ -74,27 +84,31 @@ export function evaluateEditorialSnapshot(snapshot, { sourceVerified = false, ri
     if(ok)resolved.push(issue.key)
     else add(issue.key,issue.reason,'해당 주장 수정·삭제, 공식 근거 보강 또는 본문의 적용 한계를 근거와 함께 기록하세요.')
   }
+  if(claims.length&&claims.every(c=>narrative.includes(c)))add('claims','현실 안내를 뒷받침하는 공식 근거가 필요합니다.')
   // Rights/source enums are NOT changed by an operator checkbox. Historical
   // nonstandard values remain blockers until verifiable source/rights evidence.
-  if(ev.copyright_status!=='CLEAR' && !rightsVerified) add('rights','출처의 재사용 권한을 검증해야 합니다.','이용조건의 원문 주소와 허용 범위를 보강하세요. 원본 판정은 유지됩니다.')
+  if(!rightsVerified && (ev.copyright_status!=='CLEAR' || JSON.stringify(brief.sources)!==JSON.stringify(original.brief?.sources))) add('rights','출처의 재사용 권한을 검증해야 합니다.','이용조건의 원문 주소와 허용 범위를 보강하세요. 원본 판정은 유지됩니다.')
   if(!sourceVerified && !['VERIFIED_PUBLIC_READER_BACKFILL','VERIFIED_PUBLIC_ARCHIVE','USER_REPORTED_EXPERIENCE'].includes(ev.story_source_status)) add('provenance','원본 연결을 다시 검증해야 합니다.','출처 진단 후 다시 시도하세요. 서사를 현실 근거로 바꾸지 않습니다.')
-  const evidence={...structuredClone(ev),brief_id:brief.id,question:brief.title,claims:structuredClone(claims),
+  const evidence={...structuredClone(ev),brief_id:brief.id,question:brief.title,claims:structuredClone(claims.filter(c=>!narrative.includes(c))),
     unknowns:(ev.unknowns??[]).filter(v=>!resolved.includes(issueKey('unknowns',v))),
     conflicts:(ev.conflicts??[]).filter(v=>!resolved.includes(issueKey('conflicts',v))),
     risk_notes:Array.isArray(ev.risk_notes)?ev.risk_notes:text(ev.risk_notes)?[ev.risk_notes]:[],
     copyright_status: rightsVerified ? 'CLEAR' : ev.copyright_status,
     story_source_status:sourceVerified ? ({PUBLIC_READER:'VERIFIED_PUBLIC_READER_BACKFILL',PUBLIC_ARCHIVE:'VERIFIED_PUBLIC_ARCHIVE',USER_REPORTED_EXPERIENCE:'USER_REPORTED_EXPERIENCE'})[job.source_kind] : ev.story_source_status,
-    editorial_review:{version:1,original_result_sha256:job.semantic_result_sha256,resolved,decisions:review.resolutions??[]}}
+    editorial_review:{version:1,original_result_sha256:job.semantic_result_sha256,resolved,decisions:review.resolutions??[],narrative_provenance:narrative}}
   return {status:issues.length?'NEEDS_CHANGES':'STRUCTURE_CHECKED',issues,evidence}
 }
 
 // Fetch only public official HTTPS pages, reject redirects and bound response
 // size/time. Never call arbitrary source URLs through a privileged network.
-export async function verifyEditorialRights(brief, review, {fetcher=fetch}={}) {
+export async function verifyEditorialRights(brief, review, {fetcher=fetch,trustedSources=[]}={}) {
   if(!brief.sources?.length) return false
   for(const source of brief.sources) {
+    if(trustedSources.some(trusted=>JSON.stringify(trusted)===JSON.stringify(source)))continue
     const proof=review.rights?.find(p=>p.source_id===source.id)
     if(!proof||!official(proof.url)||!text(proof.quote)||proof.quote.length<30||!official(source.url)) return false
+    const sourceHost=new URL(source.url).hostname,termsHost=new URL(proof.url).hostname
+    if(sourceHost!==termsHost&&!sourceHost.endsWith('.'+termsHost)&&!termsHost.endsWith('.'+sourceHost))return false
     const response=await fetcher(proof.url,{redirect:'error',signal:AbortSignal.timeout(15000)})
     if(!response.ok||Number(response.headers.get('content-length')??0)>524288) return false
     const reader=response.body.getReader(); let size=0, chunks=[]

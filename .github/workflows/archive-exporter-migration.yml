@@ -25,6 +25,7 @@ on:
       - 'supabase/tests/knowledge_semantic_finalizer_retry.sql'
       - 'supabase/tests/knowledge_operator_inbox_verification.sql'
       - 'supabase/tests/knowledge_operator_drafts_verification.sql'
+      - 'supabase/tests/knowledge_editor_workflow.sql'
       - 'supabase/tests/knowledge_media_bucket_verification.sql'
       - 'supabase/migrations/20261001233000_knowledge_semantic_published_reconcile_v1.sql'
       - 'supabase/migrations/20261003090000_knowledge_operator_inbox_v1.sql'
@@ -51,6 +52,7 @@ on:
       - 'supabase/tests/knowledge_semantic_finalizer_retry.sql'
       - 'supabase/tests/knowledge_operator_inbox_verification.sql'
       - 'supabase/tests/knowledge_operator_drafts_verification.sql'
+      - 'supabase/tests/knowledge_editor_workflow.sql'
       - 'supabase/tests/knowledge_media_bucket_verification.sql'
       - 'supabase/migrations/20261001233000_knowledge_semantic_published_reconcile_v1.sql'
 
@@ -246,6 +248,8 @@ jobs:
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261021121000_knowledge_human_approval_immediate_consumer_dispatch.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261021141433_knowledge_review_verified_publication_recovery.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_operator_drafts_verification.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261022163829_knowledge_editor_revision_workflow.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_editor_workflow.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261022153819_knowledge_prep_shared_pause_gate.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261022154138_knowledge_submission_schema_guard.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_prep_pause_submission.sql
