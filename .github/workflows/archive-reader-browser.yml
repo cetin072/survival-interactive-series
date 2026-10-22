@@ -75,6 +75,8 @@ jobs:
         run: python ../scripts/check-reader-browser.py --world-wiki --screenshots "$RUNNER_TEMP/archive-browser/local"
       - name: Audit read-only Operator states, permissions and mobile layout (mock providers)
         run: python ../scripts/check-operator-deploy-browser.py --screenshots "$RUNNER_TEMP/archive-browser/operator-local"
+      - name: Exercise private Knowledge editor clicks at 320, 390 and 1280 pixels
+        run: python ../scripts/check-knowledge-editor-browser.py --screenshots "$RUNNER_TEMP/archive-browser/knowledge-editor"
       - name: Fetch recent PR history for source-equivalent preview verification
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         working-directory: .

@@ -89,13 +89,16 @@ export function evaluateEditorialSnapshot(snapshot, { sourceVerified = false, ri
   // nonstandard values remain blockers until verifiable source/rights evidence.
   if(!rightsVerified && (ev.copyright_status!=='CLEAR' || JSON.stringify(brief.sources)!==JSON.stringify(original.brief?.sources))) add('rights','출처의 재사용 권한을 검증해야 합니다.','이용조건의 원문 주소와 허용 범위를 보강하세요. 원본 판정은 유지됩니다.')
   if(!sourceVerified && !['VERIFIED_PUBLIC_READER_BACKFILL','VERIFIED_PUBLIC_ARCHIVE','USER_REPORTED_EXPERIENCE'].includes(ev.story_source_status)) add('provenance','원본 연결을 다시 검증해야 합니다.','출처 진단 후 다시 시도하세요. 서사를 현실 근거로 바꾸지 않습니다.')
-  const evidence={...structuredClone(ev),brief_id:brief.id,question:brief.title,claims:structuredClone(claims.filter(c=>!narrative.includes(c))),
+  const evidence={brief_id:brief.id,question:brief.title,claims:structuredClone(claims.filter(c=>!narrative.includes(c))),
     unknowns:(ev.unknowns??[]).filter(v=>!resolved.includes(issueKey('unknowns',v))),
     conflicts:(ev.conflicts??[]).filter(v=>!resolved.includes(issueKey('conflicts',v))),
     risk_notes:Array.isArray(ev.risk_notes)?ev.risk_notes:text(ev.risk_notes)?[ev.risk_notes]:[],
-    copyright_status: rightsVerified ? 'CLEAR' : ev.copyright_status,
-    story_source_status:sourceVerified ? ({PUBLIC_READER:'VERIFIED_PUBLIC_READER_BACKFILL',PUBLIC_ARCHIVE:'VERIFIED_PUBLIC_ARCHIVE',USER_REPORTED_EXPERIENCE:'USER_REPORTED_EXPERIENCE'})[job.source_kind] : ev.story_source_status,
-    editorial_review:{version:1,original_result_sha256:job.semantic_result_sha256,resolved,decisions:review.resolutions??[],narrative_provenance:narrative}}
+    copyright_status:rightsVerified?'CLEAR':ev.copyright_status,
+    story_source_status:sourceVerified?({PUBLIC_READER:'VERIFIED_PUBLIC_READER_BACKFILL',PUBLIC_ARCHIVE:'VERIFIED_PUBLIC_ARCHIVE',USER_REPORTED_EXPERIENCE:'USER_REPORTED_EXPERIENCE'})[job.source_kind]:ev.story_source_status,
+    ...(ev.experience_provenance?{experience_provenance:structuredClone(ev.experience_provenance)}:{}),
+    // Human notes and removed text stay in the private DB, never in public Git.
+    editorial_review:{version:1,original_result_sha256:job.semantic_result_sha256,resolved,
+      decision_sha256:hash(review.resolutions??[]),narrative_count:narrative.length}}
   return {status:issues.length?'NEEDS_CHANGES':'STRUCTURE_CHECKED',issues,evidence}
 }
 

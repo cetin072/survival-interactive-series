@@ -1,5 +1,9 @@
 import type {EditorialRequest} from './knowledgeEditorialModel'
 export type KnowledgeItem = {
+  slug?: string | null
+  draft_revision?: number
+  published_on_site?: boolean
+  technical_only?: boolean
   editor_archived?: boolean
   editor_request?: EditorialRequest | null
   public_record?: EditorialRequest | null
@@ -62,10 +66,11 @@ export const emptyKnowledgeInbox: KnowledgeInbox = {
 
 export const knowledgeBucketFor = (item: KnowledgeItem): Exclude<KnowledgeFilter, 'ALL'> => {
   if (item.editor_archived === true) return 'HELD'
+  if(item.editor_request&&item.editor_request.revision<(item.draft_revision??0))return 'REVIEW'
   if (item.editor_request?.status === 'PUBLISHED') return 'PUBLISHED'
   if (item.editor_request && ['QUEUED','CHECKING','WAITING_CI','PUBLISHING'].includes(item.editor_request.status)) return 'APPROVED'
   if (item.editor_request && ['FAILED','RETRYABLE','CHECKED'].includes(item.editor_request.status)) return 'REVIEW'
-  if (item.status === 'PUBLISHED') return 'PUBLISHED'
+  if (item.status === 'PUBLISHED') return item.published_on_site===false?'APPROVED':'PUBLISHED'
   if (item.editor_archived === false && ['HOLD','BLOCKED'].includes(item.status)) return 'REVIEW'
   if (item.status === 'HUMAN_REVIEW') {
     if (item.review_status === 'APPROVED') return 'APPROVED'

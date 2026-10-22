@@ -51,6 +51,10 @@ export async function prepareEditorialFiles({snapshot,base=root,sourceVerifier=v
   const heading=job.source_kind==='USER_REPORTED_EXPERIENCE'?'이 질문이 생긴 실제 경험':'《생존일기》에서 시작한 질문'
   if(brief.sections.at(-1)?.heading!==heading||brief.lead.trim().split(/[.!?]/)[0].length<20) throw Error('KNOWLEDGE_EDITOR_EDITORIAL_CONTRACT')
  }
+ // Only public BRIEF fields are projected. Removed legacy Markdown and
+ // private job metadata must not leak through the public browser data bundle.
+ const publicFields=new Set(['id','slug','topic_id','content_type','title','summary','meta_description','lead','label','scope','basis','footer','editorial_note','sections','sources','risk_level','risk_domains','publication_policy','semantic_qa_status','status','source_checked_at','updated_at','published_at','ai_assisted','story_refs','related_brief_ids','tools','guide_id'])
+ for(const key of Object.keys(brief))if(!publicFields.has(key))delete brief[key]
  const candidate=candidateFromSnapshot(snapshot,brief)
  candidate.question=brief.title
  if(data.candidates.some(c=>c.id===candidate.id&&c.brief_id!==brief.id))candidate.id='KC-editorial-'+job.job_id
@@ -105,9 +109,11 @@ async function main() {
   console.log(JSON.stringify({status:request.status,request_id:requestId}))
  }
  try {
-  if(request.publish_requested&&request.result?.pr_number&&!request.result?.merge_sha) {
+  if(request.result?.pr_number&&!request.result?.merge_sha) {
    const previousPr=JSON.parse(gh('api','repos/'+repo+'/pulls/'+request.result.pr_number))
-   if(previousPr.merged_at&&previousPr.head?.sha===request.result.prepared_sha)await update('PUBLISHING',{merge_sha:previousPr.merge_commit_sha})
+   if(previousPr.head?.sha!==request.result.prepared_sha||previousPr.head?.repo?.full_name!==repo)throw Error('KNOWLEDGE_EDITOR_PR_HEAD_CHANGED')
+   if(previousPr.merged_at)await update('PUBLISHING',{merge_sha:previousPr.merge_commit_sha})
+   else if(previousPr.state==='open')gh('api','--method','PATCH','repos/'+repo+'/pulls/'+request.result.pr_number,'-f','state=closed')
   }
   if(request.publish_requested&&request.result?.merge_sha&&request.result?.prepared_sha) {
    await update('PUBLISHING')
@@ -178,4 +184,14 @@ async function main() {
   throw Error(message)
  }
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href)main().catch(e=>{console.error(e.message);process.exitCode=1})
+export async function dispatchNextEditorRequest({requestRpc=rpc,run=command}={}) {
+ const next=await requestRpc('archive_worker_next_knowledge_editor_request',{})
+ if(!next?.request_id)return {status:'QUEUE_EMPTY'}
+ if(!uuid.test(next.request_id))throw Error('KNOWLEDGE_EDITOR_QUEUE_ID_INVALID')
+ run('gh',['workflow','run','knowledge-review-consumer.yml','--repo',repo,'--ref','main','-f','editorial_request_id='+next.request_id])
+ return {status:'QUEUED',request_id:next.request_id}
+}
+if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href) {
+ const action=process.argv[2]==='drain'?dispatchNextEditorRequest:main
+ action().then(result=>{if(result)console.log(JSON.stringify(result))}).catch(e=>{console.error(e.message);process.exitCode=1})
+}

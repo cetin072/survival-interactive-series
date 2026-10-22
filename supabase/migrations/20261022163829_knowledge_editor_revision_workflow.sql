@@ -232,7 +232,7 @@ language plpgsql security definer set search_path='' as $$
 declare previous jsonb; items jsonb; begin
  perform survival_ops.private_require_archive_operator();
  previous:=public.archive_operator_knowledge_inbox();
- select coalesce(jsonb_agg(i||jsonb_build_object('editor_archived',coalesce(s.archived,(i->>'status')='HOLD'),'editor_request',r.request,'has_body',j.semantic_result ? 'brief','updated_at',coalesce(d.updated_at,j.updated_at),'title',coalesce(d.draft_brief->>'title',i->>'title'),'public_record',pub.request) order by coalesce(d.updated_at,j.updated_at) desc),'[]') into items
+ select coalesce(jsonb_agg(i||jsonb_build_object('editor_archived',coalesce(s.archived,(i->>'status')='HOLD'),'editor_request',r.request,'has_body',coalesce(j.semantic_result ? 'brief',false),'technical_only',j.semantic_result is null and j.status='BLOCKED','draft_revision',coalesce(d.revision,0),'slug',coalesce(d.draft_brief->>'slug',j.semantic_result->'brief'->>'slug'),'updated_at',coalesce(d.updated_at,j.updated_at),'title',coalesce(d.draft_brief->>'title',i->>'title'),'public_record',pub.request) order by coalesce(d.updated_at,j.updated_at) desc),'[]') into items
  from jsonb_array_elements(previous->'items') i
  join survival_ops.knowledge_semantic_jobs j on j.job_id=(i->>'job_id')::uuid
  left join survival_ops.knowledge_operator_drafts d using(job_id)
@@ -278,3 +278,14 @@ language plpgsql security definer set search_path='' as $$ begin
 end $$;
 create trigger knowledge_editor_capture_prior before update on survival_ops.knowledge_operator_drafts for each row execute function survival_ops.capture_knowledge_editor_prior_draft();
 revoke all on function survival_ops.capture_knowledge_editor_prior_draft() from public,anon,authenticated,service_role;
+
+-- GitHub keeps only one pending run per concurrency group. Persisted intents
+-- therefore drain oldest-first after every run; a replaced pending run cannot
+-- lose an operator's exact approval. Failed attempts are never auto-retried.
+create function public.archive_worker_next_knowledge_editor_request() returns jsonb
+language sql security definer set search_path='' as $$
+ select jsonb_build_object('request_id',request_id) from survival_ops.knowledge_editor_requests
+ where status='QUEUED' order by created_at,request_id limit 1
+$$;
+revoke all on function public.archive_worker_next_knowledge_editor_request() from public,anon,authenticated;
+grant execute on function public.archive_worker_next_knowledge_editor_request() to service_role;

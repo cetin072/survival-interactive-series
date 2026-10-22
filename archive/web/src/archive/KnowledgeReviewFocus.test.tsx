@@ -60,7 +60,7 @@ describe('Knowledge focused human review', () => {
       conflicts: [], copyright_status: 'PUBLIC_OFFICIAL_SOURCE_SUMMARY',
       story_source_status: 'NARRATIVE_PROVENANCE_ONLY',
     } })
-    expect(unresolved.blockers.length).toBe(2)
+    expect(unresolved.blockers.length).toBe(3)
     expect(unresolved.unknowns).toContain('현지 소방 정원 확인 필요')
     const markup = renderToStaticMarkup(createElement(KnowledgeEvidenceGatePanel, { gate: unresolved }))
     expect(markup).toContain('현지 소방 정원 확인 필요')

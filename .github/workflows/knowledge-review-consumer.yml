@@ -21,7 +21,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: knowledge-human-review-consumer
+  group: archive-production-release
   cancel-in-progress: false
 
 jobs:
@@ -46,6 +46,13 @@ jobs:
           ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
           NETLIFY_PRODUCTION_BUILD_HOOK: ${{ secrets.NETLIFY_PRODUCTION_BUILD_HOOK }}
         run: node archive/scripts/knowledge-editor-request.mjs
+      - name: Continue the durable operator queue without retrying failed releases
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: node archive/scripts/knowledge-editor-request.mjs drain
 
   consume:
     if: inputs.editorial_request_id == ''
@@ -493,3 +500,11 @@ jobs:
         if: steps.inspect.outputs.status == 'NOOP'
         run: echo "No approved human-review item is waiting."
 
+
+      - name: Continue the durable operator queue without retrying failed releases
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: node archive/scripts/knowledge-editor-request.mjs drain

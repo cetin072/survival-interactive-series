@@ -4,17 +4,17 @@ export type EditorialResolution = { key: string; method: string; quote: string; 
 export type EditorialReview = { claims: EditorialClaim[]; resolutions: EditorialResolution[]; duplicate_note?:string; rights?: Array<{ source_id: string; url: string; quote: string }> }
 export type EditorialIssue = {key:string; reason:string; kind:string; quote?:string}
 export type EditorialRequest = {request_id:string; revision:number; publish_requested:boolean; status:string; updated_at:string; result?:{reason?:string;issues?:Array<{key:string;message:string;action?:string}>;public_url?:string;merge_sha?:string}}
-export type EditorialEnvelope = {job_id:string;revision:number;draft_sha256?:string;brief:KnowledgeDraftBrief|null;original?:Record<string, unknown>;context?:Record<string, unknown>;archived:boolean;evidence_review:EditorialReview;status:string;blocker_code?:string;updated_at?:string;request?:EditorialRequest|null;public_record?:EditorialRequest|null;related_public?:Array<{title:string;url:string}>;history:Array<{revision:number;draft_sha256:string;created_at:string}>;source_ref?:string;brief_id:string}
+export type EditorialEnvelope = {job_id:string;revision:number;public_verified?:boolean;draft_sha256?:string;brief:KnowledgeDraftBrief|null;original?:Record<string, unknown>;context?:Record<string, unknown>;archived:boolean;evidence_review:EditorialReview;status:string;blocker_code?:string;updated_at?:string;request?:EditorialRequest|null;public_record?:EditorialRequest|null;related_public?:Array<{title:string;url:string}>;history:Array<{revision:number;draft_sha256:string;created_at:string}>;source_ref?:string;brief_id:string}
 export const publicationActive = (r?:EditorialRequest|null) => !!r && ['QUEUED','CHECKING','WAITING_CI','PUBLISHING'].includes(r.status)
 export function editorialStatus(value:EditorialEnvelope):string {
  const r=value.request
  if(value.public_record && value.revision<=value.public_record.revision)return '게시됨'
- if(r?.publish_requested && r.status==='PUBLISHED')return '게시됨'
+ if(r?.publish_requested && r.status==='PUBLISHED' && r.revision>=value.revision)return '게시됨'
  if(r?.status==='PUBLISHING')return '게시 중'
  if(publicationActive(r))return '검사 중'
  if(r && ['FAILED','RETRYABLE'].includes(r.status))return '수정 필요'
  if(value.archived)return '보관함'
- return value.status==='PUBLISHED'?'게시됨':'검토할 글'
+ return value.status==='PUBLISHED'?(value.public_verified?'게시됨':value.revision>1?'검토할 글':'공개 확인 대기'):'검토할 글'
 }
 export function editorialError(code?:string):string {
  if(!code)return ''
@@ -76,4 +76,19 @@ export function readableBrief(raw:KnowledgeDraftBrief, original?:Record<string,u
  brief.related_brief_ids??=[]
  brief.story_refs??=[]
  return brief
+}
+
+// Legacy automatic jobs historically marked Git merge as PUBLISHED. Observe
+// actual public HTML instead of inheriting that early completion label.
+export async function observeLegacyPublic(brief:KnowledgeDraftBrief,fetcher=fetch):Promise<boolean> {
+ try {
+  if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(String(brief.slug??'')))return false
+  const origin='https://survival-diary-archive.netlify.app',path='/knowledge/'+brief.slug+'/'
+  const routes=[path,'/knowledge/','/sitemap.xml','/deploy-meta.json']
+  const results=await Promise.all(routes.map(async route=>{const response=await fetcher(origin+route,{cache:'no-store',signal:AbortSignal.timeout(15000)});if(!response.ok)throw Error('PUBLIC_NOT_VISIBLE');return response.text()}))
+  const escape=(value:string)=>value.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!))
+  const normalize=(value:string)=>value.replaceAll('&#x27;','&#39;').replace(/\s+/g,' ').trim()
+  const fields=[brief.title,brief.lead,...brief.sections.flatMap(s=>[s.heading,...s.blocks.flatMap(b=>'text' in b?[b.text]:'items' in b?b.items:[])])]
+  return JSON.parse(results[3]).context==='production'&&fields.filter(Boolean).every(t=>normalize(results[0]).includes(normalize(escape(t))))&&results[1].includes(path)&&results[2].includes(origin+path)
+ } catch {return false}
 }

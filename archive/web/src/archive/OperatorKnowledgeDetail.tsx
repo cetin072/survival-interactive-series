@@ -1,6 +1,6 @@
 import {useCallback,useEffect,useRef,useState} from 'react'
 import {KnowledgeDraftEditor,KnowledgeDraftPreview,type KnowledgeDraftBrief} from './KnowledgeDraftEditor'
-import {editorialError,editorialIssues,editorialStatus,editorialTemplate,publicationActive,readableBrief,quoteLocations,type EditorialEnvelope,type EditorialIssue,type EditorialReview,type EditorialResolution} from './knowledgeEditorialModel'
+import {editorialError,editorialIssues,editorialStatus,editorialTemplate,publicationActive,readableBrief,observeLegacyPublic,quoteLocations,type EditorialEnvelope,type EditorialIssue,type EditorialReview,type EditorialResolution} from './knowledgeEditorialModel'
 import {formatOperatorTime} from './operatorSystemStatus'
 import {uploadKnowledgeImage} from './knowledgeMedia'
 import {supabaseClient} from './supabaseClient'
@@ -14,19 +14,23 @@ export function OperatorKnowledgeDetail({jobId,email,busy:parentBusy,onSignOut}:
  const [issues,setIssues]=useState<EditorialIssue[]>([])
  const [preview,setPreview]=useState(false)
  const [dirty,setDirty]=useState(false)
- const dirtyRef=useRef(false), operation=useRef(false)
+ const dirtyRef=useRef(false), operation=useRef(false), baseRevision=useRef(0)
+ const [conflict,setConflict]=useState<EditorialEnvelope|null>(null)
  const [busy,setBusy]=useState(false),[error,setError]=useState(''),[code,setCode]=useState(''),[notice,setNotice]=useState('')
  const [recovery,setRecovery]=useState<{revision:number;brief:KnowledgeDraftBrief;review:EditorialReview}|null>(null)
  const cacheKey='knowledge-editor:'+email+':'+jobId
  const adopt=useCallback(async(next:EditorialEnvelope,content=true)=>{
   setValue(next)
-  if(content&&!dirtyRef.current){setBrief(next.brief?{...readableBrief(next.brief,next.original),id:next.brief_id}:null);setReview(copy(next.evidence_review));setIssues(await editorialIssues(next.original))}
+  if(content&&!dirtyRef.current){baseRevision.current=next.revision;setBrief(next.brief?{...readableBrief(next.brief,next.original),id:next.brief_id}:null);setReview(copy(next.evidence_review));setIssues(await editorialIssues(next.original))}
  },[])
  const load=useCallback(async(content=true)=>{
   if(!supabaseClient)return
   const response=await supabaseClient.rpc('archive_operator_knowledge_editor_get',{p_job_id:jobId})
   if(response.error)throw Error(response.error.message)
-  await adopt(response.data as EditorialEnvelope,content)
+  if((response.data as EditorialEnvelope).job_id!==jobId)throw Error('KNOWLEDGE_EDITOR_IDENTITY_MISMATCH')
+  const next=response.data as EditorialEnvelope
+  if(next.status==='PUBLISHED'&&next.brief&&!publicationActive(next.request))next.public_verified=await observeLegacyPublic(readableBrief(next.brief,next.original))
+  await adopt(next,content)
  },[jobId,adopt])
  useEffect(()=>{
   dirtyRef.current=false;setDirty(false);setValue(null);setBrief(null);setBusy(true)
@@ -35,7 +39,7 @@ export function OperatorKnowledgeDetail({jobId,email,busy:parentBusy,onSignOut}:
  },[load,cacheKey])
  const change=(next:KnowledgeDraftBrief,nextReview=review)=>{
   setBrief(next);setReview(nextReview);dirtyRef.current=true;setDirty(true);setNotice('수정 중 · 아직 저장되지 않았습니다.')
-  try{sessionStorage.setItem(cacheKey,JSON.stringify({revision:value?.revision??0,brief:next,review:nextReview}))}catch{setNotice('이 브라우저에 복구본을 보관하지 못했습니다. 저장 버튼으로 서버에 저장하세요.')}
+  try{sessionStorage.setItem(cacheKey,JSON.stringify({revision:baseRevision.current,brief:next,review:nextReview}))}catch{setNotice('이 브라우저에 복구본을 보관하지 못했습니다. 저장 버튼으로 서버에 저장하세요.')}
  }
  const changeReview=(next:EditorialReview)=>{if(brief)change(brief,next)}
  useEffect(()=>{
@@ -55,9 +59,9 @@ export function OperatorKnowledgeDetail({jobId,email,busy:parentBusy,onSignOut}:
  }
  const save=async()=>{
   if(!supabaseClient||!value||!brief)throw Error('KNOWLEDGE_EDITOR_BRIEF_REQUIRED')
-  const {data,error:err}=await supabaseClient.rpc('archive_operator_knowledge_editor_save',{p_job_id:jobId,p_expected_revision:value.revision,p_brief:brief,p_evidence_review:review})
-  if(err)throw Error(err.message)
-  dirtyRef.current=false;setDirty(false);sessionStorage.removeItem(cacheKey);setRecovery(null)
+  const {data,error:err}=await supabaseClient.rpc('archive_operator_knowledge_editor_save',{p_job_id:jobId,p_expected_revision:baseRevision.current,p_brief:brief,p_evidence_review:review})
+  if(err){if(err.message.includes('REVISION_CONFLICT')){const latest=await supabaseClient.rpc('archive_operator_knowledge_editor_get',{p_job_id:jobId});if(!latest.error)setConflict(latest.data as EditorialEnvelope)}throw Error(err.message)}
+  dirtyRef.current=false;setDirty(false);sessionStorage.removeItem(cacheKey);setRecovery(null);setConflict(null)
   await adopt(data as EditorialEnvelope);setNotice('저장됨');return data as EditorialEnvelope
  }
  const request=async(publish:boolean)=>{
@@ -85,15 +89,16 @@ export function OperatorKnowledgeDetail({jobId,email,busy:parentBusy,onSignOut}:
   changeReview(next)
  }
  const result=value?.request?.result
- const lastError=result?.reason?editorialError(result.reason):''
+ const lastError=result?.reason&&['FAILED','RETRYABLE'].includes(value?.request?.status??'')?editorialError(result.reason):''
  const originalBrief=value?.original?.brief as KnowledgeDraftBrief|undefined
  const unknownRights=(value?.original?.evidence as {copyright_status?:string}|undefined)?.copyright_status!=='CLEAR'||JSON.stringify(brief?.sources)!==JSON.stringify(originalBrief?.sources)
- const publicUrl=value?.public_record?.result?.public_url??result?.public_url??(value?.status==='PUBLISHED'&&brief?.slug?'https://survival-diary-archive.netlify.app/knowledge/'+brief.slug+'/':null)
+ const publicUrl=value?.public_record?.result?.public_url??result?.public_url??(value?.status==='PUBLISHED'&&value.public_verified&&brief?.slug?'https://survival-diary-archive.netlify.app/knowledge/'+brief.slug+'/':null)
  return <section className="operator-page knowledge-editor-page">
   <header className="operator-heading"><div><h1>{brief?.title||'글 관리'}</h1><p>{value?editorialStatus(value):'불러오는 중…'} · {dirty?'수정 중':value?.updated_at?'저장 '+formatOperatorTime(value.updated_at):''}</p></div><nav><a href={'/operator/knowledge/'+(sessionStorage.getItem('knowledge-list-query')??'')}>← 글 목록</a> <a href="/operator/">대시보드</a> <button className="operator-secondary" disabled={busy} onClick={onSignOut}>로그아웃</button></nav></header>
   {error&&<p role="alert" className="operator-error">{error}</p>}
   {notice&&<p role="status" className="operator-muted">{notice}</p>}
-  {recovery&&<aside className="operator-panel"><p>이 브라우저에 저장하지 못한 수정 내용이 남아 있습니다. 최신 저장본을 덮어쓰지 않고 편집 화면으로 불러옵니다.</p><button disabled={!!locked} onClick={()=>{if(brief){change(recovery.brief,recovery.review);setRecovery(null)}}}>수정본 복구</button><button onClick={()=>{sessionStorage.removeItem(cacheKey);setRecovery(null)}}>닫기</button></aside>}
+  {recovery&&<aside className="operator-panel"><p>이 브라우저에 저장하지 못한 수정 내용이 남아 있습니다. 최신 저장본을 덮어쓰지 않고 편집 화면으로 불러옵니다.</p><button disabled={!!locked} onClick={()=>{if(brief){baseRevision.current=recovery.revision;change(recovery.brief,recovery.review);setRecovery(null)}}}>수정본 복구</button><button onClick={()=>{sessionStorage.removeItem(cacheKey);setRecovery(null)}}>닫기</button></aside>}
+  {conflict&&<section className="operator-panel"><h2>다른 저장본과 비교</h2><p>아래는 서버에 먼저 저장된 최신 본문입니다. 현재 입력한 내용은 위 편집기에 보존돼 있습니다.</p>{conflict.brief&&<KnowledgeDraftPreview brief={readableBrief(conflict.brief,conflict.original)}/>}<button onClick={()=>{baseRevision.current=conflict.revision;setValue(conflict);setConflict(null);setError('');setNotice('최신 저장본을 확인했습니다. 현재 편집 내용을 다시 저장하면 새 수정본으로 기록합니다.')}}>최신 저장본을 확인하고 내 수정으로 이어가기</button></section>}
   {value&&<>
    <div className="knowledge-editor-actions" aria-label="글 작업">
     <button disabled={!!locked||!brief} onClick={()=>void run(async()=>{await save()})}>{busy?'처리 중…':'저장'}</button>
