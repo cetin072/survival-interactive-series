@@ -13,6 +13,7 @@ returns boolean language plpgsql security definer set search_path='' as $$
 declare target record;
 begin
   if p_enabled is null then raise exception 'PREP_ENABLED_REQUIRED'; end if;
+  perform pg_catalog.pg_advisory_xact_lock(724015);
   if (select count(*) from cron.job where jobname in ('afterfall-knowledge-semantic-prep-am','afterfall-knowledge-semantic-prep-pm')) <> 2 then
     raise exception 'PREP_CRON_IDENTITY_MISSING';
   end if;
@@ -32,10 +33,10 @@ create or replace function public.archive_knowledge_semantic_job_prepare(
 ) returns jsonb language plpgsql security definer set search_path='' as $$
 declare existing survival_ops.knowledge_semantic_jobs%rowtype;
 begin
+  perform pg_catalog.pg_advisory_xact_lock(724015);
   if not public.archive_knowledge_semantic_prep_enabled() then
     return jsonb_build_object('status','PREP_PAUSED','created',false);
   end if;
-  perform pg_catalog.pg_advisory_xact_lock(724015);
   select * into existing from survival_ops.knowledge_semantic_jobs j
     where survival_ops.knowledge_main_drift_recoverable(j) order by prepared_at limit 1;
   if found then return jsonb_build_object('status','ACTIVE_RECOVERABLE_JOB_EXISTS','job_id',existing.job_id,'created',false); end if;
