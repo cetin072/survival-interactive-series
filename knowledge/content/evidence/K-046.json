@@ -1,0 +1,79 @@
+{
+  "claims": [
+    {
+      "claim": "재난 자원 협의에 들어가기 전에는 필요한 자원의 종류·수량 또는 요구 역량, 필요한 시각, 전달·보고 장소와 인수·사용 주체를 확인해야 한다.",
+      "context": "FEMA NIMS 자원관리 교육은 자원 요구를 식별할 때 종류와 수량, 보낼 위치, 받을 사람과 사용 주체를 확인하도록 설명한다. FEMA ICS 213 RR도 수량, 종류·유형과 상세 설명, 요청·예상 도착 시각, 비용, 전달·보고 장소, 대체품 또는 제안 공급원을 기록하도록 구성되어 있다.",
+      "limitation": "미국 사고관리체계의 자원 요청 절차와 양식이다. 모든 민간단체 회의에 동일한 양식을 의무화하지 않으며, 이 글의 사전 확인표는 그 정보 항목을 소규모 조직의 협의 준비에 맞게 재구성한 편집안이다.",
+      "source_ids": [
+        "FEMA-IS703B-RESOURCE-MANAGEMENT",
+        "FEMA-ICS213RR"
+      ]
+    },
+    {
+      "claim": "회의 참석자마다 정보 수집, 협상, 요청 승인, 비용 승인 가운데 어떤 권한이 있는지 구분해야 참석 자체가 자원 제공이나 책임 수락으로 오해되는 일을 줄일 수 있다.",
+      "context": "NIMS 자원관리 교육은 누가 자원을 주문할 수 있는지와 어떤 요청에 지휘 승인·재정 통제가 필요한지를 정하도록 설명한다. ICS 213 RR은 요청자, 우선순위, 부서장 승인, 권한 있는 물류 담당 승인과 재정 회신을 별도 항목으로 둔다.",
+      "limitation": "공식 자료는 '회의 참석은 약속이 아니다'라는 보편적 법률 규칙을 선언하지 않는다. 실제 대리권, 계약 성립, 책임과 비용 부담은 조직 규정과 관할 법률에 따라 권한 있는 담당자가 확인해야 한다.",
+      "source_ids": [
+        "FEMA-IS703B-RESOURCE-MANAGEMENT",
+        "FEMA-ICS213RR"
+      ]
+    },
+    {
+      "claim": "여러 조직이 자원을 함께 논의할 때는 회의 목적과 결정 범위를 미리 적고, 각 조직의 역할·책임, 지원 요청 절차와 비용 처리 원칙을 의제에서 분리해 확인하는 편이 좋다.",
+      "context": "NIMS 자원관리 교육은 상호지원 협정에 각 당사자의 역할과 책임, 지원 요청·제공 절차, 지불·상환·비용 배분 권한과 규칙, 통지 절차를 포함하도록 설명한다.",
+      "limitation": "이 글은 상호지원 협정서나 계약서 작성법을 제공하지 않는다. 회의 전 의제 확인에 필요한 범위만 사용하며, 법적 의무와 비용 약정은 권한 있는 담당자의 별도 검토 대상이다.",
+      "source_ids": [
+        "FEMA-IS703B-RESOURCE-MANAGEMENT"
+      ]
+    },
+    {
+      "claim": "협의 자료의 수량과 가용성은 확인 시각과 상태를 함께 표시하고, 요청량·현재 가용량·승인량·실제 제공량을 같은 숫자로 취급하지 않아야 한다.",
+      "context": "NIMS 자료는 자원 가용성이 보장되지 않으며 제공 조직이 요청을 수용하고 실제 제공 가능 자원과의 차이를 알리도록 설명한다. ICS 213 RR도 요청 정보와 공급자·승인·재정 회신을 분리한다.",
+      "limitation": "공식 자료가 이 글의 네 단계 상태명을 표준으로 정한 것은 아니다. 구체적인 상태명과 갱신 주기는 조직의 기존 자원관리 절차에 맞춰야 한다.",
+      "source_ids": [
+        "FEMA-IS703B-RESOURCE-MANAGEMENT",
+        "FEMA-ICS213RR"
+      ]
+    }
+  ],
+  "source": {
+    "ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-b99011e5ad999a9b2469cea47dc185e1aeb6d3d084234cb2fc5037ab04dd0a4e",
+    "kind": "PUBLIC_READER",
+    "refs": [
+      "worldlines/AFTERFALL/seasons/S04/raw_transcript/SESSION_001/PART_001.md"
+    ],
+    "hashes": [
+      "5217b71025a5e39f248bd431c4cc2c09c35a0174faa0bd1f3c006e56f7da8152"
+    ],
+    "sha256": "e22750adcb5882b917d98f5a11a41f2a1d795ac3057b96946f29f69e84cfc1ad"
+  },
+  "brief_id": "K-046",
+  "question": "재난 자원 협의에 참석하기 전 무엇을 확인할까",
+  "unknowns": [],
+  "conflicts": [],
+  "risk_notes": [
+    "회의 전 확인표는 자원 제공, 계약 체결, 비용 부담 또는 지역 배분 책임을 자동으로 승인하지 않는다.",
+    "참석자에게 대리권·예산 승인권·자원 배분 권한이 없으면 그 한계를 회의 전에 밝히고 결정사항을 권한 있는 담당자에게 되돌려 확인한다.",
+    "의료·구조·전기·연소·연료·급수·건축 등 인명 위험이 큰 자원의 상태와 운송 가능성은 일반 회의표로 판정하지 않고 관할 기관과 자격 있는 전문가에게 맡긴다.",
+    "참석자 연락처, 공급처, 취약 시설 위치와 보유량은 공개 범위를 따로 정해야 할 수 있다."
+  ],
+  "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-b99011e5ad999a9b2469cea47dc185e1aeb6d3d084234cb2fc5037ab04dd0a4e",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S04/raw_transcript/SESSION_001/PART_001.md"
+  ],
+  "candidate_id": "KC-c03-afterfall-auto-b99011e5ad999a9b246-d6945a93f1",
+  "source_hashes": [
+    "5217b71025a5e39f248bd431c4cc2c09c35a0174faa0bd1f3c006e56f7da8152"
+  ],
+  "source_sha256": "e22750adcb5882b917d98f5a11a41f2a1d795ac3057b96946f29f69e84cfc1ad",
+  "policy_version": "knowledge-c3-policy-v1",
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "copyright_status": "CLEAR",
+  "narrative_context": "공개 Reader의 허구·서사(narrative)에서 지역 연료·운송 회의 요청을 받은 조직이 참석 주체, 실제 의제, 대략적 자원 규모, 운송 책임, 자원 종류·상태와 자신의 책임 범위를 먼저 확인하는 장면이 질문의 출발점이다. 작품은 현실 자원협의 절차의 근거로 사용하지 않았다.",
+  "reader_chapter_id": "c03-afterfall-auto-b99011e5ad999a9b2469cea47dc185e1aeb6d3d084234cb2fc5037ab04dd0a4e",
+  "reader_book_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0",
+  "story_source_status": "VERIFIED_PUBLIC_READER_BACKFILL",
+  "narrative_limitation": "작품 속 연료량, 저장상태, 조직의 권한, 배분 갈등과 회의 결과는 허구·서사(narrative) 설정이며 현실 자원의 가용성·안전성, 계약 효력, 배분 기준 또는 특정 협의 방식의 효과를 입증하지 않는다.",
+  "reader_chapter_sha256": "e22750adcb5882b917d98f5a11a41f2a1d795ac3057b96946f29f69e84cfc1ad"
+}
