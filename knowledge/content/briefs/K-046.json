@@ -19,7 +19,7 @@
     ],
     "sha256": "e22750adcb5882b917d98f5a11a41f2a1d795ac3057b96946f29f69e84cfc1ad"
   },
-  "status": "READY",
+  "status": "PUBLISHED",
   "sources": [
     {
       "id": "FEMA-IS703B-RESOURCE-MANAGEMENT",
@@ -219,7 +219,7 @@
   ],
   "candidate_id": "KC-c03-afterfall-auto-b99011e5ad999a9b246-d6945a93f1",
   "content_type": "BRIEF",
-  "published_at": null,
+  "published_at": "2026-10-22",
   "risk_domains": [
     "GENERAL_PREPAREDNESS"
   ],
