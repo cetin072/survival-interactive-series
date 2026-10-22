@@ -8,6 +8,7 @@ import { checkRelease, changedFilesFromGit } from './lib/knowledge-release.mjs'
 import { applySemanticPackage, chapterHash, hashPolicyBytes, postSupabaseRpc, validateSemanticResult } from './lib/knowledge-semantic-jobs.mjs'
 import { buildReviewQueuePayload, enqueueReview } from './knowledge-review-sync.mjs'
 import { loadKnowledge, validateKnowledge } from './lib/knowledge-content.mjs'
+import { readVerifiedArchivedS03Raw } from './lib/knowledge-semantic-source-alias.mjs'
 
 export const repository = 'cetin072/survival-interactive-series'
 const root = resolve(import.meta.dirname, '../..')
@@ -87,7 +88,7 @@ export async function verifyPins(job, base) {
   const config = JSON.parse(configBytes.toString('utf8'))
   if (context.policy?.publication_mode !== config.publication_mode || context.policy?.auto_publish_enabled !== config.auto_publish_enabled) throw new Error('SEMANTIC_CONFIG_PIN_CHANGED')
 
-  const readPinnedSourceBytes = async (ref) => {
+  const readPinnedSourceBytes = async (ref, expectedHash) => {
     try {
       return await readFile(join(base, ref))
     } catch (cause) {
@@ -98,13 +99,19 @@ export async function verifyPins(job, base) {
           stdio: ['ignore', 'pipe', 'pipe'],
         })
       } catch {
+        // The original S03 branch may lack its RAW despite a verified,
+        // SHA-pinned public Archive copy. No unverified fallback is allowed.
+        const archived = await readVerifiedArchivedS03Raw({
+          base, ref, expectedSha256: expectedHash,
+        })
+        if (archived) return archived
         throw new Error('SEMANTIC_SOURCE_UNAVAILABLE')
       }
     }
   }
   const verifyFile = async (ref, expectedHash) => {
     if (!safeRef(ref) || !/^[a-f0-9]{64}$/.test(expectedHash ?? '')) throw new Error('SEMANTIC_SOURCE_REFERENCE_INVALID')
-    if (sha(await readPinnedSourceBytes(ref)) !== expectedHash) throw new Error('SEMANTIC_SOURCE_SHA_CHANGED')
+    if (sha(await readPinnedSourceBytes(ref, expectedHash)) !== expectedHash) throw new Error('SEMANTIC_SOURCE_SHA_CHANGED')
   }
   if (job.source_kind === 'PUBLIC_ARCHIVE') {
     await verifyFile(job.source_ref, job.source_sha256)
@@ -122,7 +129,7 @@ export async function verifyPins(job, base) {
     for (let index = 0; index < context.source.refs.length; index += 1) await verifyFile(context.source.refs[index], context.source.hashes[index])
   } else if (job.source_kind === 'USER_REPORTED_EXPERIENCE') {
     if (!/^knowledge\/content\/experience-seeds\/EX-[0-9]{3,}-[a-z0-9-]+\.json$/.test(job.source_ref) || context.source.refs.length !== 0) throw new Error('SEMANTIC_EXPERIENCE_SOURCE_INVALID')
-    const bytes = await readPinnedSourceBytes(job.source_ref)
+    const bytes = await readPinnedSourceBytes(job.source_ref, job.source_sha256)
     if (sha(Buffer.from(bytes.toString('utf8').replace(/\r\n/g, '\n'), 'utf8')) !== job.source_sha256) throw new Error('SEMANTIC_SOURCE_SHA_CHANGED')
   } else throw new Error('SEMANTIC_SOURCE_KIND_INVALID')
   return { context, config }
