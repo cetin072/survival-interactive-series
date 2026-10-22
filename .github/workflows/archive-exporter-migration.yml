@@ -187,7 +187,8 @@ jobs:
             WHERE p.id=auth.uid() AND c.code=$1
           ) $fn$;
           CREATE TABLE vault.decrypted_secrets (name text, decrypted_secret text, created_at timestamptz);
-          CREATE TABLE cron.job (jobname text primary key, schedule text not null, active boolean not null);
+          CREATE TABLE cron.job (jobid bigint generated always as identity, jobname text primary key, schedule text not null, active boolean not null);
+          CREATE FUNCTION cron.alter_job(job_id bigint, active boolean) RETURNS void LANGUAGE sql AS $fn$ UPDATE cron.job SET active=$2 WHERE jobid=$1 $fn$;
           CREATE FUNCTION cron.schedule(text,text,text) RETURNS bigint LANGUAGE plpgsql AS $fn$ BEGIN INSERT INTO cron.job(jobname,schedule,active) VALUES ($1,$2,true) ON CONFLICT (jobname) DO UPDATE SET schedule=excluded.schedule,active=true; RETURN 1; END $fn$;
           CREATE FUNCTION net.http_post(url text, body jsonb, headers jsonb, timeout_milliseconds integer) RETURNS bigint LANGUAGE sql AS $fn$ SELECT 1::bigint $fn$;
           CREATE TABLE survival_rpg.archive_publication_daily_runs (scheduled_date date,status text,attempt_count integer,last_error_code text,started_at timestamptz,finished_at timestamptz,created_at timestamptz);
@@ -245,6 +246,9 @@ jobs:
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261021121000_knowledge_human_approval_immediate_consumer_dispatch.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261021141433_knowledge_review_verified_publication_recovery.sql
           psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_operator_drafts_verification.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261022153819_knowledge_prep_shared_pause_gate.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/migrations/20261022154138_knowledge_submission_schema_guard.sql
+          psql --dbname knowledge_semantic_test -v ON_ERROR_STOP=1 --file supabase/tests/knowledge_prep_pause_submission.sql
 
   illustration-db-contract:
     runs-on: ubuntu-latest

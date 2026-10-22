@@ -61,6 +61,14 @@ jobs:
           VITE_SUPABASE_PUBLISHABLE_KEY: operator-browser-qa
       - name: Install browser test tooling (not a runtime dependency)
         run: |
+          # The runner's Azure HTTP mirror can stall before browser QA starts.
+          # Use the official HTTPS mirror and bounded retries on this CI VM.
+          for mirror in /etc/apt/apt-mirrors.txt /etc/apt/apt-mirrors-security.txt; do
+            if [ -f "$mirror" ]; then
+              sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' "$mirror"
+            fi
+          done
+          printf '%s\n' 'Acquire::Retries "1";' 'Acquire::http::Timeout "30";' 'Acquire::https::Timeout "30";' | sudo tee /etc/apt/apt.conf.d/99-browser-qa-timeouts > /dev/null
           python -m pip install playwright==1.55.0
           python -m playwright install --with-deps chromium
       - name: Audit built app on touch mobile and desktop

@@ -1,3 +1,4 @@
+import { verifyPins } from './lib/knowledge-semantic-pins.mjs'
 import { createHash } from 'node:crypto'
 import { readFile, readdir } from 'node:fs/promises'
 import { execFileSync } from 'node:child_process'
@@ -258,11 +259,18 @@ export async function createJob({ choice, policy, policyPin, mainSha, data, hand
     p_initial_status: initialStatus,
     p_blocker_code: blockerCode,
   }
+  try {
+    await verifyPins({ source_kind: choice.sourceKind, source_ref: choice.sourceRef, source_sha256: choice.sourceSha256, policy_sha256: policyPin.sha256, policy_pin: policyPin, semantic_context: context }, root)
+  } catch (error) {
+    await recordPrep('BLOCKED', 'SOURCE_ACCESS', { blockerCode: error.message, sourceRef: choice.sourceRef, sourceSha256: choice.sourceSha256, mainSha })
+    return { result: { status: 'BLOCKED', reason: error.message }, choice, context }
+  }
   const result = await supabase('archive_knowledge_semantic_job_prepare', args)
   return { result, choice, context }
 }
 
 export async function runSemanticPrepare({ now = new Date() } = {}) {
+  if (!await supabase('archive_knowledge_semantic_prep_enabled', {})) return { status: 'PREP_PAUSED', created: false }
   const mainSha = execFileSync('git', ['rev-parse', 'origin/main'], { cwd: root, encoding: 'utf8' }).trim()
   const [policyBytes, configBytes, editorialBytes, policy] = await Promise.all([
     readFile(join(root, 'knowledge/automation/worker-policy.json')),
@@ -357,6 +365,10 @@ export async function runSemanticPrepare({ now = new Date() } = {}) {
     return { status: 'BLOCKED', reason: blockerCode, job: blocked.result }
   }
   const prepared = await createJob({ choice, policy, config, policyPin: pin, mainSha, data, handledJobs })
+  if (prepared.result.status === 'BLOCKED' && prepared.result.reason) {
+    // createJob already recorded the exact SOURCE_ACCESS error; retain it.
+    return { status: 'BLOCKED', reason: prepared.result.reason, source_ref: choice.sourceRef, main_sha: mainSha }
+  }
   if (prepared.result.status === 'PREPARED' && prepared.result.created === true) {
     await recordPrep('PREPARED', choice.jobType, {
       sourceRef: choice.sourceRef, sourceSha256: choice.sourceSha256, mainSha,
