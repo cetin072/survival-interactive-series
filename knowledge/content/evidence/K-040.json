@@ -1,0 +1,79 @@
+{
+  "claims": [
+    {
+      "claim": "다른 기관이나 시설을 알려 주는 소개와, 제공 기관이 요청을 검토하고 실제 가용량·시간·장소를 확인한 예약 확정은 별도 상태로 기록해야 한다.",
+      "context": "FEMA NIMS 자원관리 교육은 요청 기관이 필요한 종류·수량·도착 시각·전달 장소·수령자를 명확히 하고, 제공 기관이 요청에 동의하면서 실제 제공 가능량과의 차이를 알려야 한다고 설명한다. 이는 연결 사실만으로 제공이 확정되지 않음을 뒷받침한다.",
+      "limitation": "FEMA 자료는 미국 사고관리 체계의 자원 요청 절차다. 숙박·급수·수리 등 개별 서비스의 계약이나 소비자 예약 규정을 정하지 않으며, 이 글의 '소개/확정' 명칭은 소규모 조직이 상태 혼선을 줄이기 위해 재구성한 편집 용어다.",
+      "source_ids": [
+        "FEMA-IS703-MANAGING-RESOURCES",
+        "FEMA-IS703-ORDER-ACQUIRE"
+      ]
+    },
+    {
+      "claim": "확정 여부를 판단하려면 요청 인원·수량, 필요한 서비스, 도착 예정 시각, 제공 장소, 수령·응대 담당자와 제공 기관의 회신을 함께 기록해야 한다.",
+      "context": "FEMA 자원 주문 요소는 수량·종류, 필요한 도착 시각, 전달·보고 장소, 수령자를 포함하며, 주문 처리 기록에는 공급원, 응답 자원, 예상 도착 시각, 비용과 변경사항을 남기도록 안내한다.",
+      "limitation": "모든 항목이 모든 생활지원 서비스에 동일하게 필요한 것은 아니다. 개인정보는 필요한 최소 범위만 수집하고, 의료·보호·법률 서비스처럼 별도 규정이 있는 영역은 해당 기관 절차를 우선해야 한다.",
+      "source_ids": [
+        "FEMA-IS703-MANAGING-RESOURCES",
+        "FEMA-ICS-FORMS-CENTER"
+      ]
+    },
+    {
+      "claim": "수용량과 자원 상태는 변할 수 있으므로 확정에는 확인 시각과 유효기간을 붙이고, 변경되면 양쪽 기록을 갱신해야 한다.",
+      "context": "FEMA 교육은 자원 필요와 가용성이 사고 진행에 따라 계속 바뀌므로 요구를 지속적으로 확인·조정하고, 자원의 위치와 상태를 동원 전부터 종료까지 추적하라고 설명한다.",
+      "limitation": "공식 자료는 이 글의 구체적인 유효시간을 제시하지 않는다. 갱신 주기와 확정 만료 시각은 이동시간, 통신 여건, 서비스 특성과 제공 기관의 운영 규칙에 맞춰 정해야 한다.",
+      "source_ids": [
+        "FEMA-IS703-MANAGING-RESOURCES",
+        "FEMA-IS703-TRACK-REPORT"
+      ]
+    },
+    {
+      "claim": "현장 도착 후에도 예약번호·요청 내용·도착 여부를 확인하고 실제 제공 결과를 기록해야 다음 연결의 수용 가능성을 정확히 판단할 수 있다.",
+      "context": "FEMA 자원관리 절차는 자원이 도착하면 공식 체크인을 하고, 주문 번호·도착 시각·자원 상태를 추적하며, 요청부터 수령 이후까지 기록을 유지하도록 한다.",
+      "limitation": "일반 숙박이나 생활지원 이용자에게 사고지휘체계의 정식 체크인 양식을 그대로 적용할 필요는 없다. 최소 기록 항목만 단순화하고, 민감정보 보관기간과 접근권한은 조직 정책과 관련 법규에 맞춰야 한다.",
+      "source_ids": [
+        "FEMA-IS703-MANAGING-RESOURCES",
+        "FEMA-ICS-FORMS-CENTER"
+      ]
+    }
+  ],
+  "source": {
+    "ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-ec3ae3e40dc56590d92b49736568c47a3e50c69a2f0cba467d874419515bc47f",
+    "kind": "PUBLIC_READER",
+    "refs": [
+      "worldlines/AFTERFALL/seasons/S03/raw_transcript/SESSION_003/PART_001.md"
+    ],
+    "hashes": [
+      "3dc61364456b3c08c11c985f2f35df92ff518c033d00b931f60369d94217c0c0"
+    ],
+    "sha256": "6cb64c51d973556a4241827e3d04ef8518292c35fbfaa8f31f51ed4c0b75cd43"
+  },
+  "brief_id": "K-040",
+  "question": "재난 지원 연결에서 소개와 예약 확정은 어떻게 나눌까",
+  "unknowns": [],
+  "conflicts": [],
+  "risk_notes": [
+    "소개를 예약 확정으로 잘못 전달하면 이용자가 이동한 뒤 서비스나 자리를 받지 못할 수 있으므로, 제공 기관의 명시적 회신 전에는 '미확정'으로 표시한다.",
+    "생명·의료·대피 명령과 관련된 긴급 상황에서는 이 일반 연결표로 판단하지 말고 119와 관할 재난기관의 공식 안내를 우선한다.",
+    "이름·연락처·이동정보는 서비스 제공에 필요한 최소 범위만 공유하고, 열람 대상과 파기 시점을 정한다."
+  ],
+  "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-ec3ae3e40dc56590d92b49736568c47a3e50c69a2f0cba467d874419515bc47f",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S03/raw_transcript/SESSION_003/PART_001.md"
+  ],
+  "candidate_id": "KC-c03-afterfall-auto-ec3ae3e40dc56590d92-e02de32888",
+  "source_hashes": [
+    "3dc61364456b3c08c11c985f2f35df92ff518c033d00b931f60369d94217c0c0"
+  ],
+  "source_sha256": "6cb64c51d973556a4241827e3d04ef8518292c35fbfaa8f31f51ed4c0b75cd43",
+  "policy_version": "knowledge-c3-policy-v1",
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "copyright_status": "CLEAR",
+  "narrative_context": "공개 Reader의 허구·서사(narrative)에서 길드와 동쪽 차고지가 서로 이용자를 소개하되, 출발 전 인원·차량·도착 예정일을 알리고 제공처가 실제 방·물·서비스 가능 여부를 확인하며 '소개 ≠ 예약'을 기록하는 장면이 질문의 출발점이다. 작품은 현실 운영 근거로 사용하지 않았다.",
+  "reader_chapter_id": "c03-afterfall-auto-ec3ae3e40dc56590d92b49736568c47a3e50c69a2f0cba467d874419515bc47f",
+  "reader_book_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0",
+  "story_source_status": "VERIFIED_PUBLIC_READER_BACKFILL",
+  "narrative_limitation": "작품 속 숙박·급수·수리·보관 서비스, 이동거리, 수용량과 통신 상태는 허구·서사(narrative) 설정이다. 현실 서비스의 이용 가능성, 안전성, 계약 성립 또는 개인정보 처리의 적법성을 입증하지 않는다.",
+  "reader_chapter_sha256": "6cb64c51d973556a4241827e3d04ef8518292c35fbfaa8f31f51ed4c0b75cd43"
+}
