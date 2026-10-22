@@ -19,7 +19,7 @@
     ],
     "sha256": "6cb64c51d973556a4241827e3d04ef8518292c35fbfaa8f31f51ed4c0b75cd43"
   },
-  "status": "READY",
+  "status": "PUBLISHED",
   "sources": [
     {
       "id": "FEMA-IS703-MANAGING-RESOURCES",
@@ -215,7 +215,7 @@
   "risk_level": "LOW",
   "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-ec3ae3e40dc56590d92b49736568c47a3e50c69a2f0cba467d874419515bc47f",
   "story_refs": [],
-  "updated_at": "2026-10-20",
+  "updated_at": "2026-10-22",
   "ai_assisted": true,
   "source_kind": "PUBLIC_READER",
   "source_refs": [
@@ -244,5 +244,6 @@
   "publication_policy": "AUTO_LOW_RISK",
   "reader_book_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0",
   "semantic_qa_status": "PASS",
-  "reader_chapter_sha256": "6cb64c51d973556a4241827e3d04ef8518292c35fbfaa8f31f51ed4c0b75cd43"
+  "reader_chapter_sha256": "6cb64c51d973556a4241827e3d04ef8518292c35fbfaa8f31f51ed4c0b75cd43",
+  "published_at": "2026-10-22"
 }
