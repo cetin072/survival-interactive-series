@@ -1,0 +1,77 @@
+{
+  "claims": [
+    {
+      "claim": "새 인력에게는 맡은 업무를 수행하는 데 필요한 최소 권한만 먼저 부여하고, 권한이 큰 행위는 별도 역할이나 승인 단계로 분리하는 것이 오류와 권한 남용 위험을 줄이는 기본 원칙이다.",
+      "context": "NIST SP 800-53 Rev. 5의 AC-5는 분리해야 할 임무를 식별·문서화하고 그 분리를 지원하도록 접근 권한을 정의하라고 설명한다. AC-6은 배정된 조직 업무에 필요한 접근만 허용하는 최소권한 원칙을 제시한다.",
+      "limitation": "NIST 통제는 정보시스템과 조직 보안을 위한 미국 연방 중심의 통제 카탈로그다. 이 글은 그 원칙을 종이 장부·물품 인출·예약·정산 같은 일반 운영에도 적용한 편집적 확장이며, 특정 조직의 법적 직무분장이나 내부통제 적합성을 인증하지 않는다.",
+      "source_ids": [
+        "NIST-SP800-53R5"
+      ]
+    },
+    {
+      "claim": "업무 위임표에는 독립 처리 범위, 상급자에게 넘길 예외, 최종 승인자와 책임 한계를 함께 적고 정기적으로 다시 확인해야 한다.",
+      "context": "FEMA의 2024 Continuity Guidance Circular은 권한 위임에서 권한과 책임의 한계를 명확히 하고 위임 내용을 검토하도록 안내한다. NIST AC-6(7)은 부여한 권한의 필요성을 정기적으로 검토하고 필요하면 재배정하거나 제거하도록 한다.",
+      "limitation": "FEMA 자료는 미국의 연속성 계획 지침이며, NIST 자료는 보안 통제다. 두 자료 모두 이 글의 시험근무 기간, 승인 금액, 재검토 주기 같은 수치를 정해 주지 않으므로 조직이 업무 영향과 현지 규정에 맞춰 정해야 한다.",
+      "source_ids": [
+        "FEMA-CGC-2024",
+        "NIST-SP800-53R5"
+      ]
+    },
+    {
+      "claim": "새 업무를 맡기기 전에는 기대 역할과 안전한 작업 방법을 설명하고, 독립 수행 전에 관찰·피드백·확인 단계를 두어야 한다.",
+      "context": "미국 OSHA의 Safety and Health Program Management Guidelines는 조직 각자가 기대되는 책임을 알도록 책임을 배정·전달하고, 새 업무를 맡는 근로자에게 교육이 특히 중요하다고 설명한다.",
+      "limitation": "해당 OSHA 문서는 자율적 안전보건 프로그램 지침이며 모든 직무에 동일하게 적용되는 구체적 법적 시험근무 절차가 아니다. 위험 작업의 자격·훈련·감독 요건과 고용·임금 규정은 관할 법령과 전문가 확인이 우선한다.",
+      "source_ids": [
+        "OSHA-SHPM-GUIDELINES"
+      ]
+    },
+    {
+      "claim": "시험 운영 결과는 처리 건수보다 오기·반려·예외 이관·승인 누락·권한 밖 행동을 함께 기록하고, 정해진 검토일에 권한을 확대·유지·축소·회수하는 근거로 사용하는 편이 좋다.",
+      "context": "NIST의 권한 정기 검토·재배정 원칙과 FEMA의 권한·책임 한계 검토를 실제 소규모 운영 기록으로 옮긴 편집적 적용이다. 권한 변경의 이유와 확인자를 남기면 다음 교대와 재검토에서 현재 범위를 확인할 수 있다.",
+      "limitation": "공식 자료는 이 글의 평가표나 합격 기준을 표준 양식으로 제시하지 않는다. 성과평가·징계·채용 결정은 현지 노동법, 단체협약, 개인정보 규칙과 조직 정책을 따라야 한다.",
+      "source_ids": [
+        "NIST-SP800-53R5",
+        "FEMA-CGC-2024"
+      ]
+    }
+  ],
+  "source": {
+    "ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-a4fae733c4c5f58987a52d6ce1061f9f82e055bbfb41a851fc24d4cea450cc7c",
+    "kind": "PUBLIC_READER",
+    "refs": [
+      "worldlines/AFTERFALL/seasons/S03/raw_transcript/SESSION_004/PART_001.md"
+    ],
+    "hashes": [
+      "f07fe21c2c186d5783759a2ec3b94133b924bdc09e55b53ad201f80f46919247"
+    ],
+    "sha256": "4b53ca94c46f730e9fd829272a21224f0eac23c1625d4b695062636b5f0ea639"
+  },
+  "brief_id": "K-041",
+  "question": "비상 운영 조직의 새 인력 권한은 어떻게 나눌까",
+  "unknowns": [],
+  "conflicts": [],
+  "risk_notes": [
+    "이 글은 일반 접수·기록·보관 준비·예약 확인 같은 저위험 운영 권한을 다루며 의료, 전기, 화재 대응, 구조, 위험물, 무장 경비, 개인정보 고위험 처리나 법정 면허 업무의 자격 기준을 대신하지 않는다.",
+    "현금 지급, 고객 재산 반출, 장부 정정, 개인정보 열람처럼 되돌리기 어렵거나 분쟁 영향이 큰 행위는 새 인력 혼자 확정하지 않도록 별도 승인과 기록을 둔다.",
+    "시험근무의 임금·계약·차별·해고·개인정보 처리 요건은 관할 법률과 조직 규정에 따라 확인해야 하며 이 글은 법률 자문이 아니다."
+  ],
+  "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-a4fae733c4c5f58987a52d6ce1061f9f82e055bbfb41a851fc24d4cea450cc7c",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S03/raw_transcript/SESSION_004/PART_001.md"
+  ],
+  "candidate_id": "KC-c03-afterfall-auto-a4fae733c4c5f58987a-da61bc9f76",
+  "source_hashes": [
+    "f07fe21c2c186d5783759a2ec3b94133b924bdc09e55b53ad201f80f46919247"
+  ],
+  "source_sha256": "4b53ca94c46f730e9fd829272a21224f0eac23c1625d4b695062636b5f0ea639",
+  "policy_version": "knowledge-c3-policy-v1",
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "copyright_status": "CLEAR",
+  "narrative_context": "공개 Reader의 허구·서사(narrative)에서 접수와 보관 업무가 늘자 새 인력을 유급 시험근무로 들이고, 일반 접수·위치 기록 같은 업무와 최종 정산·예외 승인·반출 승인 권한을 나눠 맡기는 장면이 질문의 출발점이다. 작품은 현실 주장의 근거로 사용하지 않았다.",
+  "reader_chapter_id": "c03-afterfall-auto-a4fae733c4c5f58987a52d6ce1061f9f82e055bbfb41a851fc24d4cea450cc7c",
+  "reader_book_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0",
+  "story_source_status": "VERIFIED_PUBLIC_READER_BACKFILL",
+  "narrative_limitation": "작품 속 조직, 채용 방식, 인물의 판단과 업무 결과는 허구·서사(narrative) 설정이며 현실 조직의 안전성, 신뢰성, 고용 적법성 또는 특정 인력의 자격을 입증하지 않는다.",
+  "reader_chapter_sha256": "4b53ca94c46f730e9fd829272a21224f0eac23c1625d4b695062636b5f0ea639"
+}

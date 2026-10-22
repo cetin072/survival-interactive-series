@@ -1,8 +1,8 @@
 {
   "version": 1,
   "backfill": {
-    "last_attempted_at": "2026-10-19T15:07:24.693Z",
-    "last_work_key": "PUBLIC_READER:archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-ec3ae3e40dc56590d92b49736568c47a3e50c69a2f0cba467d874419515bc47f:6cb64c51d973556a4241827e3d04ef8518292c35fbfaa8f31f51ed4c0b75cd43",
+    "last_attempted_at": "2026-10-20T03:08:15.503Z",
+    "last_work_key": "PUBLIC_READER:archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-a4fae733c4c5f58987a52d6ce1061f9f82e055bbfb41a851fc24d4cea450cc7c:4b53ca94c46f730e9fd829272a21224f0eac23c1625d4b695062636b5f0ea639",
     "last_result": "PR_CREATED",
     "reviewed_items": [
       {
@@ -64,6 +64,11 @@
         "work_key": "PUBLIC_READER:archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-ec3ae3e40dc56590d92b49736568c47a3e50c69a2f0cba467d874419515bc47f:6cb64c51d973556a4241827e3d04ef8518292c35fbfaa8f31f51ed4c0b75cd43",
         "status": "PR_CREATED",
         "processed_at": "2026-10-19T15:07:24.693Z"
+      },
+      {
+        "work_key": "PUBLIC_READER:archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-a4fae733c4c5f58987a52d6ce1061f9f82e055bbfb41a851fc24d4cea450cc7c:4b53ca94c46f730e9fd829272a21224f0eac23c1625d4b695062636b5f0ea639",
+        "status": "PR_CREATED",
+        "processed_at": "2026-10-20T03:08:15.503Z"
       }
     ]
   }
