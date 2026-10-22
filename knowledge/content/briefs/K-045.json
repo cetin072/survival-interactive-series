@@ -1,0 +1,221 @@
+{
+  "id": "K-045",
+  "lead": "장비마다 바뀌지 않는 식별번호를 하나 정하고, 구매·배치·점검·수리 기록을 모두 그 번호에 연결합니다. 장비가 여러 장소와 담당자를 오갈수록 이름이나 외형만으로는 같은 물건인지 확인하기 어렵습니다. 제조사 일련번호가 있으면 원형 그대로 기록하고, 내부 관리번호를 따로 붙일 때는 두 번호를 함께 보존해야 이력이 끊기지 않습니다.",
+  "slug": "link-emergency-equipment-id-maintenance-history",
+  "basis": "FEMA의 NIMS 자원관리 지침과 ICS 218 장비 재고 양식을 바탕으로 고유 식별자, 장비 속성, 배치·상태 변경 기록을 하나의 생애주기 장부로 재구성했다. 공개 Reader의 허구 서사는 질문이 시작된 출처일 뿐 현실 장비의 진품·안전·권리 판단 근거가 아니다.",
+  "label": "비상장비 식별·이력",
+  "scope": "소규모 공동체와 비영리조직이 일반 비상장비의 식별번호를 구매·배치·점검·수리 기록과 연결하는 저위험 자산관리 절차를 다룬다. 진품 감정, 상표권·계약 분쟁, 리콜 판정, 법정 검사나 고위험 장비의 안전성 평가는 다루지 않는다.",
+  "title": "비상장비의 식별번호와 정비이력은 어떻게 연결할까",
+  "tools": [],
+  "footer": "이 기록은 장비를 찾고 이력을 연결하는 도구이지 안전 인증서가 아닙니다. 고장 시 인명 위험이 큰 장비는 제조사 지침, 관할 규정, 법정 검사와 자격 있는 전문가의 판단을 우선하세요.",
+  "source": {
+    "ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-7a589e3a941834319a82033e0169df5b7270a24315fbe18f30d8a368daee6b4a",
+    "kind": "PUBLIC_READER",
+    "refs": [
+      "worldlines/AFTERFALL/seasons/S03/raw_transcript/SESSION_008/PART_001.md"
+    ],
+    "hashes": [
+      "4f3f927f3a5cee583d47cc94dc375d43467c92bd54930426a8b434a12e2dfa2f"
+    ],
+    "sha256": "a2a1447e2648605ac1740ef51e41eb1f24a35672675ce8cc6aa09f45220a4e44"
+  },
+  "status": "PUBLISHED",
+  "sources": [
+    {
+      "id": "FEMA-ICS218-EQUIPMENT-INVENTORY",
+      "url": "https://training.fema.gov/emiweb/is/icsresource/assets/ics%20forms/ics%20form%20218,%20support%20vehicle-equipment%20inventory%20(v3).pdf",
+      "note": "지원 장비 재고에 제조사, 분류·규격, 소유자, 운용자, 일련번호·장비번호, 배치 위치와 기능을 함께 기록하고 상태·위치 변경을 갱신하는 범위를 확인했다. 이 양식 자체를 소규모 조직의 의무 양식으로 제시하지 않았다.",
+      "title": "ICS Form 218: Support Vehicle/Equipment Inventory",
+      "checked_at": "2026-10-22"
+    },
+    {
+      "id": "FEMA-NIMS-RM-PREPAREDNESS",
+      "url": "https://www.fema.gov/sites/default/files/documents/nims-guideline-resource-management-preparedness.pdf",
+      "note": "일련번호를 공식 기록에 사용하는 실제 재고관리용 고유 식별자로 다루는 자원 식별 원칙을 확인했다. 구체적인 정비 주기, 진품 판정 또는 법적 증명 절차로 확대하지 않았다.",
+      "title": "NIMS Guideline for Resource Management Preparedness",
+      "checked_at": "2026-10-22"
+    },
+    {
+      "id": "FEMA-NDEMU-RIGHTS",
+      "url": "https://training.fema.gov/programs/independent-study/isfaq.aspx?lang=en",
+      "note": "별도 표시가 없는 연방정부 제작 교육자료의 공공영역 안내와 출처 표기·연방정부 보증 오인 금지 조건을 확인했다. FEMA가 이 글이나 편집표를 보증한다는 뜻으로 사용하지 않았다.",
+      "title": "NDEMU Independent Study FAQ: Course-material rights",
+      "checked_at": "2026-10-22"
+    }
+  ],
+  "summary": "비상장비마다 고정 식별번호를 두고 구매·배치·점검·수리 기록을 연결하며, 번호 중복이나 불일치는 미확인 상태로 분리해 검증하는 방법을 설명한다.",
+  "sections": [
+    {
+      "blocks": [
+        {
+          "type": "ordered_list",
+          "items": [
+            "장비 몸체에 제조사 일련번호나 차량·장비 번호가 있으면 사진과 문자로 그대로 기록합니다.",
+            "내부 관리번호가 필요하면 별도로 발급하되 제조사 번호를 덮거나 지우지 않고 두 번호의 연결표를 남깁니다.",
+            "장비 종류·제조사·모델·규격·소유자·보관 위치를 같은 기본 기록에 묶습니다.",
+            "번호를 읽을 수 없거나 같은 번호가 이미 있으면 새 번호로 덮어쓰기 전에 상태를 '미확인'으로 표시합니다."
+          ]
+        },
+        {
+          "text": "식별번호는 기록을 연결하는 열쇠입니다. 번호 하나만으로 진품, 소유권, 안전성 또는 작동 가능 상태가 증명되지는 않습니다.",
+          "type": "note"
+        }
+      ],
+      "heading": "식별번호의 기준을 먼저 고정합니다"
+    },
+    {
+      "blocks": [
+        {
+          "rows": [
+            [
+              "구매·인수",
+              "구매처, 인수일, 증빙 참조, 제조사 번호와 내부 번호",
+              "증빙의 품목·모델·번호가 장비와 맞는가"
+            ],
+            [
+              "배치·이동",
+              "위치, 담당자, 용도, 이동 시각",
+              "이전 위치의 출고와 새 위치의 인수가 모두 기록됐는가"
+            ],
+            [
+              "점검",
+              "점검일, 점검자, 결과, 다음 확인일",
+              "점검 결과가 사용 가능 상태와 일치하는가"
+            ],
+            [
+              "수리·부품",
+              "고장 증상, 조치, 교체 부품, 작업자, 완료일",
+              "원래 장비의 식별번호 아래 기록됐는가"
+            ],
+            [
+              "상태 변경",
+              "사용 가능·제한·미확인·사용 중지, 결정자와 근거",
+              "현재 위치와 실제 표식이 장부와 맞는가"
+            ]
+          ],
+          "type": "table",
+          "headers": [
+            "단계",
+            "남길 기록",
+            "변경 때 확인할 것"
+          ]
+        },
+        {
+          "text": "기록을 수정할 때 이전 값을 지우기보다 날짜, 변경자와 사유를 덧붙입니다. 그래야 위치가 바뀌거나 담당자가 교대해도 어느 장비에 어떤 조치가 있었는지 역순으로 확인할 수 있습니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "한 번호 아래 이력을 시간순으로 연결합니다"
+    },
+    {
+      "blocks": [
+        {
+          "type": "ordered_list",
+          "items": [
+            "중복·누락·훼손·장부 불일치를 발견한 시각과 발견자를 기록합니다.",
+            "해당 장비를 '미확인'으로 표시하고, 같은 번호의 다른 장비와 기록이 섞이지 않게 임시 참조번호를 붙입니다.",
+            "원래 표식 사진, 구매·인수 증빙, 과거 위치 기록과 정비 이력을 모아 서로 대조합니다.",
+            "제조사·공급처 확인이나 계약·법률 판단이 필요하면 담당 기관 또는 전문가에게 넘깁니다.",
+            "확인 결과, 새로 확정한 번호, 변경 사유와 승인자를 기록한 뒤에만 정상 이력으로 합칩니다."
+          ]
+        },
+        {
+          "text": "번호가 겹친다는 사실만으로 위조품이라고 공개 단정하지 않습니다. 확인되지 않은 주장은 별도 기록으로 남기고 운영 판단과 법적 판단을 분리합니다.",
+          "type": "note"
+        }
+      ],
+      "heading": "번호 충돌은 판정이 아니라 검증 신호로 다룹니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "아래 사례는 사람을 구조하거나 전기·연료·압력·위험물을 다루지 않는 수동 접이식 운반카트 두 대를 관리하는 상황입니다. 인명 위험이 큰 장비의 안전 판정 절차를 설명하기 위한 사례가 아닙니다.",
+          "type": "prose"
+        },
+        {
+          "text": "두 카트에 같은 내부번호 A-07이 적혀 있다면 한쪽 번호를 바로 바꾸기보다 두 대를 각각 임시 참조번호로 구분하고, 몸체 표식 사진·구매 영수증·이전 배치 기록·바퀴 수리 기록을 대조합니다. 어느 기록이 어느 카트에 속하는지 확인한 뒤 한 대에 새 내부번호를 발급하고, 기존 A-07 기록에서 분리한 이유와 승인자를 남깁니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "사례는 저위험 수동 운반장비를 가정합니다"
+    },
+    {
+      "blocks": [
+        {
+          "type": "unordered_list",
+          "items": [
+            "제조사 번호, 내부 관리번호와 두 번호의 연결 상태",
+            "장비 종류·제조사·모델·규격·소유자",
+            "현재 위치·담당자·용도와 마지막 확인 시각",
+            "구매·인수 증빙의 참조번호와 보관 위치",
+            "점검·수리·부품 교체의 날짜·작업자·결과",
+            "현재 상태와 사용 제한, 다음 점검일",
+            "번호 충돌·훼손·누락의 발견 내용과 검증 상태",
+            "변경자, 변경 시각, 사유와 승인자"
+          ]
+        },
+        {
+          "text": "정기 실물 점검 때는 장부의 번호와 장비 몸체의 표식을 직접 대조하고, 위치·상태 변경이 빠졌으면 발견 시점부터 보정 기록을 추가합니다. 원본 사진과 증빙은 접근 권한을 정해 보관합니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "점검표와 변경기록을 함께 보관합니다"
+    },
+    {
+      "blocks": [
+        {
+          "text": "FEMA 자료는 고유 식별번호, 장비 속성, 배치 위치와 상태 변경을 연결하는 자원관리 원칙을 뒷받침합니다. 다만 이 글의 정비이력 표, 임시 참조번호와 충돌 해소 순서는 그 원칙을 소규모 조직에 맞게 재구성한 편집안이며 공식 표준 양식이 아닙니다.",
+          "type": "prose"
+        },
+        {
+          "text": "식별과 이력 기록은 제조사 정비지침, 리콜 확인, 법정 검사, 진품 감정 또는 전문가의 안전 판단을 대신하지 않습니다. 구조·의료·전기·연소·압력·중장비는 확인되지 않은 상태에서 투입하지 않습니다.",
+          "type": "note"
+        }
+      ],
+      "heading": "안전 경계와 출처의 확인 범위"
+    },
+    {
+      "blocks": [
+        {
+          "text": "공개된 《생존일기》의 허구·서사(narrative)에서는 겉표식이 비슷한 장비 두 대에 같은 관리번호가 적힌 사실을 발견하고 판매·수리 장부로 출처와 이력을 다시 확인합니다. 이 장면은 '장비의 식별번호와 정비이력을 어떻게 연결할까'라는 질문의 출처일 뿐, 작품 속 표식과 장부가 현실 제품의 진품 여부·안전성·권리관계 또는 특정 기록 방식의 효과를 입증하지 않습니다.",
+          "type": "prose"
+        }
+      ],
+      "heading": "《생존일기》에서 시작한 질문"
+    }
+  ],
+  "topic_id": "community-emergency-resource-management",
+  "risk_level": "LOW",
+  "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-7a589e3a941834319a82033e0169df5b7270a24315fbe18f30d8a368daee6b4a",
+  "story_refs": [],
+  "updated_at": "2026-10-22",
+  "ai_assisted": true,
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S03/raw_transcript/SESSION_008/PART_001.md"
+  ],
+  "candidate_id": "KC-c03-afterfall-auto-7a589e3a941834319a8-707697a6fb",
+  "content_type": "BRIEF",
+  "published_at": "2026-10-22",
+  "risk_domains": [
+    "GENERAL_PREPAREDNESS"
+  ],
+  "source_hashes": [
+    "4f3f927f3a5cee583d47cc94dc375d43467c92bd54930426a8b434a12e2dfa2f"
+  ],
+  "source_sha256": "a2a1447e2648605ac1740ef51e41eb1f24a35672675ce8cc6aa09f45220a4e44",
+  "editorial_note": "Editorial V2 적용: 첫 문장에서 고정 식별번호 아래 구매·배치·점검·수리 기록을 연결하라고 직접 답했다. 현실 장비관리 맥락, 식별 기준→이력 연결→충돌 검증 순서, 저위험 수동 운반카트라는 조건을 먼저 둔 사례, 실물 점검과 변경기록, 안전 경계와 출처 범위를 배치했다. 번호 중복은 위조 판정이 아닌 검증 신호로 제한했고 공개 Reader의 허구 provenance는 마지막 절에만 두었다.",
+  "policy_version": "knowledge-c3-policy-v1",
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "meta_description": "비상장비의 고정 식별번호를 구매·배치·점검·수리 기록과 연결하고, 중복 번호를 안전하게 검증하는 기록 절차입니다.",
+  "reader_chapter_id": "c03-afterfall-auto-7a589e3a941834319a82033e0169df5b7270a24315fbe18f30d8a368daee6b4a",
+  "related_brief_ids": [
+    "K-004",
+    "K-020"
+  ],
+  "source_checked_at": "2026-10-22",
+  "publication_policy": "AUTO_LOW_RISK",
+  "reader_book_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0",
+  "semantic_qa_status": "PASS",
+  "reader_chapter_sha256": "a2a1447e2648605ac1740ef51e41eb1f24a35672675ce8cc6aa09f45220a4e44"
+}
