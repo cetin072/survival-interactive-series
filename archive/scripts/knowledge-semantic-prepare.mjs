@@ -365,6 +365,10 @@ export async function runSemanticPrepare({ now = new Date() } = {}) {
     return { status: 'BLOCKED', reason: blockerCode, job: blocked.result }
   }
   const prepared = await createJob({ choice, policy, config, policyPin: pin, mainSha, data, handledJobs })
+  if (prepared.result.status === 'BLOCKED' && prepared.result.reason) {
+    // createJob already recorded the exact SOURCE_ACCESS error; retain it.
+    return { status: 'BLOCKED', reason: prepared.result.reason, source_ref: choice.sourceRef, main_sha: mainSha }
+  }
   if (prepared.result.status === 'PREPARED' && prepared.result.created === true) {
     await recordPrep('PREPARED', choice.jobType, {
       sourceRef: choice.sourceRef, sourceSha256: choice.sourceSha256, mainSha,
