@@ -1,0 +1,38 @@
+{
+  "id": "KC-c03-afterfall-auto-7a589e3a941834319a8-707697a6fb",
+  "source": {
+    "ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-7a589e3a941834319a82033e0169df5b7270a24315fbe18f30d8a368daee6b4a",
+    "kind": "PUBLIC_READER",
+    "refs": [
+      "worldlines/AFTERFALL/seasons/S03/raw_transcript/SESSION_008/PART_001.md"
+    ],
+    "hashes": [
+      "4f3f927f3a5cee583d47cc94dc375d43467c92bd54930426a8b434a12e2dfa2f"
+    ],
+    "sha256": "a2a1447e2648605ac1740ef51e41eb1f24a35672675ce8cc6aa09f45220a4e44"
+  },
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-045",
+  "question": "비상장비의 식별번호와 정비이력은 어떻게 연결할까",
+  "topic_id": "community-emergency-resource-management",
+  "risk_level": "LOW",
+  "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-7a589e3a941834319a82033e0169df5b7270a24315fbe18f30d8a368daee6b4a",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S03/raw_transcript/SESSION_008/PART_001.md"
+  ],
+  "risk_domains": [
+    "GENERAL_PREPAREDNESS"
+  ],
+  "source_hashes": [
+    "4f3f927f3a5cee583d47cc94dc375d43467c92bd54930426a8b434a12e2dfa2f"
+  ],
+  "source_sha256": "a2a1447e2648605ac1740ef51e41eb1f24a35672675ce8cc6aa09f45220a4e44",
+  "policy_version": "knowledge-c3-policy-v1",
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "disposition_note": "원문의 복구 우선순위 질문은 기존 K-015와 의미가 겹쳐 제외했다. 이 후보는 장비 한 대의 고정 식별번호를 구매·배치·점검·수리 기록과 연결하고 번호 충돌을 검증 상태로 관리하는 절차에 초점을 둔다. K-004의 여러 거점 재고 수량 관리 및 K-020의 독립 거래 기록 대조와 달리, 개별 장비의 생애주기 정체성과 이력 연결이 핵심이다. 중복 번호는 위조나 법적 책임의 결론으로 단정하지 않고 검증 신호로만 다루며, 장비 안전성 판정은 범위에서 제외한다.",
+  "reader_chapter_id": "c03-afterfall-auto-7a589e3a941834319a82033e0169df5b7270a24315fbe18f30d8a368daee6b4a",
+  "publication_policy": "AUTO_LOW_RISK",
+  "reader_book_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0",
+  "reader_chapter_sha256": "a2a1447e2648605ac1740ef51e41eb1f24a35672675ce8cc6aa09f45220a4e44"
+}
