@@ -4,7 +4,7 @@ export type EditorialResolution = { key: string; method: string; quote: string; 
 export type EditorialReview = { claims: EditorialClaim[]; resolutions: EditorialResolution[]; duplicate_note?:string; rights?: Array<{ source_id: string; url: string; quote: string }> }
 export type EditorialIssue = {key:string; reason:string; kind:string; quote?:string}
 export type EditorialRequest = {request_id:string; revision:number; publish_requested:boolean; status:string; updated_at:string; result?:{reason?:string;issues?:Array<{key:string;message:string;action?:string}>;public_url?:string;merge_sha?:string}}
-export type EditorialEnvelope = {job_id:string;revision:number;public_verified?:boolean;draft_sha256?:string;brief:KnowledgeDraftBrief|null;original?:Record<string, unknown>;context?:Record<string, unknown>;archived:boolean;evidence_review:EditorialReview;status:string;blocker_code?:string;updated_at?:string;request?:EditorialRequest|null;public_record?:EditorialRequest|null;related_public?:Array<{title:string;url:string}>;history:Array<{revision:number;draft_sha256:string;created_at:string}>;source_ref?:string;brief_id:string}
+export type EditorialEnvelope = {job_id:string;revision:number;public_verified?:boolean;draft_sha256?:string;brief:KnowledgeDraftBrief|null;original?:Record<string, unknown>;context?:Record<string, unknown>;archived:boolean;evidence_review:EditorialReview;status:string;blocker_code?:string;updated_at?:string;request?:EditorialRequest|null;public_record?:EditorialRequest|null;related_public?:Array<{title:string;url:string}>;history:Array<{revision:number;draft_sha256:string;created_at:string}>;source_ref?:string;brief_id:string;brief_slug?:string|null}
 export const publicationActive = (r?:EditorialRequest|null) => !!r && ['QUEUED','CHECKING','WAITING_CI','PUBLISHING'].includes(r.status)
 export function editorialStatus(value:EditorialEnvelope):string {
  const r=value.request
@@ -41,7 +41,7 @@ export async function editorialIssues(original?:Record<string,unknown>):Promise<
 }
 export function editorialTemplate(value:EditorialEnvelope):KnowledgeDraftBrief {
  const today=new Date().toISOString().slice(0,10)
- return {id:value.brief_id,slug:'knowledge-'+value.brief_id.toLowerCase(),topic_id:'community-emergency-resource-management',content_type:'BRIEF',title:'',summary:'',meta_description:'',lead:'',label:'생존 지식',scope:'',basis:'',footer:'',editorial_note:'운영자가 보관된 글감에서 작성한 새 초안. 아직 검토·공개되지 않았습니다.',sections:[{heading:'',blocks:[{type:'prose',text:''}]}],sources:[],risk_level:'HIGH',risk_domains:['OTHER_SEVERE_HARM'],publication_policy:'HUMAN_APPROVED',semantic_qa_status:'REVIEW',status:'READY',source_checked_at:today,updated_at:today,published_at:null,ai_assisted:false,story_refs:[],related_brief_ids:[],tools:[],guide_id:null}
+ return {id:value.brief_id,slug:value.brief_slug??'knowledge-'+value.brief_id.toLowerCase(),topic_id:'community-emergency-resource-management',content_type:'BRIEF',title:'',summary:'',meta_description:'',lead:'',label:'생존 지식',scope:'',basis:'',footer:'',editorial_note:'운영자가 보관된 글감에서 작성한 새 초안. 아직 검토·공개되지 않았습니다.',sections:[{heading:'',blocks:[{type:'prose',text:''}]}],sources:[],risk_level:'HIGH',risk_domains:['OTHER_SEVERE_HARM'],publication_policy:'HUMAN_APPROVED',semantic_qa_status:'REVIEW',status:'READY',source_checked_at:today,updated_at:today,published_at:null,ai_assisted:false,story_refs:[],related_brief_ids:[],tools:[],guide_id:null}
 }
 export function quoteLocations(brief:KnowledgeDraftBrief,quote:string):number {
  if(!quote.trim())return 0

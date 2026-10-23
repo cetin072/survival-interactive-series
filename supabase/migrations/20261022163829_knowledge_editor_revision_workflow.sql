@@ -111,7 +111,7 @@ declare actor uuid; j survival_ops.knowledge_semantic_jobs%rowtype; d survival_o
  'related_public',(select coalesce(jsonb_agg(jsonb_build_object('title',other.semantic_result->'brief'->>'title','url','https://survival-diary-archive.netlify.app/knowledge/'||(other.semantic_result->'brief'->>'slug')||'/')),'[]'::jsonb) from survival_ops.knowledge_semantic_jobs other where other.status='PUBLISHED' and other.semantic_result->'brief'->>'id' in (select (regexp_matches(coalesce(j.semantic_result->>'note',''),'K-[0-9]+','g'))[1])),
  'history',(select coalesce(jsonb_agg(jsonb_build_object('revision',v.revision,'draft_sha256',v.draft_sha256,'created_at',v.created_at) order by v.revision desc),'[]'::jsonb) from survival_ops.knowledge_editor_versions v where job_id=p_job_id),
  'public_record',(select to_jsonb(pr)-'snapshot'-'lease_token' from survival_ops.knowledge_editor_requests pr where pr.job_id=p_job_id and pr.status='PUBLISHED' order by pr.created_at desc limit 1),
- 'source_ref',j.source_ref,'brief_id',coalesce(s.publication_brief_id,j.semantic_result->'brief'->>'id',j.semantic_context->'target'->>'brief_id'));
+ 'source_ref',j.source_ref,'brief_slug',coalesce(s.publication_slug,j.semantic_result->'brief'->>'slug'),'brief_id',coalesce(s.publication_brief_id,j.semantic_result->'brief'->>'id',j.semantic_context->'target'->>'brief_id'));
 end $$;
 
 create function public.archive_operator_knowledge_editor_save(p_job_id uuid,p_expected_revision integer,p_brief jsonb,p_evidence_review jsonb) returns jsonb

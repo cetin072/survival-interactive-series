@@ -77,7 +77,7 @@ export function OperatorKnowledgeDetail({jobId,email,busy:parentBusy,onSignOut}:
   if(dirty&&name==='ARCHIVE')await save()
   const {data,error:err}=await supabaseClient.rpc('archive_operator_knowledge_editor_action',{p_job_id:jobId,p_action:name})
   if(err)throw Error(err.message)
-  await adopt(data as EditorialEnvelope);setNotice(name==='ARCHIVE'?'보관했습니다. 원고와 이력은 그대로 남습니다.':'편집을 위해 복원했습니다. 아직 발행되지 않았습니다.')
+  await adopt(data as EditorialEnvelope);setNotice(name==='ARCHIVE'?'보관했습니다. 원고와 이력은 그대로 남습니다.':'편집을 위해 복원했습니다. 아직 발행되지 않았습니다.');return data as EditorialEnvelope
  }
  const connectedIssues=brief?issues.map(issue=>({...issue,quote:review.resolutions.find(r=>r.key===issue.key)?.quote??issue.quote??''})).filter(issue=>quoteLocations(brief,issue.quote)===1):[]
  const highlights=connectedIssues.map(issue=>issue.quote)
@@ -113,8 +113,8 @@ export function OperatorKnowledgeDetail({jobId,email,busy:parentBusy,onSignOut}:
     <button aria-busy={busy} disabled={!!locked||!brief} onClick={()=>void run(async()=>{await save()})}>저장</button>
     <button className="operator-secondary" disabled={!brief} onClick={()=>setPreview(v=>!v)}>{preview?'편집':'미리보기'}</button>
     <button disabled={!!locked||!brief} onClick={()=>void run(()=>request(true))}>발행</button>
-    {!value.archived&&<button className="operator-secondary" disabled={busy||active} onClick={()=>void run(()=>action('ARCHIVE'))}>보관</button>}
-    {value.archived&&<button disabled={busy} onClick={()=>void run(()=>action('RESTORE'))}>복원</button>}
+    {!value.archived&&<button className="operator-secondary" disabled={busy||active} onClick={()=>void run(async()=>{await action('ARCHIVE')})}>보관</button>}
+    {value.archived&&<button disabled={busy} onClick={()=>void run(async()=>{await action('RESTORE')})}>복원</button>}
     {value.request&&['QUEUED','CHECKING'].includes(value.request.status)&&<button className="operator-secondary" disabled={busy} onClick={()=>void run(async()=>{const response=await supabaseClient!.rpc('archive_operator_knowledge_editor_cancel',{p_request_id:value.request!.request_id});if(response.error)throw Error(response.error.message);await load(false);setNotice('요청을 취소했습니다. 수정본과 처리 이력은 보존됩니다.')})}>요청 취소</button>}
     {(timedOut||result&&['FAILED','RETRYABLE'].includes(value.request?.status??''))&&<button disabled={busy||dirty} onClick={()=>void run(()=>request(value.request?.publish_requested??false))}>다시 시도</button>}
    </div>
@@ -122,7 +122,7 @@ export function OperatorKnowledgeDetail({jobId,email,busy:parentBusy,onSignOut}:
    {lastError&&<section role="alert" className="operator-panel"><h2>발행을 완료하지 못했습니다</h2><p>{lastError}</p><p>기존 공개본과 수정본은 유지됩니다.</p></section>}
    {publicUrl&&<section className="operator-panel"><h2>{value.request?.status==='PUBLISHED'?'게시됨':'기존 공개본'}</h2><a href={publicUrl} target="_blank" rel="noreferrer">공개 글 보기 ↗</a> <button className="operator-secondary" onClick={()=>void navigator.clipboard.writeText(publicUrl).then(()=>setNotice('주소를 복사했습니다.')).catch(()=>setNotice(publicUrl))}>주소 복사</button></section>}
    {value.archived&&<aside className="operator-panel"><h2>보관된 {brief?'원고':'글감'}</h2><p>{String(value.original?.note??'과거 처리 결과로 보관돼 있습니다. 복원하면 같은 편집기로 이어집니다.')}</p><p>복원은 편집 시작이며 공개 승인이 아닙니다.</p>{value.related_public?.map(link=><p key={link.url}><a href={link.url} target="_blank" rel="noreferrer">{link.title} · 관련 기존 글 보기</a></p>)}</aside>}
-   {!brief&&<section className="operator-panel"><h2>원고 미작성</h2><p>원본과 보류 이유는 아래 기술 정보에서 확인할 수 있습니다. 새 초안은 직접 작성하며 자동 발행되지 않습니다.</p><p>{String(value.original?.note??'아직 완성 본문이 없습니다.')}</p><button disabled={busy} onClick={()=>void run(async()=>{await action('RESTORE');change(editorialTemplate(value));setNotice('새 초안입니다. 본문과 근거를 작성한 뒤 검토하세요.')})}>초안 만들기 · 직접 작성</button></section>}
+   {!brief&&<section className="operator-panel"><h2>원고 미작성</h2><p>원본과 보류 이유는 아래 기술 정보에서 확인할 수 있습니다. 새 초안은 직접 작성하며 자동 발행되지 않습니다.</p><p>{String(value.original?.note??'아직 완성 본문이 없습니다.')}</p><button disabled={busy} onClick={()=>void run(async()=>{const restored=await action('RESTORE');if(!restored)throw Error('KNOWLEDGE_EDITOR_RESTORE_REQUIRED');change(editorialTemplate(restored));setNotice('새 초안입니다. 본문과 근거를 작성한 뒤 검토하세요.')})}>초안 만들기 · 직접 작성</button></section>}
    {brief&&<>
     {result?.issues?.length? <section className="operator-panel" aria-label="검사 결과"><h2>문제 {result.issues.length}개 확인</h2><ul>{result.issues.map(issue=><li key={issue.key}><a href={issues.some(original=>original.key===issue.key)?'#problem-'+issue.key:'#knowledge-editor-body'}>{issue.message}</a>{issue.action&&<p>{issue.action}</p>}</li>)}</ul></section>:null}
     <section className="operator-panel knowledge-editor-body" id="knowledge-editor-body">

@@ -84,6 +84,9 @@ def run(args):
                     result = {'status': 'CANCELLED'}
                 elif name == 'archive_operator_knowledge_editor_action':
                     state['data']['archived'] = payload['p_action'] == 'ARCHIVE'
+                    if payload['p_action'] == 'RESTORE' and state['data']['brief'] is None:
+                        state['data']['brief_id'] = 'K-1001'
+                        state['data']['brief_slug'] = 'restored-unique-slug'
                     result = state['data']
                 else:
                     route.fulfill(status=403, json={'message': 'QA_DENIES_UNEXPECTED_MUTATION'})
@@ -140,6 +143,10 @@ def run(args):
             expect(page.get_by_role('heading', name='원고 미작성', exact=True)).to_be_visible()
             page.get_by_role('button', name='초안 만들기 · 직접 작성', exact=True).click()
             expect(page.get_by_label('제목', exact=True)).to_be_visible()
+            page.get_by_role('button', name='저장', exact=True).click()
+            expect(page.get_by_text('저장됨', exact=True)).to_be_visible()
+            assert state['data']['brief']['id'] == 'K-1001'
+            assert state['data']['brief']['slug'] == 'restored-unique-slug'
             assert not [p for n, p in state['calls'] if n.endswith('_request')]
 
             # Exact, current quote anchors and unsaved/conflicting edits remain private.

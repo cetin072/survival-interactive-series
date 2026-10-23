@@ -64,3 +64,5 @@ Latest CI and live observation should be read from PR #626 and its browser artif
 
 Repeated editorial publication now pins the latest verified public request in the immutable snapshot. Subsequent edits compare against that commit, while the original job/merge SHA stays immutable. A restored job with an editorial public record retains its published ID and slug. Synthetic SQL and unit contracts cover these boundaries.
 The safety-specifics check also applies to edits of historically LOW-risk articles; their old classification cannot exempt newly added voltage/dosage/distance instructions.
+
+Empty-idea creation consumes the restore RPC response, including both the assigned ID and slug. The synthetic browser test saves a body-free restored idea under a different server-assigned identity rather than reusing its pre-restore state.

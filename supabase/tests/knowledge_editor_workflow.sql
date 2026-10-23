@@ -193,6 +193,7 @@ begin
   select job_type,'PUBLISHED',source_kind,'synthetic://published-collision',source_sha256,'published-collision',policy_version,policy_sha256,policy_pin,main_sha_at_prepare,jsonb_set(semantic_context,'{target,brief_id}','"K-1001"'),jsonb_set(semantic_result,'{brief,id}','"K-1001"'),semantic_result_sha256,result_decision,999,repeat('c',40),repeat('d',40),clock_timestamp()
   from survival_ops.knowledge_semantic_jobs where job_id=v_job_id returning job_id into v_collision;
   v_restored:=public.archive_operator_knowledge_editor_action(v_job_id,'RESTORE');
+  if v_restored->>'brief_slug' is distinct from v_restored->'brief'->>'slug' then raise exception 'restored slug missing from envelope'; end if;
   if v_restored->>'brief_id'='K-998' or v_restored->'brief'->>'slug'='operator-editor-fixture' then raise exception 'restoration retained conflicting identity'; end if;
   if v_restored->'original'->'brief'->>'slug'<>'operator-editor-fixture' then raise exception 'restoration changed immutable origin'; end if;
   v_restored:=public.archive_operator_knowledge_editor_save(v_job_id,2,v_restored->'brief',v_review_copy);
