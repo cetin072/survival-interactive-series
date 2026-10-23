@@ -1,0 +1,77 @@
+{
+  "claims": [
+    {
+      "claim": "비상물자를 주문하기 전에는 필요한 종류·수량 또는 요구 기능, 필요한 시각, 전달 장소와 실제 수령·사용 주체를 먼저 확인해야 한다.",
+      "context": "FEMA의 NIMS는 자원 요구를 식별할 때 종류와 수량, 보낼 위치, 누가 받고 사용할지를 확인하도록 설명하며, 자원 요청에는 상세 품목·수량·종류·유형, 도착 시각, 전달 위치와 안전상 우려를 포함하도록 안내한다.",
+      "limitation": "미국 사고관리체계의 자원 요청 원칙이다. 모든 민간단체 구매에 동일한 양식을 의무화하지 않으며, 이 글은 일반 비상물자의 구매 전 확인 순서로 재구성했다.",
+      "source_ids": [
+        "FEMA-NIMS-2017"
+      ]
+    },
+    {
+      "claim": "조직은 물자를 확보할 때 보관 공간과 유지에 필요한 부대 지원을 함께 계획하고, 현재 상태와 위치를 확인할 수 있는 재고기록을 준비해야 한다.",
+      "context": "FEMA NIMS는 자원을 획득·보관·재고화할 때 대형·복잡 자원에 필요한 부대 지원·물품·공간을 계획하고, 현재성·정확성이 유지되는 재고정보를 갖추도록 설명한다.",
+      "limitation": "공식 자료는 물품별 창고 면적이나 적재방식을 정하지 않는다. 필요한 공간·지원의 구체 기준은 품목 특성, 제조사 지침과 관할 규정에 따라 별도로 판단해야 한다.",
+      "source_ids": [
+        "FEMA-NIMS-2017"
+      ]
+    },
+    {
+      "claim": "주문 담당과 실제 수령·보관 담당을 구분하고, 수령 때 주문내역과 실제 도착분을 대조해 기록하면 미수령·중복·수량 차이를 확인하기 쉽다.",
+      "context": "FEMA 물류 교육은 주문 기능과 수령·보관·배포 기능을 분리하고, 수령 부서가 도착 물품을 기록해 주문 추적 체계와 대조하도록 설명한다.",
+      "limitation": "FEMA의 대규모 재난 물류 조직을 설명한 자료다. 소규모 조직은 한 사람이 여러 역할을 맡을 수 있으나, 최소한 주문기록과 수령확인은 별도 단계로 남기는 편집 원칙으로만 사용했다.",
+      "source_ids": [
+        "FEMA-IS0027-SUPPORT-BRANCH"
+      ]
+    },
+    {
+      "claim": "구매 결정을 '필요하다'는 판단만으로 끝내지 말고 인수 가능일, 하역·이동 담당, 보관 위치, 책임자와 수령 후 점검 방법까지 확인한 뒤 확정해야 한다.",
+      "context": "NIMS는 요구 자원의 종류·수량·도착지·수령자를 확인하고, 추적을 통해 직원이 자원을 받을 준비와 사용 준비를 하도록 설명한다. FEMA 물류 교육은 시설·운송·공급 기능과 창고 지원 장비·인력을 함께 운영하도록 제시한다.",
+      "limitation": "이 확인 순서는 두 공식 자료의 원칙을 소규모 조직에 맞게 재구성한 편집안이며 공식 표준 구매 체크리스트가 아니다.",
+      "source_ids": [
+        "FEMA-NIMS-2017",
+        "FEMA-IS0027-SUPPORT-BRANCH"
+      ]
+    }
+  ],
+  "source": {
+    "ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-ad9daaa86fde8aa36bbe3315618f18dce8826ceea9d13dcf88e39ee484db87e2",
+    "kind": "PUBLIC_READER",
+    "refs": [
+      "worldlines/AFTERFALL/seasons/S04/raw_transcript/SESSION_002/PART_001.md"
+    ],
+    "hashes": [
+      "a133745d52e8cdfded1142b6b3a674f2df7b91feb2e858c3f3759ae903016903"
+    ],
+    "sha256": "06f7ec7526f315e2c7503317da20340945ba321ba6ad532aa7d31639e27ca000"
+  },
+  "brief_id": "K-047",
+  "question": "비상물자를 사기 전 인수·보관 능력은 어떻게 확인할까",
+  "unknowns": [],
+  "conflicts": [],
+  "risk_notes": [
+    "이 글은 일반 비상물자의 구매·인수·보관 준비를 다루며 연료·가스·화학물질·의약품·전기설비·위험물의 저장 또는 취급 방법을 제공하지 않는다.",
+    "화재·폭발·중독·감염·구조 위험이 있는 품목은 구매 전에 관할 법령, 허가, 제조사 지침과 자격 있는 전문가의 판단을 별도로 확인해야 한다.",
+    "수량과 공간이 충분해도 품질·안전성·유효기간·규격 적합성이 자동으로 확인되는 것은 아니다.",
+    "주소, 보유량, 창고 위치와 담당자 연락처는 필요 범위에서만 공유하고 접근권한을 정해야 할 수 있다."
+  ],
+  "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-ad9daaa86fde8aa36bbe3315618f18dce8826ceea9d13dcf88e39ee484db87e2",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S04/raw_transcript/SESSION_002/PART_001.md"
+  ],
+  "candidate_id": "KC-c03-afterfall-auto-ad9daaa86fde8aa36bb-5f2cc56beb",
+  "source_hashes": [
+    "a133745d52e8cdfded1142b6b3a674f2df7b91feb2e858c3f3759ae903016903"
+  ],
+  "source_sha256": "06f7ec7526f315e2c7503317da20340945ba321ba6ad532aa7d31639e27ca000",
+  "policy_version": "knowledge-c3-policy-v1",
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "copyright_status": "CLEAR",
+  "narrative_context": "공개 Reader의 허구·서사(narrative)에서 공동체가 연료 구매량을 정하기 전에 연료 종류, 실제 용도, 인수 방법과 별도 보관계약의 필요성을 확인하는 장면이 질문의 출발점이다. 작품은 현실 물자 구매·보관 절차의 근거로 사용하지 않았다.",
+  "reader_chapter_id": "c03-afterfall-auto-ad9daaa86fde8aa36bbe3315618f18dce8826ceea9d13dcf88e39ee484db87e2",
+  "reader_book_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0",
+  "story_source_status": "VERIFIED_PUBLIC_READER_BACKFILL",
+  "narrative_limitation": "작품 속 연료 종류·수량·상태, 저장시설, 계약조건과 조직의 판단은 허구·서사(narrative) 설정이다. 현실의 연료 안전성, 저장 적합성, 법적 허가 또는 일반 물류 절차의 효과를 입증하지 않는다.",
+  "reader_chapter_sha256": "06f7ec7526f315e2c7503317da20340945ba321ba6ad532aa7d31639e27ca000"
+}
