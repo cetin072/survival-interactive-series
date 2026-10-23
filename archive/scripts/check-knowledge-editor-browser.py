@@ -79,6 +79,9 @@ def run(args):
                     state['data']['request'] = dict(request_id=JOB, revision=payload['p_expected_revision'],
                         publish_requested=payload['p_publish'], status='CHECKING', result={}, updated_at='2099-01-01T00:00:00Z')
                     result = state['data']['request']
+                elif name == 'archive_operator_knowledge_editor_cancel':
+                    state['data']['request']['status'] = 'CANCELLED'
+                    result = {'status': 'CANCELLED'}
                 elif name == 'archive_operator_knowledge_editor_action':
                     state['data']['archived'] = payload['p_action'] == 'ARCHIVE'
                     result = state['data']
@@ -111,6 +114,11 @@ def run(args):
             expect(page.get_by_role('button', name='다시 시도', exact=True)).to_be_enabled()
             expect(page.get_by_label('도입', exact=True)).to_have_value('저장 전 수정한 정확한 도입 문장입니다.')
             assert state['data']['original'] == original
+            state['data']['request']['status'] = 'CHECKING'
+            page.reload()
+            page.get_by_role('button', name='요청 취소', exact=True).click()
+            expect(page.get_by_role('button', name='발행', exact=True)).to_be_enabled()
+            assert state['data']['request']['status'] == 'CANCELLED'
 
             state['data'] = envelope('BLOCKED', archived=True)
             state['calls'] = []

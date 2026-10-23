@@ -25,6 +25,7 @@ export function editorialError(code?:string):string {
  if(/MAIN_MOVED/.test(code))return '사이트의 다른 변경이 먼저 반영됐습니다. 다시 시도하면 최신 사이트 기준으로 검사합니다.'
  if(/RESERVED_ID|CANDIDATE_COLLISION/.test(code))return '과거 원고의 번호가 다른 글에 사용됐습니다. 기존 글을 덮어쓰지 않도록 새 원고 식별자를 준비해야 합니다.'
  if(/ACTIVE/.test(code))return '이 수정본을 처리 중입니다. 진행 결과를 확인한 뒤 다시 편집할 수 있습니다.'
+ if(/CANCEL_TOO_LATE/.test(code))return '이미 게시 준비 단계로 넘어갔습니다. 기존 요청을 삭제하지 않고 처리 결과를 확인해야 합니다.'
  if(/DISPATCH/.test(code))return '게시 검사 요청을 전달하지 못했습니다. 수정본은 저장돼 있습니다. 다시 시도하세요.'
  return '처리를 완료하지 못했습니다. 수정 내용은 보존했습니다. 다시 시도하거나 기술 정보의 오류 내용을 확인하세요.'
 }

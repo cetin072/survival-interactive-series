@@ -33,9 +33,9 @@ create table survival_ops.knowledge_editor_requests (
   lease_at timestamptz,
   result jsonb not null default '{}',
   created_at timestamptz not null default clock_timestamp(),
-  updated_at timestamptz not null default clock_timestamp(),
-  unique(job_id,revision,publish_requested)
+  updated_at timestamptz not null default clock_timestamp()
 );
+create unique index knowledge_editor_same_revision_intent on survival_ops.knowledge_editor_requests(job_id,revision,publish_requested) where status<>'CANCELLED';
 create unique index knowledge_editor_one_active on survival_ops.knowledge_editor_requests(job_id)
 where status in ('QUEUED','CHECKING','WAITING_CI','PUBLISHING');
 -- Preserve all existing user edits before any new edit is possible.
@@ -170,7 +170,7 @@ declare actor uuid; j survival_ops.knowledge_semantic_jobs%rowtype; d survival_o
  select * into strict d from survival_ops.knowledge_operator_drafts where job_id=p_job_id for update;
  if d.revision is distinct from p_expected_revision then raise exception using errcode='40001',message='KNOWLEDGE_EDITOR_REVISION_CONFLICT'; end if;
  if p_publish is null then raise exception 'KNOWLEDGE_EDITOR_INTENT_REQUIRED'; end if;
- select * into r from survival_ops.knowledge_editor_requests where job_id=p_job_id and revision=d.revision and publish_requested=p_publish;
+ select * into r from survival_ops.knowledge_editor_requests where job_id=p_job_id and revision=d.revision and publish_requested=p_publish and status<>'CANCELLED';
  if r.status in ('CHECKING','WAITING_CI','PUBLISHING') and r.updated_at<clock_timestamp()-interval '35 minutes' then
   update survival_ops.knowledge_editor_requests set status='FAILED',result=result||jsonb_build_object('reason','KNOWLEDGE_EDITOR_WORKER_TIMEOUT'),updated_at=clock_timestamp() where request_id=r.request_id returning * into r;
  end if;
@@ -303,3 +303,20 @@ language sql security definer set search_path='' as $$
 $$;
 revoke all on function public.archive_worker_next_knowledge_editor_request() from public,anon,authenticated;
 grant execute on function public.archive_worker_next_knowledge_editor_request() to service_role;
+
+-- Cancellation is possible before the Git handoff. After handoff/merge the
+-- worker must finish or recover exact public verification, never erase history.
+create function public.archive_operator_knowledge_editor_cancel(p_request_id uuid) returns jsonb
+language plpgsql security definer set search_path='' as $$
+declare actor uuid; r survival_ops.knowledge_editor_requests%rowtype; target uuid; begin
+ actor:=survival_ops.private_require_archive_operator();
+ select job_id into strict target from survival_ops.knowledge_editor_requests where request_id=p_request_id;
+ perform 1 from survival_ops.knowledge_semantic_jobs where job_id=target for update;
+ select * into strict r from survival_ops.knowledge_editor_requests where request_id=p_request_id for update;
+ if r.status='CANCELLED' then return jsonb_build_object('status','CANCELLED'); end if;
+ if r.status not in ('QUEUED','CHECKING') or r.result ? 'pr_number' or r.result ? 'merge_sha' then raise exception 'KNOWLEDGE_EDITOR_CANCEL_TOO_LATE'; end if;
+ update survival_ops.knowledge_editor_requests set status='CANCELLED',lease_token=null,lease_at=null,updated_at=clock_timestamp(),result=result||jsonb_build_object('reason','OPERATOR_CANCELLED_BEFORE_HANDOFF','cancelled_by',actor) where request_id=p_request_id;
+ return jsonb_build_object('status','CANCELLED');
+end $$;
+revoke all on function public.archive_operator_knowledge_editor_cancel(uuid) from public,anon,authenticated,service_role;
+grant execute on function public.archive_operator_knowledge_editor_cancel(uuid) to authenticated;

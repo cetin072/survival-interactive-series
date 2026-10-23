@@ -28,3 +28,36 @@ Status: implementation in progress; no overall PASS claimed. Scope follows the u
 ## Pending gates
 
 Isolated DB contract test, private scenario/browser tests at 320/390/1280, exact-head CI/Preview, authenticated new UI, preservation readback, independent review and safe service rollout. New publication is limited to an exact revision explicitly approved by the user; other scenarios use synthetic/private copies.
+
+## 2026-10-23 resumed verification
+
+The existing branch/PR was resumed at `14039e0e`. The Linux environment cannot inspect the Windows-only checkout or its logged-in browser. A local worktree at `/workspace/knowledge-editor-v2` tracks the same remote branch; the unrelated bag branch and its untracked reports were preserved. Current main `bea03b187724678e3581f93b920858a133ce75c6` was merged into this branch, not the reverse.
+
+Confirmed fixes:
+
+- Reproduced the previous browser CI failure. Explicit textarea labels resolve the exact label lookup. Keeping the Save label stable prevents a double click moving onto the Preview button during save.
+- Exact quotes follow reordered sections; ambiguous/repeated/deleted text has no inferred anchor. The current sentence can be focused and selected, with the original reason immediately below the editor field. Dirty navigation and revision conflicts preserve input.
+- Restore allocates both a new ID and a distinct stable slug on a public identity collision. The editable projection and draft record use the new identity; original jobs and the existing public URL remain unchanged.
+- Publication scope now reads complete modified/untracked filenames instead of trimming porcelain output. It binds the exact candidate written during preparation.
+- Privacy/safety inspection covers search descriptions, labels, captions, alternative text, tables, source notes and tool descriptions.
+- Human hold/rejection participates in server-side restore enforcement. Program-error records remain visible in the existing inbox. Public observation no longer blocks editor loading. Latest request observation uses its update time.
+- Cancellation before the Git handoff invalidates the lease. A later request for the same revision creates a new approval record, preserving the cancelled snapshot. Handoff/merge stages cannot be cancelled by deleting their recovery history.
+- Public verification additionally checks title, description, canonical and Article identity. The existing browser CI now performs read-only Production observation using the served commit as its baseline.
+
+Local verification (not authenticated Production mutation):
+
+- Web: 282 tests; content/static: 71; semantic/evidence: 83; existing release/consumer: 18.
+- TypeScript, verified reader build and public-boundary build passed (53 probes).
+- PostgreSQL 17: the existing isolated Knowledge lifecycle workflow and expanded editor SQL contract passed. Includes denied viewer access, exact revision/CAS, locked machine QA, immutable snapshots/history, lease fencing, body-free restore, ID/slug collision, distinct-document queue intents, cancellation and retry boundaries. Production migration remains unapplied.
+- Private browser: 320/390/1280; save-before-publish, double click, restoration, empty ideas, exact/moved/ambiguous quotes, dirty navigation, conflicts and denied access. Original reader/navigation and read-only operator regressions also passed locally.
+- Read-only DB: all 16 requested representatives reread. Eleven non-public cases were projected/evaluated from private `/tmp` copies; source pins passed 11/11. A second DB comparison found 0 original-result/draft-SHA/revision mismatches across those 11. K-015 remains revision 1 with the original slug; the existing three publication-attempt records remain present. No private manuscript snapshot is committed or uploaded.
+- K-018/025/032 still need attributed decisions for current unknowns; K-025 also has claim issues. K-027–029 retain unknowns and rights blockers. K-038 projects seven editable sections but needs missing fields, evidence and rights work. K-034/042 remain body-free held ideas. K-043/044 pass only the editorial structure evaluator; legacy tool names still require deletion or valid downloadable-resource records before the full validator can pass. None of these checks authorizes publication.
+
+### Rollout blockers — keep PR Draft
+
+1. Published records without semantic jobs (K-002/003/007/008/009/010) still lack a verified import into the versioned editor. Do not manufacture semantic provenance, Candidate records or approval receipts to make these pass.
+2. Real authenticated V2 save/publication and post-migration operational verification remain unperformed in this environment. The existing Windows session is not available here. Synthetic Auth is not evidence of a real operator publication.
+3. The immediate release gate still correctly rejects unrelated pending authored content. No batching exception or approval bypass was added. Source/rights decisions and exact approved revisions are still required.
+4. No complete production rollout, database migration, PR Ready conversion or main merge is claimed. Search metadata/index/sitemap readiness does not prove search-engine indexing.
+
+Latest CI and live observation should be read from PR #626 and its browser artifact; do not reuse an earlier HEAD's result as an exact-head PASS.

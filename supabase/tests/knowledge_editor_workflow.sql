@@ -20,7 +20,7 @@ declare
   v_original_sha text;
   v_receipt_id uuid;
   v_decided_at timestamptz;
-  v_collision uuid; v_restored jsonb; v_request jsonb; v_lease uuid; v_review_copy jsonb; v_old_sha text;
+  v_collision uuid; v_restored jsonb; v_next jsonb; v_second jsonb; v_request jsonb; v_lease uuid; v_review_copy jsonb; v_old_sha text;
 begin
   if has_function_privilege('anon','public.archive_operator_knowledge_draft_get(uuid)','EXECUTE')
      or has_function_privilege('anon','public.archive_operator_knowledge_draft_save(uuid,integer,jsonb)','EXECUTE')
@@ -178,6 +178,10 @@ begin
   v_lease:=(v_worker->>'lease_token')::uuid;
   perform public.archive_worker_knowledge_editor_request((v_request->>'request_id')::uuid,'PUBLISHING',v_lease,'{}');
   begin
+   perform public.archive_operator_knowledge_editor_cancel((v_request->>'request_id')::uuid);
+   raise exception 'merged-stage request cancellation accepted';
+  exception when raise_exception then if sqlerrm<>'KNOWLEDGE_EDITOR_CANCEL_TOO_LATE' then raise; end if; end;
+  begin
    perform public.archive_worker_knowledge_editor_request((v_request->>'request_id')::uuid,'PUBLISHED',v_lease,'{"status":"LIVE_VERIFIED","verified_at":"2026-10-23T00:00:00Z"}');
    raise exception 'missing public proof accepted';
   exception when raise_exception then if sqlerrm<>'KNOWLEDGE_EDITOR_PUBLIC_PROOF_REQUIRED' then raise; end if; end;
@@ -204,6 +208,29 @@ begin
   v_draft:=v_draft||'{"risk_domains":["OTHER_SEVERE_HARM"],"risk_level":"HIGH","semantic_qa_status":"REVIEW","publication_policy":"HUMAN_APPROVED"}';
   v_restored:=public.archive_operator_knowledge_editor_save(v_collision,0,v_draft,v_review_copy);
   if (v_restored->>'revision')::integer<>1 or v_restored->'request' is distinct from 'null'::jsonb then raise exception 'empty idea save implied approval'; end if;
+  v_next:=public.archive_operator_knowledge_editor_request(v_collision,1,false);
+  v_second:=public.archive_operator_knowledge_editor_request(v_job_id,3,false);
+  if v_next->>'request_id'=v_second->>'request_id' then raise exception 'different documents shared request identity'; end if;
+  if public.archive_worker_next_knowledge_editor_request()->>'request_id'<>v_next->>'request_id' then raise exception 'persisted queue lost oldest request'; end if;
+  if (select count(*) from survival_ops.knowledge_editor_requests where status='QUEUED' and job_id in (v_job_id,v_collision))<>2 then raise exception 'concurrent document intents lost'; end if;
+  v_worker:=public.archive_worker_knowledge_editor_request((v_next->>'request_id')::uuid,'CLAIM');
+  v_lease:=(v_worker->>'lease_token')::uuid;
+  perform public.archive_operator_knowledge_editor_cancel((v_next->>'request_id')::uuid);
+  begin
+   perform public.archive_worker_knowledge_editor_request((v_next->>'request_id')::uuid,'CHECKED',v_lease,'{}');
+   raise exception 'cancelled worker retained a valid lease';
+  exception when raise_exception then if sqlerrm<>'KNOWLEDGE_EDITOR_LEASE_INVALID' then raise; end if; end;
+  v_request:=public.archive_operator_knowledge_editor_request(v_collision,1,false);
+  if v_request->>'request_id'=v_next->>'request_id' then raise exception 'new approval overwrote cancelled history'; end if;
+  if (select status from survival_ops.knowledge_editor_requests where request_id=(v_next->>'request_id')::uuid)<>'CANCELLED' then raise exception 'cancellation history lost'; end if;
+  perform set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-0000-4000-8000-000000000004"}',true);
+  begin
+   perform public.archive_operator_knowledge_editor_get(v_job_id);
+   raise exception 'viewer accessed editor';
+  exception when insufficient_privilege then
+   if sqlerrm<>'SURVIVAL_ARCHIVE_OPERATOR_FORBIDDEN' then raise; end if;
+  end;
+  perform set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-0000-4000-8000-000000000002"}',true);
   begin
    update survival_ops.knowledge_editor_versions set brief='{}' where job_id=v_job_id and revision=1;
    raise exception 'history overwritten';

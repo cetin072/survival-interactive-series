@@ -115,6 +115,7 @@ export function OperatorKnowledgeDetail({jobId,email,busy:parentBusy,onSignOut}:
     <button disabled={!!locked||!brief} onClick={()=>void run(()=>request(true))}>발행</button>
     {!value.archived&&<button className="operator-secondary" disabled={busy||active} onClick={()=>void run(()=>action('ARCHIVE'))}>보관</button>}
     {value.archived&&<button disabled={busy} onClick={()=>void run(()=>action('RESTORE'))}>복원</button>}
+    {value.request&&['QUEUED','CHECKING'].includes(value.request.status)&&<button className="operator-secondary" disabled={busy} onClick={()=>void run(async()=>{const response=await supabaseClient!.rpc('archive_operator_knowledge_editor_cancel',{p_request_id:value.request!.request_id});if(response.error)throw Error(response.error.message);await load(false);setNotice('요청을 취소했습니다. 수정본과 처리 이력은 보존됩니다.')})}>요청 취소</button>}
     {(timedOut||result&&['FAILED','RETRYABLE'].includes(value.request?.status??''))&&<button disabled={busy||dirty} onClick={()=>void run(()=>request(value.request?.publish_requested??false))}>다시 시도</button>}
    </div>
    {active&&<section className="operator-panel" aria-live="polite"><h2>{editorialStatus(value)}</h2><p>승인한 저장본을 검사하고 공개 여부를 확인하고 있습니다. 요청 접수와 검사 성공만으로 게시 완료로 표시하지 않습니다.</p><p>{timedOut?'처리 응답이 늦어지고 있습니다. 다시 시도하면 기존 병합·공개 결과부터 확인하여 중복 게시를 막습니다.':'검증 단계에서 오류가 나면 이 화면에 수정 방법을 표시합니다.'}</p></section>}
