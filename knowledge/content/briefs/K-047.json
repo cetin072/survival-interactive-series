@@ -19,7 +19,7 @@
     ],
     "sha256": "06f7ec7526f315e2c7503317da20340945ba321ba6ad532aa7d31639e27ca000"
   },
-  "status": "READY",
+  "status": "PUBLISHED",
   "sources": [
     {
       "id": "FEMA-NIMS-2017",
@@ -181,7 +181,7 @@
   ],
   "candidate_id": "KC-c03-afterfall-auto-ad9daaa86fde8aa36bb-5f2cc56beb",
   "content_type": "BRIEF",
-  "published_at": null,
+  "published_at": "2026-10-23",
   "risk_domains": [
     "GENERAL_PREPAREDNESS"
   ],
