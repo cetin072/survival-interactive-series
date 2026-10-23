@@ -20,6 +20,14 @@ const git=(...args)=>command('git',args)
 const gh=(...args)=>command('gh',args[0]==='api'?args:[...args,'--repo',repo])
 const rpc=(name,args)=>postSupabaseRpc({projectUrl:process.env.ARCHIVE_SUPABASE_URL,serviceRoleKey:process.env.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY,name,args})
 const pause=ms=>new Promise(r=>setTimeout(r,ms))
+export function publicBaselineSha(snapshot) {
+ const baseline=snapshot.public_baseline
+ if(baseline) {
+  if(!/^[a-f0-9]{40}$/.test(baseline.merge_sha??'')||baseline.brief_id!==snapshot.brief.id||baseline.slug!==snapshot.brief.slug)throw Error('KNOWLEDGE_EDITOR_PUBLIC_BASELINE_INVALID')
+  return baseline.merge_sha
+ }
+ return snapshot.job.status==='PUBLISHED'?snapshot.job.merge_sha:null
+}
 export function candidateFromSnapshot(snapshot, brief) {
  const j=snapshot.job,s=j.semantic_context.source
  const c={...structuredClone(j.semantic_result?.candidate??{}),id:j.semantic_context.target.candidate_id,topic_id:brief.topic_id,question:brief.title,brief_id:brief.id,source_kind:j.source_kind,status:'BRIEF_PROPOSED',disposition_note:'운영자가 보관된 글감에서 새 원고를 작성하고 검토를 요청했습니다.'}
@@ -39,7 +47,7 @@ export async function prepareEditorialFiles({snapshot,base=root,sourceVerifier=v
  const data=await loadKnowledge(base)
  const prior=data.briefs.find(b=>b.id===approved.id)
  if(data.briefs.some(b=>b.id!==approved.id&&b.slug===approved.slug))throw Error('KNOWLEDGE_EDITOR_PUBLIC_SLUG_CONFLICT')
- if(prior&&job.status!=='PUBLISHED') throw Error('KNOWLEDGE_EDITOR_RESERVED_ID_CONFLICT')
+ if(prior&&!publicBaselineSha(snapshot)) throw Error('KNOWLEDGE_EDITOR_RESERVED_ID_CONFLICT')
  if(prior&&(prior.slug!==approved.slug||prior.id!==approved.id))throw Error('KNOWLEDGE_EDITOR_PUBLIC_URL_CHANGED')
  const authored=['id','slug','title','summary','meta_description','lead','label','scope','basis','footer','editorial_note','sections','sources','tools','source_checked_at','risk_level','risk_domains','story_refs','related_brief_ids','guide_id']
  if(prior?.status==='PUBLISHED'&&authored.every(key=>JSON.stringify(prior[key]??null)===JSON.stringify(approved[key]??null)))return {...evaluation,status:'ALREADY_LIVE',brief:prior,brief_id:prior.id}
@@ -126,9 +134,10 @@ async function main() {
   const snapshot=request.snapshot, job=snapshot.job
   // Editing an existing public article may replace only its last known public
   // version. Another author's update cannot be overwritten by an older draft.
-  if(job.status==='PUBLISHED') {
+  const baselineSha=publicBaselineSha(snapshot)
+  if(baselineSha) {
    const actual=await readFile(join(root,'knowledge/content/briefs/'+snapshot.brief.id+'.json'),'utf8')
-   const previous=git('show',job.merge_sha+':knowledge/content/briefs/'+snapshot.brief.id+'.json')
+   const previous=git('show',baselineSha+':knowledge/content/briefs/'+snapshot.brief.id+'.json')
    if(actual.trim()!==previous.trim())throw Error('KNOWLEDGE_EDITOR_PUBLIC_VERSION_CONFLICT')
   }
   const preparation=await prepareEditorialFiles({snapshot})

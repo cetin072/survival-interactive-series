@@ -46,7 +46,7 @@ Confirmed fixes:
 
 Local verification (not authenticated Production mutation):
 
-- Web: 282 tests; content/static: 71; semantic/evidence: 83; existing release/consumer: 18.
+- Web: 282 tests; content/static: 71; semantic/evidence: 85; existing release/consumer: 18.
 - TypeScript, verified reader build and public-boundary build passed (53 probes).
 - PostgreSQL 17: the existing isolated Knowledge lifecycle workflow and expanded editor SQL contract passed. Includes denied viewer access, exact revision/CAS, locked machine QA, immutable snapshots/history, lease fencing, body-free restore, ID/slug collision, distinct-document queue intents, cancellation and retry boundaries. Production migration remains unapplied.
 - Private browser: 320/390/1280; save-before-publish, double click, restoration, empty ideas, exact/moved/ambiguous quotes, dirty navigation, conflicts and denied access. Original reader/navigation and read-only operator regressions also passed locally.
@@ -61,3 +61,6 @@ Local verification (not authenticated Production mutation):
 4. No complete production rollout, database migration, PR Ready conversion or main merge is claimed. Search metadata/index/sitemap readiness does not prove search-engine indexing.
 
 Latest CI and live observation should be read from PR #626 and its browser artifact; do not reuse an earlier HEAD's result as an exact-head PASS.
+
+Repeated editorial publication now pins the latest verified public request in the immutable snapshot. Subsequent edits compare against that commit, while the original job/merge SHA stays immutable. A restored job with an editorial public record retains its published ID and slug. Synthetic SQL and unit contracts cover these boundaries.
+The safety-specifics check also applies to edits of historically LOW-risk articles; their old classification cannot exempt newly added voltage/dosage/distance instructions.

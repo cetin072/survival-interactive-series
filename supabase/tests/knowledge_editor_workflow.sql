@@ -223,6 +223,18 @@ begin
   v_request:=public.archive_operator_knowledge_editor_request(v_collision,1,false);
   if v_request->>'request_id'=v_next->>'request_id' then raise exception 'new approval overwrote cancelled history'; end if;
   if (select status from survival_ops.knowledge_editor_requests where request_id=(v_next->>'request_id')::uuid)<>'CANCELLED' then raise exception 'cancellation history lost'; end if;
+  -- A synthetic, server-verified publication supplies the next revision's
+  -- baseline without rewriting the original HOLD job or its historical SHA.
+  perform public.archive_operator_knowledge_editor_cancel((v_request->>'request_id')::uuid);
+  insert into survival_ops.knowledge_editor_requests(job_id,revision,draft_sha256,snapshot,publish_requested,approved_by,status,result)
+  values(v_collision,1,v_restored->>'draft_sha256',jsonb_build_object('brief',v_restored->'brief'),true,'00000000-0000-4000-8000-000000000002','PUBLISHED',jsonb_build_object('status','LIVE_VERIFIED','merge_sha',repeat('f',40),'public_url','https://survival-diary-archive.netlify.app/knowledge/operator-editor-fixture/'));
+  v_restored:=public.archive_operator_knowledge_editor_action(v_collision,'RESTORE');
+  if v_restored->>'brief_id'<>'K-1000' or v_restored->'brief'->>'slug'<>'operator-editor-fixture' then raise exception 'restoration reassigned an editorial public identity'; end if;
+  v_draft:=jsonb_set(v_restored->'brief','{title}','"다음 수정본 검증"');
+  v_restored:=public.archive_operator_knowledge_editor_save(v_collision,1,v_draft,v_review_copy);
+  v_request:=public.archive_operator_knowledge_editor_request(v_collision,2,false);
+  v_worker:=public.archive_worker_knowledge_editor_request((v_request->>'request_id')::uuid,'GET');
+  if v_worker->'snapshot'->'public_baseline'->>'merge_sha'<>repeat('f',40) or v_worker->'snapshot'->'public_baseline'->>'brief_id'<>'K-1000' then raise exception 'request did not bind latest verified public baseline'; end if;
   perform set_config('request.jwt.claims','{"role":"authenticated","sub":"00000000-0000-4000-8000-000000000004"}',true);
   begin
    perform public.archive_operator_knowledge_editor_get(v_job_id);

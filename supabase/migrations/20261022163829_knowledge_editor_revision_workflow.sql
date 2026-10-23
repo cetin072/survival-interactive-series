@@ -149,7 +149,7 @@ declare actor uuid; j survival_ops.knowledge_semantic_jobs%rowtype; target_id te
   perform pg_advisory_xact_lock(928430271);
   target_id:=coalesce((select publication_brief_id from survival_ops.knowledge_editor_state where job_id=p_job_id),j.semantic_result->'brief'->>'id',j.semantic_context->'target'->>'brief_id');
   target_slug:=coalesce((select publication_slug from survival_ops.knowledge_editor_state where job_id=p_job_id),j.semantic_result->'brief'->>'slug');
-  if j.status<>'PUBLISHED' and exists(select 1 from survival_ops.knowledge_semantic_jobs other where other.job_id<>p_job_id and other.status='PUBLISHED' and (other.semantic_result->'brief'->>'id'=target_id or other.semantic_result->'brief'->>'slug'=target_slug)) then
+  if j.status<>'PUBLISHED' and not exists(select 1 from survival_ops.knowledge_editor_requests where job_id=p_job_id and status='PUBLISHED') and exists(select 1 from survival_ops.knowledge_semantic_jobs other where other.job_id<>p_job_id and other.status='PUBLISHED' and (other.semantic_result->'brief'->>'id'=target_id or other.semantic_result->'brief'->>'slug'=target_slug)) then
    select greatest(coalesce((select max(substring(coalesce(semantic_result->'brief'->>'id',semantic_context->'target'->>'brief_id') from '^K-([0-9]+)$')::integer) from survival_ops.knowledge_semantic_jobs),0),coalesce((select max(substring(publication_brief_id from '^K-([0-9]+)$')::integer) from survival_ops.knowledge_editor_state),0))+1 into next_id;
    target_id:='K-'||lpad(next_id::text,greatest(3,length(next_id::text)),'0');
    target_slug:='knowledge-'||lower(target_id)||'-'||replace(p_job_id::text,'-','');
@@ -183,7 +183,7 @@ declare actor uuid; j survival_ops.knowledge_semantic_jobs%rowtype; d survival_o
  else
   insert into survival_ops.knowledge_editor_requests(job_id,revision,draft_sha256,publish_requested,approved_by,snapshot)
   values(p_job_id,d.revision,d.draft_sha256,p_publish,actor,
-   jsonb_build_object('job',to_jsonb(j),'brief',d.draft_brief,'review',coalesce((select evidence_review from survival_ops.knowledge_editor_state where job_id=p_job_id),jsonb_build_object('claims',coalesce(j.semantic_result->'evidence'->'claims','[]'::jsonb),'resolutions','[]'::jsonb)))) returning * into r;
+   jsonb_build_object('job',to_jsonb(j),'brief',d.draft_brief,'public_baseline',(select jsonb_build_object('merge_sha',pr.result->>'merge_sha','brief_id',pr.snapshot->'brief'->>'id','slug',pr.snapshot->'brief'->>'slug') from survival_ops.knowledge_editor_requests pr where pr.job_id=p_job_id and pr.status='PUBLISHED' order by pr.updated_at desc,pr.created_at desc limit 1),'review',coalesce((select evidence_review from survival_ops.knowledge_editor_state where job_id=p_job_id),jsonb_build_object('claims',coalesce(j.semantic_result->'evidence'->'claims','[]'::jsonb),'resolutions','[]'::jsonb)))) returning * into r;
  end if;
  select decrypted_secret into token from vault.decrypted_secrets where name='archive_github_dispatch_token' order by created_at desc limit 1;
  if token is null then raise exception 'KNOWLEDGE_EDITOR_DISPATCH_UNAVAILABLE'; end if;

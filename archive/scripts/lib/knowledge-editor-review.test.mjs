@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {evaluateEditorialSnapshot,issueKey,locateQuote,verifyEditorialRights} from './knowledge-editor-review.mjs'
-import {waitExactChecks} from '../knowledge-editor-request.mjs'
+import {waitExactChecks,publicBaselineSha} from '../knowledge-editor-request.mjs'
 const condition='실제 도로 상태와 통신 가능 여부는 지역과 시점에 따라 달라진다.'
 function fixture() {
  const brief={id:'K-999',title:'연락 기록은 어떻게 남길까',summary:'요약',meta_description:'검색 설명',lead:'사전 연락 계획과 마지막 확인 시각을 남깁니다.',scope:'일반적인 연락 기록만 다루며 실제 출동 여부는 관할기관이 판단합니다.',basis:'공식 자료의 기록 원칙',footer:'현장기관의 판단을 따릅니다.',editorial_note:'사람 편집',risk_level:'HIGH',sources:[{id:'S1',url:'https://www.fema.gov/guide'}],sections:[{heading:'기록',blocks:[{type:'prose',text:'현재 상태가 확인되지 않으면 출동하지 않고 담당 기관에 확인합니다.'}]}]}
@@ -97,4 +97,19 @@ test('two occurrences in the same paragraph are ambiguous',()=>{
  const s=fixture(),q=s.brief.sections[0].blocks[0].text
  s.brief.sections[0].blocks[0].text=q+' '+q
  assert.equal(locateQuote(s.brief,q).kind,'AMBIGUOUS')
+})
+
+test('republication uses the latest verified public baseline and preserves its exact identity',()=>{
+ const s=fixture();s.brief.slug='same-public-url';s.job.status='PUBLISHED';s.job.merge_sha='a'.repeat(40)
+ assert.equal(publicBaselineSha(s),'a'.repeat(40))
+ s.public_baseline={merge_sha:'b'.repeat(40),brief_id:s.brief.id,slug:s.brief.slug}
+ assert.equal(publicBaselineSha(s),'b'.repeat(40))
+ s.job.status='HOLD';assert.equal(publicBaselineSha(s),'b'.repeat(40))
+ for(const patch of [{brief_id:'K-001'},{slug:'another-url'},{merge_sha:'bad'}])assert.throws(()=>publicBaselineSha({...s,public_baseline:{...s.public_baseline,...patch}}),/PUBLIC_BASELINE_INVALID/)
+ assert.equal(publicBaselineSha({...s,public_baseline:null}),null)
+})
+
+test('a previously low-risk article cannot inherit an exemption for newly added safety instructions',()=>{
+ const s=fixture();s.brief.risk_level='LOW';s.brief.sections[0].blocks[0].text='전압 220 V에서 직접 작업합니다.'
+ assert.ok(evaluateEditorialSnapshot(s).issues.some(i=>i.key==='safety-specific'))
 })

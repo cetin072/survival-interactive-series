@@ -65,7 +65,7 @@ export function evaluateEditorialSnapshot(snapshot, { sourceVerified = false, ri
   // A reasoned, evidence-linked editorial judgment is not an expert certificate.
   // Dangerous specifics cannot use the condition/limitation route.
   const dangerous=/안전거리|허가\s*정원|복용량|투약|전압|농도|인화점|소유권|저작권|개인정보|개인\s*정보|서명|보관기간|법적|유독가스|안전\s*수치/
-  if(/\b\d+(?:\.\d+)?\s*(?:m|km|mg|ml|V|ppm|미터|밀리그램|볼트)\b/i.test(body)&&brief.risk_level==='HIGH')add('safety-specific','안전 수치·전문 작업 지침이 포함돼 있습니다. 일반 한계 설명만으로 확인할 수 없습니다.','해당 수치를 삭제하거나 별도의 전문 검증을 받으세요.')
+  if(/\b\d+(?:\.\d+)?\s*(?:m|km|mg|ml|V|ppm|미터|밀리그램|볼트)\b/i.test(body))add('safety-specific','안전 수치·전문 작업 지침이 포함돼 있습니다. 일반 한계 설명만으로 확인할 수 없습니다.','해당 수치를 삭제하거나 별도의 전문 검증을 받으세요.')
   if(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|01[016789][- ]?\d{3,4}[- ]?\d{4}/i.test(body))add('privacy','공개 본문에 개인 연락처가 포함될 수 있습니다.','개인정보를 제거하고 다시 검사하세요.')
   const resolved=[]
   for(const issue of reviewIssues(original,brief,review)) {
