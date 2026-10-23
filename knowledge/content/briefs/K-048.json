@@ -19,7 +19,7 @@
     ],
     "sha256": "e838b93c84ba42439ce83be950e584b31eca6000c22b1dc1f1520947f5a1a6af"
   },
-  "status": "READY",
+  "status": "PUBLISHED",
   "sources": [
     {
       "id": "MASS-MEMA-WARMING-CENTERS",
@@ -176,7 +176,7 @@
   ],
   "candidate_id": "KC-c03-afterfall-auto-51eb9401a8c6f4d252c-c01567745c",
   "content_type": "BRIEF",
-  "published_at": null,
+  "published_at": "2026-10-23",
   "risk_domains": [
     "GENERAL_PREPAREDNESS"
   ],
