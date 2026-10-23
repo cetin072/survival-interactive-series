@@ -113,3 +113,9 @@ test('a previously low-risk article cannot inherit an exemption for newly added 
  const s=fixture();s.brief.risk_level='LOW';s.brief.sections[0].blocks[0].text='전압 220 V에서 직접 작업합니다.'
  assert.ok(evaluateEditorialSnapshot(s).issues.some(i=>i.key==='safety-specific'))
 })
+
+test('legacy resource names produce an actionable issue before the final content validator',()=>{
+ const s=fixture();s.brief.tools=['현장 점검 기록지'];
+ const result=evaluateEditorialSnapshot(s)
+ assert.ok(result.issues.some(i=>i.key==='tools:0'&&i.action.includes('삭제')))
+})

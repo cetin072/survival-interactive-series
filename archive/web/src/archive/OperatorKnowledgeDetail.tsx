@@ -124,8 +124,8 @@ export function OperatorKnowledgeDetail({jobId,email,busy:parentBusy,onSignOut}:
    {value.archived&&<aside className="operator-panel"><h2>보관된 {brief?'원고':'글감'}</h2><p>{String(value.original?.note??'과거 처리 결과로 보관돼 있습니다. 복원하면 같은 편집기로 이어집니다.')}</p><p>복원은 편집 시작이며 공개 승인이 아닙니다.</p>{value.related_public?.map(link=><p key={link.url}><a href={link.url} target="_blank" rel="noreferrer">{link.title} · 관련 기존 글 보기</a></p>)}</aside>}
    {!brief&&<section className="operator-panel"><h2>원고 미작성</h2><p>원본과 보류 이유는 아래 기술 정보에서 확인할 수 있습니다. 새 초안은 직접 작성하며 자동 발행되지 않습니다.</p><p>{String(value.original?.note??'아직 완성 본문이 없습니다.')}</p><button disabled={busy} onClick={()=>void run(async()=>{await action('RESTORE');change(editorialTemplate(value));setNotice('새 초안입니다. 본문과 근거를 작성한 뒤 검토하세요.')})}>초안 만들기 · 직접 작성</button></section>}
    {brief&&<>
-    {result?.issues?.length? <section className="operator-panel" aria-label="검사 결과"><h2>문제 {result.issues.length}개 확인</h2><ul>{result.issues.map(issue=><li key={issue.key}><a href={'#problem-'+issue.key}>{issue.message}</a>{issue.action&&<p>{issue.action}</p>}</li>)}</ul></section>:null}
-    <section className="operator-panel knowledge-editor-body">
+    {result?.issues?.length? <section className="operator-panel" aria-label="검사 결과"><h2>문제 {result.issues.length}개 확인</h2><ul>{result.issues.map(issue=><li key={issue.key}><a href={issues.some(original=>original.key===issue.key)?'#problem-'+issue.key:'#knowledge-editor-body'}>{issue.message}</a>{issue.action&&<p>{issue.action}</p>}</li>)}</ul></section>:null}
+    <section className="operator-panel knowledge-editor-body" id="knowledge-editor-body">
      <h2>{preview?'글 미리보기':'본문 편집'}</h2>{!preview&&!value.archived&&highlights.length>0&&<details open><summary>문제 위치를 표시한 본문</summary><KnowledgeDraftPreview brief={brief} highlights={highlights}/></details>}
      {preview||value.archived?<KnowledgeDraftPreview brief={brief} highlights={highlights}/>:<KnowledgeDraftEditor brief={brief} issues={connectedIssues} disabled={!!locked} onChange={change} onUploadImage={supabaseClient?file=>uploadKnowledgeImage(supabaseClient!,jobId,file):undefined}/>}
     </section>

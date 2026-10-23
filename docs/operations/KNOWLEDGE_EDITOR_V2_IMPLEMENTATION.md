@@ -46,12 +46,12 @@ Confirmed fixes:
 
 Local verification (not authenticated Production mutation):
 
-- Web: 282 tests; content/static: 71; semantic/evidence: 85; existing release/consumer: 18.
+- Web: 282 tests; content/static: 71; semantic/evidence: 86; existing release/consumer: 18.
 - TypeScript, verified reader build and public-boundary build passed (53 probes).
 - PostgreSQL 17: the existing isolated Knowledge lifecycle workflow and expanded editor SQL contract passed. Includes denied viewer access, exact revision/CAS, locked machine QA, immutable snapshots/history, lease fencing, body-free restore, ID/slug collision, distinct-document queue intents, cancellation and retry boundaries. Production migration remains unapplied.
 - Private browser: 320/390/1280; save-before-publish, double click, restoration, empty ideas, exact/moved/ambiguous quotes, dirty navigation, conflicts and denied access. Original reader/navigation and read-only operator regressions also passed locally.
 - Read-only DB: all 16 requested representatives reread. Eleven non-public cases were projected/evaluated from private `/tmp` copies; source pins passed 11/11. A second DB comparison found 0 original-result/draft-SHA/revision mismatches across those 11. K-015 remains revision 1 with the original slug; the existing three publication-attempt records remain present. No private manuscript snapshot is committed or uploaded.
-- K-018/025/032 still need attributed decisions for current unknowns; K-025 also has claim issues. K-027–029 retain unknowns and rights blockers. K-038 projects seven editable sections but needs missing fields, evidence and rights work. K-034/042 remain body-free held ideas. K-043/044 pass only the editorial structure evaluator; legacy tool names still require deletion or valid downloadable-resource records before the full validator can pass. None of these checks authorizes publication.
+- K-018/025/032 still need attributed decisions for current unknowns; K-025 also has claim issues. K-027–029 retain unknowns and rights blockers. K-038 projects seven editable sections but needs missing fields, evidence and rights work. K-034/042 remain body-free held ideas. K-043/044 expose actionable legacy-resource-format issues before the full validator; tool names require deletion or valid downloadable-resource records. None of these checks authorizes publication.
 
 ### Rollout blockers — keep PR Draft
 

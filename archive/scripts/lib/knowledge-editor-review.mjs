@@ -49,6 +49,9 @@ export function evaluateEditorialSnapshot(snapshot, { sourceVerified = false, ri
     if (b.type?.endsWith('list')&&(!b.items?.length||b.items.some(v=>!text(v))))add(`section:${si}:${bi}`,'빈 목록 항목은 삭제하거나 작성하세요.')
   }
   const byId=new Map((brief.sources??[]).map(s=>[s.id,s]))
+  for(const [index,tool] of (brief.tools??[]).entries()) {
+    if(!plain(tool)||!['title','path','description','label'].every(field=>text(tool[field]))||!String(tool.path).startsWith('/')||tool.availability!=='AVAILABLE')add('tools:'+index,'자료 연결 형식을 확인하세요. 자료 이름만으로는 다운로드를 제공할 수 없습니다.','실제 파일이 있는 자료 연결을 작성하거나 본문 편집의 자료 연결 목록에서 삭제하세요.')
+  }
   if(!byId.size) add('sources','근거 출처를 추가하세요.')
   const claims=Array.isArray(review.claims)?review.claims:[]
   if(!claims.length) add('claims','본문의 핵심 주장과 출처·확인 범위를 연결하세요.')
