@@ -6,19 +6,21 @@ const plain = value => value && typeof value === 'object' && !Array.isArray(valu
 const text = value => typeof value === 'string' && value.trim().length > 0
 export const issueKey = (kind, value) => kind + ':' + hash(value).slice(0, 24)
 export function manuscriptText(brief) {
-  return [brief.title,brief.summary,brief.lead,brief.scope,brief.basis,brief.footer,
+  return [brief.title,brief.summary,brief.meta_description,brief.lead,brief.label,brief.scope,brief.basis,brief.footer,brief.editorial_note,
+    ...(brief.sources??[]).flatMap(s=>[s.title,s.note,s.url]),
+    ...(brief.tools??[]).flatMap(t=>typeof t==='string'?[t]:[t.title,t.description,t.label]),
     ...(brief.sections ?? []).flatMap(s => [s.heading,...(s.blocks ?? []).flatMap(b =>
-      [b.text,...(b.items ?? []),...(b.headers ?? []),...(b.rows ?? []).flat()])])].filter(text).join('\n')
+      [b.text,b.alt,b.caption,b.title,...(b.items ?? []),...(b.headers ?? []),...(b.rows ?? []).flat()])])].filter(text).join('\n')
 }
 // Anchors are exact quotes plus field identity, never keyword-ranked paragraphs.
 // Ambiguous/deleted/moved quotes are not silently attached to a different paragraph.
 export function locateQuote(brief, quote) {
   if (!text(quote)) return {kind:'GLOBAL'}
   const locations=[]
-  for (const f of ['title','summary','lead','scope','basis','footer']) if (String(brief[f]??'').includes(quote)) locations.push({field:f})
+  for (const f of ['title','summary','lead','scope','basis','footer']) for(let i=0;i<String(brief[f]??'').split(quote).length-1;i++)locations.push({field:f})
   brief.sections?.forEach((s,si)=>s.blocks?.forEach((b,bi)=>{
-    if (typeof b.text==='string' && b.text.includes(quote)) locations.push({section:si,block:bi})
-    b.items?.forEach((v,ii)=>{if(v.includes(quote))locations.push({section:si,block:bi,item:ii})})
+    if (typeof b.text==='string') for(let i=0;i<b.text.split(quote).length-1;i++)locations.push({section:si,block:bi})
+    b.items?.forEach((v,ii)=>{for(let i=0;i<v.split(quote).length-1;i++)locations.push({section:si,block:bi,item:ii})})
   }))
   return locations.length===1 ? {kind:'EXACT',...locations[0]} : {kind:locations.length?'AMBIGUOUS':'MISSING'}
 }

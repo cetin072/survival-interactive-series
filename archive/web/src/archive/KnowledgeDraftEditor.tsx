@@ -63,12 +63,15 @@ export function KnowledgeDraftEditor({
   disabled,
   onChange,
   onUploadImage,
+  issues = [],
 }: {
   brief: KnowledgeDraftBrief
   disabled?: boolean
   onChange: (next: KnowledgeDraftBrief) => void
   onUploadImage?: (file: File) => Promise<{ url: string; path: string; alt: string; bytes: number }>
+  issues?: Array<{key:string;quote:string;reason:string}>
 }) {
+  const reasons = (text:string) => issues.filter(issue=>text.includes(issue.quote)).map(issue=><p className="knowledge-editor-inline-reason" key={issue.key}><strong>AI가 확인을 요청한 이유</strong><br/>{issue.reason} <a href={'#problem-'+issue.key}>해결 방법</a></p>)
   const [uploadingKey, setUploadingKey] = useState<string | null>(null)
   const [uploadError, setUploadError] = useState('')
   const updateSection = (sectionIndex: number, updater: (section: KnowledgeDraftSection) => void) => {
@@ -116,10 +119,12 @@ export function KnowledgeDraftEditor({
       <label className="knowledge-draft-field" key={key}>
         <span>{label}</span>
         <textarea
+          aria-label={label}
           disabled={disabled}
           value={String(brief[key] ?? '')}
           onChange={(event) => onChange(setText(brief, key, event.target.value))}
         />
+        {reasons(String(brief[key]??''))}
       </label>
     )}
 
@@ -161,6 +166,7 @@ export function KnowledgeDraftEditor({
               if (target.type === 'prose' || target.type === 'note') target.text = event.target.value
             })}
           />}
+          {'text' in block&&reasons(block.text)}
 
           {(block.type === 'ordered_list' || block.type === 'unordered_list') && <textarea
             disabled={disabled}
@@ -170,6 +176,7 @@ export function KnowledgeDraftEditor({
               if (target.type === 'ordered_list' || target.type === 'unordered_list') target.items = event.target.value.split('\n').filter(item => item.trim())
             })}
           />}
+          {'items' in block&&reasons(block.items.join('\n'))}
 
           {block.type === 'image' && <div className="knowledge-draft-media-fields">
             {onUploadImage && <label className="knowledge-draft-file">

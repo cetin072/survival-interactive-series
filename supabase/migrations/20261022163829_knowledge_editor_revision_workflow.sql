@@ -3,6 +3,7 @@
 create table survival_ops.knowledge_editor_state (
   job_id uuid primary key references survival_ops.knowledge_semantic_jobs on delete restrict,
   publication_brief_id text unique,
+  publication_slug text unique,
   archived boolean not null default false,
   evidence_review jsonb not null default '{"claims":[],"resolutions":[]}',
   updated_at timestamptz not null default clock_timestamp(),
@@ -75,13 +76,24 @@ declare j survival_ops.knowledge_semantic_jobs%rowtype; base jsonb; f text; begi
  if p_brief->>'id' is distinct from coalesce((select publication_brief_id from survival_ops.knowledge_editor_state where job_id=p_job_id),base->>'id',j.semantic_context->'target'->>'brief_id') then raise exception 'KNOWLEDGE_EDITOR_ID_LOCKED'; end if;
  if base is null and (p_brief->>'risk_level' is distinct from 'HIGH' or p_brief->>'publication_policy' is distinct from 'HUMAN_APPROVED' or p_brief->>'semantic_qa_status' is distinct from 'REVIEW' or p_brief->'risk_domains' is distinct from '["OTHER_SEVERE_HARM"]'::jsonb) then raise exception 'KNOWLEDGE_EDITOR_NEW_DRAFT_RISK_LOCKED'; end if;
  if base is not null then
-  foreach f in array array['slug','topic_id','content_type','risk_level','risk_domains','publication_policy','story_refs','guide_id','ai_assisted','source_checked_at'] loop
+  foreach f in array array['topic_id','content_type','risk_level','risk_domains','publication_policy','story_refs','guide_id','ai_assisted','source_checked_at'] loop
    if base->f is not null and p_brief->f is distinct from base->f then raise exception 'KNOWLEDGE_EDITOR_IDENTITY_LOCKED:%',f; end if;
   end loop;
  end if;
+ if p_brief->>'slug' is distinct from coalesce((select publication_slug from survival_ops.knowledge_editor_state where job_id=p_job_id),base->>'slug',p_brief->>'slug') then raise exception 'KNOWLEDGE_EDITOR_IDENTITY_LOCKED:slug'; end if;
  if p_brief->'semantic_qa_status' is distinct from coalesce(base->'semantic_qa_status','"REVIEW"'::jsonb) then raise exception 'KNOWLEDGE_EDITOR_MACHINE_QA_LOCKED'; end if;
  if jsonb_typeof(p_brief->'sections') is distinct from 'array' or jsonb_typeof(p_brief->'sources') is distinct from 'array' then raise exception 'KNOWLEDGE_EDITOR_STRUCTURE_INVALID'; end if;
 end $$;
+
+-- Explicit editor restoration overrides historical hold/rejection only in working
+-- state. The original human decision remains in the existing review ledger.
+create function survival_ops.private_knowledge_editor_archived(p_job_id uuid) returns boolean
+language sql set search_path='' as $$
+ select coalesce((select archived from survival_ops.knowledge_editor_state where job_id=p_job_id),
+  (select status in ('HOLD','BLOCKED') from survival_ops.knowledge_semantic_jobs where job_id=p_job_id)
+  or coalesce(public.archive_operator_knowledge_job_detail(p_job_id)->>'review_status' in ('HOLD','REJECTED'),false))
+$$;
+revoke all on function survival_ops.private_knowledge_editor_archived(uuid) from public,anon,authenticated,service_role;
 
 create function public.archive_operator_knowledge_editor_get(p_job_id uuid) returns jsonb
 language plpgsql security definer set search_path='' as $$
@@ -91,10 +103,10 @@ declare actor uuid; j survival_ops.knowledge_semantic_jobs%rowtype; d survival_o
  if not found then raise exception 'KNOWLEDGE_EDITOR_NOT_FOUND'; end if;
  select * into d from survival_ops.knowledge_operator_drafts where job_id=p_job_id;
  select * into s from survival_ops.knowledge_editor_state where job_id=p_job_id;
- select to_jsonb(r)-'snapshot'-'lease_token' into request from survival_ops.knowledge_editor_requests r where job_id=p_job_id order by created_at desc limit 1;
+ select to_jsonb(r)-'snapshot'-'lease_token' into request from survival_ops.knowledge_editor_requests r where job_id=p_job_id order by updated_at desc,created_at desc limit 1;
  return jsonb_build_object('job_id',j.job_id,'revision',coalesce(d.revision,0),'draft_sha256',d.draft_sha256,
- 'brief',coalesce(d.draft_brief,j.semantic_result->'brief'),'original',j.semantic_result,'context',j.semantic_context,
- 'archived',coalesce(s.archived,j.status in ('HOLD','BLOCKED')),'evidence_review',coalesce(s.evidence_review,jsonb_build_object('claims',coalesce(j.semantic_result->'evidence'->'claims','[]'::jsonb),'resolutions','[]'::jsonb)),
+ 'brief',case when coalesce(d.draft_brief,j.semantic_result->'brief') is not null then coalesce(d.draft_brief,j.semantic_result->'brief')||jsonb_strip_nulls(jsonb_build_object('id',s.publication_brief_id,'slug',s.publication_slug)) end,'original',j.semantic_result,'context',j.semantic_context,
+ 'archived',survival_ops.private_knowledge_editor_archived(p_job_id),'evidence_review',coalesce(s.evidence_review,jsonb_build_object('claims',coalesce(j.semantic_result->'evidence'->'claims','[]'::jsonb),'resolutions','[]'::jsonb)),
  'status',j.status,'blocker_code',j.blocker_code,'updated_at',coalesce(d.updated_at,j.updated_at),'request',request,
  'related_public',(select coalesce(jsonb_agg(jsonb_build_object('title',other.semantic_result->'brief'->>'title','url','https://survival-diary-archive.netlify.app/knowledge/'||(other.semantic_result->'brief'->>'slug')||'/')),'[]'::jsonb) from survival_ops.knowledge_semantic_jobs other where other.status='PUBLISHED' and other.semantic_result->'brief'->>'id' in (select (regexp_matches(coalesce(j.semantic_result->>'note',''),'K-[0-9]+','g'))[1])),
  'history',(select coalesce(jsonb_agg(jsonb_build_object('revision',v.revision,'draft_sha256',v.draft_sha256,'created_at',v.created_at) order by v.revision desc),'[]'::jsonb) from survival_ops.knowledge_editor_versions v where job_id=p_job_id),
@@ -110,7 +122,7 @@ declare actor uuid; j survival_ops.knowledge_semantic_jobs%rowtype; d survival_o
  perform survival_ops.private_knowledge_editor_idle(p_job_id);
  select * into d from survival_ops.knowledge_operator_drafts where job_id=p_job_id for update;
  if coalesce(d.revision,0) is distinct from p_expected_revision then raise exception using errcode='40001',message='KNOWLEDGE_EDITOR_REVISION_CONFLICT'; end if;
- if coalesce((select archived from survival_ops.knowledge_editor_state where job_id=p_job_id),j.status in ('HOLD','BLOCKED')) then raise exception 'KNOWLEDGE_EDITOR_RESTORE_REQUIRED'; end if;
+ if survival_ops.private_knowledge_editor_archived(p_job_id) then raise exception 'KNOWLEDGE_EDITOR_RESTORE_REQUIRED'; end if;
  perform survival_ops.private_knowledge_editor_validate(p_job_id,p_brief);
  if jsonb_typeof(p_evidence_review) is distinct from 'object' or jsonb_typeof(p_evidence_review->'claims') is distinct from 'array' or jsonb_typeof(p_evidence_review->'resolutions') is distinct from 'array' or pg_column_size(p_evidence_review)>262144 then raise exception 'KNOWLEDGE_EDITOR_REVIEW_INVALID'; end if;
  if d.draft_brief=p_brief and coalesce((select evidence_review from survival_ops.knowledge_editor_state where job_id=p_job_id),'{}')=p_evidence_review then return public.archive_operator_knowledge_editor_get(p_job_id); end if;
@@ -119,7 +131,7 @@ declare actor uuid; j survival_ops.knowledge_semantic_jobs%rowtype; d survival_o
  digest:=encode(extensions.digest(convert_to(jsonb_build_object('brief',p_brief,'review',p_evidence_review)::text,'UTF8'),'sha256'),'hex');
  insert into survival_ops.knowledge_operator_drafts(job_id,brief_id,base_semantic_result_sha256,draft_brief,draft_sha256,revision,edited_by)
  values(p_job_id,p_brief->>'id',coalesce(j.semantic_result_sha256,encode(extensions.digest(convert_to(j.semantic_context::text,'UTF8'),'sha256'),'hex')),p_brief,digest,rev,actor)
- on conflict(job_id) do update set draft_brief=excluded.draft_brief,draft_sha256=excluded.draft_sha256,revision=excluded.revision,edited_by=excluded.edited_by,updated_at=clock_timestamp();
+ on conflict(job_id) do update set brief_id=excluded.brief_id,draft_brief=excluded.draft_brief,draft_sha256=excluded.draft_sha256,revision=excluded.revision,edited_by=excluded.edited_by,updated_at=clock_timestamp();
  insert into survival_ops.knowledge_editor_state(job_id,evidence_review,updated_by) values(p_job_id,p_evidence_review,actor)
  on conflict(job_id) do update set evidence_review=excluded.evidence_review,updated_at=clock_timestamp(),updated_by=actor;
  insert into survival_ops.knowledge_editor_versions(job_id,revision,draft_sha256,brief,evidence_review,edited_by) values(p_job_id,rev,digest,p_brief,p_evidence_review,actor);
@@ -128,7 +140,7 @@ end $$;
 
 create function public.archive_operator_knowledge_editor_action(p_job_id uuid,p_action text) returns jsonb
 language plpgsql security definer set search_path='' as $$
-declare actor uuid; j survival_ops.knowledge_semantic_jobs%rowtype; target_id text; next_id integer; begin
+declare actor uuid; j survival_ops.knowledge_semantic_jobs%rowtype; target_id text; target_slug text; next_id integer; begin
  actor:=survival_ops.private_require_archive_operator();
  select * into strict j from survival_ops.knowledge_semantic_jobs where job_id=p_job_id for update;
  perform survival_ops.private_knowledge_editor_idle(p_job_id);
@@ -136,15 +148,17 @@ declare actor uuid; j survival_ops.knowledge_semantic_jobs%rowtype; target_id te
  if p_action='RESTORE' then
   perform pg_advisory_xact_lock(928430271);
   target_id:=coalesce((select publication_brief_id from survival_ops.knowledge_editor_state where job_id=p_job_id),j.semantic_result->'brief'->>'id',j.semantic_context->'target'->>'brief_id');
-  if exists(select 1 from survival_ops.knowledge_semantic_jobs other where other.job_id<>p_job_id and other.status='PUBLISHED' and other.semantic_result->'brief'->>'id'=target_id) then
+  target_slug:=coalesce((select publication_slug from survival_ops.knowledge_editor_state where job_id=p_job_id),j.semantic_result->'brief'->>'slug');
+  if j.status<>'PUBLISHED' and exists(select 1 from survival_ops.knowledge_semantic_jobs other where other.job_id<>p_job_id and other.status='PUBLISHED' and (other.semantic_result->'brief'->>'id'=target_id or other.semantic_result->'brief'->>'slug'=target_slug)) then
    select greatest(coalesce((select max(substring(coalesce(semantic_result->'brief'->>'id',semantic_context->'target'->>'brief_id') from '^K-([0-9]+)$')::integer) from survival_ops.knowledge_semantic_jobs),0),coalesce((select max(substring(publication_brief_id from '^K-([0-9]+)$')::integer) from survival_ops.knowledge_editor_state),0))+1 into next_id;
    target_id:='K-'||lpad(next_id::text,greatest(3,length(next_id::text)),'0');
+   target_slug:='knowledge-'||lower(target_id)||'-'||replace(p_job_id::text,'-','');
   end if;
   if target_id is null or target_id!~'^K-[0-9]+$' then raise exception 'KNOWLEDGE_EDITOR_TARGET_REQUIRED'; end if;
  end if;
- insert into survival_ops.knowledge_editor_state(job_id,publication_brief_id,archived,evidence_review,updated_by)
- values(p_job_id,target_id,p_action='ARCHIVE',jsonb_build_object('claims',coalesce(j.semantic_result->'evidence'->'claims','[]'::jsonb),'resolutions','[]'::jsonb),actor)
- on conflict(job_id) do update set publication_brief_id=coalesce(survival_ops.knowledge_editor_state.publication_brief_id,excluded.publication_brief_id),archived=excluded.archived,updated_at=clock_timestamp(),updated_by=actor;
+ insert into survival_ops.knowledge_editor_state(job_id,publication_brief_id,publication_slug,archived,evidence_review,updated_by)
+ values(p_job_id,target_id,target_slug,p_action='ARCHIVE',jsonb_build_object('claims',coalesce(j.semantic_result->'evidence'->'claims','[]'::jsonb),'resolutions','[]'::jsonb),actor)
+ on conflict(job_id) do update set publication_brief_id=coalesce(excluded.publication_brief_id,survival_ops.knowledge_editor_state.publication_brief_id),publication_slug=coalesce(excluded.publication_slug,survival_ops.knowledge_editor_state.publication_slug),archived=excluded.archived,updated_at=clock_timestamp(),updated_by=actor;
  return public.archive_operator_knowledge_editor_get(p_job_id);
 end $$;
 
@@ -163,7 +177,7 @@ declare actor uuid; j survival_ops.knowledge_semantic_jobs%rowtype; d survival_o
  if r.request_id is not null and r.status not in ('FAILED','RETRYABLE') and not (r.status='QUEUED' and r.updated_at<clock_timestamp()-interval '2 minutes') then return to_jsonb(r)-'snapshot'-'lease_token'; end if;
  if r.status='QUEUED' then update survival_ops.knowledge_editor_requests set status='RETRYABLE' where request_id=r.request_id; end if;
  perform survival_ops.private_knowledge_editor_idle(p_job_id);
- if coalesce((select archived from survival_ops.knowledge_editor_state where job_id=p_job_id),j.status in ('HOLD','BLOCKED')) then raise exception 'KNOWLEDGE_EDITOR_RESTORE_REQUIRED'; end if;
+ if survival_ops.private_knowledge_editor_archived(p_job_id) then raise exception 'KNOWLEDGE_EDITOR_RESTORE_REQUIRED'; end if;
  if r.request_id is not null then
   update survival_ops.knowledge_editor_requests set status='QUEUED',lease_token=null,lease_at=null,updated_at=clock_timestamp() where request_id=r.request_id returning * into r;
  else
@@ -232,12 +246,12 @@ language plpgsql security definer set search_path='' as $$
 declare previous jsonb; items jsonb; begin
  perform survival_ops.private_require_archive_operator();
  previous:=public.archive_operator_knowledge_inbox();
- select coalesce(jsonb_agg(i||jsonb_build_object('editor_archived',coalesce(s.archived,(i->>'status')='HOLD'),'editor_request',r.request,'has_body',coalesce(j.semantic_result ? 'brief',false),'technical_only',j.semantic_result is null and j.status='BLOCKED','draft_revision',coalesce(d.revision,0),'slug',coalesce(d.draft_brief->>'slug',j.semantic_result->'brief'->>'slug'),'updated_at',coalesce(d.updated_at,j.updated_at),'title',coalesce(d.draft_brief->>'title',i->>'title'),'public_record',pub.request) order by coalesce(d.updated_at,j.updated_at) desc),'[]') into items
+ select coalesce(jsonb_agg(i||jsonb_build_object('editor_archived',coalesce(s.archived,(i->>'status') in ('HOLD','BLOCKED') or (i->>'review_status') in ('HOLD','REJECTED')),'editor_request',r.request,'has_body',coalesce(j.semantic_result ? 'brief',false),'technical_only',j.semantic_result is null and j.status='BLOCKED','draft_revision',coalesce(d.revision,0),'slug',coalesce(d.draft_brief->>'slug',j.semantic_result->'brief'->>'slug'),'updated_at',coalesce(d.updated_at,j.updated_at),'title',coalesce(d.draft_brief->>'title',i->>'title'),'public_record',pub.request) order by coalesce(d.updated_at,j.updated_at) desc),'[]') into items
  from jsonb_array_elements(previous->'items') i
  join survival_ops.knowledge_semantic_jobs j on j.job_id=(i->>'job_id')::uuid
  left join survival_ops.knowledge_operator_drafts d using(job_id)
  left join survival_ops.knowledge_editor_state s using(job_id)
- left join lateral(select to_jsonb(req)-'snapshot'-'lease_token' request from survival_ops.knowledge_editor_requests req where req.job_id=j.job_id order by created_at desc limit 1) r on true
+ left join lateral(select to_jsonb(req)-'snapshot'-'lease_token' request from survival_ops.knowledge_editor_requests req where req.job_id=j.job_id order by updated_at desc,created_at desc limit 1) r on true
  left join lateral(select to_jsonb(req)-'snapshot'-'lease_token' request from survival_ops.knowledge_editor_requests req where req.job_id=j.job_id and status='PUBLISHED' order by created_at desc limit 1) pub on true;
  return previous||jsonb_build_object('items',items);
 end $$;

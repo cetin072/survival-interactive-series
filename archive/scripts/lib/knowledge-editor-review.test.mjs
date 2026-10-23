@@ -80,3 +80,21 @@ test('required CI must succeed on the exact PR head; stale success and moved hea
  await assert.rejects(waitExactChecks({head,pr:1,read:readFor(checks(),'success',{state:'open',head:{sha:'b'.repeat(40)}}),maxAttempts:1}),/HEAD_CHANGED/)
  await assert.rejects(waitExactChecks({head,pr:1,read:readFor([{name:'browser',head_sha:head,status:'completed',conclusion:'failure'}]),maxAttempts:1}),/CI_FAILED/)
 })
+
+test('every public text surface participates in privacy and high-risk checks',()=>{
+ for(const field of ['meta_description','label','editorial_note']) {
+  const s=fixture();s.brief[field]='담당자 010-1234-5678';
+  assert.ok(evaluateEditorialSnapshot(s).issues.some(i=>i.key==='privacy'),field)
+ }
+ for(const block of [{type:'image',src:'https://example.gov/a.webp',alt:'010-1234-5678'}, {type:'youtube',url:'https://youtu.be/abcdefghi',title:'010-1234-5678'}, {type:'table',headers:['안내'],rows:[['010-1234-5678']]}]) {
+  const s=fixture();s.brief.sections[0].blocks=[block];
+  assert.ok(evaluateEditorialSnapshot(s).issues.some(i=>i.key==='privacy'))
+ }
+ const s=fixture();s.brief.sources[0].note='전압 220 V 사용을 허용합니다.'
+ assert.ok(evaluateEditorialSnapshot(s).issues.some(i=>i.key==='safety-specific'))
+})
+test('two occurrences in the same paragraph are ambiguous',()=>{
+ const s=fixture(),q=s.brief.sections[0].blocks[0].text
+ s.brief.sections[0].blocks[0].text=q+' '+q
+ assert.equal(locateQuote(s.brief,q).kind,'AMBIGUOUS')
+})

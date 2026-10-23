@@ -20,7 +20,7 @@ declare
   v_original_sha text;
   v_receipt_id uuid;
   v_decided_at timestamptz;
-  v_request jsonb; v_lease uuid; v_review_copy jsonb; v_old_sha text;
+  v_collision uuid; v_restored jsonb; v_request jsonb; v_lease uuid; v_review_copy jsonb; v_old_sha text;
 begin
   if has_function_privilege('anon','public.archive_operator_knowledge_draft_get(uuid)','EXECUTE')
      or has_function_privilege('anon','public.archive_operator_knowledge_draft_save(uuid,integer,jsonb)','EXECUTE')
@@ -183,6 +183,27 @@ begin
   exception when raise_exception then if sqlerrm<>'KNOWLEDGE_EDITOR_PUBLIC_PROOF_REQUIRED' then raise; end if; end;
   if (select count(*) from survival_ops.knowledge_editor_events where job_id=v_job_id and event='FAILED')<>1 then raise exception 'failure history lost'; end if;
   if (select semantic_result from survival_ops.knowledge_semantic_jobs where job_id=v_job_id)<>v_result then raise exception 'immutable AI result changed'; end if;
+  -- Restore a stale identity without changing either immutable origin or public URL.
+  perform public.archive_worker_knowledge_editor_request((v_request->>'request_id')::uuid,'FAILED',v_lease,'{"reason":"SYNTHETIC_STOP"}');
+  insert into survival_ops.knowledge_semantic_jobs(job_type,status,source_kind,source_ref,source_sha256,work_key,policy_version,policy_sha256,policy_pin,main_sha_at_prepare,semantic_context,semantic_result,semantic_result_sha256,result_decision,final_pr_number,final_head_sha,merge_sha,published_at)
+  select job_type,'PUBLISHED',source_kind,'synthetic://published-collision',source_sha256,'published-collision',policy_version,policy_sha256,policy_pin,main_sha_at_prepare,jsonb_set(semantic_context,'{target,brief_id}','"K-1001"'),jsonb_set(semantic_result,'{brief,id}','"K-1001"'),semantic_result_sha256,result_decision,999,repeat('c',40),repeat('d',40),clock_timestamp()
+  from survival_ops.knowledge_semantic_jobs where job_id=v_job_id returning job_id into v_collision;
+  v_restored:=public.archive_operator_knowledge_editor_action(v_job_id,'RESTORE');
+  if v_restored->>'brief_id'='K-998' or v_restored->'brief'->>'slug'='operator-editor-fixture' then raise exception 'restoration retained conflicting identity'; end if;
+  if v_restored->'original'->'brief'->>'slug'<>'operator-editor-fixture' then raise exception 'restoration changed immutable origin'; end if;
+  v_restored:=public.archive_operator_knowledge_editor_save(v_job_id,2,v_restored->'brief',v_review_copy);
+  if (v_restored->>'revision')::integer<>3 or (select brief_id from survival_ops.knowledge_operator_drafts where job_id=v_job_id)='K-998' then raise exception 'reidentified working copy not saved'; end if;
+  if (select semantic_result->'brief'->>'slug' from survival_ops.knowledge_semantic_jobs where job_id=v_collision)<>'operator-editor-fixture' then raise exception 'existing public URL changed'; end if;
+  -- A body-free held idea uses the same restore and versioned-save path.
+  insert into survival_ops.knowledge_semantic_jobs(job_type,status,source_kind,source_ref,source_sha256,work_key,policy_version,policy_sha256,policy_pin,main_sha_at_prepare,semantic_context,semantic_result,semantic_result_sha256,result_decision)
+  select job_type,'HOLD',source_kind,'synthetic://empty-idea',source_sha256,'empty-idea',policy_version,policy_sha256,policy_pin,main_sha_at_prepare,jsonb_set(semantic_context,'{target,brief_id}','"K-1000"'),'{"decision":"HOLD","note":"중복 질문 검토"}',repeat('e',64),'HOLD'
+  from survival_ops.knowledge_semantic_jobs where job_id=v_job_id returning job_id into v_collision;
+  v_restored:=public.archive_operator_knowledge_editor_action(v_collision,'RESTORE');
+  if v_restored->'brief' is distinct from 'null'::jsonb or (v_restored->>'archived')::boolean then raise exception 'empty idea restoration failed'; end if;
+  v_draft:=jsonb_set(v_draft,'{id}','"K-1000"');
+  v_draft:=v_draft||'{"risk_domains":["OTHER_SEVERE_HARM"],"risk_level":"HIGH","semantic_qa_status":"REVIEW","publication_policy":"HUMAN_APPROVED"}';
+  v_restored:=public.archive_operator_knowledge_editor_save(v_collision,0,v_draft,v_review_copy);
+  if (v_restored->>'revision')::integer<>1 or v_restored->'request' is distinct from 'null'::jsonb then raise exception 'empty idea save implied approval'; end if;
   begin
    update survival_ops.knowledge_editor_versions set brief='{}' where job_id=v_job_id and revision=1;
    raise exception 'history overwritten';

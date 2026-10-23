@@ -44,7 +44,9 @@ export function editorialTemplate(value:EditorialEnvelope):KnowledgeDraftBrief {
 }
 export function quoteLocations(brief:KnowledgeDraftBrief,quote:string):number {
  if(!quote.trim())return 0
- return [brief.title,brief.summary,brief.lead,brief.scope,brief.basis,brief.footer,...brief.sections.flatMap(s=>s.blocks.flatMap(b=>'text' in b?[b.text]:'items' in b?b.items:[]))].filter(v=>String(v).includes(quote)).length
+ const values=[brief.title,brief.summary,brief.meta_description,brief.lead,brief.label,brief.scope,brief.basis,brief.footer,brief.editorial_note,
+  ...brief.sections.flatMap(s=>[s.heading,...s.blocks.flatMap(b=>b.type==='table'?[...b.headers,...b.rows.flat()]:'text' in b?[b.text]:'items' in b?b.items:[])])]
+ return values.reduce((count,v)=>count+String(v??'').split(quote).length-1,0)
 }
 
 // Lossless structural projection for old drafts; callers keep the raw original.
@@ -72,7 +74,7 @@ export function readableBrief(raw:KnowledgeDraftBrief, original?:Record<string,u
  brief.ai_assisted??=true
  brief.content_type??='BRIEF'
  brief.guide_id??=null
- brief.tools??=[]
+ brief.tools=Array.isArray(brief.tools)?brief.tools:typeof brief.tools==='string'&&brief.tools.trim()?[brief.tools]:[]
  brief.related_brief_ids??=[]
  brief.story_refs??=[]
  return brief

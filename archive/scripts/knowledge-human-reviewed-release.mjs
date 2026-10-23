@@ -80,9 +80,17 @@ export async function verifyPublicArticle({ payload, brief, fetcher = fetch }) {
   }
   const [page, index, sitemap, metaText] = await Promise.all([read(path), read('/knowledge/'), read('/sitemap.xml'), read('/deploy-meta.json')])
   const meta = JSON.parse(metaText)
+  const structured = [...page.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)].flatMap(match=>{
+    try {const value=JSON.parse(match[1]);return Array.isArray(value)?value:[value]}catch{return []}
+  })
+  const article=structured.find(value=>value['@type']==='Article')
   const expected = [brief.title, brief.lead, ...(brief.sections || []).flatMap(section =>
     [section.heading, ...(section.blocks || []).flatMap(block => [block.text, ...(block.items || []), ...(block.headers || []), ...(block.rows || []).flat()])])].filter(text => typeof text === 'string' && text.trim())
   if (meta.commit_ref !== payload.merge_sha || meta.context !== 'production'
+    || !/<title>[^<]+<\/title>/i.test(page)
+    || !page.includes('<meta name="description" content="'+esc(brief.meta_description)+'"')
+    || !page.includes('<link rel="canonical" href="'+ORIGIN+path+'"')
+    || article?.headline!==brief.title || article?.description!==brief.meta_description || article?.mainEntityOfPage!==ORIGIN+path
     || !expected.every(text => normalize(page).includes(normalize(esc(text))))
     || !index.includes(path) || !sitemap.includes(ORIGIN + path)) throw Error('HUMAN_APPROVED_PUBLIC_CONTENT_MISMATCH')
   return path

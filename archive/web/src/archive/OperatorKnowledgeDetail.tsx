@@ -29,8 +29,8 @@ export function OperatorKnowledgeDetail({jobId,email,busy:parentBusy,onSignOut}:
   if(response.error)throw Error(response.error.message)
   if((response.data as EditorialEnvelope).job_id!==jobId)throw Error('KNOWLEDGE_EDITOR_IDENTITY_MISMATCH')
   const next=response.data as EditorialEnvelope
-  if(next.status==='PUBLISHED'&&next.brief&&!publicationActive(next.request))next.public_verified=await observeLegacyPublic(readableBrief(next.brief,next.original))
   await adopt(next,content)
+  if(next.status==='PUBLISHED'&&next.brief&&!publicationActive(next.request))void observeLegacyPublic(readableBrief((next.original?.brief??next.brief) as KnowledgeDraftBrief,next.original)).then(public_verified=>setValue(current=>current?.job_id===next.job_id&&current.revision===next.revision?{...current,public_verified}:current))
  },[jobId,adopt])
  useEffect(()=>{
   dirtyRef.current=false;setDirty(false);setValue(null);setBrief(null);setBusy(true)
@@ -79,7 +79,16 @@ export function OperatorKnowledgeDetail({jobId,email,busy:parentBusy,onSignOut}:
   if(err)throw Error(err.message)
   await adopt(data as EditorialEnvelope);setNotice(name==='ARCHIVE'?'보관했습니다. 원고와 이력은 그대로 남습니다.':'편집을 위해 복원했습니다. 아직 발행되지 않았습니다.')
  }
- const highlights=brief?review.resolutions.map(r=>r.quote).filter(q=>quoteLocations(brief,q)===1):[]
+ const connectedIssues=brief?issues.map(issue=>({...issue,quote:review.resolutions.find(r=>r.key===issue.key)?.quote??issue.quote??''})).filter(issue=>quoteLocations(brief,issue.quote)===1):[]
+ const highlights=connectedIssues.map(issue=>issue.quote)
+ const jumpToQuote=(quote:string)=>{
+  setPreview(false)
+  window.requestAnimationFrame(()=>{
+   const fields=Array.from(document.querySelectorAll<HTMLInputElement|HTMLTextAreaElement>('.knowledge-draft-editor input:not([type=file]),.knowledge-draft-editor textarea')).filter(field=>field.value.includes(quote))
+   if(fields.length!==1||fields[0].value.split(quote).length!==2){setNotice('현재 본문에서 한 위치를 확정할 수 없습니다. 인용문을 다시 확인하세요.');return}
+   const field=fields[0];field.focus();field.scrollIntoView({block:'center',behavior:'smooth'});try{const start=field.value.indexOf(quote);field.setSelectionRange(start,start+quote.length)}catch{}
+  })
+ }
  const timedOut=!!value?.request&&Date.now()-Date.parse(value.request.updated_at)>35*60000
  const active=publicationActive(value?.request), locked=busy||parentBusy||active||value?.archived
  const updateResolution=(issue:EditorialIssue,patch:Partial<EditorialResolution>)=>{
@@ -101,7 +110,7 @@ export function OperatorKnowledgeDetail({jobId,email,busy:parentBusy,onSignOut}:
   {conflict&&<section className="operator-panel"><h2>다른 저장본과 비교</h2><p>아래는 서버에 먼저 저장된 최신 본문입니다. 현재 입력한 내용은 위 편집기에 보존돼 있습니다.</p>{conflict.brief&&<KnowledgeDraftPreview brief={readableBrief(conflict.brief,conflict.original)}/>}<button onClick={()=>{baseRevision.current=conflict.revision;setValue(conflict);setConflict(null);setError('');setNotice('최신 저장본을 확인했습니다. 현재 편집 내용을 다시 저장하면 새 수정본으로 기록합니다.')}}>최신 저장본을 확인하고 내 수정으로 이어가기</button></section>}
   {value&&<>
    <div className="knowledge-editor-actions" aria-label="글 작업">
-    <button disabled={!!locked||!brief} onClick={()=>void run(async()=>{await save()})}>{busy?'처리 중…':'저장'}</button>
+    <button aria-busy={busy} disabled={!!locked||!brief} onClick={()=>void run(async()=>{await save()})}>저장</button>
     <button className="operator-secondary" disabled={!brief} onClick={()=>setPreview(v=>!v)}>{preview?'편집':'미리보기'}</button>
     <button disabled={!!locked||!brief} onClick={()=>void run(()=>request(true))}>발행</button>
     {!value.archived&&<button className="operator-secondary" disabled={busy||active} onClick={()=>void run(()=>action('ARCHIVE'))}>보관</button>}
@@ -117,12 +126,13 @@ export function OperatorKnowledgeDetail({jobId,email,busy:parentBusy,onSignOut}:
     {result?.issues?.length? <section className="operator-panel" aria-label="검사 결과"><h2>문제 {result.issues.length}개 확인</h2><ul>{result.issues.map(issue=><li key={issue.key}><a href={'#problem-'+issue.key}>{issue.message}</a>{issue.action&&<p>{issue.action}</p>}</li>)}</ul></section>:null}
     <section className="operator-panel knowledge-editor-body">
      <h2>{preview?'글 미리보기':'본문 편집'}</h2>{!preview&&!value.archived&&highlights.length>0&&<details open><summary>문제 위치를 표시한 본문</summary><KnowledgeDraftPreview brief={brief} highlights={highlights}/></details>}
-     {preview||value.archived?<KnowledgeDraftPreview brief={brief} highlights={highlights}/>:<KnowledgeDraftEditor brief={brief} disabled={!!locked} onChange={change} onUploadImage={supabaseClient?file=>uploadKnowledgeImage(supabaseClient!,jobId,file):undefined}/>}
+     {preview||value.archived?<KnowledgeDraftPreview brief={brief} highlights={highlights}/>:<KnowledgeDraftEditor brief={brief} issues={connectedIssues} disabled={!!locked} onChange={change} onUploadImage={supabaseClient?file=>uploadKnowledgeImage(supabaseClient!,jobId,file):undefined}/>}
     </section>
     <section className="operator-panel" aria-label="문제와 해결"><h2>확인할 부분과 해결 방법</h2><p>원본의 판단은 보존됩니다. 아래에 현재 본문과 근거를 연결해 재검사를 요청하세요. 체크만으로 사실·권한·안전 검증을 통과시키지 않습니다.</p>
      {issues.map(issue=>{const r=review.resolutions.find(v=>v.key===issue.key),quote=r?.quote??issue.quote??'',locations=quoteLocations(brief,quote);return <article className="knowledge-editor-issue" id={'problem-'+issue.key} key={issue.key}>
       <h3>{locations===1?'현재 본문에 연결된 구간':'글 전체의 적용 범위 확인'}</h3>
       {quote&&<p>{locations===1?<mark>{quote}</mark>:<>{quote} <b>— 현재 문장에 정확히 연결되지 않았습니다.</b></>}</p>}
+      {locations===1&&!value.archived&&<button className="operator-secondary" onClick={()=>jumpToQuote(quote)}>해당 문장 수정</button>}
       <strong>AI가 확인을 요청한 이유</strong><p>{issue.reason}</p>
       <p>해당 문장 수정·삭제는 위 본문에서 할 수 있습니다. 정확한 위치가 없는 과거 지적을 특정 문장의 오류로 단정하지 않습니다.</p>
       <label>해결 방법<select disabled={!!locked} value={r?.method??'UNRESOLVED'} onChange={e=>updateResolution(issue,{method:e.target.value})}><option value="UNRESOLVED">미해결 · 보류</option><option value="REMOVED">해당 주장 삭제</option><option value="SUPPORTED">공식 근거로 확인</option><option value="SITE_CONDITION">현장별 확인 조건으로 범위 제한</option><option value="STATED_LIMIT">본문에 설명한 적용 한계</option></select></label>

@@ -134,6 +134,39 @@ def run(args):
             expect(page.get_by_label('제목', exact=True)).to_be_visible()
             assert not [p for n, p in state['calls'] if n.endswith('_request')]
 
+            # Exact, current quote anchors and unsaved/conflicting edits remain private.
+            state['data'] = envelope()
+            quote = '기관 확인 전에는 현장의 안전 여부를 단정하지 않습니다.'
+            state['data']['brief']['sections'][0]['blocks'][0]['text'] = quote
+            state['data']['original']['evidence']['unknowns'] = [{'quote': quote, 'reason': '현장 조건의 확인 범위를 설명하세요.'}]
+            page.reload()
+            expect(page.get_by_role('button', name='해당 문장 수정', exact=True)).to_be_visible()
+            page.get_by_role('button', name='해당 문장 수정', exact=True).click()
+            page.wait_for_function('(q)=>document.activeElement?.value?.slice(document.activeElement.selectionStart,document.activeElement.selectionEnd)===q', arg=quote)
+            assert page.evaluate('document.activeElement.value.slice(document.activeElement.selectionStart,document.activeElement.selectionEnd)') == quote
+            expect(page.locator('.knowledge-editor-inline-reason')).to_contain_text('현장 조건')
+            page.get_by_role('button', name='+ 섹션 추가', exact=True).click()
+            page.locator('.knowledge-draft-section').first.locator('header button').nth(1).click()
+            page.get_by_role('button', name='해당 문장 수정', exact=True).click()
+            expect(page.locator('.knowledge-draft-editor textarea:focus')).to_have_value(quote)
+            focused = page.locator('.knowledge-draft-editor textarea:focus')
+            focused.fill(quote + ' ' + quote)
+            expect(page.get_by_role('button', name='해당 문장 수정', exact=True)).to_have_count(0)
+            expect(page.locator('.knowledge-editor-inline-reason')).to_have_count(0)
+            dialogs = []
+            def dismiss_navigation(dialog):
+                dialogs.append(dialog.type)
+                dialog.dismiss()
+            page.once('dialog', dismiss_navigation)
+            page.get_by_role('link', name='← 글 목록', exact=True).click(no_wait_after=True)
+            assert dialogs == ['beforeunload']
+            assert '/operator/knowledge/' + JOB in page.url
+            state['fail_save'] = True
+            page.get_by_role('button', name='저장', exact=True).click()
+            expect(page.get_by_role('heading', name='다른 저장본과 비교', exact=True)).to_be_visible()
+            assert page.locator('.knowledge-draft-editor').get_by_text('정확히 연결되지').count() == 0
+            state['fail_save'] = False
+            page.once('dialog', lambda d: d.accept())
             state['deny'] = True
             page.reload()
             expect(page.get_by_role('alert').first).to_be_visible()
@@ -141,7 +174,7 @@ def run(args):
             assert not errors, errors
             report.append({'mode': 'SYNTHETIC_PRIVATE_CLICK', 'width': width, 'save_before_publish': True,
                            'double_click_one_request': True, 'premature_completion': False,
-                           'restoration': True, 'empty_draft': True, 'unauthorized_denied': True})
+                           'restoration': True, 'empty_draft': True, 'unauthorized_denied': True, 'exact_moved_anchor': True, 'ambiguous_anchor_hidden': True, 'dirty_navigation_warning': True, 'conflict_preserves_edits': True})
             context.close()
         browser.close()
     server.shutdown()

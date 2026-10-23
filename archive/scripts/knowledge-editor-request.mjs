@@ -38,6 +38,7 @@ export async function prepareEditorialFiles({snapshot,base=root,sourceVerifier=v
  if(evaluation.issues.length) return evaluation
  const data=await loadKnowledge(base)
  const prior=data.briefs.find(b=>b.id===approved.id)
+ if(data.briefs.some(b=>b.id!==approved.id&&b.slug===approved.slug))throw Error('KNOWLEDGE_EDITOR_PUBLIC_SLUG_CONFLICT')
  if(prior&&job.status!=='PUBLISHED') throw Error('KNOWLEDGE_EDITOR_RESERVED_ID_CONFLICT')
  if(prior&&(prior.slug!==approved.slug||prior.id!==approved.id))throw Error('KNOWLEDGE_EDITOR_PUBLIC_URL_CHANGED')
  const authored=['id','slug','title','summary','meta_description','lead','label','scope','basis','footer','editorial_note','sections','sources','tools','source_checked_at','risk_level','risk_domains','story_refs','related_brief_ids','guide_id']
@@ -77,7 +78,7 @@ export async function prepareEditorialFiles({snapshot,base=root,sourceVerifier=v
  await write('knowledge/content/candidates/'+candidate.id+'.json',candidate)
  await write('knowledge/content/topics.json',data.topics)
  await validateKnowledge(await loadKnowledge(base))
- return {...evaluation,brief_id:brief.id,brief,projected_sha256:digest(brief)}
+ return {...evaluation,brief_id:brief.id,candidate_id:candidate.id,brief,projected_sha256:digest(brief)}
 }
 const permitted=(p,id,slug,candidate)=>[
  'knowledge/content/briefs/'+id+'.json','knowledge/content/evidence/'+id+'.json',
@@ -150,8 +151,8 @@ async function main() {
   if(!request.publish_requested){await update('CHECKED',{issues:[],checked_revision:request.revision});return}
   command('node',['archive/scripts/knowledge-human-approved-prepare.mjs','--brief',preparation.brief_id,'--base',current,'--head','HEAD'])
   const brief=JSON.parse(await readFile(join(root,'knowledge/content/briefs/'+preparation.brief_id+'.json'),'utf8'))
-  const candidate=(await loadKnowledge(root)).candidates.find(c=>c.brief_id===brief.id)
-  const changed=git('status','--porcelain').split(/\r?\n/).filter(Boolean).map(s=>s.slice(3))
+  const candidate={id:preparation.candidate_id}
+  const changed=git('ls-files','--modified','--others','--exclude-standard').split(/\r?\n/).filter(Boolean)
   if(!changed.length) {await update('CHECKED',{issues:[],reason:'NO_CHANGES'});return}
   if(changed.some(p=>!permitted(p,brief.id,brief.slug,candidate.id)))throw Error('KNOWLEDGE_EDITOR_SCOPE_VIOLATION')
   const gate=await checkHumanApprovedRelease(await loadKnowledge(root),{changedFiles:changed,briefIds:[brief.id],base:root})
