@@ -1,0 +1,81 @@
+{
+  "claims": [
+    {
+      "claim": "온열공간은 이름만 보고 숙박시설로 간주하지 말고, 실제 운영시간과 숙박 가능 여부, 제공 서비스와 이용 조건을 확인해야 한다.",
+      "context": "Massachusetts Emergency Management Agency는 warming center를 야간 비상대피소가 아니라 주로 낮 동안 지역주민이 모이는 장소로 설명한다. 미주리주 컬럼비아시는 warming/cooling center가 보통 건물의 정상 운영시간에 공용공간을 제공하고, 공식 shelter는 잠자리 제공 여부로 구분된다고 안내한다.",
+      "limitation": "미국 주·지방정부의 운영 예시다. 국내 기관의 명칭과 운영기준은 다를 수 있으므로 실제 이용 때는 관할 지자체와 시설의 최신 공지를 확인해야 한다.",
+      "source_ids": [
+        "MASS-MEMA-WARMING-CENTERS",
+        "COLUMBIA-MO-WARMING-SHELTERS"
+      ]
+    },
+    {
+      "claim": "숙박 가능한 단기 대피소는 단순히 따뜻한 실내를 여는 것보다 수용인원, 접근성, 숙박·급식·급수·위생과 운영 인력을 함께 계획해야 한다.",
+      "context": "FEMA의 2025년 Short-Term Shelter 자원 유형은 단기 대피소를 재난 이재민에게 안전하고 접근 가능한 단기 주거를 제공하는 시설로 정의하고, 기숙 공간, 급식, 급수, 기본 의료지원, 위생, 접근·기능상 지원과 시설 수용능력 계획을 포함한다.",
+      "limitation": "FEMA의 미국 재난대응 자원 유형 기준이다. 이 글은 시설 설계치나 개설 승인을 제시하지 않으며, 구체 요건은 관할 법령과 담당기관의 판단에 따른다.",
+      "source_ids": [
+        "FEMA-RTLT-SHORT-TERM-SHELTER-2025"
+      ]
+    },
+    {
+      "claim": "이용 안내에는 최소한 개방·종료 시각, 숙박 가능 여부, 제공 서비스, 수용 또는 확인 상태, 종료 뒤 이동·연결 방법을 서로 다른 항목으로 적어야 한다.",
+      "context": "Massachusetts와 컬럼비아의 안내는 warming center와 overnight shelter를 시간·숙박·서비스 범위로 구분하며, FEMA는 단기 대피소가 수용능력과 여러 생활지원 기능을 별도로 계획하도록 한다. 이를 소규모 공동체의 공지·접수 기록 순서로 재구성했다.",
+      "limitation": "다섯 항목은 여러 공식 자료의 차이를 독자가 확인하기 쉽게 만든 편집 체크리스트이며, 특정 기관의 공식 표준 양식이나 법적 의무 목록이 아니다.",
+      "source_ids": [
+        "MASS-MEMA-WARMING-CENTERS",
+        "COLUMBIA-MO-WARMING-SHELTERS",
+        "FEMA-RTLT-SHORT-TERM-SHELTER-2025"
+      ]
+    },
+    {
+      "claim": "지금 잠시 머물 수 있다는 안내와 오늘 밤 숙박이 확정됐다는 안내는 같은 상태로 기록해서는 안 된다.",
+      "context": "공식 지방정부 안내에서 일반 warming center는 정상 운영시간의 공용공간 이용으로, emergency shelter는 sleeping accommodation 제공으로 구분된다. 따라서 문의·현장 대기·낮 이용·숙박 확정을 분리해 알리는 것이 서비스 범위를 오인하지 않게 하는 합리적 운영 적용이다.",
+      "limitation": "상태 명칭과 기록 절차는 편집적 적용이다. 실제 예약·입소 결정권, 우선순위와 개인정보 처리는 해당 시설 운영기관의 규칙을 따른다.",
+      "source_ids": [
+        "COLUMBIA-MO-WARMING-SHELTERS",
+        "FEMA-RTLT-SHORT-TERM-SHELTER-2025"
+      ]
+    }
+  ],
+  "source": {
+    "ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-51eb9401a8c6f4d252cb2696a09c06b7ef7f7c02b7a587b40a9529be9a29c04d",
+    "kind": "PUBLIC_READER",
+    "refs": [
+      "worldlines/AFTERFALL/seasons/S04/raw_transcript/SESSION_003/PART_001.md"
+    ],
+    "hashes": [
+      "4fe9d8792477dbf8c1adc146c21547141f06d81a0597d2b3f8018d609be8c0a3"
+    ],
+    "sha256": "e838b93c84ba42439ce83be950e584b31eca6000c22b1dc1f1520947f5a1a6af"
+  },
+  "brief_id": "K-048",
+  "question": "한파 때 온열공간과 숙박 대피소는 어떻게 구분할까",
+  "unknowns": [],
+  "conflicts": [],
+  "risk_notes": [
+    "이 글은 온열공간과 숙박 대피소의 서비스 범위와 안내 기록을 구분하는 일반 운영 원칙만 다룬다.",
+    "건물의 구조·소방·전기·급수·환기·수용인원 적합성이나 시설 개설 허가는 관할 기관과 자격 있는 전문가가 판단해야 한다.",
+    "한파 노출 뒤 의식 저하, 심한 혼란, 호흡 이상 등 긴급 증상이 의심되면 온열공간 접수로 대신하지 말고 지역 응급체계의 지시를 따라야 한다. 이 글은 의료 판단이나 처치법을 제공하지 않는다.",
+    "시설명과 서비스 범위는 지역마다 다르므로 오래된 목록이나 소문이 아니라 운영기관의 최신 공지와 직접 확인을 우선한다.",
+    "이용자 이름·건강상태·연락처·이동경로는 필요한 범위에서만 기록하고 접근권한을 제한해야 할 수 있다."
+  ],
+  "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-51eb9401a8c6f4d252cb2696a09c06b7ef7f7c02b7a587b40a9529be9a29c04d",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S04/raw_transcript/SESSION_003/PART_001.md"
+  ],
+  "candidate_id": "KC-c03-afterfall-auto-51eb9401a8c6f4d252c-c01567745c",
+  "source_hashes": [
+    "4fe9d8792477dbf8c1adc146c21547141f06d81a0597d2b3f8018d609be8c0a3"
+  ],
+  "source_sha256": "e838b93c84ba42439ce83be950e584b31eca6000c22b1dc1f1520947f5a1a6af",
+  "policy_version": "knowledge-c3-policy-v1",
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "copyright_status": "CLEAR",
+  "narrative_context": "공개 Reader의 허구·서사(narrative)에서 따뜻한 복지관으로 여러 사람이 모이지만, 낮 동안 잠시 머무는 것과 야간 숙박 확정이 서로 다른 결정으로 다뤄지는 장면이 질문의 출발점이다. 작품은 현실 온열공간이나 대피소 운영의 근거로 사용하지 않았다.",
+  "reader_chapter_id": "c03-afterfall-auto-51eb9401a8c6f4d252cb2696a09c06b7ef7f7c02b7a587b40a9529be9a29c04d",
+  "reader_book_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0",
+  "story_source_status": "VERIFIED_PUBLIC_READER_BACKFILL",
+  "narrative_limitation": "작품 속 복지관의 수용인원, 난방·급수 상태, 숙박 자리, 이용자 구성과 담당자의 판단은 허구·서사(narrative) 설정이다. 현실 시설의 안전성, 법적 적합성, 실제 수용능력이나 운영 효과를 입증하지 않는다.",
+  "reader_chapter_sha256": "e838b93c84ba42439ce83be950e584b31eca6000c22b1dc1f1520947f5a1a6af"
+}
