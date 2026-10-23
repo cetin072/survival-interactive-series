@@ -70,6 +70,7 @@ export const knowledgeBucketFor = (item: KnowledgeItem): Exclude<KnowledgeFilter
   if (item.editor_request?.status === 'PUBLISHED') return 'PUBLISHED'
   if (item.editor_request && ['QUEUED','CHECKING','WAITING_CI','PUBLISHING'].includes(item.editor_request.status)) return 'APPROVED'
   if (item.editor_request && ['FAILED','RETRYABLE','CHECKED'].includes(item.editor_request.status)) return 'REVIEW'
+  if(item.status==='PUBLISHED'&&(item.draft_revision??0)>0&&(!item.public_record||(item.draft_revision??0)>item.public_record.revision))return 'REVIEW'
   if (item.status === 'PUBLISHED') return item.published_on_site===false?'APPROVED':'PUBLISHED'
   if (item.editor_archived === false && ['HOLD','BLOCKED'].includes(item.status)) return 'REVIEW'
   if (item.status === 'HUMAN_REVIEW') {

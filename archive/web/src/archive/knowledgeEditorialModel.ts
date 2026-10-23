@@ -14,6 +14,7 @@ export function editorialStatus(value:EditorialEnvelope):string {
  if(publicationActive(r))return '검사 중'
  if(r && ['FAILED','RETRYABLE'].includes(r.status))return '수정 필요'
  if(value.archived)return '보관함'
+ if(value.status==='PUBLISHED'&&value.revision>0&&(!value.public_record||value.revision>value.public_record.revision))return '검토할 글'
  return value.status==='PUBLISHED'?(value.public_verified?'게시됨':value.revision>1?'검토할 글':'공개 확인 대기'):'검토할 글'
 }
 export function editorialError(code?:string):string {
@@ -23,6 +24,7 @@ export function editorialError(code?:string):string {
  if(/RELEASE_GATE|VALIDATION|EDITORIAL_CONTRACT/.test(code))return '본문·근거 검사에 통과하지 못했습니다. 빠진 항목과 적용 범위를 확인하고 다시 검사하세요.'
  if(/CI|PREVIEW/.test(code))return '게시 전 사이트 검사가 완료되지 않았습니다. 수정본은 보존했습니다. 다시 시도하면 같은 승인 내용으로 재검사합니다.'
  if(/MAIN_MOVED/.test(code))return '사이트의 다른 변경이 먼저 반영됐습니다. 다시 시도하면 최신 사이트 기준으로 검사합니다.'
+ if(/OTHER_CONTENT_PENDING/.test(code))return '다른 글까지 함께 공개되지 않도록 게시를 멈췄습니다. 대기 중인 변경의 검수·배포가 끝난 뒤 다시 시도하세요. 현재 수정본과 기존 공개본은 유지됩니다.'
  if(/RESERVED_ID|CANDIDATE_COLLISION/.test(code))return '과거 원고의 번호가 다른 글에 사용됐습니다. 기존 글을 덮어쓰지 않도록 새 원고 식별자를 준비해야 합니다.'
  if(/ACTIVE/.test(code))return '이 수정본을 처리 중입니다. 진행 결과를 확인한 뒤 다시 편집할 수 있습니다.'
  if(/CANCEL_TOO_LATE/.test(code))return '이미 게시 준비 단계로 넘어갔습니다. 기존 요청을 삭제하지 않고 처리 결과를 확인해야 합니다.'

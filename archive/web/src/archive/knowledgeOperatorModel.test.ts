@@ -17,6 +17,10 @@ describe('Knowledge operator review queue', () => {
     expect(knowledgeBucketFor({ ...item('APPROVED'), status: 'PUBLISHED' })).toBe('PUBLISHED')
   })
 
+  it('keeps a new stored legacy copy in review while its old article stays live',()=>{
+    expect(knowledgeBucketFor({...item(),status:'PUBLISHED',draft_revision:2,published_on_site:true})).toBe('REVIEW')
+  })
+
   it('keeps hold and rejection in the archive', () => {
     expect(knowledgeBucketFor(item('HOLD'))).toBe('HELD')
     expect(knowledgeBucketFor(item('REJECTED'))).toBe('HELD')

@@ -46,7 +46,7 @@ Confirmed fixes:
 
 Local verification (not authenticated Production mutation):
 
-- Web: 282 tests; content/static: 71; semantic/evidence: 86; existing release/consumer: 18.
+- Web: 284 tests; content/static: 71; semantic/evidence: 86; existing release/consumer: 18.
 - TypeScript, verified reader build and public-boundary build passed (53 probes).
 - PostgreSQL 17: the existing isolated Knowledge lifecycle workflow and expanded editor SQL contract passed. Includes denied viewer access, exact revision/CAS, locked machine QA, immutable snapshots/history, lease fencing, body-free restore, ID/slug collision, distinct-document queue intents, cancellation and retry boundaries. Production migration remains unapplied.
 - Private browser: 320/390/1280; save-before-publish, double click, restoration, empty ideas, exact/moved/ambiguous quotes, dirty navigation, conflicts and denied access. Original reader/navigation and read-only operator regressions also passed locally.
@@ -66,3 +66,5 @@ Repeated editorial publication now pins the latest verified public request in th
 The safety-specifics check also applies to edits of historically LOW-risk articles; their old classification cannot exempt newly added voltage/dosage/distance instructions.
 
 Empty-idea creation consumes the restore RPC response, including both the assigned ID and slug. The synthetic browser test saves a body-free restored idea under a different server-assigned identity rather than reusing its pre-restore state.
+
+A stored legacy working copy is never labelled approved/published merely because its source job or old public page is PUBLISHED. Without a matching verified editor publication record it remains in review. Unrelated-pending-content release blocks have a plain Korean explanation; the release gate itself is unchanged.
