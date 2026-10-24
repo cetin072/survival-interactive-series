@@ -1,0 +1,41 @@
+{
+  "id": "KC-c03-afterfall-auto-7d0d83f2f1a88ec4412-7c59d83b78",
+  "source": {
+    "ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-7d0d83f2f1a88ec441243b93268b74a98936abfc5c2e09df227c7a8b99ced8d5",
+    "kind": "PUBLIC_READER",
+    "refs": [
+      "worldlines/AFTERFALL/seasons/S04/raw_transcript/SESSION_004/PART_001.md"
+    ],
+    "hashes": [
+      "2987265ba53c54bd7b7aa50ce673365e399fbac95b33ec6c2eb00526366c6443"
+    ],
+    "sha256": "e2fcd5f5aa11c350aa5b6d428b6759fa0ff9e3f155bd50617e194d5835874cbc"
+  },
+  "status": "BRIEF_PROPOSED",
+  "brief_id": "K-049",
+  "question": "건물에 사람이 남았다는 신고를 받으면 무엇부터 확인할까",
+  "topic_id": "community-information-sharing",
+  "risk_level": "HIGH",
+  "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-7d0d83f2f1a88ec441243b93268b74a98936abfc5c2e09df227c7a8b99ced8d5",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S04/raw_transcript/SESSION_004/PART_001.md"
+  ],
+  "risk_domains": [
+    "RESCUE",
+    "COMBUSTION_CO",
+    "SHELTER_STRUCTURAL",
+    "OTHER_SEVERE_HARM"
+  ],
+  "source_hashes": [
+    "2987265ba53c54bd7b7aa50ce673365e399fbac95b33ec6c2eb00526366c6443"
+  ],
+  "source_sha256": "e2fcd5f5aa11c350aa5b6d428b6759fa0ff9e3f155bd50617e194d5835874cbc",
+  "policy_version": "knowledge-c3-policy-v1",
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "disposition_note": "원문의 온열공간과 숙박 구분은 기존 K-048과 의미가 겹치므로 제외했다. 이 후보는 유해 공기나 건물 손상이 의심되는 현장에서 누군가 남았다는 불확실한 신고를 받았을 때, 비전문가가 진입하지 않고 신고자·인원명단·마지막 목격·연락 시도 정보를 확인해 전문 구조기관에 인계하는 절차에 초점을 둔다. 구조 진입, 공기 측정, 응급처치와 건물 안전 판정은 다루지 않는다.",
+  "reader_chapter_id": "c03-afterfall-auto-7d0d83f2f1a88ec441243b93268b74a98936abfc5c2e09df227c7a8b99ced8d5",
+  "publication_policy": "HUMAN_APPROVED",
+  "reader_book_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0",
+  "reader_chapter_sha256": "e2fcd5f5aa11c350aa5b6d428b6759fa0ff9e3f155bd50617e194d5835874cbc"
+}

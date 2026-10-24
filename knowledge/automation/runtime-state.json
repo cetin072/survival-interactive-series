@@ -1,9 +1,9 @@
 {
   "version": 1,
   "backfill": {
-    "last_attempted_at": "2026-10-23T15:05:20.960Z",
-    "last_work_key": "PUBLIC_READER:archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-51eb9401a8c6f4d252cb2696a09c06b7ef7f7c02b7a587b40a9529be9a29c04d:e838b93c84ba42439ce83be950e584b31eca6000c22b1dc1f1520947f5a1a6af",
-    "last_result": "PR_CREATED",
+    "last_attempted_at": "2026-10-24T03:05:34.334Z",
+    "last_work_key": "PUBLIC_READER:archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-7d0d83f2f1a88ec441243b93268b74a98936abfc5c2e09df227c7a8b99ced8d5:e2fcd5f5aa11c350aa5b6d428b6759fa0ff9e3f155bd50617e194d5835874cbc",
+    "last_result": "HUMAN_REVIEW",
     "reviewed_items": [
       {
         "work_key": "PUBLIC_READER:c03-afterfall-prelude-07:150e28ec1809490010bf960d1ff2c9caaf5edfc88cc26b18cb3bbdac995ba6bc",
@@ -89,6 +89,11 @@
         "work_key": "PUBLIC_READER:archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-51eb9401a8c6f4d252cb2696a09c06b7ef7f7c02b7a587b40a9529be9a29c04d:e838b93c84ba42439ce83be950e584b31eca6000c22b1dc1f1520947f5a1a6af",
         "status": "PR_CREATED",
         "processed_at": "2026-10-23T15:05:20.960Z"
+      },
+      {
+        "work_key": "PUBLIC_READER:archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-7d0d83f2f1a88ec441243b93268b74a98936abfc5c2e09df227c7a8b99ced8d5:e2fcd5f5aa11c350aa5b6d428b6759fa0ff9e3f155bd50617e194d5835874cbc",
+        "status": "HUMAN_REVIEW",
+        "processed_at": "2026-10-24T03:05:34.334Z"
       }
     ]
   }
