@@ -21,6 +21,19 @@ describe('Knowledge operator review queue', () => {
     expect(knowledgeBucketFor({...item(),status:'PUBLISHED',draft_revision:2,published_on_site:true})).toBe('REVIEW')
   })
 
+  it.each(['QUEUED', 'CHECKING'])('does not call a check-only %s request publication', status => {
+    const request = {request_id:'r', revision:2, status, publish_requested:false, updated_at:''}
+    const current = {...item('APPROVED'), draft_revision:2, editor_request:request}
+    expect(knowledgeBucketFor(current)).toBe('REVIEW')
+    expect(knowledgeBucketFor({...current, editor_request:{...request, publish_requested:true}})).toBe('APPROVED')
+  })
+
+  it('does not revive historical approval after cancelling the current request', () => {
+    expect(knowledgeBucketFor({...item('APPROVED'), draft_revision:2,
+      editor_request:{request_id:'r', revision:2, status:'CANCELLED', publish_requested:true, updated_at:''},
+    })).toBe('REVIEW')
+  })
+
   it('keeps hold and rejection in the archive', () => {
     expect(knowledgeBucketFor(item('HOLD'))).toBe('HELD')
     expect(knowledgeBucketFor(item('REJECTED'))).toBe('HELD')

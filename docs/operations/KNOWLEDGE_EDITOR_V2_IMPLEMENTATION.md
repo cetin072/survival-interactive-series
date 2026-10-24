@@ -68,3 +68,64 @@ The safety-specifics check also applies to edits of historically LOW-risk articl
 Empty-idea creation consumes the restore RPC response, including both the assigned ID and slug. The synthetic browser test saves a body-free restored idea under a different server-assigned identity rather than reusing its pre-restore state.
 
 A stored legacy working copy is never labelled approved/published merely because its source job or old public page is PUBLISHED. Without a matching verified editor publication record it remains in review. Unrelated-pending-content release blocks have a plain Korean explanation; the release gate itself is unchanged.
+
+## 2026-10-24 cloud follow-up — PARTIAL, not rollout approval
+
+Resumed the existing PR #626 branch at `0f5a141c5a004bafb2c885c42fb6255bf22ea0a0`.
+Remote main was `94fa9a90a741ec5815265d35dc46955a24a7d975`; it was not merged or changed.
+The root AGENTS.md matches that main checkout. There is no repository `.agents/skills`
+directory at this head and `/workspace/.agents` is empty. The original Windows-only
+requirements file and logged-in session are not mounted here.
+
+A concrete approval-display regression was corrected: QUEUED/CHECKING requests with
+`publish_requested=false` remain in review, and cancelling a current request cannot
+revive the original job's historical APPROVED label. Three regression cases cover
+these transitions, including the contrasting explicit publish request.
+
+Fresh local evidence (source tree containing this fix):
+- Web: 287/287; content/static: 71/71; semantic/evidence: 86/86.
+- Editorial evaluator plus existing release/consumer: 32/32 (14 + 18).
+- Verified build and public boundary: PASS, 53 probes.
+- Private browser clicks: PASS at 320/390/1280px with system Chromium; save before
+  publish, duplicate clicks, restoration, empty draft, denied access, quote anchors,
+  dirty navigation and conflict input preservation. All Auth/RPC was intercepted.
+- PostgreSQL 17: the Knowledge job from `archive-exporter-migration.yml`, including
+  `knowledge_editor_workflow.sql`, passed in a new container with `--network none`.
+  Repository mounted read-only; fake net.http_post and synthetic profiles are the
+  existing CI fixtures. This is a DB contract test, not a real Auth/API login.
+- First semantic run lacked the exact historical Reader source. Fetching the
+  existing `worldline/afterfall-rpg` ref made all 86 pass; no source was invented.
+- Initial npm cache permissions were resolved with a `/tmp` cache. No lockfile or
+  package version changed. Initial browser build had no synthetic Auth settings;
+  the existing CI build settings were then used. Downloading Playwright Chromium
+  returned HTTP 403; `/usr/bin/chromium` is the available fallback.
+
+### Remaining implementation — not a Windows-only manual check
+
+K-002/003/007/008/009/010 still cannot enter the versioned editor. Inspection
+confirms editor state, versions, requests and drafts reference semantic jobs, and
+get/save/request plus the worker read semantic source/policy pins. K-002/003 have
+no Candidate at all; K-007/008/009/010 have existing Candidates. All six have an
+Evidence file. Do not fabricate semantic results, Candidates or prior approvals.
+A complete connection needs an explicit immutable legacy source identity (exact
+Git commit, brief and Evidence hashes, original ID/slug), reuse of the versioned
+editor with that identity, and a worker path that revalidates new edits without
+claiming old publication exceptions as new provenance. This implementation is
+still pending; the UI fix above does not complete it.
+
+### Remaining actual-session checks
+
+After the missing connection is implemented and an isolated V2 environment is
+available, use the authorized existing operator session to save a private test
+copy, reload it, compare revision/hash, verify original/public copy unchanged,
+check-only without publication, deny viewer access, and cancel/retry an exact
+revision. Record actual environment and account role, not credentials. Cloud
+mock Auth and SQL claims are not substitutes for that integration check.
+
+The specified Windows session/spec remains unavailable here. Production migration,
+actual manuscript publication, main merge and Production deployment are explicitly
+outside this task's authorization and were not attempted. A later real publication
+check requires separate authorization for the exact revision and destination, and
+must verify served deployment SHA plus body/metadata/list/sitemap while retaining
+the unrelated-pending-content release gate. No claim of whole-task completion or
+current-head remote CI success follows from the previous head's green checks.
