@@ -16,14 +16,18 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
   const [filter, setFilter] = useState<KnowledgeFilter>('REVIEW')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [available, setAvailable] = useState(false)
 
   const refresh = useCallback(async () => {
     if (!supabaseClient) return
     setBusy(true); setError('')
-    const { data, error: rpcError } = await supabaseClient.rpc('archive_operator_knowledge_inbox')
-    if (rpcError) setError('Knowledge Inbox를 불러오지 못했습니다.')
-    else setInbox((data ?? emptyKnowledgeInbox) as KnowledgeInbox)
-    setBusy(false)
+    try {
+      const { data, error: rpcError } = await supabaseClient.rpc('archive_operator_knowledge_inbox').abortSignal(AbortSignal.timeout(15000))
+      if (rpcError || !data || !Array.isArray(data.items)) throw new Error('unavailable')
+      setAvailable(true); setInbox(data as KnowledgeInbox)
+    } catch {
+      setAvailable(false); setError('Knowledge Inbox를 불러오지 못했습니다.'); setInbox(emptyKnowledgeInbox)
+    } finally { setBusy(false) }
   }, [])
 
   useEffect(() => { void refresh() }, [refresh])
@@ -53,12 +57,12 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
     {error && <p className="operator-error" role="alert">{error}</p>}
 
     <div className="operator-counts">
-      <article><span>C3 작업 글감</span><strong>{inbox.total_count}</strong></article>
-      <article><span>작업 중</span><strong>{inbox.working_count}</strong></article>
-      <article><span>사람 검토</span><strong>{pendingReviewCount}</strong></article>
-      <article><span>휴먼체크 완료 · 공개 확인 대기</span><strong>{approvedReviewCount}</strong></article>
-      <article><span>보관</span><strong>{inbox.held_count}</strong></article>
-      <article><span>공개 게시됨</span><strong>{inbox.published_count}</strong></article>
+      <article><span>C3 작업 글감</span><strong>{available ? inbox.total_count : '조회 불가'}</strong></article>
+      <article><span>작업 중</span><strong>{available ? inbox.working_count : '조회 불가'}</strong></article>
+      <article><span>사람 검토</span><strong>{available ? pendingReviewCount : '조회 불가'}</strong></article>
+      <article><span>휴먼체크 완료 · 공개 확인 대기</span><strong>{available ? approvedReviewCount : '조회 불가'}</strong></article>
+      <article><span>보관</span><strong>{available ? inbox.held_count : '조회 불가'}</strong></article>
+      <article><span>저장소 반영 · 공개 확인 별도</span><strong>{available ? inbox.published_count : '조회 불가'}</strong></article>
     </div>
 
     <section className="operator-system">
@@ -77,9 +81,9 @@ export function OperatorKnowledgeInbox({ email, busy: parentBusy, onSignOut }: {
     </section>
 
     <section className="operator-panel knowledge-inbox-list-page">
-      <header><h2>글감 목록</h2><strong>{visibleItems.length}건</strong></header>
+      <header><h2>글감 목록</h2><strong>{available ? `${visibleItems.length}건` : '조회 불가'}</strong></header>
       {busy && <p className="operator-muted" aria-live="polite">불러오는 중…</p>}
-      {!visibleItems.length && <p className="operator-empty">해당 상태의 글감이 없습니다.</p>}
+      {available && !busy && !visibleItems.length && <p className="operator-empty">해당 상태의 글감이 없습니다.</p>}
       <ul className="operator-inbox">
         {visibleItems.map((item) => <li key={item.job_id}>
           <a href={`/operator/knowledge/${item.job_id}/`} aria-label={`${item.title ?? item.brief_id ?? 'Knowledge 글감'} 상세 열기`}>

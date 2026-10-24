@@ -221,7 +221,7 @@ export function OperatorKnowledgeDetail({
         <span>{selected.risk_level ?? '위험도 미정'}</span>
       </div>
 
-      {selected.status === 'PUBLISHED' && <p className="knowledge-review-complete-hint" role="status">발행 완료 · 공개 홈페이지에서 확인됐습니다.</p>}
+      {selected.status === 'PUBLISHED' && <p className="knowledge-review-complete-hint" role="status">저장소 반영 완료 · 실제 공개 사이트 배포는 별도로 확인해야 합니다.</p>}
       {selected.review_status === 'APPROVED' && selected.status !== 'PUBLISHED' && <p className="knowledge-review-complete-hint" role="status">
         사람 검토 승인은 저장되었습니다. 원문·근거 검증과 GitHub 병합을 통과하면 정규 배포 날짜를 기다리지 않고 즉시 공개 배포를 확인합니다. 검증에 실패하면 원고는 공개되지 않습니다.
       </p>}

@@ -18,8 +18,21 @@ A repository-owned scheduled consumer checks at most one approved item per run. 
 If main or the reviewed PR identity has moved, the approval fails closed instead of publishing stale content. Netlify Production remains controlled by the existing batched release gate.
 
 Operator Auth/RPC connects only to the exact configured Supabase project origin.
-The Operator-only public deployment observations additionally allow the two exact
+The Operator-only public deployment/workflow observations additionally allow the two exact
 provider origins documented below. No wildcard network origins are permitted.
+
+## Automation observations
+
+Visible dashboard DB reads refresh every minute and expire after two minutes.
+A-Core and B additionally read their fixed public GitHub workflow endpoints after
+the capability check, at most every five minutes automatically; manual refresh
+is available. Dispatch is distinct from processing, and old B image success does
+not override a newer Prepare failure. Workflow observations expire after five
+minutes and failed reads remain unknown. A-Wiki shows continuous-review errors
+and approval queues separately. C PUBLISHED means repository completion, with
+actual public deployment checked separately. See
+[`OPERATOR_RUNTIME_AUDIT_FIX_20261024.md`](../../docs/operations/OPERATOR_RUNTIME_AUDIT_FIX_20261024.md)
+for evidence, recovery boundaries and synthetic browser coverage.
 
 ## 주요 사이트 · 48시간 배포 현황
 
@@ -73,7 +86,7 @@ provider token or credential forwarding. The Operator-only CSP allows exactly
 Supabase origin. Public reader CSP rules are unchanged. Requests omit credentials,
 have an 8-second timeout each, and return independent site results as they finish.
 Only required fields are retained in memory. Each site has a two-minute cache;
-refreshes do not extend its original timestamp. There is no automatic API polling,
+refreshes do not extend its original timestamp. These site cards have no automatic API polling,
 localStorage persistence or stale-on-error success fallback. A local clock updates
 the countdown and changes expired observations to `상태 조회 불가`. Signing out
 clears observations; late responses cannot refill the signed-out screen.
