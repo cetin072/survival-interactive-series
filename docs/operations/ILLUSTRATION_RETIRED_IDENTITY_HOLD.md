@@ -14,8 +14,11 @@ are preserved. Resuming preparation or advancing to another image requires a
 separately reviewed decision; deleting the failed row cannot clear this hold.
 
 Before the separately authorized deletion, verify the current matching row counts,
-foreign keys, no active lease, and no older in-flight Prepare execution. Checkout
-uses current main, so newly queued runs encounter the hold. Delete only the exact
+foreign keys, no active lease, and no older non-completed Prepare execution,
+including queued/waiting/requested/pending runs. Checkout alone does not update
+the workflow YAML: a pre-merge run could still clean the vault before its new CLI
+stops. Drain every pre-merge run before deletion; do not assume queued means safe.
+Runs created after the merge use the workflow hold before cleanup. Delete only the exact
 confirmed failed row in a conditional transaction after locking and checking its
 dependent rows. Do not delete Library originals or previous rejected attempts.
 An unexpected count, state, connection or outcome must stop the operation.
