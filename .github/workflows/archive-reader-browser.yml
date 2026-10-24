@@ -34,7 +34,9 @@ concurrency:
 
 jobs:
   browser:
-    runs-on: ubuntu-latest
+    # Playwright 1.55's pinned browser dependencies support Ubuntu 24.04.
+    # Do not follow ubuntu-latest into an unsupported host release.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
