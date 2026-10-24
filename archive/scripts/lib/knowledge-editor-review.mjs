@@ -37,10 +37,10 @@ const official = url => {
   try {const u=new URL(url); return u.protocol==='https:' && !u.username && !u.password && (u.hostname.endsWith('.gov')||u.hostname.endsWith('.go.kr')||u.hostname.endsWith('.gov.kr')||u.hostname==='who.int'||u.hostname.endsWith('.who.int'))}catch{return false}
 }
 export function evaluateEditorialSnapshot(snapshot, { sourceVerified = false, rightsVerified = false } = {}) {
-  const {brief,review={},job}=snapshot, original=job?.semantic_result??{}, ev=original.evidence??{}
+  const {brief,review={},job,legacy_source:legacy}=snapshot, original=legacy?{brief:JSON.parse(legacy.brief_text),evidence:JSON.parse(legacy.evidence_text)}:job?.semantic_result??{}, ev=original.evidence??{}
   const issues=[], add=(key,message,action='본문과 근거를 수정하고 다시 검사하세요.')=>issues.push({key,message,action})
-  if (!plain(brief) || !job?.job_id) return {status:'NEEDS_CHANGES',issues:[{key:'draft',message:'원고가 없습니다.',action:'초안을 작성하세요.'}]}
-  if(job.result_decision==='HOLD'&&(!text(review.duplicate_note)||review.duplicate_note.length<40))add('duplicate','기존 글과 다른 질문과 추가할 내용을 구체적으로 기록하세요.','관련 기존 글을 확인하거나 계속 보관하세요.')
+  if (!plain(brief) || !(job?.job_id||legacy&&snapshot.document_id)) return {status:'NEEDS_CHANGES',issues:[{key:'draft',message:'원고가 없습니다.',action:'초안을 작성하세요.'}]}
+  if(job?.result_decision==='HOLD'&&(!text(review.duplicate_note)||review.duplicate_note.length<40))add('duplicate','기존 글과 다른 질문과 추가할 내용을 구체적으로 기록하세요.','관련 기존 글을 확인하거나 계속 보관하세요.')
   const body=manuscriptText(brief), originalBody=manuscriptText(original.brief??{})
   for(const f of ['title','summary','meta_description','lead','scope','basis','footer','editorial_note']) if(!text(brief[f])) add(f,({title:'제목',summary:'요약',meta_description:'검색 설명',lead:'도입',scope:'적용 범위',basis:'근거 설명',footer:'주의문',editorial_note:'편집 메모'})[f]+'을 입력하세요.')
   if (!Array.isArray(brief.sections)||!brief.sections.length||brief.sections.some(s=>!text(s.heading)||!s.blocks?.length)) add('sections','제목과 본문이 있는 문단이 필요합니다.')
@@ -92,17 +92,17 @@ export function evaluateEditorialSnapshot(snapshot, { sourceVerified = false, ri
   if(claims.length&&claims.every(c=>narrative.includes(c)))add('claims','현실 안내를 뒷받침하는 공식 근거가 필요합니다.')
   // Rights/source enums are NOT changed by an operator checkbox. Historical
   // nonstandard values remain blockers until verifiable source/rights evidence.
-  if(!rightsVerified && (ev.copyright_status!=='CLEAR' || JSON.stringify(brief.sources)!==JSON.stringify(original.brief?.sources))) add('rights','출처의 재사용 권한을 검증해야 합니다.','이용조건의 원문 주소와 허용 범위를 보강하세요. 원본 판정은 유지됩니다.')
+  if(!rightsVerified && (legacy || ev.copyright_status!=='CLEAR' || JSON.stringify(brief.sources)!==JSON.stringify(original.brief?.sources))) add('rights','출처의 재사용 권한을 검증해야 합니다.','이용조건의 원문 주소와 허용 범위를 보강하세요. 원본 판정은 유지됩니다.')
   if(!sourceVerified && !['VERIFIED_PUBLIC_READER_BACKFILL','VERIFIED_PUBLIC_ARCHIVE','USER_REPORTED_EXPERIENCE'].includes(ev.story_source_status)) add('provenance','원본 연결을 다시 검증해야 합니다.','출처 진단 후 다시 시도하세요. 서사를 현실 근거로 바꾸지 않습니다.')
-  const evidence={brief_id:brief.id,question:brief.title,claims:structuredClone(claims.filter(c=>!narrative.includes(c))),
+  const evidence={...(legacy?{legacy_origin:Object.fromEntries(['kind','commit_sha','brief_id','slug','brief_sha256','evidence_sha256'].map(k=>[k,legacy[k]]))}:{}),brief_id:brief.id,question:brief.title,claims:structuredClone(claims.filter(c=>!narrative.includes(c))),
     unknowns:(ev.unknowns??[]).filter(v=>!resolved.includes(issueKey('unknowns',v))),
     conflicts:(ev.conflicts??[]).filter(v=>!resolved.includes(issueKey('conflicts',v))),
     risk_notes:Array.isArray(ev.risk_notes)?ev.risk_notes:text(ev.risk_notes)?[ev.risk_notes]:[],
     copyright_status:rightsVerified?'CLEAR':ev.copyright_status,
-    story_source_status:sourceVerified?({PUBLIC_READER:'VERIFIED_PUBLIC_READER_BACKFILL',PUBLIC_ARCHIVE:'VERIFIED_PUBLIC_ARCHIVE',USER_REPORTED_EXPERIENCE:'USER_REPORTED_EXPERIENCE'})[job.source_kind]:ev.story_source_status,
+    story_source_status:legacy?'LEGACY_PUBLIC_SNAPSHOT':sourceVerified?({PUBLIC_READER:'VERIFIED_PUBLIC_READER_BACKFILL',PUBLIC_ARCHIVE:'VERIFIED_PUBLIC_ARCHIVE',USER_REPORTED_EXPERIENCE:'USER_REPORTED_EXPERIENCE'})[job.source_kind]:ev.story_source_status,
     ...(ev.experience_provenance?{experience_provenance:structuredClone(ev.experience_provenance)}:{}),
     // Human notes and removed text stay in the private DB, never in public Git.
-    editorial_review:{version:1,original_result_sha256:job.semantic_result_sha256,resolved,
+    editorial_review:{version:1,...(legacy?{legacy_source_sha256:legacy.brief_sha256}:{original_result_sha256:job.semantic_result_sha256}),resolved,
       decision_sha256:hash(review.resolutions??[]),narrative_count:narrative.length}}
   return {status:issues.length?'NEEDS_CHANGES':'STRUCTURE_CHECKED',issues,evidence}
 }

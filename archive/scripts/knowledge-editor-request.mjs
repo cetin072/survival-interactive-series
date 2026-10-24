@@ -4,6 +4,7 @@ import {execFileSync} from 'node:child_process'
 import {readFile,writeFile} from 'node:fs/promises'
 import {join,resolve} from 'node:path'
 import {pathToFileURL} from 'node:url'
+import {verifyLegacySnapshot} from './lib/knowledge-legacy-source.mjs'
 import {createHash} from 'node:crypto'
 import {loadKnowledge,validateKnowledge} from './lib/knowledge-content.mjs'
 import {postSupabaseRpc} from './lib/knowledge-semantic-jobs.mjs'
@@ -26,7 +27,18 @@ export function publicBaselineSha(snapshot) {
   if(!/^[a-f0-9]{40}$/.test(baseline.merge_sha??'')||baseline.brief_id!==snapshot.brief.id||baseline.slug!==snapshot.brief.slug)throw Error('KNOWLEDGE_EDITOR_PUBLIC_BASELINE_INVALID')
   return baseline.merge_sha
  }
- return snapshot.job.status==='PUBLISHED'?snapshot.job.merge_sha:null
+ return snapshot.legacy_source?.commit_sha??(snapshot.job.status==='PUBLISHED'?snapshot.job.merge_sha:null)
+}
+export async function verifyEditorialPublicBaseline(snapshot,base=root) {
+ const baseline=publicBaselineSha(snapshot)
+ if(!baseline)return
+ if(!/^[a-f0-9]{40}$/.test(baseline)||!/^K-[0-9]+$/.test(snapshot.brief.id))throw Error('KNOWLEDGE_EDITOR_PUBLIC_BASELINE_INVALID')
+ for(const kind of ['briefs','evidence']) {
+  const path='knowledge/content/'+kind+'/'+snapshot.brief.id+'.json'
+  const actual=await readFile(join(base,path),'utf8')
+  const previous=command('git',['show',baseline+':'+path],base)
+  if(actual.trim()!==previous.trim())throw Error('KNOWLEDGE_EDITOR_PUBLIC_VERSION_CONFLICT')
+ }
 }
 export function candidateFromSnapshot(snapshot, brief) {
  const j=snapshot.job,s=j.semantic_context.source
@@ -37,11 +49,13 @@ export function candidateFromSnapshot(snapshot, brief) {
  return c
 }
 export async function prepareEditorialFiles({snapshot,base=root,sourceVerifier=verifyPins,rightsVerifier=verifyEditorialRights}) {
- const {job,brief:approved,review}=snapshot
+ const {job,brief:approved,review,legacy_source:legacy}=snapshot
+ const original=legacy?{brief:JSON.parse(legacy.brief_text),evidence:JSON.parse(legacy.evidence_text)}:job.semantic_result
  // Pin verifier never consults the editable copy for source/policy authority.
- await sourceVerifier(job,base)
- const sameSources=JSON.stringify(approved.sources)===JSON.stringify(job.semantic_result?.brief?.sources)
- const rightsVerified=(sameSources&&job.semantic_result?.evidence?.copyright_status==='CLEAR')||await rightsVerifier(approved,review,{trustedSources:job.semantic_result?.evidence?.copyright_status==='CLEAR'?job.semantic_result.brief?.sources??[]:[]})
+ if(legacy)verifyLegacySnapshot(snapshot,base)
+ else await sourceVerifier(job,base)
+ const sameSources=JSON.stringify(approved.sources)===JSON.stringify(original?.brief?.sources)
+ const rightsVerified=(!legacy&&sameSources&&original?.evidence?.copyright_status==='CLEAR')||await rightsVerifier(approved,review,{trustedSources:!legacy&&original?.evidence?.copyright_status==='CLEAR'?original.brief?.sources??[]:[]})
  const evaluation=evaluateEditorialSnapshot(snapshot,{sourceVerified:true,rightsVerified})
  if(evaluation.issues.length) return evaluation
  const data=await loadKnowledge(base)
@@ -56,7 +70,7 @@ export async function prepareEditorialFiles({snapshot,base=root,sourceVerifier=v
   // A server-side structural/content/evidence check creates this projection.
   // The saved manuscript's original QA marker is never overwritten.
   semantic_qa_status:'PASS',published_at:prior?.published_at??null,updated_at:today}
- if(job.semantic_context?.editorial_contract?.version==='V2') {
+ if(job?.semantic_context?.editorial_contract?.version==='V2') {
   const heading=job.source_kind==='USER_REPORTED_EXPERIENCE'?'이 질문이 생긴 실제 경험':'《생존일기》에서 시작한 질문'
   if(brief.sections.at(-1)?.heading!==heading||brief.lead.trim().split(/[.!?]/)[0].length<20) throw Error('KNOWLEDGE_EDITOR_EDITORIAL_CONTRACT')
  }
@@ -64,33 +78,33 @@ export async function prepareEditorialFiles({snapshot,base=root,sourceVerifier=v
  // private job metadata must not leak through the public browser data bundle.
  const publicFields=new Set(['id','slug','topic_id','content_type','title','summary','meta_description','lead','label','scope','basis','footer','editorial_note','sections','sources','risk_level','risk_domains','publication_policy','semantic_qa_status','status','source_checked_at','updated_at','published_at','ai_assisted','story_refs','related_brief_ids','tools','guide_id'])
  for(const key of Object.keys(brief))if(!publicFields.has(key))delete brief[key]
- const candidate=candidateFromSnapshot(snapshot,brief)
- candidate.question=brief.title
- if(data.candidates.some(c=>c.id===candidate.id&&c.brief_id!==brief.id))candidate.id='KC-editorial-'+job.job_id
+ const candidate=legacy?null:candidateFromSnapshot(snapshot,brief)
+ if(candidate)candidate.question=brief.title
+ if(candidate&&data.candidates.some(c=>c.id===candidate.id&&c.brief_id!==brief.id))candidate.id='KC-editorial-'+job.job_id
  // No guessed Story registry IDs. Narrative provenance remains in pinned Candidate.
  const validStories=new Set(data.stories.map(s=>s.id))
  const invalid=brief.story_refs.filter(id=>!validStories.has(id))
- const provenance=new Set([job.source_ref,job.semantic_context.source.reader_book_ref,...job.semantic_context.source.refs])
+ const provenance=new Set(legacy?[]:[job.source_ref,job.semantic_context.source.reader_book_ref,...job.semantic_context.source.refs])
  if(invalid.some(id=>!provenance.has(id)))throw Error('KNOWLEDGE_EDITOR_STORY_REFERENCE_INVALID')
  brief.story_refs=brief.story_refs.filter(id=>validStories.has(id))
  if(invalid.length)evaluation.evidence.editorial_review.projected_provenance_refs=invalid
  const topic=data.topics.find(t=>t.id===brief.topic_id)
  if(!topic) {
-  const proposed=job.semantic_result?.topic
+  const proposed=job?.semantic_result?.topic
   if(proposed?.id!==brief.topic_id) throw Error('KNOWLEDGE_EDITOR_TOPIC_REQUIRED')
   data.topics.push({...proposed,brief_ids:[brief.id],guide_id:null,tools:[],story_refs:[]})
  } else if(!topic.brief_ids.includes(brief.id)) topic.brief_ids.push(brief.id)
  const write=async(path,value)=>writeFile(join(base,path),JSON.stringify(value,null,2)+'\n')
  await write('knowledge/content/briefs/'+brief.id+'.json',brief)
  await write('knowledge/content/evidence/'+brief.id+'.json',evaluation.evidence)
- await write('knowledge/content/candidates/'+candidate.id+'.json',candidate)
+ if(candidate)await write('knowledge/content/candidates/'+candidate.id+'.json',candidate)
  await write('knowledge/content/topics.json',data.topics)
  await validateKnowledge(await loadKnowledge(base))
- return {...evaluation,brief_id:brief.id,candidate_id:candidate.id,brief,projected_sha256:digest(brief)}
+ return {...evaluation,brief_id:brief.id,candidate_id:candidate?.id??null,brief,projected_sha256:digest(brief)}
 }
 const permitted=(p,id,slug,candidate)=>[
  'knowledge/content/briefs/'+id+'.json','knowledge/content/evidence/'+id+'.json',
- 'knowledge/content/candidates/'+candidate+'.json','knowledge/content/topics.json',
+ ...(candidate?['knowledge/content/candidates/'+candidate+'.json']:[]),'knowledge/content/topics.json',
  'archive/web/public/knowledge/'+slug+'/index.html','archive/web/public/knowledge/index.html','archive/web/public/sitemap.xml'
 ].includes(p)
 export async function waitExactChecks({head,pr,read=(path)=>JSON.parse(gh('api',path)),sleep=pause,maxAttempts=80}) {
@@ -134,12 +148,7 @@ async function main() {
   const snapshot=request.snapshot, job=snapshot.job
   // Editing an existing public article may replace only its last known public
   // version. Another author's update cannot be overwritten by an older draft.
-  const baselineSha=publicBaselineSha(snapshot)
-  if(baselineSha) {
-   const actual=await readFile(join(root,'knowledge/content/briefs/'+snapshot.brief.id+'.json'),'utf8')
-   const previous=git('show',baselineSha+':knowledge/content/briefs/'+snapshot.brief.id+'.json')
-   if(actual.trim()!==previous.trim())throw Error('KNOWLEDGE_EDITOR_PUBLIC_VERSION_CONFLICT')
-  }
+  await verifyEditorialPublicBaseline(snapshot)
   const preparation=await prepareEditorialFiles({snapshot})
   if(preparation.issues?.length){await update('FAILED',{issues:preparation.issues});return}
   if(preparation.status==='ALREADY_LIVE') {

@@ -129,3 +129,92 @@ check requires separate authorization for the exact revision and destination, an
 must verify served deployment SHA plus body/metadata/list/sitemap while retaining
 the unrelated-pending-content release gate. No claim of whole-task completion or
 current-head remote CI success follows from the previous head's green checks.
+
+## 2026-10-24 continued implementation — supersedes the incomplete connection above
+
+The six legacy connections are now implemented, without manufacturing semantic
+jobs, Candidates, old approvals or published request receipts. A common editor
+identity references either an existing semantic job or a separate immutable
+`LEGACY_PUBLIC` source. Legacy drafts have their own working-copy table; versions,
+requests, leases, cancellation, audit events and the existing UI remain shared.
+The legacy source pins the exact Git commit and original brief/Evidence bytes.
+The operator sees “기존 공개 원본”, not “AI 원본”. Its original ID and public URL
+cannot change on save or restore. Importing does not save or approve a draft.
+
+The V2 migration already in this unmerged PR was extended rather than applying
+DDL remotely. A read-only production check on 2026-10-24 confirmed version
+`20261022163829` is absent and both editor state/documents tables are absent.
+No production migration or registration was performed.
+
+`knowledge-editor-import-legacy.mjs --commit <SHA>` emits a read-only manifest for
+K-002/003/007/008/009/010. The explicit `--apply` mode requires the server credential,
+checks that SHA is the served Production commit and verifies all six public pages
+before registering anything. Registration is idempotent for the exact snapshot;
+a changed snapshot is rejected, never overwritten. This mode has NOT been run
+against Production. It is a later authorized rollout step, not a browser action.
+
+Worker verification independently rereads source bytes from Git, checks ancestry,
+identity and original hashes, then runs the existing current-manuscript evaluator.
+It writes no Candidate for legacy edits and leaves existing Candidates unchanged.
+New Evidence calls this `LEGACY_PUBLIC_SNAPSHOT`, not verified narrative provenance.
+Old CLEAR/publication exceptions do not waive new rights checks; explicit rights
+inputs are visible. Human release requires the pinned legacy origin, official
+claim support, no unresolved conflicts/unknowns, current QA and human publication
+policy. Automatic eligibility was not expanded. New saves still require a distinct
+exact-revision publish request. Brief AND Evidence drift reject stale replacement.
+K-008's unsupported existing claim remains a validation blocker, not a fabricated
+PASS; operator editing is available even while publication remains blocked.
+
+### Reproducible isolated checks
+
+- Existing Knowledge DB CI plus `knowledge_editor_legacy.sql`: all six public Git
+  snapshots are imported only into the isolated DB, then save/reload/CAS, locked
+  identity, archive/restore, check-only denial of publication, cancellation/lease,
+  explicit publish intent, subsequent revision baseline, viewer denial, immutable
+  originals and unchanged semantic-job/review counts are checked and rolled back.
+- Worker regression uses a temporary local clone, tests all six source identities,
+  altered hashes, fabricated semantic origin, unchanged Candidates, rights and
+  unsafe-content blockers, Evidence-only drift and the human release gate.
+- Real Auth integration: `bash archive/scripts/check-knowledge-editor-auth-local.sh
+  /tmp/knowledge-real-auth-final` creates a disposable Docker internal network,
+  PostgreSQL 17, GoTrue 2.177.0 and PostgREST 12.2.3, builds the local app, and uses
+  real password login/JWT/RPC through a loopback proxy. No Auth or RPC responses
+  are mocked. Temporary editor/viewer accounts exist only in that private DB.
+  Browser traffic outside loopback is denied, and `net.http_post` is the existing
+  CI stub; no request can publish to GitHub/Production. The script deletes only
+  its own containers/network afterward. Requires Docker, Node dependencies,
+  Python Playwright and local Chromium; no production credentials.
+- Local test initialization defects were corrected: GoTrue's fixture default role
+  is explicitly authenticated, and PostgreSQL readiness waits for TCP rather than
+  the temporary initialization socket. These are fixture settings, not changes to
+  production authentication or permissions.
+
+### Boundary after code verification
+
+Windows is not intrinsically required to verify these editor functions: the local
+real-auth integration exercises the same browser/Auth/API/SQL chain safely. It does
+not inspect or reuse the user's Windows session or original Windows-only spec.
+What remains outside this task is rollout: authorized migration/registration,
+main merge and deployment, then an actual existing-account smoke check on that
+approved environment. Actual manuscript publication still needs explicit approval
+of the exact revision, with live deployment SHA/body/metadata/index/sitemap proof.
+Do not ask the user to debug the six legacy connections or call synthetic/local
+request cancellation an actual public publication.
+
+Actual API regression found and fixed during the local-auth run: V2 revision
+conflicts raised SQLSTATE 40001, which PostgREST treats as a transient transaction
+failure and retries. They now raise PT409, preserving the same conflict message
+and returning HTTP 409 promptly. Both SQL contracts and the real-auth test require
+this response (under five seconds). This follows Supabase's documented warning:
+https://supabase.com/docs/guides/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions-77326b
+
+Final local results for the continued implementation: web 287/287, content 71/71,
+semantic/evidence/legacy worker 89/89; editorial+legacy+release/consumer targeted
+suite 35/35. Verified builds retain 53 public-boundary probes. Both the existing
+isolated DB contracts and six-import DB contract passed. The reusable real-auth
+script passed for all six articles at 320/390/1280px, including save/reload,
+original preservation, check-only vs publish intent, cancellation, denied viewer
+read/write, HTTP 409 in under five seconds and concurrent save/request exclusion.
+No real manuscript was published. Detailed local reports are under
+`/tmp/knowledge-real-auth-final/`; source-controlled regression scripts reproduce
+these checks. Remote final-head CI/Preview results belong in the PR, separately.

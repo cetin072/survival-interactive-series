@@ -138,7 +138,7 @@ begin
   begin
    perform public.archive_operator_knowledge_editor_save(v_job_id,1,v_draft,v_review_copy);
    raise exception 'stale save unexpectedly accepted';
-  exception when serialization_failure then null; end;
+  exception when sqlstate 'PT409' then null; end;
   begin
    perform public.archive_operator_knowledge_editor_save(v_job_id,2,jsonb_set(v_draft,'{semantic_qa_status}','"PASS"'),v_review_copy);
    raise exception 'client unexpectedly asserted machine PASS';
