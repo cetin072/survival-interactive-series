@@ -78,11 +78,11 @@ test('archive alias fails closed for missing manifest, false public-safe metadat
   }
 })
 
-test('real Finalizer verifyPins accepts the S03 Reader source only via a byte-verified public archive', async () => {
-  const readerBookRef = 'archive/content/stories/C03-AFTERFALL/BOOK.json'
+for (const chronicle of ['C03-AFTERFALL', 'C02-STRONGHOLD']) test(`real Prepare/Finalizer verifyPins accepts ${chronicle} via byte-verified archive`, async () => {
+  const readerBookRef = `archive/content/stories/${chronicle}/BOOK.json`
   const book = JSON.parse(await readFile(join(root, readerBookRef), 'utf8'))
   const chapter = book.chapters.find((item) => item.sourceKind === 'VERIFIED_GM_NARRATIVE'
-    && item.sourceRefs?.includes(raw('002')))
+    && (chronicle === 'C02-STRONGHOLD' ? item.id === 'c02-stronghold-chapter-01' : item.sourceRefs?.includes(raw('002'))))
   assert.ok(chapter, 'expected source-pinned public Reader chapter for SESSION_002')
   const chapterSha256 = chapterHash(chapter)
   const [policyBytes, configBytes, editorialBytes] = await Promise.all([
@@ -119,7 +119,7 @@ test('real Finalizer verifyPins accepts the S03 Reader source only via a byte-ve
   }
   const verified = await verifyPins(job, root)
   assert.equal(verified.context.source.sha256, chapterSha256)
-  assert.equal(chapter.sourceHashes[chapter.sourceRefs.indexOf(raw('002'))], cases[1][1])
+  if (chronicle === 'C03-AFTERFALL') assert.equal(chapter.sourceHashes[chapter.sourceRefs.indexOf(raw('002'))], cases[1][1])
 })
 
 test('S04 K-046 archive is byte-identical, with season and manifest pins enforced', async () => {
@@ -142,4 +142,33 @@ test('main then worldline originals take precedence; S02 still uses worldline wi
   assert.equal(branchReads,0)
   assert.equal(await readPinnedSourceBytes({base:root,ref,expectedHash:sha(original),read:async () => {throw Object.assign(Error('missing'),{code:'ENOENT'})},readWorldline:async () => original}), original)
   await assert.rejects(readPinnedSourceBytes({base:root,ref,expectedHash:sha(original),read:async () => {throw Object.assign(Error('missing'),{code:'ENOENT'})},readWorldline:async () => {throw Error('missing')}}), /SEMANTIC_SOURCE_UNAVAILABLE/)
+})
+
+const c02Session = 'SESSION_2031_02_TO_2031_03_ROOM_20260925'
+const c02Prefix = `worldlines/STRONGHOLD/raw_transcript/${c02Session}`
+const c02Dir = `archive/content/transcripts/C02-STRONGHOLD/SESSIONS/${c02Session}`
+const c02Hashes = ['ea0989372e72622554440965fd3f130ac5c0257b41fc9260c22a1e4c12417f10', 'fcab069d26a3e991f53f2d3a329f5f1fa627be8bc310ede5d5056c5e9b19124b']
+for (const [index, expectedHash] of c02Hashes.entries()) test(`C02 part ${index + 1} resolves without another worldline branch`, async () => {
+  const ref = `${c02Prefix}/PART_00${index + 1}.md`
+  const bytes = await readPinnedSourceBytes({base:root,ref,expectedHash,readWorldline:() => assert.fail('C02 must not read AFTERFALL')})
+  assert.equal(sha(bytes),expectedHash)
+  const manifest = JSON.parse(await readFile(join(root,c02Dir,'MANIFEST.json')))
+  assert.equal(manifest.completeness,'PARTIAL')
+  assert.ok(manifest.missing_ranges.length)
+})
+
+test('C02 fails closed for unapproved paths, pin mismatch, changed provenance and corrupt/missing bytes', async () => {
+  const ref = `${c02Prefix}/PART_001.md`
+  const expectedHash = c02Hashes[0]
+  for (const invalid of [ref.replace('PART_001','PART_003'), ref.replace(c02Session,'SESSION_OTHER'), ref.replace('STRONGHOLD','OTHER'), `${c02Prefix}/../PART_001.md`]) {
+    await assert.rejects(readPinnedSourceBytes({base:root,ref:invalid,expectedHash}), {code:'ENOENT'})
+  }
+  await assert.rejects(readPinnedSourceBytes({base:root,ref,expectedHash:c02Hashes[1]}), /SEMANTIC_ARCHIVE_PROVENANCE_INVALID/)
+  const manifest = JSON.parse(await readFile(join(root,c02Dir,'MANIFEST.json')))
+  for (const change of [{completeness:'COMPLETE'}, {worldline_id:'AFTERFALL'}, {parts:[]}, {missing_ranges:[]}]) {
+    await assert.rejects(readPinnedSourceBytes({base:root,ref,expectedHash,read:async (path) => path.endsWith('MANIFEST.json') ? Buffer.from(JSON.stringify({...manifest,...change})) : readFile(path)}), /SEMANTIC_ARCHIVE_PROVENANCE_INVALID/)
+  }
+  await assert.rejects(readPinnedSourceBytes({base:root,ref,expectedHash,read:async (path) => path.includes('/archive/') && path.endsWith('PART_001.md') ? Buffer.from('corrupt') : readFile(path)}), /SEMANTIC_SOURCE_SHA_CHANGED/)
+  await assert.rejects(readPinnedSourceBytes({base:root,ref,expectedHash,read:async () => {throw Object.assign(Error('missing'), {code:'ENOENT'})}}), /SEMANTIC_SOURCE_UNAVAILABLE/)
+  await assert.rejects(readPinnedSourceBytes({base:root,ref,expectedHash,read:async () => {throw Object.assign(Error('denied'), {code:'EACCES'})}}), {code:'EACCES'})
 })
