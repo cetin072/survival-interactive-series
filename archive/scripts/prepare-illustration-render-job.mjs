@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { compileIllustrationRendererText, ILLUSTRATION_IMAGE_PROMPT_VERSION } from './lib/illustration-image-prompt.mjs'
 import { buildIllustrationReviewContext } from './lib/illustration-review-context.mjs'
 import { readJson, selectIllustrationCandidates } from './lib/illustration-worker.mjs'
+import { assertIllustrationPreparationAllowed, isRetiredIllustrationIdentity } from './lib/illustration-operator-hold.mjs'
 
 const root = resolve(fileURLToPath(new URL('../..', import.meta.url)))
 const visualPath = resolve(root, 'archive/content/visuals/C03-AFTERFALL/VISUALS.json')
@@ -130,6 +131,7 @@ export async function prepareRenderJob({
   }
 
   for (const candidate of plan.candidates) {
+    if (isRetiredIllustrationIdentity(candidate)) throw new Error('ILLUSTRATION_RETIRED_IDENTITY')
     const point = catalog.points.find((item) => item.point_id === candidate.point_id)
     demand(point, 'ILLUSTRATION_PREP_POINT_NOT_FOUND')
     const profile = profileBySubject.get(candidate.subject_id)
@@ -179,6 +181,7 @@ export async function prepareRenderJob({
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   try {
+    assertIllustrationPreparationAllowed()
     const result = await prepareRenderJob()
     const promptOutput = process.env.RENDER_PROMPT_OUTPUT
     if (promptOutput) {
