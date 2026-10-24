@@ -136,7 +136,7 @@ export function BunkerOsDashboardView({
         <div>
           <p className="archive-eyebrow">현재 진행</p>
           <h2>{cycleLabel(dashboard.current_cycle)}</h2>
-          <p className="operator-muted">마지막 기록 {formatOperatorTime(dashboard.latest_at)} · 중요한 장기 판단만 GitHub Bunker OS에 따로 남깁니다.</p>
+          <p className="operator-muted">{dashboard.latest_at && Date.now() - Date.parse(dashboard.latest_at) > 48 * 3600000 ? '오래된 기록 · 실제 진행 여부 재확인 필요. ' : ''}마지막 기록 {formatOperatorTime(dashboard.latest_at)} · 중요한 장기 판단만 GitHub Bunker OS에 따로 남깁니다.</p>
         </div>
         <button className="operator-secondary operator-refresh-button" disabled={busy} onClick={onRefresh}>↻ 새로고침</button>
       </header>
@@ -339,6 +339,7 @@ export function OperatorBunkerOsDashboard({ email, busy: parentBusy, onSignOut }
   }, [page.kind, page.kind === 'detail' ? page.id : null, note])
 
   const shared = { email, busy: parentBusy || busy, error, onRefresh: () => void refresh(), onSignOut }
+  if (error) return <section className="operator-page"><BunkerOsHeader email={email} busy={busy} onSignOut={onSignOut} /><p role="alert" className="operator-error">{error}</p><button onClick={() => void refresh()}>다시 조회</button></section>
   if (page.kind === 'list') return <BunkerOsLogListView {...shared} list={list} filter={page.filter} />
   if (page.kind === 'detail') return <BunkerOsLogDetailView {...shared} log={detail} note={note} onNoteChange={setNote} onMarkReviewed={() => void markReviewed()} />
   if (page.kind === 'sources') return <BunkerOsSourcesView {...shared} data={sources} />

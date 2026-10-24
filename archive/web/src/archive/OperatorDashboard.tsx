@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+import { workflowSignal, type WorkflowObservations } from './operatorWorkflowStatus'
 import { chronicleRegistry } from './chronicleRegistry'
 import { OperatorRoadmap } from './OperatorRoadmap'
 import { OperatorSiteDeployments } from './OperatorSiteDeployments'
@@ -7,6 +9,8 @@ import {
   aWikiPublicationStatus,
   aWikiOperatorGuidance,
   aWikiStatusLabel,
+  aWikiContinuousGuidance,
+  type AWikiContinuousStatus,
   blockerLabel,
   decisionLabel,
   formatOperatorRefreshTime,
@@ -96,7 +100,7 @@ export type SystemStatus = {
     retry_cron: CronStatus | null
   }
   review: { pending_count: number; automation_error_count: number }
-  a_wiki?: { job_count: number; active_count: number; human_review_count?: number; published_count: number; latest_job: AWikiJob | null }
+  a_wiki?: { job_count: number; active_count: number; human_review_count?: number; published_count: number; latest_job: AWikiJob | null; continuous_review?: AWikiContinuousStatus | null }
   knowledge_semantic?: {
     active_count: number
     machine_active_count?: number
@@ -122,6 +126,8 @@ export const emptyInbox: Inbox = { pending_count: 0, automation_error_count: 0, 
 
 export function OperatorDashboard({
   email,
+  workflows,
+  inboxAvailable = true,
   busy,
   refreshing,
   lastRefreshedAt,
@@ -143,6 +149,8 @@ export function OperatorDashboard({
   onSignOut,
 }: {
   email?: string | null
+  workflows?: WorkflowObservations
+  inboxAvailable?: boolean
   busy: boolean
   refreshing: boolean
   lastRefreshedAt: string | null
@@ -163,28 +171,41 @@ export function OperatorDashboard({
   onDecide: (decision: 'APPROVED' | 'HOLD' | 'REJECTED') => void
   onSignOut: () => void
 }) {
+  const [clock, setClock] = useState(Date.now)
+  useEffect(() => { const timer = setInterval(() => setClock(Date.now()), 15000); return () => clearInterval(timer) }, [])
+  const now = Math.max(clock, Date.now())
+  const expired = !!lastRefreshedAt && now - Date.parse(lastRefreshedAt) >= 120000
+  if (expired) { systemStatus = null; inboxAvailable = false; roadmapLogs = null }
+  const archiveExecution = workflowSignal(workflows?.archive, now, 30)
+  const visualExecution = workflowSignal(workflows?.visual, now, 30)
   const archiveCron = systemStatus?.archive.cron ?? null
   const archiveDispatch = systemStatus?.archive.latest_dispatch ?? null
-  const archiveHealthy = archiveCron?.active === true && archiveCron.last_status === 'succeeded'
 
   const aWikiLatest = systemStatus?.a_wiki?.latest_job ?? null
   const aWikiBlocker = aWikiLatest?.blocker_code ?? null
   const aWikiGuidance = aWikiOperatorGuidance(aWikiLatest)
+  const continuous = systemStatus?.a_wiki?.continuous_review
+  const continuousHelp = aWikiContinuousGuidance(continuous)
   const aWikiHumanReview = aWikiLatest?.status === 'HUMAN_REVIEW'
   const aWikiHumanCount = systemStatus?.a_wiki?.human_review_count ?? (aWikiHumanReview ? 1 : 0)
   const aWikiPublication = aWikiPublicationStatus(aWikiLatest, productionStatus)
-  const aWikiBadgeClass = !systemStatus?.a_wiki ? 'neutral'
+  let aWikiBadgeClass = !systemStatus?.a_wiki ? 'neutral'
     : aWikiLatest?.status === 'BLOCKED' ? 'danger'
     : aWikiGuidance.badge ? 'warning'
     : systemStatus.a_wiki.active_count > 0 ? 'running'
     : aWikiLatest?.status === 'PUBLISHED' ? 'ok' : visualStatusTone(aWikiLatest?.status)
   // A published repository merge is a success even when the next regular
   // Production deployment has not yet reflected the content.
-  const aWikiBadge = !systemStatus?.a_wiki ? '상태 조회 필요'
+  let aWikiBadge = !systemStatus?.a_wiki ? '상태 조회 필요'
     : aWikiGuidance.badge ?? (systemStatus.a_wiki.active_count > 0 ? '처리 중'
       : aWikiLatest?.status === 'PUBLISHED' ? '저장소 반영 완료'
       : aWikiLatest?.status ? aWikiStatusLabel(aWikiLatest.status) : '실행 이력 없음')
 
+  if (continuous) {
+    if (continuous.error_count > 0) { aWikiBadgeClass = 'danger'; aWikiBadge = `재검수 오류 ${continuous.error_count}건` }
+    else if (aWikiBadgeClass !== 'danger' && (continuous.human_approval_required_count ?? 0) + continuous.human_review_count > 0) { aWikiBadgeClass = 'warning'; aWikiBadge = '재검수·공개 승인 대기' }
+    else if (aWikiBadgeClass !== 'danger' && continuous.current_status && ['EXTRACTOR_READY','EXTRACTOR_SUBMITTED','REVIEW_READY','REVIEW_SUBMITTED'].includes(continuous.current_status)) { aWikiBadgeClass = 'running'; aWikiBadge = '재검수 처리 중' }
+  }
   const visualLatest = systemStatus?.visual.latest_job ?? null
   const visualPrepHealthy = systemStatus?.visual.prep_cron?.active === true
     && systemStatus?.visual.prep_cron?.last_status === 'succeeded'
@@ -225,7 +246,7 @@ export function OperatorDashboard({
   const knowledgeBadge = knowledgeSignal.badge
   const knowledgeBadgeClass = knowledgeSignal.tone
   const latestProcessing = semanticLatest?.status === 'HOLD' && (semanticLatest.disposition_code ?? semanticLatest.blocker_code) === 'SEMANTIC_DUPLICATE'
-    ? '중복으로 보류' : statusLabel(semanticLatest?.status)
+    ? '중복으로 보류' : semanticLatest?.status === 'PUBLISHED' ? '저장소 반영 완료 · 공개 확인 별도' : statusLabel(semanticLatest?.status)
 
   const productionContext = productionStatus.deploy?.context ?? null
 
@@ -246,13 +267,14 @@ export function OperatorDashboard({
     </header>
 
     {error && <p className="operator-error" role="alert">{error}</p>}
+    {expired && <p role="alert" className="operator-error">조회한 지 2분이 지나 현재 상태를 확인할 수 없습니다. 새로고침하세요.</p>}
     {statusError && <p className="operator-error" role="alert">{statusError}</p>}
 
     <OperatorRoadmap logs={roadmapLogs ?? null} error={roadmapError ?? ""} />
 
     <div className="operator-counts">
-      <article><span>사람이 확인할 항목</span><strong>{inbox.pending_count + aWikiHumanCount}</strong></article>
-      <article><span>자동화 문제</span><strong>{inbox.automation_error_count}</strong></article>
+      <article><span>사람이 확인할 항목</span><strong>{inboxAvailable && systemStatus ? inbox.pending_count + aWikiHumanCount + (continuous?.human_approval_required_count ?? 0) + (continuous?.human_review_count ?? 0) : '조회 불가'}</strong></article>
+      <article><span>검토함 오류 신고</span><strong>{inboxAvailable ? inbox.automation_error_count : '조회 불가'}</strong></article>
       <article><span>보안 알림</span><strong className="operator-unwired">미연결</strong></article>
       <article><span>비용 알림</span><strong className="operator-unwired">미연결</strong></article>
     </div>
@@ -262,7 +284,7 @@ export function OperatorDashboard({
         <div>
           <p className="archive-eyebrow">자동화 운영 현황</p>
           <h2>자동화 상태</h2>
-          <p className="operator-refresh-time" aria-live="polite">마지막 갱신 {formatOperatorRefreshTime(lastRefreshedAt)}</p>
+          <p className="operator-refresh-time" aria-live="polite">마지막 성공 조회 {formatOperatorRefreshTime(lastRefreshedAt)} · 화면이 보이면 1분마다 갱신</p>
         </div>
         <button className={`operator-secondary operator-refresh-button ${refreshing ? 'refreshing' : ''}`} disabled={busy} aria-busy={refreshing} onClick={onRefresh}>
           <span aria-hidden="true">↻</span>{refreshing ? '새로고침 중…' : '상태 새로고침'}
@@ -281,17 +303,19 @@ export function OperatorDashboard({
         <article className="operator-system-card">
           <div className="operator-system-title">
             <h3>A · 기록 보관 <small>게임 기록 자동 저장</small></h3>
-            <span className={`operator-status-badge ${archiveHealthy ? 'ok' : archiveCron ? 'warning' : 'neutral'}`}>
-              {archiveHealthy ? '정상 작동' : archiveCron?.active === false ? '중지됨' : archiveCron ? statusLabel(archiveCron.last_status) : '기록 없음'}
+            <span className={`operator-status-badge ${archiveExecution.tone}`}>
+              {archiveExecution.label}
             </span>
           </div>
           <dl>
             <div><dt>운영 방식</dt><dd>{statusLabel(operatorStaticStatus.archive.mode)}</dd></div>
-            <div><dt>자동 실행</dt><dd>{archiveCron?.active ? '켜짐' : archiveCron ? '꺼짐' : '기록 없음'} · {statusLabel(archiveCron?.last_status)}</dd></div>
-            <div><dt>최근 실행</dt><dd>{formatOperatorTime(archiveCron?.last_end_at ?? archiveCron?.last_start_at)}</dd></div>
+            <div><dt>작업 전달</dt><dd>{archiveCron?.active ? '켜짐' : archiveCron ? '꺼짐' : '기록 없음'} · {statusLabel(archiveCron?.last_status)}</dd></div>
+            <div><dt>최근 전달</dt><dd>{formatOperatorTime(archiveCron?.last_end_at ?? archiveCron?.last_start_at)}</dd></div>
             <div><dt>최근 작업 전달</dt><dd>{formatOperatorTime(archiveDispatch?.requested_at)}</dd></div>
-            <div><dt>누적 작업 전달</dt><dd>{systemStatus?.archive.dispatch_count ?? 0}건</dd></div>
+            <div><dt>누적 작업 전달</dt><dd>{systemStatus ? `${systemStatus.archive.dispatch_count}건` : '조회 불가'}</dd></div>
+            <div><dt>실제 처리 결과</dt><dd>{archiveExecution.label} · {formatOperatorTime(workflows?.archive?.run?.createdAt)}</dd></div>
           </dl>
+          <p className="operator-status-help">전달 성공은 처리 성공이 아닙니다. {workflows?.archive?.run && <a href={workflows.archive.run.url} target="_blank" rel="noreferrer">실행 결과 보기</a>}</p>
           <details className="operator-tech-details">
             <summary>기술 상세</summary>
             <dl>
@@ -308,15 +332,21 @@ export function OperatorDashboard({
             <span className={`operator-status-badge ${aWikiBadgeClass}`}>{aWikiBadge}</span>
           </div>
           <dl>
+            <div><dt>연속검수 연결</dt><dd>{continuousHelp.connection} · 예약 ON/OFF와 별개</dd></div>
+            <div><dt>연속검수 단계</dt><dd>{continuous?.current_status === 'HUMAN_APPROVAL_REQUIRED' ? '사람 공개 승인 대기' : continuous?.current_status ? aWikiStatusLabel(continuous.current_status) : '조회 불가'}</dd></div>
+            <div><dt>사람 공개 승인 / 검토</dt><dd>{continuous ? `${continuous.human_approval_required_count ?? 0}건 / ${continuous.human_review_count}건` : '조회 불가'}</dd></div>
+            <div><dt>연속검수 오류</dt><dd>{continuous ? `${continuous.error_count}건` : '조회 불가'}</dd></div>
+            <div><dt>최근 원문 탐색</dt><dd>{formatOperatorTime(continuous?.last_scan_at)}</dd></div>
+            <div><dt>변경 없음 / 후보</dt><dd>{continuous ? `${continuous.no_change_count}건 / ${continuous.candidate_count}건` : '조회 불가'}</dd></div>
             <div><dt>최근 작업</dt><dd>{aWikiLatest?.season_id ? `${aWikiLatest.season_id} · ` : ''}{sessionLabel(aWikiLatest?.session_id)}</dd></div>
             <div><dt>작업 수</dt><dd>{systemStatus?.a_wiki ? `처리 중 ${systemStatus.a_wiki.active_count}건 · 검수 보류 ${aWikiHumanCount}건 · 저장소 반영 ${systemStatus.a_wiki.published_count}건` : '조회 필요'}</dd></div>
             <div><dt>현 상태</dt><dd>{systemStatus?.a_wiki ? aWikiLatest?.status === 'PUBLISHED' ? '세계관 기록 저장소 반영 완료' : aWikiGuidance.category : '조회 필요'}</dd></div>
             <div><dt>내용 검수</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.review : '조회 필요'}</dd></div>
             <div><dt>저장소 반영</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.repository : '조회 필요'}</dd></div>
             <div><dt>공개 사이트</dt><dd>{systemStatus?.a_wiki ? aWikiPublication.deployment : '조회 필요'}</dd></div>
-            <div><dt>다음 작업</dt><dd>{!systemStatus?.a_wiki ? '조회 필요' : aWikiGuidance.next ?? (systemStatus.a_wiki.active_count > 0 ? '현재 기록 처리 중' : '다음 공개 원문 처리 대기')}</dd></div>
+            <div><dt>다음 작업</dt><dd>{!systemStatus?.a_wiki ? '조회 필요' : continuous ? continuousHelp.next : aWikiGuidance.next ?? (systemStatus.a_wiki.active_count > 0 ? '현재 기록 처리 중' : '다음 공개 원문 처리 대기')}</dd></div>
             <div><dt>최근 갱신</dt><dd>{formatOperatorTime(aWikiLatest?.published_at ?? aWikiLatest?.updated_at ?? aWikiLatest?.created_at)}</dd></div>
-            <div><dt>막힌 이유</dt><dd>{!systemStatus?.a_wiki ? '조회 필요' : aWikiHumanReview ? blockerLabel('REVIEWER_HUMAN_REVIEW') : aWikiBlocker ? blockerLabel(aWikiBlocker) : '없음'}</dd></div>
+            <div><dt>막힌 이유</dt><dd>{!systemStatus?.a_wiki ? '조회 필요' : continuous && continuous.error_count > 0 ? '연속검수 오류 확인 필요' : aWikiHumanReview ? blockerLabel('REVIEWER_HUMAN_REVIEW') : aWikiBlocker ? blockerLabel(aWikiBlocker) : '없음'}</dd></div>
           </dl>
           {aWikiHumanReview && <section className="operator-wiki-review-guidance" aria-label="A-Wiki 독립 검수 결과">
             <strong>검수자가 지적한 내용</strong>
@@ -335,7 +365,7 @@ export function OperatorDashboard({
               <div><dt>반영 코드</dt><dd><code>{aWikiLatest?.merge_sha?.slice(0, 12) ?? '없음'}</code></dd></div>
               <div><dt>배포 원본</dt><dd><code>{shortSha(productionStatus.release?.source_main_sha)}</code></dd></div>
               <div><dt>현재 상태 시간</dt><dd>{aWikiLatest?.age_minutes == null ? '—' : `${aWikiLatest.age_minutes}분`}</dd></div>
-              <div><dt>작업 전달</dt><dd>{aWikiLatest?.dispatch_count ?? 0}회 · {formatOperatorTime(aWikiLatest?.dispatch_at)}</dd></div>
+              <div><dt>작업 전달</dt><dd>{systemStatus?.a_wiki ? `${aWikiLatest?.dispatch_count ?? 0}회` : '조회 불가'} · {formatOperatorTime(aWikiLatest?.dispatch_at)}</dd></div>
               <div><dt>문제 코드</dt><dd><code>{aWikiBlocker ?? '없음'}</code></dd></div>
             </dl>
             <p>다음 작업 대기는 현재 진행 중인 작업이 없다는 뜻입니다. 새 공개 원문 유무는 원문 탐색 결과에서 별도로 확인해야 합니다.</p>
@@ -345,21 +375,22 @@ export function OperatorDashboard({
         <article className="operator-system-card">
           <div className="operator-system-title">
             <h3>B · 일러스트 <small>이미지 자동 제작</small></h3>
-            <span className={`operator-status-badge ${visualBadgeClass}`}>{visualSignal.badge}</span>
+            <span className={`operator-status-badge ${visualExecution.tone === 'ok' ? visualBadgeClass : visualExecution.tone}`}>{visualExecution.tone === 'ok' ? visualSignal.badge : visualExecution.label}</span>
           </div>
           <dl>
-            <div><dt>DB 예약</dt><dd>{visualPrepHealthy ? '준비·재시도 정상' : '준비·재시도 확인 필요'} · ChatGPT 예약 별도</dd></div>
-            <div><dt>현재 판정</dt><dd>{visualSignal.summary}</dd></div>
+            <div><dt>준비 실행 결과</dt><dd>{visualExecution.label} · {formatOperatorTime(workflows?.visual?.run?.createdAt)} {workflows?.visual?.run && <a href={workflows.visual.run.url} target="_blank" rel="noreferrer">실행 기록</a>}</dd></div>
+            <div><dt>DB 작업 전달</dt><dd>{visualPrepHealthy ? '전달 성공 · 처리 결과 별도' : '준비·재시도 확인 필요'} · ChatGPT 예약 별도</dd></div>
+            <div><dt>마지막 생성 작업</dt><dd>{visualSignal.badge} · {visualSignal.summary}</dd></div>
             <div><dt>다음 조치</dt><dd>{visualSignal.next}</dd></div>
-            <div><dt>오늘 시도 / 성공</dt><dd>{systemStatus?.visual.today_job_count ?? 0}건 / {systemStatus?.visual.today_success_count ?? 0}건</dd></div>
-            <div><dt>진행 중</dt><dd>{systemStatus?.visual.active_count ?? 0}건</dd></div>
+            <div><dt>오늘 시도 / 성공</dt><dd>{systemStatus ? `${systemStatus.visual.today_job_count}건 / ${systemStatus.visual.today_success_count}건` : '조회 불가'}</dd></div>
+            <div><dt>진행 중</dt><dd>{systemStatus ? `${systemStatus.visual.active_count}건` : '조회 불가'}</dd></div>
             <div><dt>최근 대상</dt><dd>{visualLatest?.title ?? subjectWithKorean(visualLatest?.subject_id).split(' · ')[0]}</dd></div>
             <div><dt>최근 갱신</dt><dd>{formatOperatorTime(visualLatest?.finalized_at ?? visualLatest?.reviewed_at ?? visualLatest?.updated_at ?? visualLatest?.created_at)}</dd></div>
             <div><dt>이미지 생성 완료</dt><dd>{formatOperatorTime(visualLatest?.provider_completed_at)}</dd></div>
             <div><dt>현재 상태 시간</dt><dd>{visualLatest?.age_minutes == null ? '—' : `${visualLatest.age_minutes}분`}</dd></div>
-            <div><dt>실패 횟수</dt><dd>생성 {visualLatest?.provider_failure_count ?? 0} · 저장 {visualLatest?.ingest_failure_count ?? 0} · 검수 {visualLatest?.review_failure_count ?? 0}</dd></div>
+            <div><dt>실패 횟수</dt><dd>{systemStatus ? `생성 ${visualLatest?.provider_failure_count ?? 0} · 저장 ${visualLatest?.ingest_failure_count ?? 0} · 검수 ${visualLatest?.review_failure_count ?? 0}` : '조회 불가'}</dd></div>
             <div><dt>검수 결과</dt><dd>{visualLatest?.review_decision ? statusLabel(visualLatest.review_decision) : '아직 없음'}</dd></div>
-            <div><dt>현재 장애</dt><dd>{visualBlocker ? blockerLabel(visualBlocker) : '없음'}</dd></div>
+            <div><dt>현재 장애</dt><dd>{visualExecution.tone !== 'ok' ? visualExecution.label : visualBlocker ? blockerLabel(visualBlocker) : '최근 작업 차단 없음 · 실행 성공은 신규 생성 보장 아님'}</dd></div>
           </dl>
           <p className="operator-status-help">이전 이미지의 차단·재시도 이력은 보존되며 최신 작업의 현재 장애로 합산하지 않습니다.</p>
           <details className="operator-tech-details">
@@ -368,7 +399,7 @@ export function OperatorDashboard({
               <div><dt>상태 코드</dt><dd><code>{visualLatest?.status ?? '없음'}</code></dd></div>
               <div><dt>대상 ID</dt><dd><code>{visualLatest?.subject_id ?? '없음'}</code></dd></div>
               <div><dt>이번 시도</dt><dd>{visualLatest?.attempt_no ?? '—'}회</dd></div>
-              <div><dt>누적 작업</dt><dd>{systemStatus?.visual.job_count ?? 0}건</dd></div>
+              <div><dt>누적 작업</dt><dd>{systemStatus ? `${systemStatus.visual.job_count}건` : '조회 불가'}</dd></div>
               <div><dt>문제 코드</dt><dd><code>{visualBlocker ?? '없음'}</code></dd></div>
               <div><dt>문제 단계</dt><dd><code>{visualLatest?.blocker_stage ?? visualLatest?.last_error_stage ?? '없음'}</code></dd></div>
             </dl>
@@ -385,14 +416,15 @@ export function OperatorDashboard({
             <div><dt>다음 조치</dt><dd>{knowledgeSignal.next}</dd></div>
             <div><dt>진행 중</dt><dd>{semantic?.machine_active_count === undefined ? '조회 필요' : `${machineCount}건`}</dd></div>
             <div><dt>최근 처리</dt><dd>{knowledgeLatestBrief} · {latestProcessing}</dd></div>
-            <div><dt>최근 게시</dt><dd>{hasLiveContract ? semantic?.latest_published_job?.brief_id ?? '없음' : '조회 필요'}</dd></div>
+            <div><dt>공개 사이트</dt><dd>저장소 반영과 별도 · 실제 배포 미확인</dd></div>
+            <div><dt>최근 저장소 반영</dt><dd>{hasLiveContract ? semantic?.latest_published_job?.brief_id ?? '없음' : '조회 필요'}</dd></div>
             <div><dt>현재 복구할 오류</dt><dd>{hasLiveContract ? `${knowledgeErrorCount}건` : '조회 필요'}</dd></div>
-            <div><dt>최근 오류</dt><dd>{blockedJob?.brief_id ?? stalledJob?.brief_id ?? '없음'}</dd></div>
+            <div><dt>최근 오류</dt><dd>{hasLiveContract ? blockedJob?.brief_id ?? stalledJob?.brief_id ?? '없음' : '조회 불가'}</dd></div>
             <div><dt>원본</dt><dd>{sourceKindLabel(semanticLatest?.source_kind)}</dd></div>
             <div><dt>작업 시작 / 제출</dt><dd>{formatOperatorTime(semanticLatest?.prepared_at)} / {formatOperatorTime(semanticLatest?.submitted_at)}</dd></div>
             <div><dt>사람 검토 대기</dt><dd>{semantic?.human_review_count === undefined ? '조회 필요' : `${humanCount}건`}</dd></div>
-            <div><dt>게시 상태</dt><dd>{latestProcessing}</dd></div>
-            <div><dt>막힌 이유</dt><dd>{semanticBlocker ? blockerLabel(semanticBlocker) : '없음'}</dd></div>
+            <div><dt>저장소 처리 상태</dt><dd>{latestProcessing}</dd></div>
+            <div><dt>막힌 이유</dt><dd>{!hasLiveContract ? '조회 불가' : semanticBlocker ? blockerLabel(semanticBlocker) : '없음'}</dd></div>
             <div><dt>자동 실행 주기</dt><dd>{operatorStaticStatus.knowledge.triggerIntervalHours}시간 · {timezoneLabel(operatorStaticStatus.knowledge.timezone)}</dd></div>
           </dl>
           <p className="operator-status-help">과거에 해결된 실패 이력과 사람 검토 대기 원고는 ‘현재 복구할 오류’에 포함하지 않습니다. 사람 검토가 쌓여도 새 글의 자동 집필은 별도로 진행됩니다.</p>
@@ -431,9 +463,9 @@ export function OperatorDashboard({
       <section className="operator-panel">
         <header><h2>대기 항목</h2><button className={`operator-secondary operator-refresh-button ${refreshing ? 'refreshing' : ''}`} disabled={busy} aria-busy={refreshing} onClick={onRefresh}><span aria-hidden="true">↻</span>{refreshing ? '새로고침 중…' : '새로고침'}</button></header>
         {busy && <p className="operator-muted" aria-live="polite">처리 중…</p>}
-        {!inbox.items.length && <p className="operator-empty">현재 대기 중인 검토 항목이 없습니다.</p>}
+        {inboxAvailable && !inbox.items.length && <p className="operator-empty">현재 대기 중인 검토 항목이 없습니다.</p>}
         <ul className="operator-inbox">
-          {inbox.items.map((item) => {
+          {(inboxAvailable ? inbox.items : []).map((item) => {
             const editorHref = knowledgeReviewEditorHref(item, knowledgeReviewJobs)
             const description = editorHref
               ? 'AI가 게시 전에 확인을 요청한 글입니다. 전체 원고와 검토 이유를 읽고 수정할 수 있습니다.'

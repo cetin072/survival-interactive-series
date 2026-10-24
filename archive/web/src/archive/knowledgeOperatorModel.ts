@@ -73,7 +73,7 @@ export const knowledgeBucketLabel: Record<Exclude<KnowledgeFilter, 'ALL'>, strin
   REVIEW: '사람 검토',
   APPROVED: '휴먼체크 완료',
   HELD: '보관',
-  PUBLISHED: '게시됨',
+  PUBLISHED: '저장소 반영',
 }
 
 

@@ -1,3 +1,4 @@
+import { readWorkflow, WORKFLOW_FRESH_MS, type WorkflowObservations } from './operatorWorkflowStatus'
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { OperatorVisualMetadata } from './OperatorVisualMetadata'
@@ -25,7 +26,7 @@ import {
 const rpcError = (error: { message: string }) => error.message.replace(/^.*SURVIVAL_ARCHIVE_/, '권한 또는 요청 오류: SURVIVAL_ARCHIVE_')
 const readJson = async <T,>(path: string): Promise<T | null> => {
   try {
-    const response = await fetch(path, { cache: 'no-store' })
+    const response = await fetch(path, { cache: 'no-store', signal: AbortSignal.timeout(8000) })
     return response.ok ? await response.json() as T : null
   } catch {
     return null
@@ -41,6 +42,10 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
   const [resetSent, setResetSent] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [inboxAvailable, setInboxAvailable] = useState(false)
+  const [workflows, setWorkflows] = useState<WorkflowObservations>({})
+  const workflowChecked = useRef(0)
+  const refreshInFlight = useRef(false)
   const [inbox, setInbox] = useState<Inbox>(emptyInbox)
   const [knowledgeReviewJobs, setKnowledgeReviewJobs] = useState<Record<string, string>>({})
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null)
@@ -58,23 +63,26 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
   const [error, setError] = useState('')
   const initialDashboardLoaded = useRef(false)
 
-  const refresh = useCallback(async () => {
-    if (!supabaseClient) return
+  const refresh = useCallback(async (automatic = false) => {
+    if (!supabaseClient || refreshInFlight.current) return
+    refreshInFlight.current = true
     const generation = ++deploymentRefresh.current
-    setSiteDeployments(null)
-    setBusy(true); setRefreshing(true); setError(''); setStatusError(''); setRoadmapError('')
+    if (!automatic) setSiteDeployments(null)
+    setRefreshing(true); setError(''); setStatusError(''); setRoadmapError('')
     try {
       const [inboxResult, systemResult, release, deploy, roadmapResult, knowledgeInboxResult] = await Promise.all([
-        supabaseClient.rpc('archive_operator_review_inbox'),
-        supabaseClient.rpc('archive_operator_system_status'),
+        supabaseClient.rpc('archive_operator_review_inbox').abortSignal(AbortSignal.timeout(15000)),
+        supabaseClient.rpc('archive_operator_system_status').abortSignal(AbortSignal.timeout(15000)),
         readJson<ReleaseMarker>('/release/production.json'),
         readJson<DeployMeta>('/deploy-meta.json'),
         // Existing permission-checked Bunker OS RPC, without new DB or scheduler.
-        supabaseClient.rpc('archive_operator_bunker_os_logs', { p_status: null, p_limit: 100 }),
-        supabaseClient.rpc('archive_operator_knowledge_inbox'),
+        supabaseClient.rpc('archive_operator_bunker_os_logs', { p_status: null, p_limit: 100 }).abortSignal(AbortSignal.timeout(15000)),
+        supabaseClient.rpc('archive_operator_knowledge_inbox').abortSignal(AbortSignal.timeout(15000)),
       ])
-      if (inboxResult.error) setError(rpcError(inboxResult.error))
-      else setInbox((inboxResult.data ?? emptyInbox) as Inbox)
+      if (generation !== deploymentRefresh.current) return
+      setInboxAvailable(!inboxResult.error && !!inboxResult.data)
+      if (inboxResult.error || !inboxResult.data) { setInbox(emptyInbox); setError('검토 목록을 조회하지 못했습니다.'); setSelected(null) }
+      else setInbox(inboxResult.data as Inbox)
       // Reuse the existing authenticated Knowledge Inbox; no new DB RPC or job state.
       // On lookup failure, the dashboard links to the general editor list instead.
       setKnowledgeReviewJobs(knowledgeInboxResult.error ? {} : knowledgeReviewJobMap(knowledgeInboxResult.data as KnowledgeInbox | null))
@@ -92,21 +100,33 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
         setRoadmapLogs(Array.isArray(payload?.logs) ? payload.logs : null)
         if (!Array.isArray(payload?.logs)) setRoadmapError('작업 기록 응답을 확인하지 못했습니다.')
       }
-      setLastRefreshedAt(new Date().toISOString())
+      if (!systemResult.error && systemResult.data) setLastRefreshedAt(new Date().toISOString())
       // The existing server-side capability check is authoritative. Do not
       // request external observations for signed-in users denied by this RPC.
       if (!systemResult.error && systemResult.data && generation === deploymentRefresh.current) {
-        await loadSiteDeployments(fetch, Date.now, (observation) => {
+        const reads: Promise<unknown>[] = []
+        if (!automatic || Date.now() - workflowChecked.current >= WORKFLOW_FRESH_MS) {
+          reads.push(Promise.all([readWorkflow('archive'), readWorkflow('visual')]).then(([archive, visual]) => {
+            if (generation === deploymentRefresh.current) {
+              workflowChecked.current = Date.now()
+              setWorkflows({archive, visual})
+            }
+          }))
+        }
+        if (!automatic) reads.push(loadSiteDeployments(fetch, Date.now, (observation) => {
           if (generation !== deploymentRefresh.current) return
           setSiteDeployments((current) => [...(current ?? []).filter((o) => o.site.siteId !== observation.site.siteId), observation])
-        })
-      }
+        }))
+        await Promise.all(reads)
+      } else { setWorkflows({}); workflowChecked.current = 0; setSiteDeployments(null) }
     } catch {
+      if (generation !== deploymentRefresh.current) return
+      setSystemStatus(null); setInboxAvailable(false); setInbox(emptyInbox); setSelected(null); setWorkflows({}); setRoadmapLogs(null)
       setStatusError('상태를 불러오지 못했습니다. 다시 조회해 주세요.')
       setSiteDeployments(null)
     } finally {
+      refreshInFlight.current = false
       setRefreshing(false)
-      setBusy(false)
     }
   }, [])
 
@@ -135,6 +155,7 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
       setUser(session?.user ?? null)
       if (!session?.user) {
         deploymentRefresh.current++
+        setSystemStatus(null); setLastRefreshedAt(null); setWorkflows({}); workflowChecked.current = 0; setInboxAvailable(false)
         clearSiteDeployments()
         setSiteDeployments(null)
         initialDashboardLoaded.current = false
@@ -154,6 +175,14 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
       void refresh()
     }
   }, [user?.id, refresh, view])
+
+  useEffect(() => {
+    if (!user || view !== 'dashboard') return
+    const refreshVisible = () => { if (document.visibilityState === 'visible') void refresh(true) }
+    const timer = setInterval(refreshVisible, 60_000)
+    document.addEventListener('visibilitychange', refreshVisible)
+    return () => { clearInterval(timer); document.removeEventListener('visibilitychange', refreshVisible); deploymentRefresh.current++ }
+  }, [user?.id, view, refresh])
 
   async function signIn(event: FormEvent) {
     event.preventDefault()
@@ -241,12 +270,14 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
 
   return <OperatorDashboard
     email={user.email}
-    busy={busy}
+    busy={busy || refreshing}
     refreshing={refreshing}
     lastRefreshedAt={lastRefreshedAt}
     error={error}
     statusError={statusError}
     inbox={inbox}
+    inboxAvailable={inboxAvailable}
+    workflows={workflows}
     knowledgeReviewJobs={knowledgeReviewJobs}
     roadmapLogs={roadmapLogs}
     roadmapError={roadmapError}

@@ -45,7 +45,7 @@ export function OperatorIllustrationVault({
     setBusy(true); setError('')
     const { data, error: rpcError } = await client.rpc('archive_operator_illustration_vault', { p_limit: 100 })
     if (rpcError) {
-      setError('보관함을 불러오지 못했습니다.')
+      setError('보관함을 불러오지 못했습니다.'); setItems([]); setUrls({})
       setBusy(false)
       return
     }
@@ -85,7 +85,7 @@ export function OperatorIllustrationVault({
         <div><p className="archive-eyebrow">30-DAY PRIVATE VAULT</p><h2>보관 중인 생성물</h2></div>
         <button className="operator-secondary" disabled={busy} onClick={() => void refresh()}>{busy ? '불러오는 중…' : '새로고침'}</button>
       </header>
-      {!items.length && !busy && <p className="operator-empty">현재 보관 중인 일러스트가 없습니다.</p>}
+      {!error && !items.length && !busy && <p className="operator-empty">현재 보관 중인 일러스트가 없습니다.</p>}
       <div className="operator-visual-list">
         {items.map((item) => <details key={item.job_id}>
           <summary>

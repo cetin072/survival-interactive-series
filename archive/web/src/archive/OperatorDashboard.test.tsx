@@ -217,7 +217,7 @@ describe('C live runtime contract', () => {
       latest_job: { status: 'HOLD', brief_id: 'K-024', blocker_code: 'SEMANTIC_DUPLICATE' },
       latest_published_job: { brief_id: 'K-021', status: 'PUBLISHED' } })
     expect(card).toContain('K-024 · 중복으로 보류')
-    expect(card).toContain('<dt>최근 게시</dt><dd>K-021')
+    expect(card).toContain('<dt>최근 저장소 반영</dt><dd>K-021')
     expect(card).toContain('<dt>막힌 이유</dt><dd>없음')
     expect(card).not.toContain('K-010')
     expect(card).not.toContain('확인 필요')
@@ -313,5 +313,52 @@ describe('C human review uses one editable route', () => {
       knowledgeReviewJobs: jobs,
     })
     expect(markup).toMatch(/<button[^>]*>승인<\/button>/)
+  })
+})
+
+describe('audit regressions: independent execution and current observation', () => {
+  const observation = (conclusion: string) => ({ checkedAt: new Date().toISOString(), error: false,
+    run: { id: 1, status: 'completed', conclusion, createdAt: new Date().toISOString(), url: 'https://github.com/cetin072/survival-interactive-series/actions/runs/1' } })
+  it('latest Prepare failure outranks a successful old B job and successful dispatch', () => {
+    const page = renderDashboard({ workflows: { visual: observation('failure') }, systemStatus: {
+      ...systemStatus, visual: { ...systemStatus.visual, latest_job: { status: 'SUCCEEDED' },
+        prep_cron: { active: true, last_status: 'succeeded' }, retry_cron: { active: true, last_status: 'succeeded' } },
+    } })
+    const card = page.split('B · 일러스트')[1].split('</article>')[0]
+    expect(card).toContain('operator-status-badge danger')
+    expect(card).toContain('최근 실행 실패')
+    expect(card).toContain('마지막 생성 작업')
+    expect(card).not.toContain('준비·재시도 정상')
+    expect(card).not.toContain('<dt>현재 장애</dt><dd>없음')
+  })
+  it('dispatch success alone cannot imply successful A-Core processing', () => {
+    const page = renderDashboard({ systemStatus: { ...systemStatus, archive: { ...systemStatus.archive, cron: {active: true,last_status: 'succeeded'} } } })
+    const card = page.split('A · 기록 보관')[1].split('</article>')[0]
+    expect(card).toContain('실행 결과 조회 불가')
+    expect(card).not.toContain('정상 작동')
+  })
+  it('shows continuous review errors and approvals even when the old native job is published', () => {
+    const card = wikiCard({ systemStatus: { ...systemStatus, a_wiki: { ...systemStatus.a_wiki!, latest_job: {status:'PUBLISHED'},
+      continuous_review: {worker_connected:false,last_scan_at:null,next_status:'EXISTING_JOB',current_chronicle_id:'C01',current_work_type:'SOURCE_REVIEW',current_status:'EXTRACTOR_READY',new_source_count:6,review_count:14,candidate_count:80,published_count:0,duplicate_count:0,no_change_count:3,human_review_count:2,human_approval_required_count:9,error_count:1,last_success_at:null} } } })
+    expect(card).toContain('재검수 오류 1건')
+    expect(card).toContain('9건 / 2건')
+    expect(card).toContain('Worker 연결 미확인')
+    expect(card).not.toContain('예약 OFF')
+    const blocked = wikiCard({ systemStatus: { ...systemStatus, a_wiki: { ...systemStatus.a_wiki!, latest_job: {status:'BLOCKED'}, continuous_review: {worker_connected:false,last_scan_at:null,next_status:'EXISTING_JOB',current_chronicle_id:'C01',current_work_type:'SOURCE_REVIEW',current_status:'EXTRACTOR_READY',new_source_count:1,review_count:1,candidate_count:1,published_count:0,duplicate_count:0,no_change_count:0,human_review_count:1,human_approval_required_count:1,error_count:0,last_success_at:null} } } })
+    expect(blocked).toContain('operator-status-badge danger')
+    expect(blocked).toContain('작업 장애 확인')
+  })
+  it('expired DB snapshots and failed inbox reads never render empty or zero counts as current', () => {
+    const page = renderDashboard({ lastRefreshedAt: new Date(Date.now()-121000).toISOString(), inboxAvailable: false })
+    expect(page).toContain('조회한 지 2분')
+    expect(page).toContain('조회 불가')
+    expect(page).not.toContain('현재 대기 중인 검토 항목이 없습니다')
+    expect(page).not.toContain('7번째 기록 묶음')
+  })
+  it('C published jobs never assert verified public deployment', () => {
+    const card = knowledgeCard({...healthyC,latest_job:{status:'PUBLISHED',brief_id:'K-048'},latest_published_job:{status:'PUBLISHED',brief_id:'K-048'}})
+    expect(card).toContain('저장소 반영 완료 · 공개 확인 별도')
+    expect(card).toContain('실제 배포 미확인')
+    expect(card).not.toContain('게시 완료')
   })
 })
