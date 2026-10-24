@@ -5,11 +5,16 @@ on:
     paths:
       - '.github/workflows/a-wiki-native-handoff.yml'
       - 'archive/scripts/a-wiki-native-control*'
+      - 'archive/scripts/a-wiki-worker-router*'
       - 'archive/scripts/lib/wiki-fact-*'
       - 'archive/scripts/lib/wiki-semantic-jobs*'
       - 'archive/scripts/lib/a-wiki-publication-evidence*'
+      - 'archive/scripts/lib/wiki-continuous-review*'
+      - 'archive/scripts/lib/wiki-review-sources*'
+      - 'archive/scripts/run-wiki-continuous-review*'
       - 'archive/scripts/lib/publication-graph.mjs'
       - 'supabase/migrations/*a_wiki_native_jobs*'
+      - 'supabase/migrations/*a_wiki_continuous*'
       - 'docs/automation/A_WIKI_NATIVE_HANDOFF_V1.md'
   push:
     branches: [main]
@@ -19,6 +24,10 @@ on:
       - 'archive/content/graphs/C03-AFTERFALL/GRAPH.json'
       - '.github/workflows/a-wiki-native-handoff.yml'
       - 'archive/scripts/a-wiki-native-control*'
+      - 'archive/scripts/a-wiki-worker-router*'
+      - 'archive/scripts/lib/wiki-review-sources*'
+      - 'archive/content/stories/**/BOOK.json'
+      - 'archive/content/wiki/**'
       - 'archive/scripts/lib/wiki-fact-*'
       - 'archive/scripts/lib/wiki-semantic-jobs*'
       - 'archive/scripts/lib/a-wiki-publication-evidence*'
@@ -31,12 +40,15 @@ on:
         description: A-Wiki program action
         required: false
         type: choice
-        options: [prepare, consume]
+        options: [prepare, consume, continuous-prepare, continuous-consume, continuous-pilot]
         default: consume
       dispatch_origin:
         description: Dispatch origin
         required: false
         default: manual
+      program_sha:
+        description: Exact reviewed Program commit for the review-only branch pilot
+        required: false
 
 permissions:
   contents: write
@@ -68,7 +80,11 @@ jobs:
             archive/scripts/lib/wiki-fact-extractor.test.mjs \
             archive/scripts/lib/wiki-fact-finalizer.test.mjs \
             archive/scripts/lib/a-wiki-publication-evidence.test.mjs \
+            archive/scripts/lib/wiki-continuous-review.test.mjs \
+            archive/scripts/a-wiki-worker-router.test.mjs \
             archive/scripts/a-wiki-native-control.test.mjs
+      - name: Verify real public multi-world discovery (read only)
+        run: node archive/scripts/run-wiki-continuous-review.mjs --scan
 
   prepare:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.action == 'prepare')
@@ -94,7 +110,7 @@ jobs:
           GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
           ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
           ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
-        run: node archive/scripts/a-wiki-native-control.mjs prepare
+        run: node archive/scripts/a-wiki-worker-router.mjs prepare
 
   consume:
     if: github.event_name == 'workflow_dispatch' && inputs.action == 'consume'
@@ -127,4 +143,42 @@ jobs:
           GH_TOKEN: ${{ secrets.ARCHIVE_GITHUB_TOKEN }}
           ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
           ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
-        run: node archive/scripts/a-wiki-native-control.mjs consume
+        run: node archive/scripts/a-wiki-worker-router.mjs consume
+
+  continuous-program:
+    if: github.event_name == 'workflow_dispatch' && startsWith(inputs.action, 'continuous-') && github.sha == inputs.program_sha
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.program_sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Require exact Program and freshest main source worktree
+        env:
+          EXPECTED_PROGRAM_SHA: ${{ inputs.program_sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_PROGRAM_SHA"
+          test -n "$EXPECTED_PROGRAM_SHA"
+          git fetch origin main
+          git worktree add --detach "$RUNNER_TEMP/a-wiki-public-main" origin/main
+      - name: Run review-only Program (no content publication)
+        env:
+          PROGRAM_ACTION: ${{ inputs.action }}
+          A_WIKI_SOURCE_ROOT: ${{ runner.temp }}/a-wiki-public-main
+          ARCHIVE_SUPABASE_URL: ${{ secrets.ARCHIVE_SUPABASE_URL }}
+          ARCHIVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          test -n "$ARCHIVE_SUPABASE_URL"
+          test -n "$ARCHIVE_SUPABASE_SERVICE_ROLE_KEY"
+          case "$PROGRAM_ACTION" in
+            continuous-prepare) node archive/scripts/a-wiki-worker-router.mjs prepare ;;
+            continuous-pilot) node archive/scripts/a-wiki-worker-router.mjs pilot ;;
+            continuous-consume) node archive/scripts/a-wiki-worker-router.mjs continuous-consume ;;
+            *) exit 1 ;;
+          esac

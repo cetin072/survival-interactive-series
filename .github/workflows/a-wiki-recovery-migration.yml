@@ -6,12 +6,14 @@ on:
       - '.github/workflows/a-wiki-recovery-migration.yml'
       - 'supabase/migrations/*a_wiki*'
       - 'supabase/tests/a_wiki_native_jobs*'
+      - 'supabase/tests/a_wiki_continuous*'
   push:
     branches: [main]
     paths:
       - '.github/workflows/a-wiki-recovery-migration.yml'
       - 'supabase/migrations/*a_wiki*'
       - 'supabase/tests/a_wiki_native_jobs*'
+      - 'supabase/tests/a_wiki_continuous*'
   workflow_dispatch:
 
 permissions:
@@ -56,9 +58,13 @@ jobs:
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261005101808_a_wiki_native_jobs_recovery_v1.sql
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261012050000_a_wiki_label_correction_v1.sql
           psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261013223500_a_wiki_native_review_relation_revision_v1.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261016141219_a_wiki_continuous_runtime_v1.sql
+          psql -v ON_ERROR_STOP=1 --file supabase/migrations/20261016141914_a_wiki_continuous_safeupdate_v1.sql
       - name: Verify publication evidence, supersession, and operator readback
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/a_wiki_native_jobs_recovery_verification.sql
       - name: Verify immutable one-time label correction and existing transition guards
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/a_wiki_native_jobs_label_correction.sql
       - name: Verify immutable human-review relation revision and fresh Reviewer gate
         run: psql -v ON_ERROR_STOP=1 --file supabase/tests/a_wiki_native_jobs_human_review_revision.sql
+      - name: Verify additive continuous review, RLS, independent roles and V1 priority
+        run: psql -v ON_ERROR_STOP=1 --file supabase/tests/a_wiki_continuous_runtime.sql

@@ -40,7 +40,7 @@ const run = (command, args, cwd = root, options = {}) => {
   }
 }
 
-async function rpc(name, args) {
+export async function rpc(name, args) {
   const url = process.env.ARCHIVE_SUPABASE_URL
   const key = process.env.ARCHIVE_SUPABASE_SERVICE_ROLE_KEY
   insist(typeof url === 'string' && /^https:\/\//.test(url), 'A_WIKI_SUPABASE_URL_REQUIRED')
