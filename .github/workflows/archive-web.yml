@@ -53,6 +53,7 @@ jobs:
           node --test ../scripts/lib/illustration-worker.test.mjs
           node --test ../scripts/lib/illustration-review-handoff.test.mjs
           node --test ../scripts/lib/illustration-reservation-handoff.test.mjs ../scripts/prepare-illustration-render-job.test.mjs
+          node --test ../scripts/lib/illustration-operator-hold.test.mjs
       - name: Test original image storage provider boundary
         run: |
           python3 ../scripts/test_original_storage_provider.py

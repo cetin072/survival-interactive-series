@@ -26,6 +26,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Enforce operator hold before cleanup or any state-changing RPC
+        run: node archive/scripts/lib/illustration-operator-hold.mjs
       - name: Install pinned PNG validator
         run: 'python -m pip install --only-binary=:all: Pillow==12.3.0'
       - name: Clean expired 30-day illustration vault objects
