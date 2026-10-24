@@ -1,0 +1,88 @@
+{
+  "claims": [
+    {
+      "claim": "위험한 건물에 사람이 남았을 가능성이 있을 때 비전문가는 직접 진입하기보다 통제선을 유지하고 신고자에게 마지막 확인 위치와 시간을 물어 전문 구조기관에 전달해야 한다.",
+      "context": "미국 소방청의 현장운영지침은 현장 위험을 식별하고 진입을 관리하며, 신고자를 면담해 피해자의 마지막 알려진 위치를 확인한 뒤 위험평가와 비상계획을 갖춘 수색·구조를 시행하도록 한다.",
+      "limitation": "미국 재난대응 현장 지침이며 국내 119의 현장지휘 절차를 대체하지 않는다. 통제선 위치와 실제 구조 방식은 현장 지휘기관이 결정한다.",
+      "source_ids": [
+        "USFA-FIELD-OPERATIONS-GUIDE"
+      ]
+    },
+    {
+      "claim": "발전기가 꺼졌더라도 일산화탄소가 의심되는 실내가 곧바로 안전해졌다고 판단할 수 없으며, 측정과 안전 확인 전에는 접근을 피해야 한다.",
+      "context": "CDC/NIOSH는 일산화탄소를 무색·무취의 유해가스로 설명하고, 증상이 있으면 즉시 밖으로 나가 응급기관에 연락하며 장비가 꺼지고 측정 농도가 기준 아래임이 확인될 때까지 위험구역에서 떨어져 있도록 안내한다.",
+      "limitation": "증상과 측정값의 해석은 응급·산업보건 전문가의 영역이다. 이 글은 농도 기준, 호흡보호구 선택이나 진입 허용치를 제시하지 않는다.",
+      "source_ids": [
+        "CDC-NIOSH-CO-HAZARDS"
+      ]
+    },
+    {
+      "claim": "손상되었거나 안전성이 확인되지 않은 건물은 관할 기관이 안전하다고 할 때까지 들어가지 않아야 한다.",
+      "context": "CDC의 지진 후 안전지침은 손상된 건물에 들어가지 말고, 관할 당국이 안전하다고 할 때까지 기다리라고 안내한다.",
+      "limitation": "지진 후 손상 건물을 전제로 한 일반 지침이다. 화재·가스·붕괴 등 다른 원인의 세부 통제는 현장 소방·구조기관의 지시를 따라야 한다.",
+      "source_ids": [
+        "CDC-DAMAGED-BUILDING-REENTRY"
+      ]
+    },
+    {
+      "claim": "즉시 생명위험 분위기에서의 구조 진입은 훈련·장비·외부 감시와 구조 준비를 갖춘 인력이 수행해야 한다.",
+      "context": "미국 산업안전보건청은 IDLH 환경의 구조 진입 인력이 훈련과 장비를 갖추고, 외부 인력과 통신을 유지하며, 구조 준비가 마련되어야 한다고 설명한다.",
+      "limitation": "미국 작업장 호흡보호·밀폐공간 규정 맥락의 자료다. 민간인이 따라 할 진입 절차가 아니며, 국내 법령이나 119 구조대의 장비·전술 기준을 대신하지 않는다.",
+      "source_ids": [
+        "OSHA-IDLH-RESCUE-ENTRY"
+      ]
+    },
+    {
+      "claim": "인원 확인표에는 이름, 현재 상태, 마지막 목격 시간·장소, 확인자, 연락 시도, 위치 단서와 전문기관 인계 시각을 구분해 적는 것이 유용하다.",
+      "context": "미국 소방청 지침의 인원책임, 신고자 면담, 마지막 알려진 위치 확인과 현장 진입 관리 원칙을 소규모 현장 인계용 기록 순서로 재구성했다.",
+      "limitation": "이 표는 편집 체크리스트이며 공식 119 신고양식이나 법적 신원확인 문서가 아니다. 개인정보는 필요한 범위에서만 수집·공유해야 한다.",
+      "source_ids": [
+        "USFA-FIELD-OPERATIONS-GUIDE"
+      ]
+    }
+  ],
+  "source": {
+    "ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-7d0d83f2f1a88ec441243b93268b74a98936abfc5c2e09df227c7a8b99ced8d5",
+    "kind": "PUBLIC_READER",
+    "refs": [
+      "worldlines/AFTERFALL/seasons/S04/raw_transcript/SESSION_004/PART_001.md"
+    ],
+    "hashes": [
+      "2987265ba53c54bd7b7aa50ce673365e399fbac95b33ec6c2eb00526366c6443"
+    ],
+    "sha256": "e2fcd5f5aa11c350aa5b6d428b6759fa0ff9e3f155bd50617e194d5835874cbc"
+  },
+  "brief_id": "K-049",
+  "question": "건물에 사람이 남았다는 신고를 받으면 무엇부터 확인할까",
+  "unknowns": [
+    "국내 지역별 119 신고·현장지휘 체계가 요구하는 정확한 인계 항목과 용어는 관할 기관 지침에 따라 달라질 수 있다.",
+    "현장 공기에 일산화탄소가 실제로 존재하는지, 건물이 구조적으로 안전한지는 측정 장비와 자격 있는 대응인력의 평가 없이는 확인할 수 없다."
+  ],
+  "conflicts": [],
+  "risk_notes": [
+    "사람이 남았을 가능성은 긴급 구조기관에 즉시 알릴 사안이며, 이 글의 확인표 작성 때문에 신고가 지연되어서는 안 된다.",
+    "비전문가에게 실내 진입, 공기 측정, 호흡보호구 선택, 구조·응급처치 또는 건물 안전 판정을 지시하지 않는다.",
+    "발전기 정지나 창문 개방만으로 일산화탄소 위험이 해소되었다고 간주하지 않는다.",
+    "마지막 목격 위치와 출입정보는 구조기관의 판단 자료일 뿐, 민간인의 진입 경로나 수색계획으로 사용하지 않는다.",
+    "이름·전화번호·동선 등 개인정보는 구조 인계에 필요한 범위로 제한하고 접근 대상을 관리해야 한다."
+  ],
+  "source_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json#c03-afterfall-auto-7d0d83f2f1a88ec441243b93268b74a98936abfc5c2e09df227c7a8b99ced8d5",
+  "source_kind": "PUBLIC_READER",
+  "source_refs": [
+    "worldlines/AFTERFALL/seasons/S04/raw_transcript/SESSION_004/PART_001.md"
+  ],
+  "candidate_id": "KC-c03-afterfall-auto-7d0d83f2f1a88ec4412-7c59d83b78",
+  "source_hashes": [
+    "2987265ba53c54bd7b7aa50ce673365e399fbac95b33ec6c2eb00526366c6443"
+  ],
+  "source_sha256": "e2fcd5f5aa11c350aa5b6d428b6759fa0ff9e3f155bd50617e194d5835874cbc",
+  "policy_version": "knowledge-c3-policy-v1",
+  "reader_book_ref": "archive/content/stories/C03-AFTERFALL/BOOK.json",
+  "copyright_status": "CLEAR",
+  "narrative_context": "공개 Reader의 허구·서사에서 발전기 배기가스가 의심되는 상가 밖으로 세 사람이 나온 뒤, 출입기록상 네 번째 사람이 건물 안에 남았을 가능성이 제기되고 장비 없는 재진입을 막는 장면이 질문의 출발점이다. 작품은 현실 구조 절차의 근거로 사용하지 않았다.",
+  "reader_chapter_id": "c03-afterfall-auto-7d0d83f2f1a88ec441243b93268b74a98936abfc5c2e09df227c7a8b99ced8d5",
+  "reader_book_sha256": "09b23cc2b062f8003d9034700dc8a57d8609a32747f04764fc6d0e9db7b90cd0",
+  "story_source_status": "VERIFIED_PUBLIC_READER_BACKFILL",
+  "narrative_limitation": "작품 속 사고 원인, 환자 수와 상태, 인물의 판단, 장비·인력 가용성은 허구·서사 설정이다. 실제 일산화탄소 존재, 건물 안전성이나 구조 결과를 입증하지 않는다.",
+  "reader_chapter_sha256": "e2fcd5f5aa11c350aa5b6d428b6759fa0ff9e3f155bd50617e194d5835874cbc"
+}
