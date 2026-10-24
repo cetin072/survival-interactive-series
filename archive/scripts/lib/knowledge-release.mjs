@@ -1,3 +1,4 @@
+import {verifyLegacyOrigin} from './knowledge-legacy-source.mjs'
 import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { execFileSync } from 'node:child_process'
@@ -193,13 +194,19 @@ export async function checkHumanApprovedRelease(data, { changedFiles, briefIds, 
     if (pack.conflicts?.length) reasons.push(`EVIDENCE_CONFLICT:${id}`)
     if (pack.unknowns?.length) reasons.push(`MATERIAL_UNKNOWNS:${id}`)
     if (pack.copyright_status !== 'CLEAR') reasons.push(`COPYRIGHT_UNCLEAR:${id}`)
-    if (!['VERIFIED_PUBLIC_READER_BACKFILL', 'VERIFIED_PUBLIC_ARCHIVE', 'USER_REPORTED_EXPERIENCE'].includes(pack.story_source_status)) {
+    if (!['VERIFIED_PUBLIC_READER_BACKFILL', 'VERIFIED_PUBLIC_ARCHIVE', 'USER_REPORTED_EXPERIENCE','LEGACY_PUBLIC_SNAPSHOT'].includes(pack.story_source_status)) {
       reasons.push(`STORY_SOURCE_NOT_VERIFIED:${id}`)
     }
     if (!hasAuthoritativeClaimSupport(brief, pack, data.config.site_origin)) {
       reasons.push(`AUTHORITATIVE_SUPPORT_MISSING:${id}`)
     }
 
+    if(pack.story_source_status==='LEGACY_PUBLIC_SNAPSHOT') {
+      if(brief.publication_policy!=='HUMAN_APPROVED')reasons.push('LEGACY_HUMAN_APPROVAL_REQUIRED:'+id)
+      try { verifyLegacyOrigin(pack.legacy_origin,base,brief) }
+      catch { reasons.push('LEGACY_SOURCE_NOT_VERIFIED:'+id) }
+      continue
+    }
     const candidateResult = candidateFor(brief, data.candidates)
     if (!candidateResult.ok) {
       reasons.push(`${candidateResult.reason}:${id}`)

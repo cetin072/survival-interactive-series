@@ -1,4 +1,4 @@
-import type { KnowledgeDraftBlock, KnowledgeDraftBrief } from './KnowledgeDraftEditor'
+import type { KnowledgeDraftBrief } from './KnowledgeDraftEditor'
 
 export type KnowledgeReviewTarget = {
   key: string
@@ -51,14 +51,6 @@ const FALLBACK = {
   explanation: 'AI의 검토 대기 판정이 있습니다. 이 구간은 우선 확인 후보이며, 오류로 확정된 문장은 아닙니다. 원문과 출처를 대조하세요.',
 }
 
-function textFromBlock(block: KnowledgeDraftBlock): Array<{ text: string; itemIndex?: number }> {
-  if (block.type === 'prose' || block.type === 'note') return [{ text: block.text }]
-  if (block.type === 'ordered_list' || block.type === 'unordered_list') {
-    return block.items.map((text, itemIndex) => ({ text, itemIndex }))
-  }
-  return []
-}
-
 // Existing BRIEF and Evidence remain the source of truth. This function
 // recommends locations, never asserts that a sentence is factually wrong.
 export function selectKnowledgeReviewTargets(
@@ -67,40 +59,12 @@ export function selectKnowledgeReviewTargets(
   aiNote?: string | null,
 ): KnowledgeReviewTarget[] {
   const rule = RULES[reasonCode ?? ''] ?? FALLBACK
-  const candidates: Array<KnowledgeReviewTarget & { score: number }> = []
-  brief.sections.forEach((section, sectionIndex) => {
-    if (/《생존일기》에서 시작한 질문|이 질문이 생긴 실제 경험/.test(section.heading)) return
-    section.blocks.forEach((block, blockIndex) => {
-      textFromBlock(block).forEach(({ text, itemIndex }) => {
-        if (!text?.trim()) return
-        const score = rule.terms.reduce((sum, term) => (
-          sum + (section.heading.includes(term) ? 7 : 0) + (text.includes(term) ? 2 : 0)
-        ), 0) + (aiNote?.includes(section.heading) ? 9 : 0)
-        candidates.push({
-          key: 's' + sectionIndex + '-b' + blockIndex + (itemIndex === undefined ? '' : '-i' + itemIndex),
-          heading: section.heading + (itemIndex === undefined ? '' : ' · 항목 ' + (itemIndex + 1)),
-          sectionIndex, blockIndex, itemIndex,
-          reason: rule.explanation, score,
-        })
-      })
-    })
-  })
-  candidates.sort((a, b) => b.score - a.score || (a.sectionIndex ?? 0) - (b.sectionIndex ?? 0) || (a.blockIndex ?? 0) - (b.blockIndex ?? 0))
-  const selected: KnowledgeReviewTarget[] = candidates.slice(0, 2).map((item) => ({
-    key: item.key, heading: item.heading, reason: item.reason,
-    sectionIndex: item.sectionIndex, blockIndex: item.blockIndex, itemIndex: item.itemIndex,
-  }))
-  // Every held package needs evidence-scope verification, including LOW-risk
-  // BRIEF_READY packages routed to a person's inbox by the publication gate.
-  if (brief.basis?.trim()) selected.push({
-    key: 'field:basis',
-    heading: '근거·출처의 적용 범위',
-    field: 'basis',
-    reason: '이 문장의 근거·적용 범위가 실제 자료와 일치하는지 확인하세요. 미확인 사항은 단정하지 않아야 합니다.',
-  })
-  if (!selected.length && brief.lead?.trim()) selected.push({
-    key: 'field:lead', heading: '첫 안내 문장', field: 'lead', reason: rule.explanation,
-  })
+  // No heuristic paragraph may stand in for a missing original AI anchor.
+  // The current editor uses exact quote identities from its evidence decisions.
+  const selected: KnowledgeReviewTarget[] = []
+  if (brief.scope?.trim()) selected.push({key:'field:scope',heading:'글 전체의 적용 범위 확인',field:'scope',reason:rule.explanation})
+  if (brief.basis?.trim()) selected.push({key:'field:basis',heading:'근거·출처의 적용 범위',field:'basis',reason:'원문의 실제 적용 범위와 본문 한계를 대조하세요. 특정 오류 위치가 기록되지 않은 과거 검토입니다.'})
+  if (!selected.length && brief.lead?.trim()) selected.push({key:'field:lead',heading:'글 전체의 적용 범위 확인',field:'lead',reason:rule.explanation})
   return selected
 }
 
