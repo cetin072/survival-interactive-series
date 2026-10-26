@@ -31,3 +31,5 @@
 이번 작업에서 Production 시험 배포를 하지 않는다. 로컬 fixture 검증은 실제 게시 성공 증거가 아니다.
 
 A/B/C/A-Wiki 콘텐츠 자동화와 기존 human-approved Knowledge 게시 경로는 변경하지 않는다. 실제 사이트 설정 파일은 `archive/web/netlify.toml`이다.
+
+운영자 사이트 배포 현황은 main 정책에 있는 48/72시간 값을 읽어 전환 중에도 실제 상태를 표시하며, 업무수첩의 `schedule_enabled=false`를 공통 정기 일정에서 제외한다. 각 카드의 **즉시 배포** 링크는 해당 GitHub workflow로 연결한다. 브라우저에서 Hook을 직접 호출하거나 새 권한을 부여하지 않는다. 이 UI는 다음 정상 Production 게시 이후 운영 화면에 나타난다.

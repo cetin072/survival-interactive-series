@@ -61,7 +61,7 @@ describe('Operator dashboard structure', () => {
     expect(markup.match(/operator-system-card/g)).toHaveLength(4)
     expect(markup).toContain('operator-release-strip')
     expect(markup).toContain('실사이트 배포')
-    expect(markup).toContain('주요 사이트 · 48시간 배포 현황')
+    expect(markup).toContain('주요 사이트 · 배포 현황')
     expect(markup.match(/class="operator-site-card"/g)).toHaveLength(3)
     expect(markup).toContain('기술 상세')
     expect(markup).toContain('7번째 기록 묶음')
