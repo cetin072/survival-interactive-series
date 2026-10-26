@@ -13,17 +13,17 @@ test('backup schedule keeps original 17:20 KST slot and safe late wake-ups', () 
   const crons = [...yaml.matchAll(/- cron: '([^']+)'/g)].map(item => item[1]);
   assert.deepEqual(crons, ['20 8 * * *', '47 8 * * *', '17 9 * * *', '47 9 * * *']);
   const anchor = Date.parse(config.schedule_anchor_utc);
-  assert.equal(new Date(anchor + 48 * 3600000).toISOString(), '2026-10-21T08:20:00.000Z');
-  const currentSlot = calendarSlot(config, new Date('2026-10-23T09:47:00.000Z'));
+  assert.equal(new Date(anchor + 72 * 3600000).toISOString(), '2026-10-22T08:20:00.000Z');
+  const currentSlot = calendarSlot(config, new Date('2026-10-25T09:47:00.000Z'));
   assert.equal(currentSlot.status, 'DUE');
-  const first = { id: 100, head_branch: 'main', event: 'schedule', run_attempt: 1, created_at: '2026-10-23T08:20:00.000Z' };
-  const backup = { ...first, id: 101, created_at: '2026-10-23T09:47:00.000Z' };
-  assert.equal(evaluateSchedule(config, backup, [first, backup], new Date('2026-10-23T09:47:20.000Z')).status, 'SLOT_ALREADY_CHECKED');
+  const first = { id: 100, head_branch: 'main', event: 'schedule', run_attempt: 1, created_at: '2026-10-25T08:20:00.000Z' };
+  const backup = { ...first, id: 101, created_at: '2026-10-25T09:47:00.000Z' };
+  assert.equal(evaluateSchedule(config, backup, [first, backup], new Date('2026-10-25T09:47:20.000Z')).status, 'SLOT_ALREADY_CHECKED');
 });
 
 
 const a = 'a'.repeat(40), b = 'b'.repeat(40);
-const due = new Date('2026-10-21T08:20:00Z');
+const due = new Date('2026-10-22T08:20:00Z');
 const published = { id: 'published-old', state: 'ready', context: 'production', commit_ref: a, published_at: '2026-10-18T08:00:00Z' };
 const snapshot = { id: config.site_id, published_deploy: published };
 const run = { id: 100, head_branch: 'main', event: 'schedule', run_attempt: 1, created_at: due.toISOString() };
@@ -43,10 +43,10 @@ const forbidden = () => { throw new Error('forbidden side effect'); };
 
 test('fixed slots survive 900 transitions, leap days, month/year boundaries and NO_CHANGES', () => {
   for (let i = 1; i < 901; i++) {
-    const at = new Date(Date.parse(config.schedule_anchor_utc) + i * 48 * 3600000);
+    const at = new Date(Date.parse(config.schedule_anchor_utc) + i * 72 * 3600000);
     assert.equal(calendarSlot(config, at).slot.index, i);
     assert.equal(calendarSlot(config, new Date(+at + 24 * 3600000)).status, 'WAITING_SLOT');
-    assert.equal(Date.parse(calendarSlot(config, at).next_check_utc) - at, 48 * 3600000);
+    assert.equal(Date.parse(calendarSlot(config, at).next_check_utc) - at, 72 * 3600000);
   }
   assert.equal(calendarSlot(config, '2026-10-20T08:20:00Z').status, 'WAITING_SLOT');
 });
@@ -55,13 +55,17 @@ test('creation time owns slot; retries, simultaneous and cancelled/failed/no-cha
     assert.equal(evaluateSchedule(config, run, [{ ...run, id: 99, conclusion }], due).status, 'SLOT_ALREADY_CHECKED');
   }
   assert.equal(evaluateSchedule(config, { ...run, run_attempt: 2 }, [], due).status, 'SLOT_ALREADY_CHECKED');
-  assert.equal(evaluateSchedule(config, run, [], new Date('2026-10-23T08:20:00Z')).status, 'MISSED_SLOT');
+  assert.equal(evaluateSchedule(config, run, [], new Date('2026-10-25T08:20:00Z')).status, 'MISSED_SLOT');
   assert.equal(evaluateSchedule(config, run, [{ ...run, id: 101 }], due).status, 'DUE');
 });
-test('actual 48 hours, rather than calendar dates, are required since successful publication', () => {
-  const late = { ...published, published_at: '2026-10-19T08:20:01Z' };
-  assert.equal(decide(config, late, b, [changed], due).status, 'WAITING_WINDOW');
-  assert.equal(decide(config, { ...late, published_at: '2026-10-19T08:20:00Z' }, b, [changed], due).status, 'READY');
+test('an intervening manual publication never moves or blocks the fixed slot', async () => {
+  const recent = { ...published, published_at: new Date(+due - 60000).toISOString() };
+  assert.equal(decide(config, recent, b, [changed], due).status, 'READY');
+  const before = JSON.stringify(config);
+  assert.equal((await cycle({ snapshot: async () => ({ ...snapshot, published_deploy: recent }) })).status, 'PUBLISHED');
+  assert.equal(calendarSlot(config, due).next_check_utc, '2026-10-25T08:20:00.000Z');
+  assert.equal(JSON.stringify(config), before);
+  assert.equal((await cycle({ snapshot: async () => ({ ...snapshot, published_deploy: recent }), files: async () => [], post: forbidden })).status, 'NO_CHANGES');
 });
 test('only actual published Production is authoritative; failed and Preview records reject', () => {
   for (const patch of [{ state: 'error' }, { context: 'deploy-preview' }, { published_at: null }, { commit_ref: 'bad' }]) {
@@ -97,9 +101,9 @@ test('DB incompatibility, main movement or intervening publication stops before 
   let reads = 0;
   assert.equal((await cycle({ snapshot: async () => ++reads === 1 ? snapshot : { ...snapshot, published_deploy: { ...published, id: 'new' } }, post: forbidden })).status, 'PUBLICATION_CHANGED');
 });
-test('failed publication is retried at next 48h slot using unchanged actual public SHA', async () => {
+test('failed publication is retried at next 72h slot using unchanged actual public SHA', async () => {
   await assert.rejects(cycle({ post: async () => { throw new Error('PUBLICATION_NOT_CONFIRMED'); } }), /PUBLICATION_NOT_CONFIRMED/);
-  const next = new Date('2026-10-23T08:20:00Z');
+  const next = new Date('2026-10-25T08:20:00Z');
   const nextRun = { ...run, id: 102, created_at: next.toISOString() };
   let posts = 0;
   const result = await cycle({ now: () => next, api: async route => route.includes('/actions/runs/') ? nextRun : { total_count: 1, workflow_runs: [nextRun] },
@@ -114,13 +118,13 @@ test('ordinary main build cannot reach Production; Preview and QA branch builds 
 test('build guard verifies exact source, repository, site, branch, hook, slot, freshness and encoded payload', () => {
   assert.equal(validateHook(config, hookEnv, due).source_main_sha, b);
   assert.equal(validateHook(config, { ...hookEnv, INCOMING_HOOK_BODY: encodeURIComponent(JSON.stringify(payload)) }, due).source_main_sha, b);
-  for (const patch of [{ source_main_sha: a }, { repository: 'wrong/repo' }, { site_id: 'wrong' }, { slot_index: 2 }, { issued_at: '2026-10-20T08:20:00Z' }, { issued_at: '2026-10-22T08:20:00Z' }, { run_id: 'bad' }]) {
+  for (const patch of [{ source_main_sha: a }, { repository: 'wrong/repo' }, { site_id: 'wrong' }, { slot_index: 2 }, { issued_at: '2026-10-20T08:20:00Z' }, { issued_at: '2026-10-25T08:20:00Z' }, { run_id: 'bad' }]) {
     assert.throws(() => validateHook(config, { ...hookEnv, INCOMING_HOOK_BODY: JSON.stringify({ ...payload, ...patch }) }, due));
   }
   for (const patch of [{ BRANCH: 'draft' }, { COMMIT_REF: a }, { INCOMING_HOOK_TITLE: 'other' }]) assert.throws(() => validateHook(config, { ...hookEnv, ...patch }, due));
 });
-test('build guard rejects already published or too recent public version before writing marker', async () => {
-  for (const [patch, error] of [[{ commit_ref: b }, /ALREADY_PUBLISHED/], [{ published_at: '2026-10-20T00:00:00Z' }, /WAITING_WINDOW/]]) {
+test('build guard rejects already published or future public version before writing marker', async () => {
+  for (const [patch, error] of [[{ commit_ref: b }, /ALREADY_PUBLISHED/], [{ published_at: '2026-10-23T00:00:00Z' }, /INVALID_PUBLICATION_TIME/]]) {
     await assert.rejects(guard(config, hookEnv, { now: due, fetcher: async () => ({ ok: true, json: async () => ({ ...snapshot, published_deploy: { ...published, ...patch } }) }) }), error);
   }
 });
@@ -170,7 +174,7 @@ test('ignore command stops Production only; CLI dry-run does not mutate reposito
 });
 
 
-test('manual human-reviewed release bypasses 48h only with a merged exact PR and current main SHA', async () => {
+test('manual human-reviewed release remains independent with a merged exact PR and current main SHA', async () => {
   const immediate = { version: 2, mode: 'HUMAN_APPROVED_KNOWLEDGE',
     repository: config.repository, site_id: config.site_id,
     source_main_sha: b, merge_sha: b,
@@ -183,7 +187,7 @@ test('manual human-reviewed release bypasses 48h only with a merged exact PR and
     head: { ref: 'knowledge/worker/test', repo: { full_name: config.repository } },
     body: '<!-- knowledge-worker-phase-v1:PUBLICATION_HANDOFF -->', title: 'knowledge: prepare K-015' };
   const fastFetcher = async (url) => ({ ok: true, json: async () => (
-    url.includes('/compare/') ? {status:'ahead',files:[]} : url.includes('/sites/') ? { ...snapshot, published_deploy: { ...published, published_at: '2026-10-21T07:00:00Z' } }
+    url.includes('/compare/') ? {status:'ahead',files:[]} : url.includes('/sites/') ? { ...snapshot, published_deploy: { ...published, published_at: '2026-10-22T07:00:00Z' } }
       : url.includes('/pulls/') ? pr : { object: { sha: b } }
   ) });
   const tmp = mkdtempSync(join(tmpdir(), 'human-release-guard-')), marker = join(tmp, 'marker.json');
@@ -191,7 +195,7 @@ test('manual human-reviewed release bypasses 48h only with a merged exact PR and
     const result = await guard({ ...config, marker_path: marker }, directEnv, { now: due, fetcher: fastFetcher });
     assert.equal(result.status, 'HUMAN_APPROVED_PRODUCTION_ALLOWED');
     assert.equal(JSON.parse(readFileSync(marker, 'utf8')).reviewed_brief_id, 'K-015');
-    await assert.rejects(guard({ ...config, marker_path: marker }, hookEnv, { now: due, fetcher: fastFetcher }), /WAITING_WINDOW/);
+    assert.equal((await guard({ ...config, marker_path: marker }, hookEnv, { now: due, fetcher: fastFetcher })).status, 'SCHEDULED_PRODUCTION_ALLOWED');
   } finally { rmSync(tmp, { recursive: true, force: true }); }
   assert.equal(await verifyHumanApprovedReleaseProof(config, immediate, fastFetcher), true);
 });
@@ -212,4 +216,63 @@ test('spoofed reviewed-release payloads and unmerged/unrelated PRs fail closed',
   await assert.rejects(verifyHumanApprovedReleaseProof(config, good, async url => ({
     ok: true, json: async () => url.includes('/pulls/') ? badPr : { object: { sha: b } },
   })), /HUMAN_APPROVED_GITHUB_PROOF_MISMATCH/);
+});
+
+test('build guard accepts a recent manual release at the scheduled slot without changing anchor', async () => {
+  const result = await guard({ ...config, marker_path: null }, hookEnv, { now: due,
+    fetcher: async () => ({ ok: true, json: async () => ({ ...snapshot, published_deploy: {
+      ...published, published_at: new Date(+due - 1000).toISOString() } }) }) });
+  assert.equal(result.status, 'SCHEDULED_PRODUCTION_ALLOWED');
+  assert.equal(calendarSlot(config, due).next_check_utc, '2026-10-25T08:20:00.000Z');
+});
+test('completed earlier checks cannot be bypassed by a later manual release', async () => {
+  for (const status of ['completed', 'in_progress', 'queued']) {
+    const earlier = { ...run, id: 99, status, updated_at: due.toISOString() };
+    assert.equal((await cycle({ api: async route => route.includes('/actions/runs/') ? run :
+      { total_count: 2, workflow_runs: [earlier, run] }, post: forbidden })).status, 'SLOT_ALREADY_CHECKED');
+  }
+});
+
+// Explicit manual intent reuses the same concurrency group and one-shot hook.
+test('manual deploy-now uses latest main off-slot with no publication cooldown', async () => {
+  const at = new Date('2026-10-20T08:20:00Z');
+  const manualRun = { ...run, event: 'workflow_dispatch', created_at: at.toISOString() };
+  let posts = 0;
+  const result = await cycle({ env: { ...env, GITHUB_EVENT_NAME: 'workflow_dispatch', RELEASE_ACTION: 'deploy-now' },
+    now: () => at, api: async () => manualRun,
+    snapshot: async () => ({ ...snapshot, published_deploy: { ...published, published_at: new Date(+at - 1000).toISOString() } }),
+    post: async body => {
+      posts++; assert.equal(body.version, 3); assert.equal(body.mode, 'MANUAL_MAIN'); assert.equal(body.source_main_sha, b);
+      assert.equal(validateHook(config, { ...hookEnv, INCOMING_HOOK_BODY: JSON.stringify(body) }, at).version, 3);
+      return { status: 'PUBLISHED' };
+    } });
+  assert.equal(result.status, 'PUBLISHED'); assert.equal(posts, 1);
+  const manualEnv = { ...env, GITHUB_EVENT_NAME: 'workflow_dispatch', RELEASE_ACTION: 'deploy-now' };
+  assert.equal((await cycle({ env: manualEnv, api: async () => manualRun, files: async () => [], post: forbidden })).status, 'NO_CHANGES');
+  assert.equal((await cycle({ env: manualEnv, api: async () => ({ ...manualRun, run_attempt: 2 }), post: forbidden })).status, 'RUN_ALREADY_CHECKED');
+  await assert.rejects(cycle({ env: { ...manualEnv, GITHUB_REF: 'refs/heads/draft' }, post: forbidden }), /MAIN_MANUAL_REQUIRED/);
+  assert.equal((await cycle({ env: manualEnv, api: async () => manualRun, refresh: async () => a, post: forbidden })).status, 'MAIN_MOVED');
+});
+test('manual build validates intent and freshness but needs no fixed slot', async () => {
+  const at = new Date('2026-10-20T08:20:00Z');
+  const body = { ...payload, version: 3, mode: 'MANUAL_MAIN', run_created_at: at.toISOString(), issued_at: at.toISOString() };
+  const manualEnv = { ...hookEnv, INCOMING_HOOK_BODY: JSON.stringify(body) };
+  assert.equal((await guard({ ...config, marker_path: null }, manualEnv, { now: at,
+    fetcher: async () => ({ ok: true, json: async () => ({ ...snapshot, published_deploy: { ...published, published_at: new Date(+at - 1000).toISOString() } }) }) })).status, 'MANUAL_PRODUCTION_ALLOWED');
+  for (const patch of [{ mode: 'anything' }, { run_created_at: 'invalid' }, { issued_at: '2026-10-19T08:20:00Z' }]) {
+    assert.throws(() => validateHook(config, { ...manualEnv, INCOMING_HOOK_BODY: JSON.stringify({ ...body, ...patch }) }, at));
+  }
+});
+
+test('queued duplicate manual clicks publish once and manual history never consumes a scheduled slot', async () => {
+  let live = snapshot, posts = 0;
+  const manualRun = { ...run, event: 'workflow_dispatch' };
+  const options = { env: { ...env, GITHUB_EVENT_NAME: 'workflow_dispatch', RELEASE_ACTION: 'deploy-now' },
+    api: async () => manualRun, snapshot: async () => live,
+    files: async (base, head) => base === head ? [] : [changed],
+    post: async () => { posts++; live = { ...snapshot, published_deploy: { ...published, id: 'manual-new', commit_ref: b, published_at: due.toISOString() } }; return { status: 'PUBLISHED' }; } };
+  assert.equal((await cycle(options)).status, 'PUBLISHED');
+  assert.equal((await cycle(options)).status, 'NO_CHANGES');
+  assert.equal(posts, 1);
+  assert.equal(evaluateSchedule(config, run, [{ ...manualRun, id: 99 }], due).status, 'DUE');
 });
