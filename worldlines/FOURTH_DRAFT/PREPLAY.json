@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "status": "PLANNING_ONLY",
+  "reference": "FOURTH_WORLDLINE_DRAFT",
+  "planning_document": "docs/FOURTH_WORLDLINE_PLANNING_V1.md",
+  "identity": {
+    "worldline_id": null,
+    "chronicle_id": null,
+    "season_id": null
+  },
+  "protagonist": {
+    "sex": "male",
+    "adult": true,
+    "occupation": "일반 배송기사",
+    "name": null,
+    "age": null,
+    "marital_status": "single",
+    "children_count": 0,
+    "current_partner": false
+  },
+  "opening": {
+    "country": "KR",
+    "city": "창원",
+    "district": "성산구",
+    "workplace": null,
+    "delivery_type": "일반배송",
+    "employer": null,
+    "vehicle": null,
+    "home_access": null
+  },
+  "disaster": {
+    "kind": "ASTEROID_IMPACT",
+    "status": "TENTATIVE",
+    "region": "몽골 남부 고비사막",
+    "diameter_km_approx": 2,
+    "warning_mode": "SCIENTISTS_FIRST_PUBLIC_LATE"
+  },
+  "runtime": {
+    "play_enabled": false,
+    "db_initialized": false,
+    "raw_capture_ready": false,
+    "canon_initialized": false,
+    "production_publication_enabled": false
+  },
+  "reuse_guards": {
+    "pattern_source_branch": "worldline/afterfall-rpg",
+    "independent_runtime_required": true,
+    "no_afterfall_state_fallback": true,
+    "state_link_write_blocked_pending_compatibility": true
+  }
+}
