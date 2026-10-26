@@ -166,7 +166,7 @@ test('releases after the batching window and supports force', () => {
 })
 
 
-test('checked-in Survival Diary config keeps one two-day Production gate', () => {
+test('checked-in Survival Diary config keeps the fixed three-day Production gate', () => {
   const checkedInPolicy = JSON.parse(readFileSync(
     new URL('../../automation/release-policy.json', import.meta.url),
     'utf8',
@@ -178,7 +178,9 @@ test('checked-in Survival Diary config keeps one two-day Production gate', () =>
   const productionContext = netlifyConfig.split('[context.production]')[1]?.split('[context.deploy-preview]')[0] ?? ''
 
   assert.equal(checkedInPolicy.mode, 'BATCHED')
-  assert.equal(checkedInPolicy.production_interval_days, 2)
+  assert.equal(checkedInPolicy.production_interval_days, 3)
+  assert.equal(checkedInPolicy.schedule_interval_hours, 72)
+  assert.equal(checkedInPolicy.schedule_anchor_utc, '2026-10-19T08:20:00.000Z')
   assert.equal(checkedInPolicy.max_production_deploys_per_day, 1)
   assert.match(productionContext,
     /node \.\.\/scripts\/scheduled-netlify-release\.mjs ignore/)
