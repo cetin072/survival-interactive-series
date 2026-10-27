@@ -128,3 +128,13 @@ describe('RAW presentation supports the real preserved header formats', () => {
     }
   })
 })
+
+ it('preserves only validated operator stage/cycle/page context during canonicalization',()=>{
+   const href='https://example.com/operator/?stage=day-1&cycle=MONTH01_FIND_THE_ENGINE&page=1&return=https://evil.invalid#operator-roadmap'
+   const result=archiveRouteUrl(parseArchiveRoute('',undefined,'/operator/'),href)
+   expect(result.searchParams.get('stage')).toBe('day-1')
+   expect(result.searchParams.get('cycle')).toBe('MONTH01_FIND_THE_ENGINE')
+   expect(result.searchParams.get('page')).toBe('1')
+   expect(result.searchParams.has('return')).toBe(false)
+   expect(result.hash).toBe('#operator-roadmap')
+ })

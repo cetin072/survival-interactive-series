@@ -92,9 +92,19 @@ export function parseArchiveRoute(search: string, storage?: ReaderStorage, pathn
 
 export function archiveRouteUrl(route: ArchiveRoute, href: string): URL {
   const url = new URL(href)
+  const previous = new URL(href)
   url.search = ''; url.hash = ''
   if (route.view === 'operator' || route.view === 'operator-visuals' || route.view === 'operator-knowledge' || route.view === 'operator-knowledge-detail' || route.view === 'operator-vault' || route.view === 'operator-bunker-os') {
     url.pathname = route.view === 'operator-visuals' ? '/operator/visuals/' : route.view === 'operator-knowledge' ? '/operator/knowledge/' : route.view === 'operator-knowledge-detail' ? `/operator/knowledge/${route.jobId}/` : route.view === 'operator-vault' ? '/operator/vault/' : route.view === 'operator-bunker-os' ? `/operator/bunker-os/${route.bunkerPath ? `${route.bunkerPath}/` : ''}` : '/operator/'
+    // Preserve only the operator navigation context; never carry auth/return URLs.
+    if ((route.view === 'operator' || route.view === 'operator-bunker-os') && previous.pathname.startsWith('/operator/')) {
+      const rules: Record<string,RegExp> = {stage:/^(year-[1-5]|week-[1-4]|day-[1-7])$/,cycle:/^[A-Z0-9_]{6,80}$/,page:/^\d{1,6}$/,cyclesPage:/^\d{1,6}$/,category:/^(ALL|DISASTER_SURVIVAL|BUNKER_BUILD|BUSINESS_STRATEGY|PRODUCT_MARKET|TECH_AUTOMATION|OTHER)$/}
+      for (const [key,rule] of Object.entries(rules)) {
+        const value=previous.searchParams.get(key)
+        if(value&&rule.test(value))url.searchParams.set(key,value)
+      }
+      if(previous.hash==='#operator-roadmap')url.hash=previous.hash
+    }
   } else if (route.view === 'archive') {
     url.pathname = '/'
     if (route.nodeId) {

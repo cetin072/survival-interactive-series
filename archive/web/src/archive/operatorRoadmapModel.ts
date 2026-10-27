@@ -1,5 +1,7 @@
 // Operational roadmap status. Calendar position is NOT milestone completion.
 export type RoadmapLog = {
+  id?: string
+  summary?: string
   cycle_key: string
   phase: string
   day_index: number | null
@@ -135,4 +137,40 @@ export function buildRoadmap(logs:RoadmapLog[]|null,today:string) {
     stats, upcoming,
     latestLogAt: logs?.filter(log=>log.cycle_key===ROADMAP_CYCLE).sort((a,b)=>b.occurred_at.localeCompare(a.occurred_at))[0]?.occurred_at??null,
   }
+}
+
+// Explicit index, not a repository crawler. Titles only; private bodies remain in their source.
+export const roadmapDocuments = [
+  {title:'5년 전략 · #500', url:ROADMAP_STRATEGY},
+  {title:'첫 달 실행계획 · #501', url:ROADMAP_ISSUE},
+  ...[
+    ['NORTH_STAR.md','장기 목적'], ['STRATEGY.md','현재 전략'],
+    ['BUNKER_THREAT_MODEL_V0.md','벙커 위협 모델 V0'],
+    ['SOURCE_LIBRARY.md','장기 자료 목록'], ['DECISION_LOG.md','판단 기록'],
+    ['EXPERIMENT_LOG.md','실험 기록'],
+  ].map(([file,title])=>({title,url:'https://github.com/cetin072/survival-interactive-series/blob/main/docs/bunker_os/'+file})),
+]
+export function safeSourceUrl(value: unknown): string | null {
+  if(typeof value!=='string')return null
+  try { const url=new URL(value); return ['https:','http:'].includes(url.protocol)&&!url.username&&!url.password ? url.href : null } catch { return null }
+}
+export function roadmapStage(value:string|null) {
+  return value && /^(year-[1-5]|week-[1-4]|day-[1-7])$/.test(value) ? value : null
+}
+export function stageEvidence(logs:RoadmapLog[]|null,stage:string):RoadmapLog[] {
+  const [kind,number]=stage.split('-'); const index=Number(number)
+  return (logs??[]).filter(log=>{
+    if(log.cycle_key!==ROADMAP_CYCLE)return false
+    if(kind==='year')return index===1
+    if(kind==='day') {
+      const task=dayTasks[index-1]
+      return task && (('exact' in task && log.phase==='WEEK_1_FIND_THE_GAME' && log.title===task.exact) || ('gate' in task && Boolean(proof(log,task.gate))))
+    }
+    const phase=['WEEK_1_FIND_THE_GAME','WEEK_2_FIND_THE_ACTION','WEEK_3_FIND_THE_TRAFFIC','WEEK_4_FIND_THE_ENGINE'][index-1]
+    return log.phase===phase || Boolean(proof(log,weeks[index-1]?.gate))
+  })
+}
+export function gateEvidenceUrl(log:RoadmapLog):string|null {
+  const gate=(log.details as {roadmap_gate?:{id?:string}}|null)?.roadmap_gate
+  return gate?.id ? proof(log,gate.id) : null
 }

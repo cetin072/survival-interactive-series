@@ -1,6 +1,32 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { roadmapStage, safeSourceUrl, roadmapDocuments } from './operatorRoadmapModel'
 import { supabaseClient } from './supabaseClient'
 import { formatOperatorTime } from './operatorSystemStatus'
+
+export function bunkerLink(path: string, changes: Record<string,string|null> = {}): string {
+  const current = new URLSearchParams(typeof window==='undefined'?'':window.location.search)
+  const query = new URLSearchParams()
+  for (const key of ['cycle','stage','page','category','cyclesPage']) {
+    const value = current.get(key)
+    if (value && value.length<=120 && (key!=='stage'||roadmapStage(value))) query.set(key,value)
+  }
+  for (const [key,value] of Object.entries(changes)) value===null ? query.delete(key) : query.set(key,value)
+  const [pathname,hash] = path.split('#')
+  return pathname+(query.size?'?'+query.toString():'')+(hash?'#'+hash:'')
+}
+function pageNumber(value:string|null):number { return value&&/^\d{1,6}$/.test(value)?Number(value):0 }
+function PageLinks({total,size}:{total:number;size:number}) {
+  const page=pageNumber(typeof window==='undefined'?null:new URLSearchParams(window.location.search).get('page'))
+  const path=typeof window==='undefined'?'/operator/bunker-os/logs/':window.location.pathname
+  return <nav aria-label="조회 페이지"><p>전체 {total}건 · {total?Math.min(total,page*size+1):0}–{Math.min(total,(page+1)*size)}건 조회 · 페이지당 최대 {size}건</p>
+    {page>0&&<a href={bunkerLink(path,{page:String(page-1)})}>← 이전 페이지</a>}{' '}
+    {(page+1)*size<total&&<a href={bunkerLink(path,{page:String(page+1)})}>다음 페이지 →</a>}
+  </nav>
+}
+function SourceLink({url,title}:{url?:string|null;title:string}) {
+  const safe=safeSourceUrl(url)
+  return safe?<a href={safe} target="_blank" rel="noopener noreferrer">{title||'제목 없는 자료'} ↗</a>:<span>{title||'제목 없는 자료'} · 유효한 원문 링크 없음</span>
+}
 
 export type BunkerOsStatus = 'RUNNING' | 'COMPLETED' | 'BLOCKED' | 'APPROVAL_REQUIRED'
 export type BunkerOsSourceCategory = 'DISASTER_SURVIVAL' | 'BUNKER_BUILD' | 'BUSINESS_STRATEGY' | 'PRODUCT_MARKET' | 'TECH_AUTOMATION' | 'OTHER'
@@ -97,11 +123,11 @@ function BunkerOsHeader({ email, busy, onSignOut }: { email?: string | null; bus
       <p>{email} · AI 운영총괄이 한 일과 내가 확인할 일을 쉽게 나눠 봅니다.</p>
     </div>
     <div className="operator-heading-actions">
-      <a className="operator-secondary" href="/operator/#operator-roadmap">전체 로드맵</a>
-      <a className="operator-secondary" href="/operator/bunker-os/">상황판</a>
-      <a className="operator-secondary" href="/operator/bunker-os/logs/">작업 기록</a>
-      <a className="operator-secondary" href="/operator/bunker-os/sources/">자료함</a>
-      <a className="operator-secondary" href="/operator/">자동화 상황판</a>
+      <a className="operator-secondary" href={bunkerLink("/operator/#operator-roadmap")}>전체 로드맵</a>
+      <a className="operator-secondary" href={bunkerLink("/operator/bunker-os/",{page:null})}>상황판</a>
+      <a className="operator-secondary" href={bunkerLink("/operator/bunker-os/logs/")}>작업 기록</a>
+      <a className="operator-secondary" href={bunkerLink("/operator/bunker-os/sources/",{page:null})}>자료함</a>
+      <a className="operator-secondary" href={bunkerLink("/operator/")}>자동화 상황판</a>
       <button className="operator-secondary" disabled={busy} onClick={onSignOut}>로그아웃</button>
     </div>
   </header>
@@ -111,7 +137,7 @@ function RecentLogs({ logs }: { logs: BunkerOsLog[] }) {
   if (!logs.length) return <p className="operator-empty">아직 기록이 없습니다.</p>
   return <ul className="bunker-os-board-list">
     {logs.slice(0, 3).map((log) => <li key={log.id}>
-      <a href={`/operator/bunker-os/log/${log.id}/`}>
+      <a href={bunkerLink(`/operator/bunker-os/log/${log.id}/`)}>
         <span><b>{phaseLabel(log.phase)}</b><b>{statusLabel(log.status)}</b></span>
         <strong>{log.title}</strong>
         <p>{log.summary}</p>
@@ -143,19 +169,19 @@ export function BunkerOsDashboardView({
     </section>
 
     <div className="operator-counts bunker-os-counts">
-      <a href="/operator/bunker-os/running/"><span>진행 중</span><strong>{dashboard.running_count}</strong><small>지금 하고 있는 일</small></a>
-      <a href="/operator/bunker-os/review/"><span>내 확인 필요</span><strong>{dashboard.approval_count}</strong><small>내가 버튼을 눌러야 하는 일</small></a>
-      <a href="/operator/bunker-os/completed/"><span>완료</span><strong>{dashboard.completed_count}</strong><small>끝난 작업</small></a>
-      <a href="/operator/bunker-os/blocked/"><span>막힘</span><strong>{dashboard.blocked_count}</strong><small>문제가 있어 멈춘 일</small></a>
+      <a href={bunkerLink("/operator/bunker-os/running/",{page:null})}><span>진행 중</span><strong>{dashboard.running_count}</strong><small>지금 하고 있는 일</small></a>
+      <a href={bunkerLink("/operator/bunker-os/review/",{page:null})}><span>내 확인 필요</span><strong>{dashboard.approval_count}</strong><small>내가 버튼을 눌러야 하는 일</small></a>
+      <a href={bunkerLink("/operator/bunker-os/completed/",{page:null})}><span>완료</span><strong>{dashboard.completed_count}</strong><small>끝난 작업</small></a>
+      <a href={bunkerLink("/operator/bunker-os/blocked/",{page:null})}><span>막힘</span><strong>{dashboard.blocked_count}</strong><small>문제가 있어 멈춘 일</small></a>
     </div>
 
     <div className="bunker-os-quick-links">
-      <a className="operator-secondary" href="/operator/bunker-os/logs/">전체 작업 기록 {dashboard.total_count}건</a>
-      <a className="operator-secondary" href="/operator/bunker-os/sources/">모아둔 자료 보기</a>
+      <a className="operator-secondary" href={bunkerLink("/operator/bunker-os/logs/")}>전체 작업 기록 {dashboard.total_count}건</a>
+      <a className="operator-secondary" href={bunkerLink("/operator/bunker-os/sources/",{page:null})}>모아둔 자료 보기</a>
     </div>
 
     <section className="operator-panel bunker-os-recent">
-      <header><h2>최근 작업</h2><a href="/operator/bunker-os/logs/">전체 보기 →</a></header>
+      <header><h2>최근 작업</h2><a href={bunkerLink("/operator/bunker-os/logs/")}>전체 보기 →</a></header>
       <RecentLogs logs={dashboard.logs} />
     </section>
   </section>
@@ -179,14 +205,14 @@ export function BunkerOsLogListView({
     <section className="operator-panel">
       <header><div><p className="archive-eyebrow">작업 기록</p><h2>{listTitle(filter)}</h2></div><button className="operator-secondary" disabled={busy} onClick={onRefresh}>새로고침</button></header>
       <div className="bunker-os-status-nav">
-        <a href="/operator/bunker-os/logs/">전체</a><a href="/operator/bunker-os/running/">진행 중</a>
-        <a href="/operator/bunker-os/review/">내 확인 필요</a><a href="/operator/bunker-os/completed/">완료</a><a href="/operator/bunker-os/blocked/">막힘</a>
+        <a href={bunkerLink("/operator/bunker-os/logs/")}>전체</a><a href={bunkerLink("/operator/bunker-os/running/",{page:null})}>진행 중</a>
+        <a href={bunkerLink("/operator/bunker-os/review/",{page:null})}>내 확인 필요</a><a href={bunkerLink("/operator/bunker-os/completed/",{page:null})}>완료</a><a href={bunkerLink("/operator/bunker-os/blocked/",{page:null})}>막힘</a>
       </div>
-      <p className="operator-muted">{list.total_count}건 · 제목을 누르면 별도 상세 글로 열립니다.</p>
-      {!list.logs.length && <p className="operator-empty">해당 상태의 작업이 없습니다.</p>}
+      <PageLinks total={list.total_count} size={100} />
+      {!busy && !error && !list.logs.length && <p className="operator-empty">해당 상태의 작업이 없습니다.</p>}
       <ul className="bunker-os-board-list">
         {list.logs.map((log) => <li key={log.id}>
-          <a href={`/operator/bunker-os/log/${log.id}/`}>
+          <a href={bunkerLink(`/operator/bunker-os/log/${log.id}/`)}>
             <span><b>{phaseLabel(log.phase)}</b><b>{statusLabel(log.status)}</b>{log.day_index ? <b>Day {log.day_index}</b> : null}</span>
             <strong>{log.title}</strong>
             <p>{log.summary}</p>
@@ -217,7 +243,7 @@ export function BunkerOsLogDetailView({
         <TextList title="한 일" items={log.details.actions} />
         <TextList title="중요하게 알아낸 것" items={log.details.findings} />
         <TextList title="생각이 바뀐 점" items={log.details.invalidated_hypotheses} />
-        {!!log.details.source_candidates?.length && <section className="bunker-os-log-section"><h4>모아둔 자료</h4><ul>{log.details.source_candidates.map((source, index) => <li key={index}><b>{sourceCategoryLabel(source.category ?? 'OTHER')}</b> · {source.url ? <a href={source.url} target="_blank" rel="noopener noreferrer">{source.title}</a> : source.title}{source.note ? ` · ${source.note}` : ''}</li>)}</ul></section>}
+        {!!log.details.source_candidates?.length && <section className="bunker-os-log-section"><h4>모아둔 자료</h4><ul>{log.details.source_candidates.map((source, index) => <li key={index}><b>{sourceCategoryLabel(source.category ?? 'OTHER')}</b> · <SourceLink url={source.url} title={source.title} />{source.note ? ` · ${source.note}` : ''}</li>)}</ul></section>}
         <TextList title="판단할 것" items={log.details.decision_candidates} />
         <TextList title="시험해볼 것" items={log.details.experiment_candidates} />
         {!!log.details.approvals?.length && <section className="bunker-os-log-section bunker-os-approval"><h4>내 확인이 필요한 것</h4><ul>{log.details.approvals.map((approval, index) => <li key={index}><strong>{approval.title}</strong>{approval.reason ? ` · ${approval.reason}` : ''}{approval.cost ? ` · 비용 ${approval.cost}` : ''}</li>)}</ul></section>}
@@ -229,7 +255,7 @@ export function BunkerOsLogDetailView({
           <label>메모 (선택)<textarea maxLength={1000} value={note} onChange={(event) => onNoteChange(event.target.value)} /></label>
           <div><button disabled={busy} onClick={onMarkReviewed}>{busy ? '처리 중…' : '확인 완료'}</button></div>
         </section>}
-        <footer className="bunker-os-detail-footer"><a className="operator-secondary" href="/operator/bunker-os/logs/">작업 목록으로</a><button className="operator-secondary" disabled={busy} onClick={onRefresh}>새로고침</button></footer>
+        <footer className="bunker-os-detail-footer"><a className="operator-secondary" href={bunkerLink("/operator/bunker-os/logs/")}>작업 목록으로</a><button className="operator-secondary" disabled={busy} onClick={onRefresh}>새로고침</button></footer>
       </article>}
   </section>
 }
@@ -242,28 +268,29 @@ export function BunkerOsSourcesView({
   email?: string | null; busy: boolean; error: string; data: BunkerOsSources
   onRefresh: () => void; onSignOut: () => void
 }) {
-  const [filter, setFilter] = useState<(typeof sourceCategories)[number]>('ALL')
+  const requested=typeof window==='undefined'?'ALL':new URLSearchParams(window.location.search).get('category')??'ALL'
+  const filter=sourceCategories.find(value=>value===requested)??'ALL'
   const visible = useMemo(() => filter === 'ALL' ? data.sources : data.sources.filter((source) => source.category === filter), [data.sources, filter])
   return <section className="operator-page">
     <BunkerOsHeader email={email} busy={busy} onSignOut={onSignOut} />
     {error && <p className="operator-error" role="alert">{error}</p>}
     <section className="operator-panel">
       <header><div><p className="archive-eyebrow">자료함</p><h2>모아둔 자료</h2></div><button className="operator-secondary" disabled={busy} onClick={onRefresh}>새로고침</button></header>
-      <p className="operator-muted">조사 중 발견한 뉴스·영상·문서·사례를 작업일지와 분리해 모아봅니다. 중요한 자료만 나중에 GitHub Bunker OS 장기자료로 승격합니다.</p>
+      <p className="operator-muted">선택한 주기 일지의 source_candidates 자료만 모아봅니다. 저장소 전체 자동수집이 아닙니다. 외부 원문이 열리지 않으면 관련 일지에서 제목·이동·접근 권한을 확인하세요.</p>
       <div className="bunker-os-source-filters">
-        {sourceCategories.map((category) => <button key={category} className="operator-secondary" aria-pressed={filter === category} onClick={() => setFilter(category)}>
+        {sourceCategories.map((category) => <button key={category} className="operator-secondary" aria-pressed={filter === category} onClick={() => window.location.assign(bunkerLink('/operator/bunker-os/sources/',{category,page:null}))}>
           {category === 'ALL' ? '전체' : sourceCategoryLabel(category)}
         </button>)}
       </div>
-      <p className="operator-muted">전체 {data.total_count}건 · 현재 {visible.length}건 표시</p>
-      {!visible.length && <p className="operator-empty">이 분류에 모아둔 자료가 없습니다.</p>}
+      <PageLinks total={data.total_count} size={200} /><p>현재 분류 {visible.length}건 표시</p><details><summary>기획문서 목록</summary><ul>{roadmapDocuments.map(doc=><li key={doc.url}><SourceLink {...doc} /></li>)}</ul></details>
+      {!busy && !error && !visible.length && <p className="operator-empty">이 분류에 모아둔 자료가 없습니다.</p>}
       <ul className="bunker-os-source-list">
         {visible.map((source) => <li key={source.source_key}>
           <article>
             <span>{sourceCategoryLabel(source.category)}</span>
-            <h3>{source.url ? <a href={source.url} target="_blank" rel="noopener noreferrer">{source.title}</a> : source.title}</h3>
+            <h3><SourceLink url={source.url} title={source.title} /></h3>
             {source.note && <p>{source.note}</p>}
-            <small>{formatOperatorTime(source.occurred_at)} · <a href={`/operator/bunker-os/log/${source.log_id}/`}>관련 작업: {source.log_title}</a></small>
+            <small>{formatOperatorTime(source.occurred_at)} · <a href={bunkerLink(`/operator/bunker-os/log/${source.log_id}/`)}>관련 작업: {source.log_title}</a></small>
           </article>
         </li>)}
       </ul>
@@ -291,57 +318,81 @@ export function bunkerPageFromPath(pathname: string): BunkerPage {
 
 export function OperatorBunkerOsDashboard({ email, busy: parentBusy, onSignOut }: { email?: string | null; busy: boolean; onSignOut: () => void }) {
   const page = bunkerPageFromPath(window.location.pathname)
+  const query=new URLSearchParams(window.location.search)
+  const cycle=query.get('cycle')||null
+  const offset=pageNumber(query.get('page'))*(page.kind==='sources'?200:100)
+  const category=query.get('category')||'ALL'
+  const cyclesOffset=pageNumber(query.get('cyclesPage'))*100
+  const [cycles,setCycles]=useState<{cycle_key:string}[]>([])
+  const [cycleTotal,setCycleTotal]=useState(0)
+  const [selectedCycle,setSelectedCycle]=useState<string|null>(cycle)
+  const request=useRef(0)
   const [dashboard, setDashboard] = useState<BunkerOsDashboard>(emptyBunkerOsDashboard)
   const [list, setList] = useState<BunkerOsLogList>(emptyBunkerOsLogList)
   const [detail, setDetail] = useState<BunkerOsLog | null>(null)
   const [sources, setSources] = useState<BunkerOsSources>(emptyBunkerOsSources)
   const [note, setNote] = useState('')
-  const [busy, setBusy] = useState(false)
+  const [busy, setBusy] = useState(true)
   const [error, setError] = useState('')
 
   const refresh = useCallback(async () => {
-    if (!supabaseClient) return
-    setBusy(true); setError('')
+    if (!supabaseClient) {setError('연결 설정을 확인하지 못했습니다.'); return}
+    const generation=++request.current
+    setBusy(true); setError(''); setDetail(null)
     try {
-      if (page.kind === 'dashboard') {
-        const { data, error: rpcError } = await supabaseClient.rpc('archive_operator_bunker_os_dashboard', { p_limit: 5 })
-        if (rpcError) setError('감독 상황판을 불러오지 못했습니다.')
-        else setDashboard((data ?? emptyBunkerOsDashboard) as BunkerOsDashboard)
-      } else if (page.kind === 'list') {
-        const { data, error: rpcError } = await supabaseClient.rpc('archive_operator_bunker_os_logs', { p_status: page.filter, p_limit: 100 })
-        if (rpcError) setError('작업 기록을 불러오지 못했습니다.')
-        else setList((data ?? emptyBunkerOsLogList) as BunkerOsLogList)
-      } else if (page.kind === 'detail') {
-        const { data, error: rpcError } = await supabaseClient.rpc('archive_operator_bunker_os_log_detail', { p_log_id: page.id })
-        if (rpcError) setError('상세 기록을 불러오지 못했습니다.')
-        else {
-          const log = data as BunkerOsLog
-          setDetail(log); setNote(log.review_note ?? '')
-        }
+      const cycleResult=await supabaseClient.rpc('archive_operator_bunker_os_read_v2',{p_view:'cycles',p_offset:cyclesOffset,p_limit:100}).abortSignal(AbortSignal.timeout(15000))
+      if(generation!==request.current)return
+      if(cycleResult.error||!Array.isArray(cycleResult.data?.cycles))throw new Error('주기 조회 실패 · 과거 주기 조회 계약 적용 여부와 접근 권한을 확인하세요.')
+      setCycles(cycleResult.data.cycles); setCycleTotal(cycleResult.data.total_count)
+      if (page.kind === 'detail') {
+        const result=await supabaseClient.rpc('archive_operator_bunker_os_log_detail',{p_log_id:page.id}).abortSignal(AbortSignal.timeout(15000))
+        if(generation!==request.current)return
+        if(result.error||!result.data?.id||!result.data?.details)throw new Error('상세 기록을 찾거나 조회하지 못했습니다. 목록에서 참조를 확인하세요.')
+        setDetail(result.data as BunkerOsLog);setNote(result.data.review_note??'');setSelectedCycle(result.data.cycle_key)
+        if(cycle!==result.data.cycle_key)window.history.replaceState(null,'',bunkerLink(window.location.pathname,{cycle:result.data.cycle_key}))
       } else {
-        const { data, error: rpcError } = await supabaseClient.rpc('archive_operator_bunker_os_sources', { p_limit: 200 })
-        if (rpcError) setError('자료함을 불러오지 못했습니다.')
-        else setSources((data ?? emptyBunkerOsSources) as BunkerOsSources)
+        const result=await supabaseClient.rpc('archive_operator_bunker_os_read_v2',{
+          p_view:page.kind==='list'?'logs':page.kind,p_cycle:cycle,p_offset:offset,
+          p_status:page.kind==='list'?page.filter:null,p_limit:page.kind==='sources'?200:100,p_category:category,
+        }).abortSignal(AbortSignal.timeout(15000))
+        if(generation!==request.current)return
+        if(result.error||!result.data||!Number.isSafeInteger(result.data.total_count)||result.data.total_count<0||!Array.isArray(page.kind==='sources'?result.data.sources:result.data.logs))throw new Error('기록 조회 실패 · 읽기 계약과 접근 권한을 확인하고 다시 조회하세요.')
+        setSelectedCycle(result.data.current_cycle)
+        if(!cycle&&result.data.current_cycle)window.history.replaceState(null,'',bunkerLink(window.location.pathname,{cycle:result.data.current_cycle}))
+        if(page.kind==='dashboard')setDashboard(result.data as BunkerOsDashboard)
+        else if(page.kind==='list')setList(result.data as BunkerOsLogList)
+        else setSources(result.data as BunkerOsSources)
       }
-    } finally {
-      setBusy(false)
-    }
-  }, [page.kind, page.kind === 'list' ? page.filter : null, page.kind === 'detail' ? page.id : null])
-
-  useEffect(() => { void refresh() }, [refresh])
+    } catch(cause) {
+      if(generation===request.current)setError(cause instanceof Error?cause.message:'조회 실패 · 다시 시도하세요.')
+    } finally { if(generation===request.current)setBusy(false) }
+  }, [page.kind, page.kind==='list'?page.filter:null,page.kind==='detail'?page.id:null,cycle,offset,category,cyclesOffset])
+  useEffect(() => { void refresh(); return ()=>{request.current++} }, [refresh])
 
   const markReviewed = useCallback(async () => {
     if (!supabaseClient || page.kind !== 'detail') return
     setBusy(true); setError('')
     const { error: rpcError } = await supabaseClient.rpc('archive_operator_bunker_os_mark_reviewed', { p_log_id: page.id, p_note: note.trim() || null })
     if (rpcError) { setError('확인 완료 처리를 하지 못했습니다.'); setBusy(false); return }
-    window.location.assign('/operator/bunker-os/completed/')
+    window.location.assign(bunkerLink('/operator/bunker-os/completed/',{page:null}))
   }, [page.kind, page.kind === 'detail' ? page.id : null, note])
 
   const shared = { email, busy: parentBusy || busy, error, onRefresh: () => void refresh(), onSignOut }
   if (error) return <section className="operator-page"><BunkerOsHeader email={email} busy={busy} onSignOut={onSignOut} /><p role="alert" className="operator-error">{error}</p><button onClick={() => void refresh()}>다시 조회</button></section>
-  if (page.kind === 'list') return <BunkerOsLogListView {...shared} list={list} filter={page.filter} />
-  if (page.kind === 'detail') return <BunkerOsLogDetailView {...shared} log={detail} note={note} onNoteChange={setNote} onMarkReviewed={() => void markReviewed()} />
-  if (page.kind === 'sources') return <BunkerOsSourcesView {...shared} data={sources} />
-  return <BunkerOsDashboardView {...shared} dashboard={dashboard} />
+  if (busy) return <section className="operator-page"><BunkerOsHeader email={email} busy={busy} onSignOut={onSignOut}/><p role="status">선택한 주기의 기록을 불러오는 중…</p></section>
+  return <>
+    <nav className="bunker-cycle-navigation" aria-label="활동 주기">
+      <label>활동 주기 <select value={selectedCycle??''} onChange={event=>window.location.assign(bunkerLink('/operator/bunker-os/',{cycle:event.target.value,page:null}))}>
+        {!selectedCycle&&<option value="">아직 기록 없음</option>}
+        {selectedCycle&&!cycles.some(item=>item.cycle_key===selectedCycle)&&<option value={selectedCycle}>{cycleLabel(selectedCycle)}</option>}
+        {cycles.map(item=><option key={item.cycle_key} value={item.cycle_key}>{cycleLabel(item.cycle_key)}</option>)}
+      </select></label>
+      <span>주기 목록 {cyclesOffset+1}–{Math.min(cycleTotal,cyclesOffset+100)} / {cycleTotal}</span>
+      {cyclesOffset>0&&<a href={bunkerLink(window.location.pathname,{cyclesPage:String(cyclesOffset/100-1)})}>이전 주기 목록</a>}
+      {cyclesOffset+100<cycleTotal&&<a href={bunkerLink(window.location.pathname,{cyclesPage:String(cyclesOffset/100+1)})}>다음 주기 목록</a>}
+    </nav>
+    {page.kind==='list'?<BunkerOsLogListView {...shared} list={list} filter={page.filter}/>:
+      page.kind==='detail'?<BunkerOsLogDetailView {...shared} log={detail} note={note} onNoteChange={setNote} onMarkReviewed={()=>void markReviewed()}/>:
+      page.kind==='sources'?<BunkerOsSourcesView {...shared} data={sources}/>:<BunkerOsDashboardView {...shared} dashboard={dashboard}/>}
+  </>
 }
