@@ -27,6 +27,8 @@ with sync_playwright() as pw:
     args=r.request.post_data_json
     if mode['error'] or mode['deny']:r.fulfill(status=403,json={'message':'SYNTHETIC_DENIED'});return
     view=args['p_view'];cycle=args.get('p_cycle') or NEW;offset=args.get('p_offset',0)
+    if mode.get('empty'):
+     r.fulfill(json={'cycles':[],'total_count':0,'current_cycle':None,'logs':[],'running_count':0,'completed_count':0,'blocked_count':0,'approval_count':0,'latest_at':None});return
     common={'current_cycle':cycle,'running_count':0,'completed_count':101,'blocked_count':0,'approval_count':0,'latest_at':LOG['occurred_at']}
     if view=='cycles':body={'cycles':[{'cycle_key':NEW},{'cycle_key':OLD}],'total_count':2}
     elif view=='sources':
@@ -88,6 +90,9 @@ with sync_playwright() as pw:
    try:r.fulfill(json=body)
    except Exception:pass
   expect(page.get_by_role('combobox',name='활동 주기',exact=True)).to_have_value(NEW)
+  mode['empty']=True;page.goto(base+'/operator/bunker-os/')
+  expect(page.get_by_text('주기 목록 0–0 / 0',exact=True)).to_be_visible()
+  expect(page.get_by_role('combobox',name='활동 주기',exact=True)).to_have_value('')
   assert not errors, errors
   reports.append({'width':width,'result':'PASS','auth':'synthetic','real_remote_writes':0})
   context.close()

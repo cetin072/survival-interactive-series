@@ -387,7 +387,7 @@ export function OperatorBunkerOsDashboard({ email, busy: parentBusy, onSignOut }
         {selectedCycle&&!cycles.some(item=>item.cycle_key===selectedCycle)&&<option value={selectedCycle}>{cycleLabel(selectedCycle)}</option>}
         {cycles.map(item=><option key={item.cycle_key} value={item.cycle_key}>{cycleLabel(item.cycle_key)}</option>)}
       </select></label>
-      <span>주기 목록 {cyclesOffset+1}–{Math.min(cycleTotal,cyclesOffset+100)} / {cycleTotal}</span>
+      <span>주기 목록 {cycleTotal?Math.min(cycleTotal,cyclesOffset+1):0}–{Math.min(cycleTotal,cyclesOffset+100)} / {cycleTotal}</span>
       {cyclesOffset>0&&<a href={bunkerLink(window.location.pathname,{cyclesPage:String(cyclesOffset/100-1)})}>이전 주기 목록</a>}
       {cyclesOffset+100<cycleTotal&&<a href={bunkerLink(window.location.pathname,{cyclesPage:String(cyclesOffset/100+1)})}>다음 주기 목록</a>}
     </nav>
