@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { buildRoadmap, kstCalendarDate, years, ROADMAP_ISSUE, ROADMAP_STRATEGY, type EvidenceState, type RoadmapLog } from './operatorRoadmapModel'
+import { buildRoadmap, kstCalendarDate, years, ROADMAP_ISSUE, ROADMAP_STRATEGY, type EvidenceState, type RoadmapLog, roadmapDocuments, roadmapStage, stageEvidence, gateEvidenceUrl } from './operatorRoadmapModel'
 import './operatorRoadmap.css'
 
 const stateLabel=(state:EvidenceState):string=>
@@ -16,11 +16,23 @@ function RoadmapTile({eyebrow,value,help}: {eyebrow:string;value:ReactNode;help:
 }
 
 export function OperatorRoadmap({
-  logs, error='', today=kstCalendarDate(new Date()),
+  logs=null, error='', today=kstCalendarDate(new Date()),
 }: {
   logs?:RoadmapLog[]|null; error?:string; today?:string
 }) {
-  const roadmap=buildRoadmap(logs??null,today)
+  if(error)logs=null
+  const roadmap=buildRoadmap(logs,today)
+  const stage=roadmapStage(typeof window==='undefined'?null:new URLSearchParams(window.location.search).get('stage'))
+  const stageHref=(value:string)=>'/operator/?stage='+value+'#operator-roadmap'
+  const selected=stage?.split('-')
+  const index=Number(selected?.[1])
+  const target=selected?.[0]==='year'?years[index-1]:selected?.[0]==='week'?roadmap.weeks[index-1]:selected?.[0]==='day'?roadmap.days[index-1]:null
+  const evidence=stage?stageEvidence(logs,stage):[]
+  const nextActions=evidence.flatMap(log=>{
+    const items=(log.details as {next_actions?:unknown}|null)?.next_actions
+    return Array.isArray(items)?items.filter((item):item is string=>typeof item==='string'):[]
+  })
+
   const {calendar,days,stats}=roadmap
   const currentYear=calendar.currentYear
   const currentWeek=calendar.currentWeek
@@ -44,14 +56,14 @@ export function OperatorRoadmap({
     </div>
     <ol className="roadmap-year-track" aria-label="5년 로드맵">
       {years.map(year=><li key={year.year} className={year.year===currentYear?'current':''} aria-current={year.year===currentYear?'step':undefined}>
-        <span>{year.year}년차</span><strong>{year.title}</strong><small>{year.description}</small>
+        <span>{year.year}년차</span><strong><a href={stageHref("year-"+year.year)}>{year.title} →</a></strong><small>{year.description}</small>
       </li>)}
     </ol>
     <div className="roadmap-subheading"><h3>첫 달 · 4주 계획</h3><a href={ROADMAP_ISSUE} target="_blank" rel="noreferrer noopener">원본 실행계획 #501 ↗</a></div>
     <ol className="roadmap-week-track">
       {roadmap.weeks.map(week=><li key={week.index} className={week.index===currentWeek?'current':''}>
         <span>W{week.index} · {week.start.slice(5).replace('-','/')}-{week.end.slice(5).replace('-','/')}</span>
-        <strong>{week.title}</strong><small>{week.goal}</small>
+        <strong><a href={stageHref("week-"+week.index)}>{week.title} →</a></strong><small>{week.goal}</small>
         <em className={'roadmap-state '+stateClass(week.state)}>{stateLabel(week.state)}</em>
       </li>)}
     </ol>
@@ -67,9 +79,22 @@ export function OperatorRoadmap({
     {error&&<p role="alert" className="roadmap-load-error">{error}</p>}
     <details className="roadmap-evidence-details">
       <summary>1주차 작업 7개와 완료 근거 보기</summary>
-      <ol>{days.map(item=><li key={item.day}><span>Day {item.day} · {item.title}</span><strong className={'roadmap-state '+stateClass(item.state)}>{stateLabel(item.state)}</strong></li>)}</ol>
+      <ol>{days.map(item=><li key={item.day}><a href={stageHref("day-"+item.day)}>Day {item.day} · {item.title} →</a><strong className={'roadmap-state '+stateClass(item.state)}>{stateLabel(item.state)}</strong></li>)}</ol>
       <p>기존 Bunker OS 운영 기록을 로그인 후 읽어 자동 갱신합니다. 현재 '조사 기록'은 원고·사업성과·Production 배포까지 검증됐다는 뜻이 아닙니다.</p>
     </details>
+    {stage&&target&&<article className="roadmap-stage-detail" aria-labelledby="roadmap-stage-title">
+      <a href="/operator/#operator-roadmap">← 5년 전체 지도</a>
+      <h3 id="roadmap-stage-title">{stage.startsWith('year')?index+'년차':stage.startsWith('week')?'W'+index:'Day '+index} · {target.title}</h3>
+      <h4>목표</h4><p>{'description' in target?target.description:'goal' in target?target.goal:target.title}</p>
+      <h4>현재 상태</h4><p>{'state' in target?stateLabel(target.state):'장기 방향 · 연차별 완료율은 산정하지 않습니다.'}</p>
+      <h4>근거 자료</h4>
+      {error||logs===null?<p>조회 필요 · 기록을 확인하지 못했습니다.</p>:evidence.length?<ul>{evidence.map((log,i)=><li key={log.id??i}>
+        {log.id&&/^[0-9a-f-]{36}$/i.test(log.id)?<a href={'/operator/bunker-os/log/'+log.id+'/?stage='+stage+'&cycle='+encodeURIComponent(log.cycle_key)}>{log.title}</a>:<span>{log.title} · 상세 참조 ID 없음</span>}
+        {gateEvidenceUrl(log)&&<> · <a href={gateEvidenceUrl(log)!} target="_blank" rel="noopener noreferrer">검수 근거 원문 ↗</a></>}</li>)}</ul>:<p>연결된 실행 근거가 없습니다. 계획이나 날짜만으로 완료를 판단하지 않습니다.</p>}
+      <h4>다음 행동</h4>{nextActions.length>0&&<ul>{nextActions.map((action,i)=><li key={i}>{action}</li>)}</ul>}<p>{stage.startsWith('year')&&index>1?'세부 실행계획 미정 · 앞 단계 결과를 검토한 뒤 구체화합니다.':'연결된 일지의 다음 할 일과 원본 실행계획을 확인하고, 근거가 없으면 검토 후 기록합니다.'}</p>
+      <a href={'/operator/bunker-os/logs/?cycle=MONTH01_FIND_THE_ENGINE&stage='+stage}>첫 달 전체 기록 조회 →</a>
+    </article>}
+    <details className="roadmap-evidence-details"><summary>기획문서와 장기 자료 목록</summary><ul>{roadmapDocuments.map(doc=><li key={doc.url}><a href={doc.url} target="_blank" rel="noopener noreferrer">{doc.title} ↗</a></li>)}</ul><p>명시적으로 연결한 문서입니다. 원문 접근 권한이 필요할 수 있으며, 링크가 열리지 않으면 삭제·이동·권한을 확인하세요. 일지 자료함은 source_candidates만 모으며 저장소 전체 자동수집이 아닙니다.</p></details>
     <div className="roadmap-footer"><span>출처: <a href={ROADMAP_STRATEGY} target="_blank" rel="noreferrer noopener">5년 전략 #500</a> · <a href={ROADMAP_ISSUE} target="_blank" rel="noreferrer noopener">30일 실행계획 #501</a> · 기존 Bunker OS 감독 기록</span>
       <span>{logs===null?'운영 기록 조회 전':roadmap.latestLogAt?'기록 기준 '+new Date(roadmap.latestLogAt).toLocaleDateString('ko-KR',{timeZone:'Asia/Seoul'}):'월간 기록 없음'} · 새로고침 시 다시 확인</span>
     </div>

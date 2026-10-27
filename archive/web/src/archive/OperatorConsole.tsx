@@ -75,8 +75,8 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
         supabaseClient.rpc('archive_operator_system_status').abortSignal(AbortSignal.timeout(15000)),
         readJson<ReleaseMarker>('/release/production.json'),
         readJson<DeployMeta>('/deploy-meta.json'),
-        // Existing permission-checked Bunker OS RPC, without new DB or scheduler.
-        supabaseClient.rpc('archive_operator_bunker_os_logs', { p_status: null, p_limit: 100 }).abortSignal(AbortSignal.timeout(15000)),
+        // Explicit first-month read; never substitute the latest cycle.
+        supabaseClient.rpc('archive_operator_bunker_os_read_v2', { p_view: 'logs', p_cycle: 'MONTH01_FIND_THE_ENGINE', p_limit: 100 }).abortSignal(AbortSignal.timeout(15000)),
         supabaseClient.rpc('archive_operator_knowledge_inbox').abortSignal(AbortSignal.timeout(15000)),
       ])
       if (generation !== deploymentRefresh.current) return
@@ -94,10 +94,11 @@ export default function OperatorConsole({ view = 'dashboard', knowledgeJobId }: 
       setProductionStatus({ release, deploy })
       if (roadmapResult.error) {
         setRoadmapLogs(null)
-        setRoadmapError('로드맵 작업 기록을 확인할 수 없습니다. 나중에 다시 조회하세요.')
+        setRoadmapError('로드맵 기록 조회 실패 · 과거 주기 조회 계약 적용 여부와 접근 권한을 확인하세요.')
       } else {
-        const payload = roadmapResult.data as { logs?: RoadmapLog[] } | null
-        setRoadmapLogs(Array.isArray(payload?.logs) ? payload.logs : null)
+        const payload = roadmapResult.data as { logs?: RoadmapLog[]; has_more?: boolean } | null
+        setRoadmapLogs(Array.isArray(payload?.logs) && !payload?.has_more ? payload.logs : null)
+        if (payload?.has_more) setRoadmapError('첫 달 기록이 100건을 넘었습니다. 전체 기록에서 페이지별 근거를 확인하세요. 요약 상태는 조회 필요로 유지합니다.')
         if (!Array.isArray(payload?.logs)) setRoadmapError('작업 기록 응답을 확인하지 못했습니다.')
       }
       if (!systemResult.error && systemResult.data) setLastRefreshedAt(new Date().toISOString())

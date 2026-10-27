@@ -68,3 +68,13 @@ describe('operator roadmap first-screen display',()=>{
     expect(html).not.toContain('전체 목표 달성')
   })
 })
+
+describe('roadmap navigation and references',()=>{
+  it('exposes every planned stage and only explicit document references',()=>{
+    const html=renderToStaticMarkup(createElement(OperatorRoadmap,{logs:evidence}))
+    for(const [kind,count] of [['year',5],['week',4],['day',7]] as const)
+      for(let i=1;i<=count;i++)expect(html).toContain('stage='+kind+'-'+i)
+    expect(html).toContain('BUNKER_THREAT_MODEL_V0.md')
+    expect(html).toContain('저장소 전체 자동수집이 아닙니다')
+  })
+})
