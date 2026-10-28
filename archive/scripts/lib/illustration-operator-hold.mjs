@@ -1,0 +1,36 @@
+import { appendFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+// Explicit operator retirement. No job IDs, prompt text or asset references.
+// This hold survives DB deletion and must not advance to another generation.
+export const retiredIdentityFingerprint = 'e1959379bb7118aa5ee009e79a2c7159b89d6b6646f001e8c20ae00512f415c6'
+export const preparationHold = Object.freeze({
+  status: 'ILLUSTRATION_OPERATOR_HOLD',
+  reason: 'RETIRED_IDENTITY_NO_SUCCESSOR_AUTHORIZED',
+  next_generation_allowed: false,
+})
+
+export function isRetiredIllustrationIdentity({ point_id, generation_key }) {
+  return createHash('sha256').update(`${point_id}:${generation_key}`).digest('hex') === retiredIdentityFingerprint
+}
+
+export function assertIllustrationPreparationAllowed() {
+  // Deliberately unconditional: missing/deleted history or catalog changes must
+  // not silently clear the hold. Resuming requires a separately reviewed change.
+  throw new Error(`${preparationHold.status}:${preparationHold.reason}`)
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  if (process.argv[2] === '--github-output') {
+    // Observation only. The operational assertion above remains fail-closed.
+    if (!process.env.GITHUB_OUTPUT || !process.env.GITHUB_STEP_SUMMARY) throw new Error('GITHUB_REPORT_PATHS_REQUIRED')
+    appendFileSync(process.env.GITHUB_OUTPUT, `status=${preparationHold.status}\nnext_generation_allowed=false\n`)
+    appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## Automation B: operator hold\n\n${JSON.stringify(preparationHold)}\n\nNo cleanup, preparation or prompt publication. A separately approved successor is required; rerunning cannot clear this hold.\n`)
+    process.stdout.write(JSON.stringify(preparationHold) + '\n')
+  } else {
+    process.stderr.write(JSON.stringify(preparationHold) + '\n')
+    process.exitCode = 1
+  }
+}

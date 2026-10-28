@@ -218,3 +218,30 @@ read/write, HTTP 409 in under five seconds and concurrent save/request exclusion
 No real manuscript was published. Detailed local reports are under
 `/tmp/knowledge-real-auth-final/`; source-controlled regression scripts reproduce
 these checks. Remote final-head CI/Preview results belong in the PR, separately.
+
+## 2026-10-28 main integration and B hold reporting
+
+Reuse PR #626 and its existing branch. Integrate main
+`05872e8598ef390426600c9ae552fe7f49720efb` into prior reviewed head
+`332410a4acd92202389543fb39bd92fd8507e9d2`. Four conflicts: Knowledge detail,
+Knowledge inbox, bucket labels and browser workflow. Preserve V2 editing and
+both browser suites; carry main's bounded inbox read/error/empty separation and
+require positive public observation or a verified publication record before
+calling a legacy repository-published article public. No manuscripts, SQL,
+approval gates, release policy or deployment schedules changed relative to main.
+
+The B report-only workflow change is documented in
+`ILLUSTRATION_RETIRED_IDENTITY_HOLD.md`. Preparation remains unconditionally held.
+Old GitHub failures are historical results, not evidence of generator damage.
+
+Validation on the integrated source: web tests, verified build/public boundaries,
+content/semantic tests, editor/legacy/release workers, isolated PostgreSQL 17 CI
+contracts including editor legacy fixtures, and synthetic editor/runtime browser
+checks. Exact command outcomes and final-head CI are recorded in PR #626.
+The initial drift test lacked the canonical remote ref; fetching the same ref
+required by CI made its four tests pass. Initial browser build lacked the CI dummy
+Auth configuration; browser checks use the existing intercepted synthetic config.
+No actual operator login, operational DB mutation, publication, generation,
+scheduler activation, main merge or production deployment was performed. Prior
+head's real local Auth evidence remains prior-head evidence; it is not relabeled
+as a fresh operational test.

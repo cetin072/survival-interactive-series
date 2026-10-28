@@ -11,8 +11,34 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  prepare:
+  policy:
     if: github.repository == 'cetin072/survival-interactive-series'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      status: ${{ steps.policy.outputs.status }}
+      allowed: ${{ steps.policy.outputs.next_generation_allowed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - id: policy
+        name: Observe preparation policy without changing state
+        run: node archive/scripts/lib/illustration-operator-hold.mjs --github-output
+  held:
+    needs: policy
+    if: needs.policy.outputs.status == 'ILLUSTRATION_OPERATOR_HOLD' && needs.policy.outputs.allowed == 'false'
+    name: ILLUSTRATION_OPERATOR_HOLD / RETIRED_IDENTITY_NO_SUCCESSOR_AUTHORIZED / next_generation_allowed:false
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: echo 'Operator hold confirmed; no generation authorized.'
+  prepare:
+    needs: policy
+    if: github.repository == 'cetin072/survival-interactive-series' && needs.policy.outputs.status == 'ALLOWED' && needs.policy.outputs.allowed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -26,6 +52,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Enforce operator hold before cleanup or any state-changing RPC
+        run: node archive/scripts/lib/illustration-operator-hold.mjs
       - name: Install pinned PNG validator
         run: 'python -m pip install --only-binary=:all: Pillow==12.3.0'
       - name: Clean expired 30-day illustration vault objects

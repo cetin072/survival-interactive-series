@@ -10,6 +10,7 @@ export const deploymentSites = [
 export type DeploymentSite = typeof deploymentSites[number]
 export type SiteReleasePolicy = {
   repository: string; site_id: string; workflow: string
+  schedule_enabled?: boolean
   schedule_anchor_utc: string; schedule_interval_hours: number; schedule_window_hours: number
   deploy_inputs: string[]; deploy_excludes: string[]
 }
@@ -41,7 +42,7 @@ const dateValid = (s: unknown): s is string => typeof s === 'string' && Number.i
 export function validateSitePolicy(value: SiteReleasePolicy, site: DeploymentSite): SiteReleasePolicy {
   if (!value || value.repository !== site.repository || value.site_id !== site.siteId
     || !/^[a-zA-Z0-9_-]+\.yml$/.test(value.workflow)
-    || !dateValid(value.schedule_anchor_utc) || value.schedule_interval_hours !== 48
+    || !dateValid(value.schedule_anchor_utc) || ![48, 72].includes(value.schedule_interval_hours)
     || value.schedule_window_hours !== 24 || !Array.isArray(value.deploy_inputs) || !value.deploy_inputs.length
     || !Array.isArray(value.deploy_excludes)) throw new Error('POLICY_INVALID')
   for (const pattern of [...value.deploy_inputs, ...value.deploy_excludes]) {
@@ -54,11 +55,12 @@ export function validateSitePolicy(value: SiteReleasePolicy, site: DeploymentSit
 // Same epoch/index rule as scheduled-netlify-release.mjs: index 0 establishes
 // the baseline; the first scheduled slot is index 1. UTC arithmetic survives
 // month/year boundaries. The UI never changes the actual scheduler.
-export function deploymentSlot(policy: Pick<SiteReleasePolicy, 'schedule_anchor_utc' | 'schedule_interval_hours' | 'schedule_window_hours'>, now: number) {
+export function deploymentSlot(policy: Pick<SiteReleasePolicy, 'schedule_anchor_utc' | 'schedule_interval_hours' | 'schedule_window_hours' | 'schedule_enabled'>, now: number) {
+  if (policy.schedule_enabled === false) return null
   const anchor = Date.parse(policy.schedule_anchor_utc)
   const interval = policy.schedule_interval_hours * HOUR
   const window = policy.schedule_window_hours * HOUR
-  if (!Number.isFinite(anchor) || !Number.isFinite(now) || interval !== 48 * HOUR || window !== 24 * HOUR) return null
+  if (!Number.isFinite(anchor) || !Number.isFinite(now) || ![48 * HOUR, 72 * HOUR].includes(interval) || window !== 24 * HOUR) return null
   const index = Math.floor((now - anchor) / interval)
   const start = anchor + index * interval
   return {
@@ -216,6 +218,7 @@ export async function observeSiteDeployment(site: DeploymentSite, fetcher: Fetch
       if (file.encoding !== 'base64' || typeof file.content !== 'string') throw new Error('POLICY_INVALID')
       const bytes = Uint8Array.from(atob(file.content.replace(/\s/g, '')), (c) => c.charCodeAt(0))
       result.policy = validateSitePolicy(JSON.parse(new TextDecoder().decode(bytes)), site)
+      if (result.policy.schedule_enabled === false) return
       const runs = await publicJson<{ workflow_runs: ScheduledRun[] }>(`${github}/actions/workflows/${result.policy.workflow}/runs?branch=main&event=schedule&per_page=1`, fetcher)
       if (!Array.isArray(runs.workflow_runs)) throw new Error('RUNS_INVALID')
       const run = runs.workflow_runs[0]

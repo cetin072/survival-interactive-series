@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { chapterHash, hashPolicyBytes } from './knowledge-semantic-jobs.mjs'
-import { readVerifiedArchivedRaw } from './knowledge-semantic-source-alias.mjs'
+import { readVerifiedArchivedRaw, readVerifiedStrongholdRaw } from './knowledge-semantic-source-alias.mjs'
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex')
 const json = JSON.stringify
 const safeRef = (value) => typeof value === 'string' && value.length > 0 && !value.startsWith('/') && !value.includes('..') && !value.includes('\\')
@@ -11,7 +11,10 @@ const safeRef = (value) => typeof value === 'string' && value.length > 0 && !val
 export async function readPinnedSourceBytes({ base, ref, expectedHash, read = readFile, readWorldline = (ref) => execFileSync('git', ['show', `origin/worldline/afterfall-rpg:${ref}`], {cwd:base,stdio:['ignore','pipe','pipe']}) }) {
   try { return await read(join(base,ref)) }
   catch (cause) {
-    if (cause?.code !== 'ENOENT' || !ref.startsWith('worldlines/AFTERFALL/')) throw cause
+    if (cause?.code !== 'ENOENT') throw cause
+    const stronghold = await readVerifiedStrongholdRaw({base,ref,expectedSha256:expectedHash,read})
+    if (stronghold) return stronghold
+    if (!ref.startsWith('worldlines/AFTERFALL/')) throw cause
     try { return await readWorldline(ref) }
     catch {
       const archived = await readVerifiedArchivedRaw({base,ref,expectedSha256:expectedHash,read})

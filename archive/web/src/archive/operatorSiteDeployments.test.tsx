@@ -21,17 +21,17 @@ const healthy = (): SiteDeploymentObservation => ({ ...emptySiteObservation(site
   published, mainSha: sha, webChanges: false })
 const compare = { status: 'ahead', base_commit: { sha }, merge_base_commit: { sha }, files: [] as { filename: string; previous_filename?: string }[] }
 
-describe('fixed 48-hour slots and Korean clock', () => {
+describe('fixed 72-hour slots and Korean clock', () => {
   it.each([
-    ['2026-10-19T08:20:00Z', '2026-10-21T08:20:00.000Z', false],
-    ['2026-10-20T09:05:00Z', '2026-10-21T08:20:00.000Z', false],
-    ['2026-10-21T08:19:59Z', '2026-10-21T08:20:00.000Z', false],
-    ['2026-10-21T08:20:00Z', '2026-10-23T08:20:00.000Z', true],
-    ['2026-10-22T08:19:59Z', '2026-10-23T08:20:00.000Z', true],
-    ['2026-10-22T08:20:00Z', '2026-10-23T08:20:00.000Z', false],
-    ['2026-10-31T09:00:00Z', '2026-11-02T08:20:00.000Z', true],
-    ['2026-12-31T23:59:59Z', '2027-01-01T08:20:00.000Z', false],
-    ['2027-01-01T08:20:00Z', '2027-01-03T08:20:00.000Z', true],
+    ['2026-10-19T08:20:00Z', '2026-10-22T08:20:00.000Z', false],
+    ['2026-10-20T09:05:00Z', '2026-10-22T08:20:00.000Z', false],
+    ['2026-10-22T08:19:59Z', '2026-10-22T08:20:00.000Z', false],
+    ['2026-10-22T08:20:00Z', '2026-10-25T08:20:00.000Z', true],
+    ['2026-10-23T08:19:59Z', '2026-10-25T08:20:00.000Z', true],
+    ['2026-10-23T08:20:00Z', '2026-10-25T08:20:00.000Z', false],
+    ['2026-10-31T09:00:00Z', '2026-11-03T08:20:00.000Z', true],
+    ['2026-12-31T23:59:59Z', '2027-01-02T08:20:00.000Z', false],
+    ['2027-01-02T08:20:00Z', '2027-01-05T08:20:00.000Z', true],
   ])('uses the original epoch at %s', (at, next, active) => {
     const result = deploymentSlot(policy, Date.parse(at))!
     expect(result.next).toBe(next)
@@ -282,6 +282,19 @@ describe('three-site presentation', () => {
     expect(markup).not.toContain(' open=')
     expect(markup).not.toContain('work-notebook-app')
     expect(markup).not.toContain('· 23시 ·')
-    expect(markup).toContain('10월 21일 (수) 오후 5:20')
+    expect(markup).toContain('10월 22일 (목) 오후 5:20')
   })
+})
+
+it('excludes disabled worklog from shared schedule, retains server status and exposes authenticated workflow links', () => {
+  const observations = deploymentSites.map((entry, i) => ({ ...healthy(), site: entry,
+    policy: { ...policy, schedule_enabled: i !== 2, workflow: i === 1 ? 'archive-production-release.yml' : 'production-release.yml' } }))
+  expect(deploymentSlot(observations[2].policy, now)).toBeNull()
+  const html = renderToStaticMarkup(createElement(OperatorSiteDeployments, { observations, at: now }))
+  expect(html).toContain('정기 배포 제외')
+  expect(html).toContain('10월 22일 (목) 오후 5:20')
+  expect(html).not.toContain('공개 간격 최소 48시간')
+  expect(html.match(/>즉시 배포<\/a>/g)).toHaveLength(3)
+  expect(html).toContain('/actions/workflows/archive-production-release.yml')
+  expect(html).toContain('main → deploy-now → Run workflow')
 })

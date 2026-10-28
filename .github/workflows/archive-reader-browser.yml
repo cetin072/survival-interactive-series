@@ -11,6 +11,7 @@ on:
       - 'archive/scripts/check-operator-deploy-browser.py'
       - 'archive/scripts/check-knowledge-editor-browser.py'
       - 'archive/scripts/check-knowledge-live.mjs'
+      - 'archive/scripts/check-operator-runtime-browser.py'
       - 'archive/scripts/reader_deploy_identity.py'
       - 'archive/scripts/test_reader_deploy_identity.py'
       - '.github/workflows/archive-reader-browser.yml'
@@ -23,6 +24,7 @@ on:
       - 'archive/scripts/check-operator-deploy-browser.py'
       - 'archive/scripts/check-knowledge-editor-browser.py'
       - 'archive/scripts/check-knowledge-live.mjs'
+      - 'archive/scripts/check-operator-runtime-browser.py'
       - 'archive/scripts/reader_deploy_identity.py'
       - 'archive/scripts/test_reader_deploy_identity.py'
       - '.github/workflows/archive-reader-browser.yml'
@@ -36,7 +38,9 @@ concurrency:
 
 jobs:
   browser:
-    runs-on: ubuntu-latest
+    # Playwright 1.55's pinned browser dependencies support Ubuntu 24.04.
+    # Do not follow ubuntu-latest into an unsupported host release.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
@@ -83,6 +87,8 @@ jobs:
         run: python ../scripts/check-knowledge-editor-browser.py --screenshots "$RUNNER_TEMP/archive-browser/knowledge-editor"
       - name: Observe existing Production Knowledge pages without publishing
         run: node ../scripts/check-knowledge-live.mjs "$RUNNER_TEMP/archive-browser/knowledge-live"
+      - name: Verify Operator execution, expiry and error states without remote writes
+        run: python ../scripts/check-operator-runtime-browser.py --screenshots "$RUNNER_TEMP/archive-browser/operator-runtime"
       - name: Fetch recent PR history for source-equivalent preview verification
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         working-directory: .

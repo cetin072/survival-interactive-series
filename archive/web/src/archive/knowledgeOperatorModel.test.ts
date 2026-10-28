@@ -14,7 +14,8 @@ describe('Knowledge operator review queue', () => {
   it('shows human-check approval separately and never calls it published', () => {
     expect(knowledgeBucketFor(item('APPROVED'))).toBe('APPROVED')
     expect(knowledgeBucketLabel.APPROVED).toBe('발행 중')
-    expect(knowledgeBucketFor({ ...item('APPROVED'), status: 'PUBLISHED' })).toBe('PUBLISHED')
+    expect(knowledgeBucketFor({ ...item('APPROVED'), status: 'PUBLISHED' })).toBe('APPROVED')
+    expect(knowledgeBucketFor({ ...item('APPROVED'), status: 'PUBLISHED', published_on_site:true })).toBe('PUBLISHED')
   })
 
   it('keeps a new stored legacy copy in review while its old article stays live',()=>{
