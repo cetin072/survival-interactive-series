@@ -390,7 +390,7 @@ export function OperatorDashboard({
             <div><dt>현재 상태 시간</dt><dd>{visualLatest?.age_minutes == null ? '—' : `${visualLatest.age_minutes}분`}</dd></div>
             <div><dt>실패 횟수</dt><dd>{systemStatus ? `생성 ${visualLatest?.provider_failure_count ?? 0} · 저장 ${visualLatest?.ingest_failure_count ?? 0} · 검수 ${visualLatest?.review_failure_count ?? 0}` : '조회 불가'}</dd></div>
             <div><dt>검수 결과</dt><dd>{visualLatest?.review_decision ? statusLabel(visualLatest.review_decision) : '아직 없음'}</dd></div>
-            <div><dt>현재 장애</dt><dd>{visualExecution.tone !== 'ok' ? visualExecution.label : visualBlocker ? blockerLabel(visualBlocker) : '최근 작업 차단 없음 · 실행 성공은 신규 생성 보장 아님'}</dd></div>
+            <div><dt>보류·장애</dt><dd>{visualExecution.tone !== 'ok' ? visualExecution.label : visualBlocker ? blockerLabel(visualBlocker) : '최근 작업 차단 없음 · 실행 성공은 신규 생성 보장 아님'}</dd></div>
           </dl>
           <p className="operator-status-help">이전 이미지의 차단·재시도 이력은 보존되며 최신 작업의 현재 장애로 합산하지 않습니다.</p>
           <details className="operator-tech-details">

@@ -1,7 +1,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { readFileSync, mkdtempSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { assertIllustrationPreparationAllowed, isRetiredIllustrationIdentity } from './illustration-operator-hold.mjs'
@@ -47,4 +48,24 @@ test('workflow hold precedes cleanup, preparation and prompt publication', () =>
   assert.ok(hold > 0)
   for (const action of ['illustration_vault.py cleanup', 'run: node archive/scripts/prepare-illustration-render-job.mjs', 'Publish visual-only prompt transport'])
     assert.ok(workflow.indexOf(action) > hold)
+})
+
+
+test('workflow observation reports hold without allowing preparation', (t) => {
+  const dir = mkdtempSync(resolve(tmpdir(), 'illustration-hold-'))
+  t.after(() => rmSync(dir, {recursive:true, force:true}))
+  const output = resolve(dir, 'output'), summary = resolve(dir, 'summary')
+  const script = resolve(root, 'archive/scripts/lib/illustration-operator-hold.mjs')
+  const result = spawnSync(process.execPath, [script, '--github-output'], {
+    encoding:'utf8', env:{PATH:process.env.PATH, GITHUB_OUTPUT:output, GITHUB_STEP_SUMMARY:summary},
+  })
+  assert.equal(result.status, 0)
+  assert.equal(JSON.parse(result.stdout).next_generation_allowed, false)
+  assert.match(readFileSync(output,'utf8'), /next_generation_allowed=false/)
+  assert.match(readFileSync(summary,'utf8'), /RETIRED_IDENTITY_NO_SUCCESSOR_AUTHORIZED/)
+  assert.throws(assertIllustrationPreparationAllowed, /ILLUSTRATION_OPERATOR_HOLD/)
+  assert.notEqual(spawnSync(process.execPath, [script, '--github-output'], {env:{PATH:process.env.PATH}}).status, 0)
+  const workflow = readFileSync(resolve(root,'.github/workflows/archive-illustration-prep.yml'),'utf8')
+  assert.match(workflow, /needs.policy.outputs.status == 'ALLOWED' && needs.policy.outputs.allowed == 'true'/)
+  assert.doesNotMatch(workflow, /continue-on-error/)
 })

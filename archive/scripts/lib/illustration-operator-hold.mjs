@@ -1,3 +1,4 @@
+import { appendFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -22,6 +23,14 @@ export function assertIllustrationPreparationAllowed() {
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
-  process.stderr.write(JSON.stringify(preparationHold) + '\n')
-  process.exitCode = 1
+  if (process.argv[2] === '--github-output') {
+    // Observation only. The operational assertion above remains fail-closed.
+    if (!process.env.GITHUB_OUTPUT || !process.env.GITHUB_STEP_SUMMARY) throw new Error('GITHUB_REPORT_PATHS_REQUIRED')
+    appendFileSync(process.env.GITHUB_OUTPUT, `status=${preparationHold.status}\nnext_generation_allowed=false\n`)
+    appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## Automation B: operator hold\n\n${JSON.stringify(preparationHold)}\n\nNo cleanup, preparation or prompt publication. A separately approved successor is required; rerunning cannot clear this hold.\n`)
+    process.stdout.write(JSON.stringify(preparationHold) + '\n')
+  } else {
+    process.stderr.write(JSON.stringify(preparationHold) + '\n')
+    process.exitCode = 1
+  }
 }

@@ -9,6 +9,8 @@ on:
       - 'archive/scripts/lib/archive-source-discovery*'
       - 'archive/scripts/check-reader-browser.py'
       - 'archive/scripts/check-operator-deploy-browser.py'
+      - 'archive/scripts/check-knowledge-editor-browser.py'
+      - 'archive/scripts/check-knowledge-live.mjs'
       - 'archive/scripts/check-operator-runtime-browser.py'
       - 'archive/scripts/reader_deploy_identity.py'
       - 'archive/scripts/test_reader_deploy_identity.py'
@@ -20,6 +22,8 @@ on:
       - 'archive/content/**'
       - 'archive/scripts/check-reader-browser.py'
       - 'archive/scripts/check-operator-deploy-browser.py'
+      - 'archive/scripts/check-knowledge-editor-browser.py'
+      - 'archive/scripts/check-knowledge-live.mjs'
       - 'archive/scripts/check-operator-runtime-browser.py'
       - 'archive/scripts/reader_deploy_identity.py'
       - 'archive/scripts/test_reader_deploy_identity.py'
@@ -79,6 +83,10 @@ jobs:
         run: python ../scripts/check-reader-browser.py --world-wiki --screenshots "$RUNNER_TEMP/archive-browser/local"
       - name: Audit read-only Operator states, permissions and mobile layout (mock providers)
         run: python ../scripts/check-operator-deploy-browser.py --screenshots "$RUNNER_TEMP/archive-browser/operator-local"
+      - name: Exercise private Knowledge editor clicks at 320, 390 and 1280 pixels
+        run: python ../scripts/check-knowledge-editor-browser.py --screenshots "$RUNNER_TEMP/archive-browser/knowledge-editor"
+      - name: Observe existing Production Knowledge pages without publishing
+        run: node ../scripts/check-knowledge-live.mjs "$RUNNER_TEMP/archive-browser/knowledge-live"
       - name: Verify Operator execution, expiry and error states without remote writes
         run: python ../scripts/check-operator-runtime-browser.py --screenshots "$RUNNER_TEMP/archive-browser/operator-runtime"
       - name: Fetch recent PR history for source-equivalent preview verification

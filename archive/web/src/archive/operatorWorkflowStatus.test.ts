@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { readWorkflow, workflowSignal, WORKFLOW_FRESH_MS } from './operatorWorkflowStatus'
+import { readWorkflow, workflowSignal, WORKFLOW_FRESH_MS, confirmedOperatorHold, OPERATOR_HOLD_JOB } from './operatorWorkflowStatus'
 
 describe('actual workflow evidence', () => {
   const now = Date.now()
@@ -41,5 +41,29 @@ describe('actual workflow evidence', () => {
       expect(result.run).toBeNull()
     }
     expect((await readWorkflow('archive', (async () => { throw new Error('network') }) as typeof fetch)).error).toBe(true)
+  })
+})
+
+
+describe('operator hold evidence', () => {
+  const jobs = [
+    {run_id:12,name:'policy',status:'completed',conclusion:'success'},
+    {run_id:12,name:OPERATOR_HOLD_JOB,status:'completed',conclusion:'success'},
+    {run_id:12,name:'prepare',status:'completed',conclusion:'skipped'},
+  ]
+  it('requires complete matching evidence and skipped mutation job', () => {
+    expect(confirmedOperatorHold({total_count:3,jobs},12)).toBe(true)
+    expect(confirmedOperatorHold({total_count:4,jobs},12)).toBe(false)
+    expect(confirmedOperatorHold({total_count:3,jobs},13)).toBe(false)
+    for (const conclusion of ['failure','success','cancelled']) {
+      expect(confirmedOperatorHold({total_count:3,jobs:jobs.map(j=>j.name==='prepare'?{...j,conclusion}:j)},12)).toBe(false)
+    }
+  })
+  it('does not hide failures or expired observations', () => {
+    const now=Date.now(),checkedAt=new Date(now).toISOString()
+    const observation={checkedAt,operatorHold:true,error:false,run:{id:12,status:'completed',conclusion:'success',createdAt:checkedAt,url:''}}
+    expect(workflowSignal(observation,now,30).label).toContain('운영자 보류')
+    expect(workflowSignal({...observation,run:{...observation.run,conclusion:'failure'}},now,30).tone).toBe('danger')
+    expect(workflowSignal(observation,now+WORKFLOW_FRESH_MS,30).tone).toBe('neutral')
   })
 })

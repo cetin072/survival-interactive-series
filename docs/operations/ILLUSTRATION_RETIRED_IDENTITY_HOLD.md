@@ -1,7 +1,7 @@
 # Automation B retired identity hold
 
 The operator retired one failed illustration identity and did not authorize a
-successor generation. Preparation now exits nonzero with
+successor generation. Direct preparation still exits nonzero with
 `ILLUSTRATION_OPERATOR_HOLD:RETIRED_IDENTITY_NO_SUCCESSOR_AUTHORIZED` before vault
 cleanup, database calls or prompt publication. The schedule remains configured;
 this is an explicit operational hold, not a successful image or completed repair.
@@ -23,9 +23,29 @@ confirmed failed row in a conditional transaction after locking and checking its
 dependent rows. Do not delete Library originals or previous rejected attempts.
 An unexpected count, state, connection or outcome must stop the operation.
 
-The existing workflow API does not distinguish an intentional hold from other
-nonzero failures; its run log names this hold explicitly. The dashboard must not
-show a successful generation. Site deployment is separate and unchanged.
+The revised workflow observes policy in a separate job. An explicit held result
+finishes with a named hold job and skips the entire preparation job (including
+cleanup). Missing output, observation errors and unexpected statuses never enable
+preparation. The unconditional assertion remains in the mutation entrypoints.
+No continue-on-error, scheduler changes or retry loop is introduced.
+
+The dashboard recognizes a hold only from the complete, matching three-job result:
+policy success, the exact named hold success and prepare skipped. API failure or
+expired evidence remains unknown; actual failure remains failure. GitHub's green
+conclusion means policy observation completed, not image generation or recovery.
+Historical run 40685595404 retains its failure conclusion; its log explicitly
+reports this policy hold before all mutation steps. It must not be diagnosed as
+a lease or generator failure. No historical run was rerun or altered.
+
+Resumption requires a separate explicit operator decision naming the successor
+content identity (point_id/generation_key), permitted generation scope and any
+paid-generation authorization. Then a separately reviewed code change must update
+the preparation policy/guard and its tests while retaining rejection of the retired
+identity and all receipt/recovery/approval gates. There is currently no environment
+variable, credential rotation, DB deletion or schedule toggle that authorizes a
+successor. This PR does not supply that authorization or change identities,
+credentials, privileges, images, candidates, receipts or manuscripts. Site deployment
+and scheduler configuration are unchanged.
 
 Earlier audit clarification: the existing privileged read-only connection can
 verify stored prompt hashes without new grants. Coordinator RPC limitations are

@@ -29,7 +29,7 @@ def run(output):
             page = context.new_page()
             page.clock.install()
             errors, providers, calls = [], [], []
-            mode = {'deny': False}
+            mode = {'deny': False, 'hold': False}
             pending_decisions = []
             review = {'id': '00000000-0000-4000-8000-000000000123', 'source_worker': 'A_TEST', 'item_type': 'TEST', 'chronicle_id': None, 'priority': 'LOW', 'title': 'Synthetic review', 'summary': 'Only local fixture', 'risk_level': 'LOW', 'source_ref': 'https://example.invalid', 'status': 'PENDING', 'created_at': '2026-10-01T00:00:00Z', 'payload': {}, 'updated_at': None, 'decided_at': None, 'decision_note': None, 'decision_history': []}
             page.on('pageerror', lambda e: errors.append(str(e)))
@@ -59,7 +59,12 @@ def run(output):
                         workflow = u.path.split('/')[-2]
                         r.fulfill(json={'workflow_runs': [{'id': 123, 'head_branch': 'main', 'event': 'workflow_dispatch',
                             'path': '.github/workflows/' + workflow, 'repository': {'full_name': 'cetin072/survival-interactive-series'},
-                            'status': 'completed', 'conclusion': 'failure' if 'illustration' in workflow else 'success', 'created_at': now}]})
+                            'status': 'completed', 'conclusion': 'failure' if 'illustration' in workflow and not mode['hold'] else 'success', 'created_at': now}]})
+                    elif '/actions/runs/123/jobs' in u.path:
+                        r.fulfill(json={'total_count':3,'jobs':[
+                            {'run_id':123,'name':'policy','status':'completed','conclusion':'success'},
+                            {'run_id':123,'name':'ILLUSTRATION_OPERATOR_HOLD / RETIRED_IDENTITY_NO_SUCCESSOR_AUTHORIZED / next_generation_allowed:false','status':'completed','conclusion':'success'},
+                            {'run_id':123,'name':'prepare','status':'completed','conclusion':'skipped'}]})
                     else:
                         r.fulfill(status=503, json={})
                     return
@@ -91,6 +96,10 @@ def run(output):
             expect(page.locator('.operator-sites')).to_have_attribute('aria-busy', 'false')
             assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1')
             page.locator('.operator-system-grid').screenshot(path=str(output / f'runtime-{width}.png'))
+            mode['hold'] = True
+            page.reload()
+            expect(cards.nth(2).locator('.operator-status-badge')).to_have_text('운영자 보류 · 후속 생성 승인 필요')
+            expect(cards.nth(2)).not_to_contain_text('최근 실행 성공')
             before = calls.count('archive_operator_system_status')
             page.clock.fast_forward(60000)
             expect(page.locator('.operator-refresh-button').first).to_have_attribute('aria-busy', 'false')
@@ -117,8 +126,8 @@ def run(output):
             mode['deny'] = True
             page.goto(base + '/operator/knowledge/')
             expect(page.get_by_role('alert')).to_contain_text('불러오지 못했습니다')
-            expect(page.locator('.operator-counts')).to_contain_text('조회 불가')
-            expect(page.get_by_text('해당 상태의 글감이 없습니다.')).to_have_count(0)
+            expect(page.get_by_role('heading', name='검토할 글 · 조회 불가')).to_be_visible()
+            expect(page.get_by_text('이 목록에 글이 없습니다.')).to_have_count(0)
             before = len(providers)
             page.goto(base + '/operator/')
             expect(page.get_by_text('자동화 실행 상태를 불러오지 못했습니다.')).to_be_visible()

@@ -22,13 +22,13 @@ describe('Knowledge focused human review', () => {
   it('highlights relevant source passages and a source-scope field without modifying the original', () => {
     const original = example()
     const targets = selectKnowledgeReviewTargets(original, 'HIGH_RISK_SHELTER_CAPACITY', '구조·소방·피난 확인')
-    expect(targets.length).toBe(3)
-    expect(targets[0].heading).toContain('수용 인원')
+    expect(targets.length).toBe(2)
+    expect(targets[0].heading).toBe('글 전체의 적용 범위 확인')
     expect(targets.some((v) => v.key === 'field:basis')).toBe(true)
     expect(targets.every((v) => !v.heading.includes('생존일기'))).toBe(true)
     const next = editReviewTarget(original, targets[0], '국내 기준을 확인하기 전에는 수용 인원을 단정하지 않는다.')
     expect(reviewTargetValue(next, targets[0])).toContain('단정하지 않는다')
-    expect(reviewTargetValue(original, targets[0])).toContain('소방 기준')
+    expect(reviewTargetValue(original, targets[0])).toBe('범위를 확인한다')
   })
 
   it('can edit an individual list item without rewriting other items', () => {

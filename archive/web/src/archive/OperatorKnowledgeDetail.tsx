@@ -1,304 +1,158 @@
-import { useCallback, useEffect, useState } from 'react'
-import { KnowledgeDraftEditor, KnowledgeDraftPreview, type KnowledgeDraftBrief } from './KnowledgeDraftEditor'
-import { KnowledgeEvidenceGatePanel, KnowledgeReviewFocus, editReviewTarget, knowledgeEvidenceGate, normalizeHumanReviewDraft, selectKnowledgeReviewTargets, type KnowledgeReviewTarget } from './KnowledgeReviewFocus'
+import {useCallback,useEffect,useRef,useState} from 'react'
+import {KnowledgeDraftEditor,KnowledgeDraftPreview,type KnowledgeDraftBrief} from './KnowledgeDraftEditor'
+import {editorialError,editorialIssues,editorialStatus,editorialTemplate,publicationActive,readableBrief,observeLegacyPublic,quoteLocations,type EditorialEnvelope,type EditorialIssue,type EditorialReview,type EditorialResolution} from './knowledgeEditorialModel'
+import {formatOperatorTime} from './operatorSystemStatus'
+import {uploadKnowledgeImage} from './knowledgeMedia'
+import {supabaseClient} from './supabaseClient'
 import './KnowledgeReviewFocus.css'
-import { uploadKnowledgeImage } from './knowledgeMedia'
-import {
-  knowledgeBucketFor,
-  knowledgeBucketLabel,
-  knowledgeSourceLabel,
-  type KnowledgeDetail,
-} from './knowledgeOperatorModel'
-import { formatOperatorTime } from './operatorSystemStatus'
-import { supabaseClient } from './supabaseClient'
-
-type DraftEnvelope = {
-  job_id: string
-  editable: boolean
-  review_item_id?: string | null
-  review_status?: string | null
-  revision: number
-  draft_sha256?: string | null
-  updated_at?: string | null
-  brief?: KnowledgeDraftBrief | null
-}
-
-const cloneBrief = (brief: KnowledgeDraftBrief) => JSON.parse(JSON.stringify(brief)) as KnowledgeDraftBrief
-
-export function OperatorKnowledgeDetail({
-  jobId,
-  email,
-  busy: parentBusy,
-  onSignOut,
-}: {
-  jobId: string
-  email?: string | null
-  busy: boolean
-  onSignOut: () => void
-}) {
-  const [selected, setSelected] = useState<KnowledgeDetail | null>(null)
-  const [reviewNote, setReviewNote] = useState('')
-  const [reviewTargets, setReviewTargets] = useState<KnowledgeReviewTarget[]>([])
-  const [reviewed, setReviewed] = useState<Record<string, boolean>>({})
-  const [reviewReasonCode, setReviewReasonCode] = useState<string | null>(null)
-  const [reviewAiNote, setReviewAiNote] = useState<string | null>(null)
-  const [draftBrief, setDraftBrief] = useState<KnowledgeDraftBrief | null>(null)
-  const [draftRevision, setDraftRevision] = useState(0)
-  const [draftEditable, setDraftEditable] = useState(false)
-  const [editing, setEditing] = useState(false)
-  const [draftDirty, setDraftDirty] = useState(false)
-  const [savingDraft, setSavingDraft] = useState(false)
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState('')
-  const [publicationNotice, setPublicationNotice] = useState('')
-
-  const loadDetail = useCallback(async () => {
-    if (!supabaseClient) return
-    setBusy(true); setError('')
-    const [detailResponse, draftResponse] = await Promise.all([
-      supabaseClient.rpc('archive_operator_knowledge_job_detail', { p_job_id: jobId }),
-      supabaseClient.rpc('archive_operator_knowledge_draft_get', { p_job_id: jobId }),
-    ])
-    if (detailResponse.error) {
-      setError('글감 상세를 불러오지 못했습니다.')
-      setSelected(null)
-    } else {
-      const detail = detailResponse.data as KnowledgeDetail
-      setSelected(detail)
-      setReviewNote(detail.review_decision_note ?? '')
-      let visibleBrief: KnowledgeDraftBrief | null = null
-      if (!draftResponse.error && draftResponse.data) {
-        const draft = draftResponse.data as DraftEnvelope
-        visibleBrief = draft.brief ? (draft.editable ? normalizeHumanReviewDraft(draft.brief) : cloneBrief(draft.brief)) : null
-        setDraftRevision(draft.revision ?? 0)
-        setDraftEditable(draft.editable === true)
-      } else {
-        const resultBrief = detail.result?.brief as KnowledgeDraftBrief | undefined
-        visibleBrief = resultBrief ? cloneBrief(resultBrief) : null
-        setDraftRevision(0)
-        setDraftEditable(false)
-      }
-      setDraftBrief(visibleBrief)
-      const aiNote = typeof detail.result?.note === 'string' ? detail.result.note : null
-      let reasonCode = typeof detail.result?.code === 'string' ? detail.result.code : null
-      if (detail.review_item_id) {
-        const { data: reviewData } = await supabaseClient.rpc('archive_operator_review_item_detail', {
-          p_item_id: detail.review_item_id,
-        })
-        const payload = (reviewData as { payload?: { reason_codes?: unknown } } | null)?.payload
-        const codes = payload?.reason_codes
-        if (!reasonCode && Array.isArray(codes) && typeof codes[0] === 'string') reasonCode = codes[0]
-      }
-      setReviewReasonCode(reasonCode)
-      setReviewAiNote(aiNote)
-      setReviewTargets(visibleBrief ? selectKnowledgeReviewTargets(visibleBrief, reasonCode, aiNote) : [])
-      setReviewed({})
-      setEditing(false)
-      setDraftDirty(false)
-    }
-    setBusy(false)
-  }, [jobId])
-
-  useEffect(() => { void loadDetail() }, [loadDetail])
-
-  const decideReview = useCallback(async (decision: 'HOLD' | 'REJECTED') => {
-    if (!supabaseClient || !selected?.review_item_id) return
-    setBusy(true); setError('')
-    const { error: decisionError } = await supabaseClient.rpc('archive_operator_decide_review_item', {
-      p_item_id: selected.review_item_id,
-      p_decision: decision,
-      p_note: reviewNote.trim() || null,
-    })
-    if (decisionError) setError('검토 결정을 저장하지 못했습니다.')
-    else await loadDetail()
-    setBusy(false)
-  }, [loadDetail, reviewNote, selected])
-
-  const saveDraft = useCallback(async () => {
-    if (!supabaseClient || !selected || !draftBrief || !draftEditable) return
-    setBusy(true); setSavingDraft(true); setError('')
-    const { data, error: saveError } = await supabaseClient.rpc('archive_operator_knowledge_draft_save', {
-      p_job_id: selected.job_id,
-      p_expected_revision: draftRevision,
-      p_draft_brief: draftBrief,
-    })
-    if (saveError) {
-      setError(saveError.message.includes('REVISION_CONFLICT')
-        ? '다른 편집본이 먼저 저장되었습니다. 새로고침 후 다시 확인하세요.'
-        : '초안을 저장하지 못했습니다. 필수 항목과 미디어 URL을 확인하세요.')
-    } else {
-      const saved = data as { revision: number; brief: KnowledgeDraftBrief }
-      setDraftRevision(saved.revision)
-      setDraftBrief(cloneBrief(saved.brief))
-      setDraftDirty(false)
-      setEditing(false)
-    }
-    setSavingDraft(false); setBusy(false)
-  }, [draftBrief, draftEditable, draftRevision, selected])
-
-  const uploadDraftImage = useCallback(async (file: File) => {
-    if (!supabaseClient || !selected) throw new Error('KNOWLEDGE_IMAGE_EDITOR_NOT_READY')
-    return uploadKnowledgeImage(supabaseClient, selected.job_id, file)
-  }, [selected])
-
-  const publishDraft = useCallback(async () => {
-    if (knowledgeEvidenceGate(selected?.result).blockers.length > 0) {
-      setError('해결되지 않은 출처·근거 검증이 있습니다. 초안 수정은 저장할 수 있지만 이 상태로 공개 승인하면 게시 안전검사를 통과하지 못합니다.')
-      return
-    }
-    // A checked priority review is explicit human action, not an automatic QA pass.
-    if (!supabaseClient || !selected || !draftEditable || !draftBrief
-      || reviewTargets.length === 0 || !reviewTargets.every((target) => reviewed[target.key] === true)) return
-    setBusy(true); setSavingDraft(true); setError(''); setPublicationNotice('')
-    try {
-      // Exact revision + approved content are bound by the existing RPC contract.
-      const checkedBrief = { ...draftBrief, semantic_qa_status: 'PASS' }
-      const { data, error: saveError } = await supabaseClient.rpc('archive_operator_knowledge_draft_save', {
-        p_job_id: selected.job_id,
-        p_expected_revision: draftRevision,
-        p_draft_brief: checkedBrief,
-      })
-      if (saveError) {
-        setError(saveError.message.includes('REVISION_CONFLICT')
-          ? '다른 편집본이 먼저 저장되었습니다. 새로고침한 뒤 다시 확인하세요.'
-          : '검토 내용을 저장하지 못했습니다. 수정 내용과 필수 필드를 확인하세요.')
-        return
-      }
-      const saved = data as { revision: number; brief: KnowledgeDraftBrief }
-      setDraftBrief(cloneBrief(saved.brief))
-      setDraftRevision(saved.revision)
-      setDraftDirty(false)
-      const { data: approvalData, error: publishError } = await supabaseClient.rpc('archive_operator_knowledge_publish', {
-        p_job_id: selected.job_id,
-        p_expected_revision: saved.revision,
-        p_note: reviewNote.trim() || null,
-      })
-      if (publishError) {
-        setError('검토 내용은 저장됐지만 공개 승인을 마치지 못했습니다. 승인 조건과 기존 게시 이력을 확인하세요.')
-        return
-      }
-      const dispatch = (approvalData as { publication_dispatch?: string } | null)?.publication_dispatch
-      setPublicationNotice(dispatch === 'QUEUED_FOR_VERIFICATION'
-        ? '검토가 완료되어 즉시 게시 검증을 요청했습니다. 검증 통과 후 실제 홈페이지 배포를 진행합니다.'
-        : '검토 승인은 저장됐습니다. 즉시 요청 확인이 필요해 기존 예약 재시도도 유지합니다.')
-      await loadDetail()
-    } finally {
-      setSavingDraft(false); setBusy(false)
-    }
-  }, [draftBrief, draftEditable, draftRevision, loadDetail, reviewNote, reviewed, reviewTargets, selected])
-
-  useEffect(() => {
-    if (selected?.review_status !== 'APPROVED' || selected.status === 'PUBLISHED') return
-    const timer = window.setInterval(() => { void loadDetail() }, 15000)
-    return () => window.clearInterval(timer)
-  }, [selected?.review_status, selected?.status, loadDetail])
-
-  const evidenceGate = knowledgeEvidenceGate(selected?.result)
-
-  return <section className="operator-page knowledge-detail-page">
-    <header className="operator-heading">
-      <div>
-        <p className="archive-eyebrow">SURVIVAL DIARY · KNOWLEDGE DETAIL</p>
-        <h1>{selected?.title ?? selected?.brief_id ?? 'Knowledge 글감'}</h1>
-        <p>{email} · 이 페이지에서 글을 읽고, 검토 대상이면 편집·미디어 추가·공개 승인을 처리합니다.</p>
-      </div>
-      <div className="operator-heading-actions">
-        <a className="operator-secondary" href="/operator/knowledge/">← Knowledge Inbox</a>
-        <a className="operator-secondary" href="/operator/">대시보드</a>
-        <button className="operator-secondary" disabled={parentBusy || busy} onClick={onSignOut}>로그아웃</button>
-      </div>
-    </header>
-
-    {error && <p className="operator-error" role="alert">{error}</p>}
-    {publicationNotice && <p className="operator-success" role="status">{publicationNotice}</p>}
-    {busy && !selected && <section className="operator-panel"><p className="operator-muted" aria-live="polite">글을 불러오는 중…</p></section>}
-    {!busy && !selected && !error && <section className="operator-panel"><p className="operator-empty">해당 글감을 찾을 수 없습니다.</p></section>}
-
-    {selected && <section className="operator-panel operator-detail knowledge-operator-detail knowledge-detail-card">
-      <div className="knowledge-detail-status">
-        <span>{knowledgeBucketLabel[knowledgeBucketFor(selected)]}</span>
-        <span>{selected.result_decision ?? selected.status}</span>
-        <span>{selected.risk_level ?? '위험도 미정'}</span>
-      </div>
-
-      {selected.status === 'PUBLISHED' && <p className="knowledge-review-complete-hint" role="status">저장소 반영 완료 · 실제 공개 사이트 배포는 별도로 확인해야 합니다.</p>}
-      {selected.review_status === 'APPROVED' && selected.status !== 'PUBLISHED' && <p className="knowledge-review-complete-hint" role="status">
-        사람 검토 승인은 저장되었습니다. 원문·근거 검증과 GitHub 병합을 통과하면 정규 배포 날짜를 기다리지 않고 즉시 공개 배포를 확인합니다. 검증에 실패하면 원고는 공개되지 않습니다.
-      </p>}
-
-      {selected.note && <p>{selected.note}</p>}
-      <dl>
-        <div><dt>Candidate</dt><dd>{selected.candidate_id ?? '아직 미작성'}</dd></div>
-        <div><dt>BRIEF</dt><dd>{selected.brief_id ?? '아직 미작성'}</dd></div>
-        <div><dt>원본 유형</dt><dd>{knowledgeSourceLabel(selected.source_kind)}</dd></div>
-        <div><dt>준비</dt><dd>{formatOperatorTime(selected.prepared_at)}</dd></div>
-        <div><dt>제출</dt><dd>{formatOperatorTime(selected.submitted_at)}</dd></div>
-        <div><dt>PR</dt><dd>{selected.final_pr_number ? `#${selected.final_pr_number}` : '—'}</dd></div>
-        <div><dt>차단 코드</dt><dd>{selected.code ?? selected.blocker_code ?? '없음'}</dd></div>
-        <div><dt>사람 검토</dt><dd>{selected.review_status ?? (selected.status === 'HUMAN_REVIEW' ? '검토 항목 준비 중' : '해당 없음')}</dd></div>
-      </dl>
-
-      {draftBrief && <>
-        <div className="knowledge-draft-toolbar">
-          <div>
-            <strong>{draftEditable ? '편집 가능한 완성 초안' : '글 미리보기'}</strong>
-            <small>{draftRevision > 0 ? `사람 편집본 r${draftRevision}` : 'AI 원본'}</small>
-          </div>
-          {draftEditable && <div>
-            <button className="operator-secondary" disabled={busy} onClick={() => setEditing((value) => !value)}>{editing ? '미리보기' : '편집'}</button>
-            <button type="button" disabled={busy || (!draftDirty && draftRevision > 0)} onClick={() => void saveDraft()}>{savingDraft ? '저장 중…' : '초안 저장'}</button>
-          </div>}
-        </div>
-
-        {draftEditable && <KnowledgeEvidenceGatePanel gate={evidenceGate} />}
-
-        {draftEditable && <KnowledgeReviewFocus
-          brief={draftBrief}
-          targets={reviewTargets}
-          aiNote={reviewAiNote}
-          reasonCode={reviewReasonCode}
-          reviewed={reviewed}
-          disabled={busy}
-          onChange={(target, text) => {
-            setDraftBrief((current) => current ? editReviewTarget(current, target, text) : null)
-            setDraftDirty(true)
-            setReviewed((current) => ({ ...current, [target.key]: false }))
-          }}
-          onReview={(key, checked) => setReviewed((current) => ({ ...current, [key]: checked }))}
-        />}
-
-        {editing && draftEditable
-          ? <KnowledgeDraftEditor
-              brief={draftBrief}
-              disabled={busy}
-              onChange={(next) => { setDraftBrief(next); setDraftDirty(true); setReviewed({}) }}
-              onUploadImage={uploadDraftImage}
-            />
-          : draftEditable
-            ? <details className="knowledge-full-preview"><summary>전체 글 펼쳐보기 · 최종 문맥 검토</summary><KnowledgeDraftPreview brief={draftBrief} /></details>
-            : <KnowledgeDraftPreview brief={draftBrief} />}
-
-        {draftEditable && <div className="operator-decision knowledge-publication-decision">
-          <label>검토 메모<textarea maxLength={1000} value={reviewNote} onChange={(event) => setReviewNote(event.target.value)} /></label>
-          <div>
-            <button disabled={busy || savingDraft || evidenceGate.blockers.length > 0 || reviewTargets.length === 0 || !reviewTargets.every((target) => reviewed[target.key])}
-              onClick={() => void publishDraft()}>휴먼체크 완료 · 바로 발행 요청</button>
-            <button className="operator-secondary" disabled={busy} onClick={() => void decideReview('HOLD')}>보류</button>
-            <button className="operator-danger" disabled={busy} onClick={() => void decideReview('REJECTED')}>거절</button>
-          </div>
-          <p className="knowledge-review-complete-hint">표시된 구간을 직접 확인·수정하고, 별도 근거 차단이 모두 해소되면 승인할 수 있습니다. 승인 시 편집본을 최신 revision으로 저장하고 검토 완료를 기록합니다. 기존 C3가 근거·계약 검증, PR·CI, 정확한 커밋 병합을 수행하며, 검증된 원고는 정규 배포를 기다리지 않고 공개를 시도합니다.</p>
-          <p className="operator-muted">사람 체크만으로 근거 충돌이나 국내 법령·전문가 확인 필요가 사라지지는 않습니다. 근거 검증이 통과하지 않으면 공개는 계속 보류됩니다.</p>
-          {draftDirty && <p className="operator-muted">편집 내용이 저장되지 않았습니다. '초안 저장' 또는 '휴먼체크 완료 · 바로 발행 요청'에서 정확한 수정본을 저장합니다.</p>}
-        </div>}
-      </>}
-
-      {!draftBrief && <p className="operator-empty">이 항목은 완성 BRIEF가 없는 HOLD/BLOCKED 기록입니다. 감사 기록으로 보관되며 편집 대상으로 승격하지 않습니다.</p>}
-
-      {selected.review_status && selected.review_status !== 'PENDING' && <p className="operator-muted">검토 결과: {selected.review_status}{selected.review_decision_note ? ` · ${selected.review_decision_note}` : ''}</p>}
-
-      <details><summary>기술 상세 · 원본 경로</summary><pre>{selected.source_ref ?? '—'}</pre></details>
-      <details><summary>Prepared context</summary><pre>{JSON.stringify(selected.context, null, 2)}</pre></details>
-      <details><summary>AI 원본 · Candidate / Evidence / BRIEF</summary><pre>{JSON.stringify(selected.result, null, 2)}</pre></details>
-    </section>}
-  </section>
+import './knowledgeEditorial.css'
+const copy=<T,>(v:T):T=>JSON.parse(JSON.stringify(v))
+export function OperatorKnowledgeDetail({jobId,email,busy:parentBusy,onSignOut}:{jobId:string;email?:string|null;busy:boolean;onSignOut:()=>void}) {
+ const [value,setValue]=useState<EditorialEnvelope|null>(null)
+ const [brief,setBrief]=useState<KnowledgeDraftBrief|null>(null)
+ const [review,setReview]=useState<EditorialReview>({claims:[],resolutions:[]})
+ const [issues,setIssues]=useState<EditorialIssue[]>([])
+ const [preview,setPreview]=useState(false)
+ const [dirty,setDirty]=useState(false)
+ const dirtyRef=useRef(false), operation=useRef(false), baseRevision=useRef(0)
+ const [conflict,setConflict]=useState<EditorialEnvelope|null>(null)
+ const [busy,setBusy]=useState(false),[error,setError]=useState(''),[code,setCode]=useState(''),[notice,setNotice]=useState('')
+ const [recovery,setRecovery]=useState<{revision:number;brief:KnowledgeDraftBrief;review:EditorialReview}|null>(null)
+ const cacheKey='knowledge-editor:'+email+':'+jobId
+ const adopt=useCallback(async(next:EditorialEnvelope,content=true)=>{
+  setValue(next)
+  if(content&&!dirtyRef.current){baseRevision.current=next.revision;setBrief(next.brief?{...readableBrief(next.brief,next.original),id:next.brief_id}:null);setReview(copy(next.evidence_review));setIssues(await editorialIssues(next.original))}
+ },[])
+ const load=useCallback(async(content=true)=>{
+  if(!supabaseClient)return
+  const response=await supabaseClient.rpc('archive_operator_knowledge_editor_get',{p_job_id:jobId})
+  if(response.error)throw Error(response.error.message)
+  if((response.data as EditorialEnvelope).job_id!==jobId)throw Error('KNOWLEDGE_EDITOR_IDENTITY_MISMATCH')
+  const next=response.data as EditorialEnvelope
+  await adopt(next,content)
+  if(next.status==='PUBLISHED'&&next.brief&&!publicationActive(next.request))void observeLegacyPublic(readableBrief((next.original?.brief??next.brief) as KnowledgeDraftBrief,next.original)).then(public_verified=>setValue(current=>current?.job_id===next.job_id&&current.revision===next.revision?{...current,public_verified}:current))
+ },[jobId,adopt])
+ useEffect(()=>{
+  dirtyRef.current=false;setDirty(false);setValue(null);setBrief(null);setBusy(true)
+  void load().catch(e=>{setCode(e.message);setError(editorialError(e.message))}).finally(()=>setBusy(false))
+  try{const stored=sessionStorage.getItem(cacheKey);if(stored)setRecovery(JSON.parse(stored))}catch{}
+ },[load,cacheKey])
+ const change=(next:KnowledgeDraftBrief,nextReview=review)=>{
+  setBrief(next);setReview(nextReview);dirtyRef.current=true;setDirty(true);setNotice('수정 중 · 아직 저장되지 않았습니다.')
+  try{sessionStorage.setItem(cacheKey,JSON.stringify({revision:baseRevision.current,brief:next,review:nextReview}))}catch{setNotice('이 브라우저에 복구본을 보관하지 못했습니다. 저장 버튼으로 서버에 저장하세요.')}
+ }
+ const changeReview=(next:EditorialReview)=>{if(brief)change(brief,next)}
+ useEffect(()=>{
+  if(!dirty)return
+  const warn=(e:BeforeUnloadEvent)=>{e.preventDefault();e.returnValue=''}
+  window.addEventListener('beforeunload',warn);return()=>window.removeEventListener('beforeunload',warn)
+ },[dirty])
+ useEffect(()=>{
+  if(!publicationActive(value?.request))return
+  const timer=window.setInterval(()=>{void load(false).catch(()=>setNotice('진행 상태를 갱신하지 못했습니다. 수정본은 보존돼 있습니다.'))},8000)
+  return()=>window.clearInterval(timer)
+ },[value?.request?.request_id,value?.request?.status,load])
+ const run=async(fn:()=>Promise<void>)=>{
+  if(operation.current)return
+  operation.current=true;setBusy(true);setError('');setCode('')
+  try{await fn()}catch(e){const message=e instanceof Error?e.message:'';setCode(message);setError(editorialError(message))}finally{operation.current=false;setBusy(false)}
+ }
+ const save=async()=>{
+  if(!supabaseClient||!value||!brief)throw Error('KNOWLEDGE_EDITOR_BRIEF_REQUIRED')
+  const {data,error:err}=await supabaseClient.rpc('archive_operator_knowledge_editor_save',{p_job_id:jobId,p_expected_revision:baseRevision.current,p_brief:brief,p_evidence_review:review})
+  if(err){if(err.message.includes('REVISION_CONFLICT')){const latest=await supabaseClient.rpc('archive_operator_knowledge_editor_get',{p_job_id:jobId});if(!latest.error)setConflict(latest.data as EditorialEnvelope)}throw Error(err.message)}
+  dirtyRef.current=false;setDirty(false);sessionStorage.removeItem(cacheKey);setRecovery(null);setConflict(null)
+  await adopt(data as EditorialEnvelope);setNotice('저장됨');return data as EditorialEnvelope
+ }
+ const request=async(publish:boolean)=>{
+  if(!supabaseClient||!value)return
+  const saved=dirty||value.revision===0||JSON.stringify(brief)!==JSON.stringify(value.brief)?await save():value
+  const {error:err}=await supabaseClient.rpc('archive_operator_knowledge_editor_request',{p_job_id:jobId,p_expected_revision:saved.revision,p_publish:publish})
+  if(err)throw Error(err.message)
+  setNotice(publish?'현재 저장본으로 발행을 요청했습니다. 실제 공개 확인까지 진행 상황을 표시합니다.':'현재 수정본으로 재검사를 요청했습니다. 공개하지 않습니다.')
+  await load(false)
+ }
+ const action=async(name:'ARCHIVE'|'RESTORE')=>{
+  if(!supabaseClient)return
+  if(dirty&&name==='ARCHIVE')await save()
+  const {data,error:err}=await supabaseClient.rpc('archive_operator_knowledge_editor_action',{p_job_id:jobId,p_action:name})
+  if(err)throw Error(err.message)
+  await adopt(data as EditorialEnvelope);setNotice(name==='ARCHIVE'?'보관했습니다. 원고와 이력은 그대로 남습니다.':'편집을 위해 복원했습니다. 아직 발행되지 않았습니다.');return data as EditorialEnvelope
+ }
+ const connectedIssues=brief?issues.map(issue=>({...issue,quote:review.resolutions.find(r=>r.key===issue.key)?.quote??issue.quote??''})).filter(issue=>quoteLocations(brief,issue.quote)===1):[]
+ const highlights=connectedIssues.map(issue=>issue.quote)
+ const jumpToQuote=(quote:string)=>{
+  setPreview(false)
+  window.requestAnimationFrame(()=>{
+   const fields=Array.from(document.querySelectorAll<HTMLInputElement|HTMLTextAreaElement>('.knowledge-draft-editor input:not([type=file]),.knowledge-draft-editor textarea')).filter(field=>field.value.includes(quote))
+   if(fields.length!==1||fields[0].value.split(quote).length!==2){setNotice('현재 본문에서 한 위치를 확정할 수 없습니다. 인용문을 다시 확인하세요.');return}
+   const field=fields[0];field.focus();field.scrollIntoView({block:'center',behavior:'smooth'});try{const start=field.value.indexOf(quote);field.setSelectionRange(start,start+quote.length)}catch{}
+  })
+ }
+ const timedOut=!!value?.request&&Date.now()-Date.parse(value.request.updated_at)>35*60000
+ const active=publicationActive(value?.request), locked=busy||parentBusy||active||value?.archived
+ const updateResolution=(issue:EditorialIssue,patch:Partial<EditorialResolution>)=>{
+  const next=copy(review),existing=next.resolutions.find(r=>r.key===issue.key)
+  if(existing)Object.assign(existing,patch)
+  else next.resolutions.push({key:issue.key,method:'UNRESOLVED',quote:issue.quote??'',reason:'',source_ids:[],...patch})
+  changeReview(next)
+ }
+ const result=value?.request?.result
+ const lastError=result?.reason&&['FAILED','RETRYABLE'].includes(value?.request?.status??'')?editorialError(result.reason):''
+ const originalBrief=value?.original?.brief as KnowledgeDraftBrief|undefined
+ const unknownRights=value?.origin_kind==='LEGACY_PUBLIC'||(value?.original?.evidence as {copyright_status?:string}|undefined)?.copyright_status!=='CLEAR'||JSON.stringify(brief?.sources)!==JSON.stringify(originalBrief?.sources)
+ const publicUrl=value?.public_record?.result?.public_url??result?.public_url??(value?.status==='PUBLISHED'&&value.public_verified&&brief?.slug?'https://survival-diary-archive.netlify.app/knowledge/'+brief.slug+'/':null)
+ return <section className="operator-page knowledge-editor-page">
+  <header className="operator-heading"><div><h1>{brief?.title||'글 관리'}</h1><p>{value?editorialStatus(value):'불러오는 중…'} · {dirty?'수정 중':value?.updated_at?'저장 '+formatOperatorTime(value.updated_at):''}</p></div><nav><a href={'/operator/knowledge/'+(sessionStorage.getItem('knowledge-list-query')??'')}>← 글 목록</a> <a href="/operator/">대시보드</a> <button className="operator-secondary" disabled={busy} onClick={onSignOut}>로그아웃</button></nav></header>
+  {error&&<p role="alert" className="operator-error">{error}</p>}
+  {notice&&<p role="status" className="operator-muted">{notice}</p>}
+  {recovery&&<aside className="operator-panel"><p>이 브라우저에 저장하지 못한 수정 내용이 남아 있습니다. 최신 저장본을 덮어쓰지 않고 편집 화면으로 불러옵니다.</p><button disabled={!!locked} onClick={()=>{if(brief){baseRevision.current=recovery.revision;change(recovery.brief,recovery.review);setRecovery(null)}}}>수정본 복구</button><button onClick={()=>{sessionStorage.removeItem(cacheKey);setRecovery(null)}}>닫기</button></aside>}
+  {conflict&&<section className="operator-panel"><h2>다른 저장본과 비교</h2><p>아래는 서버에 먼저 저장된 최신 본문입니다. 현재 입력한 내용은 위 편집기에 보존돼 있습니다.</p>{conflict.brief&&<KnowledgeDraftPreview brief={readableBrief(conflict.brief,conflict.original)}/>}<button onClick={()=>{baseRevision.current=conflict.revision;setValue(conflict);setConflict(null);setError('');setNotice('최신 저장본을 확인했습니다. 현재 편집 내용을 다시 저장하면 새 수정본으로 기록합니다.')}}>최신 저장본을 확인하고 내 수정으로 이어가기</button></section>}
+  {value&&<>
+   <div className="knowledge-editor-actions" aria-label="글 작업">
+    <button aria-busy={busy} disabled={!!locked||!brief} onClick={()=>void run(async()=>{await save()})}>저장</button>
+    <button className="operator-secondary" disabled={!brief} onClick={()=>setPreview(v=>!v)}>{preview?'편집':'미리보기'}</button>
+    <button disabled={!!locked||!brief} onClick={()=>void run(()=>request(true))}>발행</button>
+    {!value.archived&&<button className="operator-secondary" disabled={busy||active} onClick={()=>void run(async()=>{await action('ARCHIVE')})}>보관</button>}
+    {value.archived&&<button disabled={busy} onClick={()=>void run(async()=>{await action('RESTORE')})}>복원</button>}
+    {value.request&&['QUEUED','CHECKING'].includes(value.request.status)&&<button className="operator-secondary" disabled={busy} onClick={()=>void run(async()=>{const response=await supabaseClient!.rpc('archive_operator_knowledge_editor_cancel',{p_request_id:value.request!.request_id});if(response.error)throw Error(response.error.message);await load(false);setNotice('요청을 취소했습니다. 수정본과 처리 이력은 보존됩니다.')})}>요청 취소</button>}
+    {(timedOut||result&&['FAILED','RETRYABLE'].includes(value.request?.status??''))&&<button disabled={busy||dirty} onClick={()=>void run(()=>request(value.request?.publish_requested??false))}>다시 시도</button>}
+   </div>
+   {active&&<section className="operator-panel" aria-live="polite"><h2>{editorialStatus(value)}</h2><p>{value.request?.publish_requested?'승인한 저장본을 검사하고 공개 여부를 확인하고 있습니다. 요청 접수와 검사 성공만으로 게시 완료로 표시하지 않습니다.':'현재 저장본을 검사하고 있습니다. 검사 요청은 발행 승인이 아닙니다.'}</p><p>{timedOut?'처리 응답이 늦어지고 있습니다. 다시 시도하면 기존 병합·공개 결과부터 확인하여 중복 게시를 막습니다.':'검증 단계에서 오류가 나면 이 화면에 수정 방법을 표시합니다.'}</p></section>}
+   {lastError&&<section role="alert" className="operator-panel"><h2>발행을 완료하지 못했습니다</h2><p>{lastError}</p><p>기존 공개본과 수정본은 유지됩니다.</p></section>}
+   {publicUrl&&<section className="operator-panel"><h2>{value.request?.status==='PUBLISHED'?'게시됨':'기존 공개본'}</h2><a href={publicUrl} target="_blank" rel="noreferrer">공개 글 보기 ↗</a> <button className="operator-secondary" onClick={()=>void navigator.clipboard.writeText(publicUrl).then(()=>setNotice('주소를 복사했습니다.')).catch(()=>setNotice(publicUrl))}>주소 복사</button></section>}
+   {value.archived&&<aside className="operator-panel"><h2>보관된 {brief?'원고':'글감'}</h2><p>{String(value.original?.note??'과거 처리 결과로 보관돼 있습니다. 복원하면 같은 편집기로 이어집니다.')}</p><p>복원은 편집 시작이며 공개 승인이 아닙니다.</p>{value.related_public?.map(link=><p key={link.url}><a href={link.url} target="_blank" rel="noreferrer">{link.title} · 관련 기존 글 보기</a></p>)}</aside>}
+   {!brief&&<section className="operator-panel"><h2>원고 미작성</h2><p>원본과 보류 이유는 아래 기술 정보에서 확인할 수 있습니다. 새 초안은 직접 작성하며 자동 발행되지 않습니다.</p><p>{String(value.original?.note??'아직 완성 본문이 없습니다.')}</p><button disabled={busy} onClick={()=>void run(async()=>{const restored=await action('RESTORE');if(!restored)throw Error('KNOWLEDGE_EDITOR_RESTORE_REQUIRED');change(editorialTemplate(restored));setNotice('새 초안입니다. 본문과 근거를 작성한 뒤 검토하세요.')})}>초안 만들기 · 직접 작성</button></section>}
+   {brief&&<>
+    {result?.issues?.length? <section className="operator-panel" aria-label="검사 결과"><h2>문제 {result.issues.length}개 확인</h2><ul>{result.issues.map(issue=><li key={issue.key}><a href={issues.some(original=>original.key===issue.key)?'#problem-'+issue.key:'#knowledge-editor-body'}>{issue.message}</a>{issue.action&&<p>{issue.action}</p>}</li>)}</ul></section>:null}
+    <section className="operator-panel knowledge-editor-body" id="knowledge-editor-body">
+     <h2>{preview?'글 미리보기':'본문 편집'}</h2>{!preview&&!value.archived&&highlights.length>0&&<details open><summary>문제 위치를 표시한 본문</summary><KnowledgeDraftPreview brief={brief} highlights={highlights}/></details>}
+     {preview||value.archived?<KnowledgeDraftPreview brief={brief} highlights={highlights}/>:<KnowledgeDraftEditor brief={brief} issues={connectedIssues} disabled={!!locked} onChange={change} onUploadImage={supabaseClient?file=>uploadKnowledgeImage(supabaseClient!,jobId,file):undefined}/>}
+    </section>
+    <section className="operator-panel" aria-label="문제와 해결"><h2>확인할 부분과 해결 방법</h2><p>원본의 판단은 보존됩니다. 아래에 현재 본문과 근거를 연결해 재검사를 요청하세요. 체크만으로 사실·권한·안전 검증을 통과시키지 않습니다.</p>
+     {issues.map(issue=>{const r=review.resolutions.find(v=>v.key===issue.key),quote=r?.quote??issue.quote??'',locations=quoteLocations(brief,quote);return <article className="knowledge-editor-issue" id={'problem-'+issue.key} key={issue.key}>
+      <h3>{locations===1?'현재 본문에 연결된 구간':'글 전체의 적용 범위 확인'}</h3>
+      {quote&&<p>{locations===1?<mark>{quote}</mark>:<>{quote} <b>— 현재 문장에 정확히 연결되지 않았습니다.</b></>}</p>}
+      {locations===1&&!value.archived&&<button className="operator-secondary" onClick={()=>jumpToQuote(quote)}>해당 문장 수정</button>}
+      <strong>AI가 확인을 요청한 이유</strong><p>{issue.reason}</p>
+      <p>해당 문장 수정·삭제는 위 본문에서 할 수 있습니다. 정확한 위치가 없는 과거 지적을 특정 문장의 오류로 단정하지 않습니다.</p>
+      <label>해결 방법<select disabled={!!locked} value={r?.method??'UNRESOLVED'} onChange={e=>updateResolution(issue,{method:e.target.value})}><option value="UNRESOLVED">미해결 · 보류</option><option value="REMOVED">해당 주장 삭제</option><option value="SUPPORTED">공식 근거로 확인</option><option value="SITE_CONDITION">현장별 확인 조건으로 범위 제한</option><option value="STATED_LIMIT">본문에 설명한 적용 한계</option></select></label>
+      <label>{r?.method==='REMOVED'?'삭제한 원문 인용':'현재 본문에 있는 정확한 문장'}<textarea disabled={!!locked} value={quote} onChange={e=>updateResolution(issue,{quote:e.target.value})}/></label>
+      <label>판단 이유와 남은 한계<textarea disabled={!!locked} value={r?.reason??''} onChange={e=>updateResolution(issue,{reason:e.target.value})}/></label>
+      <label>근거 출처<select multiple disabled={!!locked} value={r?.source_ids??[]} onChange={e=>updateResolution(issue,{source_ids:Array.from(e.target.selectedOptions).map(o=>o.value)})}>{(brief.sources??[]).map(s=><option key={s.id} value={s.id}>{s.title||'제목 없는 출처'}</option>)}</select></label>
+      <small>{r&&r.method!=='UNRESOLVED'?'판단 기록됨 · 현재 수정본 재검사 필요':'남은 문제 · 아직 해결되지 않았습니다.'}</small>
+     </article>})}
+     {!issues.length&&<p>원본에 등록된 미확인·충돌 항목은 없습니다. 현재 수정본의 출처와 본문 검사는 계속 수행합니다.</p>}
+     <button disabled={!!locked} onClick={()=>void run(()=>request(false))}>현재 수정본 재검사</button>
+    </section>
+    <section className="operator-panel" aria-label="주장과 근거">{value.status==='HOLD'&&<label>기존 글과 다른 질문·추가할 내용<textarea disabled={!!locked} value={review.duplicate_note??''} onChange={e=>changeReview({...review,duplicate_note:e.target.value})}/></label>}<h2>본문 주장과 근거</h2><p>공식 자료가 확인하는 내용과 한계를 기록합니다. 현실 주장에 작품 속 서사를 근거로 사용하지 않습니다.</p>
+     {review.claims.map((claim,i)=><fieldset key={i}><legend>주장 {i+1}</legend><label>주장의 용도<select disabled={!!locked} value={claim.role??'REAL'} onChange={e=>{const next=copy(review);next.claims[i].role=e.target.value as 'REAL'|'NARRATIVE';changeReview(next)}}><option value="REAL">현실 안내의 근거</option><option value="NARRATIVE">작품 속 질문의 출발점만</option></select></label>{(['claim','context','limitation'] as const).map(field=><label key={field}>{{claim:'주장 문장',context:'자료가 뒷받침하는 범위',limitation:'적용 한계'}[field]}<textarea disabled={!!locked} value={claim[field]??''} onChange={e=>{const next=copy(review);next.claims[i][field]=e.target.value;changeReview(next)}}/></label>)}<label>연결할 출처<select multiple disabled={!!locked} value={claim.source_ids??[]} onChange={e=>{const next=copy(review);next.claims[i].source_ids=Array.from(e.target.selectedOptions).map(o=>o.value);changeReview(next)}}>{(brief.sources??[]).map(s=><option key={s.id} value={s.id}>{s.title||'제목 없는 출처'}</option>)}</select></label><button disabled={!!locked} onClick={()=>{const next=copy(review);next.claims.splice(i,1);changeReview(next)}}>주장 삭제</button></fieldset>)}
+     <button disabled={!!locked} onClick={()=>changeReview({...review,claims:[...review.claims,{claim:'',context:'',limitation:'',source_ids:[]}]})}>주장 추가</button>
+     {unknownRights&&<><h3>출처 이용조건 확인</h3><p>이용조건 원문에서 재사용 허용 범위를 검사합니다. 이 입력만으로 저작권이 확인된 것으로 표시하지 않습니다.</p>{(brief.sources??[]).map(source=>{const proof=review.rights?.find(r=>r.source_id===source.id);const update=(field:'url'|'quote',text:string)=>{const next=copy(review);next.rights??=[];let item=next.rights.find(r=>r.source_id===source.id);if(!item){item={source_id:source.id??'',url:'',quote:''};next.rights.push(item)}item[field]=text;changeReview(next)};return <fieldset key={source.id}><legend>{source.title}</legend><label>공식 이용조건 주소<input disabled={!!locked} type="url" value={proof?.url??''} onChange={e=>update('url',e.target.value)}/></label><label>재사용 허용 범위의 정확한 원문<textarea disabled={!!locked} value={proof?.quote??''} onChange={e=>update('quote',e.target.value)}/></label></fieldset>})}</>}
+    </section>
+    <details className="operator-panel"><summary>원문 비교 · 수정본 복구</summary>{originalBrief&&<><h3>{value.origin_kind==='LEGACY_PUBLIC'?'기존 공개 원본':'AI 원본'}</h3><KnowledgeDraftPreview brief={readableBrief(originalBrief,value.original)}/></>}<h3>저장 이력</h3>{value.history.map(version=><button key={version.revision} disabled={!!locked} onClick={()=>void run(async()=>{const response=await supabaseClient!.rpc('archive_operator_knowledge_editor_version',{p_job_id:jobId,p_revision:version.revision});if(response.error)throw Error(response.error.message);change(response.data.brief,response.data.evidence_review);setNotice('이전 저장본을 편집 화면에 불러왔습니다. 저장하면 새 수정본으로 남습니다.')})}>{formatOperatorTime(version.created_at)} 저장본 불러오기</button>)}</details>
+   </>}
+   <details className="operator-panel"><summary>기술 정보 · 원본과 처리 이력</summary><p>오류: {code||result?.reason||value.blocker_code||'없음'}</p><p>원본: {value.source_ref}</p><pre>{JSON.stringify({job_id:jobId,revision:value.revision,draft_sha256:value.draft_sha256,status:value.status,request:value.request,context:value.context,original:value.original},null,2)}</pre></details>
+  </>}
+ </section>
 }
